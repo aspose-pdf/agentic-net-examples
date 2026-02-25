@@ -6,61 +6,60 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf      = "input.pdf";
-        const string encryptedPdf  = "encrypted.pdf";
-        const string decryptedPdf  = "decrypted.pdf";
-        const string htmlOutput    = "output.html";
-        const string userPassword  = "user123";
-        const string ownerPassword = "owner123";
+        const string inputPath      = "input.pdf";
+        const string encryptedPath  = "encrypted.pdf";
+        const string decryptedPath  = "decrypted.pdf";
+        const string htmlOutputPath = "output.html";
+        const string userPassword   = "user123";
+        const string ownerPassword  = "owner123";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Not found: {inputPath}");
             return;
         }
 
         try
         {
-            // ---------- Encrypt ----------
-            using (Document doc = new Document(inputPdf))
+            // Encrypt the PDF
+            using (Document doc = new Document(inputPath))
             {
-                // Set permissions and encryption algorithm (AES‑256 recommended)
                 Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
-                doc.Save(encryptedPdf); // Save encrypted PDF
+                doc.Save(encryptedPath);
             }
 
-            // ---------- Decrypt ----------
-            using (Document encDoc = new Document(encryptedPdf, userPassword))
+            // Decrypt the PDF
+            using (Document encDoc = new Document(encryptedPath, userPassword))
             {
-                encDoc.Decrypt();               // No parameters needed
-                encDoc.Save(decryptedPdf);      // Save decrypted PDF
+                encDoc.Decrypt(); // No parameters
+                encDoc.Save(decryptedPath);
             }
 
-            // ---------- Convert to HTML (Windows‑only, GDI+ required) ----------
-            using (Document decDoc = new Document(decryptedPdf))
+            // Convert the decrypted PDF to HTML (Windows‑only GDI+ operation)
+            using (Document decDoc = new Document(decryptedPath))
             {
                 HtmlSaveOptions htmlOpts = new HtmlSaveOptions
                 {
-                    // Embed all resources into a single HTML file
-                    PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
-                    // Save raster images as PNG embedded in SVG (cross‑platform friendly)
+                    PartsEmbeddingMode     = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
                     RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
                 };
-
                 try
                 {
-                    decDoc.Save(htmlOutput, htmlOpts);
-                    Console.WriteLine($"HTML saved to '{htmlOutput}'.");
+                    decDoc.Save(htmlOutputPath, htmlOpts);
+                    Console.WriteLine($"HTML saved to '{htmlOutputPath}'.");
                 }
                 catch (TypeInitializationException)
                 {
-                    // GDI+ not available on non‑Windows platforms
                     Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
                 }
             }
 
             Console.WriteLine("Encrypt/Decrypt/HTML conversion completed.");
+        }
+        catch (InvalidPasswordException ex)
+        {
+            Console.Error.WriteLine($"Password error: {ex.Message}");
         }
         catch (Exception ex)
         {

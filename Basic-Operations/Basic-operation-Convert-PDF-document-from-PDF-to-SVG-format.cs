@@ -1,12 +1,14 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;   // All SaveOptions (including SvgSaveOptions) are in this namespace
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
+        // Input PDF file path
+        const string inputPdf = "input.pdf";
+        // Desired output SVG file path
         const string outputSvg = "output.svg";
 
         // Verify that the source PDF exists
@@ -16,16 +18,16 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Wrap the Document in a using block for deterministic disposal
         using (Document pdfDoc = new Document(inputPdf))
         {
-            // Initialize SVG save options (required to ensure non‑PDF output)
+            // Initialise SVG save options (required to actually produce SVG)
             SvgSaveOptions svgOptions = new SvgSaveOptions();
 
-            // Convert and save the PDF as an SVG file
+            // Save the PDF as SVG using the explicit options
             pdfDoc.Save(outputSvg, svgOptions);
         }
 
-        Console.WriteLine($"SVG file saved to '{outputSvg}'.");
+        Console.WriteLine($"PDF successfully converted to SVG: {outputSvg}");
     }
 }

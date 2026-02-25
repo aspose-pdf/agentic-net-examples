@@ -7,10 +7,11 @@ class Program
 {
     static void Main()
     {
+        // Input and output PDF file paths
         const string inputPdf  = "input.pdf";
         const string outputPdf = "output.pdf";
 
-        // Verify input file exists
+        // Verify that the input file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Not found: {inputPdf}");
@@ -27,12 +28,12 @@ class Program
                 Console.WriteLine($"Author: {doc.Info.Author}");
                 Console.WriteLine($"Title:  {doc.Info.Title}");
 
-                // Extract all text using TextAbsorber
+                // Extract all text from the document using TextAbsorber
                 TextAbsorber absorber = new TextAbsorber();
                 doc.Pages.Accept(absorber);
                 Console.WriteLine($"Text characters: {absorber.Text.Length}");
 
-                // Save the (potentially modified) document
+                // Save the (potentially modified) document to the output path
                 doc.Save(outputPdf);
             }
 

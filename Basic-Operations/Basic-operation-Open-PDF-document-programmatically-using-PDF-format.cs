@@ -1,31 +1,25 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Path to the PDF file you want to open
-        string inputFile = "sample.pdf";
+        const string inputPath = "sample.pdf";
 
-        // Verify that the file exists to avoid FileNotFoundException
-        if (!File.Exists(inputFile))
+        if (!File.Exists(inputPath))
         {
-            Console.WriteLine($"Error: File not found -> {Path.GetFullPath(inputFile)}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document using the Aspose.Pdf.Document constructor
-        Aspose.Pdf.Document pdfDocument = new Aspose.Pdf.Document(inputFile);
-
-        // Example operation: output the number of pages in the document
-        Console.WriteLine($"PDF loaded successfully. Page count: {pdfDocument.Pages.Count}");
-
-        // (Optional) Save a copy of the opened document to demonstrate saving
-        string outputFile = "copy.pdf";
-        pdfDocument.Save(outputFile);
-        Console.WriteLine($"Document saved as: {Path.GetFullPath(outputFile)}");
+        // Open the PDF document; the using block ensures proper disposal
+        using (Document pdfDoc = new Document(inputPath))
+        {
+            // Example operations: display page count and title metadata
+            Console.WriteLine($"Pages: {pdfDoc.Pages.Count}");
+            Console.WriteLine($"Title: {pdfDoc.Info.Title}");
+        }
     }
 }

@@ -6,29 +6,33 @@ class Program
 {
     static void Main()
     {
-        // Input CGM files (treated as source PDFs after loading)
-        const string firstCgm  = "first.cgm";
-        const string secondCgm = "second.cgm";
-        const string outputPdf = "merged.pdf";
+        // Input CGM files to be merged (order matters)
+        string[] cgmFiles = { "input1.cgm", "input2.cgm", "input3.cgm" };
+        const string outputPdf = "merged_output.pdf";
 
-        // Verify input files exist
-        if (!File.Exists(firstCgm) || !File.Exists(secondCgm))
+        // Verify that all input files exist
+        foreach (string path in cgmFiles)
         {
-            Console.Error.WriteLine("One or more input CGM files not found.");
-            return;
+            if (!File.Exists(path))
+            {
+                Console.Error.WriteLine($"File not found: {path}");
+                return;
+            }
         }
 
-        // Load CGM files using CgmLoadOptions (CGM is input‑only)
-        CgmLoadOptions loadOptions = new CgmLoadOptions();
-
-        // Merge using nested using blocks to ensure deterministic disposal
-        using (Document target = new Document(firstCgm, loadOptions))
-        using (Document source = new Document(secondCgm, loadOptions))
+        // Load the first CGM as the target document
+        using (Document target = new Document(cgmFiles[0], new CgmLoadOptions()))
         {
-            // Append all pages from source to target
-            target.Pages.Add(source.Pages);
+            // Load each subsequent CGM and append its pages to the target
+            for (int i = 1; i < cgmFiles.Length; i++)
+            {
+                using (Document source = new Document(cgmFiles[i], new CgmLoadOptions()))
+                {
+                    target.Pages.Add(source.Pages);
+                }
+            }
 
-            // Save the merged result as PDF
+            // Save the merged result as a PDF
             target.Save(outputPdf);
         }
 

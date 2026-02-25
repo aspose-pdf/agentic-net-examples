@@ -7,55 +7,41 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string inputPdf   = "input.pdf";
         const string outputHtml = "output.html";
 
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
-            return;
-        }
+        if (!File.Exists(inputPdf)) { Console.Error.WriteLine($"Not found: {inputPdf}"); return; }
 
         try
         {
-            // Load PDF inside a using block for deterministic disposal
             using (Document doc = new Document(inputPdf))
             {
-                // Basic document information
+                // Basic info
                 Console.WriteLine($"Pages: {doc.Pages.Count}");
-                Console.WriteLine($"Title: {doc.Info.Title}");
-                Console.WriteLine($"Author: {doc.Info.Author}");
 
-                // Extract all text using TextAbsorber (correct API)
-                TextAbsorber absorber = new TextAbsorber
-                {
-                    ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure)
-                };
+                // Extract text using TextAbsorber
+                TextAbsorber absorber = new TextAbsorber();
                 doc.Pages.Accept(absorber);
-                Console.WriteLine($"Extracted text length: {absorber.Text.Length}");
+                Console.WriteLine($"Text characters: {absorber.Text.Length}");
 
-                // Save as HTML – must pass HtmlSaveOptions explicitly
+                // Save as HTML with explicit options (required for non-PDF output)
                 HtmlSaveOptions htmlOpts = new HtmlSaveOptions
                 {
-                    PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
+                    PartsEmbeddingMode     = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
                     RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
                 };
-
-                // HTML conversion uses GDI+; wrap in try‑catch for non‑Windows platforms
                 try
                 {
                     doc.Save(outputHtml, htmlOpts);
-                    Console.WriteLine($"HTML saved to '{outputHtml}'.");
+                    Console.WriteLine($"HTML → {outputHtml}");
                 }
                 catch (TypeInitializationException)
                 {
-                    Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
+                    // HTML conversion requires GDI+ (Windows only)
+                    Console.WriteLine("HTML requires Windows (GDI+). Skipped.");
                 }
             }
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        catch (Exception ex) { Console.Error.WriteLine($"Error: {ex.Message}"); }
     }
 }

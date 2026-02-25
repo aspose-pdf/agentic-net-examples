@@ -8,10 +8,10 @@ class Program
     {
         // Input PDF file path
         const string pdfPath = "input.pdf";
-        // Output HTML file (base name). When SplitIntoPages is true, multiple HTML files will be created.
+        // Output HTML file path (base name; multiple files will be created when splitting)
         const string htmlOutput = "output.html";
 
-        // Verify the input file exists
+        // Verify the source PDF exists
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
@@ -20,28 +20,28 @@ class Program
 
         try
         {
-            // Load the PDF inside a using block for deterministic disposal
+            // Load the PDF document inside a using block for deterministic disposal
             using (Document doc = new Document(pdfPath))
             {
                 // Configure HTML conversion options
                 HtmlSaveOptions options = new HtmlSaveOptions
                 {
-                    // Generate one HTML file per PDF page
+                    // Split each PDF page into a separate HTML file
                     SplitIntoPages = true,
-                    // Embed raster images as PNG inside SVG (cross‑platform safe)
+                    // Embed images as PNGs inside SVG to preserve quality
                     RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
                 };
 
-                // HTML conversion relies on GDI+ (Windows only); handle gracefully on other platforms
+                // HTML conversion relies on GDI+ and is Windows‑only.
+                // Wrap the save call in a try‑catch to handle non‑Windows platforms gracefully.
                 try
                 {
-                    // Save the PDF as HTML using the specified options
                     doc.Save(htmlOutput, options);
-                    Console.WriteLine("PDF split into separate HTML pages successfully.");
+                    Console.WriteLine("PDF successfully split into HTML pages.");
                 }
                 catch (TypeInitializationException)
                 {
-                    Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
+                    Console.WriteLine("HTML conversion requires Windows (GDI+). Operation skipped on this platform.");
                 }
             }
         }

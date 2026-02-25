@@ -6,40 +6,59 @@ class Program
 {
     static void Main()
     {
-        const string cgmInputPath   = "input.cgm";          // CGM source file
-        const string encryptedPath  = "encrypted.pdf";      // Encrypted PDF output
-        const string decryptedPath  = "decrypted.pdf";      // Decrypted PDF output
-        const string userPassword   = "user123";
-        const string ownerPassword  = "owner123";
+        // Input CGM file and intermediate/output paths
+        const string cgmPath        = "input.cgm";
+        const string pdfPath        = "output.pdf";
+        const string encryptedPath = "encrypted.pdf";
+        const string decryptedPath = "decrypted.pdf";
 
-        if (!File.Exists(cgmInputPath))
+        // Passwords for encryption/decryption
+        const string userPassword  = "user123";
+        const string ownerPassword = "owner123";
+
+        if (!File.Exists(cgmPath))
         {
-            Console.Error.WriteLine($"CGM file not found: {cgmInputPath}");
+            Console.Error.WriteLine($"CGM file not found: {cgmPath}");
             return;
         }
 
-        // Load CGM and convert to PDF, then encrypt
+        // -------------------------------------------------
+        // 1. Load CGM (input‑only format) and save as PDF
+        // -------------------------------------------------
         CgmLoadOptions loadOptions = new CgmLoadOptions(); // default A4 page size
-        using (Document doc = new Document(cgmInputPath, loadOptions))
+        using (Document doc = new Document(cgmPath, loadOptions))
         {
-            // Set desired permissions (example: allow printing and content extraction)
+            // Save the converted PDF
+            doc.Save(pdfPath);
+        }
+
+        // -------------------------------------------------
+        // 2. Encrypt the PDF using AES‑256
+        // -------------------------------------------------
+        using (Document doc = new Document(pdfPath))
+        {
+            // Define permissions (example: allow printing and content extraction)
             Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-            // Encrypt with AES-256
+            // Encrypt with user/owner passwords and AES‑256 algorithm
             doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-            // Save encrypted PDF
+            // Save the encrypted PDF
             doc.Save(encryptedPath);
         }
 
-        // Open the encrypted PDF, decrypt, and save the plain PDF
-        using (Document encryptedDoc = new Document(encryptedPath, userPassword))
+        // -------------------------------------------------
+        // 3. Decrypt the encrypted PDF
+        // -------------------------------------------------
+        using (Document encDoc = new Document(encryptedPath, userPassword))
         {
-            encryptedDoc.Decrypt();               // Decrypt in‑place
-            encryptedDoc.Save(decryptedPath);     // Save the decrypted version
+            // Decrypt (no parameters needed)
+            encDoc.Decrypt();
+
+            // Save the decrypted PDF
+            encDoc.Save(decryptedPath);
         }
 
-        Console.WriteLine($"Encryption complete: {encryptedPath}");
-        Console.WriteLine($"Decryption complete: {decryptedPath}");
+        Console.WriteLine("Encryption and decryption completed successfully.");
     }
 }

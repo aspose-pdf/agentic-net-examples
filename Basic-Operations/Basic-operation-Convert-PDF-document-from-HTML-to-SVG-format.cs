@@ -1,43 +1,39 @@
 using System;
 using System.IO;
-using Aspose.Pdf;   // HtmlLoadOptions, SvgSaveOptions, Document
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;   // Facades namespace as requested
 
 class Program
 {
     static void Main()
     {
-        const string htmlInput  = "input.html";
-        const string svgOutput  = "output.svg";
+        const string inputPdf  = "input.pdf";
+        const string outputSvg = "output.svg";
 
-        // Verify that the source HTML file exists
-        if (!File.Exists(htmlInput))
+        // Verify that the source PDF exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Source file not found: {htmlInput}");
+            Console.Error.WriteLine($"Source file not found: {inputPdf}");
             return;
         }
 
-        try
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // LoadOptions for HTML input
-            HtmlLoadOptions loadOptions = new HtmlLoadOptions();
+            // Optional: demonstrate usage of a Facades class (PdfConverter)
+            // Here we simply bind the document; no conversion is performed by the converter.
+            PdfConverter converter = new PdfConverter();
+            converter.BindPdf(pdfDoc);
+            // The converter can be closed when no longer needed.
+            converter.Close();
 
-            // SaveOptions for SVG output
-            SvgSaveOptions saveOptions = new SvgSaveOptions();
+            // Initialize SVG save options (no extra configuration needed for a basic conversion)
+            SvgSaveOptions svgOptions = new SvgSaveOptions();
 
-            // Perform conversion: HTML -> SVG
-            // Uses the static Document.Convert method (source file, load options, destination file, save options)
-            Document.Convert(htmlInput, loadOptions, svgOutput, saveOptions);
+            // Save the PDF as SVG using the options object.
+            pdfDoc.Save(outputSvg, svgOptions);
+        }
 
-            Console.WriteLine($"Conversion completed: '{svgOutput}'");
-        }
-        catch (TypeInitializationException)
-        {
-            // HTML conversion relies on GDI+ and is Windows‑only.
-            Console.WriteLine("HTML to SVG conversion requires Windows (GDI+). Skipped on this platform.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
-        }
+        Console.WriteLine($"PDF successfully converted to SVG: {outputSvg}");
     }
 }

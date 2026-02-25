@@ -1,37 +1,33 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Aspose.Pdf contains Document, Permissions, CryptoAlgorithm, etc.
 
 class Program
 {
     static void Main()
     {
-        // Paths for the original, encrypted, and decrypted PDF files
-        const string inputPath     = "input.pdf";
-        const string encryptedPath = "encrypted.pdf";
-        const string decryptedPath = "decrypted.pdf";
+        const string inputPath      = "input.pdf";
+        const string encryptedPath  = "encrypted.pdf";
+        const string decryptedPath  = "decrypted.pdf";
+        const string userPassword   = "user123";
+        const string ownerPassword  = "owner123";
 
-        // Passwords for encryption/decryption
-        const string userPassword  = "user123";
-        const string ownerPassword = "owner123";
-
-        // Verify the input file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         try
         {
             // ---------- Encrypt ----------
-            // Load the original PDF
+            // Open the source PDF, apply encryption, and save the encrypted file.
             using (Document doc = new Document(inputPath))
             {
-                // Set desired permissions (e.g., allow printing and content extraction)
+                // Define permissions (example: allow printing and content extraction)
                 Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-                // Apply encryption with AES-256 algorithm
+                // Encrypt using AES-256 (preferred algorithm)
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
                 // Save the encrypted PDF
@@ -39,24 +35,22 @@ class Program
             }
 
             // ---------- Decrypt ----------
-            // Open the encrypted PDF using the user password
+            // Open the encrypted PDF with the user password, decrypt it, and save the decrypted version.
             using (Document encDoc = new Document(encryptedPath, userPassword))
             {
-                // Decrypt the document (no parameters needed)
+                // Decrypt the document (no parameters required)
                 encDoc.Decrypt();
 
                 // Save the decrypted PDF
                 encDoc.Save(decryptedPath);
             }
 
-            Console.WriteLine("Encrypt/decrypt completed.");
+            Console.WriteLine("Encryption and decryption completed successfully.");
         }
-        // Handle incorrect password errors
         catch (InvalidPasswordException ex)
         {
-            Console.Error.WriteLine($"Wrong password: {ex.Message}");
+            Console.Error.WriteLine($"Password error: {ex.Message}");
         }
-        // Handle any other unexpected errors
         catch (Exception ex)
         {
             Console.Error.WriteLine($"Error: {ex.Message}");
