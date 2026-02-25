@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // CryptoAlgorithm, Permissions, Document are in this namespace
+using Aspose.Pdf; // CryptoAlgorithm, Permissions, Document
 
 class Program
 {
@@ -20,26 +20,20 @@ class Program
 
         try
         {
-            // Encrypt the PDF
+            // ---------- Encrypt ----------
+            // Load the original PDF, apply encryption, and save.
             using (Document doc = new Document(inputPath))
             {
-                // Set desired permissions (example: allow printing and content extraction)
                 Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
-
-                // Encrypt using AES-256 (preferred algorithm)
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
-
-                // Save the encrypted document
                 doc.Save(encryptedPath);
             }
 
-            // Decrypt the previously encrypted PDF
+            // ---------- Decrypt ----------
+            // Open the encrypted PDF with the user password, decrypt, and save.
             using (Document encDoc = new Document(encryptedPath, userPassword))
             {
-                // Decrypt (no parameters required)
-                encDoc.Decrypt();
-
-                // Save the decrypted version
+                encDoc.Decrypt(); // No parameters required.
                 encDoc.Save(decryptedPath);
             }
 
@@ -51,7 +45,7 @@ class Program
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }
