@@ -1,33 +1,25 @@
 using System;
-using System.IO;
-using Aspose.Pdf; // Fully qualified types are used below to avoid ambiguity
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
-class PdfToPdfConverter
+namespace AsposePdfConversion
 {
-    static void Main()
+    class Program
     {
-        // Define input and output file paths
-        string inputPath = "input.pdf";
-        string outputPath = "output.pdf";
-
-        // Ensure the input file exists to avoid DirectoryNotFoundException
-        if (!File.Exists(inputPath))
+        static void Main(string[] args)
         {
-            Console.WriteLine($"Input file not found: {inputPath}");
-            return;
+            // Define input and output PDF file paths.
+            // Adjust these paths as needed for your environment.
+            string inputPdfPath = "input.pdf";
+            string outputPdfPath = "output.pdf";
+
+            // Load the source PDF document.
+            // Using Aspose.Pdf.Document for loading.
+            Document pdfDocument = new Document(inputPdfPath);
+
+            // Save the document back to PDF format.
+            // This effectively copies the PDF, demonstrating a PDF‑to‑PDF conversion.
+            pdfDocument.Save(outputPdfPath);
         }
-
-        // Open the source PDF for reading and the destination PDF for writing
-        using (FileStream inputStream = new FileStream(inputPath, FileMode.Open, FileAccess.Read))
-        using (FileStream outputStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
-        {
-            // Load the PDF document using Aspose.Pdf.Document
-            Aspose.Pdf.Document pdfDocument = new Aspose.Pdf.Document(inputStream);
-
-            // Save the document to the output stream (PDF to PDF conversion)
-            pdfDocument.Save(outputStream);
-        }
-
-        Console.WriteLine($"PDF successfully converted and saved to: {outputPath}");
     }
 }
