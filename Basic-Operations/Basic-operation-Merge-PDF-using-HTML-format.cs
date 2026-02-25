@@ -1,59 +1,48 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class MergePdfExample
+class HtmlToPdfMerge
 {
     static void Main()
     {
-        // Define the full paths of the PDF files to be merged.
-        // Use Path.Combine to build platform‑independent paths.
-        string dataDir = "/Users/fahadadeelqazi/Projects/Aspose/agents/aspose-pdf-api/_worker_0";
-        string[] inputFiles =
-        {
-            Path.Combine(dataDir, "C:\\Data\\file1.pdf"),
-            Path.Combine(dataDir, "C:\\Data\\file2.pdf")
+        // Directory that contains the HTML files
+        string dataDir = @"C:\Data";
+
+        // HTML source files to be merged
+        string[] htmlFiles = {
+            Path.Combine(dataDir, "input1.html"),
+            Path.Combine(dataDir, "input2.html")
         };
 
-        // Define the output PDF file path.
-        string outputFile = Path.Combine(dataDir, "merged_output.pdf");
+        // Output merged PDF file
+        string outputPdf = Path.Combine(dataDir, "merged.pdf");
 
-        // Ensure that the input files exist before attempting concatenation.
-        foreach (string file in inputFiles)
+        // Convert each HTML file to an in‑memory PDF document
+        var pdfDocs = new List<Aspose.Pdf.Document>();
+        foreach (string htmlPath in htmlFiles)
         {
-            if (!File.Exists(file))
+            if (!File.Exists(htmlPath))
             {
-                Console.WriteLine($"Input file not found: {file}");
+                Console.WriteLine($"HTML file not found: {htmlPath}");
                 return;
             }
+
+            // Load HTML and convert to PDF
+            var loadOptions = new Aspose.Pdf.HtmlLoadOptions();
+            var pdfDoc = new Aspose.Pdf.Document(htmlPath, loadOptions);
+            pdfDocs.Add(pdfDoc);
         }
 
-        // Create a PdfFileEditor instance.
-        PdfFileEditor pdfEditor = new PdfFileEditor();
+        // Merge the PDF documents using PdfFileEditor
+        var destination = new Aspose.Pdf.Document();
+        var editor = new Aspose.Pdf.Facades.PdfFileEditor();
+        editor.Concatenate(pdfDocs.ToArray(), destination);
 
-        // Optional: skip corrupted files instead of throwing an exception.
-        pdfEditor.CorruptedFileAction = PdfFileEditor.ConcatenateCorruptedFileAction.ConcatenateIgnoringCorrupted;
-
-        // Perform the concatenation.
-        bool success = pdfEditor.Concatenate(inputFiles, outputFile);
-
-        if (success)
-        {
-            Console.WriteLine($"PDF files merged successfully into: {outputFile}");
-        }
-        else
-        {
-            Console.WriteLine("PDF concatenation failed.");
-        }
-
-        // If any corrupted files were ignored, report them.
-        if (pdfEditor.CorruptedItems != null && pdfEditor.CorruptedItems.Length > 0)
-        {
-            Console.WriteLine("The following input files were corrupted and ignored:");
-            foreach (var item in pdfEditor.CorruptedItems)
-            {
-                Console.WriteLine($"Index: {item.Index}, Reason: {item.Exception.Message}");
-            }
-        }
+        // Save the merged PDF to disk
+        destination.Save(outputPdf);
+        Console.WriteLine($"Merged PDF saved to: {outputPdf}");
     }
 }
