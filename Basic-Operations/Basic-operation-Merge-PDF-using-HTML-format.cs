@@ -1,48 +1,67 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
-class HtmlToPdfMerge
+class Program
 {
     static void Main()
     {
-        // Directory that contains the HTML files
-        string dataDir = @"C:\Data";
+        // Input PDF files to be merged
+        string[] pdfFiles = { "first.pdf", "second.pdf", "third.pdf" };
+        const string outputHtml = "merged.html";
 
-        // HTML source files to be merged
-        string[] htmlFiles = {
-            Path.Combine(dataDir, "input1.html"),
-            Path.Combine(dataDir, "input2.html")
-        };
-
-        // Output merged PDF file
-        string outputPdf = Path.Combine(dataDir, "merged.pdf");
-
-        // Convert each HTML file to an in‑memory PDF document
-        var pdfDocs = new List<Aspose.Pdf.Document>();
-        foreach (string htmlPath in htmlFiles)
+        // Verify that all input files exist
+        foreach (var file in pdfFiles)
         {
-            if (!File.Exists(htmlPath))
+            if (!File.Exists(file))
             {
-                Console.WriteLine($"HTML file not found: {htmlPath}");
+                Console.Error.WriteLine($"File not found: {file}");
                 return;
             }
-
-            // Load HTML and convert to PDF
-            var loadOptions = new Aspose.Pdf.HtmlLoadOptions();
-            var pdfDoc = new Aspose.Pdf.Document(htmlPath, loadOptions);
-            pdfDocs.Add(pdfDoc);
         }
 
-        // Merge the PDF documents using PdfFileEditor
-        var destination = new Aspose.Pdf.Document();
-        var editor = new Aspose.Pdf.Facades.PdfFileEditor();
-        editor.Concatenate(pdfDocs.ToArray(), destination);
+        try
+        {
+            // Load the first PDF as the target document
+            using (Document target = new Document(pdfFiles[0]))
+            {
+                // Append the remaining PDFs to the target
+                for (int i = 1; i < pdfFiles.Length; i++)
+                {
+                    using (Document source = new Document(pdfFiles[i]))
+                    {
+                        target.Pages.Add(source.Pages);
+                    }
+                }
 
-        // Save the merged PDF to disk
-        destination.Save(outputPdf);
-        Console.WriteLine($"Merged PDF saved to: {outputPdf}");
+                // Configure HTML save options (required for HTML output)
+                HtmlSaveOptions htmlOpts = new HtmlSaveOptions
+                {
+                    // Embed all resources into a single HTML file
+                    PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
+                    // Save raster images as PNGs embedded in SVG wrappers
+                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
+                };
+
+                // HTML conversion relies on GDI+ (Windows only); handle cross‑platform scenarios
+                try
+                {
+                    target.Save(outputHtml, htmlOpts);
+                    Console.WriteLine($"Merged HTML saved to '{outputHtml}'.");
+                }
+                catch (TypeInitializationException)
+                {
+                    Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
+                }
+                catch (DllNotFoundException)
+                {
+                    Console.WriteLine("GDI+ library not found. HTML conversion is Windows‑only.");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

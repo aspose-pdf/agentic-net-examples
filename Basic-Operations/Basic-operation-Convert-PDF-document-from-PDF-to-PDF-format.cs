@@ -1,25 +1,29 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
-namespace AsposePdfConversion
+class Program
 {
-    class Program
+    static void Main()
     {
-        static void Main(string[] args)
+        // Input and output file paths
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+
+        // Verify the input file exists
+        if (!File.Exists(inputPath))
         {
-            // Define input and output PDF file paths.
-            // Adjust these paths as needed for your environment.
-            string inputPdfPath = "input.pdf";
-            string outputPdfPath = "output.pdf";
-
-            // Load the source PDF document.
-            // Using Aspose.Pdf.Document for loading.
-            Document pdfDocument = new Document(inputPdfPath);
-
-            // Save the document back to PDF format.
-            // This effectively copies the PDF, demonstrating a PDF‑to‑PDF conversion.
-            pdfDocument.Save(outputPdfPath);
+            Console.Error.WriteLine($"Error: File not found – {inputPath}");
+            return;
         }
+
+        // Load the PDF document and save it as a new PDF (basic copy/conversion)
+        using (Document doc = new Document(inputPath))
+        {
+            // Save creates a copy of the PDF; no additional options are required for PDF‑to‑PDF
+            doc.Save(outputPath);
+        }
+
+        Console.WriteLine($"PDF conversion completed. Output saved to '{outputPath}'.");
     }
 }
