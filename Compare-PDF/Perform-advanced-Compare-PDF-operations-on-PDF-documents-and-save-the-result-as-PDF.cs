@@ -5,66 +5,42 @@ using Aspose.Pdf.Comparison;
 
 class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
-        // Input PDF files – adjust paths as needed
-        string firstPdfPath = "first.pdf";
-        string secondPdfPath = "second.pdf";
+        const string doc1Path = "doc1.pdf";
+        const string doc2Path = "doc2.pdf";
+        const string resultPath = "comparison_result.pdf";
 
-        // Output files for the different comparison results
-        string sideBySideOutput = "SideBySideComparisonResult.pdf";
-        string textComparisonOutput = "TextComparisonResult.pdf";
-
-        // Verify that both source files exist
-        if (!File.Exists(firstPdfPath))
+        if (!File.Exists(doc1Path) || !File.Exists(doc2Path))
         {
-            Console.Error.WriteLine($"Error: File not found – {firstPdfPath}");
-            return;
-        }
-
-        if (!File.Exists(secondPdfPath))
-        {
-            Console.Error.WriteLine($"Error: File not found – {secondPdfPath}");
+            Console.Error.WriteLine("One or both input PDF files were not found.");
             return;
         }
 
         try
         {
-            // Load the two documents
-            Document firstDoc = new Document(firstPdfPath);
-            Document secondDoc = new Document(secondPdfPath);
-
-            // ------------------------------------------------------------
-            // 1. Side‑by‑side visual comparison (pages interleaved)
-            // ------------------------------------------------------------
-            SideBySideComparisonOptions sideOptions = new SideBySideComparisonOptions
+            // Load both PDFs inside using blocks for deterministic disposal
+            using (Document doc1 = new Document(doc1Path))
+            using (Document doc2 = new Document(doc2Path))
             {
-                // Example option – show change marks that appear on other pages
-                AdditionalChangeMarks = true
-                // Other properties (ComparisonArea1, ComparisonMode, etc.) can be set here
-            };
+                // Configure side‑by‑side comparison options
+                SideBySideComparisonOptions options = new SideBySideComparisonOptions
+                {
+                    // Show change marks that exist on other pages as well
+                    AdditionalChangeMarks = true,
+                    // Normal comparison mode (spaces are taken into account)
+                    ComparisonMode = ComparisonMode.Normal
+                };
 
-            // The static Compare method creates the result PDF and saves it to the specified path
-            SideBySidePdfComparer.Compare(firstDoc, secondDoc, sideBySideOutput, sideOptions);
-            Console.WriteLine($"Side‑by‑side comparison saved to: {sideBySideOutput}");
+                // Perform the comparison; the result is saved directly to resultPath
+                SideBySidePdfComparer.Compare(doc1, doc2, resultPath, options);
+            }
 
-            // ------------------------------------------------------------
-            // 2. Text‑only comparison with detailed diff statistics
-            // ------------------------------------------------------------
-            ComparisonOptions textOptions = new ComparisonOptions
-            {
-                // Example: ignore tables during text comparison
-                ExcludeTables = false
-                // Other options (ExcludeAreas1, ExtractionArea, etc.) can be configured here
-            };
-
-            // Perform page‑by‑page text comparison and save the result PDF
-            TextPdfComparer.CompareDocumentsPageByPage(firstDoc, secondDoc, textOptions, textComparisonOutput);
-            Console.WriteLine($"Text comparison saved to: {textComparisonOutput}");
+            Console.WriteLine($"Comparison PDF saved to '{resultPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"An error occurred during PDF comparison: {ex.Message}");
+            Console.Error.WriteLine($"Error during comparison: {ex.Message}");
         }
     }
 }

@@ -5,54 +5,42 @@ using Aspose.Pdf.Comparison;
 
 class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
-        // Expect three arguments: first PDF, second PDF, output PDF
-        if (args.Length < 3)
+        const string docPath1 = "document1.pdf";
+        const string docPath2 = "document2.pdf";
+        const string resultPath = "comparison_result.pdf";
+
+        // Verify input files exist
+        if (!File.Exists(docPath1))
         {
-            Console.WriteLine("Usage: program <pdf1> <pdf2> <output>");
+            Console.Error.WriteLine($"File not found: {docPath1}");
             return;
         }
-
-        string pdfPath1 = args[0];
-        string pdfPath2 = args[1];
-        string outputPath = args[2];
-
-        // Verify that the input files exist
-        if (!File.Exists(pdfPath1))
+        if (!File.Exists(docPath2))
         {
-            Console.WriteLine($"Error: File not found – {pdfPath1}");
-            return;
-        }
-
-        if (!File.Exists(pdfPath2))
-        {
-            Console.WriteLine($"Error: File not found – {pdfPath2}");
+            Console.Error.WriteLine($"File not found: {docPath2}");
             return;
         }
 
         try
         {
-            // Load the two PDF documents
-            Document doc1 = new Document(pdfPath1);
-            Document doc2 = new Document(pdfPath2);
-
-            // Configure side‑by‑side comparison options
-            SideBySideComparisonOptions options = new SideBySideComparisonOptions
+            // Load both PDFs inside using blocks for deterministic disposal
+            using (Document doc1 = new Document(docPath1))
+            using (Document doc2 = new Document(docPath2))
             {
-                // Example option: show additional change marks
-                AdditionalChangeMarks = true
-            };
+                // Create default comparison options (can be customized if needed)
+                SideBySideComparisonOptions options = new SideBySideComparisonOptions();
 
-            // Perform the comparison; the result is written directly to outputPath
-            SideBySidePdfComparer.Compare(doc1, doc2, outputPath, options);
+                // Perform side‑by‑side comparison and save the result PDF
+                SideBySidePdfComparer.Compare(doc1, doc2, resultPath, options);
+            }
 
-            Console.WriteLine($"Comparison completed. Result saved to: {outputPath}");
+            Console.WriteLine($"Comparison PDF saved to '{resultPath}'.");
         }
         catch (Exception ex)
         {
-            // Report any unexpected errors
-            Console.WriteLine($"Error during comparison: {ex.Message}");
+            Console.Error.WriteLine($"Error during comparison: {ex.Message}");
         }
     }
 }

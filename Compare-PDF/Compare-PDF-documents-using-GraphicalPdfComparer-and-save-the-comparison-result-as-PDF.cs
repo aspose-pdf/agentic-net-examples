@@ -5,51 +5,34 @@ using Aspose.Pdf.Comparison;
 
 class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
-        // Expect three arguments: first PDF, second PDF, output PDF
-        if (args.Length < 3)
+        const string firstPath = "first.pdf";
+        const string secondPath = "second.pdf";
+        const string resultPath = "comparison_result.pdf";
+
+        if (!File.Exists(firstPath) || !File.Exists(secondPath))
         {
-            Console.WriteLine("Usage: ComparePdf <firstPdf> <secondPdf> <outputPdf>");
+            Console.Error.WriteLine("One or both input PDF files were not found.");
             return;
         }
 
-        string firstPath = args[0];
-        string secondPath = args[1];
-        string outputPath = args[2];
-
-        // Verify that the input files exist
-        if (!File.Exists(firstPath))
+        // Load both PDF documents inside using blocks for deterministic disposal
+        using (Document doc1 = new Document(firstPath))
+        using (Document doc2 = new Document(secondPath))
         {
-            Console.Error.WriteLine($"Error: File not found - {firstPath}");
-            return;
-        }
-        if (!File.Exists(secondPath))
-        {
-            Console.Error.WriteLine($"Error: File not found - {secondPath}");
-            return;
-        }
-
-        try
-        {
-            // Load the two PDF documents
-            Document firstDoc = new Document(firstPath);
-            Document secondDoc = new Document(secondPath);
-
-            // Create the graphical comparer and optionally configure its properties
+            // Instantiate the graphical comparer
             GraphicalPdfComparer comparer = new GraphicalPdfComparer();
-            // comparer.Threshold = 0; // percentage of change to ignore (default 0%)
-            // comparer.Resolution = 150; // DPI for the comparison images (default 150)
-            // comparer.Color = Aspose.Pdf.Color.Red; // highlight color (default red)
 
-            // Perform the comparison and save the result as a PDF
-            comparer.CompareDocumentsToPdf(firstDoc, secondDoc, outputPath);
+            // Optional: customize comparer settings
+            // comparer.Color = Aspose.Pdf.Color.Red; // default is red
+            // comparer.Resolution = 150; // default DPI
+            // comparer.Threshold = 0; // default percentage
 
-            Console.WriteLine($"Comparison PDF saved to: {outputPath}");
+            // Compare the documents and save the visual diff as a PDF
+            comparer.CompareDocumentsToPdf(doc1, doc2, resultPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"An error occurred: {ex.Message}");
-        }
+
+        Console.WriteLine($"Graphical comparison PDF saved to '{resultPath}'.");
     }
 }

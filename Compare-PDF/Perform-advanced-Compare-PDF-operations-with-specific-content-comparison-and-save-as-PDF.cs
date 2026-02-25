@@ -5,48 +5,46 @@ using Aspose.Pdf.Comparison;
 
 class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
-        // Expect: first PDF path, second PDF path, output PDF path
-        if (args.Length < 3)
-        {
-            Console.WriteLine("Usage: ComparePdf <firstPdf> <secondPdf> <outputPdf>");
-            return;
-        }
-
-        string firstPath = args[0];
-        string secondPath = args[1];
-        string outputPath = args[2];
+        const string firstPdfPath  = "first.pdf";
+        const string secondPdfPath = "second.pdf";
+        const string resultPdfPath = "comparison_result.pdf";
 
         // Verify input files exist
-        if (!File.Exists(firstPath))
+        if (!File.Exists(firstPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {firstPath}");
+            Console.Error.WriteLine($"File not found: {firstPdfPath}");
             return;
         }
-        if (!File.Exists(secondPath))
+        if (!File.Exists(secondPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {secondPath}");
+            Console.Error.WriteLine($"File not found: {secondPdfPath}");
             return;
         }
 
         try
         {
-            // Load the two PDF documents
-            Document doc1 = new Document(firstPath);
-            Document doc2 = new Document(secondPath);
-
-            // Configure side‑by‑side comparison options
-            SideBySideComparisonOptions options = new SideBySideComparisonOptions
+            // Load both documents inside using blocks for deterministic disposal
+            using (Document doc1 = new Document(firstPdfPath))
+            using (Document doc2 = new Document(secondPdfPath))
             {
-                AdditionalChangeMarks = true,               // Show change marks from other pages
-                ComparisonMode = ComparisonMode.IgnoreSpaces // Ignore spaces during text comparison
-            };
+                // Configure side‑by‑side comparison options
+                SideBySideComparisonOptions options = new SideBySideComparisonOptions
+                {
+                    // Show change marks that appear on other pages as well
+                    AdditionalChangeMarks = true,
+                    // Ignore whitespace differences for a cleaner diff
+                    ComparisonMode = ComparisonMode.IgnoreSpaces,
+                    // Do not exclude tables from the comparison
+                    ExcludeTables = false
+                };
 
-            // Perform the side‑by‑side comparison and save the result
-            SideBySidePdfComparer.Compare(doc1, doc2, outputPath, options);
+                // Perform the comparison and save the result as a PDF
+                SideBySidePdfComparer.Compare(doc1, doc2, resultPdfPath, options);
+            }
 
-            Console.WriteLine($"Comparison completed. Result saved to '{outputPath}'.");
+            Console.WriteLine($"Comparison PDF saved to '{resultPdfPath}'.");
         }
         catch (Exception ex)
         {
