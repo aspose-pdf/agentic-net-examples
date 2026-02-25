@@ -1,55 +1,41 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
-class PdfMergeExample
+class Program
 {
     static void Main()
     {
-        // Define the source PDF files to be merged.
-        // Ensure that these files exist in the specified location.
-        string[] sourceFiles = new string[]
-        {
-            "input1.pdf",
-            "input2.pdf",
-            // Add more file names as needed.
-        };
+        // Input PDF files to merge (must exist on disk)
+        string[] pdfFiles = { "first.pdf", "second.pdf", "third.pdf" };
+        const string outputPath = "merged.pdf";
 
-        // Define the output file path.
-        string outputFile = "merged_output.pdf";
-
-        // Verify that all source files exist before attempting the merge.
-        foreach (string filePath in sourceFiles)
+        // Validate input files
+        foreach (string file in pdfFiles)
         {
-            if (!File.Exists(filePath))
+            if (!File.Exists(file))
             {
-                Console.WriteLine($"Error: Source file not found - {filePath}");
+                Console.Error.WriteLine($"Input file not found: {file}");
                 return;
             }
         }
 
-        // Create an instance of PdfFileEditor.
-        PdfFileEditor pdfEditor = new PdfFileEditor();
-
-        // Optional: configure behavior for corrupted files.
-        // pdfEditor.CorruptedFileAction = PdfFileEditor.ConcatenateCorruptedFileAction.ConcatenateIgnoringCorrupted;
-
-        // Perform the concatenation using the overload that accepts an array of file paths.
-        // This method handles opening and closing of the files internally.
-        bool success = pdfEditor.Concatenate(sourceFiles, outputFile);
-
-        if (success)
+        // Use the first document as the target; all others are sources
+        using (Document target = new Document(pdfFiles[0]))
         {
-            Console.WriteLine($"PDF files merged successfully into '{outputFile}'.");
-        }
-        else
-        {
-            // If the operation failed, retrieve the last exception for diagnostics.
-            Console.WriteLine("PDF merge failed.");
-            if (pdfEditor.LastException != null)
+            // Merge each subsequent PDF into the target document
+            for (int i = 1; i < pdfFiles.Length; i++)
             {
-                Console.WriteLine($"Exception: {pdfEditor.LastException.Message}");
+                using (Document source = new Document(pdfFiles[i]))
+                {
+                    target.Pages.Add(source.Pages);
+                }
             }
+
+            // Save the merged result
+            target.Save(outputPath);
         }
+
+        Console.WriteLine($"PDF files merged successfully into '{outputPath}'.");
     }
 }

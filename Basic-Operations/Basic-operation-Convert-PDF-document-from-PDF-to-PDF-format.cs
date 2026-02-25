@@ -6,24 +6,31 @@ class Program
 {
     static void Main()
     {
-        // Input and output file paths
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        // Input and output PDF file paths
+        string inputPath  = "input.pdf";
+        string outputPath = "output.pdf";
 
-        // Verify the input file exists
+        // Verify that the input file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Error: File not found – {inputPath}");
+            Console.Error.WriteLine($"Not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document and save it as a new PDF (basic copy/conversion)
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Save creates a copy of the PDF; no additional options are required for PDF‑to‑PDF
-            doc.Save(outputPath);
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
+            {
+                // Save the document to the output path (basic PDF-to-PDF copy)
+                doc.Save(outputPath);
+                Console.WriteLine($"Saved → '{outputPath}'");
+            }
         }
-
-        Console.WriteLine($"PDF conversion completed. Output saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            // Report any errors that occur during loading or saving
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }
