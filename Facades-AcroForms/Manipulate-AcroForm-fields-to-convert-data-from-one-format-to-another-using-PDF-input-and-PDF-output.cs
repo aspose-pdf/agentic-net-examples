@@ -1,58 +1,43 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Paths for the source PDF (form template), source XML data,
-        // the PDF that will contain the populated form, and the final FDF file.
-        const string inputPdfPath   = "template.pdf";
-        const string xmlDataPath    = "data.xml";
-        const string outputPdfPath  = "filled.pdf";
-        const string outputFdfPath  = "data.fdf";
+        const string templatePdf = "template.pdf";   // PDF with AcroForm fields
+        const string xmlData     = "data.xml";      // Source data in XML format
+        const string outputPdf   = "filled.pdf";    // Resulting PDF after conversion
 
-        // Verify that the required files exist.
-        if (!File.Exists(inputPdfPath))
+        // Verify that required files exist
+        if (!File.Exists(templatePdf) || !File.Exists(xmlData))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(xmlDataPath))
-        {
-            Console.Error.WriteLine($"XML data file not found: {xmlDataPath}");
+            Console.Error.WriteLine("Input PDF or XML file not found.");
             return;
         }
 
-        // ------------------------------------------------------------
-        // 1. Load the PDF form and import XML data into its fields.
-        // ------------------------------------------------------------
-        // The Form constructor that takes two file names sets the source
-        // PDF and the destination PDF where changes will be saved.
-        using (Aspose.Pdf.Facades.Form form = new Aspose.Pdf.Facades.Form(inputPdfPath, outputPdfPath))
+        // Step 1: Convert the XML data to an FDF stream (in‑memory)
+        using (FileStream xmlStream = File.OpenRead(xmlData))
+        using (MemoryStream fdfStream = new MemoryStream())
         {
-            // Open the XML file as a stream and import it.
-            using (FileStream xmlStream = new FileStream(xmlDataPath, FileMode.Open, FileAccess.Read))
-            {
-                form.ImportXml(xmlStream);
-            }
+            // ConvertXmlToFdf creates an FDF representation of the XML form data
+            FormDataConverter.ConvertXmlToFdf(xmlStream, fdfStream);
+            fdfStream.Position = 0; // Reset stream position for reading
 
-            // Persist the populated form to the output PDF.
-            form.Save();
-        }
-
-        // ------------------------------------------------------------
-        // 2. Export the filled form data to FDF format.
-        // ------------------------------------------------------------
-        using (Aspose.Pdf.Facades.Form exportForm = new Aspose.Pdf.Facades.Form(outputPdfPath))
-        {
-            using (FileStream fdfStream = new FileStream(outputFdfPath, FileMode.Create, FileAccess.Write))
+            // Step 2: Load the PDF form and import the FDF data
+            using (Document pdfDoc = new Document(templatePdf))
             {
-                exportForm.ExportFdf(fdfStream);
+                // Form facade works directly on the Document instance
+                Form form = new Form(pdfDoc);
+                form.ImportFdf(fdfStream);   // Populate the AcroForm fields
+
+                // Save the updated PDF
+                pdfDoc.Save(outputPdf);
             }
         }
 
-        Console.WriteLine("Form data conversion completed successfully.");
+        Console.WriteLine($"AcroForm fields populated and saved to '{outputPdf}'.");
     }
 }
