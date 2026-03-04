@@ -6,7 +6,7 @@ This guide helps AI agents and code generation tools navigate and understand exa
 
 **AI-friendly repository** containing validated C# examples for Aspose.PDF for .NET API.
 
-- **Total Categories**: 7
+- **Total Categories**: 6
 - **Examples per category**: 20-250 (varies by complexity)
 - **Code Pattern**: Standalone `.cs` files (copy to `Program.cs`, run with dotnet)
 - **Validation**: All examples tested against latest Aspose.PDF API
@@ -24,12 +24,6 @@ Each category folder contains:
 - Tagged PDF creation and structure elements
 - Accessibility features (reading order, alternative text)
 - **Guide**: [agents.md](./Accessibility-and-Tagged-PDFs/agents.md)
-
-#### Basic-Operations/
-- Document splitting and merging
-- Page operations (insert, delete, rotate)
-- Basic file I/O operations
-- **Guide**: [agents.md](./Basic-Operations/agents.md)
 
 #### Compare-PDF/
 - Document comparison (text, structure, visual)
@@ -154,7 +148,6 @@ This repository demonstrates:
 |---------|-----------|--------|
 | Accessibility | Accessibility-and-Tagged-PDFs | ✓ |
 | Annotations | Working-with-Annotation | ✓ |
-| Basic Ops | Basic-Operations | ✓ |
 | Comparison | Compare-PDF | ✓ |
 | AcroForms | Facades-AcroForms | ✓ |
 | Conversion | Conversion | ✓ |
