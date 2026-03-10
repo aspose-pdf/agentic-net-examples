@@ -19,6 +19,8 @@ Examples are organized by feature category:
 - `basic-operations/` - 78 example(s)
 - `compare-pdf/` - 30 example(s)
 - `facades-acroforms/` - 35 example(s)
+- `facades-texts-and-images/` - 22 example(s)
+- `graphs-zugferd-operators/` - 9 example(s)
 - `parse-pdf/` - 76 example(s)
 - `securing-and-signing-pdf/` - 25 example(s)
 - `working-with-annotations/` - 252 example(s)
