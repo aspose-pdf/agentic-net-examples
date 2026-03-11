@@ -103,7 +103,7 @@ Examples in this repository are **automatically generated**. To suggest new exam
 
 ## License
 
-All examples use Aspose.PDF for .NET and require a valid license for production use. See [licensing](https://purchase.aspose.com/pdf/net).
+All examples use Aspose.PDF for .NET and require a valid license for production use. See [licensing](https://purchase.aspose.com/).
 
 ---
 
