@@ -1,86 +1,86 @@
 ---
-name: Facades - Stamps
-description: C# examples for Facades - Stamps using Aspose.PDF for .NET
+name: facades-stamps
+description: C# examples for facades-stamps using Aspose.PDF for .NET
 language: csharp
 framework: net10.0
 parent: ../agents.md
 ---
 
-# AGENTS - Facades - Stamps
+# AGENTS - facades-stamps
 
 ## Persona
 
 You are a C# developer specializing in PDF processing using Aspose.PDF for .NET,
-working within the **Facades - Stamps** category.
-This folder contains standalone C# examples for Facades - Stamps operations.
+working within the **facades-stamps** category.
+This folder contains standalone C# examples for facades-stamps operations.
 See the root [agents.md](../agents.md) for repository-wide conventions and boundaries.
 
 ## Scope
-- This folder contains examples for **Facades - Stamps**.
+- This folder contains examples for **facades-stamps**.
 - Files are standalone `.cs` examples stored directly in this folder.
 
+## Required Namespaces
+
+- `using Aspose.Pdf.Facades;` (50/50 files) ← category-specific
+- `using Aspose.Pdf;` (44/50 files) ← category-specific
+- `using Aspose.Pdf.Text;` (14/50 files)
+- `using Aspose.Pdf.Drawing;` (1/50 files)
+- `using System;` (50/50 files)
+- `using System.IO;` (50/50 files)
+- `using System.Drawing;` (10/50 files)
+- `using System.Xml.Linq;` (3/50 files)
+- `using System.Text;` (2/50 files)
+- `using System.Text.RegularExpressions;` (1/50 files)
+
+## Common Code Pattern
+
+Most files in this category use `PdfFileStamp` from `Aspose.Pdf.Facades`:
+
+```csharp
+PdfFileStamp tool = new PdfFileStamp();
+tool.BindPdf("input.pdf");
+// ... PdfFileStamp operations ...
+tool.Save("output.pdf");
+```
+
 ## Files in this folder
-- [add-a-multi-line-watermark-stamp-to-a-pdf-document-generated-from-pcl-input-programmatically](./add-a-multi-line-watermark-stamp-to-a-pdf-document-generated-from-pcl-input-programmatically.cs)
-- [add-a-multi-line-watermark-stamp-to-a-pdf-document-loaded-from-a-cgm-source-using-the-api](./add-a-multi-line-watermark-stamp-to-a-pdf-document-loaded-from-a-cgm-source-using-the-api.cs)
-- [add-a-multi-line-watermark-stamp-to-a-pdf-document-loaded-from-an-epub-file](./add-a-multi-line-watermark-stamp-to-a-pdf-document-loaded-from-an-epub-file.cs)
-- [add-a-multi-line-watermark-stamp-to-a-pdf-document-loaded-from-an-in-memory-stream](./add-a-multi-line-watermark-stamp-to-a-pdf-document-loaded-from-an-in-memory-stream.cs)
-- [add-a-multi-line-watermark-stamp-to-a-pdf-document-opened-from-an-mht-source](./add-a-multi-line-watermark-stamp-to-a-pdf-document-opened-from-an-mht-source.cs)
-- [add-a-multi-line-watermark-stamp-to-an-opened-pdf-document-preserving-the-existing-content-layout](./add-a-multi-line-watermark-stamp-to-an-opened-pdf-document-preserving-the-existing-content-layout.cs)
-- [apply-a-custom-rotation-in-degrees-to-a-stamp-generated-from-an-svg-source](./apply-a-custom-rotation-in-degrees-to-a-stamp-generated-from-an-svg-source.cs)
-- [apply-a-multi-line-watermark-stamp-defined-via-svg-onto-a-pdf-document-during-processing](./apply-a-multi-line-watermark-stamp-defined-via-svg-onto-a-pdf-document-during-processing.cs)
-- [apply-a-multi-line-watermark-stamp-onto-a-pdf-document-generated-from-tex-source-preserving-existin](./apply-a-multi-line-watermark-stamp-onto-a-pdf-document-generated-from-tex-source-preserving-existin.cs)
-- [apply-a-multi-line-watermark-stamp-onto-a-pdf-document-that-is-generated-by-loading-html-content](./apply-a-multi-line-watermark-stamp-onto-a-pdf-document-that-is-generated-by-loading-html-content.cs)
-- [apply-a-multi-line-watermark-stamp-onto-a-pdf-document-that-is-loaded-from-a-ps-source](./apply-a-multi-line-watermark-stamp-onto-a-pdf-document-that-is-loaded-from-a-ps-source.cs)
-- [apply-a-multi-line-watermark-stamp-to-a-pdf-document-created-by-loading-an-mht-file](./apply-a-multi-line-watermark-stamp-to-a-pdf-document-created-by-loading-an-mht-file.cs)
-- [apply-a-multi-line-watermark-stamp-to-a-pdf-document-generated-from-an-xps-source](./apply-a-multi-line-watermark-stamp-to-a-pdf-document-generated-from-an-xps-source.cs)
-- [apply-a-multi-line-watermark-stamp-to-a-pdf-document-generated-from-an-xslfo-source](./apply-a-multi-line-watermark-stamp-to-a-pdf-document-generated-from-an-xslfo-source.cs)
-- [apply-a-multi-line-watermark-stamp-to-a-pdf-document-generated-from-xsl-fo-input-using-the-api](./apply-a-multi-line-watermark-stamp-to-a-pdf-document-generated-from-xsl-fo-input-using-the-api.cs)
-- [apply-a-multi-line-watermark-stamp-to-a-pdf-document-loaded-directly-from-markdown-content-at-runtim](./apply-a-multi-line-watermark-stamp-to-a-pdf-document-loaded-directly-from-markdown-content-at-runtim.cs)
-- [apply-a-multi-line-watermark-stamp-to-a-pdf-document-loaded-from-a-pdf-file](./apply-a-multi-line-watermark-stamp-to-a-pdf-document-loaded-from-a-pdf-file.cs)
-- [apply-a-multi-line-watermark-stamp-to-a-pdf-document-loaded-from-an-xml-source](./apply-a-multi-line-watermark-stamp-to-a-pdf-document-loaded-from-an-xml-source.cs)
-- [apply-a-multi-line-watermark-stamp-to-a-pdf-document-loaded-via-html-ensuring-correct-positioning-a](./apply-a-multi-line-watermark-stamp-to-a-pdf-document-loaded-via-html-ensuring-correct-positioning-a.cs)
-- [apply-a-multi-line-watermark-stamp-to-a-pdf-document-programmatically-loaded-via-tex-rendering](./apply-a-multi-line-watermark-stamp-to-a-pdf-document-programmatically-loaded-via-tex-rendering.cs)
-- [apply-a-multi-line-watermark-stamp-to-a-pdf-document-that-has-been-loaded-from-an-ofd-source](./apply-a-multi-line-watermark-stamp-to-a-pdf-document-that-has-been-loaded-from-an-ofd-source.cs)
-- [apply-a-multi-line-watermark-stamp-to-a-pdf-document-that-is-imported-from-an-ofd-source](./apply-a-multi-line-watermark-stamp-to-a-pdf-document-that-is-imported-from-an-ofd-source.cs)
-- [apply-a-multi-line-watermark-stamp-to-a-pdf-document-utilizing-an-existing-pdf-as-the-source](./apply-a-multi-line-watermark-stamp-to-a-pdf-document-utilizing-an-existing-pdf-as-the-source.cs)
-- [apply-a-multi-line-watermark-stamp-to-a-pdf-that-is-opened-from-a-memory-document](./apply-a-multi-line-watermark-stamp-to-a-pdf-that-is-opened-from-a-memory-document.cs)
-- [apply-a-specific-rotation-degree-to-a-stamp-by-providing-the-angle-value-within-the-source-md-file](./apply-a-specific-rotation-degree-to-a-stamp-by-providing-the-angle-value-within-the-source-md-file.cs)
-- [apply-a-specified-rotation-angle-to-a-stamp-based-on-the-source-cgm-coordinates](./apply-a-specified-rotation-angle-to-a-stamp-based-on-the-source-cgm-coordinates.cs)
-- [configure-a-stamp-annotation-s-rotation-angle-to-a-specific-degree-value-within-the-source-pdf](./configure-a-stamp-annotation-s-rotation-angle-to-a-specific-degree-value-within-the-source-pdf.cs)
-- [configure-a-stamp-s-rotation-angle-in-degrees-based-on-the-provided-html-source-content](./configure-a-stamp-s-rotation-angle-in-degrees-based-on-the-provided-html-source-content.cs)
-- [configure-a-stamp-s-rotation-angle-in-degrees-by-supplying-the-source-tex-markup-directly](./configure-a-stamp-s-rotation-angle-in-degrees-by-supplying-the-source-tex-markup-directly.cs)
-- [configure-a-stamp-s-rotation-angle-in-degrees-via-the-source-xml-definition-to-control-document-anno](./configure-a-stamp-s-rotation-angle-in-degrees-via-the-source-xml-definition-to-control-document-anno.cs)
-- [configure-a-stamp-s-rotation-angle-to-a-specific-degree-value-by-applying-transformations-to-the-sou](./configure-a-stamp-s-rotation-angle-to-a-specific-degree-value-by-applying-transformations-to-the-sou.cs)
-- [configure-a-stamp-s-rotation-angle-to-a-specific-degree-value-derived-from-the-source-epub-file](./configure-a-stamp-s-rotation-angle-to-a-specific-degree-value-derived-from-the-source-epub-file.cs)
-- [configure-a-stamp-s-rotation-angle-to-a-specified-degree-by-applying-a-source-pcl-transformation](./configure-a-stamp-s-rotation-angle-to-a-specified-degree-by-applying-a-source-pcl-transformation.cs)
-- [configure-stamp-rotation-by-specifying-the-desired-angle-in-the-source-xslfo-applying-it-during-pdf](./configure-stamp-rotation-by-specifying-the-desired-angle-in-the-source-xslfo-applying-it-during-pdf.cs)
-- [configure-the-stamp-s-alignment-property-to-center-using-the-source-cgm-object-as-reference](./configure-the-stamp-s-alignment-property-to-center-using-the-source-cgm-object-as-reference.cs)
-- [configure-the-stamp-s-rotation-angle-to-a-specific-degree-value-by-applying-an-mht-source](./configure-the-stamp-s-rotation-angle-to-a-specific-degree-value-by-applying-an-mht-source.cs)
-- [configure-the-stamp-s-rotation-angle-to-a-specific-degree-value-when-applying-it-to-a-source-ofd-doc](./configure-the-stamp-s-rotation-angle-to-a-specific-degree-value-when-applying-it-to-a-source-ofd-doc.cs)
-- [create-a-multi-line-watermark-stamp-in-a-pdf-document-loaded-programmatically-from-an-xps-source](./create-a-multi-line-watermark-stamp-in-a-pdf-document-loaded-programmatically-from-an-xps-source.cs)
-- [create-an-imagestamp-or-textstamp-instance-by-loading-an-svg-source-enabling-vector-based-stamping](./create-an-imagestamp-or-textstamp-instance-by-loading-an-svg-source-enabling-vector-based-stamping.cs)
-- [create-an-imagestamp-or-textstamp-instance-by-loading-content-from-an-mht-source-file](./create-an-imagestamp-or-textstamp-instance-by-loading-content-from-an-mht-source-file.cs)
-- [create-an-imagestamp-or-textstamp-instance-from-a-source-postscript-file-configuring-its-properties](./create-an-imagestamp-or-textstamp-instance-from-a-source-postscript-file-configuring-its-properties.cs)
-- [create-an-imagestamp-or-textstamp-instance-from-an-xps-source-to-apply-visual-annotations-to-documen](./create-an-imagestamp-or-textstamp-instance-from-an-xps-source-to-apply-visual-annotations-to-documen.cs)
-- [create-an-imagestamp-or-textstamp-object-based-on-content-extracted-from-a-source-pdf-file](./create-an-imagestamp-or-textstamp-object-based-on-content-extracted-from-a-source-pdf-file.cs)
-- [create-an-imagestamp-or-textstamp-object-from-a-source-pcl-file-for-embedding-into-a-pdf](./create-an-imagestamp-or-textstamp-object-from-a-source-pcl-file-for-embedding-into-a-pdf.cs)
-- [create-an-imagestamp-or-textstamp-object-from-an-epub-source-file-for-stamping-operations](./create-an-imagestamp-or-textstamp-object-from-an-epub-source-file-for-stamping-operations.cs)
-- [create-an-imagestamp-or-textstamp-object-from-the-supplied-xml-source-configuration-and-settings](./create-an-imagestamp-or-textstamp-object-from-the-supplied-xml-source-configuration-and-settings.cs)
-- [create-an-imagestamp-or-textstamp-object-initialized-with-content-extracted-from-a-source-ofd-file](./create-an-imagestamp-or-textstamp-object-initialized-with-content-extracted-from-a-source-ofd-file.cs)
-- [create-an-imagestamp-or-textstamp-object-using-a-cgm-source-file-as-the-stamp-content](./create-an-imagestamp-or-textstamp-object-using-a-cgm-source-file-as-the-stamp-content.cs)
-- [create-an-imagestamp-or-textstamp-object-using-an-xslfo-source-for-subsequent-pdf-stamping](./create-an-imagestamp-or-textstamp-object-using-an-xslfo-source-for-subsequent-pdf-stamping.cs)
-- [create-an-imagestamp-or-textstamp-object-using-content-from-a-markdown-source-file-in-memory](./create-an-imagestamp-or-textstamp-object-using-content-from-a-markdown-source-file-in-memory.cs)
-- [create-an-imagestamp-or-textstamp-object-using-tex-source-content-for-overlaying-onto-pdf-pages](./create-an-imagestamp-or-textstamp-object-using-tex-source-content-for-overlaying-onto-pdf-pages.cs)
-- [generate-a-multi-line-watermark-stamp-on-a-pdf-document-loaded-from-an-svg-source](./generate-a-multi-line-watermark-stamp-on-a-pdf-document-loaded-from-an-svg-source.cs)
-- [generate-a-multi-line-watermark-stamp-on-a-pdf-document-loaded-from-an-xml-source](./generate-a-multi-line-watermark-stamp-on-a-pdf-document-loaded-from-an-xml-source.cs)
-- [generate-an-imagestamp-or-textstamp-object-directly-from-html-source-for-inclusion-in-pdf-output](./generate-an-imagestamp-or-textstamp-object-directly-from-html-source-for-inclusion-in-pdf-output.cs)
-- [programmatically-apply-a-multi-line-watermark-stamp-onto-a-pdf-document-generated-from-an-epub-sourc](./programmatically-apply-a-multi-line-watermark-stamp-onto-a-pdf-document-generated-from-an-epub-sourc.cs)
-- [programmatically-apply-a-multi-line-watermark-stamp-to-a-pdf-obtained-by-loading-a-pcl-file](./programmatically-apply-a-multi-line-watermark-stamp-to-a-pdf-obtained-by-loading-a-pcl-file.cs)
-- [set-the-rotation-angle-of-a-stamp-to-a-specified-degree-using-an-xps-source-document](./set-the-rotation-angle-of-a-stamp-to-a-specified-degree-using-an-xps-source-document.cs)
-- [set-the-stamp-s-alignment-to-center-based-on-the-source-pdf-s-layout-and-page-dimensions](./set-the-stamp-s-alignment-to-center-based-on-the-source-pdf-s-layout-and-page-dimensions.cs)
+
+| File | Key APIs | Description |
+|------|----------|-------------|
+| [add-a-multi-line-watermark-stamp-to-a-pdf-document-generated...](./add-a-multi-line-watermark-stamp-to-a-pdf-document-generated-from-pcl-input-programmatically.cs) | `PclLoadOptions` | Add a multi line watermark stamp to a pdf document generated from pcl input p... |
+| [add-a-multi-line-watermark-stamp-to-a-pdf-document-loaded-fr...](./add-a-multi-line-watermark-stamp-to-a-pdf-document-loaded-from-a-cgm-source-using-the-api.cs) | `CgmLoadOptions` | Add a multi line watermark stamp to a pdf document loaded from a cgm source u... |
+| [add-a-multi-line-watermark-stamp-to-a-pdf-document-loaded-fr...](./add-a-multi-line-watermark-stamp-to-a-pdf-document-loaded-from-an-epub-file.cs) | `EpubLoadOptions` | Add a multi line watermark stamp to a pdf document loaded from an epub file |
+| [add-a-multi-line-watermark-stamp-to-a-pdf-document-opened-fr...](./add-a-multi-line-watermark-stamp-to-a-pdf-document-opened-from-an-mht-source.cs) | `MhtLoadOptions`, `PdfFileStamp` | Add a multi line watermark stamp to a pdf document opened from an mht source |
+| [add-a-multi-line-watermark-stamp-to-an-opened-pdf-document-p...](./add-a-multi-line-watermark-stamp-to-an-opened-pdf-document-preserving-the-existing-content-layout.cs) | `PdfFileStamp` | Add a multi line watermark stamp to an opened pdf document preserving the exi... |
+| [apply-a-custom-rotation-in-degrees-to-a-stamp-generated-from...](./apply-a-custom-rotation-in-degrees-to-a-stamp-generated-from-an-svg-source.cs) | `PdfFileStamp` | Apply a custom rotation in degrees to a stamp generated from an svg source |
+| [apply-a-multi-line-watermark-stamp-defined-via-svg-onto-a-pd...](./apply-a-multi-line-watermark-stamp-defined-via-svg-onto-a-pdf-document-during-processing.cs) | `PdfFileStamp` | Apply a multi line watermark stamp defined via svg onto a pdf document during... |
+| [apply-a-multi-line-watermark-stamp-onto-a-pdf-document-gener...](./apply-a-multi-line-watermark-stamp-onto-a-pdf-document-generated-from-tex-source-preserving-existin.cs) | `TeXLoadOptions`, `PdfFileStamp` | Apply a multi line watermark stamp onto a pdf document generated from tex sou... |
+| [apply-a-multi-line-watermark-stamp-onto-a-pdf-document-that-...](./apply-a-multi-line-watermark-stamp-onto-a-pdf-document-that-is-generated-by-loading-html-content.cs) | `HtmlLoadOptions`, `PdfFileStamp` | Apply a multi line watermark stamp onto a pdf document that is generated by l... |
+| [apply-a-multi-line-watermark-stamp-onto-a-pdf-document-that-...](./apply-a-multi-line-watermark-stamp-onto-a-pdf-document-that-is-loaded-from-a-ps-source.cs) | `PsLoadOptions`, `PdfFileStamp` | Apply a multi line watermark stamp onto a pdf document that is loaded from a ... |
+| [apply-a-multi-line-watermark-stamp-to-a-pdf-document-created...](./apply-a-multi-line-watermark-stamp-to-a-pdf-document-created-by-loading-an-mht-file.cs) | `MhtLoadOptions`, `PdfFileStamp` | Apply a multi line watermark stamp to a pdf document created by loading an mh... |
+| [apply-a-multi-line-watermark-stamp-to-a-pdf-document-generat...](./apply-a-multi-line-watermark-stamp-to-a-pdf-document-generated-from-an-xps-source.cs) | `XpsLoadOptions`, `PdfFileStamp` | Apply a multi line watermark stamp to a pdf document generated from an xps so... |
+| [apply-a-multi-line-watermark-stamp-to-a-pdf-document-generat...](./apply-a-multi-line-watermark-stamp-to-a-pdf-document-generated-from-an-xslfo-source.cs) | `XslFoLoadOptions`, `PdfFileStamp` | Apply a multi line watermark stamp to a pdf document generated from an xslfo ... |
+| [apply-a-multi-line-watermark-stamp-to-a-pdf-document-generat...](./apply-a-multi-line-watermark-stamp-to-a-pdf-document-generated-from-xsl-fo-input-using-the-api.cs) | `XslFoLoadOptions`, `PdfFileStamp` | Apply a multi line watermark stamp to a pdf document generated from xsl fo in... |
+| [apply-a-multi-line-watermark-stamp-to-a-pdf-document-loaded-...](./apply-a-multi-line-watermark-stamp-to-a-pdf-document-loaded-from-a-pdf-file.cs) | `PdfFileStamp` | Apply a multi line watermark stamp to a pdf document loaded from a pdf file |
+| [apply-a-multi-line-watermark-stamp-to-a-pdf-document-loaded-...](./apply-a-multi-line-watermark-stamp-to-a-pdf-document-loaded-from-an-xml-source.cs) | `PdfFileStamp` | Apply a multi line watermark stamp to a pdf document loaded from an xml source |
+| [apply-a-multi-line-watermark-stamp-to-a-pdf-document-loaded-...](./apply-a-multi-line-watermark-stamp-to-a-pdf-document-loaded-via-html-ensuring-correct-positioning-a.cs) | `HtmlLoadOptions`, `PdfFileStamp` | Apply a multi line watermark stamp to a pdf document loaded via html ensuring... |
+| [apply-a-multi-line-watermark-stamp-to-a-pdf-document-program...](./apply-a-multi-line-watermark-stamp-to-a-pdf-document-programmatically-loaded-via-tex-rendering.cs) | `TeXLoadOptions`, `PdfFileStamp` | Apply a multi line watermark stamp to a pdf document programmatically loaded ... |
+| [apply-a-multi-line-watermark-stamp-to-a-pdf-document-that-ha...](./apply-a-multi-line-watermark-stamp-to-a-pdf-document-that-has-been-loaded-from-an-ofd-source.cs) | `PdfFileStamp` | Apply a multi line watermark stamp to a pdf document that has been loaded fro... |
+| [apply-a-multi-line-watermark-stamp-to-a-pdf-document-that-is...](./apply-a-multi-line-watermark-stamp-to-a-pdf-document-that-is-imported-from-an-ofd-source.cs) | `OfdLoadOptions`, `PdfFileStamp` | Apply a multi line watermark stamp to a pdf document that is imported from an... |
+| [apply-a-multi-line-watermark-stamp-to-a-pdf-document-utilizi...](./apply-a-multi-line-watermark-stamp-to-a-pdf-document-utilizing-an-existing-pdf-as-the-source.cs) | `PdfFileStamp` | Apply a multi line watermark stamp to a pdf document utilizing an existing pd... |
+| [apply-a-multi-line-watermark-stamp-to-a-pdf-that-is-opened-f...](./apply-a-multi-line-watermark-stamp-to-a-pdf-that-is-opened-from-a-memory-document.cs) | `PdfFileStamp`, `FormattedText`, `Stamp` | Apply a multi line watermark stamp to a pdf that is opened from a memory docu... |
+| [apply-a-specific-rotation-degree-to-a-stamp-by-providing-the...](./apply-a-specific-rotation-degree-to-a-stamp-by-providing-the-angle-value-within-the-source-md-file.cs) | `PdfFileStamp` | Apply a specific rotation degree to a stamp by providing the angle value with... |
+| [apply-a-specified-rotation-angle-to-a-stamp-based-on-the-sou...](./apply-a-specified-rotation-angle-to-a-stamp-based-on-the-source-cgm-coordinates.cs) | `CgmLoadOptions`, `PdfFileStamp` | Apply a specified rotation angle to a stamp based on the source cgm coordinates |
+| [configure-a-stamp-annotation-s-rotation-angle-to-a-specific-...](./configure-a-stamp-annotation-s-rotation-angle-to-a-specific-degree-value-within-the-source-pdf.cs) | `PdfFileStamp` | Configure a stamp annotation s rotation angle to a specific degree value with... |
+| [configure-a-stamp-s-rotation-angle-in-degrees-based-on-the-p...](./configure-a-stamp-s-rotation-angle-in-degrees-based-on-the-provided-html-source-content.cs) | `PdfFileStamp` | Configure a stamp s rotation angle in degrees based on the provided html sour... |
+| [configure-a-stamp-s-rotation-angle-in-degrees-by-supplying-t...](./configure-a-stamp-s-rotation-angle-in-degrees-by-supplying-the-source-tex-markup-directly.cs) | `PdfFileStamp` | Configure a stamp s rotation angle in degrees by supplying the source tex mar... |
+| [configure-a-stamp-s-rotation-angle-in-degrees-via-the-source...](./configure-a-stamp-s-rotation-angle-in-degrees-via-the-source-xml-definition-to-control-document-anno.cs) | `PdfFileStamp` | Configure a stamp s rotation angle in degrees via the source xml definition t... |
+| [configure-a-stamp-s-rotation-angle-to-a-specific-degree-valu...](./configure-a-stamp-s-rotation-angle-to-a-specific-degree-value-by-applying-transformations-to-the-sou.cs) | `PdfFileStamp` | Configure a stamp s rotation angle to a specific degree value by applying tra... |
+| [configure-a-stamp-s-rotation-angle-to-a-specified-degree-by-...](./configure-a-stamp-s-rotation-angle-to-a-specified-degree-by-applying-a-source-pcl-transformation.cs) | `PclLoadOptions`, `PdfFileStamp` | Configure a stamp s rotation angle to a specified degree by applying a source... |
+| ... | | *and 20 more files* |
 
 ## Category Statistics
-- Total examples: 58
+- Total examples: 50
 
 ## Category-Specific Tips
 
@@ -121,8 +121,8 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
   - **Common Mistakes** — verified anti-patterns that cause build failures
   - **Domain Knowledge** — cross-cutting API-specific gotchas
   - **Testing Guide** — build and run verification steps
-- Review code examples in this folder for Facades - Stamps patterns
+- Review code examples in this folder for facades-stamps patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-03-12 | Run: `20260312_111501_41f7c6`
+Updated: 2026-03-12 | Run: `20260312_233752_850e17`
 <!-- AUTOGENERATED:END -->
