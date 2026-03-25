@@ -1,0 +1,446 @@
+{
+  "category": "",
+  "last_updated": "2026-03-25T12:35:33Z",
+  "examples": {
+    "enable-automatic-tagging-for-pdf-ua-conversion-and-save-the-document-as-a-tagged-pdf": {
+      "title": "Enable Automatic Tagging For Pdf Ua Conversion And Save The Document As A Tagged Pdf",
+      "filename": "enable-automatic-tagging-for-pdf-ua-conversion-and-save-the-document-as-a-tagged-pdf.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "create-a-new-pdf-add-a-heading-structure-element-and-assign-a-language-attribute": {
+      "title": "Create A New Pdf Add A Heading Structure Element And Assign A Language Attribute",
+      "filename": "create-a-new-pdf-add-a-heading-structure-element-and-assign-a-language-attribute.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "set-the-document-title-property-on-the-root-structure-element-to-improve-metadata": {
+      "title": "Set The Document Title Property On The Root Structure Element To Improve Metadata",
+      "filename": "set-the-document-title-property-on-the-root-structure-element-to-improve-metadata.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "generate-a-logical-table-of-contents-page-add-heading-entries-and-tag-the-page-accordingly": {
+      "title": "Generate A Logical Table Of Contents Page Add Heading Entries And Tag The Page Accordingly",
+      "filename": "generate-a-logical-table-of-contents-page-add-heading-entries-and-tag-the-page-accordingly.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "append-a-paragraph-element-under-a-toci-element-and-set-its-actualtext-for-accessibility": {
+      "title": "Append A Paragraph Element Under A Toci Element And Set Its Actualtext For Accessibility",
+      "filename": "append-a-paragraph-element-under-a-toci-element-and-set-its-actualtext-for-accessibility.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "add-a-custom-tag-name-to-a-paragraph-element-to-represent-a-specialized-content-type": {
+      "title": "Add A Custom Tag Name To A Paragraph Element To Represent A Specialized Content Type",
+      "filename": "add-a-custom-tag-name-to-a-paragraph-element-to-represent-a-specialized-content-type.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "insert-a-link-element-pointing-to-an-external-url-and-define-its-title-attribute": {
+      "title": "Insert A Link Element Pointing To An External Url And Define Its Title Attribute",
+      "filename": "insert-a-link-element-pointing-to-an-external-url-and-define-its-title-attribute.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "create-a-link-element-that-points-to-an-internal-page-number-and-set-its-role-to-link": {
+      "title": "Create A Link Element That Points To An Internal Page Number And Set Its Role To Link",
+      "filename": "create-a-link-element-that-points-to-an-internal-page-number-and-set-its-role-to-link.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "add-a-note-element-as-a-child-of-a-paragraph-to-provide-supplemental-information": {
+      "title": "Add A Note Element As A Child Of A Paragraph To Provide Supplemental Information",
+      "filename": "add-a-note-element-as-a-child-of-a-paragraph-to-provide-supplemental-information.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "append-a-custom-note-element-under-a-figure-element-to-supply-descriptive-captions": {
+      "title": "Append A Custom Note Element Under A Figure Element To Supply Descriptive Captions",
+      "filename": "append-a-custom-note-element-under-a-figure-element-to-supply-descriptive-captions.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "add-an-actualtext-attribute-to-an-image-structure-element-for-screen-reader-alternative-text": {
+      "title": "Add An Actualtext Attribute To An Image Structure Element For Screen Reader Alternative Text",
+      "filename": "add-an-actualtext-attribute-to-an-image-structure-element-for-screen-reader-alternative-text.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "set-the-actualtext-property-on-a-span-element-to-supply-hidden-pronunciation-text": {
+      "title": "Set The Actualtext Property On A Span Element To Supply Hidden Pronunciation Text",
+      "filename": "set-the-actualtext-property-on-a-span-element-to-supply-hidden-pronunciation-text.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "update-the-language-property-of-a-specific-structure-element-to-french-and-revalidate-compliance": {
+      "title": "Update The Language Property Of A Specific Structure Element To French And Revalidate Compliance",
+      "filename": "update-the-language-property-of-a-specific-structure-element-to-french-and-revalidate-compliance.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "add-a-language-attribute-to-the-entire-document-s-structure-tree-to-indicate-primary-content-languag": {
+      "title": "Add A Language Attribute To The Entire Document S Structure Tree To Indicate Primary Content Languag",
+      "filename": "add-a-language-attribute-to-the-entire-document-s-structure-tree-to-indicate-primary-content-languag.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "propagate-a-language-attribute-from-the-root-element-to-all-child-elements-automatically": {
+      "title": "Propagate A Language Attribute From The Root Element To All Child Elements Automatically",
+      "filename": "propagate-a-language-attribute-from-the-root-element-to-all-child-elements-automatically.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "create-a-table-with-three-rows-and-four-columns-and-append-it-to-the-structure-tree": {
+      "title": "Create A Table With Three Rows And Four Columns And Append It To The Structure Tree",
+      "filename": "create-a-table-with-three-rows-and-four-columns-and-append-it-to-the-structure-tree.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "merge-cells-to-form-a-header-row-assign-the-th-role-and-set-actualtext-for-each-header": {
+      "title": "Merge Cells To Form A Header Row Assign The Th Role And Set Actualtext For Each Header",
+      "filename": "merge-cells-to-form-a-header-row-assign-the-th-role-and-set-actualtext-for-each-header.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "style-each-table-cell-with-background-color-border-thickness-and-padding-for-visual-accessibility": {
+      "title": "Style Each Table Cell With Background Color Border Thickness And Padding For Visual Accessibility",
+      "filename": "style-each-table-cell-with-background-color-border-thickness-and-padding-for-visual-accessibility.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "apply-custom-border-styles-to-table-cells-based-on-row-index-to-enhance-distinction": {
+      "title": "Apply Custom Border Styles To Table Cells Based On Row Index To Enhance Distinction",
+      "filename": "apply-custom-border-styles-to-table-cells-based-on-row-index-to-enhance-distinction.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "assign-custom-tags-to-table-cells-indicating-data-type-and-validate-the-pdf-for-compliance": {
+      "title": "Assign Custom Tags To Table Cells Indicating Data Type And Validate The Pdf For Compliance",
+      "filename": "assign-custom-tags-to-table-cells-indicating-data-type-and-validate-the-pdf-for-compliance.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "create-a-nested-table-inside-a-paragraph-element-and-validate-its-tagging-hierarchy": {
+      "title": "Create A Nested Table Inside A Paragraph Element And Validate Its Tagging Hierarchy",
+      "filename": "create-a-nested-table-inside-a-paragraph-element-and-validate-its-tagging-hierarchy.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "create-a-nested-list-with-bullet-and-numbered-items-assign-appropriate-list-tags-and-validate": {
+      "title": "Create A Nested List With Bullet And Numbered Items Assign Appropriate List Tags And Validate",
+      "filename": "create-a-nested-list-with-bullet-and-numbered-items-assign-appropriate-list-tags-and-validate.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "create-a-form-field-register-it-in-the-acroform-and-associate-it-with-a-form-structure-element": {
+      "title": "Create A Form Field Register It In The Acroform And Associate It With A Form Structure Element",
+      "filename": "create-a-form-field-register-it-in-the-acroform-and-associate-it-with-a-form-structure-element.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "insert-a-form-field-with-placeholder-text-and-associate-it-with-a-form-element": {
+      "title": "Insert A Form Field With Placeholder Text And Associate It With A Form Element",
+      "filename": "insert-a-form-field-with-placeholder-text-and-associate-it-with-a-form-element.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "add-a-page-break-element-to-the-logical-tree-to-separate-sections-in-a-tagged-pdf": {
+      "title": "Add A Page Break Element To The Logical Tree To Separate Sections In A Tagged Pdf",
+      "filename": "add-a-page-break-element-to-the-logical-tree-to-separate-sections-in-a-tagged-pdf.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "load-a-pdf-locate-a-paragraph-by-its-title-and-modify-its-actualtext-for-correction": {
+      "title": "Load A Pdf Locate A Paragraph By Its Title And Modify Its Actualtext For Correction",
+      "filename": "load-a-pdf-locate-a-paragraph-by-its-title-and-modify-its-actualtext-for-correction.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "remove-an-existing-note-element-and-replace-it-with-an-updated-note-containing-new-text": {
+      "title": "Remove An Existing Note Element And Replace It With An Updated Note Containing New Text",
+      "filename": "remove-an-existing-note-element-and-replace-it-with-an-updated-note-containing-new-text.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "programmatically-set-the-title-property-on-a-paragraph-to-provide-a-concise-summary": {
+      "title": "Programmatically Set The Title Property On A Paragraph To Provide A Concise Summary",
+      "filename": "programmatically-set-the-title-property-on-a-paragraph-to-provide-a-concise-summary.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "programmatically-set-the-title-property-on-a-figure-to-give-a-concise-description": {
+      "title": "Programmatically Set The Title Property On A Figure To Give A Concise Description",
+      "filename": "programmatically-set-the-title-property-on-a-figure-to-give-a-concise-description.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "validate-a-tagged-pdf-against-pdf-ua-standards-and-retrieve-an-xml-compliance-report": {
+      "title": "Validate A Tagged Pdf Against Pdf Ua Standards And Retrieve An Xml Compliance Report",
+      "filename": "validate-a-tagged-pdf-against-pdf-ua-standards-and-retrieve-an-xml-compliance-report.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "programmatically-check-pdf-ua-compliance-and-log-the-boolean-result-for-further-processing": {
+      "title": "Programmatically Check Pdf Ua Compliance And Log The Boolean Result For Further Processing",
+      "filename": "programmatically-check-pdf-ua-compliance-and-log-the-boolean-result-for-further-processing.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "parse-the-xml-validation-report-to-generate-a-summary-of-error-codes-and-common-violations": {
+      "title": "Parse The Xml Validation Report To Generate A Summary Of Error Codes And Common Violations",
+      "filename": "parse-the-xml-validation-report-to-generate-a-summary-of-error-codes-and-common-violations.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "filter-xml-errors-for-missing-alt-text-and-generate-a-list-of-affected-image-ids": {
+      "title": "Filter Xml Errors For Missing Alt Text And Generate A List Of Affected Image Ids",
+      "filename": "filter-xml-errors-for-missing-alt-text-and-generate-a-list-of-affected-image-ids.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "extract-all-textual-content-from-a-tagged-pdf-by-traversing-the-structure-tree": {
+      "title": "Extract All Textual Content From A Tagged Pdf By Traversing The Structure Tree",
+      "filename": "extract-all-textual-content-from-a-tagged-pdf-by-traversing-the-structure-tree.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "export-the-structure-tree-to-an-xml-file-and-transform-it-using-xslt-to-create-a-report": {
+      "title": "Export The Structure Tree To An Xml File And Transform It Using Xslt To Create A Report",
+      "filename": "export-the-structure-tree-to-an-xml-file-and-transform-it-using-xslt-to-create-a-report.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "export-the-structure-tree-to-json-for-external-accessibility-analysis": {
+      "title": "Export The Structure Tree To Json For External Accessibility Analysis",
+      "filename": "export-the-structure-tree-to-json-for-external-accessibility-analysis.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "extract-tagged-content-from-a-pdf-and-export-it-to-a-json-file-preserving-hierarchy": {
+      "title": "Extract Tagged Content From A Pdf And Export It To A Json File Preserving Hierarchy",
+      "filename": "extract-tagged-content-from-a-pdf-and-export-it-to-a-json-file-preserving-hierarchy.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "extract-all-note-elements-concatenate-their-texts-and-save-the-result-to-a-plain-text-file": {
+      "title": "Extract All Note Elements Concatenate Their Texts And Save The Result To A Plain Text File",
+      "filename": "extract-all-note-elements-concatenate-their-texts-and-save-the-result-to-a-plain-text-file.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "extract-all-link-elements-list-their-urls-and-write-the-list-to-a-csv-file": {
+      "title": "Extract All Link Elements List Their Urls And Write The List To A Csv File",
+      "filename": "extract-all-link-elements-list-their-urls-and-write-the-list-to-a-csv-file.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "batch-process-a-folder-of-pdfs-add-missing-tags-and-save-each-with-a-suffix": {
+      "title": "Batch Process A Folder Of Pdfs Add Missing Tags And Save Each With A Suffix",
+      "filename": "batch-process-a-folder-of-pdfs-add-missing-tags-and-save-each-with-a-suffix.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "batch-convert-untagged-pdfs-to-tagged-pdfs-enable-auto-tagging-and-store-outputs-separately": {
+      "title": "Batch Convert Untagged Pdfs To Tagged Pdfs Enable Auto Tagging And Store Outputs Separately",
+      "filename": "batch-convert-untagged-pdfs-to-tagged-pdfs-enable-auto-tagging-and-store-outputs-separately.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "batch-validate-a-directory-of-pdfs-collect-xml-logs-and-produce-a-summary-csv-of-compliance-status": {
+      "title": "Batch Validate A Directory Of Pdfs Collect Xml Logs And Produce A Summary Csv Of Compliance Status",
+      "filename": "batch-validate-a-directory-of-pdfs-collect-xml-logs-and-produce-a-summary-csv-of-compliance-status.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "batch-validate-pdfs-collect-xml-logs-and-generate-a-dashboard-showing-compliance-percentages-per-f": {
+      "title": "Batch Validate Pdfs Collect Xml Logs And Generate A Dashboard Showing Compliance Percentages Per F",
+      "filename": "batch-validate-pdfs-collect-xml-logs-and-generate-a-dashboard-showing-compliance-percentages-per-f.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    },
+    "add-missing-language-attributes-to-all-structure-elements-lacking-explicit-language-settings": {
+      "title": "Add Missing Language Attributes To All Structure Elements Lacking Explicit Language Settings",
+      "filename": "add-missing-language-attributes-to-all-structure-elements-lacking-explicit-language-settings.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T12:35:33Z",
+      "status": "verified"
+    }
+  }
+}
