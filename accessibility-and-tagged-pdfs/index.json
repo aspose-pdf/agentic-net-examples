@@ -1,0 +1,457 @@
+{
+  "category": "Accessibility And Tagged Pdfs",
+  "nuget_version": "26.3.0",
+  "last_updated": "2026-03-25T17:03:02Z",
+  "examples": {
+    "add-actualtext-to-image-structure": {
+      "title": "Add Actualtext To Image Structure",
+      "filename": "add-actualtext-to-image-structure.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "add-custom-tag-paragraph": {
+      "title": "Add Custom Tag Paragraph",
+      "filename": "add-custom-tag-paragraph.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "add-form-field-placeholder": {
+      "title": "Add Form Field Placeholder",
+      "filename": "add-form-field-placeholder.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "add-missing-language-attributes": {
+      "title": "Add Missing Language Attributes",
+      "filename": "add-missing-language-attributes.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "add-note-caption-under-figure": {
+      "title": "Add Note Caption Under Figure",
+      "filename": "add-note-caption-under-figure.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "add-note-element": {
+      "title": "Add Note Element",
+      "filename": "add-note-element.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "add-section-page-break": {
+      "title": "Add Section Page Break",
+      "filename": "add-section-page-break.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "append-paragraph-under-toci": {
+      "title": "Append Paragraph Under Toci",
+      "filename": "append-paragraph-under-toci.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "assign-custom-tags-table-validate": {
+      "title": "Assign Custom Tags Table Validate",
+      "filename": "assign-custom-tags-table-validate.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "batch-add-missing-tags": {
+      "title": "Batch Add Missing Tags",
+      "filename": "batch-add-missing-tags.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "batch-convert-untagged-to-tagged": {
+      "title": "Batch Convert Untagged To Tagged",
+      "filename": "batch-convert-untagged-to-tagged.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "batch-pdf-validation": {
+      "title": "Batch Pdf Validation",
+      "filename": "batch-pdf-validation.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "batch-validate-pdfs-dashboard": {
+      "title": "Batch Validate Pdfs Dashboard",
+      "filename": "batch-validate-pdfs-dashboard.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "check-pdf-ua-compliance": {
+      "title": "Check Pdf Ua Compliance",
+      "filename": "check-pdf-ua-compliance.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "create-form-field-tagged": {
+      "title": "Create Form Field Tagged",
+      "filename": "create-form-field-tagged.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "create-internal-link-element": {
+      "title": "Create Internal Link Element",
+      "filename": "create-internal-link-element.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "create-logical-toc": {
+      "title": "Create Logical Toc",
+      "filename": "create-logical-toc.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "create-nested-list": {
+      "title": "Create Nested List",
+      "filename": "create-nested-list.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "create-pdf-heading-language": {
+      "title": "Create Pdf Heading Language",
+      "filename": "create-pdf-heading-language.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "create-tagged-table": {
+      "title": "Create Tagged Table",
+      "filename": "create-tagged-table.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "custom-table-borders": {
+      "title": "Custom Table Borders",
+      "filename": "custom-table-borders.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "enable-auto-tagging-pdf": {
+      "title": "Enable Auto Tagging Pdf",
+      "filename": "enable-auto-tagging-pdf.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "export-structure-tree-json": {
+      "title": "Export Structure Tree Json",
+      "filename": "export-structure-tree-json.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "export-structure-xml-xslt": {
+      "title": "Export Structure Xml Xslt",
+      "filename": "export-structure-xml-xslt.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "extract-note-elements": {
+      "title": "Extract Note Elements",
+      "filename": "extract-note-elements.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "extract-pdf-links-to-csv": {
+      "title": "Extract Pdf Links To Csv",
+      "filename": "extract-pdf-links-to-csv.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "extract-tagged-pdf-text": {
+      "title": "Extract Tagged Pdf Text",
+      "filename": "extract-tagged-pdf-text.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "extract-tagged-structure": {
+      "title": "Extract Tagged Structure",
+      "filename": "extract-tagged-structure.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "insert-external-link-element": {
+      "title": "Insert External Link Element",
+      "filename": "insert-external-link-element.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "iterate-structure-elements": {
+      "title": "Iterate Structure Elements",
+      "filename": "iterate-structure-elements.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "list-missing-alt-images": {
+      "title": "List Missing Alt Images",
+      "filename": "list-missing-alt-images.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "modify-paragraph-actualtext": {
+      "title": "Modify Paragraph Actualtext",
+      "filename": "modify-paragraph-actualtext.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "nested-table-in-paragraph": {
+      "title": "Nested Table In Paragraph",
+      "filename": "nested-table-in-paragraph.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "parse-validation-report": {
+      "title": "Parse Validation Report",
+      "filename": "parse-validation-report.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "propagate-language": {
+      "title": "Propagate Language",
+      "filename": "propagate-language.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "replace-note-element": {
+      "title": "Replace Note Element",
+      "filename": "replace-note-element.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "set-actualtext-span": {
+      "title": "Set Actualtext Span",
+      "filename": "set-actualtext-span.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "set-document-language": {
+      "title": "Set Document Language",
+      "filename": "set-document-language.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "set-figure-title": {
+      "title": "Set Figure Title",
+      "filename": "set-figure-title.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "set-paragraph-title": {
+      "title": "Set Paragraph Title",
+      "filename": "set-paragraph-title.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "set-root-structure-title": {
+      "title": "Set Root Structure Title",
+      "filename": "set-root-structure-title.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "style-table-cells": {
+      "title": "Style Table Cells",
+      "filename": "style-table-cells.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "table-header-merged-cells": {
+      "title": "Table Header Merged Cells",
+      "filename": "table-header-merged-cells.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "update-structure-element-language": {
+      "title": "Update Structure Element Language",
+      "filename": "update-structure-element-language.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    },
+    "validate-pdfua": {
+      "title": "Validate Pdfua",
+      "filename": "validate-pdfua.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-03-25T17:03:02Z",
+      "status": "verified"
+    }
+  }
+}
