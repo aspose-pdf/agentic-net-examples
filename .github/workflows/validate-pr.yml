@@ -1,0 +1,157 @@
+name: Validate Examples (PR)
+
+# Runs on every PR targeting release/* or main.
+# Only builds/runs the .cs files changed in the PR — fast per-category checks.
+# dotnet build  → required (blocks merge if any file fails)
+# dotnet run    → informational only (15s timeout; may fail due to missing input files)
+
+on:
+  pull_request:
+    branches:
+      - "release/**"
+      - main
+    paths:
+      - "**/*.cs"
+
+jobs:
+  validate:
+    name: Build & Run changed examples
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # needed for git diff against base branch
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      # ── Detect NuGet version from index.json, fall back to 26.3.0 ──
+      - name: Detect NuGet version
+        id: version
+        run: |
+          VERSION=""
+          if [ -f "index.json" ]; then
+            VERSION=$(python3 -c "import json,sys; d=json.load(open('index.json')); print(d.get('package_version',''))" 2>/dev/null || true)
+          fi
+          VERSION="${VERSION:-26.3.0}"
+          echo "nuget_version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Using Aspose.PDF $VERSION"
+
+      # ── Create isolated build template (cached per NuGet version) ──
+      - name: Setup build template
+        run: |
+          mkdir -p .build-template
+          cat > .build-template/template.csproj << EOF
+          <Project Sdk="Microsoft.NET.Sdk">
+            <PropertyGroup>
+              <OutputType>Exe</OutputType>
+              <TargetFramework>net10.0</TargetFramework>
+              <Nullable>enable</Nullable>
+              <ImplicitUsings>enable</ImplicitUsings>
+            </PropertyGroup>
+            <ItemGroup>
+              <PackageReference Include="Aspose.PDF" Version="${{ steps.version.outputs.nuget_version }}" />
+            </ItemGroup>
+          </Project>
+          EOF
+          sed -i 's/^[[:space:]]*//' .build-template/template.csproj
+          echo 'class Program { static void Main() {} }' > .build-template/Program.cs
+          dotnet restore .build-template/ --verbosity quiet
+          echo "Template ready with Aspose.PDF ${{ steps.version.outputs.nuget_version }}"
+
+      # ── Find .cs files changed in this PR ──
+      - name: Get changed .cs files
+        id: changed
+        run: |
+          BASE="${{ github.event.pull_request.base.sha }}"
+          HEAD="${{ github.event.pull_request.head.sha }}"
+          FILES=$(git diff --name-only "$BASE" "$HEAD" -- '*.cs' | grep '\.cs$' || true)
+          if [ -z "$FILES" ]; then
+            echo "No .cs files changed in this PR"
+            echo "has_cs=false" >> "$GITHUB_OUTPUT"
+          else
+            COUNT=$(echo "$FILES" | wc -l | tr -d ' ')
+            echo "Found $COUNT changed .cs file(s)"
+            echo "$FILES"
+            echo "$FILES" > /tmp/changed_cs.txt
+            echo "has_cs=true" >> "$GITHUB_OUTPUT"
+            echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build & run examples
+        if: steps.changed.outputs.has_cs == 'true'
+        run: |
+          PASS=0; FAIL=0; RUN_PASS=0; RUN_FAIL=0
+          TOTAL="${{ steps.changed.outputs.count }}"
+
+          echo "## Validation Results" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Aspose.PDF:** ${{ steps.version.outputs.nuget_version }} | **Files:** $TOTAL" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          while IFS= read -r f; do
+            [ -f "$f" ] || continue   # skip deleted files
+
+            cp "$f" .build-template/Program.cs
+
+            # ── dotnet build (required) ──
+            BUILD_OUT=$(dotnet build .build-template/ --no-restore --nologo 2>&1)
+            if echo "$BUILD_OUT" | grep -q "Build succeeded"; then
+              PASS=$((PASS + 1))
+              BUILD_ICON="✅"
+
+              # ── dotnet run (informational, 15s timeout) ──
+              RUN_OUT=$(timeout 15s dotnet run --project .build-template/ --no-build --nologo 2>&1) && RUN_EXIT=0 || RUN_EXIT=$?
+              if [ $RUN_EXIT -eq 124 ]; then
+                # timeout — treat as neutral (example may need input files / long running)
+                RUN_ICON="⏱️"
+                RUN_NOTE="timed out (15s) — may need input files"
+                RUN_PASS=$((RUN_PASS + 1))
+              elif [ $RUN_EXIT -eq 0 ]; then
+                RUN_ICON="🚀"
+                RUN_NOTE="ran successfully"
+                RUN_PASS=$((RUN_PASS + 1))
+              else
+                RUN_ICON="⚠️"
+                RUN_NOTE="runtime error (non-blocking)"
+                RUN_FAIL=$((RUN_FAIL + 1))
+              fi
+
+              echo "$BUILD_ICON $RUN_ICON \`$f\` — $RUN_NOTE" >> "$GITHUB_STEP_SUMMARY"
+            else
+              FAIL=$((FAIL + 1))
+              ERRORS=$(echo "$BUILD_OUT" | grep -E "error CS|^.*error :" | sed "s|Program\.cs|$f|g" || true)
+              echo "::error file=$f::Build failed"
+              echo "❌ FAIL: $f"
+              echo "$ERRORS"
+              echo "" >> "$GITHUB_STEP_SUMMARY"
+              echo "<details><summary>❌ BUILD FAILED: <code>$f</code></summary>" >> "$GITHUB_STEP_SUMMARY"
+              echo "" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              echo "$ERRORS" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              echo "</details>" >> "$GITHUB_STEP_SUMMARY"
+              echo "" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done < /tmp/changed_cs.txt
+
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "---" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Build: ✅ $PASS passed | ❌ $FAIL failed**  " >> "$GITHUB_STEP_SUMMARY"
+          echo "**Run:   🚀 $RUN_PASS ok | ⚠️ $RUN_FAIL runtime errors (informational)**" >> "$GITHUB_STEP_SUMMARY"
+
+          echo "========================================"
+          echo "Build: ✅ $PASS passed | ❌ $FAIL failed"
+          echo "Run:   🚀 $RUN_PASS ok | ⚠️ $RUN_FAIL runtime errors"
+          echo "========================================"
+
+          # Only build failures block the PR
+          [ "$FAIL" -eq 0 ] || exit 1
+
+      - name: No .cs files changed
+        if: steps.changed.outputs.has_cs == 'false'
+        run: echo "No .cs files in this PR — skipping validation."
