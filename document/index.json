@@ -1,0 +1,2394 @@
+{
+  "category": "Document",
+  "last_updated": "2026-03-26T07:08:53Z",
+  "examples": {
+    "create-pdf-title-page": {
+      "title": "Create PDF with Title Page and Custom Font",
+      "filename": "create-pdf-title-page.cs",
+      "description": "Creates a new PDF document, adds a title page with custom font, size, and color, and sets the document title metadata.",
+      "tags": [
+        "pdf",
+        "title-page",
+        "font",
+        "color",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Document",
+        "Page",
+        "TextFragment",
+        "FontRepository",
+        "TextState",
+        "Aspose.Pdf.Color",
+        "Document.SetTitle",
+        "Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:31:17Z",
+      "status": "verified"
+    },
+    "insert-highres-image": {
+      "title": "Insert High-Resolution Image into PDF Page with Absolute Positioning",
+      "filename": "insert-highres-image.cs",
+      "description": "Demonstrates how to add a high‑resolution image to a PDF page at specific absolute coordinates using Aspose.Pdf for .NET.",
+      "tags": [
+        "image",
+        "pdf",
+        "positioning",
+        "aspnet",
+        "example"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.AddImage",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:31:42Z",
+      "status": "verified"
+    },
+    "generate-searchable-pdf": {
+      "title": "Generate Searchable PDF from Scanned Images",
+      "filename": "generate-searchable-pdf.cs",
+      "description": "Creates a searchable PDF by adding an invisible OCR text layer over scanned image pages.",
+      "tags": [
+        "searchable",
+        "ocr",
+        "pdf",
+        "overlay",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Convert",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:33:14Z",
+      "status": "verified"
+    },
+    "add-multi-level-toc": {
+      "title": "Add Multi‑Level Table of Contents to PDF",
+      "filename": "add-multi-level-toc.cs",
+      "description": "Creates a Table of Contents page at the beginning of an existing PDF, adding hierarchical entries with links to the corresponding pages.",
+      "tags": [
+        "toc",
+        "pdf",
+        "annotations",
+        "link",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.GoToAction",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.Position",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:36:22Z",
+      "status": "verified"
+    },
+    "remove-page-renumber": {
+      "title": "Remove a Specific Page from PDF and Renumber Remaining Pages",
+      "filename": "remove-page-renumber.cs",
+      "description": "Demonstrates how to delete a given page from a PDF using Aspose.Pdf for .NET; the library automatically renumbers the remaining pages.",
+      "tags": [
+        "pdf",
+        "delete-page",
+        "renumber",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages.Delete",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:39:44Z",
+      "status": "verified"
+    },
+    "insert-blank-cover-page": {
+      "title": "Insert Blank Cover Page at Beginning of PDF",
+      "filename": "insert-blank-cover-page.cs",
+      "description": "Demonstrates how to insert an empty page at the start of an existing PDF to serve as a cover sheet.",
+      "tags": [
+        "pdf",
+        "insert-page",
+        "cover",
+        "aspdf",
+        "beginner"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PageCollection.Insert"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:39:55Z",
+      "status": "verified"
+    },
+    "replace-word-pdf": {
+      "title": "Replace All Occurrences of a Word in PDF",
+      "filename": "replace-word-pdf.cs",
+      "description": "Demonstrates how to replace every occurrence of a specific word in a PDF while preserving the original formatting using TextFragmentAbsorber.",
+      "tags": [
+        "replace",
+        "text",
+        "pdf",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Document",
+        "TextFragmentAbsorber",
+        "TextFragment",
+        "Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:40:11Z",
+      "status": "verified"
+    },
+    "extract-images-pdf-png": {
+      "title": "Extract Images from PDF and Save as PNG",
+      "filename": "extract-images-pdf-png.cs",
+      "description": "Extracts all images from a PDF document and saves each as a PNG file while preserving the original resolution.",
+      "tags": [
+        "pdf",
+        "image extraction",
+        "png",
+        "aspose.pdf",
+        "c#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.XImage.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:40:36Z",
+      "status": "verified"
+    },
+    "add-digital-signature": {
+      "title": "Add Digital Signature Field and Sign PDF",
+      "filename": "add-digital-signature.cs",
+      "description": "Demonstrates how to add a signature form field to a PDF and sign it using a self‑signed certificate.",
+      "tags": [
+        "signature",
+        "form",
+        "pdf",
+        "aspnet",
+        "digital"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.SignatureField",
+        "Aspose.Pdf.Forms.Signature",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:41:13Z",
+      "status": "verified"
+    },
+    "validate-pdfa-1a": {
+      "title": "Validate PDF for PDF/A‑1A compliance and generate report",
+      "filename": "validate-pdfa-1a.cs",
+      "description": "Loads a PDF, validates it against the PDF/A‑1A standard, writes a detailed validation log, and reports the compliance status.",
+      "tags": [
+        "validation",
+        "pdfa",
+        "report",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Validate",
+        "Aspose.Pdf.Document.IsPdfaCompliant",
+        "Aspose.Pdf.PdfFormat"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:41:27Z",
+      "status": "verified"
+    },
+    "validate-pdfa-1b": {
+      "title": "Validate PDF for PDF/A-1B compliance and log issues",
+      "filename": "validate-pdfa-1b.cs",
+      "description": "Loads a PDF, validates it against PDF/A‑1B, writes a log of non‑conformant elements, and reports the compliance status.",
+      "tags": [
+        "pdfa",
+        "validation",
+        "log",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Validate",
+        "Aspose.Pdf.Document.IsPdfaCompliant"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:41:41Z",
+      "status": "verified"
+    },
+    "clean-pdf-metadata": {
+      "title": "Remove Metadata and Embedded Content from PDF",
+      "filename": "clean-pdf-metadata.cs",
+      "description": "Demonstrates how to strip hidden metadata, JavaScript, and embedded files from a PDF to reduce its file size using Aspose.Pdf.",
+      "tags": [
+        "metadata",
+        "cleanup",
+        "optimize",
+        "pdf",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Document",
+        "Document.RemoveMetadata",
+        "Document.OptimizeResources",
+        "Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:41:54Z",
+      "status": "verified"
+    },
+    "set-pdf-expiration": {
+      "title": "Set PDF Expiration Date with JavaScript",
+      "filename": "set-pdf-expiration.cs",
+      "description": "Demonstrates how to embed a document‑level JavaScript that makes a PDF expire on a specific date.",
+      "tags": [
+        "javascript",
+        "expiration",
+        "security",
+        "document",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.AddJavaScript",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:42:21Z",
+      "status": "verified"
+    },
+    "flatten-pdf-form-fields": {
+      "title": "Flatten PDF Form Fields to Static Content",
+      "filename": "flatten-pdf-form-fields.cs",
+      "description": "Demonstrates how to remove interactive form fields from a PDF and convert their values into static page content using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "flatten",
+        "forms",
+        "static",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Flatten",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:42:34Z",
+      "status": "verified"
+    },
+    "detect-incremental-updates": {
+      "title": "Detect Incremental Updates and Modification in PDF",
+      "filename": "detect-incremental-updates.cs",
+      "description": "Loads a PDF, checks for incremental updates, and compares original and modified IDs to determine if the file was changed after creation.",
+      "tags": [
+        "incremental-update",
+        "pdf-analysis",
+        "aspose-pdf",
+        "document-id",
+        "beginner"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.HasIncrementalUpdate",
+        "Aspose.Pdf.Document.Id",
+        "Aspose.Pdf.Document.Id.Original",
+        "Aspose.Pdf.Document.Id.Modified"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:42:56Z",
+      "status": "verified"
+    },
+    "monitor-pdf-generation-progress": {
+      "title": "Monitor PDF Generation Progress with Aspose.Pdf",
+      "filename": "monitor-pdf-generation-progress.cs",
+      "description": "Shows how to attach a custom progress handler to a SaveOptions object to receive conversion progress events while saving a PDF to HTML, updating a console progress indicator.",
+      "tags": [
+        "progress",
+        "saveoptions",
+        "html",
+        "aspose-pdf",
+        "event"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.HtmlSaveOptions",
+        "Aspose.Pdf.HtmlSaveOptions.CustomProgressHandler",
+        "Aspose.Pdf.HtmlSaveOptions.ConversionProgressEventHandler",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:43:42Z",
+      "status": "verified"
+    },
+    "add-accessibility-tags": {
+      "title": "Add Accessibility Tags to Headings, Paragraphs, and Tables",
+      "filename": "add-accessibility-tags.cs",
+      "description": "Demonstrates how to tag headings, paragraphs, and a table in an existing PDF to improve screen‑reader compatibility.",
+      "tags": [
+        "accessibility",
+        "tagging",
+        "headings",
+        "paragraph",
+        "table"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.AutoTaggingSettings",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.LogicalStructure.StructureElement",
+        "Aspose.Pdf.LogicalStructure.HeaderElement",
+        "Aspose.Pdf.LogicalStructure.ParagraphElement",
+        "Aspose.Pdf.LogicalStructure.TableElement",
+        "Aspose.Pdf.LogicalStructure.TableTHeadElement",
+        "Aspose.Pdf.LogicalStructure.TableTRElement",
+        "Aspose.Pdf.LogicalStructure.TableTHElement",
+        "Aspose.Pdf.LogicalStructure.TableTBodyElement",
+        "Aspose.Pdf.LogicalStructure.TableTDElement"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:47:10Z",
+      "status": "verified"
+    },
+    "attach-pdf-portfolio": {
+      "title": "Attach PDF Portfolio File with Description",
+      "filename": "attach-pdf-portfolio.cs",
+      "description": "Demonstrates how to attach a PDF file as a portfolio entry to another PDF and set a custom description for the attached file.",
+      "tags": [
+        "portfolio",
+        "attachment",
+        "metadata",
+        "aspdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Portfolio",
+        "Aspose.Pdf.Portfolio.AddFile",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:47:41Z",
+      "status": "verified"
+    },
+    "read-update-pdf-metadata": {
+      "title": "Read and Update PDF Metadata (Author and Title)",
+      "filename": "read-update-pdf-metadata.cs",
+      "description": "Loads a PDF, reads its author and title metadata, updates these fields, and saves the document.",
+      "tags": [
+        "metadata",
+        "author",
+        "title",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.DocumentInfo",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:47:55Z",
+      "status": "verified"
+    },
+    "apply-password-protection": {
+      "title": "Apply Password Protection to PDF",
+      "filename": "apply-password-protection.cs",
+      "description": "Demonstrates how to encrypt a PDF with user and owner passwords and set specific permissions using Aspose.Pdf for .NET.",
+      "tags": [
+        "encryption",
+        "pdf",
+        "permissions",
+        "security",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:48:07Z",
+      "status": "verified"
+    },
+    "print-pdf-document": {
+      "title": "Print PDF Document Directly from .NET",
+      "filename": "print-pdf-document.cs",
+      "description": "Demonstrates how to load a PDF and send it to the printer using Aspose.Pdf's built‑in PdfViewer.",
+      "tags": [
+        "print",
+        "pdf",
+        "viewer",
+        "document",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfViewer.BindPdf",
+        "Aspose.Pdf.Facades.PdfViewer.PrintDocument",
+        "Aspose.Pdf.Document.FormPresentationMode"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:48:32Z",
+      "status": "verified"
+    },
+    "interrupt-resume-pdf-save": {
+      "title": "Interrupt and Resume Large PDF Save Operation",
+      "filename": "interrupt-resume-pdf-save.cs",
+      "description": "Shows how to interrupt a long‑running PDF save using IInterruptMonitor and later resume the save operation.",
+      "tags": [
+        "interrupt",
+        "async",
+        "save",
+        "pdf",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Multithreading.InterruptMonitor",
+        "Aspose.Pdf.Multithreading.IInterruptMonitor.Interrupt",
+        "Aspose.Pdf.Document.SaveAsync"
+      ],
+      "difficulty": "advanced",
+      "generated_at": "2026-03-26T05:48:47Z",
+      "status": "verified"
+    },
+    "embed-zugferd-xml": {
+      "title": "Embed ZUGFeRD XML into PDF and Verify",
+      "filename": "embed-zugferd-xml.cs",
+      "description": "Demonstrates embedding a ZUGFeRD invoice XML file into a PDF using BindXml and checking its presence via GetCatalogValue.",
+      "tags": [
+        "ZUGFeRD",
+        "XML",
+        "PDF",
+        "Embedding",
+        "Verification"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.BindXml",
+        "Aspose.Pdf.Document.GetCatalogValue",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:51:14Z",
+      "status": "verified"
+    },
+    "javascript-alert-on-open": {
+      "title": "Add JavaScript Alert on PDF Open",
+      "filename": "javascript-alert-on-open.cs",
+      "description": "Demonstrates how to embed a JavaScript action that shows an alert dialog when the PDF is opened.",
+      "tags": [
+        "javascript",
+        "open-action",
+        "alert",
+        "pdf",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Annotations.JavascriptAction",
+        "Aspose.Pdf.Document.OpenAction",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:51:26Z",
+      "status": "verified"
+    },
+    "create-pdf-from-html-strings": {
+      "title": "Create PDF from Multiple HTML Strings with Custom Rendering Options",
+      "filename": "create-pdf-from-html-strings.cs",
+      "description": "Demonstrates how to convert a collection of HTML strings into a single PDF document using HtmlLoadOptions for custom page settings.",
+      "tags": [
+        "pdf",
+        "html",
+        "conversion",
+        "custom-options",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.HtmlLoadOptions",
+        "Aspose.Pdf.PageInfo",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages.Add"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:52:28Z",
+      "status": "verified"
+    },
+    "add-styled-table": {
+      "title": "Add Styled Table with Alternating Row Colors to PDF",
+      "filename": "add-styled-table.cs",
+      "description": "Creates a PDF, adds a table with borders and alternating row background colors, and saves the document.",
+      "tags": [
+        "table",
+        "border",
+        "alternating-rows",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Border",
+        "Aspose.Pdf.Color",
+        "System.Data.DataTable"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:53:36Z",
+      "status": "verified"
+    },
+    "add-external-hyperlink-annotation": {
+      "title": "Add External Hyperlink Annotation to PDF",
+      "filename": "add-external-hyperlink-annotation.cs",
+      "description": "Demonstrates how to insert a link annotation that opens an external website when clicked.",
+      "tags": [
+        "annotation",
+        "hyperlink",
+        "pdf",
+        "aspnet",
+        "linkannotation"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.GoToURIAction"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:53:50Z",
+      "status": "verified"
+    },
+    "replace-image-pdf": {
+      "title": "Replace Image in PDF Page While Preserving Layout",
+      "filename": "replace-image-pdf.cs",
+      "description": "Demonstrates how to replace an existing image on a PDF page with a new image using Aspose.Pdf, keeping the original layout intact.",
+      "tags": [
+        "image-replacement",
+        "pdf",
+        "layout",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.XImageCollection.Replace"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:54:05Z",
+      "status": "verified"
+    },
+    "add-page-numbers-footer": {
+      "title": "Add Page Numbers to PDF Footer",
+      "filename": "add-page-numbers-footer.cs",
+      "description": "Demonstrates how to add dynamic page numbers to the footer of each page in a PDF using Aspose.Pdf's PageNumberStamp.",
+      "tags": [
+        "page-number",
+        "footer",
+        "stamp",
+        "pdf",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PageNumberStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Text.FontRepository",
+        "Aspose.Pdf.Text.TextState"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:54:20Z",
+      "status": "verified"
+    },
+    "merge-pdfs-preserve-bookmarks": {
+      "title": "Merge Two PDFs Preserving Bookmarks",
+      "filename": "merge-pdfs-preserve-bookmarks.cs",
+      "description": "Merges two PDF files into a single document while keeping the bookmarks (outlines) from both source PDFs.",
+      "tags": [
+        "merge",
+        "bookmarks",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.MergeOptions",
+        "Aspose.Pdf.Document.Merge"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:58:08Z",
+      "status": "verified"
+    },
+    "extract-text-page-range": {
+      "title": "Extract Text from PDF Page Range to Text File",
+      "filename": "extract-text-page-range.cs",
+      "description": "Demonstrates how to extract text from a specific range of pages in a PDF and save it as a plain text file using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "text-extraction",
+        "page-range",
+        "aspnet",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextAbsorber",
+        "Aspose.Pdf.Text.TextAbsorber.Visit"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:58:24Z",
+      "status": "verified"
+    },
+    "add-company-logo-header": {
+      "title": "Add Company Logo Header to PDF Pages",
+      "filename": "add-company-logo-header.cs",
+      "description": "Shows how to place a company logo as a header on every page of an existing PDF using Aspose.Pdf for .NET.",
+      "tags": [
+        "header",
+        "logo",
+        "stamp",
+        "pdf",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Facades.ImageStamp"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:58:37Z",
+      "status": "verified"
+    },
+    "set-pdf-document-properties": {
+      "title": "Set PDF Document Properties (Creation Date, Modification Date, Keywords)",
+      "filename": "set-pdf-document-properties.cs",
+      "description": "Demonstrates how to set the creation date, modification date, and custom keywords in a PDF using Aspose.Pdf for .NET.",
+      "tags": [
+        "metadata",
+        "document-info",
+        "creation-date",
+        "keywords",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.DocumentInfo",
+        "Aspose.Pdf.Document.Info",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:58:47Z",
+      "status": "verified"
+    },
+    "embed-ttf-font": {
+      "title": "Create PDF with Embedded TrueType Font",
+      "filename": "embed-ttf-font.cs",
+      "description": "Creates a PDF document, embeds a TrueType font (Arial) and adds text using the embedded font to ensure consistent rendering across devices.",
+      "tags": [
+        "pdf",
+        "font",
+        "embedding",
+        "truetype",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Document",
+        "Document.Pages.Add",
+        "FontRepository.FindFont",
+        "Font.IsEmbedded",
+        "TextFragment",
+        "TextFragment.TextState.Font",
+        "Document.EmbedStandardFonts",
+        "Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:59:08Z",
+      "status": "verified"
+    },
+    "semi-transparent-watermark": {
+      "title": "Apply Semi-Transparent Watermark Overlay to PDF",
+      "filename": "semi-transparent-watermark.cs",
+      "description": "Demonstrates adding a semi‑transparent image watermark to each page of a PDF using Aspose.Pdf.",
+      "tags": [
+        "watermark",
+        "pdf",
+        "image",
+        "opacity",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.Page.AddStamp"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:59:27Z",
+      "status": "verified"
+    },
+    "clickable-toc": {
+      "title": "Create PDF with Clickable Table of Contents",
+      "filename": "clickable-toc.cs",
+      "description": "Generates a PDF containing a Table of Contents page where each entry links to its corresponding section heading.",
+      "tags": [
+        "toc",
+        "link",
+        "annotation",
+        "pdf",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.GoToAction",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:59:59Z",
+      "status": "verified"
+    },
+    "remove-all-annotations": {
+      "title": "Remove All Annotations from PDF",
+      "filename": "remove-all-annotations.cs",
+      "description": "Loads a PDF, deletes every annotation on each page, and saves a clean copy.",
+      "tags": [
+        "annotations",
+        "pdf",
+        "cleanup",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page.Annotations",
+        "Aspose.Pdf.Annotations.AnnotationCollection.Delete"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:00:08Z",
+      "status": "verified"
+    },
+    "add-signature-field": {
+      "title": "Add Signature Form Field with Custom Appearance",
+      "filename": "add-signature-field.cs",
+      "description": "Demonstrates adding a signature form field to a PDF and customizing its appearance to match the document style.",
+      "tags": [
+        "signature",
+        "form",
+        "appearance",
+        "pdf",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Document",
+        "SignatureField",
+        "Form.AddFieldAppearance",
+        "DefaultAppearance"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:02:04Z",
+      "status": "verified"
+    },
+    "encrypt-pdf-aes256-restrict-permissions": {
+      "title": "Encrypt PDF with AES‑256 and restrict printing and copying",
+      "filename": "encrypt-pdf-aes256-restrict-permissions.cs",
+      "description": "Demonstrates how to encrypt a PDF using AES‑256 encryption while disabling printing and copying permissions.",
+      "tags": [
+        "encryption",
+        "pdf",
+        "aes256",
+        "permissions",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:02:22Z",
+      "status": "verified"
+    },
+    "create-pdf-portfolio": {
+      "title": "Create PDF Portfolio from Multiple PDFs",
+      "filename": "create-pdf-portfolio.cs",
+      "description": "Demonstrates how to combine several PDF files into a single PDF portfolio (package) using Aspose.Pdf for .NET.",
+      "tags": [
+        "pdf",
+        "portfolio",
+        "merge",
+        "aspnet",
+        "document"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Portfolio",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Portfolio.AddFile"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:02:40Z",
+      "status": "verified"
+    },
+    "add-custom-xml-metadata": {
+      "title": "Add Custom XML Metadata to PDF Document",
+      "filename": "add-custom-xml-metadata.cs",
+      "description": "Demonstrates how to add custom XML metadata and a custom dictionary entry to a PDF's document information using Aspose.Pdf for .NET.",
+      "tags": [
+        "metadata",
+        "xml",
+        "documentinfo",
+        "xmp",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.DocumentInfo.Add",
+        "Aspose.Pdf.Document.SetXmpMetadata"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:02:55Z",
+      "status": "verified"
+    },
+    "add-line-annotation": {
+      "title": "Add Line Annotation with Custom Color and Thickness",
+      "filename": "add-line-annotation.cs",
+      "description": "Demonstrates how to add a line annotation to a PDF page, customize its color and thickness, and save the updated document.",
+      "tags": [
+        "annotation",
+        "line",
+        "color",
+        "thickness",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.LineAnnotation",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Color",
+        "Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:03:07Z",
+      "status": "verified"
+    },
+    "replace-pdf-page-with-html": {
+      "title": "Replace PDF Page with HTML‑Generated Page",
+      "filename": "replace-pdf-page-with-html.cs",
+      "description": "Demonstrates how to replace a specific page in an existing PDF with a new page created from HTML content using Aspose.Pdf's HTML‑to‑PDF conversion.",
+      "tags": [
+        "pdf",
+        "html",
+        "page-replacement",
+        "aspose-pdf",
+        "c#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.HtmlLoadOptions",
+        "Aspose.Pdf.PageCollection.Delete",
+        "Aspose.Pdf.PageCollection.Insert",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:03:30Z",
+      "status": "verified"
+    },
+    "add-javascript-calculation-form": {
+      "title": "Add JavaScript Calculation to PDF Form Fields",
+      "filename": "add-javascript-calculation-form.cs",
+      "description": "Demonstrates adding two text box fields and a calculated field that shows their sum using a JavaScript action.",
+      "tags": [
+        "form",
+        "javascript",
+        "calculation",
+        "pdf",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.TextBoxField",
+        "Aspose.Pdf.Annotations.JavascriptAction",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:03:57Z",
+      "status": "verified"
+    },
+    "create-dynamic-table": {
+      "title": "Create Dynamic Table in PDF with Aspose.Pdf",
+      "filename": "create-dynamic-table.cs",
+      "description": "Demonstrates creating a PDF with a table whose rows are generated from a DataTable, automatically expanding to fit the data.",
+      "tags": [
+        "table",
+        "pdf",
+        "dynamic",
+        "datatable",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Table.ImportDataTable",
+        "Aspose.Pdf.Text.FontRepository",
+        "Aspose.Pdf.Text.TextState"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:04:20Z",
+      "status": "verified"
+    },
+    "create-zugferd-invoice": {
+      "title": "Create ZUGFeRD Invoice PDF with Embedded XML",
+      "filename": "create-zugferd-invoice.cs",
+      "description": "Generates a PDF invoice compliant with the ZUGFeRD standard and embeds the corresponding XML data.",
+      "tags": [
+        "ZUGFeRD",
+        "invoice",
+        "XML",
+        "Aspose.Pdf",
+        "PDF"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.BindXml",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.Position"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:05:21Z",
+      "status": "verified"
+    },
+    "clickable-index-pdf": {
+      "title": "Create PDF with Clickable Index (Table of Contents)",
+      "filename": "clickable-index-pdf.cs",
+      "description": "Demonstrates how to build a PDF that contains a table of contents where each entry links to its corresponding section page using internal GoTo actions.",
+      "tags": [
+        "pdf",
+        "toc",
+        "linkannotation",
+        "gotoaction",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.GoToAction",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:06:03Z",
+      "status": "verified"
+    },
+    "add-background-image-template": {
+      "title": "Add Background Image to Every PDF Page Using a Reusable Template",
+      "filename": "add-background-image-template.cs",
+      "description": "Demonstrates how to create a single‑page template containing a background image and stamp it onto each page of an existing PDF.",
+      "tags": [
+        "background",
+        "stamp",
+        "template",
+        "pdf",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Image",
+        "Aspose.Pdf.Facades.PdfPageStamp.Put",
+        "Aspose.Pdf.Facades.PdfPageStamp.Background"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:07:32Z",
+      "status": "verified"
+    },
+    "add-signature-appearance": {
+      "title": "Add Signature Appearance with Custom Image on Last Page",
+      "filename": "add-signature-appearance.cs",
+      "description": "Demonstrates adding a signature field and placing a custom image as its appearance on the last page of a PDF.",
+      "tags": [
+        "signature",
+        "image",
+        "pdf",
+        "appearance",
+        "last-page"
+      ],
+      "apis_used": [
+        "Document",
+        "SignatureField",
+        "ImageStamp",
+        "Page.AddStamp",
+        "Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:07:55Z",
+      "status": "verified"
+    },
+    "extract-embedded-files": {
+      "title": "Extract Embedded Files from PDF Portfolio",
+      "filename": "extract-embedded-files.cs",
+      "description": "Shows how to open a PDF portfolio and extract all embedded files, saving each to a specified directory.",
+      "tags": [
+        "pdf",
+        "embedded-files",
+        "portfolio",
+        "extraction"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.EmbeddedFile",
+        "Aspose.Pdf.Document.EmbeddedFiles"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:08:51Z",
+      "status": "verified"
+    },
+    "magazine-multi-column": {
+      "title": "Create Magazine-Style Multi-Column PDF with Advertisement",
+      "filename": "magazine-multi-column.cs",
+      "description": "Demonstrates how to generate a PDF with a two‑column layout for article text and insert an advertisement image using Aspose.Pdf for .NET.",
+      "tags": [
+        "multi-column",
+        "layout",
+        "advertising",
+        "pdf",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.ColumnInfo",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.FontRepository",
+        "Aspose.Pdf.Drawing.Image",
+        "Aspose.Pdf.Text.MarginInfo"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:12:07Z",
+      "status": "verified"
+    },
+    "add-readonly-text-field": {
+      "title": "Add Read‑Only Text Field with Default Value to PDF",
+      "filename": "add-readonly-text-field.cs",
+      "description": "Creates a PDF, adds a text box form field with a default value and sets it to read‑only, then saves the document.",
+      "tags": [
+        "form",
+        "textbox",
+        "readonly",
+        "default-value",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Document",
+        "Page",
+        "Rectangle",
+        "TextBoxField",
+        "DefaultAppearance",
+        "Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:14:02Z",
+      "status": "verified"
+    },
+    "email-link-pdf": {
+      "title": "Create PDF with Clickable Email Link",
+      "filename": "email-link-pdf.cs",
+      "description": "Demonstrates how to add a clickable email link that opens the default mail client using a LinkAnnotation with GoToURIAction.",
+      "tags": [
+        "email",
+        "link",
+        "annotation",
+        "pdf"
+      ],
+      "apis_used": [
+        "Document",
+        "Page",
+        "TextFragment",
+        "LinkAnnotation",
+        "GoToURIAction",
+        "Border"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:14:30Z",
+      "status": "verified"
+    },
+    "add-captions-below-images": {
+      "title": "Add Captions Below Images in PDF",
+      "filename": "add-captions-below-images.cs",
+      "description": "Demonstrates how to iterate over images on each page of a PDF and add a styled text caption below each image using TextBuilder and TextParagraph.",
+      "tags": [
+        "image",
+        "caption",
+        "text",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.XImage",
+        "Aspose.Pdf.Text.TextBuilder",
+        "Aspose.Pdf.Text.TextParagraph"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:14:48Z",
+      "status": "verified"
+    },
+    "add-popup-note-annotation": {
+      "title": "Add Pop‑up Note Annotation to PDF",
+      "filename": "add-popup-note-annotation.cs",
+      "description": "Demonstrates how to add a sticky‑note annotation with an associated pop‑up window that displays additional information when the user hovers over it.",
+      "tags": [
+        "annotation",
+        "popup",
+        "note",
+        "pdf",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.PopupAnnotation",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:17:41Z",
+      "status": "verified"
+    },
+    "pdf-header-date-javascript": {
+      "title": "Create PDF with Header Date using JavaScript",
+      "filename": "pdf-header-date-javascript.cs",
+      "description": "Creates a PDF with a header that shows the current date by adding a shared DateField and setting its value via JavaScript.",
+      "tags": [
+        "header",
+        "javascript",
+        "datefield",
+        "pdf",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Document",
+        "Page",
+        "DateField",
+        "JavascriptAction",
+        "Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:17:53Z",
+      "status": "verified"
+    },
+    "add-digital-signature-timestamp": {
+      "title": "Add Digital Signature with Timestamp to PDF",
+      "filename": "add-digital-signature-timestamp.cs",
+      "description": "Demonstrates how to add a digital signature to a PDF and attach a trusted timestamp from a TSA using Aspose.Pdf for .NET.",
+      "tags": [
+        "digital-signature",
+        "timestamp",
+        "pdf",
+        "security",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.SignatureField",
+        "Aspose.Pdf.Forms.Signature",
+        "Aspose.Pdf.TimestampSettings",
+        "Aspose.Pdf.Rectangle",
+        "Document.Save",
+        "SignatureField.Sign"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:18:28Z",
+      "status": "verified"
+    },
+    "create-5x7-postcard-pdf": {
+      "title": "Create PDF with Custom 5x7 Inch Page Size",
+      "filename": "create-5x7-postcard-pdf.cs",
+      "description": "Demonstrates how to create a PDF with a custom 5x7 inch page size suitable for postcard printing.",
+      "tags": [
+        "page-size",
+        "postcard",
+        "pdf-creation",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page.SetPageSize",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.Position"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:18:47Z",
+      "status": "verified"
+    },
+    "add-semi-transparent-background": {
+      "title": "Add Semi-Transparent Background Color to PDF Page",
+      "filename": "add-semi-transparent-background.cs",
+      "description": "Demonstrates how to add a semi‑transparent colored rectangle as a background to a PDF page using Aspose.Pdf for .NET.",
+      "tags": [
+        "background",
+        "opacity",
+        "rectangle",
+        "graph",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:19:11Z",
+      "status": "verified"
+    },
+    "insert-page-into-pdf": {
+      "title": "Insert Page from One PDF into Another at Specific Position",
+      "filename": "insert-page-into-pdf.cs",
+      "description": "Demonstrates how to insert a page from a source PDF into a target PDF at a given position using Aspose.Pdf for .NET.",
+      "tags": [
+        "pdf",
+        "insert-page",
+        "aspnet",
+        "document-manipulation"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PageCollection.Insert",
+        "Aspose.Pdf.Page"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:19:25Z",
+      "status": "verified"
+    },
+    "create-pdf-form-dropdown": {
+      "title": "Create PDF Form with Dropdown List",
+      "filename": "create-pdf-form-dropdown.cs",
+      "description": "Creates a PDF document containing a form with a dropdown list populated from an array.",
+      "tags": [
+        "form",
+        "dropdown",
+        "pdf",
+        "aspdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Forms.ComboBoxField",
+        "Aspose.Pdf.Form.Add",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:20:18Z",
+      "status": "verified"
+    },
+    "add-footer-total-page-count": {
+      "title": "Add Footer with Total Page Count to PDF",
+      "filename": "add-footer-total-page-count.cs",
+      "description": "Demonstrates adding a custom footer that displays the current page number and total page count on each page of a PDF.",
+      "tags": [
+        "footer",
+        "pagination",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.HeaderFooter",
+        "Aspose.Pdf.HeaderFooterData",
+        "Aspose.Pdf.PageNumber",
+        "Aspose.Pdf.PageNumber.PageIndex",
+        "Aspose.Pdf.PageNumber.PageTotalNum",
+        "Aspose.Pdf.PageCollectionExtensions.UpdatePagination",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:21:57Z",
+      "status": "verified"
+    },
+    "remove-javascript-actions": {
+      "title": "Remove All JavaScript Actions from a PDF",
+      "filename": "remove-javascript-actions.cs",
+      "description": "Demonstrates how to strip every JavaScript action from a PDF using Aspose.Pdf for .NET.",
+      "tags": [
+        "javascript",
+        "pdf",
+        "security",
+        "actions",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Annotations.JavascriptAction",
+        "Aspose.Pdf.DocumentActionCollection.Remove"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:22:12Z",
+      "status": "verified"
+    },
+    "add-link-annotation-open-attachment": {
+      "title": "Add Link Annotation to Open PDF Attachment",
+      "filename": "add-link-annotation-open-attachment.cs",
+      "description": "Demonstrates how to embed a PDF file as an attachment and create a link annotation that opens the attachment when clicked.",
+      "tags": [
+        "link-annotation",
+        "attachment",
+        "pdf",
+        "annotation",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.FileHyperlink",
+        "Aspose.Pdf.Border"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:25:18Z",
+      "status": "verified"
+    },
+    "rotated-landscape-page": {
+      "title": "Create PDF with Rotated Landscape Page",
+      "filename": "rotated-landscape-page.cs",
+      "description": "Demonstrates how to create a new PDF and rotate a page to landscape orientation using Aspose.Pdf for .NET.",
+      "tags": [
+        "pdf",
+        "rotation",
+        "landscape",
+        "page",
+        "creation"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rotation",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.Position",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:25:49Z",
+      "status": "verified"
+    },
+    "add-checkbox-checked": {
+      "title": "Add Checkbox Form Field with Default Checked State",
+      "filename": "add-checkbox-checked.cs",
+      "description": "Creates a PDF with a checkbox form field and sets it to be checked by default.",
+      "tags": [
+        "checkbox",
+        "form",
+        "field",
+        "Aspose.Pdf",
+        "C#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Forms.CheckboxField",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Form"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:26:04Z",
+      "status": "verified"
+    },
+    "extract-pdf-outline": {
+      "title": "Extract PDF Outline Hierarchy and Print as Tree",
+      "filename": "extract-pdf-outline.cs",
+      "description": "Loads a PDF, reads its bookmark (outline) hierarchy and prints it to the console as an indented tree structure.",
+      "tags": [
+        "outline",
+        "bookmark",
+        "tree",
+        "aspdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.OutlineCollection",
+        "Aspose.Pdf.OutlineItemCollection"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:26:19Z",
+      "status": "verified"
+    },
+    "rich-table": {
+      "title": "Create PDF with Table Containing Rich Text Formatting",
+      "filename": "rich-table.cs",
+      "description": "Demonstrates how to build a table in a PDF and apply different text formatting to individual cells using Aspose.Pdf for .NET.",
+      "tags": [
+        "table",
+        "rich-text",
+        "formatting",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.FontRepository"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:27:00Z",
+      "status": "verified"
+    },
+    "add-line-stamp-annotation": {
+      "title": "Add Line Stamp Annotation to PDF Page",
+      "filename": "add-line-stamp-annotation.cs",
+      "description": "Demonstrates how to add a rubber stamp annotation with custom text across a PDF page.",
+      "tags": [
+        "stamp",
+        "annotation",
+        "pdf",
+        "aspnet",
+        "line"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.StampAnnotation",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:27:14Z",
+      "status": "verified"
+    },
+    "insert-automatic-page-numbers": {
+      "title": "Insert Automatic Page Numbers with Pagination Artifact",
+      "filename": "insert-automatic-page-numbers.cs",
+      "description": "Demonstrates adding a pagination artifact that automatically updates page numbers when pages are inserted or removed.",
+      "tags": [
+        "page-number",
+        "pagination",
+        "automatic",
+        "aspdf",
+        "c#"
+      ],
+      "apis_used": [
+        "Document",
+        "PaginationArtifact",
+        "PageCollectionExtensions.AddPagination",
+        "PageCollectionExtensions.UpdatePagination",
+        "PageCollection.Insert",
+        "Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:28:48Z",
+      "status": "verified"
+    },
+    "pdf-with-background-template": {
+      "title": "Create PDF with Background Template Page",
+      "filename": "pdf-with-background-template.cs",
+      "description": "Demonstrates how to use a PDF page as a background template for all pages in a new document using PdfPageStamp.",
+      "tags": [
+        "pdf",
+        "background",
+        "template",
+        "stamp",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Facades.PdfPageStamp",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.Position"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:30:03Z",
+      "status": "verified"
+    },
+    "add-visible-signature-lock-pdf": {
+      "title": "Add Visible Signature Field and Lock PDF",
+      "filename": "add-visible-signature-lock-pdf.cs",
+      "description": "Demonstrates how to add a visible signature field to a PDF, sign it with a certificate, and lock the document afterwards.",
+      "tags": [
+        "signature",
+        "pdf",
+        "locking",
+        "forms",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.SignatureField",
+        "Aspose.Pdf.Forms.Signature",
+        "Aspose.Pdf.Border",
+        "Aspose.Pdf.Document.Lock",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:31:56Z",
+      "status": "verified"
+    },
+    "extract-text-pdf": {
+      "title": "Extract Text from PDF to UTF-8 File",
+      "filename": "extract-text-pdf.cs",
+      "description": "Demonstrates how to extract all text from a PDF document using Aspose.Pdf and write it to a UTF‑8 encoded text file.",
+      "tags": [
+        "text extraction",
+        "pdf",
+        "utf-8",
+        "aspose.pdf",
+        "c#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextAbsorber",
+        "Aspose.Pdf.Text.TextExtractionOptions",
+        "System.IO.File.WriteAllText"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:32:06Z",
+      "status": "verified"
+    },
+    "create-pdf-radio-form": {
+      "title": "Create PDF Form with Radio Button Groups",
+      "filename": "create-pdf-radio-form.cs",
+      "description": "Demonstrates how to generate a PDF containing a form with radio button groups for multiple‑choice questions using Aspose.Pdf for .NET.",
+      "tags": [
+        "pdf",
+        "form",
+        "radiobutton",
+        "aspnet",
+        "example"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Forms.RadioButtonField",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Text.Position"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:33:02Z",
+      "status": "verified"
+    },
+    "extract-xmp-metadata": {
+      "title": "Extract XMP Metadata from PDF and Save as XML",
+      "filename": "extract-xmp-metadata.cs",
+      "description": "Loads a PDF file, extracts its embedded XMP metadata and writes it to an XML file.",
+      "tags": [
+        "pdf",
+        "xmp",
+        "metadata",
+        "xml",
+        "extraction"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.GetXmpMetadata"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:35:25Z",
+      "status": "verified"
+    },
+    "multi-page-table": {
+      "title": "Create Multi‑Page Table in PDF",
+      "filename": "multi-page-table.cs",
+      "description": "Demonstrates how to create a PDF with a table that automatically spans multiple pages using Aspose.Pdf for .NET.",
+      "tags": [
+        "table",
+        "pdf",
+        "multipage",
+        "aspnet",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:35:55Z",
+      "status": "verified"
+    },
+    "add-line-annotation__v2": {
+      "title": "Add Line Annotation as Section Separator",
+      "filename": "add-line-annotation__v2.cs",
+      "description": "Demonstrates adding a horizontal line annotation to a PDF page to act as a visual separator between sections.",
+      "tags": [
+        "line-annotation",
+        "separator",
+        "pdf",
+        "aspnet",
+        "annotations"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Annotations.LineAnnotation",
+        "Aspose.Pdf.Page.Annotations",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Point"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:36:08Z",
+      "status": "verified"
+    },
+    "set-pdf-rotation-90-degrees": {
+      "title": "Set PDF Page Rotation to 90 Degrees",
+      "filename": "set-pdf-rotation-90-degrees.cs",
+      "description": "Loads a PDF, sets each page's rotation to 90 degrees for portrait display on landscape devices, and saves the result.",
+      "tags": [
+        "rotation",
+        "pdf",
+        "page",
+        "aspdf",
+        "beginner"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page.Rotate",
+        "Aspose.Pdf.Rotation",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:36:24Z",
+      "status": "verified"
+    },
+    "create-pdf-date-picker": {
+      "title": "Create PDF with Date Picker Form Field",
+      "filename": "create-pdf-date-picker.cs",
+      "description": "Demonstrates how to generate a PDF document and add an interactive date picker form field using Aspose.Pdf for .NET.",
+      "tags": [
+        "pdf",
+        "form",
+        "datefield",
+        "aspnet",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Forms.DateField",
+        "Aspose.Pdf.Document.Form.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:36:40Z",
+      "status": "verified"
+    },
+    "extract-hyperlinks": {
+      "title": "Extract Hyperlinks from PDF to Text File",
+      "filename": "extract-hyperlinks.cs",
+      "description": "Extracts all external hyperlink URLs from a PDF document and writes them to a plain text file.",
+      "tags": [
+        "hyperlink",
+        "extraction",
+        "pdf",
+        "text",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.GoToURIAction"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:37:00Z",
+      "status": "verified"
+    },
+    "load-pdf-document": {
+      "title": "Load PDF Document with Aspose.Pdf",
+      "filename": "load-pdf-document.cs",
+      "description": "Demonstrates loading a PDF file into an Aspose.Pdf Document object and accessing basic information.",
+      "tags": [
+        "load",
+        "document",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.DocumentFactory.CreateDocument",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages.Count"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:37:21Z",
+      "status": "verified"
+    },
+    "remove-annotations-hidden-data-sanitizer": {
+      "title": "Remove All Annotations Using HiddenDataSanitizerOptions",
+      "filename": "remove-annotations-hidden-data-sanitizer.cs",
+      "description": "Demonstrates how to configure HiddenDataSanitizerOptions to strip all annotations from a PDF document.",
+      "tags": [
+        "annotations",
+        "sanitizer",
+        "pdf",
+        "aspose",
+        "hidden-data"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.HiddenDataSanitizerOptions",
+        "Aspose.Pdf.Document.Sanitize"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:37:38Z",
+      "status": "verified"
+    },
+    "sanitize-pdf-delete-embedded-scripts": {
+      "title": "Sanitize PDF by Deleting Embedded Scripts",
+      "filename": "sanitize-pdf-delete-embedded-scripts.cs",
+      "description": "Demonstrates how to configure HiddenDataSanitizerOptions to remove embedded JavaScript from a PDF before saving.",
+      "tags": [
+        "sanitize",
+        "hidden-data",
+        "scripts",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.HiddenDataSanitizerOptions",
+        "Aspose.Pdf.Document.SanitizeHiddenData",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:38:38Z",
+      "status": "verified"
+    },
+    "sanitize-pdf-remove-search-index": {
+      "title": "Sanitize PDF by Removing Search Index and Private Info",
+      "filename": "sanitize-pdf-remove-search-index.cs",
+      "description": "Demonstrates how to enable the RemoveSearchIndexAndPrivateInfo option to clear metadata and private information from a PDF during sanitization.",
+      "tags": [
+        "pdf",
+        "sanitization",
+        "metadata",
+        "optimization"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Optimization.OptimizationOptions",
+        "Aspose.Pdf.Document.OptimizeResources",
+        "Aspose.Pdf.Document.RemoveMetadata"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:39:16Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-html-rasterized": {
+      "title": "Convert PDF Pages to Rasterized Images in HTML",
+      "filename": "convert-pdf-to-html-rasterized.cs",
+      "description": "Demonstrates how to convert a PDF to HTML with each page rasterized as an image by enabling ConvertPagesToImages and setting ImageDpi to 150.",
+      "tags": [
+        "pdf",
+        "html",
+        "rasterize",
+        "conversion",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.HtmlSaveOptions",
+        "Aspose.Pdf.HtmlSaveOptions.ConvertPagesToImages",
+        "Aspose.Pdf.HtmlSaveOptions.ImageDpi"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:40:18Z",
+      "status": "verified"
+    },
+    "pdf-to-jpeg-quality-80": {
+      "title": "Convert PDF Pages to JPEG Images with Quality 80",
+      "filename": "pdf-to-jpeg-quality-80.cs",
+      "description": "Demonstrates how to compress images inside a PDF using ImageCompressionOptions and convert each page to a JPEG file with quality set to 80.",
+      "tags": [
+        "jpeg",
+        "image-compression",
+        "pdf-to-image",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Optimization.ImageCompressionOptions",
+        "Aspose.Pdf.Devices.JpegDevice",
+        "Aspose.Pdf.Document.CompressImages",
+        "Aspose.Pdf.Devices.JpegDevice.Process"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:41:10Z",
+      "status": "verified"
+    },
+    "pdf-to-images-no-compression": {
+      "title": "Convert PDF Pages to Images without Compression",
+      "filename": "pdf-to-images-no-compression.cs",
+      "description": "Demonstrates how to export each PDF page to an image while disabling image compression to preserve the original file size.",
+      "tags": [
+        "pdf",
+        "image",
+        "conversion",
+        "compression",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.ImageSaveOptions",
+        "Aspose.Pdf.Optimization.ImageCompressionOptions",
+        "Aspose.Pdf.SaveFormat"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:41:57Z",
+      "status": "verified"
+    },
+    "batch-convert-pdf-to-images": {
+      "title": "Batch Convert PDF Pages to Images Using HiddenDataSanitizer",
+      "filename": "batch-convert-pdf-to-images.cs",
+      "description": "Demonstrates how to use Aspose.Pdf's HiddenDataSanitizer to convert each page of a PDF into separate image files while removing hidden data.",
+      "tags": [
+        "pdf",
+        "image",
+        "hidden-data",
+        "batch",
+        "sanitize"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.HiddenDataSanitizer.SanitizeAllToImages"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:42:47Z",
+      "status": "verified"
+    },
+    "hidden-data-sanitizer-selective-rasterization": {
+      "title": "Configure Hidden Data Sanitizer and Selective Page Rasterization for HTML Conversion",
+      "filename": "hidden-data-sanitizer-selective-rasterization.cs",
+      "description": "Demonstrates creating a HiddenDataSanitizerOptions.All() configuration and enabling page rasterization only for specific pages when converting a PDF to HTML.",
+      "tags": [
+        "hidden-data",
+        "rasterization",
+        "html",
+        "options",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Document",
+        "HtmlSaveOptions",
+        "HiddenDataSanitizerOptions"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:44:02Z",
+      "status": "verified"
+    },
+    "remove-annotations-attachments": {
+      "title": "Remove Annotations and Attachments from PDF",
+      "filename": "remove-annotations-attachments.cs",
+      "description": "Demonstrates how to strip comments (annotations) and embedded files (attachments) from a PDF using FlattenSettings.",
+      "tags": [
+        "annotations",
+        "attachments",
+        "flatten",
+        "pdf"
+      ],
+      "apis_used": [
+        "Document",
+        "FlattenSettings",
+        "Document.Flatten"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:44:42Z",
+      "status": "verified"
+    },
+    "sanitize-multiple-pdfs": {
+      "title": "Sanitize Multiple PDFs and Save Cleaned Versions",
+      "filename": "sanitize-multiple-pdfs.cs",
+      "description": "Loads all PDF files from a folder, removes metadata, compliance tags, flattens forms, optimizes resources, and saves cleaned PDFs to a target folder.",
+      "tags": [
+        "pdf",
+        "sanitize",
+        "metadata",
+        "optimize",
+        "batch"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.RemoveMetadata",
+        "Aspose.Pdf.Document.RemovePdfUaCompliance",
+        "Aspose.Pdf.Document.RemovePdfaCompliance",
+        "Aspose.Pdf.Document.Flatten",
+        "Aspose.Pdf.Document.OptimizeResources",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:44:58Z",
+      "status": "verified"
+    },
+    "generate-crash-report": {
+      "title": "Generate Crash Report for PDF Exception",
+      "filename": "generate-crash-report.cs",
+      "description": "Demonstrates catching a PdfException, creating CrashReportOptions, and generating an HTML crash report.",
+      "tags": [
+        "exception",
+        "crash-report",
+        "aspdf",
+        "error-handling"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PdfException",
+        "Aspose.Pdf.CrashReportOptions",
+        "Aspose.Pdf.PdfException.GenerateCrashReport"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:45:08Z",
+      "status": "verified"
+    },
+    "generate-custom-crash-report": {
+      "title": "Generate Custom Crash Report with Message",
+      "filename": "generate-custom-crash-report.cs",
+      "description": "Demonstrates how to generate a crash report for an exception, set a custom message, and specify a custom file name using Aspose.Pdf.",
+      "tags": [
+        "crash-report",
+        "exception",
+        "custom-message",
+        "aspdf"
+      ],
+      "apis_used": [
+        "CrashReportOptions",
+        "PdfException.GenerateCrashReport"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:45:20Z",
+      "status": "verified"
+    },
+    "generate-crash-report__v2": {
+      "title": "Generate Crash Report and Verify Output Directory",
+      "filename": "generate-crash-report__v2.cs",
+      "description": "Demonstrates setting a custom crash report directory, generating a crash report for an exception, and confirming the report file exists.",
+      "tags": [
+        "crash-report",
+        "exception",
+        "validation",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.CrashReportOptions",
+        "Aspose.Pdf.PdfException.GenerateCrashReport"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:46:08Z",
+      "status": "verified"
+    },
+    "generate-crash-report__v3": {
+      "title": "Generate Crash Report for Unexpected PDF Errors",
+      "filename": "generate-crash-report__v3.cs",
+      "description": "Demonstrates wrapping PDF processing in a try‑catch block and generating a detailed crash report using Aspose.Pdf when an unexpected error occurs.",
+      "tags": [
+        "crash-report",
+        "error-handling",
+        "pdf",
+        "aspdf",
+        "exception"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PdfException.GenerateCrashReport",
+        "Aspose.Pdf.CrashReportOptions"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:46:40Z",
+      "status": "verified"
+    },
+    "create-pdf-level-1-heading": {
+      "title": "Create PDF with Level 1 Heading",
+      "filename": "create-pdf-level-1-heading.cs",
+      "description": "Creates a new PDF document, adds a level‑1 heading using the tagged PDF API, and saves the file.",
+      "tags": [
+        "pdf",
+        "heading",
+        "tagged",
+        "aspdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.DocumentFactory.CreateDocument",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.LogicalStructure.HeaderElement",
+        "Aspose.Pdf.LogicalStructure.StructureElement.AppendChild",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:47:20Z",
+      "status": "verified"
+    },
+    "apply-decimal-numbering-headings": {
+      "title": "Apply Decimal Numbering to Hierarchical Headings in PDF",
+      "filename": "apply-decimal-numbering-headings.cs",
+      "description": "Demonstrates how to create headings with automatic decimal numbering and hierarchical levels using Aspose.Pdf for .NET.",
+      "tags": [
+        "heading",
+        "numbering",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Heading",
+        "Aspose.Pdf.NumberingStyle"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:48:03Z",
+      "status": "verified"
+    },
+    "insert-heading-outline": {
+      "title": "Insert Heading and Bookmark into PDF Outline",
+      "filename": "insert-heading-outline.cs",
+      "description": "Adds a heading text to a page and creates a corresponding outline entry (bookmark) that points to the heading.",
+      "tags": [
+        "outline",
+        "bookmark",
+        "heading",
+        "pdf",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Document",
+        "OutlineItemCollection",
+        "XYZExplicitDestination",
+        "Heading",
+        "FontRepository",
+        "Position"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:51:47Z",
+      "status": "verified"
+    },
+    "dynamic-heading-pdf": {
+      "title": "Create PDF with Dynamic Heading Text",
+      "filename": "dynamic-heading-pdf.cs",
+      "description": "Demonstrates how to set a heading with dynamic content such as the current date before saving a PDF using Aspose.Pdf.",
+      "tags": [
+        "heading",
+        "dynamic",
+        "pdf",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Heading",
+        "Aspose.Pdf.Text.FontRepository",
+        "Aspose.Pdf.Color",
+        "Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:52:13Z",
+      "status": "verified"
+    },
+    "remove-hidden-data-reapply-headings": {
+      "title": "Remove Hidden Data and Reapply Headings in PDF",
+      "filename": "remove-hidden-data-reapply-headings.cs",
+      "description": "Loads a PDF, removes hidden metadata and compliance information, optimizes resources, and re‑applies heading structure using auto‑tagging to preserve navigation.",
+      "tags": [
+        "pdf",
+        "metadata",
+        "headings",
+        "accessibility",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Document.RemoveMetadata",
+        "Document.RemovePdfUaCompliance",
+        "Document.RemovePdfaCompliance",
+        "Document.OptimizeResources",
+        "AutoTaggingSettings.Default.EnableAutoTagging",
+        "ITaggedContent.SetLanguage",
+        "ITaggedContent.SetTitle",
+        "Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:56:11Z",
+      "status": "verified"
+    },
+    "batch-sanitize-pdfs": {
+      "title": "Batch sanitize PDFs and save cleaned copies",
+      "filename": "batch-sanitize-pdfs.cs",
+      "description": "Iterates over a folder of PDF files, removes metadata, flattens forms, strips PDF/A and PDF/UA compliance, optimizes resources, and saves the sanitized PDFs to a separate output directory.",
+      "tags": [
+        "batch",
+        "sanitize",
+        "pdf",
+        "metadata",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.RemoveMetadata",
+        "Aspose.Pdf.Document.Flatten",
+        "Aspose.Pdf.Document.RemovePdfaCompliance",
+        "Aspose.Pdf.Document.RemovePdfUaCompliance",
+        "Aspose.Pdf.Document.OptimizeResources",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:56:42Z",
+      "status": "verified"
+    },
+    "sanitize-pdf": {
+      "title": "Sanitize PDF by Removing Hidden Data",
+      "filename": "sanitize-pdf.cs",
+      "description": "Loads a PDF, removes metadata, PDF/A and PDF/UA compliance information, flattens form fields, and saves a sanitized copy.",
+      "tags": [
+        "pdf",
+        "sanitize",
+        "metadata",
+        "flatten"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Document.RemoveMetadata",
+        "Document.RemovePdfUaCompliance",
+        "Document.RemovePdfaCompliance",
+        "Document.Flatten",
+        "Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:56:59Z",
+      "status": "verified"
+    },
+    "check-hidden-annotations": {
+      "title": "Check for Hidden Annotations in PDF",
+      "filename": "check-hidden-annotations.cs",
+      "description": "Demonstrates how to detect hidden annotations in a PDF file using Aspose.Pdf for .NET.",
+      "tags": [
+        "annotations",
+        "hidden",
+        "pdf",
+        "check",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.AnnotationCollection",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.AnnotationFlags"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T06:58:00Z",
+      "status": "verified"
+    },
+    "sanitize-pdf-hidden-data": {
+      "title": "Sanitize PDF Hidden Data While Preserving Metadata",
+      "filename": "sanitize-pdf-hidden-data.cs",
+      "description": "Demonstrates how to configure HiddenDataSanitizerOptions to remove all hidden content from a PDF while keeping its metadata intact.",
+      "tags": [
+        "sanitization",
+        "metadata",
+        "hidden-data",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.HiddenDataSanitizerOptions",
+        "Aspose.Pdf.Document.SanitizeHiddenData"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T06:59:47Z",
+      "status": "verified"
+    },
+    "rasterize-pdf-to-png-with-compression": {
+      "title": "Rasterize PDF Pages to PNG with PNG Compression",
+      "filename": "rasterize-pdf-to-png-with-compression.cs",
+      "description": "Demonstrates how to rasterize each page of a PDF to PNG images while setting PNG compression level using ImageCompressionOptions.",
+      "tags": [
+        "pdf",
+        "png",
+        "rasterize",
+        "compression",
+        "image"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.PngDevice",
+        "Aspose.Pdf.Devices.Resolution",
+        "Aspose.Pdf.Optimization.OptimizationOptions",
+        "Aspose.Pdf.Optimization.ImageCompressionOptions"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T07:00:05Z",
+      "status": "verified"
+    },
+    "pdf-to-tiff-per-page": {
+      "title": "Convert PDF Pages to High-Resolution TIFF Images",
+      "filename": "pdf-to-tiff-per-page.cs",
+      "description": "Demonstrates how to convert each page of a PDF document into separate high-resolution TIFF images using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "tiff",
+        "conversion",
+        "resolution",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Devices.TiffDevice",
+        "Aspose.Pdf.Devices.Resolution",
+        "Aspose.Pdf.Devices.TiffSettings",
+        "Aspose.Pdf.Devices.CompressionType",
+        "Aspose.Pdf.Devices.ColorDepth",
+        "Aspose.Pdf.Devices.ShapeType",
+        "Aspose.Pdf.Devices.TiffDevice.Process"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T07:00:35Z",
+      "status": "verified"
+    },
+    "convert-pages-to-images-flag-test": {
+      "title": "Unit Test for ConvertPagesToImages Flag",
+      "filename": "convert-pages-to-images-flag-test.cs",
+      "description": "Verifies that setting PdfConverter.ConvertPagesToImages creates an image file for each PDF page.",
+      "tags": [
+        "pdf",
+        "conversion",
+        "unit-test",
+        "aspose-pdf",
+        "images"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfConverter",
+        "Aspose.Pdf.Text.TextFragment"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T07:02:05Z",
+      "status": "verified"
+    },
+    "sanitize-and-create-headings": {
+      "title": "Sanitize PDF and Generate Heading Structure",
+      "filename": "sanitize-and-create-headings.cs",
+      "description": "Loads a PDF, removes metadata and flattens content, enables auto‑tagging to create heading structure, and saves a clean, navigable PDF.",
+      "tags": [
+        "sanitization",
+        "headings",
+        "auto-tagging",
+        "accessibility",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.RemoveMetadata",
+        "Aspose.Pdf.Document.Flatten",
+        "Aspose.Pdf.AutoTaggingSettings",
+        "Aspose.Pdf.Document.ProcessParagraphs",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.Tagged.ITaggedContent.SetLanguage",
+        "Aspose.Pdf.Tagged.ITaggedContent.SetTitle",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T07:05:46Z",
+      "status": "verified"
+    },
+    "generate-crash-report__v4": {
+      "title": "Generate Crash Report with Custom Message for PDF Errors",
+      "filename": "generate-crash-report__v4.cs",
+      "description": "Demonstrates how to catch a PdfException, create CrashReportOptions with a custom message, and generate an HTML crash report for debugging complex PDF operations.",
+      "tags": [
+        "crash-report",
+        "exception",
+        "debugging",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PdfException.GenerateCrashReport",
+        "Aspose.Pdf.CrashReportOptions"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T07:06:10Z",
+      "status": "verified"
+    },
+    "generate-crash-report-network-share": {
+      "title": "Generate Crash Report to Network Share",
+      "filename": "generate-crash-report-network-share.cs",
+      "description": "Demonstrates setting CrashReportOptions.CrashReportDirectory to a network share and generating a crash report for an exception.",
+      "tags": [
+        "crash-report",
+        "network-share",
+        "exception",
+        "aspdf"
+      ],
+      "apis_used": [
+        "CrashReportOptions",
+        "PdfException.GenerateCrashReport"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T07:08:06Z",
+      "status": "verified"
+    },
+    "log-pdf-sanitization": {
+      "title": "Log PDF Sanitization Operation with Timestamps",
+      "filename": "log-pdf-sanitization.cs",
+      "description": "Demonstrates how to record start and end times of a PDF sanitization (validation) operation using Aspose.Pdf for .NET.",
+      "tags": [
+        "pdf",
+        "sanitization",
+        "logging",
+        "audit",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Validate",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.PdfFormat"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T07:08:53Z",
+      "status": "verified"
+    }
+  }
+}
