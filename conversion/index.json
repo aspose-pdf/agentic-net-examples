@@ -1,0 +1,2031 @@
+{
+  "category": "Conversion",
+  "last_updated": "2026-03-26T05:22:02Z",
+  "examples": {
+    "convert-pdf-to-docx": {
+      "title": "Convert PDF to DOCX with Layout Preservation",
+      "filename": "convert-pdf-to-docx.cs",
+      "description": "Demonstrates converting a PDF file to a DOCX document using Aspose.Pdf with the Textbox recognition mode to preserve the original layout.",
+      "tags": [
+        "pdf",
+        "docx",
+        "conversion",
+        "layout",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Document",
+        "DocSaveOptions",
+        "Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T04:33:11Z",
+      "status": "verified"
+    },
+    "pdf-to-docx-enhanced": {
+      "title": "Convert PDF to DOCX with Enhanced Table and Graphic Recognition",
+      "filename": "pdf-to-docx-enhanced.cs",
+      "description": "Demonstrates converting a PDF file to DOCX format using Aspose.Pdf with enhanced recognition mode to better handle complex tables and graphics.",
+      "tags": [
+        "pdf",
+        "docx",
+        "conversion",
+        "recognition",
+        "tables"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.DocSaveOptions",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:33:37Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-docx__v2": {
+      "title": "Convert PDF to DOCX with Default Text Extraction",
+      "filename": "convert-pdf-to-docx__v2.cs",
+      "description": "Demonstrates converting a PDF file to DOCX format using Aspose.Pdf with default text extraction settings.",
+      "tags": [
+        "pdf",
+        "docx",
+        "conversion",
+        "default",
+        "text-extraction"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.DocSaveOptions",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T04:33:50Z",
+      "status": "verified"
+    },
+    "pdf-to-doc-images-only": {
+      "title": "Convert PDF to DOC with Images Only",
+      "filename": "pdf-to-doc-images-only.cs",
+      "description": "Converts a PDF file to a Word document extracting only the images using a custom recognition mode.",
+      "tags": [
+        "pdf",
+        "doc",
+        "conversion",
+        "images"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.DocSaveOptions",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:35:02Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-docx-auto": {
+      "title": "Convert PDF to DOCX with Automatic Content Detection",
+      "filename": "convert-pdf-to-docx-auto.cs",
+      "description": "Demonstrates converting a PDF file to DOCX format using DocSaveOptions with Mode set to Auto for automatic content detection.",
+      "tags": [
+        "pdf",
+        "docx",
+        "conversion",
+        "autosave",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Document",
+        "DocSaveOptions",
+        "Document.Save(string, SaveOptions)"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T04:36:02Z",
+      "status": "verified"
+    },
+    "pdf-to-doc-text-mode": {
+      "title": "Convert PDF to DOC with Text Extraction Mode",
+      "filename": "pdf-to-doc-text-mode.cs",
+      "description": "Demonstrates converting a PDF file to a DOC file using DocSaveOptions with the recognition mode set to extract plain text.",
+      "tags": [
+        "pdf",
+        "doc",
+        "conversion",
+        "text",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.DocSaveOptions",
+        "Aspose.Pdf.DocSaveOptions.RecognitionMode",
+        "Aspose.Pdf.DocSaveOptions.DocFormat"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T04:36:22Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-docx__v3": {
+      "title": "Convert PDF to DOCX with Custom Metadata",
+      "filename": "convert-pdf-to-docx__v3.cs",
+      "description": "Loads a PDF, sets the author and title metadata, and saves it as a DOCX file.",
+      "tags": [
+        "pdf",
+        "docx",
+        "metadata",
+        "conversion"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.DocSaveOptions",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Info"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T04:36:44Z",
+      "status": "verified"
+    },
+    "pdf-to-docx-footnotes": {
+      "title": "Convert PDF to DOCX with Footnotes Preservation",
+      "filename": "pdf-to-docx-footnotes.cs",
+      "description": "Demonstrates converting a PDF to DOCX while preserving footnotes using enhanced recognition mode for accurate extraction.",
+      "tags": [
+        "pdf",
+        "docx",
+        "conversion",
+        "footnotes"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.DocSaveOptions",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:37:30Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-docx-extract-images": {
+      "title": "Convert PDF to DOCX and Extract Embedded Images",
+      "filename": "convert-pdf-to-docx-extract-images.cs",
+      "description": "Demonstrates converting a PDF file to DOCX format and extracting all embedded images to a designated folder.",
+      "tags": [
+        "pdf",
+        "docx",
+        "image-extraction",
+        "conversion"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.DocSaveOptions",
+        "Aspose.Pdf.XImage",
+        "Aspose.Pdf.Page"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:37:52Z",
+      "status": "verified"
+    },
+    "pdf-to-docx-summary": {
+      "title": "Convert PDF to DOCX and Generate Conversion Summary",
+      "filename": "pdf-to-docx-summary.cs",
+      "description": "Loads a PDF, converts it to DOCX using Aspose.Pdf, and creates a JSON report with conversion statistics.",
+      "tags": [
+        "pdf",
+        "docx",
+        "conversion",
+        "summary",
+        "json"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.DocSaveOptions",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages.Count"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:38:07Z",
+      "status": "verified"
+    },
+    "pdf-to-docx-zip": {
+      "title": "Convert PDF to DOCX and compress to ZIP",
+      "filename": "pdf-to-docx-zip.cs",
+      "description": "Demonstrates converting a PDF file to DOCX format using Aspose.Pdf and then compressing the DOCX into a ZIP archive for storage.",
+      "tags": [
+        "pdf",
+        "docx",
+        "zip",
+        "conversion",
+        "compression"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.DocSaveOptions",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T04:38:17Z",
+      "status": "verified"
+    },
+    "pdf-to-docx-to-pdfa": {
+      "title": "Convert PDF to DOCX and then to PDF/A",
+      "filename": "pdf-to-docx-to-pdfa.cs",
+      "description": "Demonstrates converting a PDF file to DOCX format and then creating a PDF/A‑1B compliant PDF from the DOCX output.",
+      "tags": [
+        "pdf",
+        "docx",
+        "pdfa",
+        "conversion"
+      ],
+      "apis_used": [
+        "Document",
+        "DocSaveOptions",
+        "PdfFormat",
+        "ConvertErrorAction",
+        "Document.Convert",
+        "Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:38:31Z",
+      "status": "verified"
+    },
+    "pdf-to-docx-hyphenation": {
+      "title": "Convert PDF to DOCX with Language‑Specific Hyphenation",
+      "filename": "pdf-to-docx-hyphenation.cs",
+      "description": "Loads a PDF, sets hyphenation language to improve text flow, and saves it as a DOCX file.",
+      "tags": [
+        "pdf",
+        "docx",
+        "hyphenation",
+        "conversion",
+        "language"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.HyphenationSettings",
+        "Aspose.Pdf.DocSaveOptions",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:39:25Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-docx-add-table-of-figures": {
+      "title": "Convert PDF to DOCX and Add Table of Figures",
+      "filename": "convert-pdf-to-docx-add-table-of-figures.cs",
+      "description": "Loads a PDF, extracts its images, creates a table of figures listing each image and its page, then converts the PDF to a DOCX file.",
+      "tags": [
+        "pdf",
+        "docx",
+        "table",
+        "images",
+        "conversion"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell",
+        "Aspose.Pdf.XImage",
+        "Aspose.Pdf.DocSaveOptions",
+        "Aspose.Pdf.SaveOptions"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:40:04Z",
+      "status": "verified"
+    },
+    "pdf-to-docx-embed-fonts": {
+      "title": "Convert PDF to DOCX with Embedded Custom Fonts",
+      "filename": "pdf-to-docx-embed-fonts.cs",
+      "description": "Demonstrates converting a PDF file to DOCX while embedding specified custom fonts to preserve the document's visual appearance.",
+      "tags": [
+        "pdf",
+        "docx",
+        "font-embedding",
+        "conversion"
+      ],
+      "apis_used": [
+        "Document",
+        "DocSaveOptions",
+        "Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:40:44Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-pptx": {
+      "title": "Convert PDF to PPTX Slides",
+      "filename": "convert-pdf-to-pptx.cs",
+      "description": "Demonstrates converting a PDF document to editable PowerPoint (PPTX) slides using Aspose.Pdf with default options.",
+      "tags": [
+        "pdf",
+        "pptx",
+        "conversion",
+        "aspnet",
+        "example"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.PptxSaveOptions"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T04:40:54Z",
+      "status": "verified"
+    },
+    "pdf-to-pptx-slides-as-images": {
+      "title": "Convert PDF to PPTX with Slides as Images",
+      "filename": "pdf-to-pptx-slides-as-images.cs",
+      "description": "Converts a PDF file to a PPTX presentation where each slide is rendered as a raster image using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "pptx",
+        "conversion",
+        "slides-as-images",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PptxSaveOptions",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T04:41:03Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-pptx-with-progress": {
+      "title": "Convert PDF to PPTX with Custom Progress Handler",
+      "filename": "convert-pdf-to-pptx-with-progress.cs",
+      "description": "Demonstrates converting a PDF file to PPTX format while reporting conversion progress via a custom IProgressHandler implementation.",
+      "tags": [
+        "pdf",
+        "pptx",
+        "conversion",
+        "progress",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PptxSaveOptions",
+        "Aspose.Pdf.IProgressHandler"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:42:26Z",
+      "status": "verified"
+    },
+    "batch-convert-pdf-to-pptx-slidesasimages": {
+      "title": "Batch Convert PDFs to PPTX with SlidesAsImages",
+      "filename": "batch-convert-pdf-to-pptx-slidesasimages.cs",
+      "description": "Converts all PDF files in a folder to PPTX presentations where each slide is rendered as an image.",
+      "tags": [
+        "pdf",
+        "pptx",
+        "batch",
+        "conversion",
+        "slidesasimages"
+      ],
+      "apis_used": [
+        "Document",
+        "PptxSaveOptions",
+        "Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:42:40Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-pptx-progress": {
+      "title": "Convert PDF to PPTX with Progress Logging",
+      "filename": "convert-pdf-to-pptx-progress.cs",
+      "description": "Demonstrates converting a PDF file to PPTX format while logging conversion progress via a custom progress handler.",
+      "tags": [
+        "pdf",
+        "pptx",
+        "conversion",
+        "progress",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Document",
+        "Document.Save",
+        "PptxSaveOptions",
+        "PptxSaveOptions.CustomProgressHandler",
+        "PptxSaveOptions.ConversionProgressEventHandler"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:44:08Z",
+      "status": "verified"
+    },
+    "pdf-to-pptx-slides-as-images__v2": {
+      "title": "Convert PDF to PPTX with Slides as Images and High DPI",
+      "filename": "pdf-to-pptx-slides-as-images__v2.cs",
+      "description": "Demonstrates converting a PDF to a PPTX file where each slide is rendered as an image and the image resolution (DPI) is set for high‑quality output.",
+      "tags": [
+        "pdf",
+        "pptx",
+        "conversion",
+        "slidesasimages",
+        "dpi"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PptxSaveOptions",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:44:18Z",
+      "status": "verified"
+    },
+    "pdf-to-pptx-compress": {
+      "title": "Convert PDF to PPTX and Compress the Result",
+      "filename": "pdf-to-pptx-compress.cs",
+      "description": "Demonstrates converting a PDF document to PPTX using Aspose.Pdf and then compressing the PPTX file into a ZIP archive for easier distribution.",
+      "tags": [
+        "pdf",
+        "pptx",
+        "conversion",
+        "compression",
+        "zip"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PptxSaveOptions",
+        "System.IO.Compression.ZipArchive"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:44:29Z",
+      "status": "verified"
+    },
+    "pdf-to-pptx-protect": {
+      "title": "Convert PDF to PPTX and Protect with Password",
+      "filename": "pdf-to-pptx-protect.cs",
+      "description": "Demonstrates converting a PDF file to PowerPoint (PPTX) format using Aspose.Pdf and then applying password protection to the resulting PPTX using Aspose.Slides.",
+      "tags": [
+        "pdf",
+        "pptx",
+        "conversion",
+        "encryption",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PptxSaveOptions",
+        "Aspose.Slides.Presentation",
+        "Aspose.Slides.ProtectionManager.EncryptDocument",
+        "Aspose.Slides.Export.SaveFormat"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:45:08Z",
+      "status": "verified"
+    },
+    "pdf-to-pptx-to-pdfa": {
+      "title": "Convert PDF to PPTX and then to PDF/A for archival",
+      "filename": "pdf-to-pptx-to-pdfa.cs",
+      "description": "Demonstrates converting a PDF file to PPTX format and then creating a PDF/A version from the PPTX output for long‑term archiving.",
+      "tags": [
+        "conversion",
+        "pptx",
+        "pdfa",
+        "archival",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PptxSaveOptions",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Convert",
+        "Aspose.Pdf.PdfFormat",
+        "Aspose.Pdf.ConvertErrorAction"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:45:24Z",
+      "status": "verified"
+    },
+    "pdf-to-pptx-with-notes": {
+      "title": "Convert PDF to PPTX with Annotations as Speaker Notes",
+      "filename": "pdf-to-pptx-with-notes.cs",
+      "description": "Shows how to convert a PDF file to a PowerPoint PPTX presentation while embedding PDF annotations as speaker notes on each slide.",
+      "tags": [
+        "pdf",
+        "pptx",
+        "conversion",
+        "annotations",
+        "notes"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PptxSaveOptions",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:46:13Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-pptx-embed-fonts": {
+      "title": "Convert PDF to PPTX with Embedded Fonts",
+      "filename": "convert-pdf-to-pptx-embed-fonts.cs",
+      "description": "Demonstrates converting a PDF file to a PPTX presentation while embedding font glyphs to preserve appearance.",
+      "tags": [
+        "pdf",
+        "pptx",
+        "conversion",
+        "fonts",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PptxSaveOptions",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T04:48:36Z",
+      "status": "verified"
+    },
+    "pdf-to-pptx-apply-slide-master": {
+      "title": "Convert PDF to PPTX and Apply Custom Slide Master",
+      "filename": "pdf-to-pptx-apply-slide-master.cs",
+      "description": "Converts a PDF file to PPTX using Aspose.Pdf and then applies a custom slide master template to all slides using Aspose.Slides.",
+      "tags": [
+        "pdf",
+        "pptx",
+        "slide-master",
+        "conversion",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PptxSaveOptions",
+        "Aspose.Slides.Presentation",
+        "Presentation.Masters.AddClone",
+        "Slide.LayoutSlide"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:50:47Z",
+      "status": "verified"
+    },
+    "pdf-to-pptx-extract-images": {
+      "title": "Convert PDF to PPTX and Extract Images from Slides",
+      "filename": "pdf-to-pptx-extract-images.cs",
+      "description": "Converts a PDF file to PPTX using Aspose.Pdf and then extracts all images from the generated slides using Aspose.Slides.",
+      "tags": [
+        "pdf",
+        "pptx",
+        "image-extraction",
+        "aspose-pdf",
+        "aspose-slides"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PptxSaveOptions",
+        "Aspose.Slides.Presentation",
+        "Aspose.Slides.IPictureFrame",
+        "Aspose.Slides.IImage"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:51:17Z",
+      "status": "verified"
+    },
+    "pdf-to-pptx-export-titles": {
+      "title": "Convert PDF to PPTX and Export Slide Titles to CSV",
+      "filename": "pdf-to-pptx-export-titles.cs",
+      "description": "Shows how to convert a PDF document to PowerPoint (PPTX) format and then extract each page's first line as a slide title, saving the titles into a CSV file.",
+      "tags": [
+        "pdf",
+        "pptx",
+        "conversion",
+        "csv",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PptxSaveOptions",
+        "Aspose.Pdf.Text.TextAbsorber"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:51:31Z",
+      "status": "verified"
+    },
+    "pdf-to-pptx-add-logo": {
+      "title": "Convert PDF to PPTX and Add Company Logo to Each Slide",
+      "filename": "pdf-to-pptx-add-logo.cs",
+      "description": "Loads a PDF, stamps a company logo on every page, then converts the document to PPTX format.",
+      "tags": [
+        "pdf",
+        "pptx",
+        "image-stamp",
+        "conversion",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.ImageStamp",
+        "Aspose.Pdf.PptxSaveOptions",
+        "Aspose.Pdf.Page.AddStamp"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:51:45Z",
+      "status": "verified"
+    },
+    "pdf-to-pptx-add-speaker-notes": {
+      "title": "Convert PDF to PPTX and Add Speaker Notes",
+      "filename": "pdf-to-pptx-add-speaker-notes.cs",
+      "description": "Demonstrates converting a PDF file to PowerPoint (PPTX) using Aspose.Pdf and then adding speaker notes to each slide with Aspose.Slides.",
+      "tags": [
+        "pdf",
+        "pptx",
+        "conversion",
+        "speaker-notes",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PptxSaveOptions",
+        "Aspose.Slides.Presentation",
+        "Aspose.Slides.Slide",
+        "Aspose.Slides.NotesSlideManager"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:52:25Z",
+      "status": "verified"
+    },
+    "pdf-to-single-page-html": {
+      "title": "Convert PDF to Single‑Page HTML with Embedded Resources",
+      "filename": "pdf-to-single-page-html.cs",
+      "description": "Loads a PDF, configures HtmlSaveOptions to embed fonts, images, and CSS, and saves the document as a single HTML file preserving the original layout and typography.",
+      "tags": [
+        "pdf",
+        "html",
+        "conversion",
+        "embed-resources",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.HtmlSaveOptions",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T04:52:49Z",
+      "status": "verified"
+    },
+    "pdf-to-multi-page-html": {
+      "title": "Convert PDF to Multi‑Page HTML with SplitIntoPages",
+      "filename": "pdf-to-multi-page-html.cs",
+      "description": "Demonstrates converting a PDF into separate HTML files per page by enabling the SplitIntoPages option.",
+      "tags": [
+        "pdf",
+        "html",
+        "conversion",
+        "split",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.HtmlSaveOptions",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T04:53:06Z",
+      "status": "verified"
+    },
+    "pdf-to-html-with-svg": {
+      "title": "Convert PDF to HTML with SVG images saved to a folder",
+      "filename": "pdf-to-html-with-svg.cs",
+      "description": "Demonstrates converting a PDF file to HTML while directing generated SVG images to a specific directory.",
+      "tags": [
+        "pdf",
+        "html",
+        "svg",
+        "conversion"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.HtmlSaveOptions",
+        "Aspose.Pdf.HtmlSaveOptions.SpecialFolderForSvgImages",
+        "Aspose.Pdf.HtmlSaveOptions.RasterImagesSavingMode"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T04:53:55Z",
+      "status": "verified"
+    },
+    "pdf-to-html-compress-svg": {
+      "title": "Convert PDF to HTML with SVG Image Compression",
+      "filename": "pdf-to-html-compress-svg.cs",
+      "description": "Demonstrates converting a PDF file to HTML while compressing embedded SVG images to reduce the output size.",
+      "tags": [
+        "pdf",
+        "html",
+        "svg",
+        "compression",
+        "conversion"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.HtmlSaveOptions"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T04:54:13Z",
+      "status": "verified"
+    },
+    "pdf-to-html-png-background": {
+      "title": "Convert PDF to HTML with PNG page background",
+      "filename": "pdf-to-html-png-background.cs",
+      "description": "Converts a PDF document to HTML where each page's background is rendered as a single PNG image.",
+      "tags": [
+        "pdf",
+        "html",
+        "conversion",
+        "png",
+        "background"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.HtmlSaveOptions",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T04:54:23Z",
+      "status": "verified"
+    },
+    "pdf-to-html-split-pages": {
+      "title": "Convert PDF Pages to Separate HTML Files",
+      "filename": "pdf-to-html-split-pages.cs",
+      "description": "Demonstrates converting each page of a PDF into its own HTML file using HtmlSaveOptions.SplitIntoPages.",
+      "tags": [
+        "pdf",
+        "html",
+        "conversion",
+        "split",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Document",
+        "HtmlSaveOptions",
+        "Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T04:54:33Z",
+      "status": "verified"
+    },
+    "pdf-to-html-toc": {
+      "title": "Convert PDF to HTML with Table of Contents",
+      "filename": "pdf-to-html-toc.cs",
+      "description": "Converts a PDF to separate HTML pages and creates a simple HTML table of contents linking each page.",
+      "tags": [
+        "pdf",
+        "html",
+        "toc",
+        "conversion"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.HtmlSaveOptions",
+        "Aspose.Pdf.PageCollection"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:54:52Z",
+      "status": "verified"
+    },
+    "pdf-to-html-per-page-images": {
+      "title": "Convert PDF to HTML with per-page image folders",
+      "filename": "pdf-to-html-per-page-images.cs",
+      "description": "Demonstrates converting a PDF to HTML while saving each page's images into separate subfolders for organized assets.",
+      "tags": [
+        "pdf",
+        "html",
+        "images",
+        "conversion",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Document",
+        "HtmlSaveOptions",
+        "HtmlSaveOptions.RasterImagesSavingMode",
+        "HtmlSaveOptions.CustomImageSavingStrategy",
+        "Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:55:49Z",
+      "status": "verified"
+    },
+    "pdf-to-html-compress-svg__v2": {
+      "title": "Convert PDF to HTML with SVG Compression",
+      "filename": "pdf-to-html-compress-svg__v2.cs",
+      "description": "Converts a PDF file to HTML while enabling SVG image compression to reduce asset size.",
+      "tags": [
+        "pdf",
+        "html",
+        "compression",
+        "svg",
+        "conversion"
+      ],
+      "apis_used": [
+        "Document",
+        "HtmlSaveOptions",
+        "Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:56:12Z",
+      "status": "verified"
+    },
+    "pdf-to-html-png-background__v2": {
+      "title": "Convert PDF to HTML with PNG page backgrounds",
+      "filename": "pdf-to-html-png-background__v2.cs",
+      "description": "Demonstrates converting a PDF file to HTML while rendering each page background as a single PNG image.",
+      "tags": [
+        "pdf",
+        "html",
+        "conversion",
+        "png",
+        "background"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.HtmlSaveOptions",
+        "Aspose.Pdf.HtmlSaveOptions.RasterImagesSavingModes"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T04:56:25Z",
+      "status": "verified"
+    },
+    "pdf-to-html-and-back": {
+      "title": "Convert PDF to HTML and back to PDF",
+      "filename": "pdf-to-html-and-back.cs",
+      "description": "Demonstrates converting a PDF to a single HTML file, then loading that HTML and saving it back to PDF.",
+      "tags": [
+        "pdf",
+        "html",
+        "conversion"
+      ],
+      "apis_used": [
+        "Document",
+        "HtmlSaveOptions",
+        "HtmlLoadOptions"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:56:38Z",
+      "status": "verified"
+    },
+    "pdf-to-html-zip": {
+      "title": "Convert PDF to HTML and Package into ZIP Archive",
+      "filename": "pdf-to-html-zip.cs",
+      "description": "Demonstrates converting a PDF to HTML pages with external resources and zipping the resulting files for distribution.",
+      "tags": [
+        "pdf",
+        "html",
+        "zip",
+        "conversion",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.HtmlSaveOptions",
+        "System.IO.Compression.ZipArchive"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:57:06Z",
+      "status": "verified"
+    },
+    "pdf-to-html-minify": {
+      "title": "Convert PDF to HTML and Minify Output",
+      "filename": "pdf-to-html-minify.cs",
+      "description": "Converts a PDF file to HTML using Aspose.Pdf and then minifies the generated HTML to reduce file size for faster web loading.",
+      "tags": [
+        "pdf",
+        "html",
+        "minify",
+        "conversion",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.HtmlSaveOptions"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T04:57:16Z",
+      "status": "verified"
+    },
+    "pdf-to-html-embed-fonts": {
+      "title": "Convert PDF to HTML with Embedded Custom Fonts",
+      "filename": "pdf-to-html-embed-fonts.cs",
+      "description": "Demonstrates converting a PDF to HTML while embedding fonts using @font-face rules via HtmlSaveOptions.",
+      "tags": [
+        "pdf",
+        "html",
+        "fonts",
+        "conversion",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.HtmlSaveOptions",
+        "Aspose.Pdf.HtmlSaveOptions.FontSavingModes",
+        "Aspose.Pdf.HtmlSaveOptions.PartsEmbeddingModes"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:57:28Z",
+      "status": "verified"
+    },
+    "pdf-to-responsive-html": {
+      "title": "Convert PDF to Responsive HTML",
+      "filename": "pdf-to-responsive-html.cs",
+      "description": "Converts a PDF document to HTML and injects a mobile‑friendly responsive CSS stylesheet.",
+      "tags": [
+        "pdf",
+        "html",
+        "responsive",
+        "css",
+        "conversion"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.HtmlSaveOptions",
+        "Aspose.Pdf.HtmlSaveOptions.PartsEmbeddingModes"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:57:55Z",
+      "status": "verified"
+    },
+    "pdf-to-html-with-custom-css": {
+      "title": "Convert PDF to HTML with Custom CSS",
+      "filename": "pdf-to-html-with-custom-css.cs",
+      "description": "Demonstrates converting a PDF to HTML using Aspose.Pdf and applying a custom CSS file via HtmlSaveOptions.",
+      "tags": [
+        "pdf",
+        "html",
+        "css",
+        "conversion",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Document",
+        "HtmlSaveOptions"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:58:16Z",
+      "status": "verified"
+    },
+    "pdf-to-html-sitemap": {
+      "title": "Convert PDF to HTML Pages and Generate Sitemap XML",
+      "filename": "pdf-to-html-sitemap.cs",
+      "description": "Converts a PDF into separate HTML pages using Aspose.Pdf and creates an XML sitemap that lists the generated HTML files for SEO.",
+      "tags": [
+        "pdf",
+        "html",
+        "sitemap",
+        "conversion",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.HtmlSaveOptions",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:58:36Z",
+      "status": "verified"
+    },
+    "pdf-to-html-index": {
+      "title": "Convert PDF to HTML with per-page files and generate index",
+      "filename": "pdf-to-html-index.cs",
+      "description": "Converts a PDF into separate HTML files per page and creates an index.html linking to each generated page.",
+      "tags": [
+        "pdf",
+        "html",
+        "conversion",
+        "index",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.HtmlSaveOptions",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:58:51Z",
+      "status": "verified"
+    },
+    "pdf-to-html-docx-embed-fonts": {
+      "title": "Convert PDF to HTML and then to DOCX with Embedded Fonts",
+      "filename": "pdf-to-html-docx-embed-fonts.cs",
+      "description": "Shows how to convert a PDF to HTML and subsequently load the HTML to produce a DOCX file with custom fonts embedded for consistent rendering.",
+      "tags": [
+        "pdf",
+        "html",
+        "docx",
+        "fonts",
+        "conversion"
+      ],
+      "apis_used": [
+        "Document",
+        "HtmlSaveOptions",
+        "HtmlLoadOptions",
+        "DocSaveOptions"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T04:59:23Z",
+      "status": "verified"
+    },
+    "pdf-to-html-embed-font-pptx": {
+      "title": "Convert PDF to HTML and Embed Custom Font into PPTX",
+      "filename": "pdf-to-html-embed-font-pptx.cs",
+      "description": "Shows how to convert a PDF to a single HTML file with embedded fonts and then create a PowerPoint presentation that embeds the same custom font for consistent appearance.",
+      "tags": [
+        "pdf",
+        "html",
+        "pptx",
+        "custom-font",
+        "conversion"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.HtmlSaveOptions",
+        "Aspose.Slides.Presentation",
+        "Aspose.Slides.IFontsManager",
+        "Aspose.Slides.FontEmbeddingMode",
+        "Aspose.Slides.IAutoShape"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:00:58Z",
+      "status": "verified"
+    },
+    "pdf-to-bmp": {
+      "title": "Convert PDF Pages to BMP Images",
+      "filename": "pdf-to-bmp.cs",
+      "description": "Converts each page of a PDF document to separate BMP image files using Aspose.Pdf's BmpDevice with default settings.",
+      "tags": [
+        "pdf",
+        "bmp",
+        "conversion",
+        "image",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.BmpDevice",
+        "Aspose.Pdf.Devices.BmpDevice.Process",
+        "Aspose.Pdf.PageCollection"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:01:15Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-jpeg": {
+      "title": "Convert PDF Pages to JPEG Images",
+      "filename": "convert-pdf-to-jpeg.cs",
+      "description": "Demonstrates converting each page of a PDF document into separate JPEG images using Aspose.Pdf's JpegDevice with default quality.",
+      "tags": [
+        "pdf",
+        "jpeg",
+        "conversion",
+        "image",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.JpegDevice",
+        "Aspose.Pdf.Devices.JpegDevice.Process"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:01:53Z",
+      "status": "verified"
+    },
+    "pdf-to-gif": {
+      "title": "Convert PDF Pages to GIF Images",
+      "filename": "pdf-to-gif.cs",
+      "description": "Demonstrates how to convert each page of a PDF document into separate GIF images using Aspose.Pdf's GifDevice with default settings.",
+      "tags": [
+        "pdf",
+        "gif",
+        "image",
+        "conversion",
+        "device"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.GifDevice",
+        "Aspose.Pdf.Devices.GifDevice.Process"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:02:08Z",
+      "status": "verified"
+    },
+    "pdf-to-png-transparent": {
+      "title": "Convert PDF to PNG Images with Transparent Background",
+      "filename": "pdf-to-png-transparent.cs",
+      "description": "Converts each page of a PDF document to PNG images using PngDevice and enables a transparent background for the output images.",
+      "tags": [
+        "pdf",
+        "png",
+        "image",
+        "transparent",
+        "conversion"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.PngDevice",
+        "Aspose.Pdf.Resolution"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:02:36Z",
+      "status": "verified"
+    },
+    "pdf-to-emf": {
+      "title": "Convert PDF to EMF Images Preserving Vector Data",
+      "filename": "pdf-to-emf.cs",
+      "description": "Converts each page of a PDF document to an EMF image using EmfDevice, preserving vector graphics.",
+      "tags": [
+        "pdf",
+        "emf",
+        "conversion",
+        "vector",
+        "image"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.EmfDevice",
+        "Aspose.Pdf.Devices.Resolution"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:03:25Z",
+      "status": "verified"
+    },
+    "pdf-to-multi-page-tiff": {
+      "title": "Convert PDF to Multi-Page TIFF",
+      "filename": "pdf-to-multi-page-tiff.cs",
+      "description": "Demonstrates converting a PDF document into a single multi-page TIFF image using Aspose.Pdf's TiffDevice.",
+      "tags": [
+        "pdf",
+        "tiff",
+        "conversion",
+        "device",
+        "multipage"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.TiffDevice.Process",
+        "Aspose.Pdf.Devices.Resolution",
+        "Aspose.Pdf.Devices.TiffSettings"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:03:49Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-svg": {
+      "title": "Convert PDF to SVG Images using DocumentDevice",
+      "filename": "convert-pdf-to-svg.cs",
+      "description": "Demonstrates converting a PDF document to SVG images using Aspose.Pdf's DocumentDevice (SvgDevice) with default options.",
+      "tags": [
+        "pdf",
+        "svg",
+        "conversion",
+        "documentdevice",
+        "c#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.SvgDevice",
+        "Aspose.Pdf.Devices.SvgDevice.Process"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:04:06Z",
+      "status": "verified"
+    },
+    "pdf-to-multipage-tiff": {
+      "title": "Convert PDF to Multi‑Page TIFF",
+      "filename": "pdf-to-multipage-tiff.cs",
+      "description": "Converts all pages of a PDF document into a single multi‑page TIFF image using Aspose.Pdf's TiffDevice with default settings.",
+      "tags": [
+        "pdf",
+        "tiff",
+        "conversion",
+        "aspose-pdf",
+        "devices"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.TiffDevice",
+        "Aspose.Pdf.Devices.TiffDevice.Process"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:04:29Z",
+      "status": "verified"
+    },
+    "pdf-page-region-to-png": {
+      "title": "Convert PDF Page Region to PNG Image",
+      "filename": "pdf-page-region-to-png.cs",
+      "description": "Extracts a defined rectangular region from a PDF page and saves it as a PNG image.",
+      "tags": [
+        "pdf",
+        "png",
+        "region",
+        "crop",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Devices.PngDevice",
+        "Aspose.Pdf.Devices.Resolution",
+        "System.Drawing.Image",
+        "System.Drawing.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:05:21Z",
+      "status": "verified"
+    },
+    "convert-pdf-page-to-jpeg": {
+      "title": "Convert PDF Page to JPEG Image",
+      "filename": "convert-pdf-page-to-jpeg.cs",
+      "description": "Demonstrates how to extract a specific page from a PDF and save it as a JPEG image using Aspose.Pdf's JpegDevice with the default resolution.",
+      "tags": [
+        "pdf",
+        "jpeg",
+        "image",
+        "conversion",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.JpegDevice",
+        "Aspose.Pdf.Devices.JpegDevice.Process"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:05:35Z",
+      "status": "verified"
+    },
+    "batch-pdf-to-png": {
+      "title": "Batch Convert PDFs to PNG Images Preserving Folder Structure",
+      "filename": "batch-pdf-to-png.cs",
+      "description": "Recursively scans a source folder for PDF files, converts each page to PNG, and saves the images in an output folder mirroring the original hierarchy.",
+      "tags": [
+        "pdf",
+        "png",
+        "batch",
+        "conversion",
+        "filesystem"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Document.ConvertPageToPNGMemoryStream"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:05:49Z",
+      "status": "verified"
+    },
+    "batch-convert-pdf-to-jpeg": {
+      "title": "Batch Convert PDFs to JPEG Images",
+      "filename": "batch-convert-pdf-to-jpeg.cs",
+      "description": "Converts all PDF files in a folder to JPEG images, one image per page, using a custom naming pattern.",
+      "tags": [
+        "pdf",
+        "jpeg",
+        "batch",
+        "conversion",
+        "images"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.JpegDevice",
+        "Aspose.Pdf.Document.Pages",
+        "JpegDevice.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:06:19Z",
+      "status": "verified"
+    },
+    "batch-convert-pdfs-to-multi-page-tiff": {
+      "title": "Batch Convert PDFs to Multi‑Page TIFF",
+      "filename": "batch-convert-pdfs-to-multi-page-tiff.cs",
+      "description": "Converts each PDF file in a folder into a single multi‑page TIFF image using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "tiff",
+        "batch",
+        "conversion",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.TiffDevice",
+        "Aspose.Pdf.Devices.TiffDevice.Process"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:06:33Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-pdfa-1b": {
+      "title": "Convert PDF to PDF/A-1b with Validation",
+      "filename": "convert-pdf-to-pdfa-1b.cs",
+      "description": "Loads a PDF, validates it for PDF/A‑1b compliance, converts it to PDF/A‑1b, validates the result, and saves both the PDF/A file and validation logs.",
+      "tags": [
+        "pdfa",
+        "validation",
+        "conversion",
+        "aspdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Validate",
+        "Aspose.Pdf.Document.Convert"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:06:48Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-pdfa3b-font-substitution": {
+      "title": "Convert PDF to PDF/A‑3b with Font Substitution",
+      "filename": "convert-pdf-to-pdfa3b-font-substitution.cs",
+      "description": "Demonstrates converting a PDF to PDF/A‑3b while substituting missing fonts using the FontSubstitution feature.",
+      "tags": [
+        "pdfa",
+        "font-substitution",
+        "conversion",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FontSubstitution",
+        "Aspose.Pdf.PdfFormatConversionOptions",
+        "Aspose.Pdf.Document.Convert",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:07:09Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-pdfa4-auto-tagging": {
+      "title": "Convert PDF to PDF/A‑4 with Auto‑Tagging",
+      "filename": "convert-pdf-to-pdfa4-auto-tagging.cs",
+      "description": "Demonstrates converting a PDF to PDF/A‑4 while enabling automatic tagging using AutoTaggingSettings during the conversion process.",
+      "tags": [
+        "pdfa",
+        "auto-tagging",
+        "conversion",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Document",
+        "PdfFormatConversionOptions",
+        "AutoTaggingSettings",
+        "Document.Convert",
+        "Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:07:26Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-pdfa1b-skip": {
+      "title": "Convert PDF to PDF/A-1b with Skip Error Action",
+      "filename": "convert-pdf-to-pdfa1b-skip.cs",
+      "description": "Demonstrates converting a PDF to PDF/A‑1b while skipping (deleting) elements that cannot be converted.",
+      "tags": [
+        "conversion",
+        "pdfa",
+        "error-action"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Convert",
+        "Aspose.Pdf.PdfFormat",
+        "Aspose.Pdf.ConvertErrorAction"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:07:40Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-pdfa4": {
+      "title": "Convert PDF to PDF/A‑4 with ConvertErrorAction",
+      "filename": "convert-pdf-to-pdfa4.cs",
+      "description": "Demonstrates converting a PDF to PDF/A‑4 while setting ConvertErrorAction to Convert to attempt conversion of problematic elements and log any errors.",
+      "tags": [
+        "pdf",
+        "pdfa",
+        "conversion",
+        "error-handling"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Convert",
+        "Aspose.Pdf.PdfFormat",
+        "Aspose.Pdf.ConvertErrorAction"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:10:10Z",
+      "status": "verified"
+    },
+    "add-text-file-attachment-pdfa3b": {
+      "title": "Add Text File Attachment to PDF/A‑3b Document",
+      "filename": "add-text-file-attachment-pdfa3b.cs",
+      "description": "Demonstrates how to embed an external text file as a file‑attachment annotation and then convert the PDF to PDF/A‑3b compliance.",
+      "tags": [
+        "pdfa",
+        "attachment",
+        "annotation",
+        "aspdf",
+        "c#"
+      ],
+      "apis_used": [
+        "Document",
+        "FileSpecification",
+        "FileAttachmentAnnotation",
+        "PdfFormat",
+        "ConvertErrorAction",
+        "Document.Convert",
+        "Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:10:50Z",
+      "status": "verified"
+    },
+    "add-xml-attachment-pdfa": {
+      "title": "Add XML Attachment to PDF/A‑1b Document",
+      "filename": "add-xml-attachment-pdfa.cs",
+      "description": "Converts a PDF to PDF/A‑1b compliance and attaches an external XML file to the resulting document.",
+      "tags": [
+        "pdfa",
+        "attachment",
+        "xml",
+        "conversion",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Convert",
+        "Aspose.Pdf.PdfFormat",
+        "Aspose.Pdf.ConvertErrorAction",
+        "Aspose.Pdf.FileAttachment",
+        "Aspose.Pdf.Document.Attachments.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:11:16Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-pdfa-font-substitution": {
+      "title": "Convert PDF to PDF/A with Font Substitution Fallback",
+      "filename": "convert-pdf-to-pdfa-font-substitution.cs",
+      "description": "Demonstrates how to convert a PDF to PDF/A while configuring FontEmbeddingOptions to substitute missing fonts with default fallback fonts.",
+      "tags": [
+        "pdfa",
+        "font-substitution",
+        "conversion",
+        "aspnet",
+        "csharp"
+      ],
+      "apis_used": [
+        "Document",
+        "PdfFormatConversionOptions",
+        "FontEmbeddingOptions"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:11:38Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-pdfa-auto-tagging": {
+      "title": "Convert PDF to PDF/A with Auto‑Tagging",
+      "filename": "convert-pdf-to-pdfa-auto-tagging.cs",
+      "description": "Shows how to enable auto‑tagging during PDF/A conversion by configuring AutoTaggingSettings on PdfFormatConversionOptions and saving the result.",
+      "tags": [
+        "pdfa",
+        "auto-tagging",
+        "conversion",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Document",
+        "AutoTaggingSettings",
+        "PdfFormatConversionOptions",
+        "Document.Convert",
+        "Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:11:54Z",
+      "status": "verified"
+    },
+    "epub-to-pdf-custom-page-size": {
+      "title": "Convert EPUB to PDF with Custom Page Size",
+      "filename": "epub-to-pdf-custom-page-size.cs",
+      "description": "Loads an EPUB file using EpubLoadOptions with a custom page size and saves it as a PDF document.",
+      "tags": [
+        "epub",
+        "pdf",
+        "custom-page-size",
+        "conversion",
+        "loadoptions"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.EpubLoadOptions",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:12:06Z",
+      "status": "verified"
+    },
+    "markdown-to-pdf": {
+      "title": "Convert Markdown to PDF preserving code blocks",
+      "filename": "markdown-to-pdf.cs",
+      "description": "Loads a Markdown file with MdLoadOptions and saves it as a PDF, keeping code block formatting.",
+      "tags": [
+        "markdown",
+        "pdf",
+        "conversion",
+        "code-blocks"
+      ],
+      "apis_used": [
+        "Document",
+        "MdLoadOptions"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:12:17Z",
+      "status": "verified"
+    },
+    "pcl-to-pdf-hpgl2": {
+      "title": "Convert PCL to PDF with HP‑GL/2 Vector Loading",
+      "filename": "pcl-to-pdf-hpgl2.cs",
+      "description": "Loads a PCL file, enables HP‑GL/2 vector loading, and saves it as a PDF.",
+      "tags": [
+        "pcl",
+        "pdf",
+        "hpgl2",
+        "conversion",
+        "loadoptions"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PclLoadOptions"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:12:33Z",
+      "status": "verified"
+    },
+    "convert-ps-to-pdf": {
+      "title": "Convert PostScript to PDF",
+      "filename": "convert-ps-to-pdf.cs",
+      "description": "Loads a PostScript (.ps) file using PsLoadOptions and saves it as a PDF with default settings.",
+      "tags": [
+        "postscript",
+        "pdf",
+        "conversion",
+        "aspdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Document",
+        "PsLoadOptions",
+        "Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:12:41Z",
+      "status": "verified"
+    },
+    "xml-to-pdf-xslfo": {
+      "title": "Convert XML to PDF using XSL‑FO Transformation",
+      "filename": "xml-to-pdf-xslfo.cs",
+      "description": "Loads an XML file, applies an XSL‑FO stylesheet, and saves the result as a PDF.",
+      "tags": [
+        "xml",
+        "xsl-fo",
+        "pdf",
+        "conversion",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Document",
+        "XmlLoadOptions"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:12:50Z",
+      "status": "verified"
+    },
+    "convert-xslfo-to-pdf": {
+      "title": "Convert XSL‑FO to PDF",
+      "filename": "convert-xslfo-to-pdf.cs",
+      "description": "Loads an XSL‑FO file using XslFoLoadOptions and saves it as a PDF with default settings.",
+      "tags": [
+        "xsl-fo",
+        "pdf",
+        "conversion",
+        "aspose-pdf",
+        "c#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.XslFoLoadOptions"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:13:47Z",
+      "status": "verified"
+    },
+    "convert-latex-to-pdf": {
+      "title": "Convert LaTeX File to PDF with Aspose.Pdf",
+      "filename": "convert-latex-to-pdf.cs",
+      "description": "Loads a .tex file using TeXLoadOptions and saves it as a PDF, preserving equations and formatting.",
+      "tags": [
+        "latex",
+        "pdf",
+        "conversion",
+        "aspose-pdf",
+        "tex"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.TeXLoadOptions"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:13:56Z",
+      "status": "verified"
+    },
+    "convert-ofd-to-pdf": {
+      "title": "Convert OFD to PDF",
+      "filename": "convert-ofd-to-pdf.cs",
+      "description": "Loads an OFD file using OfdLoadOptions and saves it as a PDF with default settings.",
+      "tags": [
+        "OFD",
+        "PDF",
+        "conversion",
+        "Aspose.Pdf",
+        "example"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.OfdLoadOptions",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:14:05Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-epub": {
+      "title": "Convert PDF to EPUB",
+      "filename": "convert-pdf-to-epub.cs",
+      "description": "Demonstrates converting a PDF document to an EPUB file using Aspose.Pdf with default conversion settings.",
+      "tags": [
+        "pdf",
+        "epub",
+        "conversion"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.EpubSaveOptions"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:14:14Z",
+      "status": "verified"
+    },
+    "pdf-to-epub-with-cover": {
+      "title": "Convert PDF to EPUB with Cover Image and Metadata",
+      "filename": "pdf-to-epub-with-cover.cs",
+      "description": "Converts a PDF file to EPUB format while setting custom metadata and a cover image.",
+      "tags": [
+        "pdf",
+        "epub",
+        "metadata",
+        "cover-image",
+        "conversion"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.DocumentInfo",
+        "Aspose.Pdf.Image",
+        "Aspose.Pdf.EpubSaveOptions",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:15:29Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-latex": {
+      "title": "Convert PDF to LaTeX using TeXSaveOptions",
+      "filename": "convert-pdf-to-latex.cs",
+      "description": "Loads a PDF file and saves it as a LaTeX (.tex) document, directing the generated files to a specified output directory.",
+      "tags": [
+        "pdf",
+        "latex",
+        "conversion",
+        "texsaveoptions",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Document",
+        "TeXSaveOptions.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:15:39Z",
+      "status": "verified"
+    },
+    "pdf-to-latex-custom-macros": {
+      "title": "Convert PDF to LaTeX with Custom Macro Definitions",
+      "filename": "pdf-to-latex-custom-macros.cs",
+      "description": "Loads a PDF, converts it to TeX (LaTeX) using Aspose.Pdf, then inserts user‑defined macro definitions into the generated .tex file.",
+      "tags": [
+        "pdf",
+        "latex",
+        "conversion",
+        "custom-macro",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Document",
+        "TeXSaveOptions"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:15:50Z",
+      "status": "verified"
+    },
+    "pdf-to-text": {
+      "title": "Convert PDF to Text using TextSaveOptions",
+      "filename": "pdf-to-text.cs",
+      "description": "Demonstrates converting a PDF document to a plain text file using Aspose.Pdf's TextSaveOptions with the default encoding.",
+      "tags": [
+        "pdf",
+        "text",
+        "conversion",
+        "aspose.pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.TextSaveOptions",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:16:07Z",
+      "status": "verified"
+    },
+    "pdf-to-utf8-text": {
+      "title": "Convert PDF to UTF-8 Text with Line Breaks",
+      "filename": "pdf-to-utf8-text.cs",
+      "description": "Extracts text from a PDF document using UTF‑8 encoding while preserving line breaks between pages.",
+      "tags": [
+        "pdf",
+        "text-extraction",
+        "utf8",
+        "aspose-pdf",
+        "beginner"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.TextDevice",
+        "Aspose.Pdf.Devices.TextDevice.Process"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:16:28Z",
+      "status": "verified"
+    },
+    "extract-visible-text": {
+      "title": "Extract Visible Text from PDF (excluding hidden OCR layers)",
+      "filename": "extract-visible-text.cs",
+      "description": "Shows how to extract only the visible text from a PDF using TextAbsorber, ignoring hidden OCR sublayers.",
+      "tags": [
+        "text-extraction",
+        "pdf",
+        "aspose-pdf",
+        "visible-text",
+        "csharp"
+      ],
+      "apis_used": [
+        "Document",
+        "TextAbsorber",
+        "TextExtractionOptions",
+        "Document.Pages.Accept"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:16:42Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-xps": {
+      "title": "Convert PDF to XPS using Aspose.Pdf",
+      "filename": "convert-pdf-to-xps.cs",
+      "description": "Demonstrates loading a PDF file and saving it as XPS using XpsSaveOptions with default settings.",
+      "tags": [
+        "pdf",
+        "xps",
+        "conversion",
+        "saveoptions"
+      ],
+      "apis_used": [
+        "Document",
+        "XpsSaveOptions",
+        "Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:16:53Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-xps-custom-size": {
+      "title": "Convert PDF to XPS with Custom Page Size and Orientation",
+      "filename": "convert-pdf-to-xps-custom-size.cs",
+      "description": "Demonstrates converting a PDF document to XPS format while setting a custom page size and landscape orientation for all pages.",
+      "tags": [
+        "pdf",
+        "xps",
+        "conversion",
+        "pagesize",
+        "orientation"
+      ],
+      "apis_used": [
+        "Document",
+        "Page",
+        "PageInfo",
+        "XpsSaveOptions",
+        "Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:17:08Z",
+      "status": "verified"
+    },
+    "pdf-to-markdown": {
+      "title": "Convert PDF to Markdown using Aspose.Pdf",
+      "filename": "pdf-to-markdown.cs",
+      "description": "Demonstrates loading a PDF file and saving it as a Markdown document with default settings.",
+      "tags": [
+        "pdf",
+        "markdown",
+        "conversion"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.MarkdownSaveOptions",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:17:18Z",
+      "status": "verified"
+    },
+    "pdf-to-markdown-custom-headings": {
+      "title": "Convert PDF to Markdown with Custom Heading Levels",
+      "filename": "pdf-to-markdown-custom-headings.cs",
+      "description": "Demonstrates converting a PDF document to Markdown while configuring custom heading level mapping based on font size.",
+      "tags": [
+        "pdf",
+        "markdown",
+        "heading-levels"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.MarkdownSaveOptions",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:17:31Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-mobixml": {
+      "title": "Convert PDF to MobiXml using Aspose.Pdf",
+      "filename": "convert-pdf-to-mobixml.cs",
+      "description": "Demonstrates loading a PDF file and saving it as MobiXml format with default MobiXmlSaveOptions.",
+      "tags": [
+        "pdf",
+        "mobixml",
+        "conversion",
+        "saveoptions"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.MobiXmlSaveOptions",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:17:39Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-mobixml__v2": {
+      "title": "Convert PDF to MobiXml with Custom Metadata",
+      "filename": "convert-pdf-to-mobixml__v2.cs",
+      "description": "Loads a PDF, sets author and publisher metadata, and saves it as MobiXml using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "mobixml",
+        "metadata",
+        "conversion"
+      ],
+      "apis_used": [
+        "Document",
+        "MobiXmlSaveOptions",
+        "DocumentInfo"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:17:52Z",
+      "status": "verified"
+    },
+    "pdf-to-png-bradley": {
+      "title": "Convert PDF pages to PNG with Bradley Binarization",
+      "filename": "pdf-to-png-bradley.cs",
+      "description": "Converts each page of a PDF to a PNG image and applies the Bradley binarization algorithm to enhance contrast.",
+      "tags": [
+        "pdf",
+        "png",
+        "binarization",
+        "image-processing"
+      ],
+      "apis_used": [
+        "Document",
+        "PngDevice",
+        "DocumentDevice.BinarizeBradley"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:19:03Z",
+      "status": "verified"
+    },
+    "pdf-to-png-transparent__v2": {
+      "title": "Convert PDF Pages to PNG with Transparent Background",
+      "filename": "pdf-to-png-transparent__v2.cs",
+      "description": "Converts each page of a PDF to a PNG image using a transparent background, suitable for pages that contain alpha channel content.",
+      "tags": [
+        "pdf",
+        "png",
+        "transparent",
+        "conversion",
+        "image"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.PngDevice"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:19:25Z",
+      "status": "verified"
+    },
+    "pdf-to-multi-page-tiff__v2": {
+      "title": "Convert PDF to Multi‑Page TIFF using TiffDevice",
+      "filename": "pdf-to-multi-page-tiff__v2.cs",
+      "description": "Demonstrates how to convert all pages of a PDF document into a single multi‑page TIFF image using Aspose.Pdf's TiffDevice with default compression.",
+      "tags": [
+        "pdf",
+        "tiff",
+        "conversion",
+        "aspose.pdf",
+        "device"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.TiffDevice",
+        "Aspose.Pdf.Devices.TiffDevice.Process"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:19:38Z",
+      "status": "verified"
+    },
+    "create-single-page-tiff": {
+      "title": "Create Single-Page TIFF from PDF using TiffDevice",
+      "filename": "create-single-page-tiff.cs",
+      "description": "Converts the first page of a PDF document to a single-page TIFF image with custom resolution and compression settings.",
+      "tags": [
+        "tiff",
+        "pdf",
+        "conversion",
+        "resolution",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.TiffDevice",
+        "Aspose.Pdf.Devices.Resolution",
+        "Aspose.Pdf.Devices.TiffSettings",
+        "Aspose.Pdf.Devices.CompressionType",
+        "Aspose.Pdf.Devices.ColorDepth",
+        "Aspose.Pdf.Devices.ShapeType"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-03-26T05:19:50Z",
+      "status": "verified"
+    },
+    "pdf-to-svg-css-embedding": {
+      "title": "Convert PDF to SVG with CSS Embedding using DocumentDevice",
+      "filename": "pdf-to-svg-css-embedding.cs",
+      "description": "Demonstrates converting a PDF file to SVG format using DocumentDevice and enabling CSS style embedding.",
+      "tags": [
+        "pdf",
+        "svg",
+        "conversion",
+        "css",
+        "documentdevice"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.DocumentDevice",
+        "Aspose.Pdf.SvgSaveOptions"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:21:30Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-svg-documentdevice": {
+      "title": "Convert PDF to SVG using DocumentDevice",
+      "filename": "convert-pdf-to-svg-documentdevice.cs",
+      "description": "Demonstrates converting a PDF file to SVG files using DocumentDevice and SvgDevice, saving each page into a custom output folder.",
+      "tags": [
+        "pdf",
+        "svg",
+        "conversion",
+        "documentdevice",
+        "facades"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.DocumentDevice",
+        "Aspose.Pdf.Facades.SvgDevice"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-03-26T05:22:02Z",
+      "status": "verified"
+    }
+  }
+}
