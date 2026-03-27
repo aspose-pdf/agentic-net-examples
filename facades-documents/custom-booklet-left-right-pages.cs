@@ -1,0 +1,35 @@
+using System;
+using System.IO;
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
+
+class Program
+{
+    static void Main()
+    {
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+
+        if (!File.Exists(inputPath))
+        {
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
+        }
+
+        // Define left‑hand (odd) and right‑hand (even) page order for the booklet
+        int[] leftPages = new int[] { 1, 3, 5, 7 };
+        int[] rightPages = new int[] { 2, 4, 6, 8 };
+
+        PdfFileEditor pdfFileEditor = new PdfFileEditor();
+        bool success = pdfFileEditor.MakeBooklet(inputPath, outputPath, leftPages, rightPages);
+
+        if (success)
+        {
+            Console.WriteLine($"Booklet created successfully: {outputPath}");
+        }
+        else
+        {
+            Console.Error.WriteLine("Failed to create booklet.");
+        }
+    }
+}
