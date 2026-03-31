@@ -1,65 +1,85 @@
 ---
-name: Facades - Convert Documents
-description: C# examples for Facades - Convert Documents using Aspose.PDF for .NET
+name: facades-convert-documents
+description: C# examples for facades-convert-documents using Aspose.PDF for .NET
 language: csharp
 framework: net10.0
 parent: ../agents.md
 ---
 
-# AGENTS - Facades - Convert Documents
+# AGENTS - facades-convert-documents
 
 ## Persona
 
 You are a C# developer specializing in PDF processing using Aspose.PDF for .NET,
-working within the **Facades - Convert Documents** category.
-This folder contains standalone C# examples for Facades - Convert Documents operations.
+working within the **facades-convert-documents** category.
+This folder contains standalone C# examples for facades-convert-documents operations.
 See the root [agents.md](../agents.md) for repository-wide conventions and boundaries.
 
 ## Scope
-- This folder contains **40** verified examples for **Facades - Convert Documents**.
+- This folder contains examples for **facades-convert-documents**.
 - Files are standalone `.cs` examples stored directly in this folder.
 
+## Required Namespaces
+
+- `using Aspose.Pdf;` (34/40 files) ← category-specific
+- `using Aspose.Pdf.Devices;` (34/40 files) ← category-specific
+- `using Aspose.Pdf.Facades;` (13/40 files)
+- `using Aspose.Pdf.Text;` (9/40 files)
+- `using System;` (40/40 files)
+- `using System.IO;` (40/40 files)
+- `using System.Drawing.Imaging;` (3/40 files)
+- `using System.Runtime.InteropServices;` (1/40 files)
+- `using System.Threading.Tasks;` (1/40 files)
+
+## Common Code Pattern
+
+Most files in this category use `PdfConverter` from `Aspose.Pdf.Facades`:
+
+```csharp
+PdfConverter tool = new PdfConverter();
+tool.BindPdf("input.pdf");
+// ... PdfConverter operations ...
+tool.Save("output.pdf");
+```
+
 ## Files in this folder
-- [convert-pdf-pages-1-through-10-to-jpeg-images-with-150-dpi-and-cropbox-coordinate-type](./convert-pdf-pages-1-through-10-to-jpeg-images-with-150-dpi-and-cropbox-coordinate-type.cs)
-- [convert-pdf-pages-3-through-8-to-tiff-images-using-default-resolution-and-cropbox-coordinates](./convert-pdf-pages-3-through-8-to-tiff-images-using-default-resolution-and-cropbox-coordinates.cs)
-- [convert-pdf-pages-5-to-7-to-bmp-images-while-applying-helvetica-to-arial-font-substitution](./convert-pdf-pages-5-to-7-to-bmp-images-while-applying-helvetica-to-arial-font-substitution.cs)
-- [convert-the-entire-pdf-to-png-images-at-300-dpi-using-the-default-coordinate-type](./convert-the-entire-pdf-to-png-images-at-300-dpi-using-the-default-coordinate-type.cs)
-- [convert-the-pdf-document-to-png-images-saving-each-page-as-a-separate-file-with-sequential-naming](./convert-the-pdf-document-to-png-images-saving-each-page-as-a-separate-file-with-sequential-naming.cs)
-- [convert-the-pdf-to-bmp-images-applying-font-substitution-for-missing-fonts-and-saving-with-.bmp-ext](./convert-the-pdf-to-bmp-images-applying-font-substitution-for-missing-fonts-and-saving-with-.bmp-ext.cs)
-- [convert-the-pdf-to-bmp-images-applying-times-new-roman-to-calibri-custom-font-substitution](./convert-the-pdf-to-bmp-images-applying-times-new-roman-to-calibri-custom-font-substitution.cs)
-- [convert-the-pdf-to-bmp-images-configuring-resolution-and-coordinate-type-via-properties-before-call](./convert-the-pdf-to-bmp-images-configuring-resolution-and-coordinate-type-via-properties-before-call.cs)
-- [convert-the-pdf-to-bmp-images-setting-start-page-3-and-end-page-8-for-range-conversion](./convert-the-pdf-to-bmp-images-setting-start-page-3-and-end-page-8-for-range-conversion.cs)
-- [convert-the-pdf-to-bmp-images-specifying-end-page-10-to-limit-conversion-to-the-first-ten-pages](./convert-the-pdf-to-bmp-images-specifying-end-page-10-to-limit-conversion-to-the-first-ten-pages.cs)
-- [convert-the-pdf-to-bmp-images-specifying-start-page-2-and-end-page-6-for-partial-conversion](./convert-the-pdf-to-bmp-images-specifying-start-page-2-and-end-page-6-for-partial-conversion.cs)
-- [convert-the-pdf-to-bmp-images-using-200-dpi-resolution-and-default-cropbox-for-balanced-quality](./convert-the-pdf-to-bmp-images-using-200-dpi-resolution-and-default-cropbox-for-balanced-quality.cs)
-- [convert-the-pdf-to-bmp-images-using-a-loop-to-convert-pages-1-20-with-150-dpi-resolution](./convert-the-pdf-to-bmp-images-using-a-loop-to-convert-pages-1-20-with-150-dpi-resolution.cs)
-- [convert-the-pdf-to-bmp-images-using-cropbox-coordinate-type-to-automatically-crop-margins](./convert-the-pdf-to-bmp-images-using-cropbox-coordinate-type-to-automatically-crop-margins.cs)
-- [convert-the-pdf-to-jpeg-images-applying-custom-font-substitution-for-missing-fonts-before-conversio](./convert-the-pdf-to-jpeg-images-applying-custom-font-substitution-for-missing-fonts-before-conversio.cs)
-- [convert-the-pdf-to-jpeg-images-limiting-conversion-to-the-first-five-pages-and-setting-200-dpi](./convert-the-pdf-to-jpeg-images-limiting-conversion-to-the-first-five-pages-and-setting-200-dpi.cs)
-- [convert-the-pdf-to-jpeg-images-preserving-original-page-dimensions-and-color-depth](./convert-the-pdf-to-jpeg-images-preserving-original-page-dimensions-and-color-depth.cs)
-- [convert-the-pdf-to-jpeg-images-processing-each-page-sequentially-and-saving-with-a-page-number-suff](./convert-the-pdf-to-jpeg-images-processing-each-page-sequentially-and-saving-with-a-page-number-suff.cs)
-- [convert-the-pdf-to-jpeg-images-setting-resolution-to-96-dpi-for-web-friendly-output-files](./convert-the-pdf-to-jpeg-images-setting-resolution-to-96-dpi-for-web-friendly-output-files.cs)
-- [convert-the-pdf-to-jpeg-images-setting-start-page-1-and-end-page-3-for-a-three-page-preview](./convert-the-pdf-to-jpeg-images-setting-start-page-1-and-end-page-3-for-a-three-page-preview.cs)
-- [convert-the-pdf-to-jpeg-images-using-300-dpi-resolution-and-cropbox-coordinate-type-for-precise-cro](./convert-the-pdf-to-jpeg-images-using-300-dpi-resolution-and-cropbox-coordinate-type-for-precise-cro.cs)
-- [convert-the-pdf-to-jpeg-images-using-a-batch-loop-to-handle-multiple-source-pdfs-in-a-folder](./convert-the-pdf-to-jpeg-images-using-a-batch-loop-to-handle-multiple-source-pdfs-in-a-folder.cs)
-- [convert-the-pdf-to-jpeg-images-using-default-settings-and-saving-files-with-.jpg-extension-in-outpu](./convert-the-pdf-to-jpeg-images-using-default-settings-and-saving-files-with-.jpg-extension-in-outpu.cs)
-- [convert-the-pdf-to-png-images-applying-72-dpi-resolution-for-quick-preview-generation](./convert-the-pdf-to-png-images-applying-72-dpi-resolution-for-quick-preview-generation.cs)
-- [convert-the-pdf-to-png-images-applying-helvetica-to-times-new-roman-font-substitution-for-missing-f](./convert-the-pdf-to-png-images-applying-helvetica-to-times-new-roman-font-substitution-for-missing-f.cs)
-- [convert-the-pdf-to-png-images-enabling-font-substitution-for-all-missing-fonts-before-conversion-be](./convert-the-pdf-to-png-images-enabling-font-substitution-for-all-missing-fonts-before-conversion-be.cs)
-- [convert-the-pdf-to-png-images-extracting-only-odd-numbered-pages-and-saving-them-as-separate-files](./convert-the-pdf-to-png-images-extracting-only-odd-numbered-pages-and-saving-them-as-separate-files.cs)
-- [convert-the-pdf-to-png-images-processing-pages-in-parallel-threads-to-improve-conversion-speed](./convert-the-pdf-to-png-images-processing-pages-in-parallel-threads-to-improve-conversion-speed.cs)
-- [convert-the-pdf-to-png-images-processing-pages-in-reverse-order-from-last-to-first](./convert-the-pdf-to-png-images-processing-pages-in-reverse-order-from-last-to-first.cs)
-- [convert-the-pdf-to-png-images-setting-resolution-to-72-dpi-and-using-cropbox-to-preserve-visible-co](./convert-the-pdf-to-png-images-setting-resolution-to-72-dpi-and-using-cropbox-to-preserve-visible-co.cs)
-- [convert-the-pdf-to-png-images-using-cropbox-coordinate-type-to-include-only-the-visible-page-area](./convert-the-pdf-to-png-images-using-cropbox-coordinate-type-to-include-only-the-visible-page-area.cs)
-- [convert-the-pdf-to-tiff-images-applying-400-dpi-resolution-for-high-resolution-archival-output](./convert-the-pdf-to-tiff-images-applying-400-dpi-resolution-for-high-resolution-archival-output.cs)
-- [convert-the-pdf-to-tiff-images-applying-courier-to-liberation-mono-font-substitution-for-better-ren](./convert-the-pdf-to-tiff-images-applying-courier-to-liberation-mono-font-substitution-for-better-ren.cs)
-- [convert-the-pdf-to-tiff-images-applying-symbol-to-arial-unicode-custom-font-substitution](./convert-the-pdf-to-tiff-images-applying-symbol-to-arial-unicode-custom-font-substitution.cs)
-- [convert-the-pdf-to-tiff-images-applying-symbol-to-arial-unicode-ms-font-substitution-for-compatibil](./convert-the-pdf-to-tiff-images-applying-symbol-to-arial-unicode-ms-font-substitution-for-compatibil.cs)
-- [convert-the-pdf-to-tiff-images-extracting-each-page-as-a-separate-file-and-naming-with-page-index](./convert-the-pdf-to-tiff-images-extracting-each-page-as-a-separate-file-and-naming-with-page-index.cs)
-- [convert-the-pdf-to-tiff-images-setting-resolution-to-600-dpi-for-detailed-graphics-extraction](./convert-the-pdf-to-tiff-images-setting-resolution-to-600-dpi-for-detailed-graphics-extraction.cs)
-- [convert-the-pdf-to-tiff-images-setting-start-page-4-and-end-page-9-for-mid-document-extraction](./convert-the-pdf-to-tiff-images-setting-start-page-4-and-end-page-9-for-mid-document-extraction.cs)
-- [convert-the-pdf-to-tiff-images-using-default-settings-and-saving-each-image-with-a-.tiff-extension](./convert-the-pdf-to-tiff-images-using-default-settings-and-saving-each-image-with-a-.tiff-extension.cs)
-- [convert-the-pdf-to-tiff-images-using-the-default-coordinate-type-and-300-dpi-resolution-for-high-qua](./convert-the-pdf-to-tiff-images-using-the-default-coordinate-type-and-300-dpi-resolution-for-high-qua.cs)
+
+| File | Title | Key APIs | Description |
+|------|-------|----------|-------------|
+| [convert-pdf-pages-to-bmp](./convert-pdf-pages-to-bmp.cs) | Convert PDF Pages 5‑7 to BMP Images with Font Substitution | `Document`, `FontSubstitution`, `Add` | Shows how to replace Helvetica with Arial in a PDF and export pages 5 to 7 as BMP images. |
+| [convert-pdf-pages-to-jpeg](./convert-pdf-pages-to-jpeg.cs) | Convert PDF Pages 1-10 to JPEG Images with 150 DPI | `PdfConverter`, `BindPdf`, `DoConvert` | Demonstrates how to convert the first ten pages of a PDF to JPEG images at 150 DPI using the Crop... |
+| [convert-pdf-pages-to-tiff](./convert-pdf-pages-to-tiff.cs) | Convert PDF Pages to TIFF Using CropBox | `Document`, `PdfConverter`, `StartPage` | Demonstrates converting pages 3 through 8 of a PDF to a single multi‑page TIFF image using the de... |
+| [convert-pdf-to-bmp-range](./convert-pdf-to-bmp-range.cs) | Convert PDF Pages to BMP Images (Partial Range) | `Document`, `BmpDevice`, `Resolution` | Demonstrates how to convert specific pages of a PDF to BMP images using Aspose.Pdf. |
+| [convert-pdf-to-bmp](./convert-pdf-to-bmp.cs) | Convert PDF Pages to BMP Images | `Document`, `BmpDevice`, `Resolution` | Converts the first 20 pages of a PDF to BMP images at 150 DPI resolution. |
+| [convert-pdf-to-jpeg](./convert-pdf-to-jpeg.cs) | Convert PDF Pages to JPEG Images | `Document`, `JpegDevice`, `Resolution` | Converts each page of a PDF document into separate JPEG image files, naming each file with a page... |
+| [convert-pdf-to-tiff](./convert-pdf-to-tiff.cs) | Convert PDF to TIFF Image | `PdfConverter`, `BindPdf`, `DoConvert` | Demonstrates converting a PDF document to a TIFF image using Aspose.Pdf.Facades.PdfConverter with... |
+| [convert-pdfs-to-jpeg](./convert-pdfs-to-jpeg.cs) | Convert PDFs to JPEG Images in Batch | `BindPdf`, `DoConvert`, `HasNextImage` | Converts each PDF file in a folder to separate JPEG images, one per page, using Aspose.Pdf's PdfC... |
+| [pdf-to-bmp-200dpi](./pdf-to-bmp-200dpi.cs) | Convert PDF to BMP Images with 200 DPI | `Document`, `BmpDevice`, `Resolution` | Converts each page of a PDF document to a BMP image using 200 DPI resolution and the default Crop... |
+| [pdf-to-bmp-conversion](./pdf-to-bmp-conversion.cs) | Convert PDF to BMP Images with Resolution and Coordinate Typ... | `Document`, `PdfConverter`, `Resolution` | Demonstrates converting each page of a PDF to BMP images using PdfConverter, setting custom resol... |
+| [pdf-to-bmp-cropbox](./pdf-to-bmp-cropbox.cs) | Convert PDF Pages to BMP Images with CropBox Cropping | `Document`, `BmpDevice`, `Resolution` | Demonstrates converting each page of a PDF to BMP images using BmpDevice and setting the coordina... |
+| [pdf-to-bmp-first-10-pages](./pdf-to-bmp-first-10-pages.cs) | Convert PDF to BMP Images (First 10 Pages) | `Document`, `BmpDevice`, `Resolution` | Demonstrates converting the first ten pages of a PDF document to separate BMP image files using A... |
+| [pdf-to-bmp-font-substitution](./pdf-to-bmp-font-substitution.cs) | Convert PDF to BMP Images with Font Substitution | `Document`, `Resolution`, `BmpDevice` | Demonstrates converting each page of a PDF to BMP images while substituting Times New Roman with ... |
+| [pdf-to-bmp-with-font-substitution](./pdf-to-bmp-with-font-substitution.cs) | Convert PDF Pages to BMP Images with Font Substitution | `Document`, `BmpDevice`, `Resolution` | Demonstrates converting each page of a PDF to BMP images while substituting missing fonts with a ... |
+| [pdf-to-bmp](./pdf-to-bmp.cs) | Convert PDF Pages to BMP Images | `Document`, `BmpDevice`, `Process` | Converts pages 3 through 8 of a PDF document to separate BMP image files. |
+| [pdf-to-jpeg-300dpi-cropbox](./pdf-to-jpeg-300dpi-cropbox.cs) | Convert PDF Pages to JPEG Images with 300 DPI and CropBox | `Document`, `JpegDevice`, `Resolution` | Converts each page of a PDF document to a JPEG image using 300 DPI resolution and the CropBox coo... |
+| [pdf-to-jpeg-96dpi](./pdf-to-jpeg-96dpi.cs) | Convert PDF to JPEG Images with 96 DPI | `Document`, `Resolution`, `JpegDevice` | Converts each page of a PDF document into separate JPEG files using a 96 DPI resolution suitable ... |
+| [pdf-to-jpeg-first5-200dpi](./pdf-to-jpeg-first5-200dpi.cs) | Convert PDF to JPEG Images (First 5 Pages, 200 DPI) | `Document`, `JpegDevice`, `Resolution` | Converts the first five pages of a PDF document to JPEG images at a resolution of 200 DPI. |
+| [pdf-to-jpeg-preview](./pdf-to-jpeg-preview.cs) | Convert PDF Pages to JPEG Images (Preview) | `Document`, `JpegDevice`, `Resolution` | Converts the first three pages of a PDF into separate JPEG images using Aspose.Pdf. |
+| [pdf-to-jpeg-with-font-substitution](./pdf-to-jpeg-with-font-substitution.cs) | Convert PDF to JPEG Images with Font Substitution | `Document`, `FontRepository`, `Save` | Demonstrates converting each page of a PDF to JPEG images while substituting missing fonts with a... |
+| [pdf-to-jpeg](./pdf-to-jpeg.cs) | Convert PDF Pages to JPEG Images | `Document`, `JpegDevice`, `Resolution` | Converts each page of a PDF document to separate JPEG images while preserving the original page s... |
+| [pdf-to-jpeg__v2](./pdf-to-jpeg__v2.cs) | Convert PDF Pages to JPEG Images | `Document`, `JpegDevice`, `Resolution` | Demonstrates how to convert each page of a PDF document into separate JPEG image files using Aspo... |
+| [pdf-to-png-300dpi](./pdf-to-png-300dpi.cs) | Convert PDF Pages to PNG Images at 300 DPI | `Document`, `PngDevice`, `Resolution` | Converts each page of a PDF document to separate PNG images using a 300 DPI resolution. |
+| [pdf-to-png-72dpi](./pdf-to-png-72dpi.cs) | Convert PDF Pages to PNG Images with 72 DPI using CropBox | `Document`, `Resolution`, `PngDevice` | Demonstrates converting each page of a PDF to separate PNG images at 72 DPI while preserving the ... |
+| [pdf-to-png-cropbox](./pdf-to-png-cropbox.cs) | Convert PDF Pages to PNG Images Using CropBox | `Document`, `Resolution`, `PngDevice` | Demonstrates converting each page of a PDF to PNG images while using the CropBox coordinate type ... |
+| [pdf-to-png-font-substitution](./pdf-to-png-font-substitution.cs) | Convert PDF to PNG Images with Font Substitution | `Document`, `FontRepository`, `PngDevice` | Converts each page of a PDF to PNG images while substituting missing Helvetica fonts with Times N... |
+| [pdf-to-png-odd-pages](./pdf-to-png-odd-pages.cs) | Convert PDF to PNG Images (Odd Pages Only) | `Document`, `PngDevice`, `Resolution` | Extracts odd-numbered pages from a PDF and saves each as a separate PNG image. |
+| [pdf-to-png-parallel](./pdf-to-png-parallel.cs) | Convert PDF Pages to PNG Images in Parallel | `Document`, `PngDevice`, `Resolution` | Demonstrates converting each page of a PDF to a PNG image using Aspose.Pdf with parallel processi... |
+| [pdf-to-png-preview](./pdf-to-png-preview.cs) | Convert PDF Pages to PNG Images (72 DPI Preview) | `Document`, `PngDevice`, `Resolution` | Demonstrates how to convert each page of a PDF document to separate PNG images using a 72 DPI res... |
+| [pdf-to-png-reverse](./pdf-to-png-reverse.cs) | Convert PDF to PNG Images in Reverse Page Order | `Document`, `PngDevice`, `Resolution` | Demonstrates converting each page of a PDF to separate PNG images, processing pages from the last... |
+| ... | | | *and 10 more files* |
+
+## Category Statistics
+- Total examples: 40
 
 ## Category-Specific Tips
 
@@ -100,8 +120,8 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
   - **Common Mistakes** — verified anti-patterns that cause build failures
   - **Domain Knowledge** — cross-cutting API-specific gotchas
   - **Testing Guide** — build and run verification steps
-- Review code examples in this folder for Facades - Convert Documents patterns
+- Review code examples in this folder for facades-convert-documents patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-03-27 | Run: `20260327_110313_69ece7`
+Updated: 2026-03-31 | Run: `20260331_170310_4f6364`
 <!-- AUTOGENERATED:END -->
