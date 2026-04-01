@@ -1,0 +1,431 @@
+{
+  "category": "Pages",
+  "last_updated": "2026-04-01T17:43:11Z",
+  "examples": {
+    "append-empty-a4-page": {
+      "title": "Append Empty A4 Page to PDF",
+      "filename": "append-empty-a4-page.cs",
+      "description": "Loads an existing PDF, appends an empty A4‑sized page at the end, and saves the result.",
+      "tags": [
+        "pdf",
+        "add-page",
+        "a4",
+        "document",
+        "example"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PageCollection.Add",
+        "Aspose.Pdf.Page.SetPageSize",
+        "Aspose.Pdf.PageSize"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-01T17:15:19Z",
+      "status": "verified"
+    },
+    "insert-blank-page": {
+      "title": "Insert Blank Page at Specific Position",
+      "filename": "insert-blank-page.cs",
+      "description": "Demonstrates inserting a blank page at index three in a PDF using Aspose.Pdf.",
+      "tags": [
+        "page-insertion",
+        "pdf-manipulation",
+        "aspnet",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PageCollection.Insert",
+        "Aspose.Pdf.Text.TextFragment"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-01T17:16:03Z",
+      "status": "verified"
+    },
+    "add-multiple-empty-pages": {
+      "title": "Add Multiple Empty Pages Sequentially",
+      "filename": "add-multiple-empty-pages.cs",
+      "description": "Demonstrates adding empty pages to a PDF by iterating over a list, respecting the evaluation mode limit of four pages.",
+      "tags": [
+        "pages",
+        "add",
+        "iteration",
+        "Aspose.Pdf",
+        "evaluation-mode"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PageCollection.Add"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-01T17:18:47Z",
+      "status": "verified"
+    },
+    "read-pdf-page-dimensions": {
+      "title": "Read PDF Page Dimensions",
+      "filename": "read-pdf-page-dimensions.cs",
+      "description": "Loads a PDF and logs each page's width and height to the console.",
+      "tags": [
+        "pdf",
+        "page",
+        "dimensions",
+        "console"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-01T17:19:13Z",
+      "status": "verified"
+    },
+    "resize-page-seven-letter": {
+      "title": "Resize Page Seven to Letter Size",
+      "filename": "resize-page-seven-letter.cs",
+      "description": "Demonstrates how to change the size of page seven to Letter format using SetPageSize.",
+      "tags": [
+        "page-size",
+        "setpagesize",
+        "letter",
+        "pdf",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.PageSize"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-01T17:19:40Z",
+      "status": "verified"
+    },
+    "resize-pages-a5": {
+      "title": "Resize PDF Pages to A5 Size",
+      "filename": "resize-pages-a5.cs",
+      "description": "Demonstrates how to loop through a PDF's pages and resize each one to A5 dimensions.",
+      "tags": [
+        "pdf",
+        "resize",
+        "pages",
+        "a5",
+        "loop"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.PageSize",
+        "Aspose.Pdf.Text.TextFragment"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-01T17:21:32Z",
+      "status": "verified"
+    },
+    "rotate-page-four-90-degrees": {
+      "title": "Rotate Fourth Page by 90 Degrees Clockwise",
+      "filename": "rotate-page-four-90-degrees.cs",
+      "description": "Creates a PDF with four pages, rotates the fourth page 90 degrees clockwise, and saves the result.",
+      "tags": [
+        "rotation",
+        "page",
+        "pdf",
+        "aspose",
+        "example"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page.Rotate",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.PageCollection.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-01T17:23:24Z",
+      "status": "verified"
+    },
+    "change-odd-pages-orientation": {
+      "title": "Change Odd Pages from Landscape to Portrait",
+      "filename": "change-odd-pages-orientation.cs",
+      "description": "Demonstrates how to convert odd-numbered landscape pages to portrait orientation by adjusting their MediaBox.",
+      "tags": [
+        "orientation",
+        "mediaBox",
+        "pages",
+        "Aspose.Pdf",
+        "c#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.PageInfo.IsLandscape",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-01T17:24:31Z",
+      "status": "verified"
+    },
+    "delete-last-three-pages": {
+      "title": "Delete Last Three Pages from PDF",
+      "filename": "delete-last-three-pages.cs",
+      "description": "Demonstrates how to remove the last three pages of a PDF using PageCollection.Delete.",
+      "tags": [
+        "delete",
+        "pages",
+        "pdf",
+        "aspnet",
+        "example"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PageCollection.Add",
+        "Aspose.Pdf.PageCollection.Delete"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-01T17:29:13Z",
+      "status": "verified"
+    },
+    "insert-empty-page-custom-size": {
+      "title": "Insert Empty Page with Custom Size at Beginning",
+      "filename": "insert-empty-page-custom-size.cs",
+      "description": "Demonstrates how to insert an empty page of 200 × 300 points at the start of a PDF document.",
+      "tags": [
+        "page",
+        "insert",
+        "custom-size",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PageCollection.Insert",
+        "Aspose.Pdf.Page.SetPageSize"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-01T17:31:28Z",
+      "status": "verified"
+    },
+    "append-page-from-another-pdf": {
+      "title": "Append a Page from Another PDF",
+      "filename": "append-page-from-another-pdf.cs",
+      "description": "Demonstrates how to load a PDF, copy a page from another PDF, and append it to the end of the target document without altering its content.",
+      "tags": [
+        "pdf",
+        "append",
+        "page",
+        "merge",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Document.Pages.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-01T17:31:58Z",
+      "status": "verified"
+    },
+    "rotate-all-pages-180": {
+      "title": "Rotate All PDF Pages 180 Degrees",
+      "filename": "rotate-all-pages-180.cs",
+      "description": "Demonstrates how to rotate every page of a PDF document by 180 degrees using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "rotation",
+        "pages",
+        "aspnet",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.Rotate",
+        "Aspose.Pdf.Rotation"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-01T17:34:33Z",
+      "status": "verified"
+    },
+    "convert-portrait-to-landscape": {
+      "title": "Convert PDF Pages from Portrait to Landscape",
+      "filename": "convert-portrait-to-landscape.cs",
+      "description": "Demonstrates how to change each page orientation by swapping the width and height of the MediaBox, effectively converting portrait pages to landscape.",
+      "tags": [
+        "pdf",
+        "orientation",
+        "pagesize",
+        "landscape",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.SetPageSize",
+        "Aspose.Pdf.Page.MediaBox"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-01T17:34:58Z",
+      "status": "verified"
+    },
+    "insert-blank-page-after-each": {
+      "title": "Insert Blank Page After Each Existing Page",
+      "filename": "insert-blank-page-after-each.cs",
+      "description": "Demonstrates how to double a PDF's page count by inserting a blank page after every existing page.",
+      "tags": [
+        "pages",
+        "insert",
+        "blank",
+        "pdf",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PageCollection.Insert",
+        "Aspose.Pdf.PageCollection.Count",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-01T17:35:23Z",
+      "status": "verified"
+    },
+    "set-page-rotation-parity": {
+      "title": "Set Page Rotation Based on Page Number Parity",
+      "filename": "set-page-rotation-parity.cs",
+      "description": "Creates a PDF and rotates even-numbered pages by 90 degrees while leaving odd-numbered pages unrotated.",
+      "tags": [
+        "rotation",
+        "page",
+        "parity",
+        "pdf",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rotation"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-01T17:35:40Z",
+      "status": "verified"
+    },
+    "export-page-dimensions": {
+      "title": "Export PDF Page Dimensions to CSV",
+      "filename": "export-page-dimensions.cs",
+      "description": "Extracts the width and height of each page in a PDF and writes them to a CSV file for external analysis.",
+      "tags": [
+        "pdf",
+        "dimensions",
+        "csv",
+        "export",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-01T17:36:02Z",
+      "status": "verified"
+    },
+    "insert-page-at-index-two": {
+      "title": "Insert Page from External PDF at Specific Position",
+      "filename": "insert-page-at-index-two.cs",
+      "description": "Demonstrates loading two PDFs, extracting a page from the external PDF, and inserting it into another PDF at index two while preserving its original size and rotation.",
+      "tags": [
+        "pdf",
+        "page-insertion",
+        "rotation",
+        "example",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.PageCollection.Insert"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-01T17:36:45Z",
+      "status": "verified"
+    },
+    "set-custom-page-size": {
+      "title": "Set Custom Page Size for First PDF Page",
+      "filename": "set-custom-page-size.cs",
+      "description": "Demonstrates how to change the size of the first page of a PDF to custom dimensions (500 × 700 points) using Aspose.Pdf.",
+      "tags": [
+        "page-size",
+        "pdf",
+        "csharp",
+        "aspose-pdf",
+        "beginner"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page.SetPageSize"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-01T17:36:57Z",
+      "status": "verified"
+    },
+    "rotate-pages-reverse-order": {
+      "title": "Rotate PDF Pages in Reverse Order",
+      "filename": "rotate-pages-reverse-order.cs",
+      "description": "Demonstrates rotating each page of a PDF 90 degrees clockwise, processing pages from the last to the first.",
+      "tags": [
+        "rotation",
+        "pages",
+        "pdf",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page.Rotate",
+        "Aspose.Pdf.Rotation"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-01T17:37:27Z",
+      "status": "verified"
+    },
+    "copy-mediabox": {
+      "title": "Copy MediaBox from One Page to Another",
+      "filename": "copy-mediabox.cs",
+      "description": "Copies the MediaBox rectangle from page 8 and applies it to page 12 of a PDF.",
+      "tags": [
+        "mediaBox",
+        "page",
+        "copy",
+        "Aspose.Pdf",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page.MediaBox",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-01T17:40:28Z",
+      "status": "verified"
+    },
+    "insert-empty-pages-midpoint": {
+      "title": "Insert Empty Pages at Document Midpoint",
+      "filename": "insert-empty-pages-midpoint.cs",
+      "description": "Shows how to calculate the middle of a PDF and insert empty pages there, limited to four pages due to evaluation mode restrictions.",
+      "tags": [
+        "pages",
+        "insert",
+        "midpoint",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PageCollection.Insert",
+        "Aspose.Pdf.PageCollection.Count"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-01T17:43:11Z",
+      "status": "verified"
+    }
+  }
+}
