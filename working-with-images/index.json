@@ -1,6 +1,6 @@
 {
   "category": "Working With Images",
-  "last_updated": "2026-04-03T14:09:18Z",
+  "last_updated": "2026-04-03T20:17:10Z",
   "examples": {
     "load-a-pdf-and-add-a-png-logo-to-the-first-page-at-specific-coordinates": {
       "title": "Load A Pdf And Add A Png Logo To The First Page At Specific Coordinates",
@@ -720,6 +720,136 @@
       "apis_used": [],
       "difficulty": "",
       "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "add-a-semi-transparent-watermark-image-to-each-page-and-set-its-opacity-based-on-a-configuration-set": {
+      "title": "Add A Semi Transparent Watermark Image To Each Page And Set Its Opacity Based On A Configuration Set",
+      "filename": "add-a-semi-transparent-watermark-image-to-each-page-and-set-its-opacity-based-on-a-configuration-set.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T20:17:10Z",
+      "status": "verified"
+    },
+    "replace-an-existing-jpeg-image-on-page-three-with-a-higher-resolution-png-using-the-resources.images": {
+      "title": "Replace An Existing Jpeg Image On Page Three With A Higher Resolution Png Using The Resources.Images",
+      "filename": "replace-an-existing-jpeg-image-on-page-three-with-a-higher-resolution-png-using-the-resources.images.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T20:17:10Z",
+      "status": "verified"
+    },
+    "replace-images-on-odd-pages-with-a-placeholder-that-includes-a-qr-code-linking-to-the-original-image": {
+      "title": "Replace Images On Odd Pages With A Placeholder That Includes A Qr Code Linking To The Original Image",
+      "filename": "replace-images-on-odd-pages-with-a-placeholder-that-includes-a-qr-code-linking-to-the-original-image.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T20:17:10Z",
+      "status": "verified"
+    },
+    "replace-images-with-a-placeholder-that-includes-a-hyperlink-to-the-original-image-location-for-refer": {
+      "title": "Replace Images With A Placeholder That Includes A Hyperlink To The Original Image Location For Refer",
+      "filename": "replace-images-with-a-placeholder-that-includes-a-hyperlink-to-the-original-image-location-for-refer.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T20:17:10Z",
+      "status": "verified"
+    },
+    "replace-images-that-contain-a-specific-color-palette-with-a-monochrome-version-to-achieve-a-uniform": {
+      "title": "Replace Images That Contain A Specific Color Palette With A Monochrome Version To Achieve A Uniform",
+      "filename": "replace-images-that-contain-a-specific-color-palette-with-a-monochrome-version-to-achieve-a-uniform.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T20:17:10Z",
+      "status": "verified"
+    },
+    "replace-images-that-contain-exif-orientation-metadata-with-correctly-rotated-versions-to-ensure-prop": {
+      "title": "Replace Images That Contain Exif Orientation Metadata With Correctly Rotated Versions To Ensure Prop",
+      "filename": "replace-images-that-contain-exif-orientation-metadata-with-correctly-rotated-versions-to-ensure-prop.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T20:17:10Z",
+      "status": "verified"
+    },
+    "replace-images-on-a-specific-page-using-a-dictionary-that-maps-original-image-indices-to-new-file-pa": {
+      "title": "Replace Images On A Specific Page Using A Dictionary That Maps Original Image Indices To New File Pa",
+      "filename": "replace-images-on-a-specific-page-using-a-dictionary-that-maps-original-image-indices-to-new-file-pa.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T20:17:10Z",
+      "status": "verified"
+    },
+    "set-renderingoptions.defaultfontname-to-arial-before-converting-pdf-pages-to-images-for-consistenc": {
+      "title": "Set Renderingoptions.Defaultfontname To Arial Before Converting Pdf Pages To Images For Consistenc",
+      "filename": "set-renderingoptions.defaultfontname-to-arial-before-converting-pdf-pages-to-images-for-consistenc.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T20:17:10Z",
+      "status": "verified"
+    },
+    "render-pdf-pages-to-tiff-format-with-lzw-compression-and-a-default-font-fallback-for-missing-charact": {
+      "title": "Render Pdf Pages To Tiff Format With Lzw Compression And A Default Font Fallback For Missing Charact",
+      "filename": "render-pdf-pages-to-tiff-format-with-lzw-compression-and-a-default-font-fallback-for-missing-charact.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T20:17:10Z",
+      "status": "verified"
+    },
+    "move-an-extracted-vector-graphic-to-new-coordinates-on-the-same-page-by-modifying-its-matrix-propert": {
+      "title": "Move An Extracted Vector Graphic To New Coordinates On The Same Page By Modifying Its Matrix Propert",
+      "filename": "move-an-extracted-vector-graphic-to-new-coordinates-on-the-same-page-by-modifying-its-matrix-propert.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T20:17:10Z",
+      "status": "verified"
+    },
+    "transfer-an-extracted-vector-graphic-to-a-different-pdf-page-and-adjust-its-position-using-the-matri": {
+      "title": "Transfer An Extracted Vector Graphic To A Different Pdf Page And Adjust Its Position Using The Matri",
+      "filename": "transfer-an-extracted-vector-graphic-to-a-different-pdf-page-and-adjust-its-position-using-the-matri.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T20:17:10Z",
+      "status": "verified"
+    },
+    "add-an-extracted-vector-graphic-to-another-pdf-page-individually-by-inserting-it-into-the-paragraphs": {
+      "title": "Add An Extracted Vector Graphic To Another Pdf Page Individually By Inserting It Into The Paragraphs",
+      "filename": "add-an-extracted-vector-graphic-to-another-pdf-page-individually-by-inserting-it-into-the-paragraphs.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T20:17:10Z",
+      "status": "verified"
+    },
+    "batch-extract-vector-graphics-from-multiple-pdf-files-and-store-each-set-in-separate-folders-for-ana": {
+      "title": "Batch Extract Vector Graphics From Multiple Pdf Files And Store Each Set In Separate Folders For Ana",
+      "filename": "batch-extract-vector-graphics-from-multiple-pdf-files-and-store-each-set-in-separate-folders-for-ana.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T20:17:10Z",
       "status": "verified"
     }
   }
