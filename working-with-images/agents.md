@@ -21,23 +21,23 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf;` (82/85 files) ← category-specific
-- `using Aspose.Pdf.Facades;` (20/85 files)
-- `using Aspose.Pdf.Devices;` (12/85 files)
-- `using Aspose.Pdf.Vector;` (8/85 files)
-- `using Aspose.Pdf.Text;` (4/85 files)
-- `using Aspose.Pdf.Annotations;` (3/85 files)
-- `using Aspose.Pdf.Drawing;` (3/85 files)
-- `using Aspose.Pdf.Optimization;` (2/85 files)
-- `using Aspose.Pdf.Tagged;` (1/85 files)
-- `using System;` (85/85 files)
-- `using System.IO;` (84/85 files)
-- `using System.Drawing;` (9/85 files)
-- `using System.Collections.Generic;` (8/85 files)
-- `using System.Drawing.Imaging;` (8/85 files)
-- `using System.Text.Json;` (3/85 files)
-- `using System.Linq;` (2/85 files)
-- `using System.Security.Cryptography;` (1/85 files)
+- `using Aspose.Pdf;` (69/72 files) ← category-specific
+- `using Aspose.Pdf.Facades;` (17/72 files)
+- `using Aspose.Pdf.Devices;` (10/72 files)
+- `using Aspose.Pdf.Vector;` (5/72 files)
+- `using Aspose.Pdf.Text;` (3/72 files)
+- `using Aspose.Pdf.Annotations;` (2/72 files)
+- `using Aspose.Pdf.Drawing;` (2/72 files)
+- `using Aspose.Pdf.Optimization;` (2/72 files)
+- `using Aspose.Pdf.Tagged;` (1/72 files)
+- `using System;` (72/72 files)
+- `using System.IO;` (71/72 files)
+- `using System.Collections.Generic;` (7/72 files)
+- `using System.Drawing;` (7/72 files)
+- `using System.Drawing.Imaging;` (6/72 files)
+- `using System.Text.Json;` (3/72 files)
+- `using System.Linq;` (1/72 files)
+- `using System.Security.Cryptography;` (1/72 files)
 
 ## Common Code Pattern
 
@@ -68,14 +68,11 @@ using (Document doc = new Document("input.pdf"))
 | [add-a-raster-image-to-a-new-pdf-page-using-the-ima...](./add-a-raster-image-to-a-new-pdf-page-using-the-image-class-and-paragraphs-collection.cs) | Add A Raster Image To A New Pdf Page Using The Image Class A... |  | Add A Raster Image To A New Pdf Page Using The Image Class And Paragraphs Collection |
 | [add-a-semi-transparent-overlay-image-to-the-entire...](./add-a-semi-transparent-overlay-image-to-the-entire-pdf-to-create-a-unified-visual-theme.cs) | Add A Semi Transparent Overlay Image To The Entire Pdf To Cr... | `ImageStamp` | Add A Semi Transparent Overlay Image To The Entire Pdf To Create A Unified Visual Theme |
 | [add-a-semi-transparent-overlay-to-each-page-and-ad...](./add-a-semi-transparent-overlay-to-each-page-and-adjust-its-color-based-on-a-theme-configuration-file.cs) | Add A Semi Transparent Overlay To Each Page And Adjust Its C... |  | Add A Semi Transparent Overlay To Each Page And Adjust Its Color Based On A Theme Configuration File |
-| [add-a-semi-transparent-watermark-image-to-each-pag...](./add-a-semi-transparent-watermark-image-to-each-page-and-set-its-opacity-based-on-a-configuration-set.cs) | Add A Semi Transparent Watermark Image To Each Page And Set ... | `ImageStamp` | Add A Semi Transparent Watermark Image To Each Page And Set Its Opacity Based On A Configuration Set |
 | [add-a-semi-transparent-watermark-image-to-each-pag...](./add-a-semi-transparent-watermark-image-to-each-page-and-set-its-opacity-based-on-a-configuration-setting.cs) | Add A Semi Transparent Watermark Image To Each Page And Set ... | `ImageStamp` | Add A Semi Transparent Watermark Image To Each Page And Set Its Opacity Based On A Configuration ... |
 | [add-a-transparent-png-overlay-to-each-page-and-adj...](./add-a-transparent-png-overlay-to-each-page-and-adjust-its-z-order-to-appear-above-existing-content.cs) | Add A Transparent Png Overlay To Each Page And Adjust Its Z ... | `ImageStamp` | Add A Transparent Png Overlay To Each Page And Adjust Its Z Order To Appear Above Existing Content |
 | [add-a-watermark-image-to-pdfs-and-set-its-rotation...](./add-a-watermark-image-to-pdfs-and-set-its-rotation-angle-to-45-degrees-for-diagonal-placement.cs) | Add A Watermark Image To Pdfs And Set Its Rotation Angle To ... | `ImageStamp` | Add A Watermark Image To Pdfs And Set Its Rotation Angle To 45 Degrees For Diagonal Placement |
 | [add-an-extracted-vector-graphic-to-another-pdf-pag...](./add-an-extracted-vector-graphic-to-another-pdf-page-individually-by-inserting-it-into-the-paragraphs-collection.cs) | Add An Extracted Vector Graphic To Another Pdf Page Individu... | `GraphicsAbsorber` | Add An Extracted Vector Graphic To Another Pdf Page Individually By Inserting It Into The Paragra... |
-| [add-an-extracted-vector-graphic-to-another-pdf-pag...](./add-an-extracted-vector-graphic-to-another-pdf-page-individually-by-inserting-it-into-the-paragraphs.cs) | Add An Extracted Vector Graphic To Another Pdf Page Individu... | `GraphicsAbsorber` | Add An Extracted Vector Graphic To Another Pdf Page Individually By Inserting It Into The Paragraphs |
 | [assign-alt-text-to-a-newly-added-image-to-provide-...](./assign-alt-text-to-a-newly-added-image-to-provide-descriptive-information-for-assistive-technologies.cs) | Assign Alt Text To A Newly Added Image To Provide Descriptiv... |  | Assign Alt Text To A Newly Added Image To Provide Descriptive Information For Assistive Technologies |
-| [batch-extract-vector-graphics-from-multiple-pdf-fi...](./batch-extract-vector-graphics-from-multiple-pdf-files-and-store-each-set-in-separate-folders-for-ana.cs) | Batch Extract Vector Graphics From Multiple Pdf Files And St... |  | Batch Extract Vector Graphics From Multiple Pdf Files And Store Each Set In Separate Folders For Ana |
 | [batch-extract-vector-graphics-from-multiple-pdf-fi...](./batch-extract-vector-graphics-from-multiple-pdf-files-and-store-each-set-in-separate-folders-for-analysis.cs) | Batch Extract Vector Graphics From Multiple Pdf Files And St... |  | Batch Extract Vector Graphics From Multiple Pdf Files And Store Each Set In Separate Folders For ... |
 | [batch-process-multiple-pdf-files-to-extract-embedd...](./batch-process-multiple-pdf-files-to-extract-embedded-images-into-a-designated-output-folder.cs) | Batch Process Multiple Pdf Files To Extract Embedded Images ... |  | Batch Process Multiple Pdf Files To Extract Embedded Images Into A Designated Output Folder |
 | [convert-an-entire-pdf-document-to-a-multi-page-tif...](./convert-an-entire-pdf-document-to-a-multi-page-tiff-file-while-applying-a-default-font-for-rendering.cs) | Convert An Entire Pdf Document To A Multi Page Tiff File Whi... | `TiffDevice` | Convert An Entire Pdf Document To A Multi Page Tiff File While Applying A Default Font For Rendering |
@@ -85,10 +82,13 @@ using (Document doc = new Document("input.pdf"))
 | [delete-images-from-a-pdf-whose-dpi-is-lower-than-7...](./delete-images-from-a-pdf-whose-dpi-is-lower-than-72-using-imageplacementabsorber-filters.cs) | Delete Images From A Pdf Whose Dpi Is Lower Than 72 Using Im... | `ImagePlacementAbsorber` | Delete Images From A Pdf Whose Dpi Is Lower Than 72 Using Imageplacementabsorber Filters |
 | [export-pdf-pages-as-bmp-images-at-300-dpi-using-cu...](./export-pdf-pages-as-bmp-images-at-300-dpi-using-custom-rendering-options-for-high-quality.cs) | Export Pdf Pages As Bmp Images At 300 Dpi Using Custom Rende... | `BmpDevice` | Export Pdf Pages As Bmp Images At 300 Dpi Using Custom Rendering Options For High Quality |
 | [extract-all-raster-images-from-a-pdf-document-and-...](./extract-all-raster-images-from-a-pdf-document-and-save-each-as-a-separate-png-file.cs) | Extract All Raster Images From A Pdf Document And Save Each ... | `PdfExtractor` | Extract All Raster Images From A Pdf Document And Save Each As A Separate Png File |
-| ... | | | *and 55 more files* |
+| [extract-raster-images-from-a-pdf-and-preserve-thei...](./extract-raster-images-from-a-pdf-and-preserve-their-original-formats-when-writing-to-disk.cs) | Extract Raster Images From A Pdf And Preserve Their Original... | `PdfExtractor` | Extract Raster Images From A Pdf And Preserve Their Original Formats When Writing To Disk |
+| [generate-thumbnail-images-for-each-pdf-page-as-150...](./generate-thumbnail-images-for-each-pdf-page-as-150x200-pixel-png-files-using-saveformat.png.cs) | Generate Thumbnail Images For Each Pdf Page As 150X200 Pixel... | `ThumbnailDevice` | Generate Thumbnail Images For Each Pdf Page As 150X200 Pixel Png Files Using Saveformat.Png |
+| [insert-a-dicom-image-with-custom-resolution-by-adj...](./insert-a-dicom-image-with-custom-resolution-by-adjusting-its-width-and-height-before-adding.cs) | Insert A Dicom Image With Custom Resolution By Adjusting Its... |  | Insert A Dicom Image With Custom Resolution By Adjusting Its Width And Height Before Adding |
+| ... | | | *and 42 more files* |
 
 ## Category Statistics
-- Total examples: 85
+- Total examples: 72
 
 ## Category-Specific Tips
 
@@ -132,5 +132,5 @@ using (Document doc = new Document("input.pdf"))
 - Review code examples in this folder for Working With Images patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-04-04 | Run: `20260404_011710_7dc99c`
+Updated: 2026-04-04 | Run: `20260404_011719_7ebb4e`
 <!-- AUTOGENERATED:END -->
