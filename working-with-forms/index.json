@@ -1,0 +1,2196 @@
+{
+  "category": "Working with Forms",
+  "last_updated": "2026-04-03T08:58:47Z",
+  "examples": {
+    "create-a-new-pdf-with-an-acroform-and-add-a-text-field-on-the-first-page": {
+      "title": "Create A New Pdf With An Acroform And Add A Text Field On The First Page",
+      "filename": "create-a-new-pdf-with-an-acroform-and-add-a-text-field-on-the-first-page.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:12:14Z",
+      "status": "verified"
+    },
+    "create-a-new-pdf-with-an-acroform-and-add-a-top-positioned-checkbox-field": {
+      "title": "Create A New Pdf With An Acroform And Add A Top Positioned Checkbox Field",
+      "filename": "create-a-new-pdf-with-an-acroform-and-add-a-top-positioned-checkbox-field.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:12:45Z",
+      "status": "verified"
+    },
+    "create-a-new-pdf-with-an-acroform-and-add-a-gender-radio-button-group": {
+      "title": "Create A New Pdf With An Acroform And Add A Gender Radio Button Group",
+      "filename": "create-a-new-pdf-with-an-acroform-and-add-a-gender-radio-button-group.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:13:37Z",
+      "status": "verified"
+    },
+    "create-a-new-pdf-with-an-acroform-and-add-a-list-box-containing-country-options": {
+      "title": "Create A New Pdf With An Acroform And Add A List Box Containing Country Options",
+      "filename": "create-a-new-pdf-with-an-acroform-and-add-a-list-box-containing-country-options.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:14:16Z",
+      "status": "verified"
+    },
+    "load-an-existing-pdf-and-fill-a-specific-text-field-with-a-provided-string-value": {
+      "title": "Load An Existing Pdf And Fill A Specific Text Field With A Provided String Value",
+      "filename": "load-an-existing-pdf-and-fill-a-specific-text-field-with-a-provided-string-value.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:18:10Z",
+      "status": "verified"
+    },
+    "load-an-existing-pdf-and-set-a-checkbox-field-to-checked-based-on-input-data": {
+      "title": "Load An Existing Pdf And Set A Checkbox Field To Checked Based On Input Data",
+      "filename": "load-an-existing-pdf-and-set-a-checkbox-field-to-checked-based-on-input-data.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:18:32Z",
+      "status": "verified"
+    },
+    "load-an-existing-pdf-and-select-a-radio-button-option-according-to-a-supplied-parameter": {
+      "title": "Load An Existing Pdf And Select A Radio Button Option According To A Supplied Parameter",
+      "filename": "load-an-existing-pdf-and-select-a-radio-button-option-according-to-a-supplied-parameter.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:18:47Z",
+      "status": "verified"
+    },
+    "load-an-existing-pdf-and-choose-a-list-box-entry-using-the-desired-value-index": {
+      "title": "Load An Existing Pdf And Choose A List Box Entry Using The Desired Value Index",
+      "filename": "load-an-existing-pdf-and-choose-a-list-box-entry-using-the-desired-value-index.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:19:28Z",
+      "status": "verified"
+    },
+    "iterate-over-all-pdf-fields-and-assign-values-from-a-dictionary-of-field-names-and-values": {
+      "title": "Iterate Over All Pdf Fields And Assign Values From A Dictionary Of Field Names And Values",
+      "filename": "iterate-over-all-pdf-fields-and-assign-values-from-a-dictionary-of-field-names-and-values.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:19:43Z",
+      "status": "verified"
+    },
+    "extract-a-named-form-field-s-value-and-write-it-to-the-console-output": {
+      "title": "Extract A Named Form Field S Value And Write It To The Console Output",
+      "filename": "extract-a-named-form-field-s-value-and-write-it-to-the-console-output.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:20:03Z",
+      "status": "verified"
+    },
+    "extract-all-form-field-values-from-a-pdf-and-serialize-them-into-a-json-string": {
+      "title": "Extract All Form Field Values From A Pdf And Serialize Them Into A Json String",
+      "filename": "extract-all-form-field-values-from-a-pdf-and-serialize-them-into-a-json-string.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:20:16Z",
+      "status": "verified"
+    },
+    "export-current-form-data-from-a-pdf-to-an-xml-file-at-a-specified-path": {
+      "title": "Export Current Form Data From A Pdf To An Xml File At A Specified Path",
+      "filename": "export-current-form-data-from-a-pdf-to-an-xml-file-at-a-specified-path.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:20:31Z",
+      "status": "verified"
+    },
+    "import-form-data-from-an-xml-file-into-a-pdf-updating-matching-fields-automatically": {
+      "title": "Import Form Data From An Xml File Into A Pdf Updating Matching Fields Automatically",
+      "filename": "import-form-data-from-an-xml-file-into-a-pdf-updating-matching-fields-automatically.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:20:53Z",
+      "status": "verified"
+    },
+    "export-form-data-from-a-pdf-to-a-json-string-and-save-it-to-a-text-file": {
+      "title": "Export Form Data From A Pdf To A Json String And Save It To A Text File",
+      "filename": "export-form-data-from-a-pdf-to-a-json-string-and-save-it-to-a-text-file.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:21:18Z",
+      "status": "verified"
+    },
+    "import-form-data-from-a-json-string-into-a-pdf-populating-corresponding-fields-accordingly": {
+      "title": "Import Form Data From A Json String Into A Pdf Populating Corresponding Fields Accordingly",
+      "filename": "import-form-data-from-a-json-string-into-a-pdf-populating-corresponding-fields-accordingly.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:21:35Z",
+      "status": "verified"
+    },
+    "post-form-data-from-a-pdf-to-a-remote-xml-endpoint-using-the-form.postdata-method": {
+      "title": "Post Form Data From A Pdf To A Remote Xml Endpoint Using The Form.Postdata Method",
+      "filename": "post-form-data-from-a-pdf-to-a-remote-xml-endpoint-using-the-form.postdata-method.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:23:52Z",
+      "status": "verified"
+    },
+    "add-a-new-blank-page-to-an-existing-pdf-form-while-preserving-existing-fields": {
+      "title": "Add A New Blank Page To An Existing Pdf Form While Preserving Existing Fields",
+      "filename": "add-a-new-blank-page-to-an-existing-pdf-form-while-preserving-existing-fields.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:24:00Z",
+      "status": "verified"
+    },
+    "add-a-new-page-to-a-pdf-and-place-fresh-acroform-fields-on-that-page": {
+      "title": "Add A New Page To A Pdf And Place Fresh Acroform Fields On That Page",
+      "filename": "add-a-new-page-to-a-pdf-and-place-fresh-acroform-fields-on-that-page.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:25:27Z",
+      "status": "verified"
+    },
+    "delete-a-specific-form-field-from-a-pdf-by-providing-the-field-s-name": {
+      "title": "Delete A Specific Form Field From A Pdf By Providing The Field S Name",
+      "filename": "delete-a-specific-form-field-from-a-pdf-by-providing-the-field-s-name.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:25:32Z",
+      "status": "verified"
+    },
+    "delete-all-form-fields-from-a-pdf-document-to-produce-a-plain-non-interactive-pdf": {
+      "title": "Delete All Form Fields From A Pdf Document To Produce A Plain Non Interactive Pdf",
+      "filename": "delete-all-form-fields-from-a-pdf-document-to-produce-a-plain-non-interactive-pdf.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:25:38Z",
+      "status": "verified"
+    },
+    "modify-a-form-field-s-border-color-and-width-to-match-corporate-style-guidelines": {
+      "title": "Modify A Form Field S Border Color And Width To Match Corporate Style Guidelines",
+      "filename": "modify-a-form-field-s-border-color-and-width-to-match-corporate-style-guidelines.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:26:09Z",
+      "status": "verified"
+    },
+    "change-a-form-field-s-background-color-to-highlight-required-input-areas": {
+      "title": "Change A Form Field S Background Color To Highlight Required Input Areas",
+      "filename": "change-a-form-field-s-background-color-to-highlight-required-input-areas.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:26:21Z",
+      "status": "verified"
+    },
+    "mark-a-form-field-as-read-only-to-prevent-editing-after-initial-population": {
+      "title": "Mark A Form Field As Read Only To Prevent Editing After Initial Population",
+      "filename": "mark-a-form-field-as-read-only-to-prevent-editing-after-initial-population.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:28:40Z",
+      "status": "verified"
+    },
+    "mark-a-form-field-as-required-so-validation-fails-if-the-field-is-left-empty": {
+      "title": "Mark A Form Field As Required So Validation Fails If The Field Is Left Empty",
+      "filename": "mark-a-form-field-as-required-so-validation-fails-if-the-field-is-left-empty.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:28:55Z",
+      "status": "verified"
+    },
+    "add-a-tooltip-to-a-form-field-providing-guidance-on-the-expected-input-format": {
+      "title": "Add A Tooltip To A Form Field Providing Guidance On The Expected Input Format",
+      "filename": "add-a-tooltip-to-a-form-field-providing-guidance-on-the-expected-input-format.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:30:01Z",
+      "status": "verified"
+    },
+    "define-a-default-value-for-a-form-field-that-appears-when-the-pdf-opens": {
+      "title": "Define A Default Value For A Form Field That Appears When The Pdf Opens",
+      "filename": "define-a-default-value-for-a-form-field-that-appears-when-the-pdf-opens.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:30:15Z",
+      "status": "verified"
+    },
+    "save-the-modified-pdf-to-a-new-file-name-to-preserve-the-original-version": {
+      "title": "Save The Modified Pdf To A New File Name To Preserve The Original Version",
+      "filename": "save-the-modified-pdf-to-a-new-file-name-to-preserve-the-original-version.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:30:22Z",
+      "status": "verified"
+    },
+    "save-a-pdf-with-incremental-updates-to-retain-previous-revisions-of-form-data": {
+      "title": "Save A Pdf With Incremental Updates To Retain Previous Revisions Of Form Data",
+      "filename": "save-a-pdf-with-incremental-updates-to-retain-previous-revisions-of-form-data.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:31:39Z",
+      "status": "verified"
+    },
+    "batch-process-a-folder-of-pdfs-filling-the-same-fields-with-identical-values-in-each-file": {
+      "title": "Batch Process A Folder Of Pdfs Filling The Same Fields With Identical Values In Each File",
+      "filename": "batch-process-a-folder-of-pdfs-filling-the-same-fields-with-identical-values-in-each-file.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:32:09Z",
+      "status": "verified"
+    },
+    "batch-import-xml-form-data-into-multiple-pdfs-applying-each-xml-file-to-its-corresponding-document": {
+      "title": "Batch Import Xml Form Data Into Multiple Pdfs Applying Each Xml File To Its Corresponding Document",
+      "filename": "batch-import-xml-form-data-into-multiple-pdfs-applying-each-xml-file-to-its-corresponding-document.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:32:29Z",
+      "status": "verified"
+    },
+    "batch-export-form-data-from-a-collection-of-pdfs-creating-separate-xml-files-for-each-document": {
+      "title": "Batch Export Form Data From A Collection Of Pdfs Creating Separate Xml Files For Each Document",
+      "filename": "batch-export-form-data-from-a-collection-of-pdfs-creating-separate-xml-files-for-each-document.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:32:58Z",
+      "status": "verified"
+    },
+    "convert-extracted-form-data-json-into-a-csv-file-for-easy-import-into-spreadsheets": {
+      "title": "Convert Extracted Form Data Json Into A Csv File For Easy Import Into Spreadsheets",
+      "filename": "convert-extracted-form-data-json-into-a-csv-file-for-easy-import-into-spreadsheets.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:33:29Z",
+      "status": "verified"
+    },
+    "validate-that-all-required-fields-are-filled-before-allowing-the-pdf-to-be-saved": {
+      "title": "Validate That All Required Fields Are Filled Before Allowing The Pdf To Be Saved",
+      "filename": "validate-that-all-required-fields-are-filled-before-allowing-the-pdf-to-be-saved.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:33:57Z",
+      "status": "verified"
+    },
+    "generate-a-pdf-with-acroform-fields-using-relative-positioning-based-on-page-margins": {
+      "title": "Generate A Pdf With Acroform Fields Using Relative Positioning Based On Page Margins",
+      "filename": "generate-a-pdf-with-acroform-fields-using-relative-positioning-based-on-page-margins.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:36:44Z",
+      "status": "verified"
+    },
+    "extract-xfa-form-data-from-a-pdf-and-save-it-as-an-xml-document-for-external-processing": {
+      "title": "Extract Xfa Form Data From A Pdf And Save It As An Xml Document For External Processing",
+      "filename": "extract-xfa-form-data-from-a-pdf-and-save-it-as-an-xml-document-for-external-processing.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:40:45Z",
+      "status": "verified"
+    },
+    "import-xfa-form-data-from-an-xml-file-into-a-pdf-that-contains-an-xfa-form-structure": {
+      "title": "Import Xfa Form Data From An Xml File Into A Pdf That Contains An Xfa Form Structure",
+      "filename": "import-xfa-form-data-from-an-xml-file-into-a-pdf-that-contains-an-xfa-form-structure.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:40:58Z",
+      "status": "verified"
+    },
+    "merge-two-pdfs-each-with-acroform-fields-preserving-unique-field-names-to-avoid-conflicts": {
+      "title": "Merge Two Pdfs Each With Acroform Fields Preserving Unique Field Names To Avoid Conflicts",
+      "filename": "merge-two-pdfs-each-with-acroform-fields-preserving-unique-field-names-to-avoid-conflicts.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:42:09Z",
+      "status": "verified"
+    },
+    "flatten-form-fields-after-filling-them-so-the-content-becomes-non-editable-in-the-final-pdf": {
+      "title": "Flatten Form Fields After Filling Them So The Content Becomes Non Editable In The Final Pdf",
+      "filename": "flatten-form-fields-after-filling-them-so-the-content-becomes-non-editable-in-the-final-pdf.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:43:14Z",
+      "status": "verified"
+    },
+    "unflatten-previously-flattened-form-fields-to-restore-editability-for-further-modifications": {
+      "title": "Unflatten Previously Flattened Form Fields To Restore Editability For Further Modifications",
+      "filename": "unflatten-previously-flattened-form-fields-to-restore-editability-for-further-modifications.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:43:40Z",
+      "status": "verified"
+    },
+    "set-a-form-field-s-border-style-to-dashed-to-visually-differentiate-optional-input-areas": {
+      "title": "Set A Form Field S Border Style To Dashed To Visually Differentiate Optional Input Areas",
+      "filename": "set-a-form-field-s-border-style-to-dashed-to-visually-differentiate-optional-input-areas.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:05:41Z",
+      "status": "verified"
+    },
+    "set-a-form-field-s-border-style-to-beveled-to-give-a-three-dimensional-appearance": {
+      "title": "Set A Form Field S Border Style To Beveled To Give A Three Dimensional Appearance",
+      "filename": "set-a-form-field-s-border-style-to-beveled-to-give-a-three-dimensional-appearance.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:07:41Z",
+      "status": "verified"
+    },
+    "apply-a-background-image-to-a-form-field-to-enhance-visual-branding-within-the-pdf": {
+      "title": "Apply A Background Image To A Form Field To Enhance Visual Branding Within The Pdf",
+      "filename": "apply-a-background-image-to-a-form-field-to-enhance-visual-branding-within-the-pdf.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:08:50Z",
+      "status": "verified"
+    },
+    "export-form-data-to-json-with-indentation-enabled-to-improve-readability-for-developers": {
+      "title": "Export Form Data To Json With Indentation Enabled To Improve Readability For Developers",
+      "filename": "export-form-data-to-json-with-indentation-enabled-to-improve-readability-for-developers.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:08:58Z",
+      "status": "verified"
+    },
+    "import-form-data-from-a-rest-api-json-response-using-form.importdatajson-for-real-time-population": {
+      "title": "Import Form Data From A Rest Api Json Response Using Form.Importdatajson For Real Time Population",
+      "filename": "import-form-data-from-a-rest-api-json-response-using-form.importdatajson-for-real-time-population.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:09:14Z",
+      "status": "verified"
+    },
+    "set-a-text-field-s-alignment-to-center-to-improve-visual-balance-of-entered-content": {
+      "title": "Set A Text Field S Alignment To Center To Improve Visual Balance Of Entered Content",
+      "filename": "set-a-text-field-s-alignment-to-center-to-improve-visual-balance-of-entered-content.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:14:17Z",
+      "status": "verified"
+    },
+    "set-a-text-field-s-alignment-to-right-to-accommodate-numeric-entry-formats": {
+      "title": "Set A Text Field S Alignment To Right To Accommodate Numeric Entry Formats",
+      "filename": "set-a-text-field-s-alignment-to-right-to-accommodate-numeric-entry-formats.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:14:38Z",
+      "status": "verified"
+    },
+    "add-a-date-picker-field-to-a-pdf-using-javascript-to-let-users-select-dates-from-a-calendar": {
+      "title": "Add A Date Picker Field To A Pdf Using Javascript To Let Users Select Dates From A Calendar",
+      "filename": "add-a-date-picker-field-to-a-pdf-using-javascript-to-let-users-select-dates-from-a-calendar.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:16:18Z",
+      "status": "verified"
+    },
+    "populate-a-field-with-a-formatted-currency-value-including-symbol-and-thousand-separators": {
+      "title": "Populate A Field With A Formatted Currency Value Including Symbol And Thousand Separators",
+      "filename": "populate-a-field-with-a-formatted-currency-value-including-symbol-and-thousand-separators.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:16:53Z",
+      "status": "verified"
+    },
+    "validate-that-an-email-field-contains-an-character-before-allowing-the-pdf-to-be-saved": {
+      "title": "Validate That An Email Field Contains An Character Before Allowing The Pdf To Be Saved",
+      "filename": "validate-that-an-email-field-contains-an-character-before-allowing-the-pdf-to-be-saved.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:17:16Z",
+      "status": "verified"
+    },
+    "remove-a-specific-form-field-from-a-pdf-using-document.form.remove-with-the-field-reference": {
+      "title": "Remove A Specific Form Field From A Pdf Using Document.Form.Remove With The Field Reference",
+      "filename": "remove-a-specific-form-field-from-a-pdf-using-document.form.remove-with-the-field-reference.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:17:45Z",
+      "status": "verified"
+    },
+    "insert-a-new-form-field-at-a-specific-index-within-the-document.form-collection-for-ordered-layout": {
+      "title": "Insert A New Form Field At A Specific Index Within The Document.Form Collection For Ordered Layout",
+      "filename": "insert-a-new-form-field-at-a-specific-index-within-the-document.form-collection-for-ordered-layout.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:18:12Z",
+      "status": "verified"
+    },
+    "export-form-data-to-json-and-compress-the-output-using-gzip-for-efficient-storage-or-transmission": {
+      "title": "Export Form Data To Json And Compress The Output Using Gzip For Efficient Storage Or Transmission",
+      "filename": "export-form-data-to-json-and-compress-the-output-using-gzip-for-efficient-storage-or-transmission.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:20:36Z",
+      "status": "verified"
+    },
+    "import-form-data-from-an-encrypted-xml-file-after-decrypting-it-with-the-appropriate-key": {
+      "title": "Import Form Data From An Encrypted Xml File After Decrypting It With The Appropriate Key",
+      "filename": "import-form-data-from-an-encrypted-xml-file-after-decrypting-it-with-the-appropriate-key.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:22:42Z",
+      "status": "verified"
+    },
+    "set-a-field-s-rich-text-content-using-html-markup-to-display-formatted-text-within-the-field": {
+      "title": "Set A Field S Rich Text Content Using Html Markup To Display Formatted Text Within The Field",
+      "filename": "set-a-field-s-rich-text-content-using-html-markup-to-display-formatted-text-within-the-field.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:24:10Z",
+      "status": "verified"
+    },
+    "import-form-data-from-a-json-array-of-field-objects-using-form.importdatajson-for-bulk-updates": {
+      "title": "Import Form Data From A Json Array Of Field Objects Using Form.Importdatajson For Bulk Updates",
+      "filename": "import-form-data-from-a-json-array-of-field-objects-using-form.importdatajson-for-bulk-updates.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:26:35Z",
+      "status": "verified"
+    },
+    "export-form-data-to-xml-with-a-custom-root-element-name-to-match-external-system-requirements": {
+      "title": "Export Form Data To Xml With A Custom Root Element Name To Match External System Requirements",
+      "filename": "export-form-data-to-xml-with-a-custom-root-element-name-to-match-external-system-requirements.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:26:57Z",
+      "status": "verified"
+    },
+    "add-a-calculated-field-that-sums-numeric-fields-using-javascript-to-display-a-running-total": {
+      "title": "Add A Calculated Field That Sums Numeric Fields Using Javascript To Display A Running Total",
+      "filename": "add-a-calculated-field-that-sums-numeric-fields-using-javascript-to-display-a-running-total.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:27:22Z",
+      "status": "verified"
+    },
+    "set-a-field-s-default-value-to-the-current-system-time-formatted-as-hh-mm-ss-on-document-load": {
+      "title": "Set A Field S Default Value To The Current System Time Formatted As Hh Mm Ss On Document Load",
+      "filename": "set-a-field-s-default-value-to-the-current-system-time-formatted-as-hh-mm-ss-on-document-load.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:27:31Z",
+      "status": "verified"
+    },
+    "create-a-pdf-form-that-includes-a-barcode-field-for-encoding-product-identifiers-or-tracking-numbers": {
+      "title": "Create A Pdf Form That Includes A Barcode Field For Encoding Product Identifiers Or Tracking Numbers",
+      "filename": "create-a-pdf-form-that-includes-a-barcode-field-for-encoding-product-identifiers-or-tracking-numbers.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:27:41Z",
+      "status": "verified"
+    },
+    "populate-a-barcode-field-with-dynamic-data-generated-at-runtime-to-create-unique-barcodes-per-document": {
+      "title": "Populate A Barcode Field With Dynamic Data Generated At Runtime To Create Unique Barcodes Per Document",
+      "filename": "populate-a-barcode-field-with-dynamic-data-generated-at-runtime-to-create-unique-barcodes-per-document.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:27:51Z",
+      "status": "verified"
+    },
+    "validate-that-all-required-fields-are-not-empty-before-exporting-form-data-to-prevent-incomplete-submissions": {
+      "title": "Validate That All Required Fields Are Not Empty Before Exporting Form Data To Prevent Incomplete Submissions",
+      "filename": "validate-that-all-required-fields-are-not-empty-before-exporting-form-data-to-prevent-incomplete-submissions.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:28:34Z",
+      "status": "verified"
+    },
+    "use-document.form.count-to-verify-that-the-pdf-contains-the-expected-number-of-form-fields-before-processing": {
+      "title": "Use Document.Form.Count To Verify That The Pdf Contains The Expected Number Of Form Fields Before Processing",
+      "filename": "use-document.form.count-to-verify-that-the-pdf-contains-the-expected-number-of-form-fields-before-processing.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:28:42Z",
+      "status": "verified"
+    },
+    "create-a-pdf-with-acroform-fields-and-set-page-margins-before-adding-fields-to-ensure-consistent-layout": {
+      "title": "Create A Pdf With Acroform Fields And Set Page Margins Before Adding Fields To Ensure Consistent Layout",
+      "filename": "create-a-pdf-with-acroform-fields-and-set-page-margins-before-adding-fields-to-ensure-consistent-layout.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:28:55Z",
+      "status": "verified"
+    },
+    "load-a-pdf-using-formeditor-and-bind-it-to-an-output-pdf-for-form-modifications": {
+      "title": "Load A Pdf Using Formeditor And Bind It To An Output Pdf For Form Modifications",
+      "filename": "load-a-pdf-using-formeditor-and-bind-it-to-an-output-pdf-for-form-modifications.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:30:01Z",
+      "status": "verified"
+    },
+    "set-a-50-character-limit-on-the-customername-text-field-via-formeditor.setfieldlimit": {
+      "title": "Set A 50 Character Limit On The Customername Text Field Via Formeditor.Setfieldlimit",
+      "filename": "set-a-50-character-limit-on-the-customername-text-field-via-formeditor.setfieldlimit.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:30:11Z",
+      "status": "verified"
+    },
+    "retrieve-the-current-character-limit-of-the-address-field-using-formeditor.getfieldlimit": {
+      "title": "Retrieve The Current Character Limit Of The Address Field Using Formeditor.Getfieldlimit",
+      "filename": "retrieve-the-current-character-limit-of-the-address-field-using-formeditor.getfieldlimit.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:31:13Z",
+      "status": "verified"
+    },
+    "add-a-new-checkbox-field-named-agreeterms-to-an-existing-pdf-via-document.form.add": {
+      "title": "Add A New Checkbox Field Named Agreeterms To An Existing Pdf Via Document.Form.Add",
+      "filename": "add-a-new-checkbox-field-named-agreeterms-to-an-existing-pdf-via-document.form.add.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:33:45Z",
+      "status": "verified"
+    },
+    "delete-the-form-field-oldphonenumber-from-the-pdf-by-invoking-document.form.delete": {
+      "title": "Delete The Form Field Oldphonenumber From The Pdf By Invoking Document.Form.Delete",
+      "filename": "delete-the-form-field-oldphonenumber-from-the-pdf-by-invoking-document.form.delete.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:33:54Z",
+      "status": "verified"
+    },
+    "remove-all-form-elements-of-type-typewriter-with-subtype-form-on-page-three-using-textfragmentabsorber": {
+      "title": "Remove All Form Elements Of Type Typewriter With Subtype Form On Page Three Using Textfragmentabsorber",
+      "filename": "remove-all-form-elements-of-type-typewriter-with-subtype-form-on-page-three-using-textfragmentabsorber.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:34:15Z",
+      "status": "verified"
+    },
+    "iterate-through-document.form-collection-and-delete-each-field-on-page-five-to-clear-the-page": {
+      "title": "Iterate Through Document.Form Collection And Delete Each Field On Page Five To Clear The Page",
+      "filename": "iterate-through-document.form-collection-and-delete-each-field-on-page-five-to-clear-the-page.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:36:06Z",
+      "status": "verified"
+    },
+    "export-all-acroform-data-from-a-pdf-to-an-xml-file-named-formdata.xml-using-formeditor.exportdata": {
+      "title": "Export All Acroform Data From A Pdf To An Xml File Named Formdata.Xml Using Formeditor.Exportdata",
+      "filename": "export-all-acroform-data-from-a-pdf-to-an-xml-file-named-formdata.xml-using-formeditor.exportdata.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:36:15Z",
+      "status": "verified"
+    },
+    "import-acroform-data-from-updateddata.xml-into-a-pdf-using-formeditor.importdata": {
+      "title": "Import Acroform Data From Updateddata.Xml Into A Pdf Using Formeditor.Importdata",
+      "filename": "import-acroform-data-from-updateddata.xml-into-a-pdf-using-formeditor.importdata.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:37:50Z",
+      "status": "verified"
+    },
+    "create-a-submit-button-field-named-submitform-that-posts-data-to-https-api.example.com-submit": {
+      "title": "Create A Submit Button Field Named Submitform That Posts Data To Https Api.Example.Com Submit",
+      "filename": "create-a-submit-button-field-named-submitform-that-posts-data-to-https-api.example.com-submit.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:39:12Z",
+      "status": "verified"
+    },
+    "configure-the-submit-button-s-action-to-submitform-and-set-its-url-property-programmatically": {
+      "title": "Configure The Submit Button S Action To Submitform And Set Its Url Property Programmatically",
+      "filename": "configure-the-submit-button-s-action-to-submitform-and-set-its-url-property-programmatically.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:40:32Z",
+      "status": "verified"
+    },
+    "validate-that-entering-60-characters-into-a-field-limited-to-50-characters-truncates-the-excess-input": {
+      "title": "Validate That Entering 60 Characters Into A Field Limited To 50 Characters Truncates The Excess Input",
+      "filename": "validate-that-entering-60-characters-into-a-field-limited-to-50-characters-truncates-the-excess-input.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T13:41:18Z",
+      "status": "verified"
+    },
+    "add-javascript-to-a-button-that-calculates-total-price-from-quantity-and-unit-price-fields": {
+      "title": "Add Javascript To A Button That Calculates Total Price From Quantity And Unit Price Fields",
+      "filename": "add-javascript-to-a-button-that-calculates-total-price-from-quantity-and-unit-price-fields.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T04:31:07Z",
+      "status": "verified"
+    },
+    "remove-all-javascript-actions-from-form-fields-to-improve-pdf-security-before-distribution": {
+      "title": "Remove All Javascript Actions From Form Fields To Improve Pdf Security Before Distribution",
+      "filename": "remove-all-javascript-actions-from-form-fields-to-improve-pdf-security-before-distribution.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T04:33:33Z",
+      "status": "verified"
+    },
+    "export-form-field-appearance-streams-to-separate-files-for-visual-inspection-of-field-rendering": {
+      "title": "Export Form Field Appearance Streams To Separate Files For Visual Inspection Of Field Rendering",
+      "filename": "export-form-field-appearance-streams-to-separate-files-for-visual-inspection-of-field-rendering.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T04:36:39Z",
+      "status": "verified"
+    },
+    "import-custom-appearance-streams-from-image-files-and-assign-them-to-button-fields-for-branding": {
+      "title": "Import Custom Appearance Streams From Image Files And Assign Them To Button Fields For Branding",
+      "filename": "import-custom-appearance-streams-from-image-files-and-assign-them-to-button-fields-for-branding.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T04:37:34Z",
+      "status": "verified"
+    },
+    "batch-convert-a-directory-of-pdfs-to-xml-form-data-files-preserving-original-file-names": {
+      "title": "Batch Convert A Directory Of Pdfs To Xml Form Data Files Preserving Original File Names",
+      "filename": "batch-convert-a-directory-of-pdfs-to-xml-form-data-files-preserving-original-file-names.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T04:38:02Z",
+      "status": "verified"
+    },
+    "synchronize-form-data-between-two-pdfs-by-exporting-from-one-and-importing-into-the-other-using-xml": {
+      "title": "Synchronize Form Data Between Two Pdfs By Exporting From One And Importing Into The Other Using Xml",
+      "filename": "synchronize-form-data-between-two-pdfs-by-exporting-from-one-and-importing-into-the-other-using-xml.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T04:38:21Z",
+      "status": "verified"
+    },
+    "replace-an-existing-xfa-form-with-an-acroform-by-importing-field-definitions-from-an-xml-template": {
+      "title": "Replace An Existing Xfa Form With An Acroform By Importing Field Definitions From An Xml Template",
+      "filename": "replace-an-existing-xfa-form-with-an-acroform-by-importing-field-definitions-from-an-xml-template.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T04:41:34Z",
+      "status": "verified"
+    },
+    "set-the-tooltip-text-for-the-email-field-to-guide-users-on-required-input-format": {
+      "title": "Set The Tooltip Text For The Email Field To Guide Users On Required Input Format",
+      "filename": "set-the-tooltip-text-for-the-email-field-to-guide-users-on-required-input-format.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T04:43:32Z",
+      "status": "verified"
+    },
+    "programmatically-change-the-border-color-of-a-text-field-to-red-to-highlight-mandatory-information": {
+      "title": "Programmatically Change The Border Color Of A Text Field To Red To Highlight Mandatory Information",
+      "filename": "programmatically-change-the-border-color-of-a-text-field-to-red-to-highlight-mandatory-information.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T04:43:50Z",
+      "status": "verified"
+    },
+    "add-a-signature-field-named-clientsignature-and-set-its-appearance-to-a-predefined-image-stamp": {
+      "title": "Add A Signature Field Named Clientsignature And Set Its Appearance To A Predefined Image Stamp",
+      "filename": "add-a-signature-field-named-clientsignature-and-set-its-appearance-to-a-predefined-image-stamp.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T04:44:10Z",
+      "status": "verified"
+    },
+    "lock-the-clientsignature-field-after-signing-to-prevent-further-modifications-during-document-review": {
+      "title": "Lock The Clientsignature Field After Signing To Prevent Further Modifications During Document Review",
+      "filename": "lock-the-clientsignature-field-after-signing-to-prevent-further-modifications-during-document-review.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T04:44:49Z",
+      "status": "verified"
+    },
+    "create-a-hidden-calculation-field-that-sums-values-from-item1-and-item2-fields-using-javascript": {
+      "title": "Create A Hidden Calculation Field That Sums Values From Item1 And Item2 Fields Using Javascript",
+      "filename": "create-a-hidden-calculation-field-that-sums-values-from-item1-and-item2-fields-using-javascript.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T04:45:29Z",
+      "status": "verified"
+    },
+    "export-only-selected-form-fields-to-xml-by-specifying-field-names-in-the-exportdata-call": {
+      "title": "Export Only Selected Form Fields To Xml By Specifying Field Names In The Exportdata Call",
+      "filename": "export-only-selected-form-fields-to-xml-by-specifying-field-names-in-the-exportdata-call.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T04:48:28Z",
+      "status": "verified"
+    },
+    "import-xml-data-containing-only-a-subset-of-fields-and-update-matching-fields-in-the-pdf": {
+      "title": "Import Xml Data Containing Only A Subset Of Fields And Update Matching Fields In The Pdf",
+      "filename": "import-xml-data-containing-only-a-subset-of-fields-and-update-matching-fields-in-the-pdf.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T04:48:40Z",
+      "status": "verified"
+    },
+    "validate-that-a-date-field-follows-the-mm-dd-yyyy-format-by-applying-a-regular-expression-pattern": {
+      "title": "Validate That A Date Field Follows The Mm Dd Yyyy Format By Applying A Regular Expression Pattern",
+      "filename": "validate-that-a-date-field-follows-the-mm-dd-yyyy-format-by-applying-a-regular-expression-pattern.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T04:49:22Z",
+      "status": "verified"
+    },
+    "set-the-maximum-length-of-a-password-field-to-20-characters-to-enforce-security-policy": {
+      "title": "Set The Maximum Length Of A Password Field To 20 Characters To Enforce Security Policy",
+      "filename": "set-the-maximum-length-of-a-password-field-to-20-characters-to-enforce-security-policy.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T04:51:01Z",
+      "status": "verified"
+    },
+    "create-a-pdf-form-template-with-placeholder-fields-then-populate-them-from-a-json-data-source": {
+      "title": "Create A Pdf Form Template With Placeholder Fields Then Populate Them From A Json Data Source",
+      "filename": "create-a-pdf-form-template-with-placeholder-fields-then-populate-them-from-a-json-data-source.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T04:52:32Z",
+      "status": "verified"
+    },
+    "batch-fill-a-collection-of-pdf-templates-using-data-rows-from-a-csv-file-and-save-outputs": {
+      "title": "Batch Fill A Collection Of Pdf Templates Using Data Rows From A Csv File And Save Outputs",
+      "filename": "batch-fill-a-collection-of-pdf-templates-using-data-rows-from-a-csv-file-and-save-outputs.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T04:53:42Z",
+      "status": "verified"
+    },
+    "implement-error-handling-for-missing-xml-import-files-to-prevent-runtime-exceptions-during-form-data-loading": {
+      "title": "Implement Error Handling For Missing Xml Import Files To Prevent Runtime Exceptions During Form Data Loading",
+      "filename": "implement-error-handling-for-missing-xml-import-files-to-prevent-runtime-exceptions-during-form-data-loading.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T04:54:04Z",
+      "status": "verified"
+    },
+    "create-a-multi-page-pdf-where-each-page-contains-a-cloned-set-of-form-fields-with-unique-names": {
+      "title": "Create A Multi Page Pdf Where Each Page Contains A Cloned Set Of Form Fields With Unique Names",
+      "filename": "create-a-multi-page-pdf-where-each-page-contains-a-cloned-set-of-form-fields-with-unique-names.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T05:02:11Z",
+      "status": "verified"
+    },
+    "export-form-field-definitions-to-a-json-schema-for-integration-with-external-form-builders": {
+      "title": "Export Form Field Definitions To A Json Schema For Integration With External Form Builders",
+      "filename": "export-form-field-definitions-to-a-json-schema-for-integration-with-external-form-builders.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T05:02:23Z",
+      "status": "verified"
+    },
+    "import-a-json-schema-and-generate-corresponding-acroform-fields-in-a-new-pdf-document": {
+      "title": "Import A Json Schema And Generate Corresponding Acroform Fields In A New Pdf Document",
+      "filename": "import-a-json-schema-and-generate-corresponding-acroform-fields-in-a-new-pdf-document.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T05:02:40Z",
+      "status": "verified"
+    },
+    "set-the-default-value-of-a-checkbox-field-to-checked-programmatically-during-pdf-generation": {
+      "title": "Set The Default Value Of A Checkbox Field To Checked Programmatically During Pdf Generation",
+      "filename": "set-the-default-value-of-a-checkbox-field-to-checked-programmatically-during-pdf-generation.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T05:02:51Z",
+      "status": "verified"
+    },
+    "configure-the-submit-button-to-use-http-post-method-and-include-form-data-in-url-encoded-format": {
+      "title": "Configure The Submit Button To Use Http Post Method And Include Form Data In Url Encoded Format",
+      "filename": "configure-the-submit-button-to-use-http-post-method-and-include-form-data-in-url-encoded-format.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T05:09:21Z",
+      "status": "verified"
+    },
+    "add-a-reset-button-that-clears-all-user-entered-data-from-the-form-fields-when-clicked": {
+      "title": "Add A Reset Button That Clears All User Entered Data From The Form Fields When Clicked",
+      "filename": "add-a-reset-button-that-clears-all-user-entered-data-from-the-form-fields-when-clicked.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T05:16:04Z",
+      "status": "verified"
+    },
+    "set-the-export-value-of-a-radio-button-option-to-a-specific-code-used-by-downstream-systems": {
+      "title": "Set The Export Value Of A Radio Button Option To A Specific Code Used By Downstream Systems",
+      "filename": "set-the-export-value-of-a-radio-button-option-to-a-specific-code-used-by-downstream-systems.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T05:19:09Z",
+      "status": "verified"
+    },
+    "create-a-pdf-with-a-hidden-field-that-stores-a-guid-generated-at-runtime-for-tracking": {
+      "title": "Create A Pdf With A Hidden Field That Stores A Guid Generated At Runtime For Tracking",
+      "filename": "create-a-pdf-with-a-hidden-field-that-stores-a-guid-generated-at-runtime-for-tracking.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T05:21:34Z",
+      "status": "verified"
+    },
+    "implement-a-workflow-that-extracts-form-data-transforms-it-to-a-different-schema-and-re-imports-into-another-pdf": {
+      "title": "Implement A Workflow That Extracts Form Data Transforms It To A Different Schema And Re Imports Into Another Pdf",
+      "filename": "implement-a-workflow-that-extracts-form-data-transforms-it-to-a-different-schema-and-re-imports-into-another-pdf.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T05:22:41Z",
+      "status": "verified"
+    },
+    "use-formeditor-to-set-the-zoom-level-of-the-pdf-viewer-when-opening-a-form-to-improve-usability": {
+      "title": "Use Formeditor To Set The Zoom Level Of The Pdf Viewer When Opening A Form To Improve Usability",
+      "filename": "use-formeditor-to-set-the-zoom-level-of-the-pdf-viewer-when-opening-a-form-to-improve-usability.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T05:24:05Z",
+      "status": "verified"
+    },
+    "add-a-tooltip-to-the-submit-button-explaining-required-fields-before-submission": {
+      "title": "Add A Tooltip To The Submit Button Explaining Required Fields Before Submission",
+      "filename": "add-a-tooltip-to-the-submit-button-explaining-required-fields-before-submission.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T05:26:53Z",
+      "status": "verified"
+    },
+    "programmatically-lock-all-fields-after-a-user-completes-the-form-to-prevent-further-edits": {
+      "title": "Programmatically Lock All Fields After A User Completes The Form To Prevent Further Edits",
+      "filename": "programmatically-lock-all-fields-after-a-user-completes-the-form-to-prevent-further-edits.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T05:27:37Z",
+      "status": "verified"
+    },
+    "create-a-pdf-form-that-includes-a-barcode-field-generated-from-a-numeric-identifier": {
+      "title": "Create A Pdf Form That Includes A Barcode Field Generated From A Numeric Identifier",
+      "filename": "create-a-pdf-form-that-includes-a-barcode-field-generated-from-a-numeric-identifier.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T05:28:02Z",
+      "status": "verified"
+    },
+    "set-the-maximum-file-size-for-an-attached-file-field-to-2-mb-using-formeditor-constraints": {
+      "title": "Set The Maximum File Size For An Attached File Field To 2 Mb Using Formeditor Constraints",
+      "filename": "set-the-maximum-file-size-for-an-attached-file-field-to-2-mb-using-formeditor-constraints.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T05:28:16Z",
+      "status": "verified"
+    },
+    "export-form-field-metadata-including-type-and-default-value-to-a-csv-file-for-auditing-purposes": {
+      "title": "Export Form Field Metadata Including Type And Default Value To A Csv File For Auditing Purposes",
+      "filename": "export-form-field-metadata-including-type-and-default-value-to-a-csv-file-for-auditing-purposes.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T05:29:30Z",
+      "status": "verified"
+    },
+    "add-a-date-picker-field-that-defaults-to-the-current-system-date-upon-pdf-opening": {
+      "title": "Add A Date Picker Field That Defaults To The Current System Date Upon Pdf Opening",
+      "filename": "add-a-date-picker-field-that-defaults-to-the-current-system-date-upon-pdf-opening.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T05:37:36Z",
+      "status": "verified"
+    },
+    "validate-that-the-date-picker-field-does-not-accept-dates-earlier-than-january-1-2000": {
+      "title": "Validate That The Date Picker Field Does Not Accept Dates Earlier Than January 1 2000",
+      "filename": "validate-that-the-date-picker-field-does-not-accept-dates-earlier-than-january-1-2000.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T05:38:21Z",
+      "status": "verified"
+    },
+    "create-a-pdf-form-with-a-dynamic-list-field-that-expands-as-users-add-items": {
+      "title": "Create A Pdf Form With A Dynamic List Field That Expands As Users Add Items",
+      "filename": "create-a-pdf-form-with-a-dynamic-list-field-that-expands-as-users-add-items.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T05:42:55Z",
+      "status": "verified"
+    },
+    "set-the-background-color-of-a-text-field-to-light-gray-to-improve-readability": {
+      "title": "Set The Background Color Of A Text Field To Light Gray To Improve Readability",
+      "filename": "set-the-background-color-of-a-text-field-to-light-gray-to-improve-readability.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T05:44:38Z",
+      "status": "verified"
+    },
+    "programmatically-duplicate-an-existing-form-field-and-rename-it-to-create-a-series-of-similar-fields": {
+      "title": "Programmatically Duplicate An Existing Form Field And Rename It To Create A Series Of Similar Fields",
+      "filename": "programmatically-duplicate-an-existing-form-field-and-rename-it-to-create-a-series-of-similar-fields.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T05:45:42Z",
+      "status": "verified"
+    },
+    "add-a-javascript-validation-script-to-the-email-field-that-checks-for-character-presence": {
+      "title": "Add A Javascript Validation Script To The Email Field That Checks For Character Presence",
+      "filename": "add-a-javascript-validation-script-to-the-email-field-that-checks-for-character-presence.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T05:46:21Z",
+      "status": "verified"
+    },
+    "create-a-pdf-form-that-automatically-calculates-tax-based-on-a-percentage-field-and-subtotal-field": {
+      "title": "Create A Pdf Form That Automatically Calculates Tax Based On A Percentage Field And Subtotal Field",
+      "filename": "create-a-pdf-form-that-automatically-calculates-tax-based-on-a-percentage-field-and-subtotal-field.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T05:47:34Z",
+      "status": "verified"
+    },
+    "export-the-calculated-tax-value-to-xml-after-form-submission-for-downstream-processing": {
+      "title": "Export The Calculated Tax Value To Xml After Form Submission For Downstream Processing",
+      "filename": "export-the-calculated-tax-value-to-xml-after-form-submission-for-downstream-processing.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T05:48:29Z",
+      "status": "verified"
+    },
+    "import-tax-rates-from-an-xml-file-and-populate-a-hidden-field-used-in-calculations": {
+      "title": "Import Tax Rates From An Xml File And Populate A Hidden Field Used In Calculations",
+      "filename": "import-tax-rates-from-an-xml-file-and-populate-a-hidden-field-used-in-calculations.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T05:52:15Z",
+      "status": "verified"
+    },
+    "set-the-field-flag-to-noexport-for-sensitive-fields-to-prevent-them-from-being-included-in-exported-data": {
+      "title": "Set The Field Flag To Noexport For Sensitive Fields To Prevent Them From Being Included In Exported Data",
+      "filename": "set-the-field-flag-to-noexport-for-sensitive-fields-to-prevent-them-from-being-included-in-exported-data.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T05:52:40Z",
+      "status": "verified"
+    },
+    "create-a-pdf-form-with-a-language-selection-dropdown-that-dynamically-changes-field-labels-via-javascript": {
+      "title": "Create A Pdf Form With A Language Selection Dropdown That Dynamically Changes Field Labels Via Javascript",
+      "filename": "create-a-pdf-form-with-a-language-selection-dropdown-that-dynamically-changes-field-labels-via-javascript.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T06:00:35Z",
+      "status": "verified"
+    },
+    "validate-that-a-required-field-displays-a-red-border-when-left-empty-after-form-submission": {
+      "title": "Validate That A Required Field Displays A Red Border When Left Empty After Form Submission",
+      "filename": "validate-that-a-required-field-displays-a-red-border-when-left-empty-after-form-submission.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T06:09:48Z",
+      "status": "verified"
+    },
+    "create-a-pdf-form-that-includes-a-qr-code-field-generated-from-user-entered-data": {
+      "title": "Create A Pdf Form That Includes A Qr Code Field Generated From User Entered Data",
+      "filename": "create-a-pdf-form-that-includes-a-qr-code-field-generated-from-user-entered-data.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T06:13:39Z",
+      "status": "verified"
+    },
+    "export-form-data-to-xml-then-transform-it-using-xslt-to-generate-a-custom-report-format": {
+      "title": "Export Form Data To Xml Then Transform It Using Xslt To Generate A Custom Report Format",
+      "filename": "export-form-data-to-xml-then-transform-it-using-xslt-to-generate-a-custom-report-format.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T06:19:52Z",
+      "status": "verified"
+    },
+    "import-transformed-xml-data-back-into-the-pdf-to-repopulate-fields-after-external-processing": {
+      "title": "Import Transformed Xml Data Back Into The Pdf To Repopulate Fields After External Processing",
+      "filename": "import-transformed-xml-data-back-into-the-pdf-to-repopulate-fields-after-external-processing.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T06:20:14Z",
+      "status": "verified"
+    },
+    "create-a-pdf-form-with-a-multi-select-list-box-allowing-users-to-choose-multiple-options": {
+      "title": "Create A Pdf Form With A Multi Select List Box Allowing Users To Choose Multiple Options",
+      "filename": "create-a-pdf-form-with-a-multi-select-list-box-allowing-users-to-choose-multiple-options.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T06:20:41Z",
+      "status": "verified"
+    },
+    "set-the-maximum-number-of-selections-for-the-multi-select-list-box-to-three-items": {
+      "title": "Set The Maximum Number Of Selections For The Multi Select List Box To Three Items",
+      "filename": "set-the-maximum-number-of-selections-for-the-multi-select-list-box-to-three-items.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T06:21:04Z",
+      "status": "verified"
+    },
+    "add-a-hidden-field-that-stores-the-user-s-ip-address-captured-via-javascript-on-form-load": {
+      "title": "Add A Hidden Field That Stores The User S Ip Address Captured Via Javascript On Form Load",
+      "filename": "add-a-hidden-field-that-stores-the-user-s-ip-address-captured-via-javascript-on-form-load.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T06:22:00Z",
+      "status": "verified"
+    },
+    "validate-that-the-ip-address-field-contains-a-valid-ipv4-format-using-a-regular-expression": {
+      "title": "Validate That The Ip Address Field Contains A Valid Ipv4 Format Using A Regular Expression",
+      "filename": "validate-that-the-ip-address-field-contains-a-valid-ipv4-format-using-a-regular-expression.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T06:22:52Z",
+      "status": "verified"
+    },
+    "create-a-pdf-form-with-a-digital-signature-field-with-certificate-validation": {
+      "title": "Create A Pdf Form With A Digital Signature Field With Certificate Validation",
+      "filename": "create-a-pdf-form-with-a-digital-signature-field-with-certificate-validation.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T06:23:50Z",
+      "status": "verified"
+    },
+    "set-the-digital-signature-field-to-be-required-and-lock-the-document-after-signing": {
+      "title": "Set The Digital Signature Field To Be Required And Lock The Document After Signing",
+      "filename": "set-the-digital-signature-field-to-be-required-and-lock-the-document-after-signing.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T06:27:36Z",
+      "status": "verified"
+    },
+    "export-the-digital-signature-information-to-an-xml-file-for-audit-logging": {
+      "title": "Export The Digital Signature Information To An Xml File For Audit Logging",
+      "filename": "export-the-digital-signature-information-to-an-xml-file-for-audit-logging.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T06:27:53Z",
+      "status": "verified"
+    },
+    "import-digital-signature-data-from-xml-and-apply-it-to-the-corresponding-signature-field": {
+      "title": "Import Digital Signature Data From Xml And Apply It To The Corresponding Signature Field",
+      "filename": "import-digital-signature-data-from-xml-and-apply-it-to-the-corresponding-signature-field.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T06:32:51Z",
+      "status": "verified"
+    },
+    "set-the-password-for-the-protected-field-using-formeditor.setfieldpassword-method-to-enforce-security": {
+      "title": "Set The Password For The Protected Field Using Formeditor.Setfieldpassword Method To Enforce Security",
+      "filename": "set-the-password-for-the-protected-field-using-formeditor.setfieldpassword-method-to-enforce-security.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T06:42:46Z",
+      "status": "verified"
+    },
+    "implement-a-listener-that-triggers-a-javascript-function-whenever-a-specific-field-value-changes": {
+      "title": "Implement A Listener That Triggers A Javascript Function Whenever A Specific Field Value Changes",
+      "filename": "implement-a-listener-that-triggers-a-javascript-function-whenever-a-specific-field-value-changes.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T06:51:56Z",
+      "status": "verified"
+    },
+    "export-form-field-appearance-settings-to-a-json-file-for-reuse-in-other-pdf-templates": {
+      "title": "Export Form Field Appearance Settings To A Json File For Reuse In Other Pdf Templates",
+      "filename": "export-form-field-appearance-settings-to-a-json-file-for-reuse-in-other-pdf-templates.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T06:52:13Z",
+      "status": "verified"
+    },
+    "import-appearance-settings-from-json-and-apply-them-to-matching-fields-in-a-target-pdf": {
+      "title": "Import Appearance Settings From Json And Apply Them To Matching Fields In A Target Pdf",
+      "filename": "import-appearance-settings-from-json-and-apply-them-to-matching-fields-in-a-target-pdf.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T06:54:52Z",
+      "status": "verified"
+    },
+    "create-a-pdf-form-with-a-collapsible-section-that-expands-when-a-checkbox-is-selected": {
+      "title": "Create A Pdf Form With A Collapsible Section That Expands When A Checkbox Is Selected",
+      "filename": "create-a-pdf-form-with-a-collapsible-section-that-expands-when-a-checkbox-is-selected.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T06:56:07Z",
+      "status": "verified"
+    },
+    "set-the-initial-state-of-the-collapsible-section-to-collapsed-using-field-properties": {
+      "title": "Set The Initial State Of The Collapsible Section To Collapsed Using Field Properties",
+      "filename": "set-the-initial-state-of-the-collapsible-section-to-collapsed-using-field-properties.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T06:56:35Z",
+      "status": "verified"
+    },
+    "add-a-field-that-calculates-and-displays-the-total-price-based-on-quantity-and-unit-price-fields": {
+      "title": "Add A Field That Calculates And Displays The Total Price Based On Quantity And Unit Price Fields",
+      "filename": "add-a-field-that-calculates-and-displays-the-total-price-based-on-quantity-and-unit-price-fields.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T06:57:28Z",
+      "status": "verified"
+    },
+    "export-the-calculated-total-price-to-xml-for-integration-with-an-external-invoicing-system": {
+      "title": "Export The Calculated Total Price To Xml For Integration With An External Invoicing System",
+      "filename": "export-the-calculated-total-price-to-xml-for-integration-with-an-external-invoicing-system.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T06:57:55Z",
+      "status": "verified"
+    },
+    "import-discount-rates-from-xml-and-apply-them-to-the-total-price-calculation-dynamically": {
+      "title": "Import Discount Rates From Xml And Apply Them To The Total Price Calculation Dynamically",
+      "filename": "import-discount-rates-from-xml-and-apply-them-to-the-total-price-calculation-dynamically.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:00:05Z",
+      "status": "verified"
+    },
+    "validate-that-the-attached-file-size-does-not-exceed-5-mb-before-allowing-form-submission": {
+      "title": "Validate That The Attached File Size Does Not Exceed 5 Mb Before Allowing Form Submission",
+      "filename": "validate-that-the-attached-file-size-does-not-exceed-5-mb-before-allowing-form-submission.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:06:06Z",
+      "status": "verified"
+    },
+    "add-a-progress-bar-field-that-updates-as-the-user-completes-sections-of-the-form": {
+      "title": "Add A Progress Bar Field That Updates As The User Completes Sections Of The Form",
+      "filename": "add-a-progress-bar-field-that-updates-as-the-user-completes-sections-of-the-form.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:07:09Z",
+      "status": "verified"
+    },
+    "export-the-progress-bar-value-to-xml-to-track-form-completion-status-externally": {
+      "title": "Export The Progress Bar Value To Xml To Track Form Completion Status Externally",
+      "filename": "export-the-progress-bar-value-to-xml-to-track-form-completion-status-externally.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:07:29Z",
+      "status": "verified"
+    },
+    "create-a-pdf-form-with-a-language-specific-field-that-changes-label-text-based-on-locale-selection": {
+      "title": "Create A Pdf Form With A Language Specific Field That Changes Label Text Based On Locale Selection",
+      "filename": "create-a-pdf-form-with-a-language-specific-field-that-changes-label-text-based-on-locale-selection.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:09:57Z",
+      "status": "verified"
+    },
+    "set-up-a-javascript-dictionary-of-translations-and-apply-the-appropriate-label-when-the-locale-changes": {
+      "title": "Set Up A Javascript Dictionary Of Translations And Apply The Appropriate Label When The Locale Changes",
+      "filename": "set-up-a-javascript-dictionary-of-translations-and-apply-the-appropriate-label-when-the-locale-changes.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:12:04Z",
+      "status": "verified"
+    },
+    "batch-generate-pdf-forms-from-a-template-by-injecting-data-from-a-database-for-each-record": {
+      "title": "Batch Generate Pdf Forms From A Template By Injecting Data From A Database For Each Record",
+      "filename": "batch-generate-pdf-forms-from-a-template-by-injecting-data-from-a-database-for-each-record.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:13:00Z",
+      "status": "verified"
+    },
+    "validate-that-all-required-fields-are-filled-before-enabling-the-submit-button-using-javascript": {
+      "title": "Validate That All Required Fields Are Filled Before Enabling The Submit Button Using Javascript",
+      "filename": "validate-that-all-required-fields-are-filled-before-enabling-the-submit-button-using-javascript.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:15:48Z",
+      "status": "verified"
+    },
+    "create-a-pdf-form-that-logs-each-field-interaction-to-a-hidden-log-field-for-analytics": {
+      "title": "Create A Pdf Form That Logs Each Field Interaction To A Hidden Log Field For Analytics",
+      "filename": "create-a-pdf-form-that-logs-each-field-interaction-to-a-hidden-log-field-for-analytics.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:18:36Z",
+      "status": "verified"
+    },
+    "export-the-interaction-log-to-xml-after-form-submission-for-server-side-analysis": {
+      "title": "Export The Interaction Log To Xml After Form Submission For Server Side Analysis",
+      "filename": "export-the-interaction-log-to-xml-after-form-submission-for-server-side-analysis.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:21:37Z",
+      "status": "verified"
+    },
+    "import-interaction-logs-from-xml-to-reconstruct-user-behavior-in-a-pdf-viewer-for-testing": {
+      "title": "Import Interaction Logs From Xml To Reconstruct User Behavior In A Pdf Viewer For Testing",
+      "filename": "import-interaction-logs-from-xml-to-reconstruct-user-behavior-in-a-pdf-viewer-for-testing.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:21:53Z",
+      "status": "verified"
+    },
+    "add-a-field-that-displays-the-current-date-and-time-updating-automatically-on-each-view": {
+      "title": "Add A Field That Displays The Current Date And Time Updating Automatically On Each View",
+      "filename": "add-a-field-that-displays-the-current-date-and-time-updating-automatically-on-each-view.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:23:54Z",
+      "status": "verified"
+    },
+    "set-the-date-time-field-to-read-only-to-prevent-user-modification-after-initial-population": {
+      "title": "Set The Date Time Field To Read Only To Prevent User Modification After Initial Population",
+      "filename": "set-the-date-time-field-to-read-only-to-prevent-user-modification-after-initial-population.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:24:13Z",
+      "status": "verified"
+    },
+    "create-a-pdf-form-with-a-conditional-section-that-appears-only-when-a-specific-checkbox-is-checked": {
+      "title": "Create A Pdf Form With A Conditional Section That Appears Only When A Specific Checkbox Is Checked",
+      "filename": "create-a-pdf-form-with-a-conditional-section-that-appears-only-when-a-specific-checkbox-is-checked.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:25:39Z",
+      "status": "verified"
+    },
+    "export-the-conditional-visibility-state-to-xml-to-preserve-user-preferences-across-sessions": {
+      "title": "Export The Conditional Visibility State To Xml To Preserve User Preferences Across Sessions",
+      "filename": "export-the-conditional-visibility-state-to-xml-to-preserve-user-preferences-across-sessions.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:27:42Z",
+      "status": "verified"
+    },
+    "create-a-pdf-form-that-includes-a-barcode-field-generated-from-a-concatenated-string-of-multiple-fields": {
+      "title": "Create A Pdf Form That Includes A Barcode Field Generated From A Concatenated String Of Multiple Fields",
+      "filename": "create-a-pdf-form-that-includes-a-barcode-field-generated-from-a-concatenated-string-of-multiple-fields.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:32:49Z",
+      "status": "verified"
+    },
+    "export-all-barcode-field-values-to-xml-for-integration-with-inventory-management-systems": {
+      "title": "Export All Barcode Field Values To Xml For Integration With Inventory Management Systems",
+      "filename": "export-all-barcode-field-values-to-xml-for-integration-with-inventory-management-systems.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:38:25Z",
+      "status": "verified"
+    },
+    "apply-a-rotation-transformation-to-a-form-field-label-so-it-appears-at-a-45-degree-angle": {
+      "title": "Apply A Rotation Transformation To A Form Field Label So It Appears At A 45 Degree Angle",
+      "filename": "apply-a-rotation-transformation-to-a-form-field-label-so-it-appears-at-a-45-degree-angle.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:38:52Z",
+      "status": "verified"
+    },
+    "set-a-form-field-s-visibility-property-to-hidden-so-it-does-not-appear-on-the-rendered-page": {
+      "title": "Set A Form Field S Visibility Property To Hidden So It Does Not Appear On The Rendered Page",
+      "filename": "set-a-form-field-s-visibility-property-to-hidden-so-it-does-not-appear-on-the-rendered-page.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:39:43Z",
+      "status": "verified"
+    },
+    "set-a-form-field-s-visibility-to-visible-but-not-printable-allowing-on-screen-interaction-only": {
+      "title": "Set A Form Field S Visibility To Visible But Not Printable Allowing On Screen Interaction Only",
+      "filename": "set-a-form-field-s-visibility-to-visible-but-not-printable-allowing-on-screen-interaction-only.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:40:16Z",
+      "status": "verified"
+    },
+    "import-form-data-using-form.importdata-with-an-xml-string-supplied-directly-instead-of-a-file-path": {
+      "title": "Import Form Data Using Form.Importdata With An Xml String Supplied Directly Instead Of A File Path",
+      "filename": "import-form-data-using-form.importdata-with-an-xml-string-supplied-directly-instead-of-a-file-path.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:41:53Z",
+      "status": "verified"
+    },
+    "export-form-data-to-json-with-pretty-printing-enabled-for-easier-human-reading-and-debugging": {
+      "title": "Export Form Data To Json With Pretty Printing Enabled For Easier Human Reading And Debugging",
+      "filename": "export-form-data-to-json-with-pretty-printing-enabled-for-easier-human-reading-and-debugging.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:42:07Z",
+      "status": "verified"
+    },
+    "import-form-data-from-a-compressed-json-payload-using-form.importdatajson-for-efficient-transmission": {
+      "title": "Import Form Data From A Compressed Json Payload Using Form.Importdatajson For Efficient Transmission",
+      "filename": "import-form-data-from-a-compressed-json-payload-using-form.importdatajson-for-efficient-transmission.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:42:45Z",
+      "status": "verified"
+    },
+    "copy-an-existing-form-field-from-one-page-to-another-within-the-same-pdf-document": {
+      "title": "Copy An Existing Form Field From One Page To Another Within The Same Pdf Document",
+      "filename": "copy-an-existing-form-field-from-one-page-to-another-within-the-same-pdf-document.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:48:12Z",
+      "status": "verified"
+    },
+    "rename-a-form-field-programmatically-to-align-with-a-new-naming-convention-for-downstream-systems": {
+      "title": "Rename A Form Field Programmatically To Align With A New Naming Convention For Downstream Systems",
+      "filename": "rename-a-form-field-programmatically-to-align-with-a-new-naming-convention-for-downstream-systems.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:48:31Z",
+      "status": "verified"
+    },
+    "clone-a-form-field-modify-its-properties-and-place-the-clone-on-a-different-pdf-page": {
+      "title": "Clone A Form Field Modify Its Properties And Place The Clone On A Different Pdf Page",
+      "filename": "clone-a-form-field-modify-its-properties-and-place-the-clone-on-a-different-pdf-page.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:49:16Z",
+      "status": "verified"
+    },
+    "assign-a-javascript-action-to-a-form-field-that-calculates-a-value-when-the-field-loses-focus": {
+      "title": "Assign A Javascript Action To A Form Field That Calculates A Value When The Field Loses Focus",
+      "filename": "assign-a-javascript-action-to-a-form-field-that-calculates-a-value-when-the-field-loses-focus.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:49:53Z",
+      "status": "verified"
+    },
+    "add-a-submit-button-to-a-pdf-form-that-posts-all-field-data-to-a-specified-url-endpoint": {
+      "title": "Add A Submit Button To A Pdf Form That Posts All Field Data To A Specified Url Endpoint",
+      "filename": "add-a-submit-button-to-a-pdf-form-that-posts-all-field-data-to-a-specified-url-endpoint.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:51:58Z",
+      "status": "verified"
+    },
+    "add-a-reset-button-to-a-pdf-form-that-clears-all-user-entered-data-and-restores-defaults": {
+      "title": "Add A Reset Button To A Pdf Form That Clears All User Entered Data And Restores Defaults",
+      "filename": "add-a-reset-button-to-a-pdf-form-that-clears-all-user-entered-data-and-restores-defaults.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:54:47Z",
+      "status": "verified"
+    },
+    "define-a-calculation-order-for-dependent-fields-so-totals-update-automatically-as-inputs-change": {
+      "title": "Define A Calculation Order For Dependent Fields So Totals Update Automatically As Inputs Change",
+      "filename": "define-a-calculation-order-for-dependent-fields-so-totals-update-automatically-as-inputs-change.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:55:13Z",
+      "status": "verified"
+    },
+    "implement-custom-validation-logic-for-a-numeric-field-to-ensure-values-fall-within-an-acceptable-range": {
+      "title": "Implement Custom Validation Logic For A Numeric Field To Ensure Values Fall Within An Acceptable Range",
+      "filename": "implement-custom-validation-logic-for-a-numeric-field-to-ensure-values-fall-within-an-acceptable-range.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:57:33Z",
+      "status": "verified"
+    },
+    "use-the-document.form-collection-to-enumerate-and-list-all-field-names-present-in-a-pdf": {
+      "title": "Use The Document.Form Collection To Enumerate And List All Field Names Present In A Pdf",
+      "filename": "use-the-document.form-collection-to-enumerate-and-list-all-field-names-present-in-a-pdf.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:58:19Z",
+      "status": "verified"
+    },
+    "apply-linq-queries-to-filter-form-fields-by-type-such-as-retrieving-only-text-box-fields": {
+      "title": "Apply Linq Queries To Filter Form Fields By Type Such As Retrieving Only Text Box Fields",
+      "filename": "apply-linq-queries-to-filter-form-fields-by-type-such-as-retrieving-only-text-box-fields.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:58:46Z",
+      "status": "verified"
+    },
+    "serialize-form-field-definitions-into-a-json-schema-describing-field-types-and-constraints": {
+      "title": "Serialize Form Field Definitions Into A Json Schema Describing Field Types And Constraints",
+      "filename": "serialize-form-field-definitions-into-a-json-schema-describing-field-types-and-constraints.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:59:10Z",
+      "status": "verified"
+    },
+    "deserialize-a-json-schema-to-dynamically-recreate-acroform-fields-within-a-newly-generated-pdf": {
+      "title": "Deserialize A Json Schema To Dynamically Recreate Acroform Fields Within A Newly Generated Pdf",
+      "filename": "deserialize-a-json-schema-to-dynamically-recreate-acroform-fields-within-a-newly-generated-pdf.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T07:59:33Z",
+      "status": "verified"
+    },
+    "apply-encryption-to-a-pdf-after-filling-its-forms-to-protect-sensitive-data-from-unauthorized-access": {
+      "title": "Apply Encryption To A Pdf After Filling Its Forms To Protect Sensitive Data From Unauthorized Access",
+      "filename": "apply-encryption-to-a-pdf-after-filling-its-forms-to-protect-sensitive-data-from-unauthorized-access.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:00:03Z",
+      "status": "verified"
+    },
+    "apply-a-digital-signature-to-a-pdf-containing-filled-form-fields-to-certify-its-authenticity": {
+      "title": "Apply A Digital Signature To A Pdf Containing Filled Form Fields To Certify Its Authenticity",
+      "filename": "apply-a-digital-signature-to-a-pdf-containing-filled-form-fields-to-certify-its-authenticity.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:00:56Z",
+      "status": "verified"
+    },
+    "set-pdf-document-metadata-such-as-author-and-title-after-completing-form-processing-tasks": {
+      "title": "Set Pdf Document Metadata Such As Author And Title After Completing Form Processing Tasks",
+      "filename": "set-pdf-document-metadata-such-as-author-and-title-after-completing-form-processing-tasks.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:03:15Z",
+      "status": "verified"
+    },
+    "load-a-pdf-into-a-memory-stream-fill-its-fields-and-return-the-resulting-byte-array": {
+      "title": "Load A Pdf Into A Memory Stream Fill Its Fields And Return The Resulting Byte Array",
+      "filename": "load-a-pdf-into-a-memory-stream-fill-its-fields-and-return-the-resulting-byte-array.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:03:51Z",
+      "status": "verified"
+    },
+    "use-asynchronous-methods-to-import-xml-form-data-into-a-pdf-without-blocking-the-main-thread": {
+      "title": "Use Asynchronous Methods To Import Xml Form Data Into A Pdf Without Blocking The Main Thread",
+      "filename": "use-asynchronous-methods-to-import-xml-form-data-into-a-pdf-without-blocking-the-main-thread.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:04:09Z",
+      "status": "verified"
+    },
+    "utilize-parallel-processing-to-fill-fields-in-multiple-pdfs-concurrently-improving-batch-performance": {
+      "title": "Utilize Parallel Processing To Fill Fields In Multiple Pdfs Concurrently Improving Batch Performance",
+      "filename": "utilize-parallel-processing-to-fill-fields-in-multiple-pdfs-concurrently-improving-batch-performance.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:05:03Z",
+      "status": "verified"
+    },
+    "log-each-modification-made-to-form-fields-into-a-text-file-for-audit-and-troubleshooting": {
+      "title": "Log Each Modification Made To Form Fields Into A Text File For Audit And Troubleshooting",
+      "filename": "log-each-modification-made-to-form-fields-into-a-text-file-for-audit-and-troubleshooting.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:06:01Z",
+      "status": "verified"
+    },
+    "generate-a-summary-report-listing-filled-fields-and-their-values-across-a-batch-of-processed-pdfs": {
+      "title": "Generate A Summary Report Listing Filled Fields And Their Values Across A Batch Of Processed Pdfs",
+      "filename": "generate-a-summary-report-listing-filled-fields-and-their-values-across-a-batch-of-processed-pdfs.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:06:38Z",
+      "status": "verified"
+    },
+    "compare-form-data-of-two-pdfs-and-produce-a-diff-report-highlighting-mismatched-values": {
+      "title": "Compare Form Data Of Two Pdfs And Produce A Diff Report Highlighting Mismatched Values",
+      "filename": "compare-form-data-of-two-pdfs-and-produce-a-diff-report-highlighting-mismatched-values.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:09:33Z",
+      "status": "verified"
+    },
+    "create-a-pdf-template-with-placeholder-fields-that-can-later-be-bound-to-dynamic-data-sources": {
+      "title": "Create A Pdf Template With Placeholder Fields That Can Later Be Bound To Dynamic Data Sources",
+      "filename": "create-a-pdf-template-with-placeholder-fields-that-can-later-be-bound-to-dynamic-data-sources.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:12:04Z",
+      "status": "verified"
+    },
+    "replace-placeholder-text-in-a-field-with-a-formatted-date-string-using-the-current-system-date": {
+      "title": "Replace Placeholder Text In A Field With A Formatted Date String Using The Current System Date",
+      "filename": "replace-placeholder-text-in-a-field-with-a-formatted-date-string-using-the-current-system-date.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:12:26Z",
+      "status": "verified"
+    },
+    "populate-a-multi-select-list-box-field-with-several-selected-values-to-capture-multiple-choices": {
+      "title": "Populate A Multi Select List Box Field With Several Selected Values To Capture Multiple Choices",
+      "filename": "populate-a-multi-select-list-box-field-with-several-selected-values-to-capture-multiple-choices.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:12:39Z",
+      "status": "verified"
+    },
+    "add-a-signature-field-to-a-pdf-form-to-allow-users-to-apply-handwritten-digital-signatures": {
+      "title": "Add A Signature Field To A Pdf Form To Allow Users To Apply Handwritten Digital Signatures",
+      "filename": "add-a-signature-field-to-a-pdf-form-to-allow-users-to-apply-handwritten-digital-signatures.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:17:38Z",
+      "status": "verified"
+    },
+    "extract-the-visual-appearance-of-a-signature-field-as-an-image-for-inclusion-in-audit-logs": {
+      "title": "Extract The Visual Appearance Of A Signature Field As An Image For Inclusion In Audit Logs",
+      "filename": "extract-the-visual-appearance-of-a-signature-field-as-an-image-for-inclusion-in-audit-logs.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:18:25Z",
+      "status": "verified"
+    },
+    "set-a-form-field-s-maximum-character-length-to-restrict-user-input-to-a-defined-size": {
+      "title": "Set A Form Field S Maximum Character Length To Restrict User Input To A Defined Size",
+      "filename": "set-a-form-field-s-maximum-character-length-to-restrict-user-input-to-a-defined-size.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:18:40Z",
+      "status": "verified"
+    },
+    "enable-spell-checking-for-a-text-field-if-the-pdf-library-supports-this-feature": {
+      "title": "Enable Spell Checking For A Text Field If The Pdf Library Supports This Feature",
+      "filename": "enable-spell-checking-for-a-text-field-if-the-pdf-library-supports-this-feature.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:21:24Z",
+      "status": "verified"
+    },
+    "post-form-data-to-a-local-xml-file-path-using-form.postdata-for-offline-data-collection": {
+      "title": "Post Form Data To A Local Xml File Path Using Form.Postdata For Offline Data Collection",
+      "filename": "post-form-data-to-a-local-xml-file-path-using-form.postdata-for-offline-data-collection.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:24:00Z",
+      "status": "verified"
+    },
+    "validate-incoming-xml-data-against-an-xsd-schema-before-importing-it-into-a-pdf-form": {
+      "title": "Validate Incoming Xml Data Against An Xsd Schema Before Importing It Into A Pdf Form",
+      "filename": "validate-incoming-xml-data-against-an-xsd-schema-before-importing-it-into-a-pdf-form.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:26:35Z",
+      "status": "verified"
+    },
+    "transform-imported-xml-using-an-xslt-stylesheet-before-populating-pdf-fields-with-the-result": {
+      "title": "Transform Imported Xml Using An Xslt Stylesheet Before Populating Pdf Fields With The Result",
+      "filename": "transform-imported-xml-using-an-xslt-stylesheet-before-populating-pdf-fields-with-the-result.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:26:54Z",
+      "status": "verified"
+    },
+    "create-a-pdf-with-acroform-fields-and-embed-javascript-that-automatically-calculates-order-totals": {
+      "title": "Create A Pdf With Acroform Fields And Embed Javascript That Automatically Calculates Order Totals",
+      "filename": "create-a-pdf-with-acroform-fields-and-embed-javascript-that-automatically-calculates-order-totals.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:27:18Z",
+      "status": "verified"
+    },
+    "extract-form-field-annotations-from-a-pdf-and-export-them-as-a-csv-file-for-external-analysis": {
+      "title": "Extract Form Field Annotations From A Pdf And Export Them As A Csv File For External Analysis",
+      "filename": "extract-form-field-annotations-from-a-pdf-and-export-them-as-a-csv-file-for-external-analysis.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:28:18Z",
+      "status": "verified"
+    },
+    "add-a-hidden-field-to-a-pdf-that-stores-a-session-identifier-for-backend-tracking-purposes": {
+      "title": "Add A Hidden Field To A Pdf That Stores A Session Identifier For Backend Tracking Purposes",
+      "filename": "add-a-hidden-field-to-a-pdf-that-stores-a-session-identifier-for-backend-tracking-purposes.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:28:39Z",
+      "status": "verified"
+    },
+    "set-a-field-s-default-appearance-string-da-to-define-default-font-size-and-color-settings": {
+      "title": "Set A Field S Default Appearance String Da To Define Default Font Size And Color Settings",
+      "filename": "set-a-field-s-default-appearance-string-da-to-define-default-font-size-and-color-settings.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:29:59Z",
+      "status": "verified"
+    },
+    "read-xml-form-data-from-a-network-stream-and-import-it-into-a-pdf-using-form.importdata": {
+      "title": "Read Xml Form Data From A Network Stream And Import It Into A Pdf Using Form.Importdata",
+      "filename": "read-xml-form-data-from-a-network-stream-and-import-it-into-a-pdf-using-form.importdata.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:34:37Z",
+      "status": "verified"
+    },
+    "implement-error-handling-that-gracefully-skips-missing-fields-during-a-bulk-fill-operation": {
+      "title": "Implement Error Handling That Gracefully Skips Missing Fields During A Bulk Fill Operation",
+      "filename": "implement-error-handling-that-gracefully-skips-missing-fields-during-a-bulk-fill-operation.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:35:03Z",
+      "status": "verified"
+    },
+    "provide-fallback-default-values-for-fields-when-the-source-xml-does-not-contain-corresponding-entries": {
+      "title": "Provide Fallback Default Values For Fields When The Source Xml Does Not Contain Corresponding Entries",
+      "filename": "provide-fallback-default-values-for-fields-when-the-source-xml-does-not-contain-corresponding-entries.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:36:28Z",
+      "status": "verified"
+    },
+    "batch-process-a-folder-of-pdfs-to-set-a-100-character-limit-on-the-comments-field-using-formeditor": {
+      "title": "Batch Process A Folder Of Pdfs To Set A 100 Character Limit On The Comments Field Using Formeditor",
+      "filename": "batch-process-a-folder-of-pdfs-to-set-a-100-character-limit-on-the-comments-field-using-formeditor.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:43:00Z",
+      "status": "verified"
+    },
+    "generate-a-report-listing-each-form-field-name-type-and-character-limit-across-multiple-pdf-files": {
+      "title": "Generate A Report Listing Each Form Field Name Type And Character Limit Across Multiple Pdf Files",
+      "filename": "generate-a-report-listing-each-form-field-name-type-and-character-limit-across-multiple-pdf-files.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:44:17Z",
+      "status": "verified"
+    },
+    "use-formeditor-to-modify-form-fields-without-loading-the-full-document-into-memory": {
+      "title": "Use Formeditor To Modify Form Fields Without Loading The Full Document Into Memory",
+      "filename": "use-formeditor-to-modify-form-fields-without-loading-the-full-document-into-memory.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:46:32Z",
+      "status": "verified"
+    },
+    "extract-the-xml-representation-of-acroform-data-from-a-pdf-and-save-it-to-a-network-share": {
+      "title": "Extract The Xml Representation Of Acroform Data From A Pdf And Save It To A Network Share",
+      "filename": "extract-the-xml-representation-of-acroform-data-from-a-pdf-and-save-it-to-a-network-share.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:46:52Z",
+      "status": "verified"
+    },
+    "import-xml-form-data-into-several-pdfs-simultaneously-to-synchronize-user-inputs-across-documents": {
+      "title": "Import Xml Form Data Into Several Pdfs Simultaneously To Synchronize User Inputs Across Documents",
+      "filename": "import-xml-form-data-into-several-pdfs-simultaneously-to-synchronize-user-inputs-across-documents.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:47:11Z",
+      "status": "verified"
+    },
+    "delete-all-form-fields-on-the-first-page-of-a-pdf-to-create-a-clean-template-page": {
+      "title": "Delete All Form Fields On The First Page Of A Pdf To Create A Clean Template Page",
+      "filename": "delete-all-form-fields-on-the-first-page-of-a-pdf-to-create-a-clean-template-page.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:48:19Z",
+      "status": "verified"
+    },
+    "create-a-new-radio-button-group-named-paymentmethod-with-options-credit-and-debit-in-a-pdf-form": {
+      "title": "Create A New Radio Button Group Named Paymentmethod With Options Credit And Debit In A Pdf Form",
+      "filename": "create-a-new-radio-button-group-named-paymentmethod-with-options-credit-and-debit-in-a-pdf-form.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:49:10Z",
+      "status": "verified"
+    },
+    "set-the-default-selected-value-of-the-paymentmethod-radio-group-to-credit-programmatically": {
+      "title": "Set The Default Selected Value Of The Paymentmethod Radio Group To Credit Programmatically",
+      "filename": "set-the-default-selected-value-of-the-paymentmethod-radio-group-to-credit-programmatically.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:49:27Z",
+      "status": "verified"
+    },
+    "add-a-multiline-text-field-called-feedback-with-a-500-character-limit-to-capture-detailed-user-comments": {
+      "title": "Add A Multiline Text Field Called Feedback With A 500 Character Limit To Capture Detailed User Comments",
+      "filename": "add-a-multiline-text-field-called-feedback-with-a-500-character-limit-to-capture-detailed-user-comments.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:49:48Z",
+      "status": "verified"
+    },
+    "remove-form-fields-of-subtype-signature-from-all-pages-using-a-loop-over-document.form-collection": {
+      "title": "Remove Form Fields Of Subtype Signature From All Pages Using A Loop Over Document.Form Collection",
+      "filename": "remove-form-fields-of-subtype-signature-from-all-pages-using-a-loop-over-document.form-collection.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:50:29Z",
+      "status": "verified"
+    },
+    "export-form-field-names-and-their-current-values-to-a-csv-file-for-external-processing": {
+      "title": "Export Form Field Names And Their Current Values To A Csv File For External Processing",
+      "filename": "export-form-field-names-and-their-current-values-to-a-csv-file-for-external-processing.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:50:45Z",
+      "status": "verified"
+    },
+    "import-field-values-from-a-csv-file-and-populate-corresponding-fields-in-a-target-pdf-document": {
+      "title": "Import Field Values From A Csv File And Populate Corresponding Fields In A Target Pdf Document",
+      "filename": "import-field-values-from-a-csv-file-and-populate-corresponding-fields-in-a-target-pdf-document.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:51:35Z",
+      "status": "verified"
+    },
+    "set-the-read-only-property-on-the-employeeid-field-to-prevent-user-modifications-after-generation": {
+      "title": "Set The Read Only Property On The Employeeid Field To Prevent User Modifications After Generation",
+      "filename": "set-the-read-only-property-on-the-employeeid-field-to-prevent-user-modifications-after-generation.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:55:13Z",
+      "status": "verified"
+    },
+    "programmatically-flatten-all-form-fields-in-a-pdf-to-make-the-content-static-and-non-editable": {
+      "title": "Programmatically Flatten All Form Fields In A Pdf To Make The Content Static And Non Editable",
+      "filename": "programmatically-flatten-all-form-fields-in-a-pdf-to-make-the-content-static-and-non-editable.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:55:22Z",
+      "status": "verified"
+    },
+    "bind-input-and-output-pdfs-with-formeditor-then-copy-source-form-fields-to-the-destination": {
+      "title": "Bind Input And Output Pdfs With Formeditor Then Copy Source Form Fields To The Destination",
+      "filename": "bind-input-and-output-pdfs-with-formeditor-then-copy-source-form-fields-to-the-destination.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:57:48Z",
+      "status": "verified"
+    },
+    "create-a-dropdown-list-field-named-country-populated-with-a-predefined-array-of-country-names": {
+      "title": "Create A Dropdown List Field Named Country Populated With A Predefined Array Of Country Names",
+      "filename": "create-a-dropdown-list-field-named-country-populated-with-a-predefined-array-of-country-names.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:58:07Z",
+      "status": "verified"
+    },
+    "set-the-default-selected-item-of-the-country-dropdown-to-united-states-using-formeditor": {
+      "title": "Set The Default Selected Item Of The Country Dropdown To United States Using Formeditor",
+      "filename": "set-the-default-selected-item-of-the-country-dropdown-to-united-states-using-formeditor.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:58:25Z",
+      "status": "verified"
+    },
+    "validate-that-a-numeric-field-age-rejects-non-numeric-input-by-testing-with-alphabetic-characters": {
+      "title": "Validate That A Numeric Field Age Rejects Non Numeric Input By Testing With Alphabetic Characters",
+      "filename": "validate-that-a-numeric-field-age-rejects-non-numeric-input-by-testing-with-alphabetic-characters.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T08:58:47Z",
+      "status": "verified"
+    }
+  }
+}
