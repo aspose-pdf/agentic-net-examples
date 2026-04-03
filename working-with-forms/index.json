@@ -1,6 +1,6 @@
 {
   "category": "Working with Forms",
-  "last_updated": "2026-04-03T08:58:47Z",
+  "last_updated": "2026-04-03T10:04:10Z",
   "examples": {
     "create-a-new-pdf-with-an-acroform-and-add-a-text-field-on-the-first-page": {
       "title": "Create A New Pdf With An Acroform And Add A Text Field On The First Page",
@@ -2190,6 +2190,16 @@
       "apis_used": [],
       "difficulty": "",
       "generated_at": "2026-04-03T08:58:47Z",
+      "status": "verified"
+    },
+    "create-a-new-pdf-with-an-acroform-and-add-a-text-field-on-the-first-page__v2": {
+      "title": "Create A New Pdf With An Acroform And Add A Text Field On The First Page__V2",
+      "filename": "create-a-new-pdf-with-an-acroform-and-add-a-text-field-on-the-first-page__v2.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T10:04:10Z",
       "status": "verified"
     }
   }
