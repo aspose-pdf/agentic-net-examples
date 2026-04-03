@@ -1,0 +1,601 @@
+{
+  "category": "Working with Tables",
+  "last_updated": "2026-04-02T12:02:17Z",
+  "examples": {
+    "create-table-with-rows__v5": {
+      "title": "Create Table with Rows and Cells in PDF",
+      "filename": "create-table-with-rows__v5.cs",
+      "description": "Demonstrates how to programmatically create a table, add rows and cells, and save the PDF.",
+      "tags": [
+        "table",
+        "rows",
+        "cells",
+        "pdf",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Border",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-02T11:34:01Z",
+      "status": "verified"
+    },
+    "insert-table-into-pdf__v5": {
+      "title": "Insert Table into PDF at Specific Position",
+      "filename": "insert-table-into-pdf__v5.cs",
+      "description": "Creates a sample PDF, then inserts a constructed table at a given location on the first page.",
+      "tags": [
+        "table",
+        "pdf",
+        "insert",
+        "aspnet",
+        "example"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Table.ImportDataTable"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-02T11:34:01Z",
+      "status": "verified"
+    },
+    "auto-fit-table-columns__v4": {
+      "title": "AutoFit Table Columns to Content in PDF",
+      "filename": "auto-fit-table-columns__v4.cs",
+      "description": "Demonstrates setting ColumnAdjustment to AutoFitToContent so that table columns automatically resize to fit their cell contents.",
+      "tags": [
+        "table",
+        "autofit",
+        "columnadjustment",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.ColumnAdjustment",
+        "Aspose.Pdf.Row"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-02T11:34:01Z",
+      "status": "verified"
+    },
+    "set-table.autofitbehavior-to-autofittopagewidth-to-stretch-the-table-across-the-page-width": {
+      "title": "Set Table.Autofitbehavior To Autofittopagewidth To Stretch The Table Across The Page Width",
+      "filename": "set-table.autofitbehavior-to-autofittopagewidth-to-stretch-the-table-across-the-page-width.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:34:01Z",
+      "status": "verified"
+    },
+    "fill-a-datatable-from-a-database-query-and-call-importdatatable-to-generate-a-pdf-table": {
+      "title": "Fill A Datatable From A Database Query And Call Importdatatable To Generate A Pdf Table",
+      "filename": "fill-a-datatable-from-a-database-query-and-call-importdatatable-to-generate-a-pdf-table.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:35:09Z",
+      "status": "verified"
+    },
+    "create-a-tableabsorber-absorb-the-document-and-iterate-tableabsorber.tableabsorbed-to-locate-tables": {
+      "title": "Create A Tableabsorber Absorb The Document And Iterate Tableabsorber.Tableabsorbed To Locate Tables",
+      "filename": "create-a-tableabsorber-absorb-the-document-and-iterate-tableabsorber.tableabsorbed-to-locate-tables.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:35:09Z",
+      "status": "verified"
+    },
+    "remove-a-single-table-from-a-pdf-by-calling-remove-on-the-tableabsorber.tableabsorbed-element": {
+      "title": "Remove A Single Table From A Pdf By Calling Remove On The Tableabsorber.Tableabsorbed Element",
+      "filename": "remove-a-single-table-from-a-pdf-by-calling-remove-on-the-tableabsorber.tableabsorbed-element.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:35:09Z",
+      "status": "verified"
+    },
+    "iterate-over-all-absorbed-tables-and-invoke-remove-on-each-to-delete-multiple-tables-from-the-document": {
+      "title": "Iterate Over All Absorbed Tables And Invoke Remove On Each To Delete Multiple Tables From The Document",
+      "filename": "iterate-over-all-absorbed-tables-and-invoke-remove-on-each-to-delete-multiple-tables-from-the-document.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:35:09Z",
+      "status": "verified"
+    },
+    "insert-image-into-table-cell__v3": {
+      "title": "Insert Image from Memory Stream into Table Cell",
+      "filename": "insert-image-into-table-cell__v3.cs",
+      "description": "Demonstrates how to embed an image from a memory stream into a PDF table cell using Aspose.Pdf for .NET.",
+      "tags": [
+        "pdf",
+        "image",
+        "table",
+        "memory-stream",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Tables.Table",
+        "Aspose.Pdf.Image",
+        "Aspose.Pdf.Tables.Cell"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-02T11:35:09Z",
+      "status": "verified"
+    },
+    "add-a-paragraph-with-centered-alignment-inside-a-cell-by-setting-paragraph.alignment-to-center": {
+      "title": "Add A Paragraph With Centered Alignment Inside A Cell By Setting Paragraph.Alignment To Center",
+      "filename": "add-a-paragraph-with-centered-alignment-inside-a-cell-by-setting-paragraph.alignment-to-center.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:37:31Z",
+      "status": "verified"
+    },
+    "create-a-header-row-and-set-its-isheader-property-to-true-so-it-repeats-on-each-new-page": {
+      "title": "Create A Header Row And Set Its Isheader Property To True So It Repeats On Each New Page",
+      "filename": "create-a-header-row-and-set-its-isheader-property-to-true-so-it-repeats-on-each-new-page.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:37:31Z",
+      "status": "verified"
+    },
+    "add-a-footer-row-to-the-table-and-configure-it-to-appear-at-the-bottom-of-each-page": {
+      "title": "Add A Footer Row To The Table And Configure It To Appear At The Bottom Of Each Page",
+      "filename": "add-a-footer-row-to-the-table-and-configure-it-to-appear-at-the-bottom-of-each-page.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:37:31Z",
+      "status": "verified"
+    },
+    "apply-alternating-row-background-colors-by-iterating-rows-and-setting-cell.backgroundcolor-based-on-row-index-parity": {
+      "title": "Apply Alternating Row Background Colors By Iterating Rows And Setting Cell.Backgroundcolor Based On Row Index Parity",
+      "filename": "apply-alternating-row-background-colors-by-iterating-rows-and-setting-cell.backgroundcolor-based-on-row-index-parity.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:37:31Z",
+      "status": "verified"
+    },
+    "add-a-checkbox-form-field-inside-a-cell-by-creating-a-checkboxfield-and-placing-it-in-the-cell": {
+      "title": "Add A Checkbox Form Field Inside A Cell By Creating A Checkboxfield And Placing It In The Cell",
+      "filename": "add-a-checkbox-form-field-inside-a-cell-by-creating-a-checkboxfield-and-placing-it-in-the-cell.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:37:31Z",
+      "status": "verified"
+    },
+    "add-a-button-group-inside-a-cell-by-creating-radiobuttonfield-objects-and-grouping-them-with-the-same-name": {
+      "title": "Add A Button Group Inside A Cell By Creating Radiobuttonfield Objects And Grouping Them With The Same Name",
+      "filename": "add-a-button-group-inside-a-cell-by-creating-radiobuttonfield-objects-and-grouping-them-with-the-same-name.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:37:58Z",
+      "status": "verified"
+    },
+    "export-the-structure-of-a-table-to-json-by-iterating-rows-and-cells-and-serializing-their-properties": {
+      "title": "Export The Structure Of A Table To Json By Iterating Rows And Cells And Serializing Their Properties",
+      "filename": "export-the-structure-of-a-table-to-json-by-iterating-rows-and-cells-and-serializing-their-properties.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:37:58Z",
+      "status": "verified"
+    },
+    "export-table-data-to-csv-format-by-writing-each-cell-s-text-to-a-comma-separated-line-in-a-file": {
+      "title": "Export Table Data To Csv Format By Writing Each Cell S Text To A Comma Separated Line In A File",
+      "filename": "export-table-data-to-csv-format-by-writing-each-cell-s-text-to-a-comma-separated-line-in-a-file.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:37:58Z",
+      "status": "verified"
+    },
+    "serialize-a-table-to-xml-by-converting-its-rows-and-cells-into-xml-elements-and-saving-the-document": {
+      "title": "Serialize A Table To Xml By Converting Its Rows And Cells Into Xml Elements And Saving The Document",
+      "filename": "serialize-a-table-to-xml-by-converting-its-rows-and-cells-into-xml-elements-and-saving-the-document.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:37:58Z",
+      "status": "verified"
+    },
+    "use-tableabsorber-to-count-the-number-of-tables-in-a-pdf-by-checking-the-tableabsorbed-collection-size": {
+      "title": "Use Tableabsorber To Count The Number Of Tables In A Pdf By Checking The Tableabsorbed Collection Size",
+      "filename": "use-tableabsorber-to-count-the-number-of-tables-in-a-pdf-by-checking-the-tableabsorbed-collection-size.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:37:58Z",
+      "status": "verified"
+    },
+    "extract-table-coordinates-from-a-pdf-by-accessing-tableabsorber.tableabsorbed-i-.rectangle-property-for-each-table": {
+      "title": "Extract Table Coordinates From A Pdf By Accessing Tableabsorber.Tableabsorbed I .Rectangle Property For Each Table",
+      "filename": "extract-table-coordinates-from-a-pdf-by-accessing-tableabsorber.tableabsorbed-i-.rectangle-property-for-each-table.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:37:58Z",
+      "status": "verified"
+    },
+    "replace-cell-content-containing-a-specific-keyword-by-locating-the-cell-and-assigning-new-textfragment": {
+      "title": "Replace Cell Content Containing A Specific Keyword By Locating The Cell And Assigning New Textfragment",
+      "filename": "replace-cell-content-containing-a-specific-keyword-by-locating-the-cell-and-assigning-new-textfragment.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:37:58Z",
+      "status": "verified"
+    },
+    "remove-a-specific-column-from-a-table-by-deleting-the-corresponding-cell-objects-from-each-row": {
+      "title": "Remove A Specific Column From A Table By Deleting The Corresponding Cell Objects From Each Row",
+      "filename": "remove-a-specific-column-from-a-table-by-deleting-the-corresponding-cell-objects-from-each-row.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:37:58Z",
+      "status": "verified"
+    },
+    "insert-a-new-column-at-a-given-index-by-adding-a-cell-to-each-row-at-that-position": {
+      "title": "Insert A New Column At A Given Index By Adding A Cell To Each Row At That Position",
+      "filename": "insert-a-new-column-at-a-given-index-by-adding-a-cell-to-each-row-at-that-position.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:37:58Z",
+      "status": "verified"
+    },
+    "reorder-columns-in-a-table-by-rearranging-cell-objects-within-each-row-according-to-the-desired-sequence": {
+      "title": "Reorder Columns In A Table By Rearranging Cell Objects Within Each Row According To The Desired Sequence",
+      "filename": "reorder-columns-in-a-table-by-rearranging-cell-objects-within-each-row-according-to-the-desired-sequence.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:37:58Z",
+      "status": "verified"
+    },
+    "adjust-column-widths-proportionally-by-calculating-total-width-and-assigning-each-column-a-percentage-of-that-total": {
+      "title": "Adjust Column Widths Proportionally By Calculating Total Width And Assigning Each Column A Percentage Of That Total",
+      "filename": "adjust-column-widths-proportionally-by-calculating-total-width-and-assigning-each-column-a-percentage-of-that-total.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:37:58Z",
+      "status": "verified"
+    },
+    "set-a-minimum-column-width-to-prevent-columns-from-becoming-narrower-than-a-defined-point-value": {
+      "title": "Set A Minimum Column Width To Prevent Columns From Becoming Narrower Than A Defined Point Value",
+      "filename": "set-a-minimum-column-width-to-prevent-columns-from-becoming-narrower-than-a-defined-point-value.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:37:58Z",
+      "status": "verified"
+    },
+    "set-a-maximum-column-width-to-limit-columns-from-expanding-beyond-a-specified-point-measurement": {
+      "title": "Set A Maximum Column Width To Limit Columns From Expanding Beyond A Specified Point Measurement",
+      "filename": "set-a-maximum-column-width-to-limit-columns-from-expanding-beyond-a-specified-point-measurement.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:37:58Z",
+      "status": "verified"
+    },
+    "add-an-auto-numbered-column-to-a-table-by-inserting-sequential-numbers-into-the-first-cell-of-each-row": {
+      "title": "Add An Auto Numbered Column To A Table By Inserting Sequential Numbers Into The First Cell Of Each Row",
+      "filename": "add-an-auto-numbered-column-to-a-table-by-inserting-sequential-numbers-into-the-first-cell-of-each-row.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:40:53Z",
+      "status": "verified"
+    },
+    "add-a-background-color-to-the-table-by-setting-table.backgroundcolor-to-a-color-with-desired-opacity": {
+      "title": "Add A Background Color To The Table By Setting Table.Backgroundcolor To A Color With Desired Opacity",
+      "filename": "add-a-background-color-to-the-table-by-setting-table.backgroundcolor-to-a-color-with-desired-opacity.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:40:53Z",
+      "status": "verified"
+    },
+    "set-the-table-s-z-index-to-control-overlapping-order-when-placing-the-table-over-other-page-elements": {
+      "title": "Set The Table S Z Index To Control Overlapping Order When Placing The Table Over Other Page Elements",
+      "filename": "set-the-table-s-z-index-to-control-overlapping-order-when-placing-the-table-over-other-page-elements.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:48:58Z",
+      "status": "verified"
+    },
+    "add-a-table-inside-a-form-field-by-creating-a-textboxfield-and-inserting-the-table-into-its-appearance": {
+      "title": "Add A Table Inside A Form Field By Creating A Textboxfield And Inserting The Table Into Its Appearance",
+      "filename": "add-a-table-inside-a-form-field-by-creating-a-textboxfield-and-inserting-the-table-into-its-appearance.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:48:58Z",
+      "status": "verified"
+    },
+    "add-a-table-inside-a-paragraph-by-adding-a-paragraph-inserting-table-then-placing-it-on-the-page": {
+      "title": "Add A Table Inside A Paragraph By Adding A Paragraph Inserting Table Then Placing It On The Page",
+      "filename": "add-a-table-inside-a-paragraph-by-adding-a-paragraph-inserting-table-then-placing-it-on-the-page.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:48:58Z",
+      "status": "verified"
+    },
+    "import-a-datatable-containing-image-data-into-a-table-ensuring-cells-render-images-using-imagefragment-objects": {
+      "title": "Import A Datatable Containing Image Data Into A Table Ensuring Cells Render Images Using Imagefragment Objects",
+      "filename": "import-a-datatable-containing-image-data-into-a-table-ensuring-cells-render-images-using-imagefragment-objects.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:49:21Z",
+      "status": "verified"
+    },
+    "render-a-table-with-high-dpi-images-by-setting-imagefragment.imageresolution-to-a-higher-value-before-adding-to-cells": {
+      "title": "Render A Table With High Dpi Images By Setting Imagefragment.Imageresolution To A Higher Value Before Adding To Cells",
+      "filename": "render-a-table-with-high-dpi-images-by-setting-imagefragment.imageresolution-to-a-higher-value-before-adding-to-cells.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:49:21Z",
+      "status": "verified"
+    },
+    "generate-a-pdf-report-containing-multiple-tables-sourced-from-different-databases-each-table-imported-from-its--7d5c5d33": {
+      "title": "Generate A Pdf Report Containing Multiple Tables Sourced From Different Databases Each Table Imported From Its  7D5C5D33",
+      "filename": "generate-a-pdf-report-containing-multiple-tables-sourced-from-different-databases-each-table-imported-from-its--7d5c5d33.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:49:21Z",
+      "status": "verified"
+    },
+    "create-a-table-with-a-dynamic-row-count-by-determining-the-number-of-source-records-before-import": {
+      "title": "Create A Table With A Dynamic Row Count By Determining The Number Of Source Records Before Import",
+      "filename": "create-a-table-with-a-dynamic-row-count-by-determining-the-number-of-source-records-before-import.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:49:21Z",
+      "status": "verified"
+    },
+    "apply-conditional-formatting-to-cells-based-on-their-numeric-values-by-setting-background-color-when-thresholds-d7ec2321": {
+      "title": "Apply Conditional Formatting To Cells Based On Their Numeric Values By Setting Background Color When Thresholds D7Ec2321",
+      "filename": "apply-conditional-formatting-to-cells-based-on-their-numeric-values-by-setting-background-color-when-thresholds-d7ec2321.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:49:21Z",
+      "status": "verified"
+    },
+    "render-an-entire-table-rotated-90-degrees-by-applying-a-transformation-matrix-before-adding-to-the-page": {
+      "title": "Render An Entire Table Rotated 90 Degrees By Applying A Transformation Matrix Before Adding To The Page",
+      "filename": "render-an-entire-table-rotated-90-degrees-by-applying-a-transformation-matrix-before-adding-to-the-page.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:55:06Z",
+      "status": "verified"
+    },
+    "use-tableabsorber-to-detect-tables-that-contain-merged-cells-by-examining-each-cell-s-rowspan-and-colspan-values": {
+      "title": "Use Tableabsorber To Detect Tables That Contain Merged Cells By Examining Each Cell S Rowspan And Colspan Values",
+      "filename": "use-tableabsorber-to-detect-tables-that-contain-merged-cells-by-examining-each-cell-s-rowspan-and-colspan-values.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:55:06Z",
+      "status": "verified"
+    },
+    "replace-a-merged-cell-with-separate-cells-by-removing-it-and-inserting-new-cells-with-appropriate-spans": {
+      "title": "Replace A Merged Cell With Separate Cells By Removing It And Inserting New Cells With Appropriate Spans",
+      "filename": "replace-a-merged-cell-with-separate-cells-by-removing-it-and-inserting-new-cells-with-appropriate-spans.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:55:06Z",
+      "status": "verified"
+    },
+    "add-footnote-references-inside-cells-by-inserting-superscript-numbers-and-linking-them-to-footnote-paragraphs-a-372636c8": {
+      "title": "Add Footnote References Inside Cells By Inserting Superscript Numbers And Linking Them To Footnote Paragraphs A 372636C8",
+      "filename": "add-footnote-references-inside-cells-by-inserting-superscript-numbers-and-linking-them-to-footnote-paragraphs-a-372636c8.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:55:06Z",
+      "status": "verified"
+    },
+    "insert-a-table-at-specific-x-and-y-coordinates-on-a-page-by-setting-table.position-with-pointf-values": {
+      "title": "Insert A Table At Specific X And Y Coordinates On A Page By Setting Table.Position With Pointf Values",
+      "filename": "insert-a-table-at-specific-x-and-y-coordinates-on-a-page-by-setting-table.position-with-pointf-values.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:55:06Z",
+      "status": "verified"
+    },
+    "align-a-table-to-the-right-margin-by-setting-table.horizontalalignment-to-right-and-adjusting-its-left-margin": {
+      "title": "Align A Table To The Right Margin By Setting Table.Horizontalalignment To Right And Adjusting Its Left Margin",
+      "filename": "align-a-table-to-the-right-margin-by-setting-table.horizontalalignment-to-right-and-adjusting-its-left-margin.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:55:06Z",
+      "status": "verified"
+    },
+    "set-the-table-border-thickness-to-2-points-by-configuring-borderinfo.width-property-before-rendering": {
+      "title": "Set The Table Border Thickness To 2 Points By Configuring Borderinfo.Width Property Before Rendering",
+      "filename": "set-the-table-border-thickness-to-2-points-by-configuring-borderinfo.width-property-before-rendering.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:55:06Z",
+      "status": "verified"
+    },
+    "apply-a-double-border-style-to-the-table-by-setting-borderinfo.style-to-double-and-defining-appropriate-width": {
+      "title": "Apply A Double Border Style To The Table By Setting Borderinfo.Style To Double And Defining Appropriate Width",
+      "filename": "apply-a-double-border-style-to-the-table-by-setting-borderinfo.style-to-double-and-defining-appropriate-width.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:55:33Z",
+      "status": "verified"
+    },
+    "add-a-cell-containing-multiline-text-by-inserting-multiple-textfragment-objects-separated-by-line-break-fragments": {
+      "title": "Add A Cell Containing Multiline Text By Inserting Multiple Textfragment Objects Separated By Line Break Fragments",
+      "filename": "add-a-cell-containing-multiline-text-by-inserting-multiple-textfragment-objects-separated-by-line-break-fragments.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T11:55:33Z",
+      "status": "verified"
+    },
+    "use-tableabsorber-to-extract-tables-into-csv-files-by-writing-each-row-s-cell-text-separated-by-commas": {
+      "title": "Use Tableabsorber To Extract Tables Into Csv Files By Writing Each Row S Cell Text Separated By Commas",
+      "filename": "use-tableabsorber-to-extract-tables-into-csv-files-by-writing-each-row-s-cell-text-separated-by-commas.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:02:17Z",
+      "status": "verified"
+    },
+    "use-tableabsorber-to-extract-tables-into-datatable-objects-by-populating-rows-and-columns-with-cell-text-values": {
+      "title": "Use Tableabsorber To Extract Tables Into Datatable Objects By Populating Rows And Columns With Cell Text Values",
+      "filename": "use-tableabsorber-to-extract-tables-into-datatable-objects-by-populating-rows-and-columns-with-cell-text-values.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:02:17Z",
+      "status": "verified"
+    },
+    "set-a-custom-row-height-for-a-specific-row-by-assigning-row.height-property-to-a-fixed-point-value": {
+      "title": "Set A Custom Row Height For A Specific Row By Assigning Row.Height Property To A Fixed Point Value",
+      "filename": "set-a-custom-row-height-for-a-specific-row-by-assigning-row.height-property-to-a-fixed-point-value.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:02:17Z",
+      "status": "verified"
+    },
+    "allow-a-row-to-automatically-adjust-its-height-to-fit-content-by-setting-row.height-to-autofit": {
+      "title": "Allow A Row To Automatically Adjust Its Height To Fit Content By Setting Row.Height To Autofit",
+      "filename": "allow-a-row-to-automatically-adjust-its-height-to-fit-content-by-setting-row.height-to-autofit.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:02:17Z",
+      "status": "verified"
+    },
+    "set-a-fixed-row-height-for-all-rows-by-configuring-table.defaultrowheight-property-before-adding-rows": {
+      "title": "Set A Fixed Row Height For All Rows By Configuring Table.Defaultrowheight Property Before Adding Rows",
+      "filename": "set-a-fixed-row-height-for-all-rows-by-configuring-table.defaultrowheight-property-before-adding-rows.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:02:17Z",
+      "status": "verified"
+    },
+    "change-page-orientation-to-landscape-before-rendering-a-wide-table-to-ensure-it-fits-within-page-boundaries": {
+      "title": "Change Page Orientation To Landscape Before Rendering A Wide Table To Ensure It Fits Within Page Boundaries",
+      "filename": "change-page-orientation-to-landscape-before-rendering-a-wide-table-to-ensure-it-fits-within-page-boundaries.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:02:17Z",
+      "status": "verified"
+    },
+    "add-a-table-after-rotating-the-page-by-applying-a-rotation-transformation-to-page-before-inserting-the-table": {
+      "title": "Add A Table After Rotating The Page By Applying A Rotation Transformation To Page Before Inserting The Table",
+      "filename": "add-a-table-after-rotating-the-page-by-applying-a-rotation-transformation-to-page-before-inserting-the-table.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:02:17Z",
+      "status": "verified"
+    },
+    "use-tableabsorber-to-locate-tables-inside-rotated-pages-by-checking-each-page-s-rotation-angle-before-absorption": {
+      "title": "Use Tableabsorber To Locate Tables Inside Rotated Pages By Checking Each Page S Rotation Angle Before Absorption",
+      "filename": "use-tableabsorber-to-locate-tables-inside-rotated-pages-by-checking-each-page-s-rotation-angle-before-absorption.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:02:17Z",
+      "status": "verified"
+    },
+    "remove-tables-that-contain-a-specific-keyword-in-any-cell-by-scanning-absorbed-tables-and-deleting-matching-ones": {
+      "title": "Remove Tables That Contain A Specific Keyword In Any Cell By Scanning Absorbed Tables And Deleting Matching Ones",
+      "filename": "remove-tables-that-contain-a-specific-keyword-in-any-cell-by-scanning-absorbed-tables-and-deleting-matching-ones.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-02T12:02:17Z",
+      "status": "verified"
+    }
+  }
+}
