@@ -1,0 +1,726 @@
+{
+  "category": "Working With Images",
+  "last_updated": "2026-04-03T14:09:18Z",
+  "examples": {
+    "load-a-pdf-and-add-a-png-logo-to-the-first-page-at-specific-coordinates": {
+      "title": "Load A Pdf And Add A Png Logo To The First Page At Specific Coordinates",
+      "filename": "load-a-pdf-and-add-a-png-logo-to-the-first-page-at-specific-coordinates.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "add-a-background-image-to-every-page-of-a-pdf-and-set-its-opacity-to-30-percent": {
+      "title": "Add A Background Image To Every Page Of A Pdf And Set Its Opacity To 30 Percent",
+      "filename": "add-a-background-image-to-every-page-of-a-pdf-and-set-its-opacity-to-30-percent.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "add-a-transparent-png-overlay-to-each-page-and-adjust-its-z-order-to-appear-above-existing-content": {
+      "title": "Add A Transparent Png Overlay To Each Page And Adjust Its Z Order To Appear Above Existing Content",
+      "filename": "add-a-transparent-png-overlay-to-each-page-and-adjust-its-z-order-to-appear-above-existing-content.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "add-a-watermark-image-to-pdfs-and-set-its-rotation-angle-to-45-degrees-for-diagonal-placement": {
+      "title": "Add A Watermark Image To Pdfs And Set Its Rotation Angle To 45 Degrees For Diagonal Placement",
+      "filename": "add-a-watermark-image-to-pdfs-and-set-its-rotation-angle-to-45-degrees-for-diagonal-placement.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "add-a-company-logo-to-the-first-page-only-positioning-it-at-the-center-of-the-page": {
+      "title": "Add A Company Logo To The First Page Only Positioning It At The Center Of The Page",
+      "filename": "add-a-company-logo-to-the-first-page-only-positioning-it-at-the-center-of-the-page.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "add-a-decorative-header-image-to-the-top-of-each-page-ensuring-it-does-not-overlap-existing-content": {
+      "title": "Add A Decorative Header Image To The Top Of Each Page Ensuring It Does Not Overlap Existing Content",
+      "filename": "add-a-decorative-header-image-to-the-top-of-each-page-ensuring-it-does-not-overlap-existing-content.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "add-a-decorative-footer-image-to-each-page-and-ensure-it-scales-proportionally-with-page-width": {
+      "title": "Add A Decorative Footer Image To Each Page And Ensure It Scales Proportionally With Page Width",
+      "filename": "add-a-decorative-footer-image-to-each-page-and-ensure-it-scales-proportionally-with-page-width.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "add-a-background-pattern-image-to-each-page-and-set-its-opacity-to-10-percent-for-subtle-effect": {
+      "title": "Add A Background Pattern Image To Each Page And Set Its Opacity To 10 Percent For Subtle Effect",
+      "filename": "add-a-background-pattern-image-to-each-page-and-set-its-opacity-to-10-percent-for-subtle-effect.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "add-a-background-pattern-image-to-each-page-and-set-its-opacity-to-5-percent-for-a-subtle-effect": {
+      "title": "Add A Background Pattern Image To Each Page And Set Its Opacity To 5 Percent For A Subtle Effect",
+      "filename": "add-a-background-pattern-image-to-each-page-and-set-its-opacity-to-5-percent-for-a-subtle-effect.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "add-a-background-image-to-a-pdf-and-set-its-blend-mode-to-multiply-for-subtle-shading-effect": {
+      "title": "Add A Background Image To A Pdf And Set Its Blend Mode To Multiply For Subtle Shading Effect",
+      "filename": "add-a-background-image-to-a-pdf-and-set-its-blend-mode-to-multiply-for-subtle-shading-effect.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "add-a-background-image-to-each-page-and-set-its-blend-mode-to-overlay-for-subtle-texture-effect": {
+      "title": "Add A Background Image To Each Page And Set Its Blend Mode To Overlay For Subtle Texture Effect",
+      "filename": "add-a-background-image-to-each-page-and-set-its-blend-mode-to-overlay-for-subtle-texture-effect.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "add-a-semi-transparent-overlay-image-to-the-entire-pdf-to-create-a-unified-visual-theme": {
+      "title": "Add A Semi Transparent Overlay Image To The Entire Pdf To Create A Unified Visual Theme",
+      "filename": "add-a-semi-transparent-overlay-image-to-the-entire-pdf-to-create-a-unified-visual-theme.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "add-a-semi-transparent-overlay-to-each-page-and-adjust-its-color-based-on-a-theme-configuration-file": {
+      "title": "Add A Semi Transparent Overlay To Each Page And Adjust Its Color Based On A Theme Configuration File",
+      "filename": "add-a-semi-transparent-overlay-to-each-page-and-adjust-its-color-based-on-a-theme-configuration-file.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "add-a-semi-transparent-watermark-image-to-each-page-and-set-its-opacity-based-on-a-configuration-setting": {
+      "title": "Add A Semi Transparent Watermark Image To Each Page And Set Its Opacity Based On A Configuration Setting",
+      "filename": "add-a-semi-transparent-watermark-image-to-each-page-and-set-its-opacity-based-on-a-configuration-setting.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "replace-an-existing-jpeg-image-on-page-three-with-a-higher-resolution-png-using-the-resources.images-collection": {
+      "title": "Replace An Existing Jpeg Image On Page Three With A Higher Resolution Png Using The Resources.Images Collection",
+      "filename": "replace-an-existing-jpeg-image-on-page-three-with-a-higher-resolution-png-using-the-resources.images-collection.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "replace-all-jpeg-images-in-a-pdf-with-png-equivalents-while-maintaining-their-original-positions": {
+      "title": "Replace All Jpeg Images In A Pdf With Png Equivalents While Maintaining Their Original Positions",
+      "filename": "replace-all-jpeg-images-in-a-pdf-with-png-equivalents-while-maintaining-their-original-positions.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "replace-all-raster-images-with-vector-equivalents-where-available-to-improve-scalability-of-the-pdf": {
+      "title": "Replace All Raster Images With Vector Equivalents Where Available To Improve Scalability Of The Pdf",
+      "filename": "replace-all-raster-images-with-vector-equivalents-where-available-to-improve-scalability-of-the-pdf.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "replace-images-on-odd-numbered-pages-with-a-placeholder-graphic-while-preserving-original-dimensions": {
+      "title": "Replace Images On Odd Numbered Pages With A Placeholder Graphic While Preserving Original Dimensions",
+      "filename": "replace-images-on-odd-numbered-pages-with-a-placeholder-graphic-while-preserving-original-dimensions.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "replace-images-on-odd-pages-with-a-placeholder-that-includes-a-qr-code-linking-to-the-original-image-source": {
+      "title": "Replace Images On Odd Pages With A Placeholder That Includes A Qr Code Linking To The Original Image Source",
+      "filename": "replace-images-on-odd-pages-with-a-placeholder-that-includes-a-qr-code-linking-to-the-original-image-source.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "replace-images-on-even-pages-with-a-grayscale-version-while-leaving-odd-pages-unchanged": {
+      "title": "Replace Images On Even Pages With A Grayscale Version While Leaving Odd Pages Unchanged",
+      "filename": "replace-images-on-even-pages-with-a-grayscale-version-while-leaving-odd-pages-unchanged.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "replace-images-on-the-last-page-of-a-pdf-with-a-single-banner-spanning-the-page-width": {
+      "title": "Replace Images On The Last Page Of A Pdf With A Single Banner Spanning The Page Width",
+      "filename": "replace-images-on-the-last-page-of-a-pdf-with-a-single-banner-spanning-the-page-width.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "replace-images-whose-file-size-exceeds-1-mb-with-a-compressed-version-to-reduce-pdf-size": {
+      "title": "Replace Images Whose File Size Exceeds 1 Mb With A Compressed Version To Reduce Pdf Size",
+      "filename": "replace-images-whose-file-size-exceeds-1-mb-with-a-compressed-version-to-reduce-pdf-size.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "replace-images-with-a-placeholder-that-includes-a-hyperlink-to-the-original-image-location-for-reference": {
+      "title": "Replace Images With A Placeholder That Includes A Hyperlink To The Original Image Location For Reference",
+      "filename": "replace-images-with-a-placeholder-that-includes-a-hyperlink-to-the-original-image-location-for-reference.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "replace-images-that-contain-a-specific-color-palette-with-a-monochrome-version-to-achieve-a-uniform-look": {
+      "title": "Replace Images That Contain A Specific Color Palette With A Monochrome Version To Achieve A Uniform Look",
+      "filename": "replace-images-that-contain-a-specific-color-palette-with-a-monochrome-version-to-achieve-a-uniform-look.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "replace-images-that-contain-exif-orientation-metadata-with-correctly-rotated-versions-to-ensure-proper-display": {
+      "title": "Replace Images That Contain Exif Orientation Metadata With Correctly Rotated Versions To Ensure Proper Display",
+      "filename": "replace-images-that-contain-exif-orientation-metadata-with-correctly-rotated-versions-to-ensure-proper-display.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "replace-images-that-are-larger-than-2-mb-with-compressed-jpeg-versions-to-reduce-overall-pdf-size": {
+      "title": "Replace Images That Are Larger Than 2 Mb With Compressed Jpeg Versions To Reduce Overall Pdf Size",
+      "filename": "replace-images-that-are-larger-than-2-mb-with-compressed-jpeg-versions-to-reduce-overall-pdf-size.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "replace-images-with-a-placeholder-that-includes-a-qr-code-linking-to-the-original-image-source": {
+      "title": "Replace Images With A Placeholder That Includes A Qr Code Linking To The Original Image Source",
+      "filename": "replace-images-with-a-placeholder-that-includes-a-qr-code-linking-to-the-original-image-source.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "replace-images-on-a-specific-page-using-a-dictionary-that-maps-original-image-indices-to-new-file-paths": {
+      "title": "Replace Images On A Specific Page Using A Dictionary That Maps Original Image Indices To New File Paths",
+      "filename": "replace-images-on-a-specific-page-using-a-dictionary-that-maps-original-image-indices-to-new-file-paths.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "replace-images-on-a-pdf-page-with-versions-that-have-embedded-icc-profiles-for-color-management": {
+      "title": "Replace Images On A Pdf Page With Versions That Have Embedded Icc Profiles For Color Management",
+      "filename": "replace-images-on-a-pdf-page-with-versions-that-have-embedded-icc-profiles-for-color-management.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "replace-images-on-a-pdf-page-with-a-new-logo-located-by-imageplacementabsorber": {
+      "title": "Replace Images On A Pdf Page With A New Logo Located By Imageplacementabsorber",
+      "filename": "replace-images-on-a-pdf-page-with-a-new-logo-located-by-imageplacementabsorber.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "replace-images-on-the-title-page-with-a-high-resolution-banner-while-preserving-existing-text-layout": {
+      "title": "Replace Images On The Title Page With A High Resolution Banner While Preserving Existing Text Layout",
+      "filename": "replace-images-on-the-title-page-with-a-high-resolution-banner-while-preserving-existing-text-layout.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "replace-images-on-the-index-page-with-a-single-banner-image-to-update-branding-across-the-document": {
+      "title": "Replace Images On The Index Page With A Single Banner Image To Update Branding Across The Document",
+      "filename": "replace-images-on-the-index-page-with-a-single-banner-image-to-update-branding-across-the-document.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "replace-images-on-the-appendix-section-with-a-single-placeholder-to-protect-confidential-content": {
+      "title": "Replace Images On The Appendix Section With A Single Placeholder To Protect Confidential Content",
+      "filename": "replace-images-on-the-appendix-section-with-a-single-placeholder-to-protect-confidential-content.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "delete-all-images-from-a-pdf-by-iterating-each-page-and-calling-removeat-on-the-images-collection": {
+      "title": "Delete All Images From A Pdf By Iterating Each Page And Calling Removeat On The Images Collection",
+      "filename": "delete-all-images-from-a-pdf-by-iterating-each-page-and-calling-removeat-on-the-images-collection.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "delete-images-from-a-pdf-whose-dpi-is-lower-than-72-using-imageplacementabsorber-filters": {
+      "title": "Delete Images From A Pdf Whose Dpi Is Lower Than 72 Using Imageplacementabsorber Filters",
+      "filename": "delete-images-from-a-pdf-whose-dpi-is-lower-than-72-using-imageplacementabsorber-filters.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "delete-images-from-a-pdf-based-on-their-dpi-being-lower-than-72-using-imageplacementabsorber-filters": {
+      "title": "Delete Images From A Pdf Based On Their Dpi Being Lower Than 72 Using Imageplacementabsorber Filters",
+      "filename": "delete-images-from-a-pdf-based-on-their-dpi-being-lower-than-72-using-imageplacementabsorber-filters.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "iterate-over-pages-and-remove-duplicate-images-by-comparing-their-raw-byte-data": {
+      "title": "Iterate Over Pages And Remove Duplicate Images By Comparing Their Raw Byte Data",
+      "filename": "iterate-over-pages-and-remove-duplicate-images-by-comparing-their-raw-byte-data.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "iterate-through-each-page-s-images-collection-to-collect-image-resolution-metadata-for-reporting": {
+      "title": "Iterate Through Each Page S Images Collection To Collect Image Resolution Metadata For Reporting",
+      "filename": "iterate-through-each-page-s-images-collection-to-collect-image-resolution-metadata-for-reporting.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "resize-every-image-on-a-pdf-page-to-half-its-original-width-and-height-before-saving": {
+      "title": "Resize Every Image On A Pdf Page To Half Its Original Width And Height Before Saving",
+      "filename": "resize-every-image-on-a-pdf-page-to-half-its-original-width-and-height-before-saving.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "resize-images-on-a-pdf-using-a-custom-scaling-factor-read-from-a-configuration-file": {
+      "title": "Resize Images On A Pdf Using A Custom Scaling Factor Read From A Configuration File",
+      "filename": "resize-images-on-a-pdf-using-a-custom-scaling-factor-read-from-a-configuration-file.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "resize-images-on-a-pdf-using-a-scaling-factor-defined-in-an-appsettings.json-configuration-file": {
+      "title": "Resize Images On A Pdf Using A Scaling Factor Defined In An Appsettings.Json Configuration File",
+      "filename": "resize-images-on-a-pdf-using-a-scaling-factor-defined-in-an-appsettings.json-configuration-file.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "resize-images-on-a-pdf-using-a-configuration-file-that-defines-target-width-and-height-for-each-page": {
+      "title": "Resize Images On A Pdf Using A Configuration File That Defines Target Width And Height For Each Page",
+      "filename": "resize-images-on-a-pdf-using-a-configuration-file-that-defines-target-width-and-height-for-each-page.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "add-a-raster-image-to-a-new-pdf-page-using-the-image-class-and-paragraphs-collection": {
+      "title": "Add A Raster Image To A New Pdf Page Using The Image Class And Paragraphs Collection",
+      "filename": "add-a-raster-image-to-a-new-pdf-page-using-the-image-class-and-paragraphs-collection.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "insert-a-raster-image-into-an-existing-pdf-page-at-specific-absolute-coordinates": {
+      "title": "Insert A Raster Image Into An Existing Pdf Page At Specific Absolute Coordinates",
+      "filename": "insert-a-raster-image-into-an-existing-pdf-page-at-specific-absolute-coordinates.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "resize-an-embedded-raster-image-by-setting-its-width-and-height-properties-before-saving": {
+      "title": "Resize An Embedded Raster Image By Setting Its Width And Height Properties Before Saving",
+      "filename": "resize-an-embedded-raster-image-by-setting-its-width-and-height-properties-before-saving.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "replace-an-existing-image-on-a-pdf-page-with-another-image-loaded-from-a-file-stream": {
+      "title": "Replace An Existing Image On A Pdf Page With Another Image Loaded From A File Stream",
+      "filename": "replace-an-existing-image-on-a-pdf-page-with-another-image-loaded-from-a-file-stream.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "delete-a-specific-raster-image-from-a-pdf-page-by-removing-its-reference-from-page-contents": {
+      "title": "Delete A Specific Raster Image From A Pdf Page By Removing Its Reference From Page Contents",
+      "filename": "delete-a-specific-raster-image-from-a-pdf-page-by-removing-its-reference-from-page-contents.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "extract-all-raster-images-from-a-pdf-document-and-save-each-as-a-separate-png-file": {
+      "title": "Extract All Raster Images From A Pdf Document And Save Each As A Separate Png File",
+      "filename": "extract-all-raster-images-from-a-pdf-document-and-save-each-as-a-separate-png-file.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "extract-raster-images-from-a-pdf-and-preserve-their-original-formats-when-writing-to-disk": {
+      "title": "Extract Raster Images From A Pdf And Preserve Their Original Formats When Writing To Disk",
+      "filename": "extract-raster-images-from-a-pdf-and-preserve-their-original-formats-when-writing-to-disk.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "batch-process-multiple-pdf-files-to-extract-embedded-images-into-a-designated-output-folder": {
+      "title": "Batch Process Multiple Pdf Files To Extract Embedded Images Into A Designated Output Folder",
+      "filename": "batch-process-multiple-pdf-files-to-extract-embedded-images-into-a-designated-output-folder.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "add-a-dicom-medical-image-to-a-pdf-page-using-a-filestream-and-the-image-constructor": {
+      "title": "Add A Dicom Medical Image To A Pdf Page Using A Filestream And The Image Constructor",
+      "filename": "add-a-dicom-medical-image-to-a-pdf-page-using-a-filestream-and-the-image-constructor.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "insert-a-dicom-image-with-custom-resolution-by-adjusting-its-width-and-height-before-adding": {
+      "title": "Insert A Dicom Image With Custom Resolution By Adjusting Its Width And Height Before Adding",
+      "filename": "insert-a-dicom-image-with-custom-resolution-by-adjusting-its-width-and-height-before-adding.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "render-a-single-pdf-page-to-png-format-while-specifying-a-fallback-font-via-renderingoptions": {
+      "title": "Render A Single Pdf Page To Png Format While Specifying A Fallback Font Via Renderingoptions",
+      "filename": "render-a-single-pdf-page-to-png-format-while-specifying-a-fallback-font-via-renderingoptions.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "render-all-pdf-pages-to-jpeg-images-using-a-specified-default-font-for-missing-glyphs": {
+      "title": "Render All Pdf Pages To Jpeg Images Using A Specified Default Font For Missing Glyphs",
+      "filename": "render-all-pdf-pages-to-jpeg-images-using-a-specified-default-font-for-missing-glyphs.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "generate-thumbnail-images-for-each-pdf-page-as-150x200-pixel-png-files-using-saveformat.png": {
+      "title": "Generate Thumbnail Images For Each Pdf Page As 150X200 Pixel Png Files Using Saveformat.Png",
+      "filename": "generate-thumbnail-images-for-each-pdf-page-as-150x200-pixel-png-files-using-saveformat.png.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "set-renderingoptions.defaultfontname-to-arial-before-converting-pdf-pages-to-images-for-consistency": {
+      "title": "Set Renderingoptions.Defaultfontname To Arial Before Converting Pdf Pages To Images For Consistency",
+      "filename": "set-renderingoptions.defaultfontname-to-arial-before-converting-pdf-pages-to-images-for-consistency.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "render-pdf-pages-to-tiff-format-with-lzw-compression-and-a-default-font-fallback-for-missing-characters": {
+      "title": "Render Pdf Pages To Tiff Format With Lzw Compression And A Default Font Fallback For Missing Characters",
+      "filename": "render-pdf-pages-to-tiff-format-with-lzw-compression-and-a-default-font-fallback-for-missing-characters.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "export-pdf-pages-as-bmp-images-at-300-dpi-using-custom-rendering-options-for-high-quality": {
+      "title": "Export Pdf Pages As Bmp Images At 300 Dpi Using Custom Rendering Options For High Quality",
+      "filename": "export-pdf-pages-as-bmp-images-at-300-dpi-using-custom-rendering-options-for-high-quality.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "convert-an-entire-pdf-document-to-a-multi-page-tiff-file-while-applying-a-default-font-for-rendering": {
+      "title": "Convert An Entire Pdf Document To A Multi Page Tiff File While Applying A Default Font For Rendering",
+      "filename": "convert-an-entire-pdf-document-to-a-multi-page-tiff-file-while-applying-a-default-font-for-rendering.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "use-graphicsabsorber-to-extract-vector-graphics-from-a-specific-pdf-page-for-further-manipulation": {
+      "title": "Use Graphicsabsorber To Extract Vector Graphics From A Specific Pdf Page For Further Manipulation",
+      "filename": "use-graphicsabsorber-to-extract-vector-graphics-from-a-specific-pdf-page-for-further-manipulation.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "move-an-extracted-vector-graphic-to-new-coordinates-on-the-same-page-by-modifying-its-matrix-property": {
+      "title": "Move An Extracted Vector Graphic To New Coordinates On The Same Page By Modifying Its Matrix Property",
+      "filename": "move-an-extracted-vector-graphic-to-new-coordinates-on-the-same-page-by-modifying-its-matrix-property.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "transfer-an-extracted-vector-graphic-to-a-different-pdf-page-and-adjust-its-position-using-the-matrix": {
+      "title": "Transfer An Extracted Vector Graphic To A Different Pdf Page And Adjust Its Position Using The Matrix",
+      "filename": "transfer-an-extracted-vector-graphic-to-a-different-pdf-page-and-adjust-its-position-using-the-matrix.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "remove-a-specific-vector-graphic-from-a-pdf-page-by-locating-it-in-the-page-contents-collection": {
+      "title": "Remove A Specific Vector Graphic From A Pdf Page By Locating It In The Page Contents Collection",
+      "filename": "remove-a-specific-vector-graphic-from-a-pdf-page-by-locating-it-in-the-page-contents-collection.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "add-an-extracted-vector-graphic-to-another-pdf-page-individually-by-inserting-it-into-the-paragraphs-collection": {
+      "title": "Add An Extracted Vector Graphic To Another Pdf Page Individually By Inserting It Into The Paragraphs Collection",
+      "filename": "add-an-extracted-vector-graphic-to-another-pdf-page-individually-by-inserting-it-into-the-paragraphs-collection.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "add-a-collection-of-extracted-vector-graphics-to-a-new-pdf-page-using-the-addrange-method": {
+      "title": "Add A Collection Of Extracted Vector Graphics To A New Pdf Page Using The Addrange Method",
+      "filename": "add-a-collection-of-extracted-vector-graphics-to-a-new-pdf-page-using-the-addrange-method.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "batch-extract-vector-graphics-from-multiple-pdf-files-and-store-each-set-in-separate-folders-for-analysis": {
+      "title": "Batch Extract Vector Graphics From Multiple Pdf Files And Store Each Set In Separate Folders For Analysis",
+      "filename": "batch-extract-vector-graphics-from-multiple-pdf-files-and-store-each-set-in-separate-folders-for-analysis.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "set-alternative-text-for-an-image-in-a-pdf-document-to-improve-accessibility-for-screen-readers": {
+      "title": "Set Alternative Text For An Image In A Pdf Document To Improve Accessibility For Screen Readers",
+      "filename": "set-alternative-text-for-an-image-in-a-pdf-document-to-improve-accessibility-for-screen-readers.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "retrieve-the-alt-text-of-an-embedded-image-and-log-the-value-for-auditing-purposes": {
+      "title": "Retrieve The Alt Text Of An Embedded Image And Log The Value For Auditing Purposes",
+      "filename": "retrieve-the-alt-text-of-an-embedded-image-and-log-the-value-for-auditing-purposes.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "assign-alt-text-to-a-newly-added-image-to-provide-descriptive-information-for-assistive-technologies": {
+      "title": "Assign Alt Text To A Newly Added Image To Provide Descriptive Information For Assistive Technologies",
+      "filename": "assign-alt-text-to-a-newly-added-image-to-provide-descriptive-information-for-assistive-technologies.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "render-pdf-pages-to-png-format-with-300-dpi-resolution-while-using-the-configured-default-font": {
+      "title": "Render Pdf Pages To Png Format With 300 Dpi Resolution While Using The Configured Default Font",
+      "filename": "render-pdf-pages-to-png-format-with-300-dpi-resolution-while-using-the-configured-default-font.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "set-renderingoptions.defaultfontname-to-times-new-roman-before-converting-pdf-pages-to-images": {
+      "title": "Set Renderingoptions.Defaultfontname To Times New Roman Before Converting Pdf Pages To Images",
+      "filename": "set-renderingoptions.defaultfontname-to-times-new-roman-before-converting-pdf-pages-to-images.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    },
+    "replace-a-vector-graphic-on-a-pdf-page-with-a-raster-image-while-preserving-the-original-layout": {
+      "title": "Replace A Vector Graphic On A Pdf Page With A Raster Image While Preserving The Original Layout",
+      "filename": "replace-a-vector-graphic-on-a-pdf-page-with-a-raster-image-while-preserving-the-original-layout.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T14:09:18Z",
+      "status": "verified"
+    }
+  }
+}
