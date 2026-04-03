@@ -1,0 +1,786 @@
+{
+  "category": "Working with Graphs",
+  "last_updated": "2026-04-03T13:34:47Z",
+  "examples": {
+    "create-a-new-pdf-document-and-add-a-graph-containing-a-filled-arc-with-custom-color": {
+      "title": "Create A New Pdf Document And Add A Graph Containing A Filled Arc With Custom Color",
+      "filename": "create-a-new-pdf-document-and-add-a-graph-containing-a-filled-arc-with-custom-color.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T09:00:19Z",
+      "status": "verified"
+    },
+    "add-an-unfilled-arc-to-a-graph-setting-its-line-width-and-dash-style": {
+      "title": "Add An Unfilled Arc To A Graph Setting Its Line Width And Dash Style",
+      "filename": "add-an-unfilled-arc-to-a-graph-setting-its-line-width-and-dash-style.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T09:01:09Z",
+      "status": "verified"
+    },
+    "insert-a-circle-into-a-graph-and-apply-a-gradient-fill-using-two-colors": {
+      "title": "Insert A Circle Into A Graph And Apply A Gradient Fill Using Two Colors",
+      "filename": "insert-a-circle-into-a-graph-and-apply-a-gradient-fill-using-two-colors.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T09:05:50Z",
+      "status": "verified"
+    },
+    "add-a-filled-circle-to-a-graph-specifying-radius-and-center-coordinates": {
+      "title": "Add A Filled Circle To A Graph Specifying Radius And Center Coordinates",
+      "filename": "add-a-filled-circle-to-a-graph-specifying-radius-and-center-coordinates.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T09:06:49Z",
+      "status": "verified"
+    },
+    "create-a-bezier-curve-in-a-graph-using-four-control-points-and-set-its-stroke-color": {
+      "title": "Create A Bezier Curve In A Graph Using Four Control Points And Set Its Stroke Color",
+      "filename": "create-a-bezier-curve-in-a-graph-using-four-control-points-and-set-its-stroke-color.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T09:08:47Z",
+      "status": "verified"
+    },
+    "draw-a-straight-line-in-a-graph-configure-start-and-end-points-and-set-line-cap-style": {
+      "title": "Draw A Straight Line In A Graph Configure Start And End Points And Set Line Cap Style",
+      "filename": "draw-a-straight-line-in-a-graph-configure-start-and-end-points-and-set-line-cap-style.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T09:14:40Z",
+      "status": "verified"
+    },
+    "add-multiple-line-segments-to-a-graph-to-represent-continuous-data-series-with-varying-colors": {
+      "title": "Add Multiple Line Segments To A Graph To Represent Continuous Data Series With Varying Colors",
+      "filename": "add-multiple-line-segments-to-a-graph-to-represent-continuous-data-series-with-varying-colors.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T09:15:34Z",
+      "status": "verified"
+    },
+    "insert-a-rectangle-into-a-graph-set-corner-radius-and-apply-a-solid-fill-color": {
+      "title": "Insert A Rectangle Into A Graph Set Corner Radius And Apply A Solid Fill Color",
+      "filename": "insert-a-rectangle-into-a-graph-set-corner-radius-and-apply-a-solid-fill-color.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T09:18:04Z",
+      "status": "verified"
+    },
+    "add-a-filled-rectangle-to-a-graph-defining-border-dash-pattern-and-width": {
+      "title": "Add A Filled Rectangle To A Graph Defining Border Dash Pattern And Width",
+      "filename": "add-a-filled-rectangle-to-a-graph-defining-border-dash-pattern-and-width.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T09:21:36Z",
+      "status": "verified"
+    },
+    "create-an-ellipse-in-a-graph-specify-horizontal-and-vertical-radii-and-set-stroke-color": {
+      "title": "Create An Ellipse In A Graph Specify Horizontal And Vertical Radii And Set Stroke Color",
+      "filename": "create-an-ellipse-in-a-graph-specify-horizontal-and-vertical-radii-and-set-stroke-color.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T09:22:24Z",
+      "status": "verified"
+    },
+    "add-a-graph-to-a-page-s-paragraphs-collection-and-align-it-to-the-page-center": {
+      "title": "Add A Graph To A Page S Paragraphs Collection And Align It To The Page Center",
+      "filename": "add-a-graph-to-a-page-s-paragraphs-collection-and-align-it-to-the-page-center.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T09:26:56Z",
+      "status": "verified"
+    },
+    "place-a-graph-on-a-pdf-page-and-align-it-to-the-left-margin-with-offset": {
+      "title": "Place A Graph On A Pdf Page And Align It To The Left Margin With Offset",
+      "filename": "place-a-graph-on-a-pdf-page-and-align-it-to-the-left-margin-with-offset.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T09:27:22Z",
+      "status": "verified"
+    },
+    "set-the-width-and-height-properties-of-a-graph-to-control-its-exact-dimensions": {
+      "title": "Set The Width And Height Properties Of A Graph To Control Its Exact Dimensions",
+      "filename": "set-the-width-and-height-properties-of-a-graph-to-control-its-exact-dimensions.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T09:28:38Z",
+      "status": "verified"
+    },
+    "create-a-new-pdf-document-and-add-a-graph-containing-a-filled-arc-with-custom-color__v2": {
+      "title": "Create A New Pdf Document And Add A Graph Containing A Filled Arc With Custom Color__V2",
+      "filename": "create-a-new-pdf-document-and-add-a-graph-containing-a-filled-arc-with-custom-color__v2.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T10:09:19Z",
+      "status": "verified"
+    },
+    "add-an-unfilled-arc-to-a-graph-setting-its-line-width-and-dash-style__v2": {
+      "title": "Add An Unfilled Arc To A Graph Setting Its Line Width And Dash Style__V2",
+      "filename": "add-an-unfilled-arc-to-a-graph-setting-its-line-width-and-dash-style__v2.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T10:10:11Z",
+      "status": "verified"
+    },
+    "add-a-filled-circle-to-a-graph-specifying-radius-and-center-coordinates__v2": {
+      "title": "Add A Filled Circle To A Graph Specifying Radius And Center Coordinates__V2",
+      "filename": "add-a-filled-circle-to-a-graph-specifying-radius-and-center-coordinates__v2.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T10:15:39Z",
+      "status": "verified"
+    },
+    "create-a-bezier-curve-in-a-graph-using-four-control-points-and-set-its-stroke-color__v2": {
+      "title": "Create A Bezier Curve In A Graph Using Four Control Points And Set Its Stroke Color__V2",
+      "filename": "create-a-bezier-curve-in-a-graph-using-four-control-points-and-set-its-stroke-color__v2.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T10:16:57Z",
+      "status": "verified"
+    },
+    "draw-a-straight-line-in-a-graph-configure-start-and-end-points-and-set-line-cap-style__v2": {
+      "title": "Draw A Straight Line In A Graph Configure Start And End Points And Set Line Cap Style__V2",
+      "filename": "draw-a-straight-line-in-a-graph-configure-start-and-end-points-and-set-line-cap-style__v2.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T10:22:26Z",
+      "status": "verified"
+    },
+    "add-multiple-line-segments-to-a-graph-to-represent-continuous-data-series-with-varying-colors__v2": {
+      "title": "Add Multiple Line Segments To A Graph To Represent Continuous Data Series With Varying Colors__V2",
+      "filename": "add-multiple-line-segments-to-a-graph-to-represent-continuous-data-series-with-varying-colors__v2.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T10:25:51Z",
+      "status": "verified"
+    },
+    "add-a-filled-rectangle-to-a-graph-defining-border-dash-pattern-and-width__v2": {
+      "title": "Add A Filled Rectangle To A Graph Defining Border Dash Pattern And Width__V2",
+      "filename": "add-a-filled-rectangle-to-a-graph-defining-border-dash-pattern-and-width__v2.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T10:31:44Z",
+      "status": "verified"
+    },
+    "create-an-ellipse-in-a-graph-specify-horizontal-and-vertical-radii-and-set-stroke-color__v2": {
+      "title": "Create An Ellipse In A Graph Specify Horizontal And Vertical Radii And Set Stroke Color__V2",
+      "filename": "create-an-ellipse-in-a-graph-specify-horizontal-and-vertical-radii-and-set-stroke-color__v2.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T10:32:48Z",
+      "status": "verified"
+    },
+    "add-a-graph-to-a-page-s-paragraphs-collection-and-align-it-to-the-page-center__v2": {
+      "title": "Add A Graph To A Page S Paragraphs Collection And Align It To The Page Center__V2",
+      "filename": "add-a-graph-to-a-page-s-paragraphs-collection-and-align-it-to-the-page-center__v2.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T10:37:18Z",
+      "status": "verified"
+    },
+    "place-a-graph-on-a-pdf-page-and-align-it-to-the-left-margin-with-offset__v2": {
+      "title": "Place A Graph On A Pdf Page And Align It To The Left Margin With Offset__V2",
+      "filename": "place-a-graph-on-a-pdf-page-and-align-it-to-the-left-margin-with-offset__v2.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T10:38:06Z",
+      "status": "verified"
+    },
+    "set-the-width-and-height-properties-of-a-graph-to-control-its-exact-dimensions__v2": {
+      "title": "Set The Width And Height Properties Of A Graph To Control Its Exact Dimensions__V2",
+      "filename": "set-the-width-and-height-properties-of-a-graph-to-control-its-exact-dimensions__v2.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T10:39:10Z",
+      "status": "verified"
+    },
+    "use-the-drawing-library-to-create-a-dimension-specific-line-object-inside-a-graph": {
+      "title": "Use The Drawing Library To Create A Dimension Specific Line Object Inside A Graph",
+      "filename": "use-the-drawing-library-to-create-a-dimension-specific-line-object-inside-a-graph.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T10:39:56Z",
+      "status": "verified"
+    },
+    "use-the-drawing-library-to-create-a-dimension-specific-rectangle-inside-a-graph": {
+      "title": "Use The Drawing Library To Create A Dimension Specific Rectangle Inside A Graph",
+      "filename": "use-the-drawing-library-to-create-a-dimension-specific-rectangle-inside-a-graph.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T10:41:12Z",
+      "status": "verified"
+    },
+    "iterate-through-all-shapes-in-a-graph-and-log-each-shape-s-bounding-box-coordinates": {
+      "title": "Iterate Through All Shapes In A Graph And Log Each Shape S Bounding Box Coordinates",
+      "filename": "iterate-through-all-shapes-in-a-graph-and-log-each-shape-s-bounding-box-coordinates.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T10:50:38Z",
+      "status": "verified"
+    },
+    "apply-a-rotation-transformation-to-a-graph-element-specifying-the-rotation-angle-in-degrees": {
+      "title": "Apply A Rotation Transformation To A Graph Element Specifying The Rotation Angle In Degrees",
+      "filename": "apply-a-rotation-transformation-to-a-graph-element-specifying-the-rotation-angle-in-degrees.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T10:54:04Z",
+      "status": "verified"
+    },
+    "translate-a-graph-element-horizontally-and-vertically-to-reposition-it-relative-to-its-original-location": {
+      "title": "Translate A Graph Element Horizontally And Vertically To Reposition It Relative To Its Original Location",
+      "filename": "translate-a-graph-element-horizontally-and-vertically-to-reposition-it-relative-to-its-original-location.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T10:54:57Z",
+      "status": "verified"
+    },
+    "scale-a-graph-element-non-uniformly-on-the-x-and-y-axes-to-achieve-desired-aspect-ratio": {
+      "title": "Scale A Graph Element Non Uniformly On The X And Y Axes To Achieve Desired Aspect Ratio",
+      "filename": "scale-a-graph-element-non-uniformly-on-the-x-and-y-axes-to-achieve-desired-aspect-ratio.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T10:56:09Z",
+      "status": "verified"
+    },
+    "skew-a-graph-element-on-the-x-axis-to-create-a-slanted-visual-effect": {
+      "title": "Skew A Graph Element On The X Axis To Create A Slanted Visual Effect",
+      "filename": "skew-a-graph-element-on-the-x-axis-to-create-a-slanted-visual-effect.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T10:57:44Z",
+      "status": "verified"
+    },
+    "apply-a-clipping-region-to-a-graph-so-that-shapes-render-only-within-a-defined-rectangle": {
+      "title": "Apply A Clipping Region To A Graph So That Shapes Render Only Within A Defined Rectangle",
+      "filename": "apply-a-clipping-region-to-a-graph-so-that-shapes-render-only-within-a-defined-rectangle.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T10:59:08Z",
+      "status": "verified"
+    },
+    "create-a-custom-star-shape-in-a-graph-with-a-specified-number-of-points-and-fill-color": {
+      "title": "Create A Custom Star Shape In A Graph With A Specified Number Of Points And Fill Color",
+      "filename": "create-a-custom-star-shape-in-a-graph-with-a-specified-number-of-points-and-fill-color.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T11:09:19Z",
+      "status": "verified"
+    },
+    "add-a-regular-polygon-with-six-sides-to-a-graph-and-set-its-border-color-and-thickness": {
+      "title": "Add A Regular Polygon With Six Sides To A Graph And Set Its Border Color And Thickness",
+      "filename": "add-a-regular-polygon-with-six-sides-to-a-graph-and-set-its-border-color-and-thickness.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T11:10:17Z",
+      "status": "verified"
+    },
+    "insert-a-polyline-into-a-graph-define-multiple-vertices-and-apply-a-dashed-line-style": {
+      "title": "Insert A Polyline Into A Graph Define Multiple Vertices And Apply A Dashed Line Style",
+      "filename": "insert-a-polyline-into-a-graph-define-multiple-vertices-and-apply-a-dashed-line-style.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T11:10:33Z",
+      "status": "verified"
+    },
+    "apply-a-background-image-to-a-graph-and-ensure-shapes-are-drawn-on-top-of-the-image": {
+      "title": "Apply A Background Image To A Graph And Ensure Shapes Are Drawn On Top Of The Image",
+      "filename": "apply-a-background-image-to-a-graph-and-ensure-shapes-are-drawn-on-top-of-the-image.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T11:23:54Z",
+      "status": "verified"
+    },
+    "insert-an-external-image-into-a-graph-scale-it-proportionally-and-rotate-it-by-a-given-angle": {
+      "title": "Insert An External Image Into A Graph Scale It Proportionally And Rotate It By A Given Angle",
+      "filename": "insert-an-external-image-into-a-graph-scale-it-proportionally-and-rotate-it-by-a-given-angle.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T11:28:56Z",
+      "status": "verified"
+    },
+    "add-a-filled-arc-with-a-radial-gradient-fill-to-a-graph-defining-start-and-sweep-angles": {
+      "title": "Add A Filled Arc With A Radial Gradient Fill To A Graph Defining Start And Sweep Angles",
+      "filename": "add-a-filled-arc-with-a-radial-gradient-fill-to-a-graph-defining-start-and-sweep-angles.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T11:30:01Z",
+      "status": "verified"
+    },
+    "create-a-new-pdf-document-and-add-a-single-default-size-page": {
+      "title": "Create A New Pdf Document And Add A Single Default Size Page",
+      "filename": "create-a-new-pdf-document-and-add-a-single-default-size-page.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T11:30:10Z",
+      "status": "verified"
+    },
+    "instantiate-a-graph-object-matching-the-page-width-and-height-for-drawing-shapes": {
+      "title": "Instantiate A Graph Object Matching The Page Width And Height For Drawing Shapes",
+      "filename": "instantiate-a-graph-object-matching-the-page-width-and-height-for-drawing-shapes.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T11:31:05Z",
+      "status": "verified"
+    },
+    "add-a-rectangle-to-the-graph-using-absolute-coordinates-and-a-solid-red-fill": {
+      "title": "Add A Rectangle To The Graph Using Absolute Coordinates And A Solid Red Fill",
+      "filename": "add-a-rectangle-to-the-graph-using-absolute-coordinates-and-a-solid-red-fill.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T11:34:03Z",
+      "status": "verified"
+    },
+    "set-an-ellipse-s-fill-to-a-semi-transparent-color-using-an-alpha-channel-value": {
+      "title": "Set An Ellipse S Fill To A Semi Transparent Color Using An Alpha Channel Value",
+      "filename": "set-an-ellipse-s-fill-to-a-semi-transparent-color-using-an-alpha-channel-value.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T11:38:27Z",
+      "status": "verified"
+    },
+    "insert-a-textfragment-saying-hello-world-centered-inside-a-rectangle-on-the-graph": {
+      "title": "Insert A Textfragment Saying Hello World Centered Inside A Rectangle On The Graph",
+      "filename": "insert-a-textfragment-saying-hello-world-centered-inside-a-rectangle-on-the-graph.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T11:39:20Z",
+      "status": "verified"
+    },
+    "enable-boundscheckmode.throwexceptionifdoesnotfit-on-the-graph-to-validate-shape-placement-during-rendering": {
+      "title": "Enable Boundscheckmode.Throwexceptionifdoesnotfit On The Graph To Validate Shape Placement During Rendering",
+      "filename": "enable-boundscheckmode.throwexceptionifdoesnotfit-on-the-graph-to-validate-shape-placement-during-rendering.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T11:42:18Z",
+      "status": "verified"
+    },
+    "add-multiple-rectangles-of-varying-sizes-to-a-graph-and-verify-no-overlap-using-bounds-checking": {
+      "title": "Add Multiple Rectangles Of Varying Sizes To A Graph And Verify No Overlap Using Bounds Checking",
+      "filename": "add-multiple-rectangles-of-varying-sizes-to-a-graph-and-verify-no-overlap-using-bounds-checking.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T11:48:42Z",
+      "status": "verified"
+    },
+    "create-a-graph-containing-rectangles-and-ellipses-with-distinct-fill-types-then-add-it-to-a-page": {
+      "title": "Create A Graph Containing Rectangles And Ellipses With Distinct Fill Types Then Add It To A Page",
+      "filename": "create-a-graph-containing-rectangles-and-ellipses-with-distinct-fill-types-then-add-it-to-a-page.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T11:49:01Z",
+      "status": "verified"
+    },
+    "export-the-pdf-to-a-memorystream-and-write-the-stream-to-a-file-on-disk": {
+      "title": "Export The Pdf To A Memorystream And Write The Stream To A File On Disk",
+      "filename": "export-the-pdf-to-a-memorystream-and-write-the-stream-to-a-file-on-disk.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T11:49:17Z",
+      "status": "verified"
+    },
+    "load-an-existing-pdf-add-a-new-page-and-draw-a-graph-with-shapes-on-it": {
+      "title": "Load An Existing Pdf Add A New Page And Draw A Graph With Shapes On It",
+      "filename": "load-an-existing-pdf-add-a-new-page-and-draw-a-graph-with-shapes-on-it.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T11:49:52Z",
+      "status": "verified"
+    },
+    "use-parallel.foreach-to-process-pdfs-concurrently-adding-a-graph-with-gradient-filled-ellipses-to-each": {
+      "title": "Use Parallel.Foreach To Process Pdfs Concurrently Adding A Graph With Gradient Filled Ellipses To Each",
+      "filename": "use-parallel.foreach-to-process-pdfs-concurrently-adding-a-graph-with-gradient-filled-ellipses-to-each.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T11:56:26Z",
+      "status": "verified"
+    },
+    "configure-the-graph-s-line-width-and-dash-style-before-adding-rectangles-for-custom-borders": {
+      "title": "Configure The Graph S Line Width And Dash Style Before Adding Rectangles For Custom Borders",
+      "filename": "configure-the-graph-s-line-width-and-dash-style-before-adding-rectangles-for-custom-borders.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T11:57:33Z",
+      "status": "verified"
+    },
+    "set-a-rectangle-s-fill-opacity-to-50-using-an-argb-color-value-and-verify-result": {
+      "title": "Set A Rectangle S Fill Opacity To 50 Using An Argb Color Value And Verify Result",
+      "filename": "set-a-rectangle-s-fill-opacity-to-50-using-an-argb-color-value-and-verify-result.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T12:01:44Z",
+      "status": "verified"
+    },
+    "create-a-reusable-method-that-builds-a-predefined-graph-and-returns-it-for-any-pdf-page": {
+      "title": "Create A Reusable Method That Builds A Predefined Graph And Returns It For Any Pdf Page",
+      "filename": "create-a-reusable-method-that-builds-a-predefined-graph-and-returns-it-for-any-pdf-page.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T12:02:47Z",
+      "status": "verified"
+    },
+    "serialize-a-pdf-containing-a-graph-to-a-byte-array-for-network-transmission": {
+      "title": "Serialize A Pdf Containing A Graph To A Byte Array For Network Transmission",
+      "filename": "serialize-a-pdf-containing-a-graph-to-a-byte-array-for-network-transmission.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T12:02:58Z",
+      "status": "verified"
+    },
+    "deserialize-a-pdf-byte-array-back-into-a-document-then-add-another-graph-with-text-labels": {
+      "title": "Deserialize A Pdf Byte Array Back Into A Document Then Add Another Graph With Text Labels",
+      "filename": "deserialize-a-pdf-byte-array-back-into-a-document-then-add-another-graph-with-text-labels.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T12:04:36Z",
+      "status": "verified"
+    },
+    "toggle-the-graph.boundscheckmode-between-throwexceptionifdoesnotfit-and-ignore-based-on-user-settings": {
+      "title": "Toggle The Graph.Boundscheckmode Between Throwexceptionifdoesnotfit And Ignore Based On User Settings",
+      "filename": "toggle-the-graph.boundscheckmode-between-throwexceptionifdoesnotfit-and-ignore-based-on-user-settings.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T12:08:00Z",
+      "status": "verified"
+    },
+    "generate-a-pdf-report-containing-a-graph-with-colored-rectangles-representing-data-categories-and-a-legend": {
+      "title": "Generate A Pdf Report Containing A Graph With Colored Rectangles Representing Data Categories And A Legend",
+      "filename": "generate-a-pdf-report-containing-a-graph-with-colored-rectangles-representing-data-categories-and-a-legend.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T12:11:35Z",
+      "status": "verified"
+    },
+    "add-a-rectangle-with-rounded-corners-by-specifying-corner-radius-and-apply-a-solid-fill": {
+      "title": "Add A Rectangle With Rounded Corners By Specifying Corner Radius And Apply A Solid Fill",
+      "filename": "add-a-rectangle-with-rounded-corners-by-specifying-corner-radius-and-apply-a-solid-fill.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T12:13:16Z",
+      "status": "verified"
+    },
+    "create-an-ellipse-rotate-it-45-degrees-using-a-transformation-matrix-and-add-it-to-the-graph": {
+      "title": "Create An Ellipse Rotate It 45 Degrees Using A Transformation Matrix And Add It To The Graph",
+      "filename": "create-an-ellipse-rotate-it-45-degrees-using-a-transformation-matrix-and-add-it-to-the-graph.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T12:16:05Z",
+      "status": "verified"
+    },
+    "combine-multiple-graphs-on-a-single-page-by-positioning-each-at-different-coordinates-to-form-a-collage": {
+      "title": "Combine Multiple Graphs On A Single Page By Positioning Each At Different Coordinates To Form A Collage",
+      "filename": "combine-multiple-graphs-on-a-single-page-by-positioning-each-at-different-coordinates-to-form-a-collage.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T12:16:45Z",
+      "status": "verified"
+    },
+    "use-the-graph-s-clip-property-to-restrict-drawing-of-shapes-within-a-defined-rectangular-region": {
+      "title": "Use The Graph S Clip Property To Restrict Drawing Of Shapes Within A Defined Rectangular Region",
+      "filename": "use-the-graph-s-clip-property-to-restrict-drawing-of-shapes-within-a-defined-rectangular-region.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T12:17:29Z",
+      "status": "verified"
+    },
+    "programmatically-measure-an-ellipse-s-bounding-box-after-applying-a-gradient-fill-to-ensure-correct-placement": {
+      "title": "Programmatically Measure An Ellipse S Bounding Box After Applying A Gradient Fill To Ensure Correct Placement",
+      "filename": "programmatically-measure-an-ellipse-s-bounding-box-after-applying-a-gradient-fill-to-ensure-correct-placement.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T12:26:33Z",
+      "status": "verified"
+    },
+    "create-a-multi-page-pdf-where-each-page-contains-a-graph-sized-to-that-page-s-dimensions": {
+      "title": "Create A Multi Page Pdf Where Each Page Contains A Graph Sized To That Page S Dimensions",
+      "filename": "create-a-multi-page-pdf-where-each-page-contains-a-graph-sized-to-that-page-s-dimensions.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T12:27:37Z",
+      "status": "verified"
+    },
+    "use-a-configuration-file-to-define-default-fill-colors-for-shapes-and-apply-them-when-building-graphs": {
+      "title": "Use A Configuration File To Define Default Fill Colors For Shapes And Apply Them When Building Graphs",
+      "filename": "use-a-configuration-file-to-define-default-fill-colors-for-shapes-and-apply-them-when-building-graphs.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T12:37:24Z",
+      "status": "verified"
+    },
+    "add-a-rectangle-with-a-2-point-border-thickness-and-a-dashed-line-style-to-the-graph": {
+      "title": "Add A Rectangle With A 2 Point Border Thickness And A Dashed Line Style To The Graph",
+      "filename": "add-a-rectangle-with-a-2-point-border-thickness-and-a-dashed-line-style-to-the-graph.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T12:38:42Z",
+      "status": "verified"
+    },
+    "batch-process-a-folder-of-pdfs-inserting-a-predefined-graph-with-a-company-logo-rectangle-into-each": {
+      "title": "Batch Process A Folder Of Pdfs Inserting A Predefined Graph With A Company Logo Rectangle Into Each",
+      "filename": "batch-process-a-folder-of-pdfs-inserting-a-predefined-graph-with-a-company-logo-rectangle-into-each.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T12:54:19Z",
+      "status": "verified"
+    },
+    "implement-a-command-line-tool-that-accepts-an-input-pdf-path-adds-a-predefined-graph-and-saves-the-file": {
+      "title": "Implement A Command Line Tool That Accepts An Input Pdf Path Adds A Predefined Graph And Saves The File",
+      "filename": "implement-a-command-line-tool-that-accepts-an-input-pdf-path-adds-a-predefined-graph-and-saves-the-file.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T12:59:26Z",
+      "status": "verified"
+    },
+    "add-a-rectangle-with-a-radial-gradient-transitioning-from-red-at-the-center-to-transparent-edges": {
+      "title": "Add A Rectangle With A Radial Gradient Transitioning From Red At The Center To Transparent Edges",
+      "filename": "add-a-rectangle-with-a-radial-gradient-transitioning-from-red-at-the-center-to-transparent-edges.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T13:02:57Z",
+      "status": "verified"
+    },
+    "create-a-pdf-where-each-page-contains-a-graph-with-shapes-sized-proportionally-to-page-dimensions": {
+      "title": "Create A Pdf Where Each Page Contains A Graph With Shapes Sized Proportionally To Page Dimensions",
+      "filename": "create-a-pdf-where-each-page-contains-a-graph-with-shapes-sized-proportionally-to-page-dimensions.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T13:04:34Z",
+      "status": "verified"
+    },
+    "use-a-dictionary-to-map-shape-identifiers-to-fill-colors-and-apply-them-when-constructing-the-graph": {
+      "title": "Use A Dictionary To Map Shape Identifiers To Fill Colors And Apply Them When Constructing The Graph",
+      "filename": "use-a-dictionary-to-map-shape-identifiers-to-fill-colors-and-apply-them-when-constructing-the-graph.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T13:05:48Z",
+      "status": "verified"
+    },
+    "add-an-ellipse-with-a-thick-border-and-semi-transparent-fill-then-place-a-centered-textfragment": {
+      "title": "Add An Ellipse With A Thick Border And Semi Transparent Fill Then Place A Centered Textfragment",
+      "filename": "add-an-ellipse-with-a-thick-border-and-semi-transparent-fill-then-place-a-centered-textfragment.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T13:07:20Z",
+      "status": "verified"
+    },
+    "generate-a-pdf-that-includes-a-graph-with-text-fragments-using-various-fonts-and-sizes-inside-each-shape": {
+      "title": "Generate A Pdf That Includes A Graph With Text Fragments Using Various Fonts And Sizes Inside Each Shape",
+      "filename": "generate-a-pdf-that-includes-a-graph-with-text-fragments-using-various-fonts-and-sizes-inside-each-shape.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T13:09:03Z",
+      "status": "verified"
+    },
+    "use-the-graph-s-transform-property-to-scale-all-shapes-by-150-before-rendering-on-the-page": {
+      "title": "Use The Graph S Transform Property To Scale All Shapes By 150 Before Rendering On The Page",
+      "filename": "use-the-graph-s-transform-property-to-scale-all-shapes-by-150-before-rendering-on-the-page.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T13:13:06Z",
+      "status": "verified"
+    },
+    "create-a-pdf-with-a-graph-where-each-shape-s-border-color-is-derived-from-a-lookup-table": {
+      "title": "Create A Pdf With A Graph Where Each Shape S Border Color Is Derived From A Lookup Table",
+      "filename": "create-a-pdf-with-a-graph-where-each-shape-s-border-color-is-derived-from-a-lookup-table.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T13:18:11Z",
+      "status": "verified"
+    },
+    "generate-a-pdf-where-the-graph-is-positioned-in-the-page-footer-area-using-page-margins": {
+      "title": "Generate A Pdf Where The Graph Is Positioned In The Page Footer Area Using Page Margins",
+      "filename": "generate-a-pdf-where-the-graph-is-positioned-in-the-page-footer-area-using-page-margins.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T13:24:29Z",
+      "status": "verified"
+    },
+    "use-a-loop-to-add-ten-rectangles-with-incremental-x-coordinates-forming-a-horizontal-bar-chart": {
+      "title": "Use A Loop To Add Ten Rectangles With Incremental X Coordinates Forming A Horizontal Bar Chart",
+      "filename": "use-a-loop-to-add-ten-rectangles-with-incremental-x-coordinates-forming-a-horizontal-bar-chart.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T13:25:48Z",
+      "status": "verified"
+    },
+    "apply-a-texture-brush-as-fill-for-an-ellipse-by-loading-an-image-resource-as-a-pattern": {
+      "title": "Apply A Texture Brush As Fill For An Ellipse By Loading An Image Resource As A Pattern",
+      "filename": "apply-a-texture-brush-as-fill-for-an-ellipse-by-loading-an-image-resource-as-a-pattern.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T13:32:07Z",
+      "status": "verified"
+    },
+    "create-a-pdf-with-a-graph-that-includes-both-filled-shapes-and-unfilled-outlines-to-illustrate-stroke-only-rendering": {
+      "title": "Create A Pdf With A Graph That Includes Both Filled Shapes And Unfilled Outlines To Illustrate Stroke Only Rendering",
+      "filename": "create-a-pdf-with-a-graph-that-includes-both-filled-shapes-and-unfilled-outlines-to-illustrate-stroke-only-rendering.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T13:33:09Z",
+      "status": "verified"
+    },
+    "export-the-graph-to-a-new-pdf-by-creating-a-document-and-adding-the-graph-to-its-page": {
+      "title": "Export The Graph To A New Pdf By Creating A Document And Adding The Graph To Its Page",
+      "filename": "export-the-graph-to-a-new-pdf-by-creating-a-document-and-adding-the-graph-to-its-page.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-03T13:34:47Z",
+      "status": "verified"
+    }
+  }
+}
