@@ -1,53 +1,54 @@
 ---
-name: Working with Forms
-description: C# examples for Working with Forms using Aspose.PDF for .NET
+name: working_with_forms
+description: C# examples for working_with_forms using Aspose.PDF for .NET
 language: csharp
 framework: net10.0
 parent: ../agents.md
 ---
 
-# AGENTS - Working with Forms
+# AGENTS - working_with_forms
 
 ## Persona
 
 You are a C# developer specializing in PDF processing using Aspose.PDF for .NET,
-working within the **Working with Forms** category.
-This folder contains standalone C# examples for Working with Forms operations.
+working within the **working_with_forms** category.
+This folder contains standalone C# examples for working_with_forms operations.
 See the root [agents.md](../agents.md) for repository-wide conventions and boundaries.
 
 ## Scope
-- This folder contains examples for **Working with Forms**.
+- This folder contains examples for **working_with_forms**.
 - Files are standalone `.cs` examples stored directly in this folder.
 
 ## Required Namespaces
 
-- `using Aspose.Pdf;` (205/219 files) ← category-specific
-- `using Aspose.Pdf.Forms;` (138/219 files) ← category-specific
-- `using Aspose.Pdf.Facades;` (52/219 files)
-- `using Aspose.Pdf.Annotations;` (44/219 files)
-- `using Aspose.Pdf.Drawing;` (13/219 files)
-- `using Aspose.Pdf.Text;` (11/219 files)
-- `using System;` (219/219 files)
-- `using System.IO;` (204/219 files)
-- `using System.Collections.Generic;` (17/219 files)
-- `using System.Xml;` (13/219 files)
-- `using System.Text;` (6/219 files)
-- `using System.Drawing;` (4/219 files)
-- `using System.Linq;` (4/219 files)
-- `using System.Threading.Tasks;` (4/219 files)
-- `using System.Net.Http;` (3/219 files)
-- `using System.Text.Json;` (3/219 files)
-- `using System.Data;` (2/219 files)
-- `using System.IO.Compression;` (2/219 files)
-- `using System.Runtime.InteropServices;` (2/219 files)
-- `using System.Text.RegularExpressions;` (2/219 files)
-- `using System.Xml.Linq;` (2/219 files)
-- `using System.Globalization;` (1/219 files)
-- `using System.Reflection;` (1/219 files)
-- `using System.Security.Cryptography;` (1/219 files)
-- `using System.Threading;` (1/219 files)
-- `using System.Xml.Schema;` (1/219 files)
-- `using System.Xml.Xsl;` (1/219 files)
+- `using Aspose.Pdf;` (216/232 files) ← category-specific
+- `using Aspose.Pdf.Forms;` (154/232 files) ← category-specific
+- `using Aspose.Pdf.Annotations;` (64/232 files)
+- `using Aspose.Pdf.Facades;` (46/232 files)
+- `using Aspose.Pdf.Text;` (17/232 files)
+- `using Aspose.Pdf.Drawing;` (11/232 files)
+- `using Aspose.Pdf.Security;` (1/232 files)
+- `using Aspose.Pdf.Tagged;` (1/232 files)
+- `using System;` (232/232 files)
+- `using System.IO;` (208/232 files)
+- `using System.Xml;` (14/232 files)
+- `using System.Collections.Generic;` (13/232 files)
+- `using System.Text;` (6/232 files)
+- `using System.Drawing;` (5/232 files)
+- `using System.Threading.Tasks;` (5/232 files)
+- `using System.Net.Http;` (4/232 files)
+- `using System.Xml.Linq;` (4/232 files)
+- `using System.Linq;` (3/232 files)
+- `using System.Data;` (2/232 files)
+- `using System.IO.Compression;` (2/232 files)
+- `using System.Text.Json;` (2/232 files)
+- `using System.Xml.Xsl;` (2/232 files)
+- `using System.Drawing.Imaging;` (1/232 files)
+- `using System.Net;` (1/232 files)
+- `using System.Security.Cryptography;` (1/232 files)
+- `using System.Threading;` (1/232 files)
+- `using System.Web;` (1/232 files)
+- `using System.Xml.Schema;` (1/232 files)
 
 ## Common Code Pattern
 
@@ -65,40 +66,40 @@ using (Document doc = new Document("input.pdf"))
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [add-a-calculated-field-that-sums-numeric-fields-us...](./add-a-calculated-field-that-sums-numeric-fields-using-javascript-to-display-a-running-total.cs) | Add A Calculated Field That Sums Numeric Fields Using Javasc... | `JavascriptAction` | Add A Calculated Field That Sums Numeric Fields Using Javascript To Display A Running Total |
-| [add-a-date-picker-field-that-defaults-to-the-curre...](./add-a-date-picker-field-that-defaults-to-the-current-system-date-upon-pdf-opening.cs) | Add A Date Picker Field That Defaults To The Current System ... | `Rectangle` | Add A Date Picker Field That Defaults To The Current System Date Upon Pdf Opening |
-| [add-a-date-picker-field-to-a-pdf-using-javascript-...](./add-a-date-picker-field-to-a-pdf-using-javascript-to-let-users-select-dates-from-a-calendar.cs) | Add A Date Picker Field To A Pdf Using Javascript To Let Use... | `JavascriptAction` | Add A Date Picker Field To A Pdf Using Javascript To Let Users Select Dates From A Calendar |
-| [add-a-field-that-calculates-and-displays-the-total...](./add-a-field-that-calculates-and-displays-the-total-price-based-on-quantity-and-unit-price-fields.cs) | Add A Field That Calculates And Displays The Total Price Bas... | `JavascriptAction` | Add A Field That Calculates And Displays The Total Price Based On Quantity And Unit Price Fields |
-| [add-a-field-that-displays-the-current-date-and-tim...](./add-a-field-that-displays-the-current-date-and-time-updating-automatically-on-each-view.cs) | Add A Field That Displays The Current Date And Time Updating... | `JavaScriptAction` | Add A Field That Displays The Current Date And Time Updating Automatically On Each View |
-| [add-a-hidden-field-that-stores-the-user-s-ip-addre...](./add-a-hidden-field-that-stores-the-user-s-ip-address-captured-via-javascript-on-form-load.cs) | Add A Hidden Field That Stores The User S Ip Address Capture... | `JavascriptAction` | Add A Hidden Field That Stores The User S Ip Address Captured Via Javascript On Form Load |
-| [add-a-hidden-field-to-a-pdf-that-stores-a-session-...](./add-a-hidden-field-to-a-pdf-that-stores-a-session-identifier-for-backend-tracking-purposes.cs) | Add A Hidden Field To A Pdf That Stores A Session Identifier... | `Rectangle` | Add A Hidden Field To A Pdf That Stores A Session Identifier For Backend Tracking Purposes |
-| [add-a-javascript-validation-script-to-the-email-fi...](./add-a-javascript-validation-script-to-the-email-field-that-checks-for-character-presence.cs) | Add A Javascript Validation Script To The Email Field That C... | `JavascriptAction` | Add A Javascript Validation Script To The Email Field That Checks For Character Presence |
-| [add-a-multiline-text-field-called-feedback-with-a-...](./add-a-multiline-text-field-called-feedback-with-a-500-character-limit-to-capture-detailed-user-comments.cs) | Add A Multiline Text Field Called Feedback With A 500 Charac... | `Rectangle` | Add A Multiline Text Field Called Feedback With A 500 Character Limit To Capture Detailed User Co... |
-| [add-a-new-blank-page-to-an-existing-pdf-form-while...](./add-a-new-blank-page-to-an-existing-pdf-form-while-preserving-existing-fields.cs) | Add A New Blank Page To An Existing Pdf Form While Preservin... |  | Add A New Blank Page To An Existing Pdf Form While Preserving Existing Fields |
-| [add-a-new-checkbox-field-named-agreeterms-to-an-ex...](./add-a-new-checkbox-field-named-agreeterms-to-an-existing-pdf-via-document.form.add.cs) | Add A New Checkbox Field Named Agreeterms To An Existing Pdf... | `Rectangle` | Add A New Checkbox Field Named Agreeterms To An Existing Pdf Via Document.Form.Add |
-| [add-a-new-page-to-a-pdf-and-place-fresh-acroform-f...](./add-a-new-page-to-a-pdf-and-place-fresh-acroform-fields-on-that-page.cs) | Add A New Page To A Pdf And Place Fresh Acroform Fields On T... | `FormEditor` | Add A New Page To A Pdf And Place Fresh Acroform Fields On That Page |
-| [add-a-progress-bar-field-that-updates-as-the-user-...](./add-a-progress-bar-field-that-updates-as-the-user-completes-sections-of-the-form.cs) | Add A Progress Bar Field That Updates As The User Completes ... | `JavascriptAction` | Add A Progress Bar Field That Updates As The User Completes Sections Of The Form |
-| [add-a-reset-button-that-clears-all-user-entered-da...](./add-a-reset-button-that-clears-all-user-entered-data-from-the-form-fields-when-clicked.cs) | Add A Reset Button That Clears All User Entered Data From Th... | `FormEditor` | Add A Reset Button That Clears All User Entered Data From The Form Fields When Clicked |
-| [add-a-reset-button-to-a-pdf-form-that-clears-all-u...](./add-a-reset-button-to-a-pdf-form-that-clears-all-user-entered-data-and-restores-defaults.cs) | Add A Reset Button To A Pdf Form That Clears All User Entere... | `FormEditor` | Add A Reset Button To A Pdf Form That Clears All User Entered Data And Restores Defaults |
-| [add-a-signature-field-named-clientsignature-and-se...](./add-a-signature-field-named-clientsignature-and-set-its-appearance-to-a-predefined-image-stamp.cs) | Add A Signature Field Named Clientsignature And Set Its Appe... | `ImageStamp` | Add A Signature Field Named Clientsignature And Set Its Appearance To A Predefined Image Stamp |
-| [add-a-signature-field-to-a-pdf-form-to-allow-users...](./add-a-signature-field-to-a-pdf-form-to-allow-users-to-apply-handwritten-digital-signatures.cs) | Add A Signature Field To A Pdf Form To Allow Users To Apply ... | `Rectangle` | Add A Signature Field To A Pdf Form To Allow Users To Apply Handwritten Digital Signatures |
-| [add-a-submit-button-to-a-pdf-form-that-posts-all-f...](./add-a-submit-button-to-a-pdf-form-that-posts-all-field-data-to-a-specified-url-endpoint.cs) | Add A Submit Button To A Pdf Form That Posts All Field Data ... | `FormEditor` | Add A Submit Button To A Pdf Form That Posts All Field Data To A Specified Url Endpoint |
-| [add-a-tooltip-to-a-form-field-providing-guidance-o...](./add-a-tooltip-to-a-form-field-providing-guidance-on-the-expected-input-format.cs) | Add A Tooltip To A Form Field Providing Guidance On The Expe... |  | Add A Tooltip To A Form Field Providing Guidance On The Expected Input Format |
-| [add-a-tooltip-to-the-submit-button-explaining-requ...](./add-a-tooltip-to-the-submit-button-explaining-required-fields-before-submission.cs) | Add A Tooltip To The Submit Button Explaining Required Field... | `FormEditor` | Add A Tooltip To The Submit Button Explaining Required Fields Before Submission |
-| [add-javascript-to-a-button-that-calculates-total-p...](./add-javascript-to-a-button-that-calculates-total-price-from-quantity-and-unit-price-fields.cs) | Add Javascript To A Button That Calculates Total Price From ... | `FormEditor` | Add Javascript To A Button That Calculates Total Price From Quantity And Unit Price Fields |
-| [apply-a-background-image-to-a-form-field-to-enhanc...](./apply-a-background-image-to-a-form-field-to-enhance-visual-branding-within-the-pdf.cs) | Apply A Background Image To A Form Field To Enhance Visual B... | `Form` | Apply A Background Image To A Form Field To Enhance Visual Branding Within The Pdf |
-| [apply-a-digital-signature-to-a-pdf-containing-fill...](./apply-a-digital-signature-to-a-pdf-containing-filled-form-fields-to-certify-its-authenticity.cs) | Apply A Digital Signature To A Pdf Containing Filled Form Fi... |  | Apply A Digital Signature To A Pdf Containing Filled Form Fields To Certify Its Authenticity |
-| [apply-a-rotation-transformation-to-a-form-field-la...](./apply-a-rotation-transformation-to-a-form-field-label-so-it-appears-at-a-45-degree-angle.cs) | Apply A Rotation Transformation To A Form Field Label So It ... | `TextFragment` | Apply A Rotation Transformation To A Form Field Label So It Appears At A 45 Degree Angle |
-| [apply-encryption-to-a-pdf-after-filling-its-forms-...](./apply-encryption-to-a-pdf-after-filling-its-forms-to-protect-sensitive-data-from-unauthorized-access.cs) | Apply Encryption To A Pdf After Filling Its Forms To Protect... |  | Apply Encryption To A Pdf After Filling Its Forms To Protect Sensitive Data From Unauthorized Access |
-| [apply-linq-queries-to-filter-form-fields-by-type-s...](./apply-linq-queries-to-filter-form-fields-by-type-such-as-retrieving-only-text-box-fields.cs) | Apply Linq Queries To Filter Form Fields By Type Such As Ret... |  | Apply Linq Queries To Filter Form Fields By Type Such As Retrieving Only Text Box Fields |
-| [assign-a-javascript-action-to-a-form-field-that-ca...](./assign-a-javascript-action-to-a-form-field-that-calculates-a-value-when-the-field-loses-focus.cs) | Assign A Javascript Action To A Form Field That Calculates A... | `JavascriptAction` | Assign A Javascript Action To A Form Field That Calculates A Value When The Field Loses Focus |
-| [batch-convert-a-directory-of-pdfs-to-xml-form-data...](./batch-convert-a-directory-of-pdfs-to-xml-form-data-files-preserving-original-file-names.cs) | Batch Convert A Directory Of Pdfs To Xml Form Data Files Pre... | `XmlSaveOptions` | Batch Convert A Directory Of Pdfs To Xml Form Data Files Preserving Original File Names |
-| [batch-export-form-data-from-a-collection-of-pdfs-c...](./batch-export-form-data-from-a-collection-of-pdfs-creating-separate-xml-files-for-each-document.cs) | Batch Export Form Data From A Collection Of Pdfs Creating Se... |  | Batch Export Form Data From A Collection Of Pdfs Creating Separate Xml Files For Each Document |
-| [batch-fill-a-collection-of-pdf-templates-using-dat...](./batch-fill-a-collection-of-pdf-templates-using-data-rows-from-a-csv-file-and-save-outputs.cs) | Batch Fill A Collection Of Pdf Templates Using Data Rows Fro... |  | Batch Fill A Collection Of Pdf Templates Using Data Rows From A Csv File And Save Outputs |
-| ... | | | *and 189 more files* |
+| [add-auto-updating-date-time-field-to-pdf](./add-auto-updating-date-time-field-to-pdf.cs) | Add Auto‑Updating Date/Time Field to PDF | `Document`, `Rectangle`, `DateField` | Demonstrates inserting a DateField into a PDF and attaching JavaScript so the field displays the ... |
+| [add-blank-page-to-pdf-form](./add-blank-page-to-pdf-form.cs) | Add Blank Page to PDF Form While Preserving Fields | `Document`, `Add`, `Save` | Shows how to load an existing PDF form, insert a new blank page, and save the document, keeping a... |
+| [add-calculated-total-field-javascript](./add-calculated-total-field-javascript.cs) | Add Calculated Total Field Using JavaScript | `Document`, `Save`, `Page` | Demonstrates how to create numeric form fields in a PDF and add a calculated field that sums them... |
+| [add-calculated-total-price-field](./add-calculated-total-price-field.cs) | Add Calculated Total Price Field to PDF Form | `Document`, `Rectangle`, `NumberField` | Demonstrates how to add numeric fields to a PDF form and use JavaScript to automatically calculat... |
+| [add-current-time-field-to-pdf](./add-current-time-field-to-pdf.cs) | Add Current Time Field to PDF on Load | `Document`, `Page`, `Rectangle` | Demonstrates how to create a DateField in a PDF, set its display format to HH:mm:ss, assign the c... |
+| [add-custom-image-to-pdf-button](./add-custom-image-to-pdf-button.cs) | Add Custom Image Appearance to PDF Button Field | `Document`, `Save`, `ButtonField` | Demonstrates how to import an image file and set it as the appearance stream of a button field in... |
+| [add-date-field-with-validation](./add-date-field-with-validation.cs) | Add Date Field with MM/DD/YYYY Validation | `Document`, `Page`, `Rectangle` | Shows how to create a PDF, add a DateField, set its display format, and attach a JavaScript OnVal... |
+| [add-date-picker-field-to-pdf](./add-date-picker-field-to-pdf.cs) | Add Date Picker Field to PDF | `Document`, `Page`, `Rectangle` | Demonstrates how to insert a date picker form field into a PDF and attach JavaScript to open the ... |
+| [add-date-picker-field-to-pdf__v2](./add-date-picker-field-to-pdf__v2.cs) | Add Date Picker Field with Current Date to PDF | `Document`, `Rectangle`, `DateField` | Demonstrates how to insert a DateField into an existing PDF and set its default value to the curr... |
+| [add-hidden-creation-timestamp-field-to-pdf](./add-hidden-creation-timestamp-field-to-pdf.cs) | Add Hidden Creation Timestamp Field to PDF | `Document`, `Rectangle`, `TextBoxField` | Demonstrates how to insert a hidden, read‑only text box form field containing the document's crea... |
+| [add-hidden-ip-field-to-pdf](./add-hidden-ip-field-to-pdf.cs) | Add Hidden IP Address Field to PDF with JavaScript | `Document`, `Rectangle`, `TextBoxField` | Demonstrates how to add a hidden text box field to a PDF and populate it with the user's IP addre... |
+| [add-hidden-session-id-field-to-pdf](./add-hidden-session-id-field-to-pdf.cs) | Add Hidden Session ID Field to PDF | `Document`, `TextBoxField`, `Rectangle` | Demonstrates how to insert a hidden text box form field into an existing PDF to store a session i... |
+| [add-ipv4-validation-to-pdf-textbox](./add-ipv4-validation-to-pdf-textbox.cs) | Add IPv4 Validation to PDF Text Box Field | `Document`, `Page`, `Rectangle` | Creates a PDF with a text box form field for an IPv4 address and attaches JavaScript that validat... |
+| [add-javascript-email-validation-to-pdf-form-field](./add-javascript-email-validation-to-pdf-form-field.cs) | Add JavaScript Email Validation to PDF Form Field | `Document`, `Field`, `JavascriptAction` | Demonstrates how to attach a JavaScript action to a PDF form field using Aspose.Pdf to ensure the... |
+| [add-javascript-listener-to-pdf-form-field](./add-javascript-listener-to-pdf-form-field.cs) | Add JavaScript Listener to PDF Form Field | `Document`, `Field`, `JavascriptAction` | Shows how to attach a JavaScript action to a PDF form field that triggers when the field's value ... |
+| [add-javascript-onlostfocus-action-to-pdf-form-fiel...](./add-javascript-onlostfocus-action-to-pdf-form-field.cs) | Add JavaScript OnLostFocus Action to PDF Form Field | `Document`, `Page`, `Rectangle` | Demonstrates how to create a PDF form with a quantity field and a read‑only total field, and assi... |
+| [add-js-calculation-button-to-pdf-form](./add-js-calculation-button-to-pdf-form.cs) | Add JavaScript Calculation Button to PDF Form | `Document`, `FormEditor`, `AddField` | Demonstrates creating a PDF form with Quantity, UnitPrice, and Total fields and a push button tha... |
+| [add-list-box-to-pdf-acroform](./add-list-box-to-pdf-acroform.cs) | Add List Box to PDF AcroForm | `Document`, `FormEditor`, `FieldType` | Shows how to create a new PDF, add an AcroForm list box field, populate it with country options, ... |
+| [add-multiline-feedback-textbox](./add-multiline-feedback-textbox.cs) | Add Multiline Feedback TextBox to PDF | `Document`, `Page`, `Rectangle` | Shows how to insert a multiline TextBox form field named 'Feedback' with a 500‑character limit in... |
+| [add-new-page-with-acroform-fields](./add-new-page-with-acroform-fields.cs) | Add a New Page with AcroForm Fields to a PDF | `Document`, `FormEditor`, `FieldType` | Demonstrates how to append a blank page to an existing PDF and create fresh AcroForm fields (text... |
+| [add-numeric-validation-to-pdf-form-field](./add-numeric-validation-to-pdf-form-field.cs) | Add Numeric Validation to PDF Form Field | `Document`, `Rectangle`, `NumberField` | Demonstrates how to create a NumberField in a PDF and attach JavaScript validation to enforce a n... |
+| [add-payment-method-radio-button-group](./add-payment-method-radio-button-group.cs) | Add PaymentMethod Radio Button Group to PDF | `Document`, `Page`, `RadioButtonField` | Demonstrates how to create a PDF form with a radio button group named 'PaymentMethod' containing ... |
+| [add-progress-bar-to-pdf-form](./add-progress-bar-to-pdf-form.cs) | Add Progress Bar to PDF Form Using Aspose.Pdf | `Document`, `Page`, `Rectangle` | Demonstrates creating a PDF form with a progress bar that updates automatically as the user check... |
+| [add-required-signature-and-lock-pdf](./add-required-signature-and-lock-pdf.cs) | Add Required Signature Field and Lock PDF after Signing | `Document`, `Rectangle`, `SignatureField` | Demonstrates how to add a required digital signature field to a PDF, sign it with a certificate, ... |
+| [add-reset-button-to-pdf-form](./add-reset-button-to-pdf-form.cs) | Add Reset Button to PDF Form | `FormEditor`, `FieldType` | Shows how to insert a push‑button field into a PDF form and attach JavaScript that resets all use... |
+| [add-reset-button-to-pdf-form__v2](./add-reset-button-to-pdf-form__v2.cs) | Add Reset Button to PDF Form | `Document`, `Form`, `Page` | Shows how to insert a reset button into an existing PDF form that clears all user‑entered data us... |
+| [add-rich-text-field-with-html](./add-rich-text-field-with-html.cs) | Add Rich Text Field with HTML Formatting to PDF | `Document`, `Page`, `Rectangle` | Demonstrates creating a RichTextBoxField, setting its FormattedValue with HTML markup, and adding... |
+| [add-signature-field-to-pdf-form](./add-signature-field-to-pdf-form.cs) | Add Signature Field to PDF Form | `Document`, `Rectangle`, `SignatureField` | Shows how to load a PDF using Aspose.Pdf, create a signature form field, and save the modified do... |
+| [add-signature-field-with-image-stamp](./add-signature-field-with-image-stamp.cs) | Add Signature Field with Image Stamp to PDF | `Document`, `Rectangle`, `SignatureField` | Demonstrates how to create a signature form field named 'ClientSignature' in an existing PDF and ... |
+| [add-submit-button-to-pdf-form](./add-submit-button-to-pdf-form.cs) | Add Submit Button to PDF Form | `FormEditor`, `AddSubmitBtn`, `SetSubmitFlag` | Shows how to insert a submit button into an existing PDF form and configure it to post the entire... |
+| ... | | | *and 202 more files* |
 
 ## Category Statistics
-- Total examples: 219
+- Total examples: 232
 
 ## Category-Specific Tips
 
@@ -139,8 +140,8 @@ using (Document doc = new Document("input.pdf"))
   - **Common Mistakes** — verified anti-patterns that cause build failures
   - **Domain Knowledge** — cross-cutting API-specific gotchas
   - **Testing Guide** — build and run verification steps
-- Review code examples in this folder for Working with Forms patterns
+- Review code examples in this folder for working_with_forms patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-04-03 | Run: `20260403_135847_dca124`
+Updated: 2026-04-07 | Run: `20260407_164846_d291c2`
 <!-- AUTOGENERATED:END -->
