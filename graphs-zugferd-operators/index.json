@@ -1,0 +1,353 @@
+{
+  "category": "Graphs - ZUGFeRD - Operators",
+  "last_updated": "2026-04-01T13:46:56Z",
+  "examples": {
+    "attach-zugferd-xml": {
+      "title": "Attach ZUGFeRD XML to PDF and Convert to PDF/A-3B",
+      "filename": "attach-zugferd-xml.cs",
+      "description": "Demonstrates embedding a ZUGFeRD XML file into a PDF using FileSpecification and converting the document to PDF/A-3B compliance.",
+      "tags": [
+        "ZUGFeRD",
+        "PDF/A-3B",
+        "attachment",
+        "Aspose.Pdf",
+        "embedded-files"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.PdfFormatConversionOptions",
+        "Aspose.Pdf.PdfFormat"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-01T12:54:11Z",
+      "status": "verified"
+    },
+    "create-zugferd-invoice": {
+      "title": "Create ZUGFeRD‑Compliant Invoice PDF",
+      "filename": "create-zugferd-invoice.cs",
+      "description": "Demonstrates embedding a ZUGFeRD XML file into a PDF and converting it to PDF/A‑3B to produce a compliant invoice.",
+      "tags": [
+        "ZUGFeRD",
+        "PDF/A-3B",
+        "embedding",
+        "invoice",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.TextFragment",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.PdfFormatConversionOptions",
+        "Aspose.Pdf.Document.Convert",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.EmbeddedFiles.Add"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-01T12:56:09Z",
+      "status": "verified"
+    },
+    "validate-zugferd-pdf": {
+      "title": "Validate ZUGFeRD PDF against PDF/A-3B and check embedded XML",
+      "filename": "validate-zugferd-pdf.cs",
+      "description": "Demonstrates how to validate a PDF containing ZUGFeRD data for PDF/A‑3B compliance and verify the presence of the embedded ZUGFeRD XML file.",
+      "tags": [
+        "ZUGFeRD",
+        "PDF/A",
+        "validation",
+        "embedded-files"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Validate",
+        "Aspose.Pdf.Document.IsPdfaCompliant",
+        "Aspose.Pdf.EmbeddedFileCollection",
+        "Aspose.Pdf.FileSpecification"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-01T12:57:35Z",
+      "status": "verified"
+    },
+    "extract-zugferd-xml": {
+      "title": "Extract ZUGFeRD XML from PDF",
+      "filename": "extract-zugferd-xml.cs",
+      "description": "Demonstrates how to locate an embedded ZUGFeRD XML file in a PDF and save it as a separate XML file.",
+      "tags": [
+        "ZUGFeRD",
+        "embedded-files",
+        "extraction",
+        "PDF",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.Document.EmbeddedFiles",
+        "Aspose.Pdf.FileSpecification.GetFileStream"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-01T13:00:05Z",
+      "status": "verified"
+    },
+    "remove-zugferd-attachment": {
+      "title": "Remove ZUGFeRD Attachment from PDF",
+      "filename": "remove-zugferd-attachment.cs",
+      "description": "Demonstrates how to delete a ZUGFeRD XML attachment from a PDF while keeping the rest of the document intact.",
+      "tags": [
+        "ZUGFeRD",
+        "attachment",
+        "remove",
+        "PDF",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.EmbeddedFiles.Delete",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-01T13:06:28Z",
+      "status": "verified"
+    },
+    "encrypt-zugferd-pdf": {
+      "title": "Encrypt ZUGFeRD PDF with User and Owner Passwords",
+      "filename": "encrypt-zugferd-pdf.cs",
+      "description": "Demonstrates embedding a ZUGFeRD XML into a PDF/A‑3B document and encrypting it with user and owner passwords.",
+      "tags": [
+        "ZUGFeRD",
+        "encryption",
+        "PDF/A-3B",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.PdfFormatConversionOptions",
+        "Aspose.Pdf.PdfFormat",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-01T13:12:37Z",
+      "status": "verified"
+    },
+    "add-document-expiry-javascript": {
+      "title": "Add Document-Level JavaScript Expiry Action",
+      "filename": "add-document-expiry-javascript.cs",
+      "description": "Demonstrates how to attach a document-level JavaScript that checks an expiry date and closes the PDF when the date has passed.",
+      "tags": [
+        "javascript",
+        "expiry",
+        "pdf",
+        "document-action",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Document",
+        "Page",
+        "JavascriptAction",
+        "Document.OpenAction",
+        "Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-01T13:19:20Z",
+      "status": "verified"
+    },
+    "javascript-open-action-page-10": {
+      "title": "Add JavaScript Open Action to Navigate to Page 10",
+      "filename": "javascript-open-action-page-10.cs",
+      "description": "Demonstrates how to set a JavaScript open action that moves the viewer to page 10 when the PDF is opened.",
+      "tags": [
+        "javascript",
+        "open-action",
+        "navigation",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Annotations.JavascriptAction"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-01T13:20:16Z",
+      "status": "verified"
+    },
+    "add-page-level-javascript": {
+      "title": "Add Page-Level JavaScript Alert to PDF",
+      "filename": "add-page-level-javascript.cs",
+      "description": "Demonstrates how to attach a JavaScript action to a PDF page that shows an alert when the page becomes visible.",
+      "tags": [
+        "javascript",
+        "pdf",
+        "page-action",
+        "alert",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.JavascriptAction"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-01T13:21:06Z",
+      "status": "verified"
+    },
+    "add-document-level-javascript-auto-save": {
+      "title": "Add Document-Level JavaScript for Auto‑Save",
+      "filename": "add-document-level-javascript-auto-save.cs",
+      "description": "Demonstrates embedding a document‑level JavaScript that periodically saves the PDF file.",
+      "tags": [
+        "javascript",
+        "document",
+        "autosave",
+        "annotation",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Annotations.JavascriptAction"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-01T13:25:11Z",
+      "status": "verified"
+    },
+    "draw-star-low-level": {
+      "title": "Draw Custom Star Shape Using Low-Level PDF Operators",
+      "filename": "draw-star-low-level.cs",
+      "description": "Demonstrates how to use Aspose.Pdf low‑level operators to draw a star shape at given coordinates.",
+      "tags": [
+        "pdf",
+        "operators",
+        "drawing",
+        "low-level",
+        "star"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Content",
+        "Aspose.Pdf.Operators.OperatorSelector",
+        "Aspose.Pdf.Operators.MoveTo",
+        "Aspose.Pdf.Operators.LineTo",
+        "Aspose.Pdf.Operators.ClosePathStroke",
+        "Aspose.Pdf.Operators.SetLineWidth",
+        "Aspose.Pdf.Operators.SetRGBColorStroke"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-01T13:26:44Z",
+      "status": "verified"
+    },
+    "change-line-width": {
+      "title": "Change Line Width Operators from 1pt to 3pt",
+      "filename": "change-line-width.cs",
+      "description": "Loads a PDF, finds SetLineWidth operators with width 1 point and changes them to 3 points, then saves the document.",
+      "tags": [
+        "line-width",
+        "operator",
+        "pdf-modification"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Operators.SetLineWidth",
+        "Aspose.Pdf.OperatorCollection"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-01T13:27:48Z",
+      "status": "verified"
+    },
+    "replace-text-showtext": {
+      "title": "Replace Text in PDF by Modifying ShowText Operators",
+      "filename": "replace-text-showtext.cs",
+      "description": "Demonstrates how to locate ShowText operators in a PDF, replace specific strings, and save the modified document.",
+      "tags": [
+        "text-replace",
+        "operators",
+        "pdf"
+      ],
+      "apis_used": [
+        "Document",
+        "Page",
+        "OperatorCollection",
+        "ShowText",
+        "OperatorCollection.Replace"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-01T13:34:00Z",
+      "status": "verified"
+    },
+    "line-graph-multi-stroke": {
+      "title": "Create Line Graph with Multiple Stroke Styles",
+      "filename": "line-graph-multi-stroke.cs",
+      "description": "Demonstrates how to draw a line graph with three data series, each using a different stroke style (solid, dashed, dotted) using Aspose.Pdf.",
+      "tags": [
+        "graph",
+        "line",
+        "stroke",
+        "aspdf",
+        "drawing"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Line",
+        "Aspose.Pdf.GraphInfo",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Drawing.Position"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-01T13:43:00Z",
+      "status": "verified"
+    },
+    "embed-vector-graphic-graph": {
+      "title": "Embed Vector Graphic Graph into PDF",
+      "filename": "embed-vector-graphic-graph.cs",
+      "description": "Creates a PDF page and embeds a vector graphic (graph) using Aspose.Pdf's Graph class, demonstrating how to add shapes as vector objects directly in the PDF.",
+      "tags": [
+        "graph",
+        "vector",
+        "pdf",
+        "aspose",
+        "embedding"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.Line",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Drawing.BorderInfo",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-01T13:45:14Z",
+      "status": "verified"
+    },
+    "combine-multiple-graphs": {
+      "title": "Combine Multiple Graphs on a Single PDF Page",
+      "filename": "combine-multiple-graphs.cs",
+      "description": "Creates a PDF with four graphs arranged in a 2x2 grid on one page.",
+      "tags": [
+        "graph",
+        "grid",
+        "pdf",
+        "aspose",
+        "layout"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-01T13:46:56Z",
+      "status": "verified"
+    }
+  }
+}
