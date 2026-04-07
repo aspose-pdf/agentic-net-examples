@@ -121,15 +121,34 @@ Examples in this repository are **automatically generated**. To suggest new exam
 
 ## Related Resources
 
-- [Aspose.PDF for .NET Documentation](https://docs.aspose.com/pdf/net/)
-- [API Reference](https://reference.aspose.com/pdf/net/)
-- [NuGet Package](https://www.nuget.org/packages/Aspose.PDF)
-- [Aspose Forum](https://forum.aspose.com/c/pdf/10)
-- [AI Agent Guide](./agents.md) - For AI agents and code generation tools
+### Official Documentation
+- [Aspose.PDF for .NET Documentation](https://docs.aspose.com/pdf/net/) — Guides, tutorials, and feature overviews
+- [API Reference](https://reference.aspose.com/pdf/net/) — Complete class/method reference
+- [Release Notes](https://releases.aspose.com/pdf/net/release-notes/) — Version history and changelogs
+
+### Downloads & Packages
+- [NuGet Package](https://www.nuget.org/packages/Aspose.PDF) — Install via `dotnet add package Aspose.PDF`
+- [Direct Downloads](https://releases.aspose.com/pdf/net/) — MSI/ZIP installers and DLLs
+- [Maven/Gradle (Java)](https://releases.aspose.com/pdf/java/) — Java equivalent for cross-platform teams
+
+### Community & Support
+- [Aspose.PDF Forum](https://forum.aspose.com/c/pdf/10) — Community Q&A and official support
+- [Aspose Blog - PDF](https://blog.aspose.com/category/pdf/) — Tutorials, tips, and product updates
+- [Stack Overflow](https://stackoverflow.com/questions/tagged/aspose.pdf) — Community questions tagged `aspose.pdf`
+- [GitHub Issues](https://github.com/aspose-pdf/Aspose.PDF-for-.NET/issues) — Bug reports and feature requests
+
+### Licensing & Purchase
+- [Purchase](https://purchase.aspose.com/buy) — Commercial license options
+- [Free Trial](https://releases.aspose.com/) — Evaluate without limitations for 30 days
+- [Temporary License](https://purchase.aspose.com/temporary-license/) — Full-feature evaluation license
+
+### Related Repositories
+- [Aspose.PDF for .NET](https://github.com/aspose-pdf/Aspose.PDF-for-.NET) — Official examples repository
+- [AI Agent Guide](./agents.md) — For AI agents and code generation tools
 
 ## License
 
-All examples use Aspose.PDF for .NET and require a valid license for production use. See [licensing](https://purchase.aspose.com/).
+All examples use [Aspose.PDF for .NET](https://products.aspose.com/pdf/net/) and require a valid license for production use. A [free trial](https://releases.aspose.com/) is available for evaluation. See [licensing options](https://purchase.aspose.com/buy).
 
 ---
 
