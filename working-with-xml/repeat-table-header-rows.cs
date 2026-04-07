@@ -1,5 +1,5 @@
 using System;
-using System.Runtime.InteropServices;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -7,82 +7,75 @@ class Program
 {
     static void Main()
     {
+        // Output PDF path
+        const string outputPath = "TableWithRepeatingHeader.pdf";
+
         // Create a new PDF document
-        using (Document document = new Document())
+        using (Document doc = new Document())
         {
             // Add a page to the document
-            Page page = document.Pages.Add();
+            Page page = doc.Pages.Add();
 
-            // Create a table and define column widths
-            Table table = new Table();
-            table.ColumnWidths = "100 100 100";
-            // Set the number of header rows to repeat on each page
-            table.RepeatingRowsCount = 1;
-
-            // Add header row
-            Row headerRow = table.Rows.Add();
-            headerRow.Cells.Add("Header 1");
-            headerRow.Cells.Add("Header 2");
-            headerRow.Cells.Add("Header 3");
-            // Style header cells
-            foreach (Cell cell in headerRow.Cells)
+            // Create a table and set its position on the page
+            Table table = new Table
             {
-                // Use the TextState constructor that accepts font name and size.
-                // Set the color via the ForegroundColor property.
-                cell.DefaultCellTextState = new TextState("Arial", 12);
-                cell.DefaultCellTextState.ForegroundColor = Aspose.Pdf.Color.Black;
-                cell.BackgroundColor = Aspose.Pdf.Color.LightGray;
+                // Position the table (left, top)
+                Left = 50,
+                Top = 750,
+                // Enable breaking across pages
+                IsBroken = true,
+                // Number of header rows to repeat on each page
+                RepeatingRowsCount = 1,
+                // Optional: style for the repeating header rows
+                RepeatingRowsStyle = new TextState
+                {
+                    Font = FontRepository.FindFont("Helvetica-Bold"),
+                    FontSize = 12,
+                    ForegroundColor = Color.Black
+                }
+            };
+
+            // Define column widths (percentage of the page width)
+            table.ColumnWidths = "30 70";
+
+            // ----- Header Row (will be repeated) -----
+            Row header = table.Rows.Add();
+            // First cell (header)
+            Cell headerCell1 = header.Cells.Add("ID");
+            // Second cell (header)
+            Cell headerCell2 = header.Cells.Add("Description");
+
+            // Apply header styling
+            headerCell1.DefaultCellTextState = new TextState
+            {
+                Font = FontRepository.FindFont("Helvetica-Bold"),
+                FontSize = 12,
+                ForegroundColor = Color.White
+            };
+            headerCell2.DefaultCellTextState = new TextState
+            {
+                Font = FontRepository.FindFont("Helvetica-Bold"),
+                FontSize = 12,
+                ForegroundColor = Color.White
+            };
+            // Background color for header row
+            header.BackgroundColor = Color.Gray;
+
+            // ----- Data Rows (enough to span multiple pages) -----
+            for (int i = 1; i <= 200; i++)
+            {
+                Row row = table.Rows.Add();
+                row.Cells.Add($"Item {i}");
+                row.Cells.Add($"This is a description for item number {i}.");
             }
 
-            // Add many data rows to force the table to span multiple pages
-            for (int i = 0; i < 100; i++)
-            {
-                Row dataRow = table.Rows.Add();
-                dataRow.Cells.Add($"Row {i} Col 1");
-                dataRow.Cells.Add($"Row {i} Col 2");
-                dataRow.Cells.Add($"Row {i} Col 3");
-            }
-
-            // Position the table on the page
-            table.Left = 50;
-            table.Top = 750;
-
-            // Add the table to the page
+            // Add the table to the page's paragraphs collection
             page.Paragraphs.Add(table);
 
-            // Save the PDF document – guard against missing GDI+ (libgdiplus) on non‑Windows platforms
-            const string outputPath = "output.pdf";
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                document.Save(outputPath);
-                Console.WriteLine($"PDF saved to '{outputPath}'.");
-            }
-            else
-            {
-                try
-                {
-                    document.Save(outputPath);
-                    Console.WriteLine($"PDF saved to '{outputPath}'. (non‑Windows platform, libgdiplus present)");
-                }
-                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
-                {
-                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. " +
-                                      "The PDF could not be saved using Aspose.Pdf's default renderer.");
-                    // Optionally, you could fall back to a different rendering approach or inform the user.
-                }
-            }
+            // Save the document
+            doc.Save(outputPath);
         }
-    }
 
-    // Helper that walks the inner‑exception chain looking for a DllNotFoundException (e.g., libgdiplus)
-    private static bool ContainsDllNotFound(Exception? ex)
-    {
-        while (ex != null)
-        {
-            if (ex is DllNotFoundException)
-                return true;
-            ex = ex.InnerException;
-        }
-        return false;
+        Console.WriteLine($"PDF saved to '{outputPath}'. Header rows will repeat on each page.");
     }
 }

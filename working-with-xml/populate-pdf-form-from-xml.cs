@@ -2,103 +2,62 @@ using System;
 using System.IO;
 using System.Xml;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        // Path to the PDF form template (must contain form fields)
-        string templatePath = "template.pdf";
-        // Path to the XML file that holds the data records
-        string xmlPath = "data.xml";
+        const string templatePath = "template.pdf";   // PDF with form fields
+        const string xmlPath      = "data.xml";      // XML containing multiple records
+        const string outputDir    = "Output";        // Folder for generated PDFs
 
-        // ---------------------------------------------------------------------
-        // Validate that the required files exist before attempting to load them.
-        // This prevents an unhandled FileNotFoundException at runtime.
-        // ---------------------------------------------------------------------
         if (!File.Exists(templatePath))
         {
-            Console.WriteLine($"Error: PDF template not found at '{Path.GetFullPath(templatePath)}'.");
+            Console.Error.WriteLine($"Template not found: {templatePath}");
             return;
         }
+
         if (!File.Exists(xmlPath))
         {
-            Console.WriteLine($"Error: XML data file not found at '{Path.GetFullPath(xmlPath)}'.");
+            Console.Error.WriteLine($"XML data not found: {xmlPath}");
             return;
         }
 
-        // Load the XML document containing one or more <Record> elements
+        Directory.CreateDirectory(outputDir);
+
+        // Load the whole XML document
         XmlDocument xmlDoc = new XmlDocument();
-        try
-        {
-            xmlDoc.Load(xmlPath);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Failed to load XML file: {ex.Message}");
-            return;
-        }
+        xmlDoc.Load(xmlPath);
 
-        XmlNodeList recordNodes = xmlDoc.SelectNodes("//Record");
-        if (recordNodes == null || recordNodes.Count == 0)
+        // Assume each record is represented by a <Record> element
+        XmlNodeList records = xmlDoc.SelectNodes("//Record");
+        if (records == null || records.Count == 0)
         {
             Console.WriteLine("No <Record> elements found in the XML file.");
             return;
         }
 
         int recordIndex = 1;
-        foreach (XmlNode recordNode in recordNodes)
+        foreach (XmlNode recordNode in records)
         {
-            // Open a fresh copy of the template for each record
+            // Open a fresh copy of the PDF template for each record
             using (Document pdfDoc = new Document(templatePath))
             {
-                // Iterate over each child element of the <Record> – element name = field name
-                foreach (XmlNode fieldNode in recordNode.ChildNodes)
-                {
-                    // Skip text nodes (e.g., whitespace) that may appear between elements
-                    if (fieldNode.NodeType != XmlNodeType.Element)
-                        continue;
+                // Build a minimal XmlDocument that contains the current record.
+                // AssignXfa expects an XmlDocument; we wrap the record node in a root element.
+                XmlDocument recordXml = new XmlDocument();
+                XmlElement root = recordXml.CreateElement("xfdf"); // arbitrary root name
+                XmlNode importedNode = recordXml.ImportNode(recordNode, true);
+                root.AppendChild(importedNode);
+                recordXml.AppendChild(root);
 
-                    string fieldName = fieldNode.Name;
-                    string fieldValue = fieldNode.InnerText ?? string.Empty;
+                // Populate the form fields with the XML data
+                pdfDoc.Form.AssignXfa(recordXml);
 
-                    // Verify that the PDF actually contains a field with this name
-                    if (pdfDoc.Form.HasField(fieldName))
-                    {
-                        // The Form indexer returns a WidgetAnnotation; cast it to Aspose.Pdf.Forms.Field
-                        Field pdfField = pdfDoc.Form[fieldName] as Field;
-                        if (pdfField == null)
-                            continue; // safety check – not a form field
-
-                        // Most simple text fields are TextBoxField – set its Value directly
-                        if (pdfField is TextBoxField textBox)
-                        {
-                            textBox.Value = fieldValue;
-                        }
-                        else
-                        {
-                            // For other field types (e.g., CheckBoxField) attempt to set a generic Value property via reflection
-                            var valueProp = pdfField.GetType().GetProperty("Value");
-                            if (valueProp != null && valueProp.CanWrite)
-                            {
-                                valueProp.SetValue(pdfField, fieldValue, null);
-                            }
-                        }
-                    }
-                }
-
-                // Save the filled PDF – each record gets its own file
-                string outputFileName = $"filled-{recordIndex}.pdf";
-                try
-                {
-                    pdfDoc.Save(outputFileName);
-                    Console.WriteLine($"Record {recordIndex} saved to '{outputFileName}'.");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Failed to save PDF for record {recordIndex}: {ex.Message}");
-                }
+                // Save the filled PDF
+                string outputPath = Path.Combine(outputDir, $"filled_{recordIndex}.pdf");
+                pdfDoc.Save(outputPath);
+                Console.WriteLine($"Saved filled PDF: {outputPath}");
             }
 
             recordIndex++;

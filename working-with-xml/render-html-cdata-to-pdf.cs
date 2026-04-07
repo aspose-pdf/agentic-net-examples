@@ -1,76 +1,80 @@
 using System;
 using System.IO;
-using System.Text;
-using System.Xml;
-using System.Runtime.InteropServices;
-using Aspose.Pdf;
-using Aspose.Pdf.Text; // needed for HtmlFragment
+using System.Linq;                     // <-- Added for LINQ extension methods
+using System.Xml.Linq;
+using Aspose.Pdf;                     // Core PDF API
+using Aspose.Pdf.Text;               // For text‑related classes (if needed)
 
-namespace RenderHtmlCdataToPdf
+class Program
 {
-    class Program
+    static void Main()
     {
-        static void Main(string[] args)
+        // Paths for the source XML and the resulting PDF.
+        const string xmlPath = "source.xml";
+        const string pdfPath = "result.pdf";
+
+        // Verify that the XML file exists.
+        if (!File.Exists(xmlPath))
         {
-            // Sample XML containing HTML fragments inside CDATA sections
-            string xmlContent = "<root><section><![CDATA[<html><body><h1>Hello World</h1><p>This is a paragraph from CDATA.</p></body></html>]]></section><section><![CDATA[<html><body><h2>Second Fragment</h2><ul><li>Item 1</li><li>Item 2</li></ul></body></html>]]></section></root>";
-
-            // Load XML and extract CDATA (HTML) fragments
-            XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.Load(new MemoryStream(Encoding.UTF8.GetBytes(xmlContent)));
-            XmlNodeList cdataNodes = xmlDoc.GetElementsByTagName("section");
-
-            // Prepare the final PDF document
-            using (Document finalDoc = new Document())
-            {
-                // Remove the default empty page that Aspose creates
-                finalDoc.Pages.Clear();
-
-                foreach (XmlNode node in cdataNodes)
-                {
-                    // The InnerText of the node contains the HTML fragment
-                    string htmlFragment = node.InnerText;
-
-                    // Create a new page for each fragment
-                    Page page = finalDoc.Pages.Add();
-
-                    // Add the HTML fragment directly to the page using HtmlFragment
-                    HtmlFragment html = new HtmlFragment(htmlFragment);
-                    page.Paragraphs.Add(html);
-                }
-
-                // Save the merged PDF – guard the call on non‑Windows platforms where libgdiplus may be missing
-                string outputPath = "output.pdf";
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    finalDoc.Save(outputPath);
-                    Console.WriteLine($"PDF saved to '{outputPath}'.");
-                }
-                else
-                {
-                    try
-                    {
-                        finalDoc.Save(outputPath);
-                        Console.WriteLine($"PDF saved to '{outputPath}'. (non‑Windows platform, libgdiplus present)");
-                    }
-                    catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
-                    {
-                        Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. PDF was not saved.");
-                    }
-                }
-            }
+            Console.Error.WriteLine($"Error: XML file not found – {xmlPath}");
+            return;
         }
 
-        // Helper that walks the inner‑exception chain looking for a DllNotFoundException (e.g., missing libgdiplus)
-        private static bool ContainsDllNotFound(Exception? ex)
+        // -----------------------------------------------------------------
+        // 1. Create an empty PDF document (lifecycle: create).
+        // -----------------------------------------------------------------
+        using (Document pdfDoc = new Document())
         {
-            while (ex != null)
+            // Ensure there is at least one page to host the fragments.
+            pdfDoc.Pages.Add();
+
+            // -----------------------------------------------------------------
+            // 2. Load the XML file using standard .NET XML APIs.
+            //    (The XML may contain CDATA sections with HTML fragments.)
+            // -----------------------------------------------------------------
+            XDocument xDoc = XDocument.Load(xmlPath);
+
+            // Counter to keep track of which page we are writing to.
+            int currentPageNumber = 1;
+
+            // Iterate over every CDATA node found in the XML.
+            foreach (XCData cdata in xDoc.DescendantNodes().OfType<XCData>())
             {
-                if (ex is DllNotFoundException)
-                    return true;
-                ex = ex.InnerException;
+                // The CDATA content is expected to be an HTML fragment.
+                string htmlContent = cdata.Value.Trim();
+
+                if (string.IsNullOrEmpty(htmlContent))
+                    continue; // Skip empty fragments.
+
+                // -----------------------------------------------------------------
+                // 3. Create an HtmlFragment from the HTML string.
+                //    (Lifecycle: create – the fragment is a formatted PDF element.)
+                // -----------------------------------------------------------------
+                HtmlFragment htmlFragment = new HtmlFragment(htmlContent);
+
+                // Optional: customize loading options for this fragment.
+                // For example, set a base path if the HTML references external resources.
+                // htmlFragment.HtmlLoadOptions = new HtmlLoadOptions(Path.GetDirectoryName(xmlPath));
+
+                // -----------------------------------------------------------------
+                // 4. Add the fragment to the current page.
+                // -----------------------------------------------------------------
+                Page page = pdfDoc.Pages[currentPageNumber];
+                page.Paragraphs.Add(htmlFragment);
+
+                // If you want each fragment on a separate page, uncomment the block below:
+                /*
+                currentPageNumber++;
+                pdfDoc.Pages.Add();
+                */
             }
-            return false;
+
+            // -----------------------------------------------------------------
+            // 5. Save the populated PDF document (lifecycle: save).
+            // -----------------------------------------------------------------
+            pdfDoc.Save(pdfPath);
         }
+
+        Console.WriteLine($"PDF generated successfully: {pdfPath}");
     }
 }
