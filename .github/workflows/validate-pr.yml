@@ -96,7 +96,7 @@ jobs:
             cp "$f" .build-template/Program.cs
 
             # ── dotnet build (required) ──
-            BUILD_OUT=$(dotnet build .build-template/ --no-restore --nologo 2>&1)
+            BUILD_OUT=$(dotnet build .build-template/ --no-restore --nologo 2>&1) || true
             if echo "$BUILD_OUT" | grep -q "Build succeeded"; then
               PASS=$((PASS + 1))
               BUILD_ICON="✅"
