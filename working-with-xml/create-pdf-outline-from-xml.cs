@@ -2,50 +2,70 @@ using System;
 using System.IO;
 using System.Xml.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations; // for GoToAction
+using Aspose.Pdf.Annotations; // Correct namespace for GoToAction
 
-public class Program
+class Program
 {
-    public static void Main()
+    static void Main()
     {
-        // Create a sample PDF with three pages
-        string pdfPath = "sample.pdf";
-        using (Document pdfDoc = new Document())
+        const string inputPdfPath  = "input.pdf";   // source PDF
+        const string inputXmlPath  = "sections.xml"; // XML with section titles
+        const string outputPdfPath = "output_with_outline.pdf";
+
+        // Verify files exist
+        if (!File.Exists(inputPdfPath))
         {
-            // Add three blank pages
-            pdfDoc.Pages.Add();
-            pdfDoc.Pages.Add();
-            pdfDoc.Pages.Add();
-            pdfDoc.Save(pdfPath);
+            Console.Error.WriteLine($"PDF not found: {inputPdfPath}");
+            return;
+        }
+        if (!File.Exists(inputXmlPath))
+        {
+            Console.Error.WriteLine($"XML not found: {inputXmlPath}");
+            return;
         }
 
-        // Create a sample XML file with section titles
-        string xmlPath = "sections.xml";
-        string xmlContent = "<?xml version='1.0' encoding='utf-8'?><document><section title='Introduction' /><section title='Chapter 1' /><section title='Conclusion' /></document>";
-        File.WriteAllText(xmlPath, xmlContent);
+        // Load the XML document containing section titles and page numbers
+        XDocument xmlDoc = XDocument.Load(inputXmlPath);
 
-        // Load the PDF document
-        using (Document pdfDoc = new Document(pdfPath))
+        // Open the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Load XML and extract titles
-            XDocument xDoc = XDocument.Load(xmlPath);
-            foreach (XElement sectionElement in xDoc.Root.Elements("section"))
+            // Expected XML format:
+            // <Sections>
+            //   <Section title="Chapter 1" page="1" />
+            //   <Section title="Chapter 2" page="5" />
+            //   ...
+            // </Sections>
+            foreach (XElement section in xmlDoc.Root.Elements("Section"))
             {
-                XAttribute titleAttr = sectionElement.Attribute("title");
-                if (titleAttr != null)
+                string title = (string)section.Attribute("title");
+                int pageNumber = (int?)section.Attribute("page") ?? 1; // default to first page if missing
+
+                // Ensure the page number is within the PDF page range
+                if (pageNumber < 1 || pageNumber > pdfDoc.Pages.Count)
                 {
-                    // Create a new outline item
-                    OutlineItemCollection outlineItem = new OutlineItemCollection(pdfDoc.Outlines);
-                    outlineItem.Title = titleAttr.Value;
-                    // Link the outline item to the first page (using GoToAction instead of Destination)
-                    outlineItem.Action = new GoToAction(pdfDoc.Pages[1]);
-                    // Add the outline item to the document outline hierarchy
-                    pdfDoc.Outlines.Add(outlineItem);
+                    Console.Error.WriteLine($"Invalid page number {pageNumber} for title \"{title}\". Skipping.");
+                    continue;
                 }
+
+                // Retrieve the target page (Aspose.Pdf uses 1‑based indexing)
+                Page targetPage = pdfDoc.Pages[pageNumber];
+
+                // Create a new outline item linked to the target page
+                OutlineItemCollection outlineItem = new OutlineItemCollection(pdfDoc.Outlines)
+                {
+                    Title  = title,
+                    Action = new GoToAction(targetPage) // navigation action
+                };
+
+                // Add the outline item to the document's outline collection
+                pdfDoc.Outlines.Add(outlineItem);
             }
 
-            // Save the updated PDF with outlines
-            pdfDoc.Save("output.pdf");
+            // Save the modified PDF
+            pdfDoc.Save(outputPdfPath);
         }
+
+        Console.WriteLine($"PDF with custom outlines saved to '{outputPdfPath}'.");
     }
 }

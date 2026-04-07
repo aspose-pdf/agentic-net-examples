@@ -4,34 +4,48 @@ using Aspose.Pdf;
 
 class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
-        // Determine the folder that contains the XML files.
-        // If a folder path is supplied as a command‑line argument it is used; otherwise the current directory is used.
-        string folderPath;
-        if (args.Length > 0)
+        // Folder containing XML files
+        const string inputFolder = "XmlFolder";
+        // Folder where PDFs will be saved
+        const string outputFolder = "PdfOutput";
+
+        if (!Directory.Exists(inputFolder))
         {
-            folderPath = args[0];
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            return;
         }
-        else
+
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputFolder);
+
+        // Get all XML files in the input folder (non‑recursive)
+        string[] xmlFiles = Directory.GetFiles(inputFolder, "*.xml", SearchOption.TopDirectoryOnly);
+
+        foreach (string xmlPath in xmlFiles)
         {
-            folderPath = Directory.GetCurrentDirectory();
-        }
-
-        // Retrieve all XML files in the folder.
-        string[] xmlFiles = Directory.GetFiles(folderPath, "*.xml");
-
-        foreach (string xmlFilePath in xmlFiles)
-        {
-            // Load the XML file with default XmlLoadOptions.
-            XmlLoadOptions loadOptions = new XmlLoadOptions();
-
-            using (Document pdfDocument = new Document(xmlFilePath, loadOptions))
+            try
             {
-                // Create a simple PDF file name (no directory part).
-                string pdfFileName = Path.GetFileNameWithoutExtension(xmlFilePath) + ".pdf";
-                pdfDocument.Save(pdfFileName);
-                Console.WriteLine("Converted: " + pdfFileName);
+                // Load the XML file with default XmlLoadOptions
+                XmlLoadOptions loadOptions = new XmlLoadOptions();
+
+                // Use the Document constructor that accepts the XML file path and load options
+                using (Document pdfDoc = new Document(xmlPath, loadOptions))
+                {
+                    // Build the output PDF file name
+                    string pdfFileName = Path.GetFileNameWithoutExtension(xmlPath) + ".pdf";
+                    string pdfPath = Path.Combine(outputFolder, pdfFileName);
+
+                    // Save the document as PDF
+                    pdfDoc.Save(pdfPath);
+
+                    Console.WriteLine($"Converted: '{xmlPath}' → '{pdfPath}'");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error converting '{xmlPath}': {ex.Message}");
             }
         }
     }
