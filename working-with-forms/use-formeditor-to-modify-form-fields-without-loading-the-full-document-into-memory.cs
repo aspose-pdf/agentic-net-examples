@@ -1,88 +1,67 @@
 using System;
-using Aspose.Pdf.Facades;          // FormEditor, FieldType, PropertyFlag
+using System.IO;
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        // Paths to the source PDF (with an existing AcroForm) and the output PDF.
-        const string inputPdf  = "input_form.pdf";
-        const string outputPdf = "output_form_modified.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output.pdf";
 
-        // Ensure the source file exists.
-        if (!System.IO.File.Exists(inputPdf))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Source PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // FormEditor works directly on the PDF file without loading the whole document into memory.
-        // It implements IDisposable, so we wrap it in a using block.
+        // Initialize FormEditor and bind the source PDF (no full document load into memory)
         using (FormEditor editor = new FormEditor())
         {
-            // Bind the existing PDF to the editor.
             editor.BindPdf(inputPdf);
 
-            // -----------------------------------------------------------------
-            // 1. Add a new single‑line text field.
-            //    Parameters: field type, field name, page number (1‑based),
-            //    lower‑left X, lower‑left Y, upper‑right X, upper‑right Y.
-            // -----------------------------------------------------------------
-            bool added = editor.AddField(FieldType.Text, "NewTextField", 1,
-                                         100f, 500f, 300f, 520f);
-            if (!added)
-                Console.WriteLine("Failed to add NewTextField.");
+            // Add a single‑line text field
+            // Parameters: field type, field name, page number, llx, lly, urx, ury
+            editor.AddField(FieldType.Text, "CustomerName", 1, 100, 700, 300, 720);
 
-            // -----------------------------------------------------------------
-            // 2. Set a maximum character limit for the newly added text field.
-            // -----------------------------------------------------------------
-            editor.SetFieldLimit("NewTextField", 30); // limit to 30 characters
+            // Set a maximum character limit for the text field
+            editor.SetFieldLimit("CustomerName", 50);
 
-            // -----------------------------------------------------------------
-            // 3. Mark the field as required.
-            // -----------------------------------------------------------------
-            editor.SetFieldAttribute("NewTextField", PropertyFlag.Required);
+            // Align text to the left inside the field
+            editor.SetFieldAlignment("CustomerName", (int)FormFieldFacade.AlignLeft);
 
-            // -----------------------------------------------------------------
-            // 4. Rename an existing field (if it exists).
-            // -----------------------------------------------------------------
-            // Note: RenameField throws if the source name is not found; we can ignore the result.
-            try
-            {
-                editor.RenameField("OldFieldName", "RenamedField");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Rename failed (field may not exist): {ex.Message}");
-            }
+            // Add a checkbox field
+            editor.AddField(FieldType.CheckBox, "SubscribeNewsletter", 1, 100, 650, 115, 665);
 
-            // -----------------------------------------------------------------
-            // 5. Remove an unwanted field.
-            // -----------------------------------------------------------------
-            try
-            {
-                editor.RemoveField("ObsoleteField");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Remove failed (field may not exist): {ex.Message}");
-            }
+            // Mark the checkbox as required
+            editor.SetFieldAttribute("SubscribeNewsletter", PropertyFlag.Required);
 
-            // -----------------------------------------------------------------
-            // 6. Change visual appearance of all text fields (optional).
-            //    Here we set a light gray background and center alignment.
-            // -----------------------------------------------------------------
-            editor.Facade = new FormFieldFacade(); // reset visual facade
-            editor.Facade.BackgroundColor = System.Drawing.Color.LightGray;
-            editor.Facade.Alignment = FormFieldFacade.AlignCenter;
-            editor.DecorateField(FieldType.Text); // apply to all text fields
+            // NOTE: The original code attempted to use AnnotationFlags.NoPrint, which does not exist in the current Aspose.PDF API.
+            // If you need to control the appearance flags, use the available members of AnnotationFlags (e.g., Print, NoView, etc.).
+            // For this example the line is omitted to keep the code compiling.
+            // editor.SetFieldAppearance("SubscribeNewsletter", AnnotationFlags.NoPrint);
 
-            // -----------------------------------------------------------------
-            // 7. Save the modified PDF to a new file.
-            // -----------------------------------------------------------------
+            // Add a submit button that posts form data to a URL
+            editor.AddSubmitBtn("SubmitForm", 1, "Submit", "https://example.com/submit", 400, 700, 500, 730);
+
+            // NOTE: SubmitFormFlag.IncludeFormFields is not present in the current API version.
+            // The call is removed; if you need to include specific flags, use the members that exist in SubmitFormFlag.
+            // editor.SetSubmitFlag("SubmitForm", SubmitFormFlag.IncludeFormFields);
+
+            // Reposition the text field
+            editor.MoveField("CustomerName", 100, 600, 300, 620);
+
+            // Rename the checkbox field
+            editor.RenameField("SubscribeNewsletter", "NewsletterOptIn");
+
+            // Remove the submit button (demonstrates field deletion)
+            editor.RemoveField("SubmitForm");
+
+            // Persist the changes to a new PDF file
             editor.Save(outputPdf);
         }
 
-        Console.WriteLine($"Form fields modified and saved to '{outputPdf}'.");
+        Console.WriteLine($"Form modifications saved to '{outputPdf}'.");
     }
 }
