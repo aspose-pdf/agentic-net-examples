@@ -1,0 +1,2141 @@
+{
+  "category": "working-with-graphs",
+  "nuget_version": "26.3.0",
+  "last_updated": "2026-04-07T12:09:54Z",
+  "examples": {
+    "create-pdf-with-filled-arc-graph": {
+      "title": "Create PDF with Filled Arc Graph",
+      "filename": "create-pdf-with-filled-arc-graph.cs",
+      "description": "Shows how to generate a PDF, add a Graph container, draw a filled arc with a custom light‑blue color, and save the document.",
+      "tags": [
+        "pdf",
+        "graph",
+        "arc",
+        "fill-color",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Arc",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Drawing.Color",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages.Add",
+        "Aspose.Pdf.Drawing.Graph.Shapes.Add",
+        "Aspose.Pdf.Page.Paragraphs.Add"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "add-unfilled-arc-with-custom-stroke": {
+      "title": "Add Unfilled Arc with Custom Stroke to PDF",
+      "filename": "add-unfilled-arc-with-custom-stroke.cs",
+      "description": "Demonstrates creating a PDF, adding a Graph container, drawing an unfilled arc, and configuring its line width and dash pattern.",
+      "tags": [
+        "PDF",
+        "Arc",
+        "Graph",
+        "Stroke",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Arc",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages.Add",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Drawing.Graph.Shapes.Add"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "insert-circle-radial-gradient-into-pdf-graph": {
+      "title": "Insert Circle with Radial Gradient Fill into PDF Graph",
+      "filename": "insert-circle-radial-gradient-into-pdf-graph.cs",
+      "description": "Demonstrates how to add a circle shape to an Aspose.Pdf Graph and fill it with a radial gradient using two colors.",
+      "tags": [
+        "circle",
+        "gradient",
+        "pdf",
+        "aspose",
+        "graph"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Circle",
+        "Aspose.Pdf.Drawing.GradientRadialShading",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Drawing.GraphInfo"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "add-filled-circle-to-pdf": {
+      "title": "Add a Filled Circle to a PDF Using Aspose.Pdf",
+      "filename": "add-filled-circle-to-pdf.cs",
+      "description": "Shows how to create a PDF document, add a Graph container, and draw a filled circle with a given radius and center coordinates.",
+      "tags": [
+        "pdf",
+        "circle",
+        "graph",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Circle",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Drawing.Graph.Shapes.Add"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "create-bezier-curve-in-pdf-graph": {
+      "title": "Create a Bezier Curve in a PDF Graph",
+      "filename": "create-bezier-curve-in-pdf-graph.cs",
+      "description": "Shows how to add a Bezier curve defined by four control points to a PDF graph and customize its stroke color and line width using Aspose.Pdf.",
+      "tags": [
+        "bezier",
+        "graph",
+        "pdf",
+        "aspose",
+        "drawing"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Curve",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "add-filled-curve-to-pdf-graph": {
+      "title": "Add Filled Curve to PDF Graph",
+      "filename": "add-filled-curve-to-pdf-graph.cs",
+      "description": "Shows how to create a PDF document, add a Graph container, draw a Bezier curve with a fill color and border thickness, and save the file.",
+      "tags": [
+        "pdf",
+        "graph",
+        "curve",
+        "fill",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Curve",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "draw-line-with-cap-style": {
+      "title": "Draw a Line with Cap Style in PDF",
+      "filename": "draw-line-with-cap-style.cs",
+      "description": "Shows how to create a PDF, add a Graph container, draw a straight line, set its color and thickness, and apply a line cap style.",
+      "tags": [
+        "pdf",
+        "line",
+        "graph",
+        "aspose-pdf",
+        "line-cap"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Line",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Drawing.Color",
+        "Aspose.Pdf.Operators.SetLineCap",
+        "Aspose.Pdf.Operators.LineCap"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "add-multi-colored-line-segments-to-pdf-graph": {
+      "title": "Add Multi-Colored Line Segments to a PDF Graph",
+      "filename": "add-multi-colored-line-segments-to-pdf-graph.cs",
+      "description": "Demonstrates how to create a PDF graph and add multiple line segments, each with its own color, using Aspose.Pdf.",
+      "tags": [
+        "graph",
+        "line",
+        "color",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Line",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Drawing.Color",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "insert-rounded-rectangle-into-pdf-graph": {
+      "title": "Insert Rounded Rectangle into PDF Graph",
+      "filename": "insert-rounded-rectangle-into-pdf-graph.cs",
+      "description": "Demonstrates creating a Graph, adding a rectangle with rounded corners, applying a solid fill color and border, and saving the PDF.",
+      "tags": [
+        "graph",
+        "rectangle",
+        "rounded-corner",
+        "fill-color",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Graph.Shapes.Add",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.Rectangle.RoundedCornerRadius",
+        "Aspose.Pdf.Drawing.Rectangle.GraphInfo",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "add-filled-rectangle-with-dashed-border": {
+      "title": "Add Filled Rectangle with Dashed Border to PDF Graph",
+      "filename": "add-filled-rectangle-with-dashed-border.cs",
+      "description": "Demonstrates creating a PDF, adding a Graph container, drawing a filled rectangle with a custom dash pattern and border width, and saving the document.",
+      "tags": [
+        "pdf",
+        "rectangle",
+        "graph",
+        "border",
+        "dash-pattern"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Drawing.Color",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "create-ellipse-with-custom-radii-and-stroke-color": {
+      "title": "Create Ellipse with Custom Radii and Stroke Color in PDF",
+      "filename": "create-ellipse-with-custom-radii-and-stroke-color.cs",
+      "description": "This example demonstrates how to draw an ellipse inside a Graph container in a PDF using Aspose.Pdf, specifying horizontal and vertical radii and setting the stroke color.",
+      "tags": [
+        "ellipse",
+        "pdf",
+        "graph",
+        "aspose-pdf",
+        "stroke-color"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Ellipse",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "add-gradient-filled-ellipse-to-pdf-graph": {
+      "title": "Add Gradient-Filled Ellipse to PDF Graph",
+      "filename": "add-gradient-filled-ellipse-to-pdf-graph.cs",
+      "description": "Creates a PDF document, adds a Graph container, draws an ellipse, and fills it with an axial gradient that transitions from red to blue.",
+      "tags": [
+        "ellipse",
+        "gradient",
+        "pdf",
+        "graph",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Graph",
+        "Aspose.Pdf.Drawing.Ellipse",
+        "Aspose.Pdf.Drawing.GradientAxialShading",
+        "Aspose.Pdf.Drawing.Point",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "add-centered-graph-to-pdf-page": {
+      "title": "Add Centered Graph to PDF Page",
+      "filename": "add-centered-graph-to-pdf-page.cs",
+      "description": "Loads an existing PDF, creates a Graph object, aligns it to the page center horizontally, adds it to the first page's Paragraphs collection, and saves the modified document.",
+      "tags": [
+        "graph",
+        "pdf",
+        "center-alignment",
+        "Aspose.Pdf",
+        "paragraphs"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.HorizontalAlignment",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "place-graph-left-margin-offset": {
+      "title": "Place a Graph Aligned to Left Margin with Offset in PDF",
+      "filename": "place-graph-left-margin-offset.cs",
+      "description": "Shows how to load a PDF, create a Graph object, align it to the left margin with a custom offset, and save the modified document using Aspose.Pdf.",
+      "tags": [
+        "graph",
+        "alignment",
+        "pdf",
+        "aspose",
+        "offset"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.Paragraphs",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Drawing.HorizontalAlignment",
+        "Aspose.Pdf.Drawing.Color"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "set-graph-width-height": {
+      "title": "Set Graph Width and Height in PDF",
+      "filename": "set-graph-width-height.cs",
+      "description": "Demonstrates creating a Graph in a PDF, setting its Width and Height properties, adding a rectangle shape, and saving the document.",
+      "tags": [
+        "graph",
+        "size",
+        "pdf",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "create-dimension-specific-line-in-pdf-graph": {
+      "title": "Create a Dimension‑Specific Line in a PDF Graph",
+      "filename": "create-dimension-specific-line-in-pdf-graph.cs",
+      "description": "Demonstrates how to use Aspose.Pdf's drawing library to add a line with explicit coordinates to a Graph object and embed it in a PDF page.",
+      "tags": [
+        "pdf",
+        "graph",
+        "line",
+        "drawing",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Line",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "create-dimension-specific-rectangle-in-graph": {
+      "title": "Create a Dimension‑Specific Rectangle Inside a PDF Graph",
+      "filename": "create-dimension-specific-rectangle-in-graph.cs",
+      "description": "Shows how to use Aspose.Pdf's Graph and Rectangle classes to draw a rectangle with explicit dimensions and styling inside a PDF page.",
+      "tags": [
+        "pdf",
+        "rectangle",
+        "graph",
+        "drawing",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Drawing.Color"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "adjust-shape-position-to-fit-page-bounds": {
+      "title": "Adjust Shape Position to Fit Within PDF Page Bounds",
+      "filename": "adjust-shape-position-to-fit-page-bounds.cs",
+      "description": "Shows how to verify a rectangle's coordinates against a PDF page size and reposition it so the shape stays inside the page using Aspose.Pdf.",
+      "tags": [
+        "bounds",
+        "rectangle",
+        "pdf",
+        "aspose",
+        "graph"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Drawing.Color",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "log-shape-bounding-boxes-in-pdf-graph": {
+      "title": "Log Shape Bounding Boxes in PDF Graph",
+      "filename": "log-shape-bounding-boxes-in-pdf-graph.cs",
+      "description": "Creates a PDF with a graph containing rectangle, ellipse, and line shapes, then iterates over the shapes to output each shape's bounding box coordinates (or notes when unavailable).",
+      "tags": [
+        "graph",
+        "shapes",
+        "bounding-box",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.Ellipse",
+        "Aspose.Pdf.Drawing.Line",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Drawing.Shape"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "rotate-graph-in-pdf": {
+      "title": "Rotate a Graph Element in a PDF",
+      "filename": "rotate-graph-in-pdf.cs",
+      "description": "Shows how to create a PDF, add a graph containing a rectangle shape, apply a 45‑degree rotation to the entire graph, and save the document using Aspose.Pdf.",
+      "tags": [
+        "graph",
+        "rotation",
+        "pdf",
+        "Aspose.Pdf",
+        "drawing"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "translate-graph-element": {
+      "title": "Translate Graph Element in PDF",
+      "filename": "translate-graph-element.cs",
+      "description": "Shows how to reposition a shape inside an Aspose.Pdf Graph by applying horizontal and vertical offsets and updating the PDF document.",
+      "tags": [
+        "graph",
+        "translation",
+        "shape",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Document",
+        "Page",
+        "Graph",
+        "Rectangle",
+        "GraphInfo",
+        "Color",
+        "Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "non-uniform-scaling-graph": {
+      "title": "Non‑Uniform Scaling of a Graph in PDF",
+      "filename": "non-uniform-scaling-graph.cs",
+      "description": "Demonstrates how to create a graph, add a shape, and apply different scaling factors on the X and Y axes to change its aspect ratio before saving the PDF.",
+      "tags": [
+        "graph",
+        "scaling",
+        "pdf",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Drawing.Color",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "skew-rectangle-x-axis-pdf-graph": {
+      "title": "Skew a Rectangle in a PDF Graph on the X‑Axis",
+      "filename": "skew-rectangle-x-axis-pdf-graph.cs",
+      "description": "Demonstrates how to create a PDF, add a Graph, draw a rectangle, and apply an X‑axis skew to achieve a slanted visual effect.",
+      "tags": [
+        "pdf",
+        "graph",
+        "skew",
+        "rectangle",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages.Add",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Graph.Shapes.Add"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "apply-clipping-region-to-pdf-graph": {
+      "title": "Apply Clipping Region to PDF Graph",
+      "filename": "apply-clipping-region-to-pdf-graph.cs",
+      "description": "Demonstrates how to create a clipping rectangle with low‑level PDF operators and render a graph so that its shapes appear only inside the defined area.",
+      "tags": [
+        "clipping",
+        "pdf",
+        "graph",
+        "shapes",
+        "aspose.pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Operators.MoveTo",
+        "Aspose.Pdf.Operators.LineTo",
+        "Aspose.Pdf.Operators.ClosePath",
+        "Aspose.Pdf.Operators.Clip",
+        "Aspose.Pdf.Operators.EOClip",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Line",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "transparent-shape-graph-layer": {
+      "title": "Create Transparent Shape Using Graph Layer in PDF",
+      "filename": "transparent-shape-graph-layer.cs",
+      "description": "Demonstrates how to start a transparency layer with a Graph, draw a semi‑transparent rectangle, and save the PDF document.",
+      "tags": [
+        "transparency",
+        "graph",
+        "rectangle",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color.FromArgb",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "add-shadow-effect-to-filled-rectangle": {
+      "title": "Add Shadow Effect to a Filled Rectangle in a PDF Graph",
+      "filename": "add-shadow-effect-to-filled-rectangle.cs",
+      "description": "Shows how to simulate a shadow for a rectangle inside an Aspose.Pdf Graph by drawing an offset semi‑transparent rectangle behind the main shape.",
+      "tags": [
+        "shadow",
+        "rectangle",
+        "graph",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "create-star-shape-pdf": {
+      "title": "Create Custom Star Shape in PDF",
+      "filename": "create-star-shape-pdf.cs",
+      "description": "Demonstrates how to generate a star polygon with a configurable number of points, set its fill and stroke colors, and embed it in a PDF using Aspose.Pdf's Graph and drawing classes.",
+      "tags": [
+        "star",
+        "shape",
+        "pdf",
+        "graph",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Graph",
+        "Aspose.Pdf.Drawing.Path",
+        "Aspose.Pdf.Drawing.Line",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "add-regular-hexagon-to-pdf-graph": {
+      "title": "Add Regular Hexagon to PDF Graph",
+      "filename": "add-regular-hexagon-to-pdf-graph.cs",
+      "description": "Demonstrates how to create a regular hexagon shape inside a PDF graph, set its border color and thickness, and save the document.",
+      "tags": [
+        "pdf",
+        "graph",
+        "hexagon",
+        "shape",
+        "border"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Graph",
+        "Aspose.Pdf.Drawing.Path",
+        "Aspose.Pdf.Drawing.Line",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Graph.Shapes.Add",
+        "Aspose.Pdf.Drawing.Path.Shapes.Add"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "insert-dashed-polyline-annotation": {
+      "title": "Insert Dashed Polyline Annotation into PDF",
+      "filename": "insert-dashed-polyline-annotation.cs",
+      "description": "Demonstrates how to add a polyline annotation with multiple vertices to a PDF page and style its border with a dashed line using Aspose.Pdf.",
+      "tags": [
+        "polyline",
+        "annotation",
+        "border",
+        "dash",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Drawing.Point",
+        "Aspose.Pdf.Drawing.Color",
+        "Aspose.Pdf.Annotations.PolylineAnnotation",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Annotations.Dash"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "add-polygon-annotation-with-dashed-outline": {
+      "title": "Add Polygon Annotation with Dashed Outline and Fill",
+      "filename": "add-polygon-annotation-with-dashed-outline.cs",
+      "description": "Demonstrates how to create a polygon annotation on a PDF page, fill it with a color (placeholder for a pattern), and apply a dashed border using Aspose.Pdf.",
+      "tags": [
+        "polygon",
+        "annotation",
+        "dash",
+        "fill",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreatePolygon",
+        "Aspose.Pdf.Annotations.LineInfo",
+        "Aspose.Pdf.Annotations.PolygonAnnotation",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Annotations.Dash",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "create-layered-graph-pdf": {
+      "title": "Create Layered Graph in PDF with Aspose.Pdf",
+      "filename": "create-layered-graph-pdf.cs",
+      "description": "Demonstrates how to build a Graph, add shapes, create a PDF layer with low‑level drawing operators, control its visibility, and save the document using Aspose.Pdf.",
+      "tags": [
+        "graph",
+        "layer",
+        "pdf",
+        "aspose-pdf",
+        "drawing"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.GraphInfo",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Layer",
+        "Aspose.Pdf.Operators.SetRGBColorStroke",
+        "Aspose.Pdf.Operators.MoveTo",
+        "Aspose.Pdf.Operators.LineTo",
+        "Aspose.Pdf.Operators.Stroke",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Layer.Lock"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "add-text-inside-graph": {
+      "title": "Add Text Inside a Graph with Custom Font and Position",
+      "filename": "add-text-inside-graph.cs",
+      "description": "Demonstrates creating a graph in a PDF, applying styling, and inserting a text fragment with a specific font, size, color, and coordinates inside the graph.",
+      "tags": [
+        "graph",
+        "text",
+        "pdf",
+        "font",
+        "position"
+      ],
+      "apis_used": [
+        "Document",
+        "Document.Save",
+        "Page",
+        "Graph",
+        "GraphInfo",
+        "Color",
+        "FontRepository.FindFont",
+        "TextFragment",
+        "TextState",
+        "Position"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "apply-background-image-and-overlay-graph": {
+      "title": "Apply Background Image and Overlay Graph on PDF",
+      "filename": "apply-background-image-and-overlay-graph.cs",
+      "description": "Demonstrates how to stamp a background image onto each PDF page and then draw vector shapes using a Graph so that the shapes appear on top of the image.",
+      "tags": [
+        "background-image",
+        "graph",
+        "overlay",
+        "shapes",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.Stamp",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.Ellipse",
+        "Aspose.Pdf.Drawing.Line",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "add-filled-arc-with-radial-gradient": {
+      "title": "Add Filled Arc with Radial Gradient to PDF Graph",
+      "filename": "add-filled-arc-with-radial-gradient.cs",
+      "description": "Shows how to create an Arc shape inside a Graph and fill it with a radial gradient shading in a PDF using Aspose.Pdf.",
+      "tags": [
+        "arc",
+        "radial-gradient",
+        "graph",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Arc",
+        "Aspose.Pdf.Drawing.GradientRadialShading",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Drawing.Point"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "create-pdf-with-single-page": {
+      "title": "Create a PDF with a Single Page",
+      "filename": "create-pdf-with-single-page.cs",
+      "description": "Shows how to create a new PDF document, add a default‑size page, and save the file using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "aspose.pdf",
+        "create",
+        "page",
+        "c#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.PageCollection.Add"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "create-graph-matching-page-size": {
+      "title": "Create a Graph Matching Page Size in PDF",
+      "filename": "create-graph-matching-page-size.cs",
+      "description": "Shows how to instantiate a Graph that exactly matches a PDF page's width and height and add a rectangle shape to it using Aspose.Pdf.",
+      "tags": [
+        "graph",
+        "pdf",
+        "aspose",
+        "drawing",
+        "page-size"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Drawing.Color",
+        "Document.Save",
+        "Page.Paragraphs.Add",
+        "Graph.Shapes.Add"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "add-red-filled-rectangle-to-pdf": {
+      "title": "Add a Red Filled Rectangle to a PDF Using Aspose.Pdf Graph",
+      "filename": "add-red-filled-rectangle-to-pdf.cs",
+      "description": "Demonstrates how to create a PDF, add a Graph that covers the page, and draw a solid red rectangle with an optional black border using absolute coordinates.",
+      "tags": [
+        "rectangle",
+        "graph",
+        "pdf",
+        "aspose",
+        "fill"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Pages.Add",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Drawing.Graph.Shapes.Add"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "semi-transparent-ellipse-pdf": {
+      "title": "Create Semi-Transparent Ellipse in PDF",
+      "filename": "semi-transparent-ellipse-pdf.cs",
+      "description": "Shows how to draw an ellipse with a semi‑transparent fill in a PDF using Aspose.Pdf by setting an ARGB color and adding the shape to a Graph container.",
+      "tags": [
+        "ellipse",
+        "transparent",
+        "pdf",
+        "Aspose.Pdf",
+        "drawing"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Ellipse",
+        "Aspose.Pdf.Drawing.Color",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "insert-centered-text-into-graph-rectangle": {
+      "title": "Insert Centered Text into a Graph Rectangle in PDF",
+      "filename": "insert-centered-text-into-graph-rectangle.cs",
+      "description": "Shows how to draw a rectangle inside a Graph and place a centered \"Hello World\" TextFragment at its center using Aspose.Pdf.",
+      "tags": [
+        "graph",
+        "textfragment",
+        "rectangle",
+        "centered-text",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.Position",
+        "Aspose.Pdf.Text.FontRepository",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Text.HorizontalAlignment",
+        "Aspose.Pdf.Text.VerticalAlignment",
+        "Aspose.Pdf.Text.TextBuilder",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "enable-boundscheckmode-graph-validation": {
+      "title": "Enable BoundsCheckMode for Graph Shape Validation",
+      "filename": "enable-boundscheckmode-graph-validation.cs",
+      "description": "Demonstrates how to create a Graph container, add a rectangle shape, and enable BoundsCheckMode.ThrowExceptionIfDoesNotFit to ensure the shape fits within the graph bounds before rendering the PDF.",
+      "tags": [
+        "graph",
+        "bounds-check",
+        "shape",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.BoundsCheckMode"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "add-shapes-with-bounds-checking-to-pdf": {
+      "title": "Add Shapes with Bounds Checking to PDF",
+      "filename": "add-shapes-with-bounds-checking-to-pdf.cs",
+      "description": "Demonstrates creating a PDF, adding rectangles, ellipses and lines inside a Graph container, performing custom bounds‑checking, catching a custom exception, logging out‑of‑range coordinates, and saving the document.",
+      "tags": [
+        "pdf",
+        "shapes",
+        "bounds-checking",
+        "graph",
+        "exception"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.PageInfo",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.Ellipse",
+        "Aspose.Pdf.Drawing.Line",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Drawing.Shape",
+        "Aspose.Pdf.Drawing.Color",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Drawing.Graph.Shapes.Add"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "add-non-overlapping-rectangles-to-pdf-graph": {
+      "title": "Add Multiple Rectangles to a PDF Graph with Overlap Checking",
+      "filename": "add-non-overlapping-rectangles-to-pdf-graph.cs",
+      "description": "Creates a PDF document, adds a graph area, and places several rectangles of varying sizes while verifying their page bounds to ensure no overlap occurs.",
+      "tags": [
+        "pdf",
+        "rectangles",
+        "overlap",
+        "graph",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Rectangle.IsIntersect",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Graph",
+        "Aspose.Pdf.Graph.Shapes.Add"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "create-graph-rectangle-ellipse": {
+      "title": "Create Graph with Rectangle and Ellipse in PDF",
+      "filename": "create-graph-rectangle-ellipse.cs",
+      "description": "Shows how to build a Graph, add rectangle and ellipse shapes with fill and stroke properties, and place the graph on a PDF page using Aspose.Pdf.",
+      "tags": [
+        "graph",
+        "shapes",
+        "rectangle",
+        "ellipse",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.Ellipse",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Drawing.Color",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Pages.Add",
+        "Aspose.Pdf.Drawing.Graph.Shapes.Add",
+        "Aspose.Pdf.Page.Paragraphs.Add"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "export-pdf-to-memorystream-and-save": {
+      "title": "Export PDF to MemoryStream and Save to File",
+      "filename": "export-pdf-to-memorystream-and-save.cs",
+      "description": "Demonstrates loading a PDF with Aspose.Pdf, saving it to a MemoryStream, and then writing the stream to a file on disk.",
+      "tags": [
+        "pdf",
+        "memory-stream",
+        "file-output",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "add-graph-shapes-to-pdf-page": {
+      "title": "Add Graph with Shapes to a New PDF Page",
+      "filename": "add-graph-shapes-to-pdf-page.cs",
+      "description": "The example loads an existing PDF, adds a blank page, creates a Graph object, draws rectangle, ellipse and line shapes, and saves the modified document.",
+      "tags": [
+        "pdf",
+        "graph",
+        "shapes",
+        "aspose-pdf",
+        "add-page"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.Ellipse",
+        "Aspose.Pdf.Drawing.Line",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "insert-watermark-rectangle-graph-into-pdf": {
+      "title": "Insert Watermark Rectangle Graph into PDF Pages",
+      "filename": "insert-watermark-rectangle-graph-into-pdf.cs",
+      "description": "The example iterates through all PDF files in a folder, adds a graph containing a semi‑transparent rectangle watermark to each page, and saves the modified PDFs to an output folder.",
+      "tags": [
+        "pdf",
+        "watermark",
+        "graph",
+        "batch-processing",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.PageInfo",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "add-ellipse-graph-to-pdf-pages-parallel": {
+      "title": "Add Ellipse Graph to PDF Pages Using Parallel.ForEach",
+      "filename": "add-ellipse-graph-to-pdf-pages-parallel.cs",
+      "description": "Demonstrates loading PDF files, iterating through each page, creating a Graph with an ellipse shape, and saving the modified document while processing multiple PDFs concurrently with Parallel.ForEach.",
+      "tags": [
+        "parallel",
+        "pdf",
+        "graph",
+        "ellipse",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Ellipse",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Drawing.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "configure-graph-line-style-add-rectangle": {
+      "title": "Configure Graph Line Style and Add Custom Bordered Rectangle",
+      "filename": "configure-graph-line-style-add-rectangle.cs",
+      "description": "Shows how to set line width and dash pattern on a Graph, apply the same style to a rectangle shape, and add the shape to a PDF page using Aspose.Pdf.",
+      "tags": [
+        "graph",
+        "rectangle",
+        "border",
+        "dash-style",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Drawing.Color",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Pages.Add",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Drawing.Graph.Shapes.Add"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "apply-radial-gradient-ellipse": {
+      "title": "Apply Radial Gradient Fill to an Ellipse with Dark Gray Border",
+      "filename": "apply-radial-gradient-ellipse.cs",
+      "description": "Shows how to create a PDF, add a Graph canvas, draw an ellipse, set a dark gray border, and fill the shape with a radial gradient using Aspose.Pdf.",
+      "tags": [
+        "ellipse",
+        "radial-gradient",
+        "border",
+        "pdf",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Ellipse",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Drawing.GradientRadialShading",
+        "Aspose.Pdf.Drawing.Point",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages.Add",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Drawing.Graph.Shapes.Add"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "set-rectangle-fill-opacity-50-percent": {
+      "title": "Set Rectangle Fill Opacity to 50% in PDF",
+      "filename": "set-rectangle-fill-opacity-50-percent.cs",
+      "description": "Shows how to create a PDF, add a rectangle shape with a semi‑transparent fill using an ARGB color value, and save the document for visual verification.",
+      "tags": [
+        "pdf",
+        "opacity",
+        "rectangle",
+        "aspose.pdf",
+        "color"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Color.FromArgb",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Drawing.Graph.Shapes.Add"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "create-predefined-graph": {
+      "title": "Create Predefined Graph with Shapes for PDF Pages",
+      "filename": "create-predefined-graph.cs",
+      "description": "Shows how to build a reusable Aspose.Pdf graph containing a rectangle, ellipse, and line that can be added to any PDF page.",
+      "tags": [
+        "graph",
+        "shapes",
+        "aspose-pdf",
+        "pdf",
+        "drawing"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.Ellipse",
+        "Aspose.Pdf.Drawing.Line",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Drawing.Color"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "serialize-pdf-to-byte-array": {
+      "title": "Serialize PDF to Byte Array for Transmission",
+      "filename": "serialize-pdf-to-byte-array.cs",
+      "description": "Loads a PDF file containing a graph, saves it into a MemoryStream, and extracts a byte array that can be transmitted over a network.",
+      "tags": [
+        "pdf",
+        "serialization",
+        "byte-array",
+        "network",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "add-graph-with-labels-to-pdf": {
+      "title": "Add Graph with Labels to PDF",
+      "filename": "add-graph-with-labels-to-pdf.cs",
+      "description": "Demonstrates loading a PDF from a byte array, creating a Graph with rectangle, line, and ellipse shapes, adding text labels using TextBuilder, and saving the modified document.",
+      "tags": [
+        "pdf",
+        "graph",
+        "shapes",
+        "text-labels",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.Line",
+        "Aspose.Pdf.Drawing.Ellipse",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Drawing.Color",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.Position",
+        "Aspose.Pdf.Text.FontRepository",
+        "Aspose.Pdf.Text.TextBuilder",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Text.TextBuilder.AppendText"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "toggle-graph-boundscheckmode": {
+      "title": "Toggle Graph BoundsCheckMode Based on User Setting",
+      "filename": "toggle-graph-boundscheckmode.cs",
+      "description": "Demonstrates how to switch the Aspose.Pdf Graph's BoundsCheckMode between strict exception throwing and default ignore behavior according to a user‑defined setting, and adds the graph to a PDF page.",
+      "tags": [
+        "graph",
+        "bounds-check",
+        "pdf",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Drawing.BoundsCheckMode",
+        "Aspose.Pdf.Drawing.GraphShapeCollection.UpdateBoundsCheckMode",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "pdf-report-graph-with-legend": {
+      "title": "Create PDF Report with Graph and Legend",
+      "filename": "pdf-report-graph-with-legend.cs",
+      "description": "Demonstrates how to generate a PDF report containing a simple bar‑graph made of colored rectangles and a corresponding legend using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "graph",
+        "legend",
+        "aspose-pdf",
+        "rectangles"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Position",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Graph.Shapes.Add",
+        "Aspose.Pdf.Page.Paragraphs.Add"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "create-rounded-rectangle-solid-fill": {
+      "title": "Create Rounded Rectangle with Solid Fill in PDF",
+      "filename": "create-rounded-rectangle-solid-fill.cs",
+      "description": "Demonstrates how to add a rectangle with rounded corners, set a corner radius, and apply a solid fill and border using Aspose.Pdf.",
+      "tags": [
+        "rounded-rectangle",
+        "solid-fill",
+        "graph",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "create-rotate-ellipse-pdf": {
+      "title": "Create and Rotate an Ellipse in a PDF",
+      "filename": "create-rotate-ellipse-pdf.cs",
+      "description": "Demonstrates adding an ellipse to a PDF, applying a 45° rotation via GraphInfo, setting visual styles, and saving the document with Aspose.Pdf.",
+      "tags": [
+        "ellipse",
+        "rotation",
+        "pdf",
+        "graph",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Ellipse",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Drawing.Color",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Drawing.Graph.Shapes.Add"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "create-pdf-collage-multiple-graphs": {
+      "title": "Create a PDF Collage by Positioning Multiple Graphs",
+      "filename": "create-pdf-collage-multiple-graphs.cs",
+      "description": "Shows how to add several Graph objects—a rectangle, an ellipse, and a line—at different page coordinates to build a collage on a single PDF page.",
+      "tags": [
+        "pdf",
+        "graph",
+        "collage",
+        "positioning",
+        "aspose.pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.Paragraphs",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.Ellipse",
+        "Aspose.Pdf.Drawing.Line",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Drawing.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "graph-drawing-with-clipping-limitations": {
+      "title": "Graph Drawing with Shapes and Clipping Discussion",
+      "filename": "graph-drawing-with-clipping-limitations.cs",
+      "description": "Demonstrates creating a Graph, adding rectangle and ellipse shapes, and explains that Aspose.Pdf.Graph lacks a Clip property, suggesting the use of Page.AddGraphics with a clipping rectangle.",
+      "tags": [
+        "graph",
+        "clipping",
+        "shapes",
+        "aspose-pdf",
+        "pdf-generation"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.Ellipse",
+        "Aspose.Pdf.GraphInfo",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "add-gradient-rectangle-alpha-transparency": {
+      "title": "Add Gradient Rectangle with Alpha Transparency to PDF",
+      "filename": "add-gradient-rectangle-alpha-transparency.cs",
+      "description": "Demonstrates how to draw a rectangle filled with a linear axial gradient that transitions from fully transparent to fully opaque, illustrating the use of the alpha channel in Aspose.Pdf.",
+      "tags": [
+        "gradient",
+        "alpha",
+        "rectangle",
+        "pdf",
+        "drawing"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.GradientAxialShading",
+        "Aspose.Pdf.Drawing.Point",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Drawing.Color",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "calculate-ellipse-bounding-box": {
+      "title": "Calculate Bounding Box of an Ellipse in a PDF",
+      "filename": "calculate-ellipse-bounding-box.cs",
+      "description": "Shows how to draw an ellipse on a PDF page with Aspose.Pdf, compute its bounding box using CalculateContentBBox, and print the coordinates.",
+      "tags": [
+        "ellipse",
+        "bounding-box",
+        "aspose-pdf",
+        "graph",
+        "pdf-generation"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Ellipse",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Page.CalculateContentBBox",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "multi-page-pdf-full-page-graphs": {
+      "title": "Create Multi-Page PDF with Full-Page Graphs",
+      "filename": "multi-page-pdf-full-page-graphs.cs",
+      "description": "Demonstrates how to generate a PDF with multiple pages where each page contains a Graph that fills the entire page dimensions using Aspose.PDF.",
+      "tags": [
+        "pdf",
+        "graph",
+        "multipage",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.PageCollection.Add",
+        "Aspose.Pdf.Page.Rect",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Drawing.Graph"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "add-rectangle-shape-with-bounds-checking": {
+      "title": "Add Rectangle Shape with Bounds Checking to PDF",
+      "filename": "add-rectangle-shape-with-bounds-checking.cs",
+      "description": "Loads a PDF, creates a rectangle shape, verifies that it fits within the page bounds, logs detailed coordinates if the check fails, adds the shape to the page, and saves the document.",
+      "tags": [
+        "pdf",
+        "shape",
+        "bounds",
+        "Aspose",
+        "rectangle"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.GraphInfo",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.BoundsOutOfRangeException"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "apply-json-defined-fill-colors-to-pdf-shapes": {
+      "title": "Apply JSON-Defined Fill Colors to PDF Shapes",
+      "filename": "apply-json-defined-fill-colors-to-pdf-shapes.cs",
+      "description": "The example loads a JSON configuration that maps shape types to color names, resolves the colors, and uses Aspose.Pdf to draw rectangles, ellipses and lines with the specified fill or stroke colors in a PDF.",
+      "tags": [
+        "json",
+        "color",
+        "shapes",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.Ellipse",
+        "Aspose.Pdf.Drawing.Line",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "add-dashed-rectangle-to-pdf-graph": {
+      "title": "Add Dashed Rectangle to PDF Graph",
+      "filename": "add-dashed-rectangle-to-pdf-graph.cs",
+      "description": "Demonstrates drawing a rectangle with a 2‑point border and dashed line style inside a Graph container and saving the result as a PDF using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "rectangle",
+        "dashed-line",
+        "graph",
+        "border"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "ellipse-radial-gradient-pattern": {
+      "title": "Create Ellipse with Radial Gradient Pattern Fill",
+      "filename": "ellipse-radial-gradient-pattern.cs",
+      "description": "Demonstrates how to draw an ellipse in a PDF and fill it with a custom radial gradient pattern brush using Aspose.Pdf, then adds a text label to verify rendering.",
+      "tags": [
+        "ellipse",
+        "gradient",
+        "pattern",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Ellipse",
+        "Aspose.Pdf.Drawing.GradientRadialShading",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.Position",
+        "Aspose.Pdf.Text.TextState"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "pdf-graph-overlapping-rectangles": {
+      "title": "Create PDF with Overlapping Shapes in Graph",
+      "filename": "pdf-graph-overlapping-rectangles.cs",
+      "description": "Demonstrates how to generate a PDF, add a Graph container, and place two overlapping rectangle shapes inside it using Aspose.Pdf. It also notes the removal of BoundsCheckMode in recent versions.",
+      "tags": [
+        "aspose-pdf",
+        "graph",
+        "shapes",
+        "rectangle",
+        "overlap"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Graph.Shapes.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "test-out-of-bounds-rectangle-throws-exception": {
+      "title": "Test Out‑of‑Bounds Rectangle Throws BoundsOutOfRangeException",
+      "filename": "test-out-of-bounds-rectangle-throws-exception.cs",
+      "description": "Demonstrates a unit test that adds a rectangle larger than the page size and asserts that Aspose.Pdf.Generator throws a BoundsOutOfRangeException.",
+      "tags": [
+        "unit-test",
+        "bounds-check",
+        "exception",
+        "Aspose.Pdf",
+        "graphics"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Generator.Document",
+        "Aspose.Pdf.Generator.Page",
+        "Aspose.Pdf.Generator.PageInfo",
+        "Aspose.Pdf.Generator.Graphics",
+        "Aspose.Pdf.Generator.Graphics.UpdateBoundsCheckMode",
+        "Aspose.Pdf.Generator.Graphics.Add",
+        "Aspose.Pdf.Generator.Rectangle",
+        "Aspose.Pdf.Generator.BoundsCheckMode",
+        "Aspose.Pdf.Generator.BoundsOutOfRangeException"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "batch-insert-graph-with-logo-into-pdfs": {
+      "title": "Batch Insert Graph with Logo into PDFs",
+      "filename": "batch-insert-graph-with-logo-into-pdfs.cs",
+      "description": "Loads each PDF in a folder, creates a vector graph containing a background rectangle, a company‑logo rectangle, and a sample line, adds the graph to the first page, and saves the modified file to an output folder.",
+      "tags": [
+        "pdf",
+        "graph",
+        "batch",
+        "logo",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.Line",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "create-pdf-with-graph": {
+      "title": "Create PDF with In-Memory Graph using Aspose.Pdf",
+      "filename": "create-pdf-with-graph.cs",
+      "description": "Shows how to generate a PDF entirely in memory, add a simple graph containing a rectangle shape, and return the PDF as a byte array.",
+      "tags": [
+        "pdf",
+        "graph",
+        "memorystream",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "add-graph-to-pdf": {
+      "title": "Add Graph to PDF Using Aspose.Pdf",
+      "filename": "add-graph-to-pdf.cs",
+      "description": "The example loads an existing PDF, creates a Graph containing a rectangle, ellipse, and line, adds it to the first page, and saves the modified document.",
+      "tags": [
+        "pdf",
+        "graph",
+        "aspose",
+        "drawing",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.Ellipse",
+        "Aspose.Pdf.Drawing.Line",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "add-radial-gradient-rectangle-to-pdf": {
+      "title": "Add Radial Gradient Rectangle to PDF",
+      "filename": "add-radial-gradient-rectangle-to-pdf.cs",
+      "description": "Demonstrates how to create a rectangle inside a graph and fill it with a radial gradient that transitions from opaque red at the center to transparent red at the edges, then save the PDF.",
+      "tags": [
+        "radial-gradient",
+        "rectangle",
+        "graph",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Graph",
+        "Aspose.Pdf.Graph.Shapes.Add",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.GradientRadialShading",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Point",
+        "Aspose.Pdf.GraphInfo"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "create-pdf-with-proportional-graphs": {
+      "title": "Create PDF with Proportional Graphs on Each Page",
+      "filename": "create-pdf-with-proportional-graphs.cs",
+      "description": "Generates a PDF where each page contains a graph sized and positioned proportionally to the page dimensions, and adds rectangle, ellipse, and line shapes to the graph.",
+      "tags": [
+        "pdf",
+        "graph",
+        "shapes",
+        "Aspose.Pdf",
+        "page-layout"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.Rect",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.Ellipse",
+        "Aspose.Pdf.Drawing.Line",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "apply-dictionary-fill-colors-to-pdf-shapes": {
+      "title": "Apply Dictionary-Based Fill Colors to PDF Shapes",
+      "filename": "apply-dictionary-fill-colors-to-pdf-shapes.cs",
+      "description": "Demonstrates using a Dictionary to map shape identifiers to Aspose.Pdf.Drawing.Color values and applying those colors when creating rectangles, ellipses, and lines within a PDF graph.",
+      "tags": [
+        "Aspose.Pdf",
+        "Dictionary",
+        "Shapes",
+        "Color",
+        "Graph"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Graph.Shapes.Add",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.Ellipse",
+        "Aspose.Pdf.Drawing.Line",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Drawing.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "draw-ellipse-with-centered-text": {
+      "title": "Draw Ellipse with Transparent Fill and Centered Text",
+      "filename": "draw-ellipse-with-centered-text.cs",
+      "description": "Demonstrates how to create an ellipse with a thick border and semi‑transparent fill using Aspose.Pdf.Drawing, and then place a centered TextFragment inside the shape.",
+      "tags": [
+        "ellipse",
+        "transparent-fill",
+        "border",
+        "textfragment",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Ellipse",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Drawing.Color",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.Position",
+        "Aspose.Pdf.Text.FontRepository",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "pdf-graph-shapes-with-text": {
+      "title": "Create PDF with Graph Shapes and Text",
+      "filename": "pdf-graph-shapes-with-text.cs",
+      "description": "Demonstrates how to add a Graph container to a PDF page, draw rectangle and ellipse shapes, and place TextFragment objects with different fonts and colors inside each shape using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "graph",
+        "shapes",
+        "text",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.Ellipse",
+        "Aspose.Pdf.GraphInfo",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.Position",
+        "Aspose.Pdf.Text.FontRepository.FindFont",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "scale-graph-shapes-150-percent": {
+      "title": "Scale Graph Shapes by 150% Using Aspose.Pdf",
+      "filename": "scale-graph-shapes-150-percent.cs",
+      "description": "Shows how to apply a 150 % scaling transformation to all shapes in an Aspose.Pdf Graph before adding it to a PDF page.",
+      "tags": [
+        "graph",
+        "scaling",
+        "pdf",
+        "shapes",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Graph",
+        "Aspose.Pdf.GraphInfo",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "add-rectangle-with-shadow-to-pdf": {
+      "title": "Add Rectangle with Shadow to PDF",
+      "filename": "add-rectangle-with-shadow-to-pdf.cs",
+      "description": "Shows how to create a PDF, add a Graph container, draw a semi‑transparent offset rectangle as a shadow, and place a main rectangle on top.",
+      "tags": [
+        "pdf",
+        "rectangle",
+        "shadow",
+        "graph",
+        "drawing"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Graph.Shapes.Add",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "create-pdf-graph-border-colors-lookup": {
+      "title": "Create PDF Graph with Shape Border Colors from Lookup Table",
+      "filename": "create-pdf-graph-border-colors-lookup.cs",
+      "description": "Demonstrates how to generate a PDF containing a graph with multiple shapes whose border colors are set using a dictionary lookup table.",
+      "tags": [
+        "pdf",
+        "graph",
+        "shapes",
+        "border-color",
+        "lookup-table"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.Ellipse",
+        "Aspose.Pdf.Drawing.Line",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Drawing.Color",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Drawing.Graph.Shapes.Add"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "insert-graph-into-pdf-footer": {
+      "title": "Insert Graph into PDF Footer Using Page Margins",
+      "filename": "insert-graph-into-pdf-footer.cs",
+      "description": "Shows how to create a simple graph shape and place it in the footer area of a PDF page by configuring footer margins with Aspose.Pdf.",
+      "tags": [
+        "graph",
+        "footer",
+        "margin",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.HeaderFooter",
+        "Aspose.Pdf.MarginInfo",
+        "Aspose.Pdf.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Drawing.Color",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "horizontal-bar-chart-rectangles": {
+      "title": "Create Horizontal Bar Chart with Rectangles",
+      "filename": "horizontal-bar-chart-rectangles.cs",
+      "description": "Demonstrates how to generate a simple horizontal bar chart in a PDF by looping to add ten rectangle shapes using Aspose.Pdf. Each rectangle is placed with incremental X coordinates and custom styling.",
+      "tags": [
+        "bar-chart",
+        "pdf",
+        "rectangle",
+        "aspose",
+        "graph"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "apply-a-texture-brush-as-fill-for-an-ellipse-by-loading-an-image-resource-as-a-pattern": {
+      "title": "Apply A Texture Brush As Fill For An Ellipse By Loading An Image Resource As A Pattern",
+      "filename": "apply-a-texture-brush-as-fill-for-an-ellipse-by-loading-an-image-resource-as-a-pattern.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "create-pdf-graph-filled-rectangle-stroke-circle": {
+      "title": "Create PDF Graph with Filled Rectangle and Stroke-Only Circle",
+      "filename": "create-pdf-graph-filled-rectangle-stroke-circle.cs",
+      "description": "The example creates a PDF document, adds a graph containing a filled rectangle and a stroke‑only circle, and saves the file.",
+      "tags": [
+        "pdf",
+        "graph",
+        "shapes",
+        "filled",
+        "stroke"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.Circle",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Drawing.Graph.Shapes.Add"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    },
+    "export-graph-to-pdf": {
+      "title": "Export a Graph to PDF using Aspose.Pdf",
+      "filename": "export-graph-to-pdf.cs",
+      "description": "Shows how to create a PDF document, add a Graph object to a page, and save the result as a PDF file.",
+      "tags": [
+        "graph",
+        "pdf",
+        "aspose",
+        "export",
+        "drawing"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Drawing.Color",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T12:09:54Z",
+      "status": "verified"
+    }
+  }
+}
