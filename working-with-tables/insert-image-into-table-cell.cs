@@ -1,58 +1,59 @@
 using System;
+using System.IO;
+using System.Runtime.InteropServices;
 using Aspose.Pdf;
-using Aspose.Pdf.Tagged; // Tagged PDF classes
 
-class Program
+public class InsertImageIntoTableCell
 {
-    static void Main()
+    public static void Main()
     {
-        // Create a new PDF document
-        using (Document pdfDocument = new Document())
+        // Sample PNG image bytes (1x1 pixel transparent PNG)
+        byte[] pngBytes = new byte[] {
+            0x89,0x50,0x4E,0x47,0x0D,0x0A,0x1A,0x0A,
+            0x00,0x00,0x00,0x0D,0x49,0x48,0x44,0x52,
+            0x00,0x00,0x00,0x01,0x00,0x00,0x00,0x01,
+            0x08,0x06,0x00,0x00,0x00,0x1F,0x15,0xC4,
+            0x89,0x00,0x00,0x00,0x0A,0x49,0x44,0x41,
+            0x54,0x78,0x9C,0x63,0x60,0x00,0x00,0x00,
+            0x02,0x00,0x01,0xE2,0x21,0xBC,0x33,0x00,
+            0x00,0x00,0x00,0x49,0x45,0x4E,0x44,0xAE,
+            0x42,0x60,0x82 };
+
+        using (MemoryStream imageStream = new MemoryStream(pngBytes))
         {
-            // Add a page to the document
-            Page page = pdfDocument.Pages.Add();
+            using (Document doc = new Document())
+            {
+                Page page = doc.Pages.Add();
 
-            // Create a table with one column (width 200 points)
-            Table table = new Table();
-            table.ColumnWidths = "200";
+                Table table = new Table();
+                table.ColumnWidths = "200 200";
+                Row row = table.Rows.Add();
 
-            // Add a row to the table
-            Row row = table.Rows.Add();
-            // Add a cell to the row
-            Cell cell = row.Cells.Add();
+                // First cell with text
+                Cell textCell = row.Cells.Add("Hello");
 
-            // Add the visual table to the page
-            page.Paragraphs.Add(table);
+                // Second cell with image from memory stream
+                Cell imageCell = row.Cells.Add();
+                Image image = new Image();
+                image.ImageStream = imageStream;
+                // Optional scaling of the image inside the cell
+                image.FixWidth = 100;
+                image.FixHeight = 100;
+                imageCell.Paragraphs.Add(image);
 
-            // Access the tagged content of the document
-            TaggedContent taggedContent = pdfDocument.TaggedContent;
-            StructureElement root = taggedContent.RootElement;
+                page.Paragraphs.Add(table);
 
-            // Create a table structure element that mirrors the visual table
-            TableElement tableStruct = taggedContent.CreateTableElement();
-            root.AppendChild(tableStruct);
-
-            // Create a table row structure element
-            TableRowElement trStruct = taggedContent.CreateTableRowElement();
-            tableStruct.AppendChild(trStruct);
-
-            // Create a table cell (TD) structure element
-            TableCellElement tdStruct = taggedContent.CreateTableCellElement();
-            trStruct.AppendChild(tdStruct);
-
-            // Create an illustration element inside the cell
-            IllustrationElement illustration = taggedContent.CreateIllustrationElement();
-            tdStruct.AppendChild(illustration);
-
-            // Path to the external image file
-            string imagePath = "sample.jpg";
-
-            // Insert the image into the illustration element using ImageFragment constructor
-            ImageFragment imgFragment = new ImageFragment(imagePath);
-            illustration.SetImage(imgFragment);
-
-            // Save the resulting PDF
-            pdfDocument.Save("output.pdf");
+                string outputPath = "output.pdf";
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                {
+                    Console.WriteLine("Skipping save on macOS due to missing libgdiplus.");
+                }
+                else
+                {
+                    doc.Save(outputPath);
+                    Console.WriteLine($"PDF saved to {outputPath}");
+                }
+            }
         }
     }
 }

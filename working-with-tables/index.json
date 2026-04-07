@@ -1,7 +1,7 @@
 {
   "category": "working-with-tables",
   "nuget_version": "26.3.0",
-  "last_updated": "2026-04-07T13:32:52Z",
+  "last_updated": "2026-04-07T13:45:46Z",
   "examples": {
     "create-table-with-rows": {
       "title": "Create Table with Rows and Cells in PDF",
@@ -23,7 +23,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "insert-table-into-pdf": {
@@ -43,7 +43,7 @@
         "Aspose.Pdf.Table.ImportDataTable"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "auto-fit-table-columns": {
@@ -63,7 +63,7 @@
         "Aspose.Pdf.Row"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "stretch-table-to-page-width": {
@@ -83,7 +83,7 @@
         "Aspose.Pdf.PageInfo"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "insert-svg-into-cell": {
@@ -105,7 +105,7 @@
         "Aspose.Pdf.Image"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "embed-html-in-table-cell": {
@@ -128,7 +128,7 @@
         "Aspose.Pdf.HtmlFragment"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "insert-page-break-table": {
@@ -150,7 +150,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "render-table-new-page": {
@@ -174,7 +174,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "merge-table-cells-colspan": {
@@ -198,7 +198,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "merge-table-cells-rowspan": {
@@ -220,7 +220,7 @@
         "Aspose.Pdf.Cell"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "set-cell-margins": {
@@ -244,7 +244,7 @@
         "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "set-table-default-cell-padding": {
@@ -267,7 +267,7 @@
         "Aspose.Pdf.MarginInfo"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "read-table-width": {
@@ -287,7 +287,7 @@
         "Aspose.Pdf.Table.GetWidth"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "import-datatable-into-pdf-table": {
@@ -309,7 +309,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "import-dataview-table": {
@@ -328,7 +328,7 @@
         "Aspose.Pdf.Table.ImportDataView"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "generate-pdf-table-from-datatable": {
@@ -353,7 +353,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "check-table-broken": {
@@ -376,7 +376,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "repeat-table-column-header": {
@@ -399,7 +399,7 @@
         "Aspose.Pdf.Text.TextState"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "extract-tables-from-pdf-using-tableabsorber": {
@@ -425,7 +425,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "replace-table": {
@@ -446,7 +446,7 @@
         "Aspose.Pdf.Row"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "remove-table-from-pdf": {
@@ -468,7 +468,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "remove-all-tables-from-pdf": {
@@ -490,7 +490,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "batch-add-logo-table": {
@@ -513,7 +513,7 @@
         "Aspose.Pdf.Text.Cell"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "batch-replace-tables": {
@@ -536,7 +536,7 @@
         "Aspose.Pdf.Text.TableAbsorber.Replace"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "apply-autofitbehavior-tables": {
@@ -559,7 +559,7 @@
         "Aspose.Pdf.Row"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "set-cell-background-color": {
@@ -583,7 +583,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "apply-solid-border-table": {
@@ -606,34 +606,12 @@
         "Aspose.Pdf.BorderSide"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "insert-image-into-table-cell": {
-      "title": "Insert Image into Table Cell of a Tagged PDF",
-      "filename": "insert-image-into-table-cell.cs",
-      "description": "Demonstrates how to add an external image into a table cell using the IllustrationElement.SetImage method in a tagged PDF.",
-      "tags": [
-        "image",
-        "table",
-        "tagged-pdf",
-        "illustration",
-        "aspnet"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.LogicalStructure.TaggedContent",
-        "Aspose.Pdf.LogicalStructure.IllustrationElement.SetImage"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
-      "status": "verified"
-    },
-    "insert-image-into-table-cell__v2": {
       "title": "Insert Image from Memory Stream into Table Cell",
-      "filename": "insert-image-into-table-cell__v2.cs",
+      "filename": "insert-image-into-table-cell.cs",
       "description": "Demonstrates how to embed an image from a memory stream into a PDF table cell using Aspose.Pdf for .NET.",
       "tags": [
         "pdf",
@@ -650,7 +628,7 @@
         "Aspose.Pdf.Tables.Cell"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "add-text-to-table-cell": {
@@ -674,7 +652,7 @@
         "Aspose.Pdf.Text.FontRepository"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "add-centered-paragraph-to-table-cell": {
@@ -699,7 +677,7 @@
         "Aspose.Pdf.Text.HorizontalAlignment"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "set-cell-vertical-alignment": {
@@ -722,7 +700,7 @@
         "Aspose.Pdf.VerticalAlignment"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "center-align-table": {
@@ -743,7 +721,7 @@
         "Aspose.Pdf.HorizontalAlignment"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "offset-table-left-margin": {
@@ -766,7 +744,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "enable-table-splitting": {
@@ -788,7 +766,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "disable-table-splitting": {
@@ -809,7 +787,7 @@
         "Aspose.Pdf.Row"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "calculate-remaining-page-space": {
@@ -829,7 +807,7 @@
         "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "fixed-width-table": {
@@ -854,7 +832,7 @@
         "Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "set-table-width-percentage": {
@@ -877,7 +855,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "map-datatable-columns-to-pdf-table": {
@@ -898,7 +876,7 @@
         "System.Data.DataTable"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "import-filtered-dataview-table": {
@@ -918,7 +896,7 @@
         "Aspose.Pdf.Table.ImportDataView"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "populate-table-from-linq": {
@@ -940,7 +918,7 @@
         "System.Data.DataTable"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "add-table-to-page": {
@@ -963,7 +941,7 @@
         "Aspose.Pdf.Page.Paragraphs.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "insert-table-after-paragraph": {
@@ -987,7 +965,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "insert-table-before-image": {
@@ -1010,7 +988,7 @@
         "Aspose.Pdf.ParagraphCollection.Insert"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "create-table-with-repeating-header": {
@@ -1036,7 +1014,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "style-header-row": {
@@ -1061,7 +1039,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "add-footer-row-to-tagged-pdf-table": {
@@ -1088,7 +1066,7 @@
         "Aspose.Pdf.Tagged.TableTFootElement"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "alternating-row-background-colors": {
@@ -1116,7 +1094,7 @@
         "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "add-hyperlink-to-table-cell": {
@@ -1144,7 +1122,7 @@
         "Aspose.Pdf.Text.TextState"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "add-checkbox-field-in-table-cell": {
@@ -1170,7 +1148,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "add-radio-button-group-inside-table-cell": {
@@ -1197,7 +1175,7 @@
         "Aspose.Pdf.Forms.RadioButtonField.AddOption"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "export-table-structure-to-json": {
@@ -1220,7 +1198,7 @@
         "Aspose.Pdf.LogicalStructure.Element"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "export-pdf-table-to-csv": {
@@ -1240,7 +1218,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "serialize-table-to-xml": {
@@ -1264,7 +1242,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "load-table-from-xml": {
@@ -1286,7 +1264,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "count-tables-in-pdf-using-tableabsorber": {
@@ -1307,7 +1285,7 @@
         "Aspose.Pdf.Text.TableAbsorber.TableList"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "extract-table-coordinates-from-pdf": {
@@ -1329,7 +1307,7 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "extract-table-cell-text": {
@@ -1351,7 +1329,7 @@
         "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "replace-table-cell-text-by-keyword": {
@@ -1377,7 +1355,7 @@
         "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "remove-all-tables": {
@@ -1399,7 +1377,7 @@
         "Aspose.Pdf.Text.AbsorbedTable"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "create-table-pdf": {
@@ -1422,7 +1400,7 @@
         "Aspose.Pdf.MarginInfo"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "update-table-cells": {
@@ -1445,7 +1423,7 @@
         "Aspose.Pdf.BorderInfo"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "extract-modify-table": {
@@ -1466,7 +1444,7 @@
         "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "create-modify-retrieve-table": {
@@ -1489,7 +1467,7 @@
         "Aspose.Pdf.Text.TableAbsorber"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "insert-table-into-pdf__v2": {
@@ -1510,7 +1488,7 @@
         "Aspose.Pdf.Text.TextState"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "remove-table-column-from-pdf": {
@@ -1538,7 +1516,7 @@
         "Aspose.Pdf.Cell"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "insert-new-column-into-pdf-table": {
@@ -1562,7 +1540,7 @@
         "Aspose.Pdf.Cell"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "reorder-table-columns-in-pdf": {
@@ -1588,7 +1566,7 @@
         "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "adjust-table-column-widths": {
@@ -1611,7 +1589,7 @@
         "Aspose.Pdf.ColumnAdjustment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "set-minimum-column-width": {
@@ -1635,7 +1613,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "set-maximum-column-width-for-pdf-table": {
@@ -1658,7 +1636,7 @@
         "Aspose.Pdf.Text.TextState"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "auto-fit-table-columns-after-importing-data": {
@@ -1681,7 +1659,7 @@
         "Aspose.Pdf.ColumnAdjustment"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "add-auto-numbered-column-to-pdf-table": {
@@ -1711,7 +1689,7 @@
         "Aspose.Pdf.MarginInfo"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "add-semi-transparent-background-color-to-pdf-table": {
@@ -1733,7 +1711,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "create-pdf-table-shadow-effect-limit": {
@@ -1759,7 +1737,7 @@
         "Aspose.Pdf.FontStyles"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "set-table-z-index": {
@@ -1787,7 +1765,7 @@
         "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "insert-table-into-textbox-form-field": {
@@ -1818,7 +1796,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "insert-table-into-paragraph-collection": {
@@ -1840,7 +1818,7 @@
         "Aspose.Pdf.Row"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "import-datatable-with-images-into-pdf-table": {
@@ -1862,7 +1840,7 @@
         "Aspose.Pdf.Table.ImportDataTable"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "render-table-high-dpi-images": {
@@ -1888,7 +1866,7 @@
         "Aspose.Pdf.HtmlSaveOptions"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "generate-pdf-report-multiple-tables": {
@@ -1914,7 +1892,7 @@
         "Aspose.Pdf.Table.ImportDataTable"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "create-pdf-table-with-dynamic-row-count": {
@@ -1936,7 +1914,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "apply-conditional-formatting-to-pdf-table-cells": {
@@ -1961,7 +1939,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "rotate-text-in-pdf-table-cell": {
@@ -1986,7 +1964,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "rotate-table-90-degrees-matrix": {
@@ -2011,7 +1989,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "detect-merged-cells-in-pdf-tables": {
@@ -2032,7 +2010,7 @@
         "Aspose.Pdf.TableAbsorber.UseFlowEngine"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "replace-merged-table-cells": {
@@ -2056,7 +2034,7 @@
         "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "add-footnote-references-in-table-cells": {
@@ -2088,7 +2066,7 @@
         "Note"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "insert-table-at-specific-position": {
@@ -2115,7 +2093,7 @@
         "Aspose.Pdf.FontRepository.FindFont"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "right-align-table": {
@@ -2139,7 +2117,7 @@
         "Aspose.Pdf.HorizontalAlignment"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "set-table-border-thickness": {
@@ -2165,7 +2143,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "apply-double-border-to-pdf-table": {
@@ -2191,7 +2169,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "add-multiline-text-to-table-cell": {
@@ -2215,7 +2193,7 @@
         "Aspose.Pdf.Text.FontRepository"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "add-bullet-list-in-table-cell": {
@@ -2241,7 +2219,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "extract-tables-to-csv-using-tableabsorber": {
@@ -2264,7 +2242,7 @@
         "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "extract-pdf-tables-to-datatables": {
@@ -2284,7 +2262,7 @@
         "Aspose.Pdf.Text.TableAbsorber.Visit"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "custom-row-height-pdf-table": {
@@ -2311,7 +2289,7 @@
         "Aspose.Pdf.Text.FontStyles"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "auto-adjust-row-height-in-pdf-table": {
@@ -2334,7 +2312,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "set-fixed-row-height-table-pdf": {
@@ -2361,7 +2339,7 @@
         "Aspose.Pdf.Row.Cells.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "render-wide-table-landscape": {
@@ -2390,7 +2368,7 @@
         "Aspose.Pdf.Row.Cells.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "rotate-page-add-table": {
@@ -2418,7 +2396,7 @@
         "Aspose.Pdf.MarginInfo"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "extract-tables-from-rotated-pdf-pages": {
@@ -2443,7 +2421,7 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     },
     "remove-tables-containing-keyword": {
@@ -2467,7 +2445,32 @@
         "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:32:52Z",
+      "generated_at": "2026-04-07T13:45:46Z",
+      "status": "verified"
+    },
+    "insert-external-image-into-table-cell": {
+      "title": "Insert External Image into Table Cell",
+      "filename": "insert-external-image-into-table-cell.cs",
+      "description": "Shows how to embed an external image file into a PDF table cell using Aspose.Pdf's Image class.",
+      "tags": [
+        "pdf",
+        "table",
+        "image",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Image",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-07T13:45:46Z",
       "status": "verified"
     }
   }
