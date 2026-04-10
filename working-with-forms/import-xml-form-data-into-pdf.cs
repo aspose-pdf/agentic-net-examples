@@ -1,56 +1,50 @@
 using System;
 using System.IO;
-using System.Net.Http;
-using System.Threading.Tasks;
+using System.Text;
+using System.Xml;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
-    // Entry point
-    static async Task Main(string[] args)
+    static void Main()
     {
-        // Paths to the source PDF (with form fields) and the output PDF
-        const string sourcePdfPath = "template.pdf";
-        const string outputPdfPath = "filled.pdf";
+        // Paths to the source PDF and the output PDF
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "output.pdf";
 
-        // URL of the XML form data (served over HTTP)
-        const string xmlDataUrl = "https://example.com/formdata.xml";
+        // XML data to import into the form fields (as a string)
+        string xmlData = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<FormData>
+    <Field name=""FirstName"">John</Field>
+    <Field name=""LastName"">Doe</Field>
+    <Field name=""Email"">john.doe@example.com</Field>
+</FormData>";
 
         // Ensure the source PDF exists
-        if (!File.Exists(sourcePdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
+            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Create an HttpClient to fetch the XML data stream
-        using (HttpClient httpClient = new HttpClient())
+        // Load the PDF document
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            try
+            // Parse the XML string into an XmlDocument
+            XmlDocument xmlDoc = new XmlDocument();
+            using (MemoryStream xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(xmlData)))
             {
-                // Obtain the XML data as a stream from the network
-                using (Stream xmlStream = await httpClient.GetStreamAsync(xmlDataUrl))
-                // Initialize the Form facade with input and output PDF files
-                using (Aspose.Pdf.Facades.Form form = new Aspose.Pdf.Facades.Form(sourcePdfPath, outputPdfPath))
-                {
-                    // Import the XML form data into the PDF form fields
-                    form.ImportXml(xmlStream);
+                xmlDoc.Load(xmlStream);
+            }
 
-                    // Save the resulting PDF with populated fields
-                    form.Save();
-                }
+            // Assign the XFA data (XML) to the form.
+            // This imports the XML data into the PDF form fields.
+            pdfDoc.Form.AssignXfa(xmlDoc);
 
-                Console.WriteLine($"Form data imported and saved to '{outputPdfPath}'.");
-            }
-            catch (HttpRequestException httpEx)
-            {
-                Console.Error.WriteLine($"Error fetching XML data: {httpEx.Message}");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Unexpected error: {ex.Message}");
-            }
+            // Save the updated PDF
+            pdfDoc.Save(outputPdfPath);
         }
+
+        Console.WriteLine($"Form data imported and saved to '{outputPdfPath}'.");
     }
 }

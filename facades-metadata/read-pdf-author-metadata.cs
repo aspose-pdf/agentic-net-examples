@@ -1,25 +1,23 @@
 using System;
-using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string pdfPath = "input.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!System.IO.File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Load PDF file information
-        PdfFileInfo fileInfo = new PdfFileInfo(inputPath);
+        // Load the PDF document using the high‑level API
+        Document pdfDocument = new Document(pdfPath);
 
-        // Retrieve the Author metadata
-        string author = fileInfo.Author;
-
+        // Retrieve the Author metadata from the document information dictionary
+        string author = pdfDocument.Info.Author;
         Console.WriteLine($"Author: {author}");
     }
 }

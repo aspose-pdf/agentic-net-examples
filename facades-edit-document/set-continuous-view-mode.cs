@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_continuous.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,14 +15,15 @@ class Program
             return;
         }
 
+        // Initialize the content editor facade, bind the PDF, set continuous view, and save.
         using (PdfContentEditor editor = new PdfContentEditor())
         {
             editor.BindPdf(inputPath);
-            // Set continuous view mode (pages displayed in one column)
+            // Continuous scrolling = one column layout.
             editor.ChangeViewerPreference(ViewerPreference.PageLayoutOneColumn);
             editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Viewer preference set and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with continuous view mode: '{outputPath}'.");
     }
 }

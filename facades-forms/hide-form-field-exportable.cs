@@ -1,32 +1,40 @@
 using System;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Annotations;
+using System.IO;
+using Aspose.Pdf.Facades;          // FormEditor, Form
+using Aspose.Pdf.Annotations;      // AnnotationFlags
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf  = "input.pdf";      // source PDF with the form
+        const string outputPdf = "output.pdf";     // PDF after modifying the field
 
-        if (!System.IO.File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Initialize FormEditor with source and destination PDF files
-        FormEditor formEditor = new FormEditor(inputPath, outputPath);
-        // Hide the field "EmployeeID" while keeping it exportable (no NoExport flag)
-        bool success = formEditor.SetFieldAppearance("EmployeeID", AnnotationFlags.Hidden);
-        if (!success)
+        // Open the PDF for form editing using FormEditor (facade API)
+        using (FormEditor editor = new FormEditor())
         {
-            Console.Error.WriteLine("Failed to set field appearance for EmployeeID.");
+            // Bind the existing PDF document
+            editor.BindPdf(inputPdf);
+
+            // Set the field "EmployeeID" to be hidden.
+            // AnnotationFlags.Hidden makes the field invisible in the viewer.
+            // Do NOT set NoExport, so the field value will still be submitted.
+            bool success = editor.SetFieldAppearance("EmployeeID", AnnotationFlags.Hidden);
+            if (!success)
+            {
+                Console.Error.WriteLine("Failed to set appearance for field 'EmployeeID'.");
+            }
+
+            // Save the modified PDF
+            editor.Save(outputPdf);
         }
 
-        // Persist changes to the output file
-        formEditor.Save();
-        Console.WriteLine($"Field 'EmployeeID' set to hidden and saved to '{outputPath}'.");
+        Console.WriteLine($"Field 'EmployeeID' set to hidden (exportable) and saved to '{outputPdf}'.");
     }
 }

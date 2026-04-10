@@ -1,7 +1,7 @@
 {
   "category": "working-with-graphs",
   "nuget_version": "26.3.0",
-  "last_updated": "2026-04-07T13:24:21Z",
+  "last_updated": "2026-04-10T07:22:35Z",
   "examples": {
     "create-pdf-with-filled-arc-graph": {
       "title": "Create PDF with Filled Arc Graph",
@@ -27,7 +27,7 @@
         "Aspose.Pdf.Page.Paragraphs.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "add-unfilled-arc-with-custom-stroke": {
@@ -53,7 +53,7 @@
         "Aspose.Pdf.Drawing.Graph.Shapes.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "insert-circle-radial-gradient-into-pdf-graph": {
@@ -77,7 +77,7 @@
         "Aspose.Pdf.Drawing.GraphInfo"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "add-filled-circle-to-pdf": {
@@ -103,7 +103,7 @@
         "Aspose.Pdf.Drawing.Graph.Shapes.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "create-bezier-curve-in-pdf-graph": {
@@ -126,7 +126,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "add-filled-curve-to-pdf-graph": {
@@ -149,7 +149,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "draw-line-with-cap-style": {
@@ -174,7 +174,7 @@
         "Aspose.Pdf.Operators.LineCap"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "add-multi-colored-line-segments-to-pdf-graph": {
@@ -198,7 +198,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "insert-rounded-rectangle-into-pdf-graph": {
@@ -226,7 +226,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "add-filled-rectangle-with-dashed-border": {
@@ -250,7 +250,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "create-ellipse-with-custom-radii-and-stroke-color": {
@@ -273,7 +273,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "add-gradient-filled-ellipse-to-pdf-graph": {
@@ -300,7 +300,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "add-centered-graph-to-pdf-page": {
@@ -322,7 +322,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "place-graph-left-margin-offset": {
@@ -347,7 +347,7 @@
         "Aspose.Pdf.Drawing.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "set-graph-width-height": {
@@ -371,7 +371,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "create-dimension-specific-line-in-pdf-graph": {
@@ -395,7 +395,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "create-dimension-specific-rectangle-in-graph": {
@@ -418,7 +418,7 @@
         "Aspose.Pdf.Drawing.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "adjust-shape-position-to-fit-page-bounds": {
@@ -442,7 +442,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "log-shape-bounding-boxes-in-pdf-graph": {
@@ -468,7 +468,7 @@
         "Aspose.Pdf.Drawing.Shape"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "rotate-graph-in-pdf": {
@@ -491,7 +491,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "translate-graph-element": {
@@ -515,7 +515,7 @@
         "Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "non-uniform-scaling-graph": {
@@ -539,7 +539,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "skew-rectangle-x-axis-pdf-graph": {
@@ -566,7 +566,7 @@
         "Aspose.Pdf.Graph.Shapes.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "apply-clipping-region-to-pdf-graph": {
@@ -595,7 +595,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "transparent-shape-graph-layer": {
@@ -619,7 +619,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "add-shadow-effect-to-filled-rectangle": {
@@ -642,7 +642,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "insert-dashed-polyline-annotation": {
@@ -669,34 +669,7 @@
         "Aspose.Pdf.Annotations.Dash"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
-      "status": "verified"
-    },
-    "add-polygon-annotation-with-dashed-outline": {
-      "title": "Add Polygon Annotation with Dashed Outline and Fill",
-      "filename": "add-polygon-annotation-with-dashed-outline.cs",
-      "description": "Demonstrates how to create a polygon annotation on a PDF page, fill it with a color (placeholder for a pattern), and apply a dashed border using Aspose.Pdf.",
-      "tags": [
-        "polygon",
-        "annotation",
-        "dash",
-        "fill",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Facades.PdfContentEditor",
-        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfContentEditor.CreatePolygon",
-        "Aspose.Pdf.Annotations.LineInfo",
-        "Aspose.Pdf.Annotations.PolygonAnnotation",
-        "Aspose.Pdf.Annotations.Border",
-        "Aspose.Pdf.Annotations.Dash",
-        "Aspose.Pdf.Color"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "create-layered-graph-pdf": {
@@ -726,7 +699,7 @@
         "Aspose.Pdf.Layer.Lock"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "add-text-inside-graph": {
@@ -753,34 +726,35 @@
         "Position"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
-    "apply-background-image-and-overlay-graph": {
-      "title": "Apply Background Image and Overlay Graph on PDF",
-      "filename": "apply-background-image-and-overlay-graph.cs",
-      "description": "Demonstrates how to stamp a background image onto each PDF page and then draw vector shapes using a Graph so that the shapes appear on top of the image.",
+    "add-background-image-and-overlay-graph": {
+      "title": "Add Background Image to PDF and Overlay Graph Shapes",
+      "filename": "add-background-image-and-overlay-graph.cs",
+      "description": "Shows how to insert a background image on a PDF page and draw vector shapes (rectangle and line) on top using Aspose.Pdf Graph with Z‑index control.",
       "tags": [
+        "pdf",
         "background-image",
         "graph",
-        "overlay",
         "shapes",
-        "Aspose.Pdf"
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfFileStamp",
-        "Aspose.Pdf.Facades.Stamp",
+        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.AddImage",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Rectangle",
         "Aspose.Pdf.Drawing.Graph",
-        "Aspose.Pdf.Drawing.Rectangle",
-        "Aspose.Pdf.Drawing.Ellipse",
-        "Aspose.Pdf.Drawing.Line",
         "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.Line",
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "insert-scale-rotate-image-in-pdf": {
@@ -802,7 +776,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "add-filled-arc-with-radial-gradient": {
@@ -828,7 +802,7 @@
         "Aspose.Pdf.Drawing.Point"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "create-pdf-with-single-page": {
@@ -848,7 +822,7 @@
         "Aspose.Pdf.PageCollection.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "create-graph-matching-page-size": {
@@ -874,7 +848,7 @@
         "Graph.Shapes.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "add-red-filled-rectangle-to-pdf": {
@@ -901,7 +875,7 @@
         "Aspose.Pdf.Drawing.Graph.Shapes.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "semi-transparent-ellipse-pdf": {
@@ -925,7 +899,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "insert-centered-text-into-graph-rectangle": {
@@ -956,7 +930,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "enable-boundscheckmode-graph-validation": {
@@ -980,7 +954,7 @@
         "Aspose.Pdf.BoundsCheckMode"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "add-shapes-with-bounds-checking-to-pdf": {
@@ -1010,7 +984,7 @@
         "Aspose.Pdf.Drawing.Graph.Shapes.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "add-non-overlapping-rectangles-to-pdf-graph": {
@@ -1038,7 +1012,7 @@
         "Aspose.Pdf.Graph.Shapes.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "create-graph-rectangle-ellipse": {
@@ -1066,7 +1040,7 @@
         "Aspose.Pdf.Page.Paragraphs.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "export-pdf-to-memorystream-and-save": {
@@ -1085,7 +1059,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "add-graph-shapes-to-pdf-page": {
@@ -1112,13 +1086,13 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
-    "insert-watermark-rectangle-graph-into-pdf": {
-      "title": "Insert Watermark Rectangle Graph into PDF Pages",
-      "filename": "insert-watermark-rectangle-graph-into-pdf.cs",
-      "description": "The example iterates through all PDF files in a folder, adds a graph containing a semi‑transparent rectangle watermark to each page, and saves the modified PDFs to an output folder.",
+    "insert-full-page-watermark-rectangle-into-pdfs": {
+      "title": "Insert Full-Page Watermark Rectangle into Multiple PDFs",
+      "filename": "insert-full-page-watermark-rectangle-into-pdfs.cs",
+      "description": "The example iterates over all PDF files in a folder, adds a light-gray rectangle that covers each page as a watermark, and saves the modified documents to an output folder.",
       "tags": [
         "pdf",
         "watermark",
@@ -1129,14 +1103,15 @@
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.PageInfo",
         "Aspose.Pdf.Drawing.Graph",
         "Aspose.Pdf.Drawing.Rectangle",
-        "Aspose.Pdf.Drawing.GraphInfo",
-        "Aspose.Pdf.Color"
+        "Aspose.Pdf.GraphInfo",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Paragraphs.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "add-ellipse-graph-to-pdf-pages-parallel": {
@@ -1160,7 +1135,7 @@
         "Aspose.Pdf.Drawing.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "configure-graph-line-style-add-rectangle": {
@@ -1187,7 +1162,7 @@
         "Aspose.Pdf.Drawing.Graph.Shapes.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "apply-radial-gradient-ellipse": {
@@ -1216,7 +1191,7 @@
         "Aspose.Pdf.Drawing.Graph.Shapes.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "set-rectangle-fill-opacity-50-percent": {
@@ -1243,7 +1218,7 @@
         "Aspose.Pdf.Drawing.Graph.Shapes.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "create-predefined-graph": {
@@ -1266,7 +1241,7 @@
         "Aspose.Pdf.Drawing.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "serialize-pdf-to-byte-array": {
@@ -1285,7 +1260,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "add-graph-with-labels-to-pdf": {
@@ -1317,7 +1292,7 @@
         "Aspose.Pdf.Text.TextBuilder.AppendText"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "toggle-graph-boundscheckmode": {
@@ -1344,7 +1319,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "pdf-report-graph-with-legend": {
@@ -1372,7 +1347,7 @@
         "Aspose.Pdf.Page.Paragraphs.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "create-rounded-rectangle-solid-fill": {
@@ -1395,7 +1370,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "create-rotate-ellipse-pdf": {
@@ -1421,7 +1396,7 @@
         "Aspose.Pdf.Drawing.Graph.Shapes.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "create-pdf-collage-multiple-graphs": {
@@ -1448,7 +1423,7 @@
         "Aspose.Pdf.Drawing.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "graph-drawing-with-clipping-limitations": {
@@ -1475,7 +1450,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "add-gradient-rectangle-alpha-transparency": {
@@ -1501,7 +1476,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "calculate-ellipse-bounding-box": {
@@ -1527,7 +1502,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "multi-page-pdf-full-page-graphs": {
@@ -1551,31 +1526,36 @@
         "Aspose.Pdf.Drawing.Graph"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
-    "add-rectangle-shape-with-bounds-checking": {
-      "title": "Add Rectangle Shape with Bounds Checking to PDF",
-      "filename": "add-rectangle-shape-with-bounds-checking.cs",
-      "description": "Loads a PDF, creates a rectangle shape, verifies that it fits within the page bounds, logs detailed coordinates if the check fails, adds the shape to the page, and saves the document.",
+    "add-ellipse-with-bounds-checking-to-pdf": {
+      "title": "Add Ellipse with Bounds Checking to PDF",
+      "filename": "add-ellipse-with-bounds-checking-to-pdf.cs",
+      "description": "Demonstrates creating a PDF, adding an ellipse inside a Graph, enabling bounds checking that throws if the shape exceeds page limits, and logging detailed coordinates when an exception occurs, with platform‑specific GDI+ handling.",
       "tags": [
         "pdf",
-        "shape",
-        "bounds",
-        "Aspose",
-        "rectangle"
+        "ellipse",
+        "bounds-checking",
+        "error-handling",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Drawing.Rectangle",
-        "Aspose.Pdf.GraphInfo",
-        "Aspose.Pdf.Color",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Drawing.Graph",
-        "Aspose.Pdf.BoundsOutOfRangeException"
+        "Aspose.Pdf.Drawing.Ellipse",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Drawing.BoundsCheckMode",
+        "Aspose.Pdf.Drawing.BoundsOutOfRangeException",
+        "Aspose.Pdf.Drawing.Graph.Shapes.UpdateBoundsCheckMode",
+        "Aspose.Pdf.Drawing.Graph.Shapes.Add",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "apply-json-defined-fill-colors-to-pdf-shapes": {
@@ -1600,7 +1580,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "add-dashed-rectangle-to-pdf-graph": {
@@ -1624,7 +1604,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "ellipse-radial-gradient-pattern": {
@@ -1651,7 +1631,7 @@
         "Aspose.Pdf.Text.TextState"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "pdf-graph-overlapping-rectangles": {
@@ -1677,7 +1657,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "test-out-of-bounds-rectangle-throws-exception": {
@@ -1703,7 +1683,7 @@
         "Aspose.Pdf.Generator.BoundsOutOfRangeException"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "batch-insert-graph-with-logo-into-pdfs": {
@@ -1728,7 +1708,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "create-pdf-with-graph": {
@@ -1754,7 +1734,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "add-graph-to-pdf": {
@@ -1779,7 +1759,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "add-radial-gradient-rectangle-to-pdf": {
@@ -1807,7 +1787,7 @@
         "Aspose.Pdf.GraphInfo"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "create-pdf-with-proportional-graphs": {
@@ -1835,7 +1815,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "apply-dictionary-fill-colors-to-pdf-shapes": {
@@ -1863,7 +1843,7 @@
         "Aspose.Pdf.Drawing.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "draw-ellipse-with-centered-text": {
@@ -1890,7 +1870,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "pdf-graph-shapes-with-text": {
@@ -1917,7 +1897,33 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
+      "status": "verified"
+    },
+    "clone-rectangle-change-fill-color": {
+      "title": "Clone Rectangle and Change Fill Color in PDF",
+      "filename": "clone-rectangle-change-fill-color.cs",
+      "description": "Creates a PDF document, draws a rectangle, clones it with a different fill color, adds both rectangles to a graph, and saves the file.",
+      "tags": [
+        "pdf",
+        "rectangle",
+        "clone",
+        "graph",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.GraphInfo",
+        "Aspose.Pdf.Drawing.Color",
+        "Page.Paragraphs.Add",
+        "Graph.Shapes.Add",
+        "Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "scale-graph-shapes-150-percent": {
@@ -1941,7 +1947,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "add-rectangle-with-shadow-to-pdf": {
@@ -1967,7 +1973,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "create-pdf-graph-border-colors-lookup": {
@@ -1995,7 +2001,7 @@
         "Aspose.Pdf.Drawing.Graph.Shapes.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "insert-graph-into-pdf-footer": {
@@ -2021,7 +2027,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "horizontal-bar-chart-rectangles": {
@@ -2044,7 +2050,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "apply-texture-brush-to-ellipse": {
@@ -2074,7 +2080,7 @@
         "Aspose.Pdf.Graph.Shapes.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "create-pdf-graph-filled-rectangle-stroke-circle": {
@@ -2101,7 +2107,7 @@
         "Aspose.Pdf.Drawing.Graph.Shapes.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "export-graph-to-pdf": {
@@ -2124,7 +2130,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "create-star-shape-pdf-graph": {
@@ -2152,7 +2158,7 @@
         "Aspose.Pdf.Drawing.Path.Shapes.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     },
     "add-regular-hexagon-to-pdf-graph": {
@@ -2176,7 +2182,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:24:21Z",
+      "generated_at": "2026-04-10T07:22:35Z",
       "status": "verified"
     }
   }

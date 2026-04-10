@@ -21,13 +21,14 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf;` (49/49 files) ← category-specific
-- `using Aspose.Pdf.Text;` (11/49 files)
-- `using Aspose.Pdf.Facades;` (9/49 files)
-- `using Aspose.Pdf.Annotations;` (7/49 files)
-- `using Aspose.Pdf.Tagged;` (1/49 files)
-- `using System;` (49/49 files)
-- `using System.IO;` (49/49 files)
+- `using Aspose.Pdf;` (50/50 files) ← category-specific
+- `using Aspose.Pdf.Text;` (12/50 files)
+- `using Aspose.Pdf.Annotations;` (7/50 files)
+- `using Aspose.Pdf.Drawing;` (1/50 files)
+- `using Aspose.Pdf.Facades;` (1/50 files)
+- `using Aspose.Pdf.Tagged;` (1/50 files)
+- `using System;` (50/50 files)
+- `using System.IO;` (50/50 files)
 
 ## Common Code Pattern
 
@@ -55,16 +56,17 @@ using (Document doc = new Document("input.pdf"))
 | [add-diagonal-text-stamp-watermark](./add-diagonal-text-stamp-watermark.cs) | Add Diagonal Text Stamp Watermark to PDF | `Document`, `TextStamp`, `HorizontalAlignment` | Demonstrates how to apply a semi‑transparent, 45° rotated text stamp as a diagonal watermark on e... |
 | [add-faint-text-overlay-to-pdf-pages](./add-faint-text-overlay-to-pdf-pages.cs) | Add Faint Text Overlay to PDF Pages | `Document`, `Page`, `TextStamp` | Demonstrates how to place a semi‑transparent 'CONFIDENTIAL' text stamp as a faint overlay on ever... |
 | [add-fixed-size-image-stamp-to-pdf-pages](./add-fixed-size-image-stamp-to-pdf-pages.cs) | Add Fixed-Size Image Stamp to PDF Pages | `Document`, `ImageStamp`, `Page` | Demonstrates how to place a fixed-size image stamp at the center of every page in a PDF, independ... |
-| [add-full-page-image-watermark-to-pdf](./add-full-page-image-watermark-to-pdf.cs) | Add Full-Page Image Watermark to PDF | `Document`, `Page`, `ImageStamp` | Demonstrates how to overlay a semi‑transparent image across every page of a PDF as a background w... |
+| [add-full-page-image-watermark-to-pdf](./add-full-page-image-watermark-to-pdf.cs) | Add Full-Page Image Watermark to PDF | `Document`, `Page`, `ImageStamp` | Shows how to place an image stamp as a full‑page background watermark on each page of a PDF using... |
 | [add-global-text-stamp-to-all-pdf-pages](./add-global-text-stamp-to-all-pdf-pages.cs) | Add Global Text Stamp to All PDF Pages | `Document`, `Save`, `Page` | Shows how to create a TextStamp and apply it to every page of a PDF document using Aspose.Pdf's D... |
 | [add-image-stamp-alt-text-page-3](./add-image-stamp-alt-text-page-3.cs) | Add Image Stamp with Alt Text to PDF Page 3 | `Document`, `ImageStamp`, `AddStamp` | Demonstrates how to add an image stamp with alternative text for accessibility to the third page ... |
-| [add-image-stamp-alt-text-pdfa1b](./add-image-stamp-alt-text-pdfa1b.cs) | Add Image Stamp with Alt Text for PDF/A‑1b Output | `Document`, `ImageStamp`, `Page` | Demonstrates adding an image stamp with alternative text to each page of a PDF and converting the... |
+| [add-image-stamp-alt-text-pdfa1b](./add-image-stamp-alt-text-pdfa1b.cs) | Add Image Stamp with Alt Text to PDF/A‑1b Document | `Document`, `Convert`, `Save` | Demonstrates converting a PDF to PDF/A‑1b and applying an image stamp with alternative text for a... |
 | [add-image-stamp-and-flatten-annotations](./add-image-stamp-and-flatten-annotations.cs) | Add Image Stamp and Flatten Annotations to Create Read‑Only ... | `Document`, `ImageStamp`, `Page` | Demonstrates how to place an image stamp on every page of a PDF and then flatten all annotations ... |
+| [add-image-stamp-from-memory-stream](./add-image-stamp-from-memory-stream.cs) | Add Image Stamp from Memory Stream to PDF | `Document`, `ImageStamp`, `AddStamp` | Demonstrates loading an image into a MemoryStream and applying it as a semi‑transparent stamp to ... |
 | [add-image-stamp-preserve-acroform](./add-image-stamp-preserve-acroform.cs) | Add Image Stamp While Preserving AcroForm Fields | `Document`, `ImageStamp`, `AddStamp` | Demonstrates how to apply an image stamp to every page of a PDF using Aspose.Pdf while keeping ex... |
-| [add-image-stamp-preserve-bookmarks](./add-image-stamp-preserve-bookmarks.cs) | Add Image Stamp While Preserving Bookmarks | `Document`, `ImageStamp`, `AddStamp` | Shows how to overlay an image stamp on every page of a PDF using Aspose.Pdf, keeping existing boo... |
+| [add-image-stamp-preserve-bookmarks](./add-image-stamp-preserve-bookmarks.cs) | Add Image Stamp While Preserving Bookmarks | `Document`, `ImageStamp`, `AddStamp` | Demonstrates how to overlay an image stamp on every page of a PDF using Aspose.Pdf without affect... |
 | [add-image-stamp-preserve-embedded-files](./add-image-stamp-preserve-embedded-files.cs) | Add Image Stamp While Preserving Embedded Files | `Document`, `ImageStamp`, `AddStamp` | Demonstrates how to add a semi‑transparent image stamp to every page of a PDF using Aspose.Pdf wh... |
 | [add-image-stamp-preserve-javascript](./add-image-stamp-preserve-javascript.cs) | Add Image Stamp to PDF While Preserving JavaScript | `Document`, `ImageStamp`, `AddStamp` | Shows how to place a semi‑transparent image stamp on each page of a PDF using Aspose.Pdf, while k... |
-| [add-image-stamp-preserve-page-labels](./add-image-stamp-preserve-page-labels.cs) | Add Image Stamp While Preserving Page Labels | `Document`, `ImageStamp`, `AddStamp` | Demonstrates how to apply an image stamp to every page of a PDF using Aspose.Pdf without affectin... |
+| [add-image-stamp-preserve-page-labels](./add-image-stamp-preserve-page-labels.cs) | Add Image Stamp to PDF While Preserving Page Labels | `Document`, `ImageStamp`, `AddStamp` | Shows how to apply an image stamp to every page of a PDF using Aspose.Pdf and keep the existing p... |
 | [add-image-stamp-preserve-xmp-metadata](./add-image-stamp-preserve-xmp-metadata.cs) | Add Image Stamp and Preserve XMP Metadata in PDF | `Document`, `ImageStamp`, `Page` | Demonstrates how to add a semi‑transparent image stamp to each page of a PDF while preserving the... |
 | [add-image-stamp-quality-opacity](./add-image-stamp-quality-opacity.cs) | Add Image Stamp with Quality and Opacity to PDF Page | `Document`, `Page`, `ImageStamp` | Demonstrates how to add an image stamp to the second page of a PDF using Aspose.Pdf, setting the ... |
 | [add-image-stamp-to-encrypted-pdf](./add-image-stamp-to-encrypted-pdf.cs) | Add Image Stamp to Encrypted PDF | `Document`, `ImageStamp`, `AddStamp` | Shows how to open an encrypted PDF with a password, decrypt it, apply an image stamp to each page... |
@@ -74,11 +76,10 @@ using (Document doc = new Document("input.pdf"))
 | [add-image-stamp-unicode-alt-text](./add-image-stamp-unicode-alt-text.cs) | Add Image Stamp with Unicode Alt Text to PDF | `Document`, `ImageStamp`, `AddStamp` | Demonstrates how to add an image stamp to each page of a PDF and set Unicode alternative text for... |
 | [add-low-quality-image-stamp-to-large-pdf](./add-low-quality-image-stamp-to-large-pdf.cs) | Add Low‑Quality Image Stamp to Large PDF | `Document`, `ImageStamp`, `AddStamp` | Demonstrates how to add an image stamp with reduced quality (10 %) to each page of a PDF using As... |
 | [add-multi-line-text-stamp-custom-line-spacing](./add-multi-line-text-stamp-custom-line-spacing.cs) | Add Multi‑Line Text Stamp with Custom Line Spacing | `Document`, `AddStamp`, `Save` | Demonstrates how to add a multi‑line text stamp with custom line spacing to each page of a PDF us... |
-| [add-opaque-image-stamp-watermark](./add-opaque-image-stamp-watermark.cs) | Add Fully Opaque Image Stamp Watermark to PDF | `Document`, `ImageStamp`, `Page` | Demonstrates how to place a fully opaque image stamp at the center of each page in a PDF using As... |
-| ... | | | *and 19 more files* |
+| ... | | | *and 20 more files* |
 
 ## Category Statistics
-- Total examples: 49
+- Total examples: 50
 
 ## General Tips
 - See parent [agents.md](../agents.md) for:
@@ -89,5 +90,5 @@ using (Document doc = new Document("input.pdf"))
 - Review code examples in this folder for stamping patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-04-07 | Run: `20260407_212044_4ffbd1`
+Updated: 2026-04-10 | Run: `20260410_121416_bd35e2`
 <!-- AUTOGENERATED:END -->

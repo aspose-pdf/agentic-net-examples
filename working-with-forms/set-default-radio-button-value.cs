@@ -1,6 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
@@ -8,37 +9,40 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName  = "PaymentMethod";
-        const string selectedValue = "Credit";
 
+        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
+        // Load the PDF document (use a using block for proper disposal)
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF form
-            using (Form form = new Form(inputPath))
-            {
-                // Fill the radio button group with the desired value
-                // This works for radio button fields; the value must match one of the option names.
-                bool filled = form.FillField(fieldName, selectedValue);
-                if (!filled)
-                {
-                    Console.Error.WriteLine($"Failed to set value for field '{fieldName}'.");
-                }
+            // Retrieve the radio button field named "PaymentMethod"
+            RadioButtonField paymentMethod = doc.Form["PaymentMethod"] as RadioButtonField;
 
-                // Save the updated PDF
-                form.Save(outputPath);
+            if (paymentMethod != null)
+            {
+                // Aspose.Pdf allows two ways to set the default selected option:
+                // 1. By export value (the value that is stored in the PDF when the form is submitted)
+                // 2. By index of the option in the field's Options collection.
+                // Here we use the export value "Credit" which must match one of the option values.
+                paymentMethod.Value = "Credit";
+
+                // If you prefer to set by index, uncomment the following line (indexes are zero‑based):
+                // paymentMethod.Selected = paymentMethod.Options.IndexOf("Credit");
+            }
+            else
+            {
+                Console.Error.WriteLine("Radio button field 'PaymentMethod' not found.");
             }
 
-            Console.WriteLine($"Radio button '{fieldName}' set to '{selectedValue}' and saved to '{outputPath}'.");
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
     }
 }

@@ -1,7 +1,7 @@
 {
-  "category": "working_with_annotations",
+  "category": "working-with-annotations",
   "nuget_version": "26.3.0",
-  "last_updated": "2026-04-07T11:15:32Z",
+  "last_updated": "2026-04-10T07:18:20Z",
   "examples": {
     "add-text-annotation-to-page-3": {
       "title": "Add Text Annotation to Page 3 of PDF",
@@ -25,7 +25,7 @@
         "Aspose.Pdf.Page.Annotations.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "create-popup-annotation-linked-to-highlight": {
@@ -49,7 +49,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-free-text-annotation-arial": {
@@ -74,7 +74,7 @@
         "Aspose.Pdf.Page.Annotations.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-callout-to-freetext-annotation": {
@@ -98,7 +98,7 @@
         "Aspose.Pdf.Point"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "hide-freetext-annotation-page-five": {
@@ -120,7 +120,7 @@
         "Aspose.Pdf.Annotations.HideAction"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-yellow-highlight-annotation": {
@@ -142,7 +142,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "set-underline-annotation-opacity-50": {
@@ -164,7 +164,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "set-author-strikethrough-annotation": {
@@ -186,7 +186,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "delete-annotation-by-id-from-pdf-page": {
@@ -207,7 +207,7 @@
         "Aspose.Pdf.Annotations.Annotation"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "remove-annotations-from-page": {
@@ -229,7 +229,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "retrieve-annotation-types-page-four": {
@@ -250,7 +250,7 @@
         "Aspose.Pdf.Annotations.Annotation"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "update-annotation-position-by-id": {
@@ -273,7 +273,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "import-xfdf-annotations-into-pdf": {
@@ -293,7 +293,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "export-pdf-annotations-to-xfdf": {
@@ -312,7 +312,7 @@
         "Aspose.Pdf.Document.ExportAnnotationsToXfdf"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "import-annotations-from-fdf": {
@@ -334,7 +334,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "batch-add-text-annotations-to-pdf-pages": {
@@ -359,7 +359,7 @@
         "Aspose.Pdf.Page.Annotations.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "highlight-keyword-occurrences-in-pdf": {
@@ -386,7 +386,7 @@
         "Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-figure-annotations-custom-line-width-color": {
@@ -409,7 +409,7 @@
         "Aspose.Pdf.Annotations.Border"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "batch-export-pdf-annotations-to-xfdf": {
@@ -428,7 +428,7 @@
         "Aspose.Pdf.Document.ExportAnnotationsToXfdf"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "import-xfdf-annotations-into-multiple-pdfs-parallel": {
@@ -448,7 +448,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "export-pdf-annotations-to-xfdf__v2": {
@@ -467,7 +467,7 @@
         "Aspose.Pdf.Document.ExportAnnotationsToXfdf"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "validate-xfdf-annotation-count": {
@@ -488,7 +488,7 @@
         "Aspose.Pdf.Page"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "export-import-pdf-annotations-xfdf": {
@@ -513,7 +513,7 @@
         "Aspose.Pdf.Annotations.AnnotationCollection.Count"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "list-annotation-ids-to-csv": {
@@ -533,7 +533,7 @@
         "Aspose.Pdf.Annotations.Annotation"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "filter-pdf-annotations-by-author": {
@@ -561,7 +561,7 @@
         "Aspose.Pdf.Annotations.AnnotationCollection.Delete"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-strikethrough-annotation-to-pdf": {
@@ -584,7 +584,7 @@
         "Aspose.Pdf.Page.Annotations.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "generate-annotation-summary-per-pdf-page": {
@@ -604,7 +604,7 @@
         "Aspose.Pdf.Annotations.Annotation"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-polyline-figure-annotation": {
@@ -628,7 +628,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-arrow-line-annotation-to-pdf": {
@@ -654,7 +654,7 @@
         "Aspose.Pdf.Page.Annotations.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "import-annotations-from-fdf__v2": {
@@ -673,7 +673,7 @@
         "Aspose.Pdf.Annotations.FdfReader.ReadAnnotations"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "recolor-highlight-annotations": {
@@ -696,7 +696,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "retrieve-annotation-bounding-rectangle": {
@@ -718,7 +718,30 @@
         "Aspose.Pdf.Annotations.Annotation.GetRectangle"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
+      "status": "verified"
+    },
+    "add-multiline-freetext-annotation": {
+      "title": "Add Multiline Free‑Text Annotation with 1.5 Line Spacing",
+      "filename": "add-multiline-freetext-annotation.cs",
+      "description": "Demonstrates how to place a free‑text annotation with multiple lines on a PDF page and control its line spacing (1.5) using RichText CSS.",
+      "tags": [
+        "free-text",
+        "annotation",
+        "multiline",
+        "line-spacing",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.FreeTextAnnotation",
+        "Aspose.Pdf.Annotations.DefaultAppearance",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-highlight-annotation-70-opacity": {
@@ -739,7 +762,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-popup-annotation-to-text-annotation": {
@@ -765,13 +788,13 @@
         "Aspose.Pdf.Annotations.TextIcon"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "import-xfdf-annotations-reassign-pages": {
-      "title": "Import XFDF Annotations and Reassign to Target Pages",
+      "title": "Import XFDF Annotations and Reassign to Specific Pages",
       "filename": "import-xfdf-annotations-reassign-pages.cs",
-      "description": "Demonstrates how to import annotations from an XFDF file into a PDF and move each annotation to a specific page using a predefined name‑to‑page mapping.",
+      "description": "Demonstrates importing annotations from an XFDF file into a PDF and moving them to target pages based on a name‑to‑page mapping dictionary.",
       "tags": [
         "xfdf",
         "annotations",
@@ -781,15 +804,16 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ImportAnnotationsFromXfdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Document.ImportAnnotationsFromXfdf",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Pages.Add",
         "Aspose.Pdf.Annotations.AnnotationCollection.Add",
         "Aspose.Pdf.Annotations.AnnotationCollection.Delete"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "remove-popup-annotations": {
@@ -813,7 +837,7 @@
         "Aspose.Pdf.AnnotationCollection.Delete"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "generate-annotation-report": {
@@ -842,7 +866,7 @@
         "Aspose.Pdf.Text.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-figure-annotation-external-image": {
@@ -867,7 +891,7 @@
         "Aspose.Pdf.Page.Annotations.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "export-import-pdf-annotations-xfdf__v2": {
@@ -889,7 +913,7 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "batch-add-text-annotation-first-page": {
@@ -914,7 +938,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "modify-figure-annotation-color": {
@@ -937,7 +961,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "delete-pdf-annotations-using-csv": {
@@ -960,7 +984,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-free-text-annotation-with-background": {
@@ -986,7 +1010,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "set-figure-annotation-line-thickness": {
@@ -1009,7 +1033,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "extract-popup-annotation-to-pdf": {
@@ -1036,7 +1060,7 @@
         "Aspose.Pdf.Page.Paragraphs.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-free-text-annotation-with-callout": {
@@ -1061,7 +1085,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "export-pdf-annotations-to-xfdf-and-upload": {
@@ -1080,7 +1104,7 @@
         "Aspose.Pdf.Document.ExportAnnotationsToXfdf"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-rounded-rectangle-annotation-around-table": {
@@ -1102,7 +1126,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "retrieve-annotation-ids-page-numbers": {
@@ -1122,7 +1146,7 @@
         "Aspose.Pdf.Annotations.Annotation"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "remove-highlight-annotations-from-pdf": {
@@ -1145,7 +1169,7 @@
         "Aspose.Pdf.Annotations.AnnotationCollection.Delete"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "export-popup-annotations-to-xfdf": {
@@ -1167,7 +1191,7 @@
         "Aspose.Pdf.Document.ExportAnnotationsToXfdf"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "import-annotations-from-fdf__v3": {
@@ -1187,7 +1211,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-transparent-free-text-annotation": {
@@ -1213,7 +1237,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "set-line-ending-styles-for-pdf-line-annotation": {
@@ -1238,7 +1262,7 @@
         "Aspose.Pdf.Border"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "replace-highlight-annotation-color": {
@@ -1260,7 +1284,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "batch-add-popup-annotations": {
@@ -1282,7 +1306,7 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "import-xfdf-annotations-set-visibility": {
@@ -1305,7 +1329,7 @@
         "Aspose.Pdf.Annotations.AnnotationFlags"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-polyline-figure-annotation__v2": {
@@ -1330,7 +1354,7 @@
         "Aspose.Pdf.Page.Annotations.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-magenta-underline-annotation": {
@@ -1353,7 +1377,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "extract-highlight-annotation-image-report": {
@@ -1379,7 +1403,7 @@
         "Aspose.Pdf.Drawing.VerticalAlignment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "set-callout-leader-line-length": {
@@ -1403,7 +1427,7 @@
         "Aspose.Pdf.Point"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "export-annotations-xfdf-upload": {
@@ -1422,13 +1446,13 @@
         "Aspose.Pdf.Document.ExportAnnotationsToXfdf"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "import-consolidate-annotations-from-fdf": {
       "title": "Import and Consolidate Annotations from Multiple FDF Files",
       "filename": "import-consolidate-annotations-from-fdf.cs",
-      "description": "Demonstrates how to import annotations from several FDF files into a PDF document and gather all page annotations into a single collection before saving the consolidated PDF.",
+      "description": "The example loads a PDF, reads annotations from several FDF files, adds them to the document, aggregates all annotations into a list, and saves the consolidated PDF.",
       "tags": [
         "annotations",
         "fdf",
@@ -1440,10 +1464,11 @@
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Annotations.Annotation",
-        "Aspose.Pdf.Facades.FdfReader.ReadAnnotations"
+        "Aspose.Pdf.Annotations.FdfReader.ReadAnnotations",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-popup-annotation-with-custom-size": {
@@ -1469,7 +1494,7 @@
         "Aspose.Pdf.Annotations.TextIcon"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "set-figure-annotation-border-color-dark-gray": {
@@ -1495,7 +1520,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "generate-csv-audit-report-of-pdf-annotations": {
@@ -1516,7 +1541,7 @@
         "Aspose.Pdf.Annotations.MarkupAnnotation"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-highlight-annotation-with-custom-opacity": {
@@ -1540,7 +1565,7 @@
         "Aspose.Pdf.Page.Annotations.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "delete-pdf-annotations-restore-xfdf": {
@@ -1561,7 +1586,7 @@
         "Aspose.Pdf.AnnotationsCollection.Delete"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "set-highlight-annotation-opacity": {
@@ -1583,7 +1608,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-video-screen-annotation-to-pdf-page": {
@@ -1606,7 +1631,7 @@
         "Aspose.Pdf.Page.Annotations.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-sound-annotation-to-pdf": {
@@ -1629,7 +1654,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "create-richmedia-flash-video": {
@@ -1652,7 +1677,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-3d-annotation-u3d-page-two": {
@@ -1677,7 +1702,7 @@
         "Aspose.Pdf.PDF3DAnnotation"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "retrieve-first-richmediaannotation-page-5": {
@@ -1697,7 +1722,7 @@
         "Aspose.Pdf.Annotations.RichMediaAnnotation"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "remove-sound-annotations-from-pdf": {
@@ -1720,7 +1745,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-javascript-button-annotation-to-pdf-page": {
@@ -1743,7 +1768,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "create-button-annotation-go-to-page-10": {
@@ -1768,7 +1793,7 @@
         "Aspose.Pdf.Annotations.GoToAction"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-watermark-annotation-page-six": {
@@ -1790,7 +1815,7 @@
         "Aspose.Pdf.Annotations.WatermarkAnnotation"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-text-watermark-annotation": {
@@ -1815,7 +1840,7 @@
         "Aspose.Pdf.PageInfo"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "reuse-ximage-across-multiple-pdf-pages": {
@@ -1839,7 +1864,7 @@
         "Aspose.Pdf.Page.AddImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-background-image-artifact-to-pdf-page": {
@@ -1862,7 +1887,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-bates-numbering-with-prefix-six-digit": {
@@ -1882,7 +1907,7 @@
         "Aspose.Pdf.BatesNumberingArtifact"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "count-watermark-artifacts-on-pdf-page": {
@@ -1903,13 +1928,13 @@
         "Aspose.Pdf.WatermarkArtifact"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "set-watermark-artifact-opacity": {
-      "title": "Set Watermark Artifact Opacity to 50% in PDF",
+      "title": "Set Watermark Artifact Opacity to 50%",
       "filename": "set-watermark-artifact-opacity.cs",
-      "description": "Loads a PDF, iterates through each page's artifacts, identifies watermark artifacts, and changes their opacity to 50% before saving the file.",
+      "description": "Loads a PDF, iterates through each page to locate WatermarkArtifact objects, changes their opacity to 50%, and saves the modified document.",
       "tags": [
         "watermark",
         "artifact",
@@ -1921,10 +1946,11 @@
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Artifact",
+        "Aspose.Pdf.WatermarkArtifact",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "export-import-pdf-annotations-xfdf__v3": {
@@ -1950,7 +1976,7 @@
         "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "import-fdf-annotations-merge-pdf": {
@@ -1970,7 +1996,7 @@
         "Aspose.Pdf.Annotations.FdfReader.ReadAnnotations"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "batch-add-screen-annotations-to-pdf": {
@@ -1993,7 +2019,7 @@
         "Page.Annotations.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "remove-background-artifacts-from-pdf": {
@@ -2015,7 +2041,7 @@
         "Aspose.Pdf.BackgroundArtifact"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-link-annotation-external-url": {
@@ -2040,7 +2066,7 @@
         "Aspose.Pdf.Page.Annotations.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-internal-link-annotation": {
@@ -2064,7 +2090,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-sound-annotation-to-every-pdf-page": {
@@ -2086,7 +2112,7 @@
         "Aspose.Pdf.Annotations.SoundIcon"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-auto-play-rich-media-annotation": {
@@ -2109,7 +2135,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "clone-watermark-annotation-across-pdf-pages": {
@@ -2131,7 +2157,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "export-pdf-annotations-to-xfdf__v3": {
@@ -2153,7 +2179,7 @@
         "Aspose.Pdf.Document.ExportAnnotationsToXfdf"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "import-xfdf-annotations-into-pdf__v2": {
@@ -2173,7 +2199,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "button-calculate-sum-form-fields": {
@@ -2199,7 +2225,7 @@
         "Aspose.Pdf.Document.Pages.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-rich-media-video-annotation": {
@@ -2222,7 +2248,7 @@
         "Aspose.Pdf.Annotations.RichMediaAnnotation.SetContent"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "create-3d-annotation-custom-lighting": {
@@ -2249,7 +2275,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "iterate-pdf-annotations-log-details": {
@@ -2271,7 +2297,7 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "replace-background-artifact-image": {
@@ -2294,7 +2320,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-dynamic-date-watermark-annotation": {
@@ -2321,7 +2347,7 @@
         "Aspose.Pdf.Annotations.WatermarkAnnotation.SetTextAndState"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "create-link-annotation-open-embedded-pdf": {
@@ -2347,7 +2373,7 @@
         "Aspose.Pdf.Document.EmbeddedFiles.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "set-dashed-border-for-button-annotations": {
@@ -2371,7 +2397,30 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
+      "status": "verified"
+    },
+    "add-looping-video-screen-annotation": {
+      "title": "Add Looping Video Screen Annotation to PDF",
+      "filename": "add-looping-video-screen-annotation.cs",
+      "description": "Shows how to embed a video file in a PDF using Aspose.Pdf's ScreenAnnotation, set a title and contents, and save the document.",
+      "tags": [
+        "screen-annotation",
+        "video",
+        "pdf",
+        "aspose-pdf",
+        "embedding"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.ScreenAnnotation",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Annotations.Add"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "extract-watermark-artifacts-report": {
@@ -2393,29 +2442,30 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
-    "add-submit-button-with-javascript-to-pdf": {
-      "title": "Add Submit Button with JavaScript to PDF",
-      "filename": "add-submit-button-with-javascript-to-pdf.cs",
-      "description": "Demonstrates how to add a push‑button to a PDF that submits form data to a specified URL and optionally attaches JavaScript using Aspose.Pdf's FormEditor.",
+    "create-submit-button-with-javascript": {
+      "title": "Create Submit Button with JavaScript in PDF",
+      "filename": "create-submit-button-with-javascript.cs",
+      "description": "Demonstrates how to add a push‑button field to a PDF and attach a JavaScript action that submits the form data to a specified HTTP endpoint.",
       "tags": [
-        "pdf",
-        "submit-button",
+        "button",
         "javascript",
         "form",
-        "aspose-pdf"
+        "submit",
+        "pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.FormEditor",
-        "Aspose.Pdf.Facades.FormEditor.AddSubmitBtn",
-        "Aspose.Pdf.Facades.FormEditor.SetFieldScript",
-        "Aspose.Pdf.Facades.FormEditor.Save"
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Forms.ButtonField",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Annotations.JavascriptAction",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-rich-media-annotation-hidden-toolbar": {
@@ -2442,7 +2492,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "batch-add-image-watermark-artifact": {
@@ -2464,7 +2514,7 @@
         "Aspose.Pdf.VerticalAlignment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "remove-screen-annotations-from-pdf": {
@@ -2486,7 +2536,7 @@
         "Aspose.Pdf.Annotations.AnnotationCollection.Delete"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "create-link-annotation-named-destination": {
@@ -2511,7 +2561,7 @@
         "Aspose.Pdf.FitExplicitDestination"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-sound-annotation-plays-when-visible": {
@@ -2535,7 +2585,7 @@
         "Aspose.Pdf.Page.Annotations.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "duplicate-watermark-annotations": {
@@ -2556,7 +2606,7 @@
         "Aspose.Pdf.Annotations.Annotation"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "create-3d-annotation-with-materials": {
@@ -2582,7 +2632,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "toggle-watermark-visibility-button": {
@@ -2609,7 +2659,7 @@
         "Aspose.Pdf.Page.Annotations.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "change-pdf-annotation-colors-using-xfdf": {
@@ -2633,7 +2683,7 @@
         "Aspose.Pdf.Document.ImportAnnotationsFromXfdf"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-footer-watermark-annotations-to-pdf-pages": {
@@ -2657,7 +2707,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "embed-pdf-portfolio-rich-media-disable-printing": {
@@ -2682,7 +2732,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-screen-annotation-external-video": {
@@ -2708,7 +2758,7 @@
         "Aspose.Pdf.Annotations.ScreenAnnotation.Actions.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "increase-sound-annotation-clickable-area": {
@@ -2731,7 +2781,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "apply-pdf-pattern-tiled-watermark": {
@@ -2753,7 +2803,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-javascript-link-annotation-open-url": {
@@ -2779,61 +2829,34 @@
         "Aspose.Pdf.Page.Annotations.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "replace-watermark-annotations-with-logo": {
-      "title": "Batch Replace Watermark Annotations with Image Logo",
+      "title": "Replace Watermark Annotations with Corporate Logo Image",
       "filename": "replace-watermark-annotations-with-logo.cs",
-      "description": "The example scans a PDF for existing WatermarkAnnotations, records their opacity, removes them, and then adds a new image‑based watermark (a corporate logo) to the same pages while preserving the original opacity settings.",
+      "description": "Shows how to iterate through PDF pages, delete existing WatermarkAnnotation objects, and add a new image‑based WatermarkArtifact while preserving the original opacity and position.",
       "tags": [
         "watermark",
         "annotation",
         "image",
-        "pdf",
-        "Aspose"
+        "Aspose.Pdf",
+        "replace"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Annotations.Annotation",
         "Aspose.Pdf.Annotations.WatermarkAnnotation",
-        "Aspose.Pdf.Facades.PdfFileStamp",
-        "Aspose.Pdf.Facades.Stamp",
-        "Aspose.Pdf.Facades.PdfFileStamp.BindPdf",
-        "Aspose.Pdf.Facades.Stamp.BindImage",
-        "Aspose.Pdf.Facades.PdfFileStamp.AddStamp",
-        "Aspose.Pdf.Facades.PdfFileStamp.Save",
-        "Aspose.Pdf.Facades.PdfFileStamp.Close"
+        "Aspose.Pdf.WatermarkArtifact",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Point",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Annotations.Delete",
+        "Aspose.Pdf.WatermarkArtifact.SetImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
-      "status": "verified"
-    },
-    "pdf-button-calc-sum": {
-      "title": "Add a JavaScript Calculation Button to a PDF Form",
-      "filename": "pdf-button-calc-sum.cs",
-      "description": "Demonstrates how to create a PDF form with two input fields, a read‑only result field, and a push button that runs JavaScript to sum the inputs and display the result.",
-      "tags": [
-        "pdf",
-        "form",
-        "button",
-        "javascript",
-        "calculation"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.FormEditor",
-        "Aspose.Pdf.Forms.FieldType",
-        "Aspose.Pdf.Forms.PropertyFlag",
-        "Aspose.Pdf.Forms.ButtonField",
-        "Aspose.Pdf.Facades.FormEditor.AddField",
-        "Aspose.Pdf.Facades.FormEditor.SetFieldAttribute",
-        "Aspose.Pdf.Facades.FormEditor.SetFieldScript",
-        "Aspose.Pdf.Facades.FormEditor.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-3d-annotation-custom-camera": {
@@ -2863,7 +2886,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "set-background-artifact-opacity-40": {
@@ -2885,7 +2908,7 @@
         "Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "richmedia-annotation-mp4-video-poster": {
@@ -2911,7 +2934,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-sound-annotation-to-pdf-page": {
@@ -2932,7 +2955,7 @@
         "Aspose.Pdf.Annotations.SoundAnnotation"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-qr-code-watermark-to-pdf": {
@@ -2958,13 +2981,13 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
-    "add-toggle-button-to-show-hide-annotations": {
-      "title": "Add Toggle Button to Show/Hide Annotations",
-      "filename": "add-toggle-button-to-show-hide-annotations.cs",
-      "description": "Demonstrates how to create a JavaScript button that toggles the visibility of all annotations on the current PDF page using Aspose.Pdf.",
+    "add-toggle-annotations-button": {
+      "title": "Add Toggle Annotations Button to PDF",
+      "filename": "add-toggle-annotations-button.cs",
+      "description": "Shows how to create a push button on a PDF page that executes JavaScript to toggle the hidden state of every annotation on the current page.",
       "tags": [
         "annotations",
         "javascript",
@@ -2973,13 +2996,16 @@
         "pdf"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfContentEditor",
-        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfContentEditor.CreateJavaScriptLink",
-        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Forms.ButtonField",
+        "Aspose.Pdf.Annotations.JavascriptAction",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Forms.HighlightingMode"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "batch-add-sound-annotations-to-pdf-pages": {
@@ -3003,7 +3029,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "extract-embedded-media-from-screenannotation": {
@@ -3025,34 +3051,7 @@
         "Aspose.Pdf.FileSpecification"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
-      "status": "verified"
-    },
-    "add-rotated-semi-transparent-png-watermark": {
-      "title": "Add Rotated Semi-Transparent PNG Watermark to PDF",
-      "filename": "add-rotated-semi-transparent-png-watermark.cs",
-      "description": "Demonstrates how to apply a semi-transparent PNG logo as a watermark rotated 30 degrees clockwise to all pages of a PDF using Aspose.Pdf's PdfFileStamp and Stamp classes.",
-      "tags": [
-        "watermark",
-        "png",
-        "rotation",
-        "opacity",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileStamp",
-        "Aspose.Pdf.Facades.PdfFileStamp.BindPdf",
-        "Aspose.Pdf.Facades.PdfFileStamp.AddStamp",
-        "Aspose.Pdf.Facades.PdfFileStamp.Save",
-        "Aspose.Pdf.Facades.PdfFileStamp.Close",
-        "Aspose.Pdf.Facades.Stamp",
-        "Aspose.Pdf.Facades.Stamp.BindImage",
-        "Aspose.Pdf.Facades.Stamp.Opacity",
-        "Aspose.Pdf.Facades.Stamp.Rotation",
-        "Aspose.Pdf.Facades.Stamp.IsBackground"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-readonly-rich-media-pdf-annotation": {
@@ -3075,7 +3074,7 @@
         "Aspose.Pdf.Annotations.RichMediaAnnotation.SetContent"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "export-pdf-annotations-to-csv": {
@@ -3097,7 +3096,7 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "button-highlight-text-fields": {
@@ -3119,7 +3118,7 @@
         "Aspose.Pdf.Annotations.JavascriptAction"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-tiled-high-res-pdf-background": {
@@ -3141,7 +3140,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "set-link-annotation-border-color": {
@@ -3165,7 +3164,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-repeating-text-watermark-artifact": {
@@ -3198,7 +3197,7 @@
         "Aspose.Pdf.VerticalAlignment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-read-only-screen-annotation-swf": {
@@ -3221,7 +3220,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "batch-import-xfdf-annotations-merge-pdfs": {
@@ -3243,31 +3242,7 @@
         "Aspose.Pdf.Document.Dispose"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
-      "status": "verified"
-    },
-    "add-js-calculation-button-to-pdf-form": {
-      "title": "Add JavaScript Calculation Button to PDF Form",
-      "filename": "add-js-calculation-button-to-pdf-form.cs",
-      "description": "Shows how to insert a push‑button field into a PDF form and attach JavaScript that adds two numeric fields and writes the sum to a total field using Aspose.Pdf.",
-      "tags": [
-        "pdf",
-        "form",
-        "javascript",
-        "button",
-        "calculation"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.FormEditor",
-        "Aspose.Pdf.Facades.FieldType",
-        "Aspose.Pdf.Facades.FormEditor.AddField",
-        "Aspose.Pdf.Facades.FormEditor.SetFieldScript",
-        "Aspose.Pdf.Facades.FormEditor.Save",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-rich-media-video-annotation__v2": {
@@ -3289,7 +3264,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "replace-pdf-page-background-images": {
@@ -3312,7 +3287,32 @@
         "Aspose.Pdf.BackgroundArtifact.SetImage"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
+      "status": "verified"
+    },
+    "watermark-annotation-barcode-from-metadata": {
+      "title": "Create Watermark Annotation with Barcode from Document Metadata",
+      "filename": "watermark-annotation-barcode-from-metadata.cs",
+      "description": "Demonstrates how to generate a barcode image from PDF metadata and apply it as a semi‑transparent watermark annotation on the first page using Aspose.Pdf.",
+      "tags": [
+        "watermark",
+        "barcode",
+        "annotation",
+        "metadata",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.WatermarkAnnotation",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Text.FontRepository.FindFont",
+        "Aspose.Pdf.Annotations.WatermarkAnnotation.SetTextAndState"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-javascript-link-annotation-modal-dialog": {
@@ -3336,7 +3336,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "batch-watermark-pdfs-page-count-opacity": {
@@ -3359,7 +3359,7 @@
         "Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "create-3d-annotation-realistic-lighting": {
@@ -3386,7 +3386,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-sound-annotation-to-pdf-page__v2": {
@@ -3408,7 +3408,7 @@
         "Aspose.Pdf.Annotations.SoundIcon"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "clone-richmedia-annotations-summary-page": {
@@ -3434,30 +3434,30 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
-    "create-pdf-button-export-annotations": {
-      "title": "Create PDF Button to Export Annotations as JSON",
-      "filename": "create-pdf-button-export-annotations.cs",
-      "description": "Demonstrates adding a push‑button form field to a PDF with Aspose.Pdf, attaching JavaScript that extracts all annotations into a JSON string, and saving the updated document.",
+    "add-js-button-export-annotations-json": {
+      "title": "Add JavaScript Button to Export Annotations as JSON",
+      "filename": "add-js-button-export-annotations-json.cs",
+      "description": "Demonstrates how to add a push‑button form field to a PDF and attach JavaScript that gathers all annotations, converts them to a JSON string, and shows the result.",
       "tags": [
-        "annotations",
-        "javascript",
+        "pdf",
         "button",
-        "aspose-pdf",
-        "form"
+        "javascript",
+        "annotations",
+        "export"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.FormEditor",
-        "Aspose.Pdf.Facades.FormEditor.BindPdf",
-        "Aspose.Pdf.Facades.FormEditor.AddField",
-        "Aspose.Pdf.Facades.FormEditor.AddFieldScript",
-        "Aspose.Pdf.Facades.FormEditor.Save"
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Forms.ButtonField",
+        "Aspose.Pdf.Annotations.JavascriptAction",
+        "Aspose.Pdf.Forms.Form.Add"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-diagonal-watermark-annotation": {
@@ -3480,7 +3480,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "extract-embedded-media-from-richmedia-annotations": {
@@ -3501,7 +3501,7 @@
         "Aspose.Pdf.Annotations.RichMediaAnnotation"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "create-link-annotation-external-pdf-page": {
@@ -3527,7 +3527,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-animated-gif-screen-annotation": {
@@ -3548,7 +3548,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "align-watermark-annotations-to-margins": {
@@ -3570,7 +3570,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "toggle-rich-media-visibility-button": {
@@ -3594,7 +3594,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-3d-annotation-front-view": {
@@ -3626,7 +3626,7 @@
         "Aspose.Pdf.Page.Annotations.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "batch-replace-watermark-annotations": {
@@ -3652,7 +3652,7 @@
         "Aspose.Pdf.Annotations.WatermarkAnnotation.SetTextAndState"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-javascript-link-word-count": {
@@ -3676,7 +3676,7 @@
         "Aspose.Pdf.Annotations.JavascriptAction"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-auto-play-background-audio": {
@@ -3699,7 +3699,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "gradient-background-pdf-backgroundartifact": {
@@ -3726,7 +3726,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "add-dynamic-page-number-watermark": {
@@ -3750,7 +3750,7 @@
         "Aspose.Pdf.Page.Annotations.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "embed-pdf-portfolio-richmedia-annotation": {
@@ -3776,7 +3776,7 @@
         "Aspose.Pdf.Page.Annotations.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "change-button-annotation-color-to-blue": {
@@ -3799,7 +3799,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     },
     "batch-add-video-screen-annotations": {
@@ -3820,7 +3820,7 @@
         "Aspose.Pdf.Annotations.ScreenAnnotation"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:15:32Z",
+      "generated_at": "2026-04-10T07:18:20Z",
       "status": "verified"
     }
   }

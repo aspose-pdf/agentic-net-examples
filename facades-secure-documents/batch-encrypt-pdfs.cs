@@ -1,38 +1,59 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf;
+using Aspose.Pdf.Facades;   // Facade API for PDF security operations
+using Aspose.Pdf;          // Needed for DocumentPrivilege, KeySize enums
 
-class Program
+class BatchEncrypt
 {
     static void Main()
     {
-        const string inputDirectory = "input";
-        const string userPassword = "user123";
+        // Directory containing PDFs to encrypt
+        const string sourceDir = @"C:\PdfInput";
+        // Directory where encrypted PDFs will be written
+        const string targetDir = @"C:\PdfEncrypted";
+
+        // Ensure the output directory exists
+        Directory.CreateDirectory(targetDir);
+
+        // Define the passwords to apply to every file
+        const string userPassword  = "user123";
         const string ownerPassword = "owner123";
 
-        // Ensure the input directory exists
-        Directory.CreateDirectory(inputDirectory);
-
-        // Process each PDF file in the directory
-        string[] pdfFiles = Directory.GetFiles(inputDirectory, "*.pdf");
-        foreach (string pdfFilePath in pdfFiles)
+        // Enumerate all PDF files in the source directory (non‑recursive)
+        foreach (string inputPath in Directory.GetFiles(sourceDir, "*.pdf"))
         {
-            string outputFileName = Path.GetFileNameWithoutExtension(pdfFilePath) + "_enc.pdf";
+            // Build the output file path – keep the original file name
+            string fileName   = Path.GetFileName(inputPath);
+            string outputPath = Path.Combine(targetDir, fileName);
 
-            using (PdfFileSecurity fileSecurity = new PdfFileSecurity())
+            try
             {
-                // Load the source PDF
-                fileSecurity.BindPdf(pdfFilePath);
+                // PdfFileSecurity has a constructor that takes input and output file names
+                using (PdfFileSecurity security = new PdfFileSecurity(inputPath, outputPath))
+                {
+                    // Encrypt the file:
+                    //   - userPassword / ownerPassword as defined above
+                    //   - DocumentPrivilege.Print allows printing; adjust as needed
+                    //   - KeySize.x256 selects 256‑bit AES encryption (strongest supported)
+                    bool success = security.EncryptFile(
+                        userPassword,
+                        ownerPassword,
+                        DocumentPrivilege.Print,
+                        KeySize.x256);
 
-                // Encrypt with user/owner passwords, allow printing, use 256‑bit AES encryption
-                fileSecurity.EncryptFile(userPassword, ownerPassword, DocumentPrivilege.Print, KeySize.x256);
+                    if (!success)
+                    {
+                        Console.Error.WriteLine($"Encryption failed for '{inputPath}'.");
+                    }
+                }
 
-                // Save the encrypted PDF (output file name only, saved to the current working directory)
-                fileSecurity.Save(outputFileName);
+                Console.WriteLine($"Encrypted: {fileName}");
             }
-
-            Console.WriteLine($"Encrypted: {outputFileName}");
+            catch (Exception ex)
+            {
+                // Log any unexpected errors but continue processing remaining files
+                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
+            }
         }
 
         Console.WriteLine("Batch encryption completed.");

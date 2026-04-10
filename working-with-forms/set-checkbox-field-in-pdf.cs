@@ -1,41 +1,50 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
-    static void Main()
+    static void Main(string[] args)
     {
         // Input PDF containing the checkbox field
         const string inputPath = "input.pdf";
-        // Output PDF with the checkbox set to checked
+        // Output PDF with the checkbox updated
         const string outputPath = "output.pdf";
-        // Full name of the checkbox field (must match the field's full name in the PDF)
-        const string checkboxFieldName = "CheckBox1";
+        // Name of the checkbox field to modify
+        const string fieldName = "myCheckBox";
 
-        // Verify that the input file exists
+        // Example input data: set the checkbox to checked (true) or unchecked (false)
+        bool setChecked = true; // replace with actual input logic as needed
+
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF form using the Facades Form class
-        Form form = new Form(inputPath);
-
-        // Fill the checkbox field with a checked value (true)
-        // Returns true if the field was found and is a checkbox
-        bool success = form.FillField(checkboxFieldName, true);
-        if (!success)
+        // Load the PDF document (using rule: document disposal with using)
+        using (Document doc = new Document(inputPath))
         {
-            Console.Error.WriteLine($"Failed to set checkbox. Field '{checkboxFieldName}' may not exist or is not a checkbox.");
+            // Retrieve the checkbox field by its name
+            CheckboxField checkbox = doc.Form[fieldName] as CheckboxField;
+
+            if (checkbox != null)
+            {
+                // Set the checkbox state based on input data
+                checkbox.Checked = setChecked;
+                // Alternatively, you can set the Value property to an allowed state:
+                // checkbox.Value = setChecked ? checkbox.AllowedStates[0] : "Off";
+            }
+            else
+            {
+                Console.Error.WriteLine($"Checkbox field '{fieldName}' not found.");
+            }
+
+            // Save the modified PDF (using rule: document disposal with using)
+            doc.Save(outputPath);
         }
 
-        // Save the modified PDF to the specified output path
-        form.Save(outputPath);
-        // Close the facade to release resources
-        form.Close();
-
-        Console.WriteLine($"Checkbox '{checkboxFieldName}' set to checked and saved to '{outputPath}'.");
+        Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
     }
 }
