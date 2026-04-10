@@ -1,68 +1,61 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using System.Drawing; // needed for System.Drawing.Rectangle
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
         // Paths – adjust as needed
-        const string xmlPath = "input.xml";
-        const string signedPdfPath = "signed_output.pdf";
-        const string certificatePath = "certificate.pfx";
-        const string certificatePassword = "password";
-        const string signatureImagePath = "signature.png"; // optional visual appearance
+        const string xmlPath      = "input.xml";          // Source XML file
+        const string outputPdf    = "signed_output.pdf"; // Resulting signed PDF
+        const string certPath     = "certificate.pfx";   // PKCS#12 certificate file
+        const string certPassword = "yourPassword";      // Certificate password
 
-        // Validate required files
+        // Ensure the source files exist
         if (!File.Exists(xmlPath))
         {
             Console.Error.WriteLine($"XML file not found: {xmlPath}");
             return;
         }
-        if (!File.Exists(certificatePath))
+        if (!File.Exists(certPath))
         {
-            Console.Error.WriteLine($"Certificate file not found: {certificatePath}");
+            Console.Error.WriteLine($"Certificate file not found: {certPath}");
             return;
         }
 
-        // -----------------------------------------------------------------
-        // 1. Create a PDF document from the XML source
-        // -----------------------------------------------------------------
-        using (Document pdfDoc = new Document())
+        // Create a new PDF document and bind the XML content to it
+        using (Document doc = new Document())
         {
-            // Bind the XML (and optional XSLT) to the document
-            pdfDoc.BindXml(xmlPath);
+            // BindXml loads the XML and creates PDF pages based on its structure
+            doc.BindXml(xmlPath);
 
-            // -----------------------------------------------------------------
-            // 2. Digitally sign the generated PDF using PdfFileSignature
-            // -----------------------------------------------------------------
-            // Initialize the signing facade on the in‑memory document
-            PdfFileSignature signer = new PdfFileSignature(pdfDoc);
+            // Define the rectangle where the visible signature will appear
+            // Rectangle constructor: (llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 300, 200);
 
-            // Set the certificate (PKCS#12) and its password
-            signer.SetCertificate(certificatePath, certificatePassword);
+            // Create a signature field on the first page (page index is 1‑based)
+            // The constructor (Document, Rectangle) places the field on page 1 by default
+            SignatureField sigField = new SignatureField(doc, sigRect);
 
-            // Optional: set a visible signature appearance (image)
-            signer.SignatureAppearance = signatureImagePath;
+            // Add the signature field to the document's form collection
+            doc.Form.Add(sigField);
 
-            // Define the signature rectangle (position and size) on page 1
-            System.Drawing.Rectangle signatureRect = new System.Drawing.Rectangle(100, 100, 200, 100);
+            // Create a concrete signature object (PKCS7) using the certificate file
+            PKCS7 pkcs7Signature = new PKCS7(certPath, certPassword);
+            pkcs7Signature.Reason      = "Document approved";
+            pkcs7Signature.ContactInfo = "signer@example.com";
+            pkcs7Signature.Location    = "New York";
 
-            // Apply the signature
-            signer.Sign(
-                page: 1,                     // 1‑based page index
-                SigReason: "Document signed", // reason for signing
-                SigContact: "Signer Contact", // contact information
-                SigLocation: "Signer Location", // location information
-                visible: true,               // make the signature visible
-                annotRect: signatureRect);   // rectangle where the signature appears
+            // Sign the field. The PKCS7 instance already contains the certificate,
+            // so we can use the overload that takes only the Signature object.
+            sigField.Sign(pkcs7Signature);
 
-            // Save the signed PDF to the specified file
-            signer.Save(signedPdfPath);
+            // Save the signed PDF
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Signed PDF saved to '{signedPdfPath}'.");
+        Console.WriteLine($"Signed PDF saved to '{outputPdf}'.");
     }
 }
