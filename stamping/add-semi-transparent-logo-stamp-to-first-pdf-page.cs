@@ -1,7 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                     // Core API
-using Aspose.Pdf.Facades;            // Not needed for ImageStamp, but kept if other facades are used
+using Aspose.Pdf;
 
 class Program
 {
@@ -11,38 +10,41 @@ class Program
         const string logoImage = "logo.png";       // logo to stamp
         const string outputPdf = "output.pdf";     // result PDF
 
-        // Verify files exist
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
+
         if (!File.Exists(logoImage))
         {
             Console.Error.WriteLine($"Logo image not found: {logoImage}");
             return;
         }
 
-        // Load the PDF document (using statement ensures proper disposal)
+        // Load the PDF document (lifecycle rule: use Document constructor)
         using (Document doc = new Document(inputPdf))
         {
-            // Create an ImageStamp from the logo file
+            // Create an image stamp from the logo file (ImageStamp has a string ctor)
             ImageStamp logoStamp = new ImageStamp(logoImage);
 
-            // Set stamp properties – semi‑transparent and centered on the page
-            logoStamp.Opacity = 0.5;                                 // 50 % opacity
-            logoStamp.Background = false;                           // stamp on top of content
-            logoStamp.HorizontalAlignment = HorizontalAlignment.Center;
-            logoStamp.VerticalAlignment   = VerticalAlignment.Center;
+            // Set semi‑transparent opacity (0.0 = fully transparent, 1.0 = opaque)
+            logoStamp.Opacity = 0.5f;
+
+            // Optionally position the stamp (e.g., top‑left corner)
+            // You can adjust XIndent/YIndent, HorizontalAlignment, etc.
+            logoStamp.HorizontalAlignment = HorizontalAlignment.Left;
+            logoStamp.VerticalAlignment   = VerticalAlignment.Top;
+            logoStamp.LeftMargin   = 10;   // distance from left edge
+            logoStamp.TopMargin    = 10;   // distance from top edge
 
             // Add the stamp to the first page (pages are 1‑based)
-            Page firstPage = doc.Pages[1];
-            firstPage.AddStamp(logoStamp);
+            doc.Pages[1].AddStamp(logoStamp);
 
-            // Save the modified PDF
+            // Save the modified PDF (lifecycle rule: use Document.Save)
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Logo stamp added and saved to '{outputPdf}'.");
+        Console.WriteLine($"Logo stamp applied. Output saved to '{outputPdf}'.");
     }
 }
