@@ -1,208 +1,219 @@
 {
-  "category": "Facades - Bookmarks",
-  "last_updated": "2026-03-27T05:19:21Z",
+  "category": "facades-bookmarks",
+  "nuget_version": "26.3.0",
+  "last_updated": "2026-04-10T06:37:11Z",
   "examples": {
-    "create-hierarchical-bookmarks": {
-      "title": "Create Hierarchical Bookmarks in PDF",
-      "filename": "create-hierarchical-bookmarks.cs",
-      "description": "Demonstrates binding a PDF to PdfBookmarkEditor and adding a parent bookmark with child chapter bookmarks.",
+    "create-hierarchical-pdf-bookmarks": {
+      "title": "Create Hierarchical PDF Bookmarks with PdfBookmarkEditor",
+      "filename": "create-hierarchical-pdf-bookmarks.cs",
+      "description": "Shows how to bind a PDF to PdfBookmarkEditor and add a root bookmark with child chapter bookmarks, forming a hierarchical outline.",
       "tags": [
         "bookmarks",
         "pdf",
-        "hierarchy",
-        "aspdf",
-        "facades"
-      ],
-      "apis_used": [
-        "PdfBookmarkEditor",
-        "PdfBookmarkEditor.BindPdf",
-        "Bookmark",
-        "Bookmarks",
-        "PdfBookmarkEditor.CreateBookmarks",
-        "PdfBookmarkEditor.Save",
-        "PdfBookmarkEditor.Close"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-27T05:19:21Z",
-      "status": "verified"
-    },
-    "import-bookmarks-merge": {
-      "title": "Import Bookmarks from One PDF into Another Preserving Order",
-      "filename": "import-bookmarks-merge.cs",
-      "description": "Demonstrates how to export bookmarks from a source PDF to XML and import them into a target PDF, preserving the original bookmark order.",
-      "tags": [
-        "bookmarks",
-        "pdf",
-        "merge",
-        "aspdf",
-        "facades"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfBookmarkEditor.ExportBookmarksToXML",
-        "Aspose.Pdf.Facades.PdfBookmarkEditor.ImportBookmarksWithXML"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-27T05:19:21Z",
-      "status": "verified"
-    },
-    "extract-pdf-bookmarks-csv": {
-      "title": "Extract PDF Bookmarks to CSV",
-      "filename": "extract-pdf-bookmarks-csv.cs",
-      "description": "Reads all bookmarks from a PDF, captures their title, destination (page or explicit destination), and hierarchical level, and writes the data to a CSV file.",
-      "tags": [
-        "bookmarks",
-        "csv",
-        "pdf",
-        "extraction"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfBookmarkEditor",
-        "Aspose.Pdf.Bookmark",
-        "Aspose.Pdf.Bookmarks",
-        "System.IO.StreamWriter"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-27T05:19:21Z",
-      "status": "verified"
-    },
-    "update-bookmark-destination": {
-      "title": "Update Bookmark Destination to Page Ten",
-      "filename": "update-bookmark-destination.cs",
-      "description": "Demonstrates how to change the destination of a specific bookmark to page 10 using PdfBookmarkEditor.",
-      "tags": [
-        "bookmark",
-        "pdf",
-        "aspnet",
-        "facades",
-        "update"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfBookmarkEditor",
-        "Aspose.Pdf.Facades.PdfBookmarkEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfBookmarkEditor.DeleteBookmarks",
-        "Aspose.Pdf.Facades.PdfBookmarkEditor.CreateBookmarkOfPage",
-        "Aspose.Pdf.Facades.PdfBookmarkEditor.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-27T05:19:21Z",
-      "status": "verified"
-    },
-    "delete-all-bookmarks": {
-      "title": "Delete All Bookmarks from PDF",
-      "filename": "delete-all-bookmarks.cs",
-      "description": "Demonstrates how to remove all bookmarks from a PDF using PdfBookmarkEditor and save the modified document.",
-      "tags": [
-        "bookmarks",
-        "pdf",
-        "delete",
         "Aspose.Pdf",
-        "facades"
-      ],
-      "apis_used": [
-        "PdfBookmarkEditor",
-        "PdfBookmarkEditor.BindPdf",
-        "PdfBookmarkEditor.DeleteBookmarks",
-        "PdfBookmarkEditor.Save",
-        "PdfBookmarkEditor.Close"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-03-27T05:19:21Z",
-      "status": "verified"
-    },
-    "delete-bookmark-verify": {
-      "title": "Delete a Specific Bookmark and Verify Removal",
-      "filename": "delete-bookmark-verify.cs",
-      "description": "Demonstrates how to delete a bookmark by title using PdfBookmarkEditor and verify its removal by extracting bookmarks before and after the operation.",
-      "tags": [
-        "bookmark",
-        "delete",
-        "verification",
-        "pdf",
-        "facade"
-      ],
-      "apis_used": [
-        "PdfBookmarkEditor",
-        "PdfBookmarkEditor.BindPdf",
-        "PdfBookmarkEditor.ExtractBookmarks",
-        "PdfBookmarkEditor.DeleteBookmarks",
-        "PdfBookmarkEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-03-27T05:19:21Z",
-      "status": "verified"
-    },
-    "add-top-level-bookmark": {
-      "title": "Add Top-Level Bookmark to PDF",
-      "filename": "add-top-level-bookmark.cs",
-      "description": "Creates a new top‑level bookmark that points to the first page of a PDF and sets its title color to blue.",
-      "tags": [
-        "bookmark",
-        "pdf",
-        "facades",
-        "color"
+        "hierarchy",
+        "PdfBookmarkEditor"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfBookmarkEditor",
-        "Aspose.Pdf.Facades.Bookmark",
-        "Aspose.Pdf.Color"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-03-27T05:19:21Z",
-      "status": "verified"
-    },
-    "add-child-bookmarks": {
-      "title": "Add Child Bookmarks Under a Parent Bookmark",
-      "filename": "add-child-bookmarks.cs",
-      "description": "Demonstrates how to add sub‑bookmarks under an existing parent bookmark in a PDF using PdfBookmarkEditor.",
-      "tags": [
-        "bookmarks",
-        "pdf",
-        "aspose",
-        "facades",
-        "c#"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfBookmarkEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfBookmarkEditor.ExtractBookmarks",
         "Aspose.Pdf.Facades.PdfBookmarkEditor.CreateBookmarks",
         "Aspose.Pdf.Facades.PdfBookmarkEditor.Save",
         "Aspose.Pdf.Facades.Bookmark",
         "Aspose.Pdf.Facades.Bookmarks"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-03-27T05:19:21Z",
+      "generated_at": "2026-04-10T06:37:11Z",
       "status": "verified"
     },
-    "extract-pdf-bookmarks-json": {
-      "title": "Extract PDF Bookmarks to Nested JSON",
-      "filename": "extract-pdf-bookmarks-json.cs",
-      "description": "Extracts all bookmarks from a PDF using PdfBookmarkEditor and builds a nested JSON structure that reflects their hierarchical levels.",
+    "import-bookmarks-merge-pdf": {
+      "title": "Import Bookmarks from One PDF into Another",
+      "filename": "import-bookmarks-merge-pdf.cs",
+      "description": "Demonstrates exporting bookmarks from a source PDF to XML and importing them into a target PDF, preserving the original order.",
       "tags": [
         "bookmarks",
-        "json",
         "pdf",
-        "extraction",
-        "aspdf"
+        "import",
+        "merge",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfBookmarkEditor",
+        "PdfBookmarkEditor.BindPdf",
+        "PdfBookmarkEditor.ExportBookmarksToXML",
+        "PdfBookmarkEditor.ImportBookmarksWithXML",
+        "PdfBookmarkEditor.Save",
+        "PdfBookmarkEditor.Close"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:37:11Z",
+      "status": "verified"
+    },
+    "export-pdf-bookmarks-to-csv": {
+      "title": "Export PDF Bookmarks to CSV",
+      "filename": "export-pdf-bookmarks-to-csv.cs",
+      "description": "Shows how to extract all bookmarks from a PDF using Aspose.Pdf.Facades.PdfBookmarkEditor and write each bookmark's title, destination page number, and hierarchy level to a CSV file.",
+      "tags": [
+        "bookmarks",
+        "csv",
+        "export",
+        "pdf",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfBookmarkEditor",
         "Aspose.Pdf.Facades.PdfBookmarkEditor.BindPdf",
         "Aspose.Pdf.Facades.PdfBookmarkEditor.ExtractBookmarks",
-        "Aspose.Pdf.Facades.Bookmarks",
-        "Aspose.Pdf.Facades.Bookmark",
-        "System.Text.Json.JsonSerializer"
+        "Aspose.Pdf.Bookmarks",
+        "Aspose.Pdf.Bookmark"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-03-27T05:19:21Z",
+      "generated_at": "2026-04-10T06:37:11Z",
       "status": "verified"
     },
-    "export-pdf-bookmarks-xml": {
+    "update-bookmark-destination-to-page-10": {
+      "title": "Update Bookmark Destination to Page 10",
+      "filename": "update-bookmark-destination-to-page-10.cs",
+      "description": "Loads a PDF, extracts its bookmark hierarchy, finds a bookmark by title, changes its destination to page 10, and saves the updated document.",
+      "tags": [
+        "bookmarks",
+        "pdf",
+        "destination",
+        "Aspose.Pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfBookmarkEditor",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.ExtractBookmarks",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.Save",
+        "Aspose.Pdf.Bookmark",
+        "Aspose.Pdf.Bookmarks"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:37:11Z",
+      "status": "verified"
+    },
+    "delete-all-bookmarks-from-pdf": {
+      "title": "Delete All Bookmarks from a PDF",
+      "filename": "delete-all-bookmarks-from-pdf.cs",
+      "description": "Shows how to remove every bookmark from a PDF using Aspose.Pdf.Facades.PdfBookmarkEditor and save the modified document.",
+      "tags": [
+        "bookmarks",
+        "delete",
+        "pdf",
+        "Aspose.Pdf",
+        "PdfBookmarkEditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfBookmarkEditor",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.DeleteBookmarks",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:37:11Z",
+      "status": "verified"
+    },
+    "delete-bookmark-verify-removal": {
+      "title": "Delete a Bookmark and Verify Removal",
+      "filename": "delete-bookmark-verify-removal.cs",
+      "description": "Shows how to remove a specific bookmark from a PDF using PdfBookmarkEditor and then confirm the deletion by extracting the remaining bookmarks.",
+      "tags": [
+        "bookmark",
+        "delete",
+        "pdf",
+        "aspose",
+        "verification"
+      ],
+      "apis_used": [
+        "PdfBookmarkEditor",
+        "PdfBookmarkEditor.BindPdf",
+        "PdfBookmarkEditor.DeleteBookmarks",
+        "PdfBookmarkEditor.Save",
+        "PdfBookmarkEditor.Close",
+        "PdfBookmarkEditor.ExtractBookmarks",
+        "Bookmarks",
+        "Bookmark"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:37:11Z",
+      "status": "verified"
+    },
+    "add-top-level-blue-bookmark-to-first-page": {
+      "title": "Add Top-Level Blue Bookmark to First Page",
+      "filename": "add-top-level-blue-bookmark-to-first-page.cs",
+      "description": "Demonstrates how to create a top-level bookmark that links to page 1 and set its title color to blue using Aspose.Pdf's PdfBookmarkEditor facade.",
+      "tags": [
+        "bookmarks",
+        "pdf",
+        "aspose",
+        "color",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfBookmarkEditor",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.CreateBookmarks",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.Save",
+        "Aspose.Pdf.Bookmark"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:37:11Z",
+      "status": "verified"
+    },
+    "add-child-bookmarks-to-pdf-chapter": {
+      "title": "Add Child Bookmarks to a PDF Chapter",
+      "filename": "add-child-bookmarks-to-pdf-chapter.cs",
+      "description": "Shows how to create a parent bookmark and attach child bookmarks representing subsections within a chapter of a PDF using Aspose.Pdf.Facades.",
+      "tags": [
+        "bookmarks",
+        "pdf",
+        "aspose",
+        "child-items",
+        "chapter"
+      ],
+      "apis_used": [
+        "PdfBookmarkEditor",
+        "PdfBookmarkEditor.BindPdf",
+        "PdfBookmarkEditor.CreateBookmarks",
+        "PdfBookmarkEditor.Save",
+        "PdfBookmarkEditor.Close",
+        "Bookmark",
+        "Bookmarks"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:37:11Z",
+      "status": "verified"
+    },
+    "export-pdf-bookmarks-to-json": {
+      "title": "Export PDF Bookmarks to Nested JSON",
+      "filename": "export-pdf-bookmarks-to-json.cs",
+      "description": "Demonstrates extracting PDF bookmarks with Aspose.Pdf.Facades, converting them into a hierarchical POCO structure, and serializing the hierarchy to a pretty‑printed JSON file.",
+      "tags": [
+        "pdf",
+        "bookmarks",
+        "json",
+        "export",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfBookmarkEditor",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.ExtractBookmarks",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.Close",
+        "Aspose.Pdf.Facades.Bookmark",
+        "Aspose.Pdf.Facades.Bookmarks"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:37:11Z",
+      "status": "verified"
+    },
+    "export-pdf-bookmarks-to-xml": {
       "title": "Export PDF Bookmarks to XML",
-      "filename": "export-pdf-bookmarks-xml.cs",
-      "description": "Exports all bookmarks from a PDF file to an XML file using Aspose.Pdf.Facades.PdfBookmarkEditor.",
+      "filename": "export-pdf-bookmarks-to-xml.cs",
+      "description": "Shows how to load a PDF with PdfBookmarkEditor and export its full bookmark hierarchy to an XML file using Aspose.Pdf.",
       "tags": [
         "bookmarks",
         "export",
@@ -213,84 +224,91 @@
       "apis_used": [
         "Aspose.Pdf.Facades.PdfBookmarkEditor",
         "Aspose.Pdf.Facades.PdfBookmarkEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfBookmarkEditor.ExportBookmarksToXML"
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.ExportBookmarksToXML",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.Close"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-03-27T05:19:21Z",
+      "generated_at": "2026-04-10T06:37:11Z",
       "status": "verified"
     },
     "import-bookmarks-from-json": {
-      "title": "Import Bookmarks from JSON into PDF",
+      "title": "Import Bookmarks from JSON into a PDF",
       "filename": "import-bookmarks-from-json.cs",
-      "description": "Demonstrates reading bookmark definitions from a JSON file, converting them to Aspose.Pdf.Facades.Bookmark objects, and adding them to an existing PDF.",
+      "description": "Demonstrates how to read a JSON file containing bookmark definitions, convert them to Aspose.Pdf.Facades.Bookmark objects, and add them to an existing PDF using PdfBookmarkEditor.",
       "tags": [
         "bookmarks",
         "json",
         "pdf",
         "import",
-        "aspdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfBookmarkEditor",
-        "Aspose.Pdf.Facades.PdfBookmarkEditor.CreateBookmarks",
-        "System.Text.Json.JsonSerializer"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-27T05:19:21Z",
-      "status": "verified"
-    },
-    "add-toc-bookmark-batch": {
-      "title": "Add Table of Contents Bookmark to PDFs in a Folder",
-      "filename": "add-toc-bookmark-batch.cs",
-      "description": "Processes all PDF files in a folder, adding a \"Table of Contents\" bookmark to each document and saving the result with a new filename.",
-      "tags": [
-        "bookmark",
-        "batch",
-        "pdf",
-        "toc",
-        "facades"
+        "facade"
       ],
       "apis_used": [
         "PdfBookmarkEditor",
+        "PdfBookmarkEditor.BindPdf",
+        "PdfBookmarkEditor.CreateBookmarks",
+        "PdfBookmarkEditor.Save",
         "Bookmark",
-        "Document"
+        "Bookmarks"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-03-27T05:19:21Z",
+      "generated_at": "2026-04-10T06:37:11Z",
       "status": "verified"
     },
-    "validate-pdf-bookmark-count": {
-      "title": "Validate PDF Bookmark Count After Saving",
-      "filename": "validate-pdf-bookmark-count.cs",
-      "description": "Creates a PDF, adds bookmarks, saves it, then extracts the bookmarks to verify the expected count.",
+    "add-toc-bookmark-to-pdfs-batch": {
+      "title": "Add Table of Contents Bookmark to PDFs in Batch",
+      "filename": "add-toc-bookmark-to-pdfs-batch.cs",
+      "description": "Shows how to iterate through a folder of PDF files and add a top‑level \"Table of Contents\" bookmark to each document using Aspose.Pdf.Facades.PdfBookmarkEditor.",
+      "tags": [
+        "pdf",
+        "bookmark",
+        "batch",
+        "aspose",
+        "toc"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfBookmarkEditor",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.CreateBookmarkOfPage",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:37:11Z",
+      "status": "verified"
+    },
+    "create-validate-pdf-bookmarks": {
+      "title": "Create and Validate PDF Bookmarks",
+      "filename": "create-validate-pdf-bookmarks.cs",
+      "description": "Shows how to generate a bookmark for each page using PdfBookmarkEditor and then verify the total bookmark count with ExtractBookmarks.",
       "tags": [
         "bookmarks",
         "validation",
         "pdf",
-        "aspdf",
-        "facades"
+        "facade",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfBookmarkEditor",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.BindPdf",
         "Aspose.Pdf.Facades.PdfBookmarkEditor.CreateBookmarks",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.Save",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.Close",
         "Aspose.Pdf.Facades.PdfBookmarkEditor.ExtractBookmarks",
-        "Aspose.Pdf.Text.TextFragment"
+        "Aspose.Pdf.Facades.Bookmarks"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-03-27T05:19:21Z",
+      "generated_at": "2026-04-10T06:37:11Z",
       "status": "verified"
     },
-    "modify-pdf-bookmarks": {
-      "title": "Modify PDF Bookmarks Using MemoryStream",
-      "filename": "modify-pdf-bookmarks.cs",
-      "description": "Demonstrates loading a PDF from a MemoryStream, changing bookmark titles with PdfBookmarkEditor, and returning the updated PDF as a byte array.",
+    "update-pdf-bookmark-title": {
+      "title": "Update PDF Bookmark Title Using MemoryStream",
+      "filename": "update-pdf-bookmark-title.cs",
+      "description": "Shows how to bind a PDF from a byte array with MemoryStream, modify an existing bookmark title, and return the updated PDF as a byte array using Aspose.Pdf.Facades.",
       "tags": [
         "pdf",
-        "bookmarks",
+        "bookmark",
         "memorystream",
-        "aspose.pdf",
+        "aspose",
         "c#"
       ],
       "apis_used": [
@@ -299,183 +317,203 @@
         "Aspose.Pdf.Facades.PdfBookmarkEditor.ModifyBookmarks",
         "Aspose.Pdf.Facades.PdfBookmarkEditor.Save"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-27T05:19:21Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:37:11Z",
       "status": "verified"
     },
-    "add-external-url-bookmarks": {
+    "add-external-url-bookmarks-to-pdf": {
       "title": "Add External URL Bookmarks to PDF",
-      "filename": "add-external-url-bookmarks.cs",
-      "description": "Demonstrates adding bookmarks that link to external web URLs using Aspose.Pdf.Facades.PdfBookmarkEditor.",
+      "filename": "add-external-url-bookmarks-to-pdf.cs",
+      "description": "Demonstrates how to add bookmarks that link to external web URLs in an existing PDF using Aspose.Pdf's PdfBookmarkEditor.",
       "tags": [
         "bookmarks",
         "external-url",
         "pdf",
-        "aspose-pdf",
-        "facades"
+        "Aspose.Pdf",
+        "facade"
       ],
       "apis_used": [
-        "PdfBookmarkEditor",
-        "PdfBookmarkEditor.BindPdf",
-        "PdfBookmarkEditor.CreateBookmarks",
-        "PdfBookmarkEditor.Save",
-        "Bookmark"
+        "Aspose.Pdf.Facades.PdfBookmarkEditor",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.CreateBookmarks",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.Save",
+        "Aspose.Pdf.Bookmark"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-03-27T05:19:21Z",
+      "generated_at": "2026-04-10T06:37:11Z",
       "status": "verified"
     },
-    "update-bookmark-titles": {
-      "title": "Update PDF Bookmark Titles to Title Case",
-      "filename": "update-bookmark-titles.cs",
-      "description": "Extracts bookmarks from a PDF, converts each title to title case while preserving predefined proper nouns, and saves the updated document.",
+    "update-pdf-bookmark-titles-to-title-case": {
+      "title": "Update PDF Bookmark Titles to Title Case with Proper Nouns",
+      "filename": "update-pdf-bookmark-titles-to-title-case.cs",
+      "description": "Demonstrates how to read PDF bookmarks, convert each title to title case while preserving predefined proper nouns, and save the updated PDF using Aspose.Pdf.Facades.",
       "tags": [
         "bookmarks",
         "titlecase",
         "pdf",
         "aspose",
-        "c#"
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfBookmarkEditor",
-        "Aspose.Pdf.Facades.Bookmark",
-        "Aspose.Pdf.Document"
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.ExtractBookmarks",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.ModifyBookmarks",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.Save",
+        "Aspose.Pdf.Facades.Bookmarks",
+        "Aspose.Pdf.Facades.Bookmark"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-03-27T05:19:21Z",
+      "generated_at": "2026-04-10T06:37:11Z",
       "status": "verified"
     },
-    "delete-bookmarks-by-pattern": {
-      "title": "Delete Bookmarks Matching a Pattern",
-      "filename": "delete-bookmarks-by-pattern.cs",
-      "description": "Demonstrates how to remove PDF bookmarks whose titles match a regular expression using PdfBookmarkEditor.",
+    "delete-bookmarks-matching-regex": {
+      "title": "Delete Bookmarks Matching a Regex Pattern",
+      "filename": "delete-bookmarks-matching-regex.cs",
+      "description": "Shows how to remove PDF bookmarks whose titles match a regular expression using Aspose.Pdf's PdfBookmarkEditor.",
       "tags": [
         "bookmarks",
         "regex",
         "delete",
         "pdf",
-        "facade"
+        "aspose-pdf"
       ],
       "apis_used": [
-        "PdfBookmarkEditor",
-        "PdfBookmarkEditor.BindPdf",
-        "PdfBookmarkEditor.ExtractBookmarks",
-        "PdfBookmarkEditor.DeleteBookmarks",
-        "PdfBookmarkEditor.Save"
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.ExtractBookmarks",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.DeleteBookmarks",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.Save",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.Close",
+        "Aspose.Pdf.Bookmarks",
+        "Aspose.Pdf.Bookmark"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-27T05:19:21Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:37:11Z",
       "status": "verified"
     },
-    "collapse-pdf-bookmarks": {
+    "collapse-specific-pdf-bookmarks": {
       "title": "Collapse Specific PDF Bookmarks",
-      "filename": "collapse-pdf-bookmarks.cs",
-      "description": "Demonstrates how to set the open state of selected bookmarks to collapsed using PdfBookmarkEditor.",
+      "filename": "collapse-specific-pdf-bookmarks.cs",
+      "description": "Demonstrates how to collapse selected bookmarks in a PDF by setting their Open property to false using Aspose.Pdf's PdfBookmarkEditor.",
       "tags": [
         "bookmarks",
-        "outline",
         "collapse",
         "pdf",
-        "aspdf"
+        "outline",
+        "Aspose.Pdf"
       ],
       "apis_used": [
-        "PdfBookmarkEditor",
-        "Bookmark",
-        "Bookmarks",
-        "PdfBookmarkEditor.BindPdf",
-        "PdfBookmarkEditor.ExtractBookmarks",
-        "PdfBookmarkEditor.DeleteBookmarks",
-        "PdfBookmarkEditor.CreateBookmarks",
-        "PdfBookmarkEditor.Save"
+        "Aspose.Pdf.Facades.PdfBookmarkEditor",
+        "Aspose.Pdf.Bookmarks",
+        "Aspose.Pdf.Bookmark"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-03-27T05:19:21Z",
+      "generated_at": "2026-04-10T06:37:11Z",
       "status": "verified"
     },
-    "adjust-bookmarks-after-inserting-pages": {
+    "adjust-pdf-bookmarks-after-inserting-pages": {
       "title": "Adjust PDF Bookmarks After Inserting Pages",
-      "filename": "adjust-bookmarks-after-inserting-pages.cs",
-      "description": "Inserts pages at the beginning of a PDF and updates bookmark destinations so they continue to point to the correct pages.",
+      "filename": "adjust-pdf-bookmarks-after-inserting-pages.cs",
+      "description": "Demonstrates inserting blank pages at the beginning of a PDF and updating existing bookmarks to reflect the new page numbers using Aspose.Pdf.",
       "tags": [
         "bookmarks",
-        "insert-pages",
+        "page-insertion",
         "pdf",
-        "aspnet",
-        "facades"
+        "aspose-pdf",
+        "document"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages.Insert",
         "Aspose.Pdf.Facades.PdfBookmarkEditor",
-        "Aspose.Pdf.PageCollection.Insert",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.ExtractBookmarks",
         "Aspose.Pdf.Facades.PdfBookmarkEditor.DeleteBookmarks",
-        "Aspose.Pdf.Facades.PdfBookmarkEditor.CreateBookmarkOfPage"
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.CreateBookmarkOfPage",
+        "Aspose.Pdf.Bookmarks",
+        "Aspose.Pdf.Bookmark"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-03-27T05:19:21Z",
+      "generated_at": "2026-04-10T06:37:11Z",
       "status": "verified"
     },
-    "export-bookmarks-to-a-plain-text-outline-file-preserving-indentation-to-reflect-hierarchy-levels": {
-      "title": "Export Bookmarks To A Plain Text Outline File Preserving Indentation To Reflect Hierarchy Levels",
-      "filename": "export-bookmarks-to-a-plain-text-outline-file-preserving-indentation-to-reflect-hierarchy-levels.cs",
-      "description": "",
-      "tags": [],
-      "apis_used": [],
-      "difficulty": "",
-      "generated_at": "2026-03-27T05:19:21Z",
-      "status": "verified"
-    },
-    "import-ofd-bookmarks": {
-      "title": "Import Bookmarks from OFD to PDF",
-      "filename": "import-ofd-bookmarks.cs",
-      "description": "Loads an OFD file, converts its bookmarks into PDF bookmarks using PdfBookmarkEditor, and saves the result as a PDF.",
+    "export-pdf-bookmarks-to-text": {
+      "title": "Export PDF Bookmarks to Text Outline",
+      "filename": "export-pdf-bookmarks-to-text.cs",
+      "description": "Demonstrates how to extract the hierarchical bookmarks from a PDF using Aspose.Pdf and write them to a plain‑text file with indentation that reflects the bookmark levels.",
       "tags": [
         "bookmarks",
-        "ofd",
+        "export",
+        "text",
         "pdf",
-        "import",
-        "facades"
+        "outline"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.OfdLoadOptions",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.ExtractBookmarks",
+        "Aspose.Pdf.Facades.Bookmarks",
+        "Aspose.Pdf.Facades.Bookmark"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:37:11Z",
+      "status": "verified"
+    },
+    "import-ofd-bookmarks-into-pdf": {
+      "title": "Import OFD Bookmarks into PDF",
+      "filename": "import-ofd-bookmarks-into-pdf.cs",
+      "description": "Shows how to load an OFD document, extract its bookmarks, and add them to an existing or newly created PDF using Aspose.Pdf.",
+      "tags": [
+        "OFD",
+        "bookmarks",
+        "PDF",
+        "Aspose.Pdf",
+        "PdfBookmarkEditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.OfdLoadOptions",
         "Aspose.Pdf.Facades.PdfBookmarkEditor",
-        "Aspose.Pdf.Facades.Bookmark",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.ExtractBookmarks",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.CreateBookmarks",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.Save",
         "Aspose.Pdf.Facades.Bookmarks"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-03-27T05:19:21Z",
+      "generated_at": "2026-04-10T06:37:11Z",
       "status": "verified"
     },
-    "bookmark-javascript-action": {
-      "title": "Create Bookmark with JavaScript Action",
-      "filename": "bookmark-javascript-action.cs",
-      "description": "Adds a bookmark that runs a JavaScript alert when clicked using PdfContentEditor.",
+    "add-javascript-bookmark-to-pdf": {
+      "title": "Add JavaScript Bookmark to PDF",
+      "filename": "add-javascript-bookmark-to-pdf.cs",
+      "description": "Shows how to create a PDF bookmark that runs JavaScript code when clicked using Aspose.Pdf.Facades.",
       "tags": [
         "bookmark",
         "javascript",
         "pdf",
         "facade",
-        "interactive"
+        "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
         "Aspose.Pdf.Facades.PdfContentEditor.CreateBookmarksAction",
-        "Aspose.Pdf.Color"
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-27T05:19:21Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:37:11Z",
       "status": "verified"
     },
-    "delete-bookmarks-encrypted-pdf": {
-      "title": "Delete All Bookmarks from Encrypted PDF",
-      "filename": "delete-bookmarks-encrypted-pdf.cs",
-      "description": "Demonstrates how to open an encrypted PDF with a password, remove all its bookmarks using PdfBookmarkEditor, and save the cleaned document.",
+    "batch-remove-bookmarks-from-encrypted-pdfs": {
+      "title": "Batch Remove Bookmarks from Encrypted PDFs",
+      "filename": "batch-remove-bookmarks-from-encrypted-pdfs.cs",
+      "description": "Shows how to open password‑protected PDF files, delete all bookmarks using PdfBookmarkEditor, and save the resulting PDFs to a separate folder in a batch operation.",
       "tags": [
         "bookmarks",
         "encryption",
-        "pdf",
+        "batch-processing",
         "Aspose.Pdf",
-        "facades"
+        "PdfBookmarkEditor"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -484,251 +522,292 @@
         "Aspose.Pdf.Facades.PdfBookmarkEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-03-27T05:19:21Z",
+      "generated_at": "2026-04-10T06:37:11Z",
       "status": "verified"
     },
-    "rename-pdf-bookmarks": {
+    "rename-pdf-bookmarks-using-translation-dictionary": {
       "title": "Rename PDF Bookmarks Using a Translation Dictionary",
-      "filename": "rename-pdf-bookmarks.cs",
-      "description": "Demonstrates how to rename existing PDF bookmarks based on a translation dictionary using PdfBookmarkEditor.",
+      "filename": "rename-pdf-bookmarks-using-translation-dictionary.cs",
+      "description": "Demonstrates how to rename PDF bookmarks by applying a translation map with Aspose.Pdf's PdfBookmarkEditor. The example loads a PDF, updates bookmark titles, and saves the result.",
       "tags": [
         "bookmarks",
         "rename",
         "translation",
         "pdf",
-        "facade"
+        "aspose"
       ],
       "apis_used": [
-        "PdfBookmarkEditor",
-        "PdfBookmarkEditor.BindPdf",
-        "PdfBookmarkEditor.ModifyBookmarks",
-        "PdfBookmarkEditor.Save"
+        "Aspose.Pdf.Facades.PdfBookmarkEditor",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.ModifyBookmarks",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.Save"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-27T05:19:21Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:37:11Z",
       "status": "verified"
     },
-    "extract-bookmarks-verify-toc": {
-      "title": "Extract Bookmarks and Verify Table of Contents Consistency",
-      "filename": "extract-bookmarks-verify-toc.cs",
-      "description": "Extracts PDF bookmarks, compares their page numbers with an expected table of contents, and reports any inconsistencies.",
+    "validate-pdf-bookmarks-against-toc": {
+      "title": "Validate PDF Bookmarks Against Generated TOC",
+      "filename": "validate-pdf-bookmarks-against-toc.cs",
+      "description": "Extracts bookmarks from a PDF, builds a simple table of contents by scanning Heading objects on each page, and compares the two to report missing or mismatched entries.",
       "tags": [
         "bookmarks",
         "toc",
         "validation",
-        "pdf",
-        "aspdf"
-      ],
-      "apis_used": [
-        "PdfBookmarkEditor",
-        "PdfBookmarkEditor.ExtractBookmarks",
-        "Bookmark",
-        "Document"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-27T05:19:21Z",
-      "status": "verified"
-    },
-    "create-image-bookmarks": {
-      "title": "Create Bookmarks for Each Image in PDF",
-      "filename": "create-image-bookmarks.cs",
-      "description": "Adds a bookmark for every image in a PDF, linking to the page where the image appears.",
-      "tags": [
-        "bookmark",
-        "image",
-        "pdf",
-        "aspdf",
-        "facades"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfBookmarkEditor",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.XImage"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-27T05:19:21Z",
-      "status": "verified"
-    },
-    "set-bookmark-zoom": {
-      "title": "Set Bookmark Zoom to 150% Magnification",
-      "filename": "set-bookmark-zoom.cs",
-      "description": "Updates all PDF bookmarks so that opening a bookmark displays the target page at 150% zoom.",
-      "tags": [
-        "bookmark",
-        "zoom",
-        "pdf",
-        "facade",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Document",
-        "PdfBookmarkEditor",
-        "PdfBookmarkEditor.ExtractBookmarks",
-        "PdfBookmarkEditor.Save",
-        "Bookmark.PageDisplay_Zoom"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-27T05:19:21Z",
-      "status": "verified"
-    },
-    "export-bookmarks-to-excel": {
-      "title": "Export PDF Bookmarks to Excel Workbook",
-      "filename": "export-bookmarks-to-excel.cs",
-      "description": "Extracts PDF bookmarks and writes their title, hierarchical level, and destination page to an Excel file.",
-      "tags": [
-        "pdf",
-        "bookmarks",
-        "excel",
-        "export",
-        "aspnet"
+        "Aspose.Pdf",
+        "pdf-processing"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfBookmarkEditor",
         "Aspose.Pdf.Facades.PdfBookmarkEditor.BindPdf",
         "Aspose.Pdf.Facades.PdfBookmarkEditor.ExtractBookmarks",
-        "Aspose.Pdf.Facades.PdfBookmarkEditor.Close",
-        "Aspose.Pdf.Bookmarks",
-        "Aspose.Pdf.Bookmark",
-        "Aspose.Cells.Workbook",
-        "Aspose.Cells.Worksheet",
-        "Aspose.Cells.Worksheet.Cells.PutValue",
-        "Aspose.Cells.Workbook.Save"
+        "Aspose.Pdf.Facades.Bookmarks",
+        "Aspose.Pdf.Facades.Bookmark",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Heading"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-03-27T05:19:21Z",
+      "generated_at": "2026-04-10T06:37:11Z",
       "status": "verified"
     },
-    "import-bookmarks-csv": {
-      "title": "Import Bookmarks from CSV into PDF",
-      "filename": "import-bookmarks-csv.cs",
-      "description": "Reads a CSV file containing bookmark title, level, and page number, builds a hierarchical bookmark structure, and adds it to a PDF.",
+    "add-bookmarks-for-each-image-in-pdf": {
+      "title": "Add Bookmarks for Each Image in a PDF",
+      "filename": "add-bookmarks-for-each-image-in-pdf.cs",
+      "description": "Demonstrates how to iterate through PDF pages, locate images, and create a bookmark for each image using Aspose.Pdf's PdfBookmarkEditor.",
       "tags": [
         "bookmarks",
-        "csv",
+        "images",
         "pdf",
-        "import",
+        "Aspose.Pdf",
         "facades"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfBookmarkEditor",
-        "Aspose.Pdf.Facades.Bookmarks",
-        "Aspose.Pdf.Facades.Bookmark"
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.CreateBookmarkOfPage",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.Save",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.Close",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.XImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-03-27T05:19:21Z",
+      "generated_at": "2026-04-10T06:37:11Z",
       "status": "verified"
     },
-    "bookmark-named-destination": {
+    "set-bookmark-zoom-to-150-percent": {
+      "title": "Set Bookmark Zoom Level to 150% in PDF",
+      "filename": "set-bookmark-zoom-to-150-percent.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades to edit PDF bookmarks so that each bookmark opens the document at a 150% zoom level.",
+      "tags": [
+        "bookmarks",
+        "zoom",
+        "pdf",
+        "Aspose.Pdf",
+        "outline"
+      ],
+      "apis_used": [
+        "PdfBookmarkEditor",
+        "PdfBookmarkEditor.BindPdf",
+        "PdfBookmarkEditor.ExtractBookmarks",
+        "PdfBookmarkEditor.Save",
+        "Bookmark",
+        "Bookmark.PageDisplay_Zoom"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:37:11Z",
+      "status": "verified"
+    },
+    "export-bookmarks-to-excel": {
+      "title": "Export Bookmarks to Excel Workbook",
+      "filename": "export-bookmarks-to-excel.cs",
+      "description": "Demonstrates extracting PDF bookmarks with PdfBookmarkEditor, arranging title, level, and destination page in a table, and saving the data as an Excel workbook.",
+      "tags": [
+        "bookmarks",
+        "excel",
+        "export",
+        "pdf",
+        "table"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfBookmarkEditor",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.ExtractBookmarks",
+        "Aspose.Pdf.Bookmarks",
+        "Aspose.Pdf.Bookmark",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.ExcelSaveOptions"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:37:11Z",
+      "status": "verified"
+    },
+    "import-bookmarks-from-csv": {
+      "title": "Import Bookmarks from CSV into PDF",
+      "filename": "import-bookmarks-from-csv.cs",
+      "description": "Shows how to read a CSV file, build a hierarchical Bookmark structure, and add the bookmarks to a PDF using Aspose.Pdf's PdfBookmarkEditor.",
+      "tags": [
+        "bookmarks",
+        "csv",
+        "pdf",
+        "import",
+        "hierarchy"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfBookmarkEditor",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.CreateBookmarks",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.Save",
+        "Aspose.Pdf.Bookmark",
+        "Aspose.Pdf.Bookmarks"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:37:11Z",
+      "status": "verified"
+    },
+    "create-bookmark-to-named-destination": {
       "title": "Create Bookmark to Named Destination in PDF",
-      "filename": "bookmark-named-destination.cs",
-      "description": "Demonstrates defining a named destination in a PDF and adding a bookmark that points to it for cross‑reference.",
+      "filename": "create-bookmark-to-named-destination.cs",
+      "description": "Demonstrates how to define a named destination in a PDF and add a bookmark that references it using Aspose.Pdf Facades.",
       "tags": [
         "bookmark",
         "named-destination",
-        "pdf",
-        "aspdf",
+        "Aspose.Pdf",
+        "facade",
         "cross-reference"
       ],
       "apis_used": [
+        "Aspose.Pdf.Facades.PdfBookmarkEditor",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.CreateBookmarks",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.Save",
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Annotations.NamedDestination",
-        "Aspose.Pdf.Annotations.GoToAction",
-        "Aspose.Pdf.Annotations.LinkAnnotation",
-        "Aspose.Pdf.Facades.PdfContentEditor",
-        "Aspose.Pdf.Color",
-        "Aspose.Pdf.Rectangle"
+        "Aspose.Pdf.NamedDestination",
+        "Aspose.Pdf.Bookmark"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-03-27T05:19:21Z",
+      "generated_at": "2026-04-10T06:37:11Z",
       "status": "verified"
     },
-    "delete-duplicate-bookmarks": {
-      "title": "Remove Duplicate Bookmarks from PDF Outline",
-      "filename": "delete-duplicate-bookmarks.cs",
-      "description": "Demonstrates how to merge and remove duplicate bookmarks (outline entries) in a PDF using Aspose.Pdf.Facades.PdfFileEditor.",
+    "remove-duplicate-bookmarks": {
+      "title": "Remove Duplicate Bookmarks from PDF",
+      "filename": "remove-duplicate-bookmarks.cs",
+      "description": "Shows how to extract PDF bookmarks, deduplicate them by title and page number, delete the original bookmarks, and recreate only the unique ones using Aspose.Pdf.",
       "tags": [
         "bookmarks",
-        "outline",
-        "duplicate",
+        "deduplication",
         "pdf",
-        "aspnet"
+        "outline",
+        "Aspose.Pdf"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.MergeDuplicateOutlines",
-        "Aspose.Pdf.Facades.PdfFileEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfFileEditor.Save"
+        "PdfBookmarkEditor",
+        "PdfBookmarkEditor.BindPdf",
+        "PdfBookmarkEditor.ExtractBookmarks",
+        "PdfBookmarkEditor.DeleteBookmarks",
+        "PdfBookmarkEditor.CreateBookmarkOfPage",
+        "PdfBookmarkEditor.Save",
+        "PdfBookmarkEditor.Close",
+        "Bookmarks",
+        "Bookmark"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-03-27T05:19:21Z",
+      "generated_at": "2026-04-10T06:37:11Z",
       "status": "verified"
     },
-    "add-reviewed-bookmark": {
-      "title": "Add \"Reviewed\" Bookmark to PDF",
-      "filename": "add-reviewed-bookmark.cs",
-      "description": "Demonstrates how to add a \"Reviewed\" bookmark pointing to the last page of a PDF using PdfBookmarkEditor.",
+    "batch-add-reviewed-bookmark": {
+      "title": "Batch Add \"Reviewed\" Bookmark to PDFs",
+      "filename": "batch-add-reviewed-bookmark.cs",
+      "description": "Demonstrates how to iterate over PDF files in a folder and add a \"Reviewed\" bookmark pointing to the last page of each document using Aspose.Pdf's PdfBookmarkEditor facade.",
       "tags": [
-        "bookmark",
+        "bookmarks",
+        "batch",
         "pdf",
-        "quality-check",
-        "facades",
-        "c#"
+        "aspose",
+        "facade"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfBookmarkEditor",
         "Aspose.Pdf.Facades.PdfBookmarkEditor.BindPdf",
         "Aspose.Pdf.Facades.PdfBookmarkEditor.CreateBookmarkOfPage",
         "Aspose.Pdf.Facades.PdfBookmarkEditor.Save",
-        "Aspose.Pdf.Document.Pages.Count"
+        "Aspose.Pdf.Document"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-03-27T05:19:21Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:37:11Z",
       "status": "verified"
     },
-    "set-bookmark-colors": {
-      "title": "Set Bookmark Colors Based on Document Sections",
-      "filename": "set-bookmark-colors.cs",
-      "description": "Demonstrates how to add bookmarks with different title colors (red for warnings, green for informational sections) to a PDF using Aspose.Pdf.",
+    "add-colored-bookmarks-to-pdf": {
+      "title": "Add Colored Bookmarks to PDF Sections",
+      "filename": "add-colored-bookmarks-to-pdf.cs",
+      "description": "Demonstrates using Aspose.Pdf.Facades.PdfContentEditor to create PDF bookmarks with red or green colors based on whether a section is a warning or informational.",
       "tags": [
         "bookmarks",
         "color",
         "pdf",
-        "Aspose.Pdf",
-        "facades"
+        "facade",
+        "Aspose.Pdf"
       ],
       "apis_used": [
-        "PdfBookmarkEditor",
-        "Bookmark",
-        "PdfBookmarkEditor.BindPdf",
-        "PdfBookmarkEditor.CreateBookmarks",
-        "PdfBookmarkEditor.Save"
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateBookmarksAction",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-03-27T05:19:21Z",
+      "generated_at": "2026-04-10T06:37:11Z",
       "status": "verified"
     },
-    "export-pdf-bookmarks": {
+    "export-pdf-bookmarks-to-json__v2": {
       "title": "Export PDF Bookmarks to JSON",
-      "filename": "export-pdf-bookmarks.cs",
-      "description": "Extracts the bookmark hierarchy from a PDF and writes it to a JSON file with title, level, and page number for each node.",
+      "filename": "export-pdf-bookmarks-to-json__v2.cs",
+      "description": "Demonstrates extracting a PDF's bookmark hierarchy with PdfBookmarkEditor, flattening it while preserving level information, and writing the data to a pretty‑printed JSON file.",
       "tags": [
         "bookmarks",
-        "export",
         "json",
+        "export",
         "pdf",
-        "aspdf"
+        "aspose-pdf"
       ],
       "apis_used": [
-        "PdfBookmarkEditor",
-        "PdfBookmarkEditor.BindPdf",
-        "PdfBookmarkEditor.ExtractBookmarks",
-        "Bookmark",
-        "Bookmarks"
+        "Aspose.Pdf.Facades.PdfBookmarkEditor",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.ExtractBookmarks",
+        "Aspose.Pdf.Bookmarks",
+        "Aspose.Pdf.Bookmark"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-03-27T05:19:21Z",
+      "generated_at": "2026-04-10T06:37:11Z",
+      "status": "verified"
+    },
+    "import-database-records-as-pdf-bookmarks": {
+      "title": "Import Database Records as PDF Bookmarks",
+      "filename": "import-database-records-as-pdf-bookmarks.cs",
+      "description": "Shows how to generate an in‑memory PDF and convert each database record into a PdfBookmark using Aspose.Pdf's PdfBookmarkEditor, respecting evaluation‑mode limits.",
+      "tags": [
+        "bookmarks",
+        "pdf",
+        "aspose",
+        "evaluation",
+        "database"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Bookmark",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.CreateBookmarks",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.Save",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.Close"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:37:11Z",
       "status": "verified"
     }
   }

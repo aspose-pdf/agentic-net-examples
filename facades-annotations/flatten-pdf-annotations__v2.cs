@@ -1,38 +1,36 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string folderPath = "pdfs";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "flattened_output.pdf";
 
-        if (!Directory.Exists(folderPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Folder not found: {folderPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Change the current working directory to the target folder so that Save uses simple filenames.
-        Directory.SetCurrentDirectory(folderPath);
-
-        string[] pdfFiles = Directory.GetFiles(".", "*.pdf");
-
-        foreach (string pdfFile in pdfFiles)
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfFile);
-            string outputFileName = $"{fileNameWithoutExt}_flattened.pdf";
+            // Initialize the annotation editor and bind the document
+            PdfAnnotationEditor editor = new PdfAnnotationEditor();
+            editor.BindPdf(doc);
 
-            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-            {
-                editor.BindPdf(pdfFile);
-                editor.FlatteningAnnotations();
-                editor.Save(outputFileName);
-                editor.Close();
-            }
+            // Convert all interactive annotations to static graphics,
+            // preserving their visual appearance
+            editor.FlatteningAnnotations();
 
-            Console.WriteLine($"Flattened: {outputFileName}");
+            // Save the resulting PDF
+            editor.Save(outputPath);
         }
+
+        Console.WriteLine($"Flattened PDF saved to '{outputPath}'.");
     }
 }
