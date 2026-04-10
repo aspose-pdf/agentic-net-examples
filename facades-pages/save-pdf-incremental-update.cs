@@ -1,41 +1,58 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Facades;
 
-class Program
+class IncrementalUpdateExample
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf  = "original.pdf";
+        const string outputPdf = "original_updated.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Open the PDF with read/write access to enable incremental updates
-        using (FileStream fileStream = new FileStream(inputPath, FileMode.Open, FileAccess.ReadWrite))
-        using (Document document = new Document(fileStream))
+        // Open the source PDF with read/write access.
+        // This stream will be used by the facade and later by the Document for incremental saving.
+        using (FileStream pdfStream = new FileStream(inputPdf, FileMode.Open, FileAccess.ReadWrite))
         {
-            // Modify the document – add a text annotation on the first page
-            Page page = document.Pages[1];
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-            TextAnnotation annotation = new TextAnnotation(page, rect);
-            annotation.Title = "Note";
-            annotation.Contents = "Incremental update example.";
-            annotation.Open = true;
-            page.Annotations.Add(annotation);
+            // Bind the PDF to a PdfFileMend facade – this allows us to modify the document
+            // (e.g., add text, images, etc.) using the Facades API.
+            PdfFileMend mend = new PdfFileMend();
+            mend.BindPdf(pdfStream);
 
-            // Save incrementally (writes changes to the same file without rewriting the whole PDF)
-            document.Save();
+            // -------------------------------------------------------------------------
+            // Example modification – add a simple image stamp (replace with any other
+            // modification you need, such as adding text via FormattedText).
+            // -------------------------------------------------------------------------
+            // string stampImagePath = "stamp.png";
+            // if (File.Exists(stampImagePath))
+            // {
+            //     // Add the image to page 1 at position (100, 500) with size 200x100.
+            //     mend.AddImage(stampImagePath, new int[] { 1 }, 100, 500, 200, 100);
+            // }
+
+            // Retrieve the underlying Document object that the facade works on.
+            Document doc = mend.Document;
+
+            // Ensure the document is saved using incremental update.
+            // Because the Document was opened from a writable stream, calling Save()
+            // without parameters writes only the changes as an incremental update.
+            doc.Save();
+
+            // After incremental save, the original file on disk now contains the updates.
+            // If you need a separate copy, copy the stream to a new file.
+            pdfStream.Position = 0; // rewind to the beginning
+            using (FileStream outStream = new FileStream(outputPdf, FileMode.Create, FileAccess.Write))
+            {
+                pdfStream.CopyTo(outStream);
+            }
         }
 
-        // Copy the updated file to a new name for demonstration purposes
-        File.Copy(inputPath, outputPath, true);
-        Console.WriteLine($"Incrementally updated PDF saved as '{outputPath}'.");
+        Console.WriteLine($"PDF saved with incremental updates to '{outputPdf}'.");
     }
 }

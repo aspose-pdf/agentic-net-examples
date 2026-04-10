@@ -2,56 +2,80 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string userPassword = "user123";
-        const string ownerPassword = "owner123";
+        // Paths
+        const string inputPath      = "encrypted.pdf";      // Encrypted source PDF
+        const string decryptedPath  = "decrypted_temp.pdf"; // Temporary decrypted file
+        const string editedPath     = "edited_temp.pdf";    // Temporary edited file
+        const string outputPath     = "re_encrypted.pdf";   // Final encrypted PDF
 
+        // Passwords
+        const string ownerPassword = "owner123"; // Owner password (required for decryption)
+        const string userPassword  = "user123"; // New user password for re‑encryption
+
+        // Verify source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
+        // -------------------------------------------------
+        // Decrypt the PDF using PdfFileSecurity (Facades API)
+        // -------------------------------------------------
+        var decryptor = new PdfFileSecurity(inputPath, decryptedPath);
+        bool decryptionSucceeded = decryptor.DecryptFile(ownerPassword);
+        if (!decryptionSucceeded)
         {
-            // Open the encrypted PDF with the user password
-            using (Document doc = new Document(inputPath, userPassword))
+            Console.Error.WriteLine("Decryption failed.");
+            return;
+        }
+
+        // -------------------------------------------------
+        // Load the decrypted PDF, edit its content, and save
+        // -------------------------------------------------
+        using (Document doc = new Document(decryptedPath))
+        {
+            // Example edit: add a text annotation on the first page
+            Page page = doc.Pages[1]; // Pages are 1‑based
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            var textAnnotation = new TextAnnotation(page, rect)
             {
-                // Decrypt the document so it can be edited
-                doc.Decrypt();
+                Title    = "Note",
+                Contents = "Edited after decryption",
+                Color    = Aspose.Pdf.Color.Yellow,
+                Open     = true
+            };
+            page.Annotations.Add(textAnnotation);
 
-                // Simple edit: add a text annotation on the first page
-                Page page = doc.Pages[1];
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-                TextAnnotation annotation = new TextAnnotation(page, rect)
-                {
-                    Title = "Note",
-                    Contents = "Edited after decryption",
-                    Color = Aspose.Pdf.Color.Yellow,
-                    Open = true,
-                    Icon = TextIcon.Note
-                };
-                page.Annotations.Add(annotation);
-
-                // Re‑encrypt the document with a strong algorithm
-                Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
-                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
-
-                // Save the re‑encrypted PDF
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"Decrypted, edited, and re‑encrypted PDF saved as '{outputPath}'.");
+            // Save the edited PDF to a temporary file
+            doc.Save(editedPath);
         }
-        catch (Exception ex)
+
+        // -------------------------------------------------
+        // Re‑encrypt the edited PDF using PdfFileSecurity
+        // -------------------------------------------------
+        var encryptor = new PdfFileSecurity(editedPath, outputPath);
+        DocumentPrivilege privilege = DocumentPrivilege.AllowAll; // Allow all operations
+        KeySize keySize = KeySize.x256;                         // 256‑bit encryption
+
+        bool encryptionSucceeded = encryptor.EncryptFile(userPassword, ownerPassword, privilege, keySize);
+        if (!encryptionSucceeded)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine("Encryption failed.");
         }
+        else
+        {
+            Console.WriteLine($"Re‑encrypted PDF saved to '{outputPath}'.");
+        }
+
+        // Optional: clean up temporary files
+        try { File.Delete(decryptedPath); } catch { }
+        try { File.Delete(editedPath); }    catch { }
     }
 }
