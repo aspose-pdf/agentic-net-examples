@@ -1,0 +1,33 @@
+using System;
+using System.IO;
+using Aspose.Pdf;
+
+class Program
+{
+    static void Main()
+    {
+        const string inputPath = "input.pdf";
+        const string outputPath = "rotated_output.pdf";
+
+        if (!File.Exists(inputPath))
+        {
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
+
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Set initial rotation to 90° for each page (portrait view on landscape devices)
+            for (int i = 1; i <= doc.Pages.Count; i++)
+            {
+                doc.Pages[i].Rotate = Rotation.on90; // correct enum value
+            }
+
+            // Save the modified document
+            doc.Save(outputPath);
+        }
+
+        Console.WriteLine($"Document saved with 90° rotation to '{outputPath}'.");
+    }
+}
