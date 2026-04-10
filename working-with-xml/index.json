@@ -1,7 +1,7 @@
 {
   "category": "working-with-xml",
   "nuget_version": "26.3.0",
-  "last_updated": "2026-04-07T16:14:17Z",
+  "last_updated": "2026-04-10T07:26:12Z",
   "examples": {
     "convert-xml-to-pdf-default-xslt": {
       "title": "Convert XML to PDF Using Default XSLT",
@@ -20,7 +20,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "load-xml-from-memorystream-to-pdf": {
@@ -41,7 +41,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "convert-xml-xsl-to-pdf": {
@@ -60,7 +60,7 @@
         "Aspose.Pdf.XmlLoadOptions"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "validate-xml-xsd-generate-pdf": {
@@ -80,7 +80,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "resize-pdf-pages-using-xml": {
@@ -100,7 +100,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "set-pdf-page-orientation-from-xml": {
@@ -120,7 +120,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "set-custom-page-margins-from-xml": {
@@ -141,30 +141,28 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
-    "insert-page-numbers-into-pdf": {
-      "title": "Insert Automatic Page Numbers into PDF",
-      "filename": "insert-page-numbers-into-pdf.cs",
-      "description": "Shows how to add sequential page numbers to an existing PDF file using Aspose.Pdf's PdfFileStamp facade.",
+    "insert-automatic-page-numbers-using-xslt": {
+      "title": "Insert Automatic Page Numbers into PDF using XSLT",
+      "filename": "insert-automatic-page-numbers-using-xslt.cs",
+      "description": "Demonstrates loading XML with an XSLT transformation, creating a PDF, and automatically updating pagination placeholders with actual page numbers.",
       "tags": [
         "pdf",
-        "pagenumber",
-        "aspose",
-        "stamping",
+        "xslt",
+        "pagination",
+        "aspose.pdf",
         "csharp"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileStamp",
-        "Aspose.Pdf.Facades.PdfFileStamp.BindPdf",
-        "Aspose.Pdf.Facades.PdfFileStamp.StartingNumber",
-        "Aspose.Pdf.Facades.PdfFileStamp.AddPageNumber",
-        "Aspose.Pdf.Facades.PdfFileStamp.Save",
-        "Aspose.Pdf.Facades.PdfFileStamp.Close"
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.XmlLoadOptions",
+        "Aspose.Pdf.PageCollection.UpdatePagination",
+        "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "generate-pdf-table-from-xml-data": {
@@ -189,7 +187,7 @@
         "Aspose.Pdf.Page"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "preserve-cdata-from-xml-to-pdf": {
@@ -216,7 +214,7 @@
         "Aspose.Pdf.Document.Pages.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "apply-custom-font-to-xml-pdf-elements": {
@@ -241,7 +239,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "embed-custom-ttf-font-into-pdf-from-xml": {
@@ -265,7 +263,7 @@
         "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "xml-to-pdf-with-external-css": {
@@ -285,7 +283,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "generate-pdf-from-xml-using-xsl-styling": {
@@ -305,7 +303,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "apply-xml-color-pdf-background": {
@@ -327,28 +325,34 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
-    "add-header-footer-using-xml-template": {
-      "title": "Add Header and Footer to PDF Using XML Template",
-      "filename": "add-header-footer-using-xml-template.cs",
-      "description": "Shows how to load an XML template, convert it to a PDF stamp, and apply that stamp as a header/footer on every page of an existing PDF document.",
+    "add-header-footer-to-pdf-pages": {
+      "title": "Add Header and Footer to PDF Pages",
+      "filename": "add-header-footer-to-pdf-pages.cs",
+      "description": "Demonstrates creating header and footer templates with pagination symbols and applying them to every page of an existing PDF using Aspose.Pdf.",
       "tags": [
         "header",
         "footer",
-        "xml",
-        "pdf",
-        "stamp"
+        "pagination",
+        "Aspose.Pdf",
+        "pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.XmlLoadOptions",
-        "Aspose.Pdf.Facades.PdfPageStamp",
-        "Aspose.Pdf.Page.AddStamp"
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.HeaderFooter",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.FontRepository",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.HorizontalAlignment",
+        "Aspose.Pdf.Pages.UpdatePagination",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "add-custom-page-borders-to-pdf": {
@@ -373,7 +377,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "apply-background-images-from-xml": {
@@ -394,7 +398,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "insert-dynamic-headers-xml-pdf": {
@@ -418,7 +422,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "insert-footnotes-into-pdf-from-xml": {
@@ -444,7 +448,7 @@
         "Aspose.Pdf.Text.Note"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "insert-conditional-page-breaks-by-xml-length": {
@@ -465,7 +469,7 @@
         "Aspose.Pdf.Page.Accept"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "generate-pdf-toc-from-xml": {
@@ -494,31 +498,29 @@
         "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
-    "create-pdf-bookmarks-from-xml": {
-      "title": "Create PDF Bookmarks from XML Hierarchy",
-      "filename": "create-pdf-bookmarks-from-xml.cs",
-      "description": "Shows how to parse an XML document that defines a nested structure and generate matching PDF bookmarks using Aspose.Pdf's bookmark editor.",
+    "create-hierarchical-pdf-outline-from-xml": {
+      "title": "Create Hierarchical PDF Outline from XML",
+      "filename": "create-hierarchical-pdf-outline-from-xml.cs",
+      "description": "Loads an XML hierarchy and generates a matching outline (bookmarks) in a PDF, assigning each entry to successive pages using Aspose.Pdf.",
       "tags": [
         "pdf",
-        "bookmarks",
+        "outline",
         "xml",
-        "aspose",
-        "csharp"
+        "bookmarks",
+        "aspose"
       ],
       "apis_used": [
-        "Aspose.Pdf.Bookmark",
-        "Aspose.Pdf.Bookmarks",
-        "Aspose.Pdf.Facades.PdfBookmarkEditor",
-        "PdfBookmarkEditor.BindPdf",
-        "PdfBookmarkEditor.CreateBookmarks",
-        "PdfBookmarkEditor.Save",
-        "PdfBookmarkEditor.Close"
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.OutlineCollection",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.Annotations.GoToAction"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "create-pdf-outline-from-xml": {
@@ -539,37 +541,33 @@
         "Aspose.Pdf.Annotations.GoToAction"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
-    "create-pdf-outline-from-xml__v2": {
-      "title": "Create PDF Outline from XML Hierarchy",
-      "filename": "create-pdf-outline-from-xml__v2.cs",
-      "description": "Shows how to parse an XML file that defines bookmark nesting and generate matching PDF outlines using Aspose.Pdf's PdfBookmarkEditor.",
+    "create-hierarchical-pdf-bookmarks-from-xml": {
+      "title": "Create Hierarchical PDF Bookmarks from XML",
+      "filename": "create-hierarchical-pdf-bookmarks-from-xml.cs",
+      "description": "Demonstrates generating PDF outline (bookmarks) that mirror the nesting levels of an XML document by recursively building outline items.",
       "tags": [
         "pdf",
-        "bookmark",
+        "bookmarks",
         "xml",
         "outline",
-        "aspose"
+        "aspose-pdf"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfBookmarkEditor",
-        "Aspose.Pdf.Facades.PdfBookmarkEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfBookmarkEditor.CreateBookmarks",
-        "Aspose.Pdf.Facades.PdfBookmarkEditor.Save",
-        "Aspose.Pdf.Facades.PdfBookmarkEditor.Close",
-        "Aspose.Pdf.Facades.Bookmark",
-        "Aspose.Pdf.Facades.Bookmarks"
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.Annotations.GoToAction"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
-    "add-page-transitions-to-pdf-from-xml": {
-      "title": "Add Page Transition Effects to PDF from XML",
-      "filename": "add-page-transitions-to-pdf-from-xml.cs",
-      "description": "Demonstrates loading an XML file into a PDF, setting per-page presentation duration, and applying a fade transition to all pages using PdfPageEditor.",
+    "apply-page-transitions-to-pdf": {
+      "title": "Apply Page Transition Effects to PDF from XML",
+      "filename": "apply-page-transitions-to-pdf.cs",
+      "description": "Loads an XML file into a PDF, sets full‑screen presentation mode, and adds a fade transition to every page using Aspose.Pdf.Facades.PdfPageEditor.",
       "tags": [
         "pdf",
         "transition",
@@ -580,11 +578,13 @@
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.XmlLoadOptions",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Facades.PdfPageEditor"
+        "Aspose.Pdf.PageMode",
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "set-pdf-page-durations-from-xml": {
@@ -603,7 +603,7 @@
         "Aspose.Pdf.Page"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "generate-pdf-from-xml-fullscreen": {
@@ -624,7 +624,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "set-pdf-viewer-preferences-xml-to-pdf": {
@@ -644,7 +644,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "generate-pdf-from-xml-version-1-7": {
@@ -667,7 +667,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "set-pdf-permissions-disable-printing-copying": {
@@ -688,7 +688,7 @@
         "CryptoAlgorithm"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "encrypt-pdf-from-xml": {
@@ -710,30 +710,32 @@
         "Aspose.Pdf.Document.Encrypt"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "digitally-sign-pdf-from-xml": {
       "title": "Digitally Sign PDF Generated from XML",
       "filename": "digitally-sign-pdf-from-xml.cs",
-      "description": "Shows how to convert an XML file to a PDF with Aspose.Pdf and then apply a digital signature using a PKCS#12 certificate, optionally adding a visible signature appearance.",
+      "description": "Shows how to bind an XML file to a PDF, add a visible signature field, and apply a PKCS#7 digital signature using a PFX certificate with Aspose.Pdf.",
       "tags": [
         "pdf",
         "digital-signature",
         "xml",
-        "aspose.pdf",
-        "certificate"
+        "aspose-pdf",
+        "pkcs7"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.BindXml",
-        "Aspose.Pdf.Facades.PdfFileSignature",
-        "Aspose.Pdf.Facades.PdfFileSignature.SetCertificate",
-        "Aspose.Pdf.Facades.PdfFileSignature.Sign",
-        "Aspose.Pdf.Facades.PdfFileSignature.Save"
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Forms.SignatureField",
+        "Aspose.Pdf.Forms.SignatureField.Sign",
+        "Aspose.Pdf.Forms.PKCS7",
+        "Aspose.Pdf.Document.Form.Add",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "encrypt-pdf-from-xml-with-permissions": {
@@ -756,7 +758,7 @@
         "Aspose.Pdf.CryptoAlgorithm"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "compress-pdf-streams-from-xml": {
@@ -778,7 +780,7 @@
         "Aspose.Pdf.Optimization.OptimizationOptions"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "compress-pdf-text-streams-flate-xml": {
@@ -801,7 +803,7 @@
         "Aspose.Pdf.XmlLoadOptions"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "compress-pdf-from-xml": {
@@ -823,7 +825,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "downsample-images-from-xml": {
@@ -845,7 +847,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "export-pdf-pages-high-res-png-from-xml": {
@@ -868,7 +870,7 @@
         "Aspose.Pdf.Devices.PngDevice.Process"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "decode-base64-images-from-xml-to-pdf": {
@@ -892,7 +894,7 @@
         "Page.Paragraphs.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "render-svg-from-xml-to-pdf": {
@@ -913,7 +915,7 @@
         "Aspose.Pdf.Document.Pages.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "render-html-cdata-to-pdf": {
@@ -935,28 +937,29 @@
         "Aspose.Pdf.Page.Paragraphs.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
-    "generate-barcode-from-xml-to-pdf": {
-      "title": "Generate Barcode in PDF from XML Layout",
-      "filename": "generate-barcode-from-xml-to-pdf.cs",
-      "description": "Shows how to load a PDF defined by an XML file, fill a barcode form field with Code128 data using Aspose.Pdf, and save the resulting PDF.",
+    "generate-barcodes-from-xml": {
+      "title": "Generate Barcodes in PDF from XML Data",
+      "filename": "generate-barcodes-from-xml.cs",
+      "description": "Shows how to read barcode values from an XML file and create Code128 barcode fields in a PDF using Aspose.Pdf.",
       "tags": [
+        "xml",
         "barcode",
         "pdf",
-        "xml",
         "aspose",
-        "form-field"
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.XmlLoadOptions",
-        "Aspose.Pdf.Facades.Form",
-        "Aspose.Pdf.Facades.Form.FillBarcodeField"
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Forms.BarcodeField",
+        "Aspose.Pdf.Forms.BarcodeField.AddBarcode"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "embed-video-annotations-from-xml": {
@@ -980,7 +983,7 @@
         "Aspose.Pdf.Page.Annotations.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "embed-audio-clips-from-xml-into-pdf": {
@@ -1002,7 +1005,7 @@
         "Aspose.Pdf.Annotations.SoundAnnotation"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "embed-3d-models-from-xml-into-pdf": {
@@ -1030,35 +1033,33 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
-    "embed-javascript-actions-in-pdf-from-xml": {
-      "title": "Embed JavaScript Actions in PDF from XML",
-      "filename": "embed-javascript-actions-in-pdf-from-xml.cs",
-      "description": "Shows how to convert an XML file to PDF using Aspose.Pdf and then add document‑level and field‑level JavaScript actions for form validation.",
+    "add-javascript-validation-to-pdf-form": {
+      "title": "Add JavaScript Validation to PDF Form from XML",
+      "filename": "add-javascript-validation-to-pdf-form.cs",
+      "description": "Demonstrates binding XML data to a PDF, creating a TextBox form field, attaching field‑level JavaScript validation, and adding a document‑level open‑action script using Aspose.Pdf.",
       "tags": [
-        "javascript",
         "pdf",
-        "form-validation",
-        "xml",
-        "aspose-pdf"
+        "javascript",
+        "form",
+        "validation",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.XmlLoadOptions",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Facades.PdfContentEditor",
-        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfContentEditor.AddDocumentAdditionalAction",
-        "Aspose.Pdf.Facades.PdfContentEditor.Save",
-        "Aspose.Pdf.Facades.FormEditor",
-        "Aspose.Pdf.Facades.FormEditor.BindPdf",
-        "Aspose.Pdf.Facades.FormEditor.AddFieldScript",
-        "Aspose.Pdf.Facades.FormEditor.Save"
+        "Aspose.Pdf.Document.BindXml",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Forms.TextBoxField",
+        "Aspose.Pdf.Forms.Border",
+        "Aspose.Pdf.Annotations.JavascriptAction",
+        "Aspose.Pdf.Document.Form",
+        "Aspose.Pdf.Document.OpenAction"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "create-pdf-form-fields-from-xml": {
@@ -1079,7 +1080,7 @@
         "Aspose.Pdf.Forms.Field"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "populate-pdf-form-from-xml": {
@@ -1099,7 +1100,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "extract-plain-text-from-pdf": {
@@ -1119,7 +1120,7 @@
         "Aspose.Pdf.Text.TextAbsorber"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "export-pdf-pages-as-bmp-images-from-xml": {
@@ -1142,7 +1143,7 @@
         "Aspose.Pdf.Devices.BmpDevice.Process"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "convert-pdf-pages-to-high-res-png-thumbnails": {
@@ -1163,7 +1164,7 @@
         "Aspose.Pdf.Devices.PngDevice.Process"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "create-pdf-thumbnail-from-xml": {
@@ -1184,7 +1185,7 @@
         "Aspose.Pdf.Devices.ThumbnailDevice.Process"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "batch-convert-xml-to-pdf": {
@@ -1204,7 +1205,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "merge-pdfs-from-xml-files": {
@@ -1225,7 +1226,30 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
+      "status": "verified"
+    },
+    "split-pdf-into-chapter-files": {
+      "title": "Split PDF into Chapter Files Using Bookmarks",
+      "filename": "split-pdf-into-chapter-files.cs",
+      "description": "Shows how to read a PDF's outline (bookmarks) to determine chapter start pages and split the original document into separate PDF files per chapter.",
+      "tags": [
+        "pdf",
+        "split",
+        "bookmarks",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.Annotations.GoToAction"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "paginate-large-xml-to-multiple-pdfs": {
@@ -1246,7 +1270,7 @@
         "Document.Pages.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "repeat-table-header-rows": {
@@ -1271,7 +1295,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "validate-pdfa-2b-compliance-xml-to-pdf": {
@@ -1292,7 +1316,7 @@
         "Aspose.Pdf.PdfFormat"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "export-pdf-structure-to-xml": {
@@ -1311,7 +1335,7 @@
         "Aspose.Pdf.Document.SaveXml"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "convert-xml-to-html-preview": {
@@ -1332,7 +1356,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "convert-xml-to-pdf-with-logging": {
@@ -1353,7 +1377,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "convert-xml-to-pdf-with-error-handling": {
@@ -1376,7 +1400,7 @@
         "ReturnAction"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "generate-pdf-from-xslfo-with-error-handling": {
@@ -1400,7 +1424,7 @@
         "Aspose.Pdf.WarningInfo"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "thread-safe-xml-to-pdf-conversion": {
@@ -1421,7 +1445,7 @@
         "Aspose.Pdf.Document.FreeMemory"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "register-pdf-generation-service-di": {
@@ -1437,7 +1461,7 @@
       ],
       "apis_used": [],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "xml-to-pdf-conversion-tests": {
@@ -1457,7 +1481,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "batch-xml-to-pdf-performance-profiling": {
@@ -1477,7 +1501,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "generate-pdf-with-retry-logic": {
@@ -1500,7 +1524,7 @@
         "Aspose.Pdf.PdfException"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "generate-pdf-from-xml-using-xslt-config": {
@@ -1520,27 +1544,26 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
-    "convert-xml-multiple-namespaces-to-pdf": {
-      "title": "Convert XML with Multiple Namespaces to PDF using XSLT",
-      "filename": "convert-xml-multiple-namespaces-to-pdf.cs",
-      "description": "Demonstrates loading an XML file, applying an XSLT that declares distinct namespace prefixes, and directly creating a PDF with Aspose.Pdf.",
+    "xml-to-pdf-with-namespaces": {
+      "title": "Convert XML to PDF with XSL‑FO and Multiple Namespaces",
+      "filename": "xml-to-pdf-with-namespaces.cs",
+      "description": "Shows how to load an XSL‑FO stylesheet, pass XSLT arguments for namespace handling, and generate a PDF from XML using Aspose.Pdf.",
       "tags": [
         "xml",
         "xslt",
         "pdf",
         "namespaces",
-        "aspose.pdf"
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.XmlLoadOptions",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.XslFoLoadOptions"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "generate-pdf-from-xml-with-custom-page-size": {
@@ -1561,7 +1584,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "generate-pdf-from-xml-xsl-fo": {
@@ -1581,7 +1604,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "apply-conditional-page-margins": {
@@ -1603,7 +1626,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     },
     "encrypt-pdf-from-xml-aes256": {
@@ -1626,7 +1649,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:14:17Z",
+      "generated_at": "2026-04-10T07:26:12Z",
       "status": "verified"
     }
   }
