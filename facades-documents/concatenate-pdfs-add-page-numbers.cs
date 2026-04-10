@@ -1,68 +1,65 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF files to concatenate
-        string[] inputFiles = new string[] { "file1.pdf", "file2.pdf", "file3.pdf" };
-        string outputFile = "merged.pdf";
+        // Input PDF files to be concatenated
+        string[] inputFiles = { "file1.pdf", "file2.pdf", "file3.pdf" };
+
+        // Path for the intermediate concatenated PDF
+        const string combinedPath = "combined.pdf";
+
+        // Final output PDF with page numbers
+        const string outputPath = "final_with_page_numbers.pdf";
 
         // Verify that all input files exist
-        foreach (string filePath in inputFiles)
+        foreach (var file in inputFiles)
         {
-            if (!File.Exists(filePath))
+            if (!File.Exists(file))
             {
-                Console.Error.WriteLine($"Input file not found: {filePath}");
+                Console.Error.WriteLine($"Input file not found: {file}");
                 return;
             }
         }
 
-        // Load source documents
-        Document[] sourceDocs = new Document[inputFiles.Length];
-        for (int i = 0; i < inputFiles.Length; i++)
+        // ---------- Concatenate PDFs ----------
+        // PdfFileEditor implements concatenation without requiring a Document instance
+        PdfFileEditor editor = new PdfFileEditor
         {
-            sourceDocs[i] = new Document(inputFiles[i]);
+            // Preserve outlines and logical structure if present
+            CopyOutlines = true,
+            CopyLogicalStructure = true
+        };
+
+        // Concatenate the input files into a single PDF
+        bool concatSuccess = editor.Concatenate(inputFiles, combinedPath);
+        if (!concatSuccess)
+        {
+            Console.Error.WriteLine("Failed to concatenate PDF files.");
+            return;
         }
 
-        // Destination document (empty)
-        using (Document destDoc = new Document())
+        // ---------- Add page numbers ----------
+        // Initialize PdfFileStamp with the concatenated PDF as source and the final file as destination
+        PdfFileStamp stamp = new PdfFileStamp(combinedPath, outputPath)
         {
-            // Concatenate source documents into the destination document
-            PdfFileEditor editor = new PdfFileEditor();
-            bool concatenated = editor.Concatenate(sourceDocs, destDoc);
-            if (!concatenated)
-            {
-                Console.Error.WriteLine("Failed to concatenate PDF files.");
-                return;
-            }
+            // Optional: set the starting page number (default is 1)
+            StartingNumber = 1
+        };
 
-            // Add page numbers to each page of the combined document
-            for (int pageIndex = 1; pageIndex <= destDoc.Pages.Count; pageIndex++)
-            {
-                Page page = destDoc.Pages[pageIndex];
-                TextFragment pageNumberFragment = new TextFragment(pageIndex.ToString());
-                pageNumberFragment.TextState.FontSize = 12;
-                pageNumberFragment.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
-                // Position near the bottom‑right corner of the page
-                pageNumberFragment.Position = new Position(page.PageInfo.Width - 50, 20);
-                page.Paragraphs.Add(pageNumberFragment);
-            }
+        // Add page numbers at the bottom middle of each page.
+        // The format string may contain '#' which will be replaced by the actual page number.
+        stamp.AddPageNumber("Page #", PdfFileStamp.PosBottomMiddle);
 
-            // Save the merged PDF with page numbers
-            destDoc.Save(outputFile);
-        }
+        // Close the stamp facade to write the output file
+        stamp.Close();
 
-        // Dispose source documents
-        foreach (Document srcDoc in sourceDocs)
-        {
-            srcDoc.Dispose();
-        }
+        // Clean up the intermediate file (optional)
+        try { File.Delete(combinedPath); } catch { }
 
-        Console.WriteLine($"Merged PDF saved to '{outputFile}'.");
+        Console.WriteLine($"Successfully created '{outputPath}' with concatenated content and page numbers.");
     }
 }
