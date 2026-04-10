@@ -21,12 +21,18 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf.Facades;` (30/40 files) ← category-specific
-- `using Aspose.Pdf;` (24/40 files) ← category-specific
-- `using Aspose.Pdf.Text;` (1/40 files)
+- `using Aspose.Pdf.Facades;` (36/40 files) ← category-specific
+- `using Aspose.Pdf;` (18/40 files)
+- `using Aspose.Pdf.Text;` (2/40 files)
 - `using System;` (40/40 files)
-- `using System.IO;` (37/40 files)
+- `using System.IO;` (35/40 files)
+- `using Azure.Identity;` (1/40 files)
+- `using Azure.Security.KeyVault.Secrets;` (1/40 files)
+- `using NUnit.Framework;` (1/40 files)
+- `using System.Collections.Generic;` (1/40 files)
 - `using System.Diagnostics;` (1/40 files)
+- `using System.Threading;` (1/40 files)
+- `using System.Threading.Tasks;` (1/40 files)
 
 ## Common Code Pattern
 
@@ -43,36 +49,36 @@ tool.Save("output.pdf");
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [apply-pdf-password-protection](./apply-pdf-password-protection.cs) | Apply Password Protection to PDF Using PdfFileSecurity | `PdfFileSecurity`, `BindPdf`, `SetPrivilege` | Demonstrates how to add user and owner passwords to an existing PDF file without creating a Docum... |
-| [batch-decrypt-pdfs](./batch-decrypt-pdfs.cs) | Batch Decrypt PDFs Using Owner Passwords | `PdfFileSecurity`, `BindPdf`, `DecryptFile` | Decrypts multiple encrypted PDF files using owner passwords read from a configuration file. |
-| [batch-encrypt-pdfs](./batch-encrypt-pdfs.cs) | Batch Encrypt PDFs in a Directory | `PdfFileSecurity`, `BindPdf`, `EncryptFile` | Encrypts every PDF file in a folder using the same user and owner passwords, producing encrypted ... |
-| [change-pdf-passwords-csv](./change-pdf-passwords-csv.cs) | Change PDF Passwords from CSV List | `PdfFileSecurity`, `BindPdf`, `ChangePassword` | Reads a CSV file with PDF paths and passwords, then updates both user and owner passwords for eac... |
-| [change-pdf-passwords](./change-pdf-passwords.cs) | Change PDF User and Owner Passwords in One Call | `PdfFileSecurity`, `BindPdf`, `ChangePassword` | Demonstrates how to change both the user and owner passwords of an encrypted PDF using the PdfFil... |
-| [change-pdf-user-password](./change-pdf-user-password.cs) | Change PDF User Password While Preserving Encryption | `PdfFileSecurity`, `BindPdf`, `ChangePassword` | Demonstrates how to change the user password of an encrypted PDF using Aspose.Pdf's PdfFileSecuri... |
-| [change-pdf-user-password__v2](./change-pdf-user-password__v2.cs) | Change User Password for PDFs in a Folder | `PdfFileSecurity`, `BindPdf`, `ChangePassword` | Iterates through all PDF files in a folder and updates each file's user password to a standardize... |
-| [check-pdf-encryption](./check-pdf-encryption.cs) | Check PDF Encryption Status and Apply Security | `Document`, `IsEncrypted`, `PdfFileSecurity` | Shows how to determine if a PDF is encrypted and then encrypt or decrypt it using Aspose.Pdf. |
-| [decrypt-pdf-owner-password](./decrypt-pdf-owner-password.cs) | Decrypt PDF with Owner Password using PdfFileSecurity | `PdfFileSecurity`, `BindPdf`, `DecryptFile` | Demonstrates how to decrypt an encrypted PDF using the owner password via PdfFileSecurity. |
-| [decrypt-pdf-owner-password__v2](./decrypt-pdf-owner-password__v2.cs) | Decrypt PDF Using Owner Password (Simulated Azure Key Vault) | `PdfFileSecurity`, `BindPdf`, `DecryptFile` | Shows how to decrypt an encrypted PDF using the owner password retrieved from a secure source (e.... |
-| [detect-usage-rights](./detect-usage-rights.cs) | Detect Extended Usage Rights in PDF | `PdfFileSignature`, `BindPdf`, `ContainsUsageRights` | Shows how to check if a PDF file contains extended usage rights using Aspose.Pdf's PdfFileSignature. |
-| [disable-copy-print](./disable-copy-print.cs) | Disable Copying While Enabling Printing for PDF | `PdfFileSecurity`, `DocumentPrivilege`, `BindPdf` | Demonstrates how to disable the copy permission and keep printing enabled on a PDF using Aspose.Pdf. |
-| [encrypt-aes256-privileges](./encrypt-aes256-privileges.cs) | Encrypt PDF with AES‑256 and Custom Privileges | `Document`, `Encrypt`, `Permissions` | Demonstrates applying AES‑256 encryption and specific permissions to a PDF in a single step. |
-| [encrypt-decrypt-pdf](./encrypt-decrypt-pdf.cs) | Encrypt and Decrypt PDF with Verification | `PdfFileSecurity`, `BindPdf`, `EncryptFile` | Demonstrates encrypting a PDF using PdfFileSecurity, decrypting it, and verifying that the origin... |
-| [encrypt-pdf-aes256-bucket](./encrypt-pdf-aes256-bucket.cs) | Encrypt PDF with AES‑256 and Save to Cloud Bucket | `PdfFileSecurity`, `BindPdf`, `EncryptFile` | Demonstrates encrypting a PDF using AES‑256 with Aspose.Pdf and saving the encrypted file to a si... |
-| [encrypt-pdf-aes256](./encrypt-pdf-aes256.cs) | Encrypt PDF with 256‑bit AES | `PdfFileSecurity`, `BindPdf`, `EncryptFile` | Demonstrates how to encrypt a PDF using 256‑bit AES with user and owner passwords. |
-| [encrypt-pdf-from-byte-array](./encrypt-pdf-from-byte-array.cs) | Encrypt PDF from Byte Array and Return Encrypted Bytes | `Document`, `Encrypt`, `Permissions` | Loads a PDF from a byte array, encrypts it with a user and owner password, and returns the encryp... |
-| [encrypt-pdf-rc4-40](./encrypt-pdf-rc4-40.cs) | Encrypt PDF with RC4‑40 Algorithm | `PdfFileSecurity`, `BindPdf`, `EncryptFile` | Demonstrates encrypting a PDF using the RC4‑40 algorithm and a user password. |
-| [encrypt-pdf-stream-rc4-40](./encrypt-pdf-stream-rc4-40.cs) | Encrypt PDF Stream with RC4‑40 using Aspose.Pdf | `PdfFileSecurity`, `BindPdf`, `EncryptFile` | Demonstrates how to encrypt a PDF provided as a stream with RC4‑40 encryption and return the encr... |
-| [encrypt-pdf-to-memorystream](./encrypt-pdf-to-memorystream.cs) | Encrypt PDF and Save to MemoryStream | `Document`, `Encrypt`, `Save(Stream)` | Demonstrates encrypting a PDF with a user and owner password and saving the encrypted document to... |
-| [encrypt-pdf-user-password](./encrypt-pdf-user-password.cs) | Encrypt PDF with User Password Only | `PdfFileSecurity`, `BindPdf`, `EncryptFile` | Encrypts a PDF using a user password while leaving the owner password undefined, causing Aspose.P... |
-| [encrypt-pdf-with-exception-logging](./encrypt-pdf-with-exception-logging.cs) | Encrypt PDF with Detailed Exception Logging | `Document`, `Permissions`, `CryptoAlgorithm` | Demonstrates encrypting a PDF using Aspose.Pdf, handling any errors, and logging detailed excepti... |
-| [encrypt-pdfs-by-filename](./encrypt-pdfs-by-filename.cs) | Encrypt PDFs with Algorithm Based on File Name | `Document`, `Encrypt`, `Save` | Encrypts each PDF in a folder using a CryptoAlgorithm selected from the file name (high, medium, ... |
-| [encrypt-pdfs-directory-archive](./encrypt-pdfs-directory-archive.cs) | Encrypt PDFs in a Directory and Archive Them | `PdfFileSecurity`, `BindPdf`, `EncryptFile` | Demonstrates a one‑shot console app that encrypts each PDF found in a folder using Aspose.Pdf and... |
-| [encrypt-pdfs-performance](./encrypt-pdfs-performance.cs) | Encrypt PDFs with Performance Timing | `PdfFileSecurity`, `BindPdf`, `EncryptFile` | Encrypts each PDF in a folder while logging the time taken for each encryption. |
-| [encrypt-rc4-128-print-edit](./encrypt-rc4-128-print-edit.cs) | Encrypt PDF with RC4‑128 allowing printing and editing | `Document`, `Encrypt`, `Permissions` | Demonstrates how to combine printing and editing permissions and encrypt a PDF using RC4‑128. |
-| [load-decrypt-modify-pdf](./load-decrypt-modify-pdf.cs) | Load, Decrypt If Encrypted, Modify, and Save PDF | `Document`, `Page`, `TextFragment` | Demonstrates loading a PDF, decrypting it when encrypted, adding a text fragment, and saving the ... |
-| [load-pdf-verify](./load-pdf-verify.cs) | Load PDF Document and Verify | `Document`, `Save` | Demonstrates loading a PDF file using Aspose.Pdf and confirming it was loaded by checking the pag... |
-| [pdf-encryption-summary](./pdf-encryption-summary.cs) | Generate Encryption Summary for PDFs | `Document`, `Permissions`, `CryptoAlgorithm` | Scans a folder of PDF files and creates a text summary listing each file’s encryption status, alg... |
-| [remove-usage-rights](./remove-usage-rights.cs) | Remove Extended Usage Rights from Signed PDF | `PdfFileSignature`, `BindPdf`, `ContainsUsageRights` | Demonstrates how to remove extended usage rights from a signed PDF using Aspose.Pdf's PdfFileSign... |
+| [apply-password-protection-to-pdf](./apply-password-protection-to-pdf.cs) | Apply Password Protection to an Existing PDF | `Document`, `Encrypt`, `Save` | Shows how to load an existing PDF, encrypt it with user and owner passwords using 256‑bit AES, an... |
+| [apply-print-privilege-disable-exceptions](./apply-print-privilege-disable-exceptions.cs) | Apply Print Privilege to PDF and Disable Internal Exceptions | `PdfFileSecurity`, `SetPrivilege`, `DocumentPrivilege` | Shows how to use Aspose.Pdf.Facades.PdfFileSecurity to set a print privilege on a PDF while turni... |
+| [batch-decrypt-pdfs-owner-password](./batch-decrypt-pdfs-owner-password.cs) | Batch Decrypt PDFs Using Owner Passwords | `PdfFileSecurity`, `DecryptFile` | Demonstrates how to read a configuration file and decrypt multiple password‑protected PDF files i... |
+| [batch-encrypt-pdfs](./batch-encrypt-pdfs.cs) | Batch Encrypt PDFs with User and Owner Passwords | `PdfFileSecurity`, `EncryptFile`, `DocumentPrivilege` | Demonstrates how to encrypt all PDF files in a folder using Aspose.Pdf.Facades, applying the same... |
+| [change-pdf-passwords-from-csv](./change-pdf-passwords-from-csv.cs) | Change User and Owner Passwords for PDFs from CSV | `PdfFileSecurity`, `ChangePassword`, `Close` | Shows how to read a CSV file containing PDF paths and passwords, then use Aspose.Pdf.Facades.PdfF... |
+| [change-pdf-user-owner-passwords](./change-pdf-user-owner-passwords.cs) | Change PDF User and Owner Passwords | `PdfFileSecurity`, `ChangePassword` | Demonstrates how to change both the user and owner passwords of an existing PDF file in a single ... |
+| [change-pdf-user-password-bulk](./change-pdf-user-password-bulk.cs) | Change PDF User Password in Bulk | `PdfFileSecurity`, `ChangePassword` | Iterates through a folder of PDF files and applies a standardized user password to each document ... |
+| [change-pdf-user-password](./change-pdf-user-password.cs) | Change PDF User Password While Preserving Encryption | `PdfFileSecurity`, `ChangePassword` | Shows how to change the user password of an encrypted PDF using Aspose.Pdf.Facades, keeping the e... |
+| [check-pdf-extended-usage-rights](./check-pdf-extended-usage-rights.cs) | Check PDF for Extended Usage Rights | `Document`, `PdfFileSignature`, `BindPdf` | Shows how to use Aspose.Pdf's PdfFileSignature facade to determine if a PDF contains extended usa... |
+| [decrypt-modify-save-pdf](./decrypt-modify-save-pdf.cs) | Decrypt, Modify, and Save PDF with Aspose.Pdf | `Document`, `Save`, `Pages` | Shows how to open a PDF, decrypt it if it is password‑protected using PdfFileSecurity, add a text... |
+| [decrypt-pdf-owner-password-azure-key-vault](./decrypt-pdf-owner-password-azure-key-vault.cs) | Decrypt PDF Using Owner Password from Azure Key Vault | `PdfFileSecurity`, `DecryptFile` | Demonstrates retrieving an owner password stored in Azure Key Vault and using Aspose.Pdf.Facades ... |
+| [decrypt-pdf-with-owner-password](./decrypt-pdf-with-owner-password.cs) | Decrypt PDF with Owner Password | `PdfFileSecurity`, `DecryptFile` | Shows how to remove encryption from a PDF by providing the owner password using Aspose.Pdf.Facade... |
+| [disable-copy-enable-print-pdf](./disable-copy-enable-print-pdf.cs) | Disable Copying While Enabling High-Resolution Printing for ... | `PdfFileSecurity`, `SetPrivilege`, `DocumentPrivilege` | Shows how to forbid copying and allow high‑resolution printing on a PDF using Aspose.Pdf.Facades. |
+| [encrypt-decrypt-pdf-verify](./encrypt-decrypt-pdf-verify.cs) | Encrypt and Decrypt PDF with Verification | `PdfFileSecurity`, `EncryptFile`, `DecryptFile` | Demonstrates encrypting a PDF using user and owner passwords with 256‑bit AES, then decrypting it... |
+| [encrypt-pdf-256-aes](./encrypt-pdf-256-aes.cs) | Encrypt PDF with 256‑bit AES and passwords | `PdfFileSecurity`, `EncryptFile`, `DocumentPrivilege` | Shows how to encrypt an existing PDF using 256‑bit AES, providing user and owner passwords and se... |
+| [encrypt-pdf-aes256-azure-blob](./encrypt-pdf-aes256-azure-blob.cs) | Encrypt PDF with AES‑256 and Upload to Azure Blob | `PdfFileSecurity`, `BindPdf`, `EncryptFile` | Demonstrates encrypting a PDF using Aspose.Pdf's PdfFileSecurity with AES‑256 and uploading the e... |
+| [encrypt-pdf-aes256-custom-privileges](./encrypt-pdf-aes256-custom-privileges.cs) | Encrypt PDF with AES‑256 and Custom Privileges | `PdfFileSecurity`, `EncryptFile`, `DocumentPrivilege` | Shows how to encrypt a PDF using AES‑256 while applying specific document privileges in a single ... |
+| [encrypt-pdf-and-measure-performance](./encrypt-pdf-and-measure-performance.cs) | Encrypt PDF Files and Log Execution Time | `Document`, `Encrypt`, `Save` | The example loads each PDF, encrypts it with user and owner passwords using AES‑256, saves the en... |
+| [encrypt-pdf-based-on-filename](./encrypt-pdf-based-on-filename.cs) | Encrypt PDFs Based on File Name | `PdfFileSecurity`, `DocumentPrivilege`, `KeySize` | Demonstrates how to encrypt PDF files using Aspose.Pdf.Facades by selecting the CryptoAlgorithm a... |
+| [encrypt-pdf-from-byte-array](./encrypt-pdf-from-byte-array.cs) | Encrypt PDF from Byte Array | `PdfFileSecurity`, `BindPdf`, `EncryptFile` | Demonstrates loading a PDF from a byte array, applying AES‑256 encryption with optional passwords... |
+| [encrypt-pdf-rc4-128-privileges](./encrypt-pdf-rc4-128-privileges.cs) | Encrypt PDF with RC4‑128 and Enable Print/Edit Privileges | `PdfFileSecurity`, `EncryptFile`, `DocumentPrivilege` | Demonstrates how to combine print and edit privileges for a PDF and encrypt the document using RC... |
+| [encrypt-pdf-rc4-40](./encrypt-pdf-rc4-40.cs) | Encrypt PDF with RC4‑40 using Aspose.Pdf | `PdfFileSecurity`, `BindPdf`, `EncryptFile` | Demonstrates how to encrypt an existing PDF with a user password using the RC4‑40 algorithm via A... |
+| [encrypt-pdf-save-to-memorystream](./encrypt-pdf-save-to-memorystream.cs) | Encrypt PDF and Save to MemoryStream | `Document`, `Encrypt`, `Save` | Demonstrates loading a PDF, applying AES‑256 encryption with user and owner passwords, and writin... |
+| [encrypt-pdf-stream-rc4-40](./encrypt-pdf-stream-rc4-40.cs) | Encrypt PDF Stream with RC4‑40 using Aspose.Pdf | `PdfFileSecurity`, `DocumentPrivilege`, `KeySize` | Demonstrates how to encrypt a PDF provided as a stream using RC4‑40 encryption with Aspose.Pdf's ... |
+| [encrypt-pdf-with-password](./encrypt-pdf-with-password.cs) | Encrypt PDF with Password and Capture Exceptions | `PdfFileSecurity`, `TryEncryptFile` | Demonstrates how to encrypt a PDF using PdfFileSecurity, enable AllowExceptions to capture errors... |
+| [encrypt-pdf-with-user-password-only](./encrypt-pdf-with-user-password-only.cs) | Encrypt PDF with User Password Only | `PdfFileSecurity`, `EncryptFile`, `DocumentPrivilege` | Demonstrates how to encrypt a PDF using Aspose.Pdf by setting only a user password, letting the l... |
+| [generate-pdf-encryption-summary](./generate-pdf-encryption-summary.cs) | Generate Encryption Summary for PDF Files | `PdfFileInfo`, `GetDocumentPrivilege` | Iterates over a set of PDF documents, determines whether each file is encrypted, captures the (un... |
+| [load-verify-pdf-using-pdffileinfo](./load-verify-pdf-using-pdffileinfo.cs) | Load and Verify PDF Using PdfFileInfo Facade | `Document`, `PdfFileInfo`, `BindPdf` | Shows how to load a PDF with the PdfFileInfo facade, retrieve the Document, and confirm it contai... |
+| [monitor-folder-encrypt-pdfs-archive](./monitor-folder-encrypt-pdfs-archive.cs) | Monitor Folder and Encrypt PDFs to Secure Archive | `PdfFileSecurity`, `EncryptFile`, `DocumentPrivilege` | Demonstrates how to watch a directory for new PDF files, encrypt them with user/owner passwords u... |
+| [pdf-encryption-usage-report](./pdf-encryption-usage-report.cs) | Generate PDF Encryption Usage Report | `PdfFileInfo` | Scans a directory of PDF files, uses Aspose.Pdf.Facades.PdfFileInfo to determine if each PDF is e... |
 | ... | | | *and 10 more files* |
 
 ## Category Statistics
@@ -87,5 +93,5 @@ tool.Save("output.pdf");
 - Review code examples in this folder for facades-secure-documents patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-04-07 | Run: `20260407_212044_4ffbd1`
+Updated: 2026-04-10 | Run: `20260410_113311_e93f13`
 <!-- AUTOGENERATED:END -->

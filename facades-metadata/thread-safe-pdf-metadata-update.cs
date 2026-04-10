@@ -1,50 +1,46 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // List of PDF files to process. Adjust the file names as needed.
-        string[] inputFiles = new string[] { "doc1.pdf", "doc2.pdf", "doc3.pdf" };
+        // Input PDF files to be processed concurrently
+        string[] inputFiles = { "doc1.pdf", "doc2.pdf", "doc3.pdf" };
+        string outputDirectory = "Modified";
 
-        // Verify that each file exists before starting parallel processing.
-        foreach (string file in inputFiles)
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDirectory);
+
+        // Process each file in parallel – each thread gets its own PdfFileInfo instance
+        Parallel.ForEach(inputFiles, inputPath =>
         {
-            if (!File.Exists(file))
-            {
-                Console.Error.WriteLine("File not found: " + file);
-            }
-        }
+            if (!File.Exists(inputPath))
+                return; // Skip missing files
 
-        ParallelOptions parallelOptions = new ParallelOptions();
-        parallelOptions.MaxDegreeOfParallelism = Environment.ProcessorCount;
+            // Build output file path
+            string baseName = Path.GetFileNameWithoutExtension(inputPath);
+            string outputPath = Path.Combine(outputDirectory, $"{baseName}_mod.pdf");
 
-        // Process each PDF in its own thread. Each thread creates its own PdfFileInfo instance,
-        // ensuring no shared mutable state and thus thread‑safety.
-        Parallel.ForEach(inputFiles, parallelOptions, (inputFile) =>
-        {
-            try
+            // PdfFileInfo implements IDisposable, so use a using block for deterministic cleanup
+            using (PdfFileInfo pdfInfo = new PdfFileInfo())
             {
-                using (PdfFileInfo pdfInfo = new PdfFileInfo(inputFile))
-                {
-                    // Update metadata safely for this document.
-                    pdfInfo.Title = "Processed " + Path.GetFileNameWithoutExtension(inputFile);
-                    pdfInfo.Author = "ThreadSafeDemo";
+                // Bind the source PDF to the facade
+                pdfInfo.BindPdf(inputPath);
 
-                    // Save the updated information to a new file (simple filename, no directory path).
-                    string outputFile = Path.GetFileNameWithoutExtension(inputFile) + "_updated.pdf";
-                    pdfInfo.SaveNewInfo(outputFile);
-                    Console.WriteLine("Updated metadata saved to " + outputFile);
-                }
+                // Update meta‑information (each thread works on its own instance)
+                pdfInfo.Title    = $"Processed {baseName}";
+                pdfInfo.Author   = "ThreadSafe Example";
+                pdfInfo.Subject  = "Metadata update";
+                pdfInfo.Keywords = "Aspose.Pdf;ThreadSafe";
+
+                // Save the updated PDF to a new file
+                pdfInfo.SaveNewInfo(outputPath);
             }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine("Error processing " + inputFile + ": " + ex.Message);
-            }
+
+            Console.WriteLine($"Thread {Task.CurrentId} completed: {inputPath} → {outputPath}");
         });
     }
 }

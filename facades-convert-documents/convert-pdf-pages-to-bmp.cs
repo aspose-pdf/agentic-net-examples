@@ -1,42 +1,53 @@
 using System;
 using System.IO;
+using System.Drawing.Imaging; // Added for ImageFormat
 using Aspose.Pdf;
-using Aspose.Pdf.Devices;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Facades; // PdfConverter resides here
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        // Paths – adjust as needed
+        string dataDir   = @"C:\PdfData";          // folder containing the source PDF
+        string pdfFile   = "sample.pdf";           // source PDF file name
+        string outputDir = @"C:\PdfData\BmpPages"; // folder to store BMP images
 
-        if (!File.Exists(inputPath))
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDir);
+
+        // Full path to the source PDF
+        string pdfPath = Path.Combine(dataDir, pdfFile);
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.WriteLine($"Error: PDF file not found at '{pdfPath}'.");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Convert pages 3 to 8 of the PDF to BMP images using PdfConverter (Facade API)
+        using (PdfConverter converter = new PdfConverter())
         {
-            // Apply Helvetica → Arial substitution using SimpleFontSubstitution
-            FontRepository.Substitutions.Add(new SimpleFontSubstitution("Helvetica", "Arial"));
+            // Bind the PDF file to the converter
+            converter.BindPdf(pdfPath);
 
-            // Export pages 5‑7 as BMP images
-            int startPage = 5;
-            int endPage = 7;
-            int resolutionDpi = 300; // DPI
+            // Define the page range (1‑based indexing)
+            converter.StartPage = 3;
+            converter.EndPage   = 8;
 
-            // BmpDevice expects a Resolution object
-            BmpDevice bmpDevice = new BmpDevice(new Resolution(resolutionDpi));
+            // Prepare the converter for image extraction
+            converter.DoConvert();
 
-            for (int i = startPage; i <= endPage && i <= doc.Pages.Count; i++)
+            // Iterate through the selected pages and save each as a BMP file
+            int pageNumber = converter.StartPage;
+            while (converter.HasNextImage())
             {
-                Page page = doc.Pages[i];
-                string outputFile = $"page{i}.bmp";
-                bmpDevice.Process(page, outputFile);
-                Console.WriteLine($"Saved page {i} as {outputFile}");
+                string bmpPath = Path.Combine(outputDir, $"page_{pageNumber}.bmp");
+                // Save the current page image as BMP using System.Drawing.Imaging.ImageFormat
+                converter.GetNextImage(bmpPath, ImageFormat.Bmp);
+                pageNumber++;
             }
         }
+
+        Console.WriteLine("BMP conversion completed.");
     }
 }

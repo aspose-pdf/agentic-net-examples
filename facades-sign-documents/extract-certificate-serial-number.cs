@@ -1,46 +1,55 @@
+// ------------------------------------------------------------
+// File: Program.cs
+// ------------------------------------------------------------
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
 using System.Security.Cryptography.X509Certificates;
-using System.Collections.Generic;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "signed.pdf";
+        const string inputPdf = "signed_document.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine("Input PDF not found: " + inputPath);
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
+        // Initialize the facade and bind the PDF file
         using (PdfFileSignature pdfSignature = new PdfFileSignature())
         {
-            pdfSignature.BindPdf(inputPath);
+            pdfSignature.BindPdf(inputPdf);
 
-            // Retrieve all filled signature field names
-            IList<SignatureName> signatureNames = pdfSignature.GetSignatureNames(true);
-            if (signatureNames == null || signatureNames.Count == 0)
-            {
-                Console.WriteLine("No signatures found in the PDF.");
-                return;
-            }
+            // Retrieve names of all non‑empty signatures in the document
+            // false => exclude empty signature fields
+            var signatureNames = pdfSignature.GetSignatureNames(false);
 
-            // Process the first signature (adjust as needed for multiple signatures)
-            SignatureName firstSignature = signatureNames[0];
-            X509Certificate2 certificate;
-            bool extracted = pdfSignature.TryExtractCertificate(firstSignature, out certificate);
-            if (extracted && certificate != null)
+            foreach (var sigName in signatureNames)
             {
-                Console.WriteLine("Signature Name: " + firstSignature.Name);
-                Console.WriteLine("Certificate Serial Number: " + certificate.SerialNumber);
-            }
-            else
-            {
-                Console.WriteLine("Failed to extract certificate from signature: " + firstSignature.Name);
+                // Try to extract the X509 certificate associated with the signature
+                if (pdfSignature.TryExtractCertificate(sigName, out X509Certificate2 cert) && cert != null)
+                {
+                    // SerialNumber is a hexadecimal string; log it for audit purposes
+                    Console.WriteLine($"Signature: {sigName.Name}");
+                    Console.WriteLine($"  Certificate Serial Number: {cert.SerialNumber}");
+                }
+                else
+                {
+                    Console.WriteLine($"Signature: {sigName.Name} – No certificate found.");
+                }
             }
         }
     }
 }
+
+// ------------------------------------------------------------
+// File: AsposePdfApi.GeneratedMSBuildEditorConfig.editorconfig
+// ------------------------------------------------------------
+// This file is intentionally empty but must exist so that the project
+// does not fail with CS2001 (source file not found). It is compiled as
+// a C# source file to satisfy the <Compile Include="..."/> entry in the
+// .csproj.
+namespace DummyNamespace { }

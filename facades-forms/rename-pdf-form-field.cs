@@ -6,10 +6,10 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string oldFieldName = "OldName";
-        const string newFieldName = "NewName";
+        const string oldName    = "OldName";
+        const string newName    = "NewName";
 
         if (!File.Exists(inputPath))
         {
@@ -17,13 +17,11 @@ class Program
             return;
         }
 
-        // Initialize the Form facade with source and destination PDF files
+        // Load the PDF, rename the field, and save the result.
         Form form = new Form(inputPath, outputPath);
-        // Rename the specified field throughout the document
-        form.RenameField(oldFieldName, newFieldName);
-        // Persist the changes to the output file
-        form.Save();
+        form.RenameField(oldName, newName);
+        form.Save(); // writes to outputPath
 
-        Console.WriteLine($"Field '{oldFieldName}' renamed to '{newFieldName}' and saved as '{outputPath}'.");
+        Console.WriteLine($"Field '{oldName}' renamed to '{newName}' and saved as '{outputPath}'.");
     }
 }
