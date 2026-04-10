@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -12,21 +13,28 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Initialize FormEditor with source and destination PDF files
-        FormEditor formEditor = new FormEditor(inputPath, outputPath);
+        // Load the existing PDF document
+        using (Document doc = new Document(inputPath))
+        {
+            // Initialize the FormEditor facade with the loaded document
+            using (FormEditor editor = new FormEditor(doc))
+            {
+                // Add a hidden text field named "Version" with the value "2"
+                // The field is placed on page 1; a zero‑size rectangle is sufficient because the field will be hidden
+                editor.AddField(FieldType.Text, "Version", "2", 1, 0, 0, 0, 0);
 
-        // Add a hidden numeric field named "Version" with value "2" on page 1
-        // Position coordinates: lower‑left (10,10), upper‑right (50,30)
-        // Note: Aspose.Pdf.Facades.FieldType.Numeric creates a numeric field.
-        formEditor.AddField(FieldType.Numeric, "Version", "2", 1, 10f, 10f, 50f, 30f);
+                // Hide the field by setting the Hidden annotation flag
+                editor.SetFieldAppearance("Version", AnnotationFlags.Hidden);
+            }
 
-        // Save the modified PDF
-        formEditor.Save();
+            // Save the updated PDF
+            doc.Save(outputPath);
+        }
 
-        Console.WriteLine($"PDF saved with hidden version field to '{outputPath}'.");
+        Console.WriteLine($"Hidden numeric field 'Version' added and saved to '{outputPath}'.");
     }
 }
