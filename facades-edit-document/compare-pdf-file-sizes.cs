@@ -1,46 +1,38 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
         const string originalPath = "original.pdf";
-        const string editedPath = "edited.pdf";
+        const string editedPath   = "edited.pdf";
 
-        if (!File.Exists(originalPath))
+        if (!File.Exists(originalPath) || !File.Exists(editedPath))
         {
-            Console.Error.WriteLine($"File not found: {originalPath}");
+            Console.Error.WriteLine("One or both PDF files were not found.");
             return;
         }
 
-        // Load the original PDF, perform a simple edit, and save as a new file
-        using (Document originalDoc = new Document(originalPath))
-        {
-            // Example edit: add a blank page at the end
-            originalDoc.Pages.Add();
-            // Save the edited document
-            originalDoc.Save(editedPath);
-        }
-
-        // Retrieve file size information
-        FileInfo originalInfo = new FileInfo(originalPath);
-        FileInfo editedInfo = new FileInfo(editedPath);
-
-        long originalSize = originalInfo.Length;
-        long editedSize = editedInfo.Length;
+        // Get file sizes using System.IO.FileInfo
+        long originalSize = new FileInfo(originalPath).Length;
+        long editedSize   = new FileInfo(editedPath).Length;
 
         Console.WriteLine($"Original size: {originalSize} bytes");
-        Console.WriteLine($"Edited size: {editedSize} bytes");
+        Console.WriteLine($"Edited size:   {editedSize} bytes");
 
-        if (editedSize != originalSize)
-        {
-            Console.WriteLine("File size changed, indicating modifications were applied.");
-        }
+        if (originalSize == editedSize)
+            Console.WriteLine("File sizes are identical – no changes detected.");
         else
+            Console.WriteLine("File sizes differ – changes have been applied.");
+
+        // Verify that both files are valid PDFs using Aspose.Pdf.Facades
+        using (PdfFileInfo infoOriginal = new PdfFileInfo(originalPath))
+        using (PdfFileInfo infoEdited   = new PdfFileInfo(editedPath))
         {
-            Console.WriteLine("File size unchanged.");
+            Console.WriteLine($"Original is PDF: {infoOriginal.IsPdfFile}");
+            Console.WriteLine($"Edited is PDF:   {infoEdited.IsPdfFile}");
         }
     }
 }
