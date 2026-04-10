@@ -1,25 +1,24 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core API
-using Aspose.Pdf.Facades;      // For PdfPageStamp (inherits from Stamp)
+using Aspose.Pdf; // Core API namespace
 
 class Program
 {
     static void Main()
     {
-        const string targetPdfPath = "target.pdf";      // PDF to receive the background stamp
-        const string stampPdfPath  = "stampSource.pdf"; // PDF containing the page to use as stamp
-        const string outputPdfPath = "output.pdf";      // Resulting PDF
+        const string targetPdfPath   = "target.pdf";   // PDF to which the background will be applied
+        const string sourcePdfPath   = "background.pdf"; // PDF containing the page used as background
+        const string outputPdfPath   = "result.pdf";
 
         // Verify input files exist
         if (!File.Exists(targetPdfPath))
         {
-            Console.Error.WriteLine($"Target PDF not found: {targetPdfPath}");
+            Console.Error.WriteLine($"Target file not found: {targetPdfPath}");
             return;
         }
-        if (!File.Exists(stampPdfPath))
+        if (!File.Exists(sourcePdfPath))
         {
-            Console.Error.WriteLine($"Stamp source PDF not found: {stampPdfPath}");
+            Console.Error.WriteLine($"Background source file not found: {sourcePdfPath}");
             return;
         }
 
@@ -27,30 +26,16 @@ class Program
         {
             // Load the document that will receive the background stamp
             using (Document targetDoc = new Document(targetPdfPath))
-            // Load the document that provides the stamp page (use first page as example)
-            using (Document stampDoc = new Document(stampPdfPath))
             {
-                // Choose which page from the stamp document to use (1‑based index)
-                const int stampPageIndex = 1;
-                Aspose.Pdf.Page stampPage = stampDoc.Pages[stampPageIndex];
+                // Create a PdfPageStamp from the first page of the source PDF.
+                // Constructor (string fileName, int pageIndex) uses 1‑based page indexing.
+                Aspose.Pdf.PdfPageStamp backgroundStamp = new Aspose.Pdf.PdfPageStamp(sourcePdfPath, 1);
+                backgroundStamp.Background = true; // Place stamp behind existing content
 
-                // Iterate over each page of the target document
-                foreach (Aspose.Pdf.Page page in targetDoc.Pages)
+                // Apply the stamp to every page of the target document
+                foreach (Page page in targetDoc.Pages)
                 {
-                    // Create a PdfPageStamp using the selected stamp page
-                    PdfPageStamp pageStamp = new PdfPageStamp(stampPage);
-
-                    // Set the stamp to be drawn as background (behind existing content)
-                    pageStamp.Background = true;
-
-                    // Optional: adjust opacity, scaling, alignment, etc.
-                    // pageStamp.Opacity = 0.5;          // 50% transparent
-                    // pageStamp.Zoom = 1.0;            // No scaling
-                    // pageStamp.HorizontalAlignment = HorizontalAlignment.Center;
-                    // pageStamp.VerticalAlignment   = VerticalAlignment.Center;
-
-                    // Apply the stamp to the current page
-                    page.AddStamp(pageStamp);
+                    page.AddStamp(backgroundStamp);
                 }
 
                 // Save the modified document

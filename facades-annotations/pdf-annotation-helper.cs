@@ -4,122 +4,128 @@ using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
 
-public class PdfAnnotationHelper : IDisposable
+namespace PdfAnnotationUtility
 {
-    private readonly PdfAnnotationEditor _editor;
-    private bool _isBound = false;
-
-    public PdfAnnotationHelper()
+    // Helper class that encapsulates common annotation operations.
+    public class PdfAnnotationHelper : IDisposable
     {
-        _editor = new PdfAnnotationEditor();
-    }
+        private readonly PdfAnnotationEditor _editor;
+        private bool _isBound = false;
 
-    /// <summary>
-    /// Binds the helper to an existing PDF file. If the file does not exist, a simple one‑page PDF is created automatically.
-    /// </summary>
-    /// <param name="pdfPath">Path to the PDF file.</param>
-    public void Bind(string pdfPath)
-    {
-        if (string.IsNullOrWhiteSpace(pdfPath))
-            throw new ArgumentException("PDF path cannot be null or empty.", nameof(pdfPath));
-
-        // If the file is missing, create a minimal PDF so the rest of the workflow can continue.
-        if (!File.Exists(pdfPath))
+        // Constructor creates a new PdfAnnotationEditor instance.
+        public PdfAnnotationHelper()
         {
-            var doc = new Document();
-            doc.Pages.Add();
-            doc.Save(pdfPath);
+            _editor = new PdfAnnotationEditor();
         }
 
-        _editor.BindPdf(pdfPath);
-        _isBound = true;
-    }
-
-    public void DeleteAll()
-    {
-        EnsureBound();
-        _editor.DeleteAnnotations();
-    }
-
-    public void DeleteByName(string annotationName)
-    {
-        EnsureBound();
-        if (string.IsNullOrEmpty(annotationName))
-            throw new ArgumentException("Annotation name cannot be null or empty.", nameof(annotationName));
-        _editor.DeleteAnnotation(annotationName);
-    }
-
-    public void DeleteByTypes(AnnotationType[] types)
-    {
-        EnsureBound();
-        if (types == null) throw new ArgumentNullException(nameof(types));
-        foreach (AnnotationType type in types)
+        // Binds the helper to an existing PDF file.
+        public void Bind(string pdfPath)
         {
-            // PdfAnnotationEditor expects the annotation subtype as a string.
-            _editor.DeleteAnnotations(type.ToString());
+            if (string.IsNullOrEmpty(pdfPath))
+                throw new ArgumentException("PDF path must be provided.", nameof(pdfPath));
+
+            if (!File.Exists(pdfPath))
+                throw new FileNotFoundException("PDF file not found.", pdfPath);
+
+            _editor.BindPdf(pdfPath);
+            _isBound = true;
         }
-    }
 
-    public void FlattenAll()
-    {
-        EnsureBound();
-        _editor.FlatteningAnnotations();
-    }
-
-    public void FlattenRange(int startPage, int endPage, AnnotationType[] types)
-    {
-        EnsureBound();
-        if (startPage < 1 || endPage < startPage)
-            throw new ArgumentException("Invalid page range supplied.");
-        _editor.FlatteningAnnotations(startPage, endPage, types);
-    }
-
-    public void Save(string outputPath)
-    {
-        EnsureBound();
-        if (string.IsNullOrWhiteSpace(outputPath))
-            throw new ArgumentException("Output path cannot be null or empty.", nameof(outputPath));
-        _editor.Save(outputPath);
-    }
-
-    public void Close()
-    {
-        if (_isBound)
+        // Deletes all annotations in the bound document.
+        public void DeleteAllAnnotations()
         {
+            EnsureBound();
+            _editor.DeleteAnnotations();
+        }
+
+        // Deletes all annotations of a specific type (e.g., "Text", "Highlight").
+        public void DeleteAnnotationsByType(string annotationType)
+        {
+            EnsureBound();
+            if (string.IsNullOrEmpty(annotationType))
+                throw new ArgumentException("Annotation type must be provided.", nameof(annotationType));
+
+            _editor.DeleteAnnotations(annotationType);
+        }
+
+        // Flattens all annotations, making them part of the page content.
+        public void FlattenAllAnnotations()
+        {
+            EnsureBound();
+            _editor.FlatteningAnnotations();
+        }
+
+        // Saves the modified PDF to the specified output path.
+        public void Save(string outputPath)
+        {
+            EnsureBound();
+            if (string.IsNullOrEmpty(outputPath))
+                throw new ArgumentException("Output path must be provided.", nameof(outputPath));
+
+            // Ensure the directory exists.
+            string directory = Path.GetDirectoryName(outputPath);
+            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                Directory.CreateDirectory(directory);
+
+            _editor.Save(outputPath);
+            // Close the facade to release the bound document.
             _editor.Close();
             _isBound = false;
         }
-    }
 
-    private void EnsureBound()
-    {
-        if (!_isBound)
-            throw new InvalidOperationException("PdfAnnotationHelper is not bound to a PDF. Call Bind() first.");
-    }
-
-    public void Dispose()
-    {
-        Close();
-        _editor?.Dispose();
-    }
-}
-
-public class Program
-{
-    public static void Main()
-    {
-        string inputPdf = "sample.pdf";
-        string outputPdf = "sample_clean.pdf";
-
-        // Use a using‑statement to guarantee proper disposal of resources.
-        using (var helper = new PdfAnnotationHelper())
+        // Helper to verify that a PDF has been bound before performing operations.
+        private void EnsureBound()
         {
-            helper.Bind(inputPdf);
-            helper.DeleteAll();
-            helper.FlattenAll();
-            helper.Save(outputPdf);
+            if (!_isBound)
+                throw new InvalidOperationException("No PDF is bound. Call Bind() first.");
         }
 
-        Console.WriteLine($"Annotations processed and saved to '{outputPdf}'.");
+        // Implements IDisposable to allow using statements.
+        public void Dispose()
+        {
+            if (_isBound)
+            {
+                _editor.Close();
+                _isBound = false;
+            }
+        }
+    }
+
+    // Simple console program demonstrating the helper usage.
+    class Program
+    {
+        public static void Main(string[] args)
+        {
+            // Example file paths (adjust as needed).
+            const string inputPdf = "input.pdf";
+            const string outputPdf = "output.pdf";
+
+            // Ensure the input file exists for the demo.
+            if (!File.Exists(inputPdf))
+            {
+                Console.Error.WriteLine($"Input file not found: {inputPdf}");
+                return;
+            }
+
+            // Use the helper within a using block to guarantee disposal.
+            using (var helper = new PdfAnnotationHelper())
+            {
+                helper.Bind(inputPdf);
+
+                // Delete all annotations.
+                helper.DeleteAllAnnotations();
+
+                // Alternatively, delete only text annotations:
+                // helper.DeleteAnnotationsByType("Text");
+
+                // Flatten any remaining annotations (if any).
+                helper.FlattenAllAnnotations();
+
+                // Save the result.
+                helper.Save(outputPdf);
+            }
+
+            Console.WriteLine($"Processed PDF saved to '{outputPdf}'.");
+        }
     }
 }

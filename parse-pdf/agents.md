@@ -21,11 +21,10 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf;` (63/65 files) ← category-specific
-- `using Aspose.Pdf.Forms;` (17/65 files)
+- `using Aspose.Pdf;` (65/65 files) ← category-specific
+- `using Aspose.Pdf.Forms;` (18/65 files)
 - `using Aspose.Pdf.Text;` (15/65 files)
 - `using Aspose.Pdf.Vector;` (12/65 files)
-- `using Aspose.Pdf.Facades;` (6/65 files)
 - `using Aspose.Pdf.Annotations;` (3/65 files)
 - `using Aspose.Pdf.Devices;` (3/65 files)
 - `using Aspose.Pdf.Drawing;` (2/65 files)
@@ -33,7 +32,7 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 - `using System.IO;` (65/65 files)
 - `using System.Collections.Generic;` (14/65 files)
 - `using System.Text;` (8/65 files)
-- `using System.Linq;` (4/65 files)
+- `using System.Linq;` (5/65 files)
 - `using System.Text.Json;` (4/65 files)
 - `using System.Drawing.Imaging;` (2/65 files)
 - `using System.Collections.Concurrent;` (1/65 files)
@@ -67,26 +66,26 @@ using (Document doc = new Document("input.pdf"))
 | [export-acroform-fields-to-xfdf](./export-acroform-fields-to-xfdf.cs) | Export AcroForm Fields to XFDF | `Document`, `ExportAnnotationsToXfdf` | Loads a PDF containing AcroForm fields and exports those fields to an XFDF file using a FileStream. |
 | [export-large-graphics-from-pdf](./export-large-graphics-from-pdf.cs) | Export Large Graphics from PDF as SVG | `Document`, `Page`, `GraphicsAbsorber` | Loads a PDF, filters graphic elements by bounding rectangle area, and exports each qualifying gra... |
 | [export-pdf-acroform-fields-to-json](./export-pdf-acroform-fields-to-json.cs) | Export PDF AcroForm Fields to JSON | `Document`, `ExportToJson` | Loads a PDF document, extracts all AcroForm field names and values, and writes them to a JSON fil... |
-| [export-pdf-form-data-to-fdf](./export-pdf-form-data-to-fdf.cs) | Export PDF Form Data to FDF | `Document`, `BindPdf`, `ExportFdf` | Shows how to load a PDF, bind it to the Form facade, and export its form fields to an FDF file us... |
-| [export-pdf-form-data-to-fdf__v2](./export-pdf-form-data-to-fdf__v2.cs) | Export PDF Form Data to FDF File | `Document`, `Form`, `BindPdf` | Shows how to load a PDF, bind it to the Form facade, and export its form fields to an FDF file us... |
+| [export-pdf-annotations-to-xfdf](./export-pdf-annotations-to-xfdf.cs) | Export PDF Annotations to XFDF using a FileStream | `Document`, `ExportAnnotationsToXfdf` | Demonstrates how to export all annotations from a PDF document to an XFDF file using Aspose.Pdf's... |
+| [export-pdf-form-data-to-fdf](./export-pdf-form-data-to-fdf.cs) | Export PDF Form Data to FDF | `Form`, `ExportFdf` | Shows how to extract all form field values from a PDF and write them to an FDF file using Aspose.... |
 | [export-pdf-form-data-to-json](./export-pdf-form-data-to-json.cs) | Export PDF Form Data to JSON | `Document`, `ExportToJson` | Shows how to load a PDF document with Aspose.Pdf, export its form fields to a JSON string using F... |
 | [export-pdf-form-data-to-json__v2](./export-pdf-form-data-to-json__v2.cs) | Export PDF Form Data to UTF-8 JSON File | `Document`, `ExportToJson` | Shows how to open a PDF with Aspose.Pdf, extract all form fields, and write them to a UTF‑8 encod... |
 | [export-pdf-form-data-to-json__v3](./export-pdf-form-data-to-json__v3.cs) | Export PDF Form Data to JSON | `Document`, `ExportToJson` | Demonstrates how to load a PDF document with Aspose.Pdf and export its form fields to a JSON file... |
 | [export-pdf-form-data-to-json__v4](./export-pdf-form-data-to-json__v4.cs) | Export PDF Form Data to JSON via FileStream | `Document`, `ExportToJson` | Shows how to load a PDF with Aspose.Pdf, access its form, and export all form fields directly to ... |
-| [export-pdf-form-data-to-xml](./export-pdf-form-data-to-xml.cs) | Export PDF Form Data to XML Using a MemoryStream | `Form`, `BindPdf`, `ExportXml` | Shows how to bind a PDF containing form fields, export the form data as XML directly into a Memor... |
-| [export-pdf-form-fields-to-xml](./export-pdf-form-fields-to-xml.cs) | Export PDF Form Fields to XML | `Form`, `BindPdf`, `ExportXml` | Shows how to bind a PDF document with Aspose.Pdf.Facades.Form and export its form fields to an XM... |
+| [export-pdf-form-data-to-xml-memorystream](./export-pdf-form-data-to-xml-memorystream.cs) | Export PDF Form Data to XML using MemoryStream | `Form`, `ExportXml` | Demonstrates how to export form fields from a PDF directly into a MemoryStream as XML using Aspos... |
+| [export-pdf-form-fields-to-xml](./export-pdf-form-fields-to-xml.cs) | Export PDF Form Fields to XML | `Document`, `SaveXml` | Shows how to load a PDF document with form fields using Aspose.Pdf and export the document model,... |
 | [export-pdf-form-fields-with-prefix-to-json](./export-pdf-form-fields-with-prefix-to-json.cs) | Export PDF Form Fields with Specific Prefix to JSON | `Document`, `Field` | Loads a PDF, filters form fields whose names start with a given prefix, and writes the field name... |
-| [export-pdf-form-to-xfdf](./export-pdf-form-to-xfdf.cs) | Export PDF Form Data to XFDF Using Form Facade | `Form`, `BindPdf`, `ExportXfdf` | Shows how to bind a PDF document to the Aspose.Pdf.Facades.Form class and export its form annotat... |
+| [export-pdf-form-to-fdf](./export-pdf-form-to-fdf.cs) | Export PDF Form Data to FDF | `Form`, `ExportFdf`, `Close` | Shows how to use Aspose.Pdf's Form facade to export PDF form fields to an FDF file and ensure the... |
 | [export-pdf-page-as-raster-png](./export-pdf-page-as-raster-png.cs) | Export PDF Page as Raster PNG with Specified DPI | `Document`, `Resolution`, `PngDevice` | Demonstrates how to rasterize a PDF page, including all vector graphics, into a PNG image at a gi... |
 | [export-pdf-subpaths-as-separate-svg](./export-pdf-subpaths-as-separate-svg.cs) | Export PDF Subpaths as Separate SVG Images | `Document`, `Page`, `SvgExtractionOptions` | Shows how to extract each graphic subpath from PDF pages and save them as individual SVG files wi... |
 | [export-pdf-tables-to-csv-with-border-markers](./export-pdf-tables-to-csv-with-border-markers.cs) | Export PDF Tables to CSV with Border Markers | `Document`, `TableAbsorber`, `TextFragment` | Demonstrates extracting tables from a PDF using Aspose.Pdf, adding visual border markers to each ... |
 | [export-pdf-to-html-png-xfdf](./export-pdf-to-html-png-xfdf.cs) | Export PDF to HTML, PNG, and XFDF with Stream Disposal | `Document`, `Save`, `ExportAnnotationsToXfdf` | Loads a PDF using Aspose.Pdf and exports the entire document to HTML, the first page to a PNG ima... |
 | [export-pdf-to-svg-with-custom-options](./export-pdf-to-svg-with-custom-options.cs) | Export PDF to SVG with Custom Options and CSS Styling | `Document`, `SvgSaveOptions`, `Page` | Demonstrates exporting a PDF to SVG using SvgSaveOptions (DPI scaling and multithreading) and ext... |
-| [extract-acroform-field-values](./extract-acroform-field-values.cs) | Extract AcroForm Field Values from a PDF | `Document`, `Form`, `GetField` | Loads a PDF file, accesses its AcroForm via the Form facade, and prints each field name with its ... |
 | [extract-checkbox-states-from-pdf-acroform](./extract-checkbox-states-from-pdf-acroform.cs) | Extract Checkbox States from PDF AcroForm | `Document`, `Field`, `CheckboxField` | Loads a PDF, iterates over its AcroForm fields, collects the checked state of each checkbox, and ... |
 | [extract-embedded-images-to-png](./extract-embedded-images-to-png.cs) | Extract Embedded Images from PDF to PNG | `Document`, `Page`, `XImage` | Shows how to load a PDF with Aspose.Pdf, iterate through each page's image resources, and save ea... |
 | [extract-first-page-text-to-utf8](./extract-first-page-text-to-utf8.cs) | Extract First Page Text from PDF to UTF-8 File | `Document`, `TextAbsorber`, `Accept` | Demonstrates loading a PDF with Aspose.Pdf, extracting the text from its first page using TextAbs... |
 | [extract-fonts-from-pdf](./extract-fonts-from-pdf.cs) | Extract Fonts from PDF and Save as TTF Files | `Document`, `GetAllFonts`, `Save` | Shows how to load a PDF with Aspose.Pdf, retrieve all embedded fonts, and export each font to a .... |
+| [extract-graphic-element-to-svg](./extract-graphic-element-to-svg.cs) | Extract Specific Graphic Element from PDF and Save as SVG | `Document`, `Page`, `GraphicsAbsorber` | Demonstrates how to absorb graphic elements from a PDF page using Aspose.Pdf, select one by its i... |
 | ... | | | *and 35 more files* |
 
 ## Category Statistics
@@ -101,5 +100,5 @@ using (Document doc = new Document("input.pdf"))
 - Review code examples in this folder for parse-pdf patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-04-08 | Run: `20260408_141903_8b78b3`
+Updated: 2026-04-10 | Run: `20260410_121416_bd35e2`
 <!-- AUTOGENERATED:END -->

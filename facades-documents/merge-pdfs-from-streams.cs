@@ -1,78 +1,61 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
-    // Entry point supports async for proper async I/O.
-    static async Task Main(string[] args)
+    static void Main(string[] args)
     {
-        // URLs can be supplied via command‑line arguments or hard‑coded for testing.
-        // Example usage: dotnet run https://example.com/file1.pdf https://example.com/file2.pdf
-        if (args.Length < 2)
+        // Expect at least two input PDF file paths and one output path.
+        // Example: PdfConcat input1.pdf input2.pdf output.pdf
+        if (args.Length < 3)
         {
-            Console.WriteLine("Please provide two PDF URLs as command‑line arguments.");
+            Console.WriteLine("Usage: PdfConcat <input1.pdf> <input2.pdf> [<input3.pdf> ...] <output.pdf>");
             return;
         }
 
-        string firstPdfUrl = args[0];
-        string secondPdfUrl = args[1];
-        const string outputFile = "merged.pdf";
+        // The last argument is the output file, the rest are inputs.
+        string outputPath = args[args.Length - 1];
+        var inputPaths = new List<string>(args);
+        inputPaths.RemoveAt(args.Length - 1);
 
-        using (HttpClient httpClient = new HttpClient())
+        // Verify that every input file exists.
+        foreach (var path in inputPaths)
         {
-            try
+            if (!File.Exists(path))
             {
-                // Download the PDFs directly into memory – no temporary files are created.
-                byte[] firstBytes = await GetPdfBytesAsync(httpClient, firstPdfUrl);
-                byte[] secondBytes = await GetPdfBytesAsync(httpClient, secondPdfUrl);
-
-                using (MemoryStream firstStream = new MemoryStream(firstBytes))
-                using (MemoryStream secondStream = new MemoryStream(secondBytes))
-                {
-                    // Load the PDFs with Aspose.Pdf.Document.
-                    Document firstDoc = new Document(firstStream);
-                    Document secondDoc = new Document(secondStream);
-
-                    // Append all pages of the second document to the first one.
-                    firstDoc.Pages.Add(secondDoc.Pages);
-
-                    // Save the merged document to disk.
-                    firstDoc.Save(outputFile);
-                }
-
-                Console.WriteLine($"Merged PDF saved to '{outputFile}'.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                // The custom exception from GetPdfBytesAsync already contains a clear message.
-                Console.WriteLine(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                // Unexpected errors – log and exit.
-                Console.WriteLine($"An unexpected error occurred: {ex.Message}");
+                Console.WriteLine($"Input file not found: {path}");
+                return;
             }
         }
-    }
 
-    /// <summary>
-    /// Retrieves the PDF content as a byte array. Throws an InvalidOperationException with a clear
-    /// message if the request fails.
-    /// </summary>
-    private static async Task<byte[]> GetPdfBytesAsync(HttpClient client, string url)
-    {
+        // Load each input PDF into a MemoryStream.
+        var inputStreams = new List<Stream>();
         try
         {
-            HttpResponseMessage response = await client.GetAsync(url);
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadAsByteArrayAsync();
+            foreach (var path in inputPaths)
+            {
+                var ms = new MemoryStream(File.ReadAllBytes(path));
+                inputStreams.Add(ms);
+            }
+
+            // Stream that will receive the concatenated PDF.
+            using var outputStream = new MemoryStream();
+
+            // PdfFileEditor does not implement IDisposable, but we can set it to close the streams after concatenation.
+            var editor = new PdfFileEditor { CloseConcatenatedStreams = true };
+            editor.Concatenate(inputStreams.ToArray(), outputStream);
+
+            // Write the merged PDF to the requested output file.
+            File.WriteAllBytes(outputPath, outputStream.ToArray());
+            Console.WriteLine($"Merged PDF saved to: {outputPath}");
         }
-        catch (HttpRequestException ex)
+        finally
         {
-            throw new InvalidOperationException($"Failed to download PDF from '{url}'.", ex);
+            // Ensure any streams that were not closed by the editor are disposed.
+            foreach (var s in inputStreams)
+                s?.Dispose();
         }
     }
 }
