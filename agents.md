@@ -21,11 +21,11 @@ When working in this repository:
 
 ## Repository Overview
 
-This repository contains **2617** working code examples demonstrating Aspose.PDF for .NET capabilities.
+This repository contains **2708** working code examples demonstrating Aspose.PDF for .NET capabilities.
 
-**Statistics** (as of 2026-04-07):
-- Total Examples: 2617
-- Categories: 31
+**Statistics** (as of 2026-04-10):
+- Total Examples: 2708
+- Categories: 34
 
 ## Category Details
 
@@ -34,31 +34,31 @@ This repository contains **2617** working code examples demonstrating Aspose.PDF
 - Guide: [agents.md](./accessibility-and-tagged-pdfs/agents.md)
 
 ### basic-operations
-- Examples: 56
+- Examples: 57
 - Guide: [agents.md](./basic-operations/agents.md)
 
 ### compare-pdf
-- Examples: 27
+- Examples: 28
 - Guide: [agents.md](./compare-pdf/agents.md)
 
 ### conversion
-- Examples: 100
+- Examples: 102
 - Guide: [agents.md](./conversion/agents.md)
 
 ### document
-- Examples: 111
+- Examples: 122
 - Guide: [agents.md](./document/agents.md)
 
 ### facades-acroforms
-- Examples: 40
+- Examples: 41
 - Guide: [agents.md](./facades-acroforms/agents.md)
 
 ### facades-annotations
-- Examples: 105
+- Examples: 107
 - Guide: [agents.md](./facades-annotations/agents.md)
 
 ### facades-bookmarks
-- Examples: 34
+- Examples: 35
 - Guide: [agents.md](./facades-bookmarks/agents.md)
 
 ### facades-convert-documents
@@ -66,23 +66,23 @@ This repository contains **2617** working code examples demonstrating Aspose.PDF
 - Guide: [agents.md](./facades-convert-documents/agents.md)
 
 ### facades-documents
-- Examples: 100
+- Examples: 101
 - Guide: [agents.md](./facades-documents/agents.md)
 
 ### facades-edit-document
-- Examples: 208
+- Examples: 214
 - Guide: [agents.md](./facades-edit-document/agents.md)
 
 ### facades-extract-images-and-text
-- Examples: 81
+- Examples: 83
 - Guide: [agents.md](./facades-extract-images-and-text/agents.md)
 
 ### facades-fill-forms
-- Examples: 32
+- Examples: 35
 - Guide: [agents.md](./facades-fill-forms/agents.md)
 
 ### facades-forms
-- Examples: 83
+- Examples: 88
 - Guide: [agents.md](./facades-forms/agents.md)
 
 ### facades-metadata
@@ -90,7 +90,7 @@ This repository contains **2617** working code examples demonstrating Aspose.PDF
 - Guide: [agents.md](./facades-metadata/agents.md)
 
 ### facades-pages
-- Examples: 116
+- Examples: 117
 - Guide: [agents.md](./facades-pages/agents.md)
 
 ### facades-secure-documents
@@ -98,11 +98,11 @@ This repository contains **2617** working code examples demonstrating Aspose.PDF
 - Guide: [agents.md](./facades-secure-documents/agents.md)
 
 ### facades-sign-documents
-- Examples: 32
+- Examples: 35
 - Guide: [agents.md](./facades-sign-documents/agents.md)
 
 ### facades-stamps
-- Examples: 46
+- Examples: 50
 - Guide: [agents.md](./facades-stamps/agents.md)
 
 ### facades-texts-and-images
@@ -110,15 +110,27 @@ This repository contains **2617** working code examples demonstrating Aspose.PDF
 - Guide: [agents.md](./facades-texts-and-images/agents.md)
 
 ### facades-xmp-metadata
-- Examples: 43
+- Examples: 45
 - Guide: [agents.md](./facades-xmp-metadata/agents.md)
 
+### graphs-zugferd-operators
+- Examples: 84
+- Guide: [agents.md](./graphs-zugferd-operators/agents.md)
+
 ### pages
-- Examples: 85
+- Examples: 99
 - Guide: [agents.md](./pages/agents.md)
 
+### parse-pdf
+- Examples: 65
+- Guide: [agents.md](./parse-pdf/agents.md)
+
+### securing-and-signing-pdf
+- Examples: 87
+- Guide: [agents.md](./securing-and-signing-pdf/agents.md)
+
 ### stamping
-- Examples: 49
+- Examples: 50
 - Guide: [agents.md](./stamping/agents.md)
 
 ### working-with-annotations
@@ -130,7 +142,7 @@ This repository contains **2617** working code examples demonstrating Aspose.PDF
 - Guide: [agents.md](./working-with-attachments/agents.md)
 
 ### working-with-forms
-- Examples: 450
+- Examples: 240
 - Guide: [agents.md](./working-with-forms/agents.md)
 
 ### working-with-graphs
@@ -142,15 +154,15 @@ This repository contains **2617** working code examples demonstrating Aspose.PDF
 - Guide: [agents.md](./working-with-images/agents.md)
 
 ### working-with-tables
-- Examples: 105
+- Examples: 109
 - Guide: [agents.md](./working-with-tables/agents.md)
 
 ### working-with-text
-- Examples: 76
+- Examples: 75
 - Guide: [agents.md](./working-with-text/agents.md)
 
 ### working-with-xml
-- Examples: 74
+- Examples: 75
 - Guide: [agents.md](./working-with-xml/agents.md)
 
 ## Boundaries
@@ -233,6 +245,27 @@ See the full **Common Mistakes** section below for code-level prohibitions with 
 ## Common Mistakes (Anti-Patterns)
 
 These are verified mistakes that cause build failures. **Never** use the wrong patterns.
+
+### Borderinfo No Color Width Properties
+BorderInfo does not have settable .Color or .Width properties. Use the constructor instead: new BorderInfo(BorderSide.All, (float)width, color). Pass BorderSide, width as float, and Aspose.Pdf.Color t
+
+```csharp
+// WRONG
+BorderInfo b = new BorderInfo();
+b.Color = Aspose.Pdf.Color.Blue;  // CS1061
+b.Width = 1.5;                    // CS1061
+```
+
+```csharp
+// CORRECT
+Aspose.Pdf.Color borderColor = Aspose.Pdf.Color.Blue;
+float borderWidth = 1.5f;
+cell.Border = new BorderInfo(BorderSide.All, borderWidth, borderColor);
+// Width-only variant:
+cell.Border = new BorderInfo(BorderSide.All, 1f);
+// Cast from double if needed:
+cell.Border = new BorderInfo(BorderSide.All, (float)someDoubleWidth, Aspose.Pdf.Color.Green);
+```
 
 ### Rotation Enum Uses On Prefix
 The Aspose.Pdf.Rotation enum values use the 'on' prefix, NOT 'Rotate'. The correct values are: Rotation.None, Rotation.on90, Rotation.on180, Rotation.on270, Rotation.on360. Using 'Rotate90', 'Rotate18
@@ -412,19 +445,6 @@ texFragment.BottomMargin = 20;
 DefaultAppearance appearance = new DefaultAppearance("Helvetica", 12, Aspose.Pdf.Color.Black);
 ```
 
-### Resolve Color Ambiguity In Defaultappearance
-When constructing DefaultAppearance, use fully qualified Aspose.Pdf.Color (not System.Drawing.Color) to avoid ambiguity. The constructor expects Aspose.Pdf.Color, and System.Drawing.Color is not impli
-
-```csharp
-// WRONG
-DefaultAppearance appearance = new DefaultAppearance("Helvetica", 12, Color.Black); // ❌ ambiguous
-```
-
-```csharp
-// CORRECT
-DefaultAppearance appearance = new DefaultAppearance("Helvetica", 12, Aspose.Pdf.Color.Black);
-```
-
 ## Domain Knowledge
 
 Cross-cutting rules and API-specific gotchas.
@@ -528,9 +548,9 @@ dotnet run
    ```
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-04-07 | Run: `20260407_212044_4ffbd1` | Examples: 2617 | Categories: 31
+Updated: 2026-04-10 | Run: `20260410_174139_d90957` | Examples: 2708 | Categories: 34
 <!-- AUTOGENERATED:END -->
 
 ---
 
-*This repository is maintained by automated code generation. Last updated: 2026-04-07 | Total examples: 2617*
+*This repository is maintained by automated code generation. Last updated: 2026-04-10 | Total examples: 2708*
