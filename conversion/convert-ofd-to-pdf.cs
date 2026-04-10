@@ -1,25 +1,27 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Core Aspose.Pdf namespace
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.ofd";
-        const string outputPath = "output.pdf";
+        const string inputOfdPath  = "input.ofd";
+        const string outputPdfPath = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputOfdPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputOfdPath}");
             return;
         }
 
-        using (Document doc = new Document(inputPath, new OfdLoadOptions()))
+        // Load the OFD file using the appropriate load options and convert to PDF
+        using (Document doc = new Document(inputOfdPath, new OfdLoadOptions()))
         {
-            doc.Save(outputPath);
+            // Save the resulting PDF with default settings
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Converted OFD to PDF: {outputPath}");
+        Console.WriteLine($"OFD converted to PDF: '{outputPdfPath}'");
     }
 }

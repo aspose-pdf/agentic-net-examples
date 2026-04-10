@@ -6,45 +6,70 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputDocx = "output.docx";
-        const string imagesDir = "extracted_images";
+        const string inputPdfPath   = "input.pdf";               // source PDF
+        const string outputDocxPath = "output.docx";              // converted DOCX
+        const string imagesDir      = "ExtractedImages";         // folder for images
 
-        if (!File.Exists(inputPdf))
+        // Validate input file
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
+        // Ensure the images output directory exists
         Directory.CreateDirectory(imagesDir);
 
-        using (Document pdfDoc = new Document(inputPdf))
+        try
         {
-            // Convert PDF to DOCX
-            var docOptions = new DocSaveOptions
+            // Load the PDF document (using the standard Document constructor)
+            using (Document pdfDocument = new Document(inputPdfPath))
             {
-                Format = DocSaveOptions.DocFormat.DocX
-            };
-            pdfDoc.Save(outputDocx, docOptions);
-            Console.WriteLine($"PDF converted to DOCX: {outputDocx}");
-
-            // Extract embedded images
-            int imgCounter = 1;
-            foreach (Page page in pdfDoc.Pages)
-            {
-                foreach (XImage img in page.Resources.Images)
+                // ---------- Convert PDF to DOCX ----------
+                // DocSaveOptions controls the DOC/DOCX conversion.
+                DocSaveOptions docOptions = new DocSaveOptions
                 {
-                    // Use a generic .png extension if original name is unavailable
-                    string imgPath = Path.Combine(imagesDir, $"image_{imgCounter}.png");
-                    // XImage.Save expects a Stream, not a file path string
-                    using (FileStream fs = new FileStream(imgPath, FileMode.Create, FileAccess.Write))
+                    // Specify DOCX output format
+                    Format = DocSaveOptions.DocFormat.DocX,
+                    // Use Flow mode for better editability (optional)
+                    Mode = DocSaveOptions.RecognitionMode.Flow
+                };
+
+                // Save the document as DOCX using the options
+                pdfDocument.Save(outputDocxPath, docOptions);
+                Console.WriteLine($"PDF converted to DOCX: {outputDocxPath}");
+
+                // ---------- Extract embedded images ----------
+                int imageIndex = 0;
+
+                // Iterate over all pages (1‑based indexing)
+                for (int pageNum = 1; pageNum <= pdfDocument.Pages.Count; pageNum++)
+                {
+                    Page page = pdfDocument.Pages[pageNum];
+
+                    // XImageCollection is enumerable; iterate directly
+                    foreach (XImage img in page.Resources.Images)
                     {
-                        img.Save(fs);
+                        imageIndex++;
+                        // Build a unique file name for each image
+                        string imagePath = Path.Combine(imagesDir, $"image_{imageIndex}.png");
+
+                        // Save the image using a FileStream because XImage.Save expects a Stream
+                        using (FileStream fs = new FileStream(imagePath, FileMode.Create, FileAccess.Write))
+                        {
+                            img.Save(fs);
+                        }
+
+                        Console.WriteLine($"Extracted image {imageIndex}: {imagePath}");
                     }
-                    Console.WriteLine($"Saved image {imgCounter} to {imgPath}");
-                    imgCounter++;
                 }
+
+                Console.WriteLine($"Total images extracted: {imageIndex}");
             }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }
