@@ -110,17 +110,10 @@ catch (Exception ex)
 
 ## Documentation
 
-- Each category folder contains an [`agents.md`](./agents.md) with category-specific guidance
+- Each category folder contains an `agents.md` with category-specific guidance
 - Each category folder contains an `index.json` with per-example metadata
 - Root [`agents.md`](./agents.md) provides cumulative guidance across all categories
 - Root [`index.json`](./index.json) provides a machine-readable manifest of all examples
-
-## Contributing
-
-Examples in this repository are **automatically generated**. To suggest new examples:
-1. Submit tasks to the Aspose.PDF Examples Generator
-2. Generated examples are validated via compilation
-3. Passing examples are included in version release batches
 
 ## Related Resources
 
@@ -141,10 +134,6 @@ Examples in this repository are **automatically generated**. To suggest new exam
 ### Licensing & Purchase
 - [Purchase](https://purchase.aspose.com/buy) — Commercial license options
 - [Temporary License](https://purchase.aspose.com/temporary-license/) — Full-feature evaluation license
-
-### Related Repositories
-- [Aspose.PDF for .NET](https://github.com/aspose-pdf/Aspose.PDF-for-.NET) — Official examples repository
-- [AI Agent Guide](./agents.md) — For AI agents and code generation tools
 
 ## License
 
