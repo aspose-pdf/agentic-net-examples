@@ -1,76 +1,99 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Drawing;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Annotations;
 
-namespace ExtractAnnotationRectanglesExample
+public static class AnnotationRectangleExtractor
 {
-    class Program
+    /// <summary>
+    /// Extracts the rectangle of every annotation in the source PDF and creates a new PDF
+    /// where each page visualises one rectangle (red outline) on a page of the same size.
+    /// </summary>
+    /// <param name="inputPdfPath">Path to the source PDF.</param>
+    /// <param name="outputPdfPath">Path where the visualisation PDF will be saved.</param>
+    public static void ExtractAnnotationRectangles(string inputPdfPath, string outputPdfPath)
     {
-        static void Main()
+        if (!File.Exists(inputPdfPath))
+            throw new FileNotFoundException($"Input file not found: {inputPdfPath}");
+
+        // Bind the source PDF with the Facade class (load operation)
+        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            const string inputPath = "input.pdf";
-            const string outputPath = "annotations_visual.pdf";
+            editor.BindPdf(inputPdfPath);
 
-            if (!File.Exists(inputPath))
+            // The underlying Document object gives access to pages and annotations
+            Document sourceDoc = editor.Document;
+
+            // Create a new PDF document that will hold the visualisation pages (create operation)
+            using (Document visualDoc = new Document())
             {
-                Console.Error.WriteLine($"File not found: {inputPath}");
-                return;
-            }
-
-            // Bind the source PDF to the annotation editor
-            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-            {
-                editor.BindPdf(inputPath);
-                Document sourceDoc = editor.Document;
-                int pageCount = sourceDoc.Pages.Count;
-
-                // Define annotation types to extract (common types)
-                string[] annotTypes = new string[] {
-                    "Text", "Highlight", "Square", "Circle", "Link", "FreeText",
-                    "Line", "Stamp", "Ink", "Popup", "FileAttachment", "Sound",
-                    "Movie", "Screen", "Widget", "PrinterMark", "Watermark", "3D", "RichMedia"
-                };
-
-                IList<Annotation> annotations = editor.ExtractAnnotations(1, pageCount, annotTypes);
-
-                // Create a new PDF to hold visual pages
-                using (Document outDoc = new Document())
+                // Iterate through all pages of the source document
+                for (int pageIndex = 1; pageIndex <= sourceDoc.Pages.Count; pageIndex++)
                 {
-                    foreach (Annotation ann in annotations)
+                    Page srcPage = sourceDoc.Pages[pageIndex];
+
+                    // Determine the size of the source page (used for the new page)
+                    Aspose.Pdf.Rectangle srcPageRect = srcPage.Rect;
+                    double pageWidth = srcPageRect.URX - srcPageRect.LLX;
+                    double pageHeight = srcPageRect.URY - srcPageRect.LLY;
+
+                    // Iterate through each annotation on the current page
+                    foreach (Annotation ann in srcPage.Annotations)
                     {
-                        // Get the rectangle of the annotation (in page coordinates)
-                        Aspose.Pdf.Rectangle annRect = ann.Rect;
+                        // Add a new blank page with the same dimensions
+                        Page newPage = visualDoc.Pages.Add();
+                        newPage.SetPageSize(pageWidth, pageHeight);
 
-                        // Create a new blank page (size 600x800 points)
-                        Page page = outDoc.Pages.Add();
-                        page.PageInfo.Width = 600;
-                        page.PageInfo.Height = 800;
+                        // Create a Graph container for drawing vector shapes
+                        Graph graph = new Graph(pageWidth, pageHeight);
 
-                        // Draw the annotation rectangle on the page using a Graph container
-                        Graph graph = new Graph(600.0, 800.0); // double literals as required by the new constructor
-                        var shape = new Aspose.Pdf.Drawing.Rectangle(
-                            (float)annRect.LLX,
-                            (float)annRect.LLY,
-                            (float)(annRect.URX - annRect.LLX),
-                            (float)(annRect.URY - annRect.LLY));
-                        shape.GraphInfo = new GraphInfo
+                        // Build a rectangle shape that matches the annotation rectangle
+                        // Aspose.Pdf.Drawing.Rectangle expects float parameters
+                        var rectShape = new Aspose.Pdf.Drawing.Rectangle(
+                            (float)ann.Rect.LLX,
+                            (float)ann.Rect.LLY,
+                            (float)(ann.Rect.URX - ann.Rect.LLX),
+                            (float)(ann.Rect.URY - ann.Rect.LLY));
+
+                        // Style the rectangle: red border, no fill
+                        rectShape.GraphInfo = new GraphInfo
                         {
-                            Color = Aspose.Pdf.Color.Red,
-                            LineWidth = 2f // float literal
+                            Color = Color.Red,
+                            LineWidth = 2f,
+                            FillColor = Color.Transparent
                         };
-                        graph.Shapes.Add(shape);
-                        page.Paragraphs.Add(graph);
-                    }
 
-                    outDoc.Save(outputPath);
+                        // Add the rectangle to the graph and the graph to the page
+                        graph.Shapes.Add(rectShape);
+                        newPage.Paragraphs.Add(graph);
+                    }
                 }
+
+                // Save the visualisation PDF (save operation)
+                visualDoc.Save(outputPdfPath);
             }
 
-            Console.WriteLine($"Annotation rectangles visualized in '{outputPath}'.");
+            // Close the facade (disposal handled by using)
+            editor.Close();
+        }
+    }
+}
+
+// Minimal entry point to satisfy the compiler when building as an executable
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        // Expected usage: <inputPdfPath> <outputPdfPath>
+        if (args.Length == 2)
+        {
+            AnnotationRectangleExtractor.ExtractAnnotationRectangles(args[0], args[1]);
+        }
+        else
+        {
+            Console.WriteLine("Usage: <inputPdfPath> <outputPdfPath>");
         }
     }
 }

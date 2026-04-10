@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,22 +16,40 @@ class Program
             return;
         }
 
+        // Load the PDF inside a using block to ensure proper disposal.
         using (Document doc = new Document(inputPath))
         {
-            Page page = doc.Pages[1];
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-            SquareAnnotation annotation = new SquareAnnotation(page, rect);
-            annotation.Color = Aspose.Pdf.Color.Blue;
-            annotation.Border = new Border(annotation)
+            // Aspose.Pdf uses 1‑based page indexing.
+            Page firstPage = doc.Pages[1];
+
+            // Define the rectangle area (llx, lly, urx, ury) in user space units.
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 600);
+
+            // Create a square (rectangle) annotation on the first page.
+            SquareAnnotation rectangleAnnotation = new SquareAnnotation(firstPage, rect)
             {
-                Width = 2,
-                Dash = new Dash(new int[] { 3, 2 })
+                // Set the border colour.
+                Color = Aspose.Pdf.Color.Blue,
+                // Set the annotation opacity to 75 % (0.75).
+                Opacity = 0.75
             };
-            annotation.Opacity = 0.75f;
-            page.Annotations.Add(annotation);
+
+            // Configure a custom dash pattern for the border.
+            // Border requires the parent annotation in its constructor.
+            Border border = new Border(rectangleAnnotation)
+            {
+                Width = 2,                     // Border width in points.
+                Dash = new Dash(new int[] { 3, 2 }) // 3‑point dash, 2‑point gap.
+            };
+            rectangleAnnotation.Border = border;
+
+            // Add the annotation to the page's annotation collection.
+            firstPage.Annotations.Add(rectangleAnnotation);
+
+            // Save the modified PDF.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Rectangle annotation saved to '{outputPath}'.");
+        Console.WriteLine($"Rectangle annotation added and saved to '{outputPath}'.");
     }
 }
