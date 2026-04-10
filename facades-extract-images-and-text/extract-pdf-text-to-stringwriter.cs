@@ -1,31 +1,45 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string pdfPath = "input.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        using (Document doc = new Document(inputPath))
+        // Use PdfExtractor facade to extract text
+        using (PdfExtractor extractor = new PdfExtractor())
         {
-            TextAbsorber absorber = new TextAbsorber();
-            doc.Pages.Accept(absorber);
-            string extractedText = absorber.Text;
+            extractor.BindPdf(pdfPath);          // Load the PDF
+            extractor.ExtractText();             // Perform extraction (Unicode by default)
 
-            using (StringWriter writer = new StringWriter())
+            // Capture extracted text into a memory stream
+            using (MemoryStream ms = new MemoryStream())
             {
-                writer.Write(extractedText);
-                // Example integration with a logging framework
-                Console.WriteLine(writer.ToString());
+                extractor.GetText(ms);           // Write text to the stream
+                ms.Position = 0;                 // Reset for reading
+
+                // Read the stream into a string
+                using (StreamReader reader = new StreamReader(ms))
+                {
+                    string extractedText = reader.ReadToEnd();
+
+                    // Write the text to a StringWriter (suitable for logging frameworks)
+                    using (StringWriter stringWriter = new StringWriter())
+                    {
+                        stringWriter.Write(extractedText);
+
+                        // Example output – replace with actual logging as needed
+                        Console.WriteLine(stringWriter.ToString());
+                    }
+                }
             }
         }
     }
