@@ -15,14 +15,18 @@ class Program
             return;
         }
 
+        // Bind the PDF, remove the specified signature, and save the result.
         using (PdfFileSignature pdfSign = new PdfFileSignature())
         {
             pdfSign.BindPdf(inputPath);
-            // Use the overload that accepts a signature name as a string.
+
+            // Remove the signature by its name using the string overload.
             pdfSign.RemoveSignature("ApprovalSignature");
+
+            // Save the modified PDF.
             pdfSign.Save(outputPath);
         }
 
-        Console.WriteLine("Signature 'ApprovalSignature' removed. Saved to 'output.pdf'.");
+        Console.WriteLine($"Signature 'ApprovalSignature' removed. Saved to '{outputPath}'.");
     }
 }
