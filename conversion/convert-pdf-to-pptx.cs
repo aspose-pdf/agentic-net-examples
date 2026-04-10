@@ -6,28 +6,30 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pptx";
+        const string inputPdfPath = "input.pdf";
+        const string outputPptxPath = "output.pptx";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
         try
         {
-            using (Document pdfDoc = new Document(inputPath))
+            // Convert PDF to PPTX using Aspose.Pdf's built‑in conversion.
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                // Convert PDF to PPTX using default options
-                pdfDoc.Save(outputPath, new PptxSaveOptions());
+                // PptxSaveOptions resides directly in the Aspose.Pdf namespace.
+                var pptxOptions = new PptxSaveOptions();
+                pdfDoc.Save(outputPptxPath, pptxOptions);
             }
 
-            Console.WriteLine($"PDF successfully converted to PPTX: '{outputPath}'");
+            Console.WriteLine($"PDF successfully converted to PPTX: {outputPptxPath}");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
         }
     }
 }

@@ -4,33 +4,37 @@ using Aspose.Pdf;
 
 class Program
 {
+    // Simple progress handler that works with any version of Aspose.Pdf.
+    // It prints the progress value reported by the conversion process.
+    static void ShowProgress(PptxSaveOptions.ProgressEventHandlerInfo eventInfo)
+    {
+        // The ProgressEventHandlerInfo always contains a Value property (percentage of work done).
+        // Some older or newer library versions may not expose an EventType enum, so we avoid using it.
+        Console.WriteLine($"{DateTime.Now:T} - Conversion progress: {eventInfo.Value}%");
+    }
+
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pptx";
+        const string inputPdfPath = "input.pdf";
+        const string outputPptxPath = "output.pptx";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
-            var pptxOptions = new PptxSaveOptions
-            {
-                SlidesAsImages = false,
-                CustomProgressHandler = ProgressHandler
-            };
+            // Initialise PPTX save options and attach the custom progress handler.
+            PptxSaveOptions saveOptions = new PptxSaveOptions();
+            saveOptions.CustomProgressHandler = new PptxSaveOptions.ConversionProgressEventHandler(ShowProgress);
 
-            doc.Save(outputPath, pptxOptions);
+            // Save the document as PPTX using the configured options.
+            pdfDocument.Save(outputPptxPath, saveOptions);
         }
 
-        Console.WriteLine($"PDF successfully converted to PPTX: {outputPath}");
-    }
-
-    private static void ProgressHandler(PptxSaveOptions.ProgressEventHandlerInfo info)
-    {
-        Console.WriteLine($"Progress event: {info.EventType}, Value: {info.Value}/{info.MaxValue}");
+        Console.WriteLine($"Conversion completed. PPTX saved to '{outputPptxPath}'.");
     }
 }
