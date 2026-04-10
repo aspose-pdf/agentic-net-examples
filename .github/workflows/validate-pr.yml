@@ -60,20 +60,76 @@ jobs:
           dotnet restore .build-template/ --verbosity quiet
           echo "Template ready with Aspose.PDF ${{ steps.version.outputs.nuget_version }}"
 
-      # ── Find .cs files changed in this PR ──
-      # Use merge-base (three-dot diff) so we only see files the PR itself
-      # changed — not files brought in from the base branch when the PR is
-      # updated via "Update branch" (which merges base into head).
+      # ── Find .cs files to validate ──
+      # We apply up to three filters to avoid re-running CI on files that
+      # didn't actually change:
+      #   1. PR-owned filter (merge-base): only files the PR itself added
+      #      or modified vs the base branch — skips files that came in via
+      #      "Update branch" merges from the base.
+      #   2. Incremental filter: if HEAD is a merge commit (i.e. the user
+      #      clicked "Update branch"), only validate files that changed in
+      #      the merge itself (HEAD^1..HEAD). If the merge introduced no
+      #      new changes to PR-owned .cs files, skip the build entirely.
+      #   3. Environment tripwire: if the merge touched csproj, workflow,
+      #      index.json, or global.json, force a full revalidation because
+      #      the build environment may have changed.
       - name: Get changed .cs files
         id: changed
         run: |
           BASE="${{ github.event.pull_request.base.sha }}"
           HEAD="${{ github.event.pull_request.head.sha }}"
           MERGE_BASE=$(git merge-base "$BASE" "$HEAD")
-          echo "PR base:   $BASE"
-          echo "PR head:   $HEAD"
+          echo "PR base:    $BASE"
+          echo "PR head:    $HEAD"
           echo "Merge base: $MERGE_BASE"
-          FILES=$(git diff --name-only "$MERGE_BASE" "$HEAD" -- '*.cs' | grep '\.cs$' || true)
+
+          # ── Filter 1: files the PR itself changed ──
+          PR_FILES=$(git diff --name-only "$MERGE_BASE" "$HEAD" -- '*.cs' | grep '\.cs$' || true)
+
+          # ── Is HEAD a merge commit (i.e. "Update branch" was clicked)? ──
+          IS_MERGE=false
+          if git rev-parse --verify HEAD^2 >/dev/null 2>&1; then
+            IS_MERGE=true
+            echo "HEAD is a merge commit (Update branch was used)"
+          fi
+
+          # ── Filter 3: environment tripwire (forces full revalidate) ──
+          FORCE_FULL=false
+          if [ "$IS_MERGE" = "true" ]; then
+            ENV_DIFF=$(git diff --name-only HEAD^1 HEAD -- \
+              'index.json' \
+              '.github/workflows/validate-pr.yml' \
+              '**/*.csproj' \
+              'global.json' 2>/dev/null || true)
+            if [ -n "$ENV_DIFF" ]; then
+              FORCE_FULL=true
+              echo "Environment changed in merge — forcing full revalidation:"
+              echo "$ENV_DIFF"
+            fi
+          fi
+
+          # ── Filter 2: incremental (only files touched by the merge) ──
+          if [ "$IS_MERGE" = "true" ] && [ "$FORCE_FULL" = "false" ]; then
+            RECENT_FILES=$(git diff --name-only HEAD^1 HEAD -- '*.cs' | grep '\.cs$' || true)
+            if [ -z "$RECENT_FILES" ]; then
+              echo "Merge did not touch any .cs files — skipping validation."
+              echo "has_cs=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            # Intersect PR-owned files with files touched by the merge
+            FILES=$(comm -12 \
+              <(printf '%s\n' "$PR_FILES" | sort -u) \
+              <(printf '%s\n' "$RECENT_FILES" | sort -u))
+            if [ -z "$FILES" ]; then
+              echo "Merge touched .cs files but none were PR-owned — skipping validation."
+              echo "has_cs=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "Incremental mode: validating only files touched by the merge"
+          else
+            FILES="$PR_FILES"
+          fi
+
           if [ -z "$FILES" ]; then
             echo "No .cs files changed in this PR"
             echo "has_cs=false" >> "$GITHUB_OUTPUT"

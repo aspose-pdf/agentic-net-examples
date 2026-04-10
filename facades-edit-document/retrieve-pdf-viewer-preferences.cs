@@ -14,24 +14,50 @@ class Program
             return;
         }
 
-        PdfContentEditor editor = new PdfContentEditor();
-        editor.BindPdf(inputPath);
-        int prefValue = editor.GetViewerPreference();
+        // Use PdfContentEditor to access viewer preferences
+        using (PdfContentEditor editor = new PdfContentEditor())
+        {
+            editor.BindPdf(inputPath);
+            int prefValue = editor.GetViewerPreference();
 
-        Console.WriteLine($"Viewer Preference flags: {prefValue}");
+            Console.WriteLine($"Viewer Preference value: {prefValue}");
 
-        // Example checks for a few common flags
-        if ((prefValue & ViewerPreference.HideMenubar) != 0)
-        {
-            Console.WriteLine("HideMenubar flag is set.");
-        }
-        if ((prefValue & ViewerPreference.PageModeUseOutlines) != 0)
-        {
-            Console.WriteLine("PageModeUseOutlines flag is set.");
-        }
-        if ((prefValue & ViewerPreference.FitWindow) != 0)
-        {
-            Console.WriteLine("FitWindow flag is set.");
+            // Helper to print each flag that is set
+            void PrintFlag(int flag, string name)
+            {
+                if ((prefValue & flag) != 0)
+                    Console.WriteLine($" - {name}");
+            }
+
+            // List of ViewerPreference flags
+            PrintFlag(ViewerPreference.CenterWindow, "CenterWindow");
+            PrintFlag(ViewerPreference.DirectionL2R, "DirectionL2R");
+            PrintFlag(ViewerPreference.DirectionR2L, "DirectionR2L");
+            PrintFlag(ViewerPreference.DisplayDocTitle, "DisplayDocTitle");
+            PrintFlag(ViewerPreference.DuplexFlipLongEdge, "DuplexFlipLongEdge");
+            PrintFlag(ViewerPreference.DuplexFlipShortEdge, "DuplexFlipShortEdge");
+            PrintFlag(ViewerPreference.FitWindow, "FitWindow");
+            PrintFlag(ViewerPreference.HideMenubar, "HideMenubar");
+            PrintFlag(ViewerPreference.HideToolbar, "HideToolbar");
+            PrintFlag(ViewerPreference.HideWindowUI, "HideWindowUI");
+            PrintFlag(ViewerPreference.NonFullScreenPageModeUseNone, "NonFullScreenPageModeUseNone");
+            PrintFlag(ViewerPreference.NonFullScreenPageModeUseOC, "NonFullScreenPageModeUseOC");
+            PrintFlag(ViewerPreference.NonFullScreenPageModeUseOutlines, "NonFullScreenPageModeUseOutlines");
+            PrintFlag(ViewerPreference.NonFullScreenPageModeUseThumbs, "NonFullScreenPageModeUseThumbs");
+            PrintFlag(ViewerPreference.PageLayoutOneColumn, "PageLayoutOneColumn");
+            PrintFlag(ViewerPreference.PageLayoutSinglePage, "PageLayoutSinglePage");
+            PrintFlag(ViewerPreference.PageLayoutTwoColumnLeft, "PageLayoutTwoColumnLeft");
+            PrintFlag(ViewerPreference.PageLayoutTwoColumnRight, "PageLayoutTwoColumnRight");
+            PrintFlag(ViewerPreference.PageModeFullScreen, "PageModeFullScreen");
+            PrintFlag(ViewerPreference.PageModeUseAttachment, "PageModeUseAttachment");
+            PrintFlag(ViewerPreference.PageModeUseNone, "PageModeUseNone");
+            PrintFlag(ViewerPreference.PageModeUseOC, "PageModeUseOC");
+            PrintFlag(ViewerPreference.PageModeUseOutlines, "PageModeUseOutlines");
+            PrintFlag(ViewerPreference.PageModeUseThumbs, "PageModeUseThumbs");
+            PrintFlag(ViewerPreference.PickTrayByPDFSize, "PickTrayByPDFSize");
+            PrintFlag(ViewerPreference.PrintScalingAppDefault, "PrintScalingAppDefault");
+            PrintFlag(ViewerPreference.PrintScalingNone, "PrintScalingNone");
+            PrintFlag(ViewerPreference.Simplex, "Simplex");
         }
     }
 }

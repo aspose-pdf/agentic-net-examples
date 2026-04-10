@@ -2,40 +2,54 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-namespace AsposePdfApi
+namespace PdfProcessingConsole
 {
-    public class PdfService
+    class Program
     {
-        public Stream RemoveAllAnnotations(Stream pdfInput)
+        /// <summary>
+        /// Entry point for the console application.
+        /// Usage: PdfProcessingConsole <input.pdf> <output.pdf>
+        /// </summary>
+        static void Main(string[] args)
         {
-            if (pdfInput == null)
-                throw new ArgumentNullException(nameof(pdfInput));
-
-            var cleanedPdf = new MemoryStream();
-
-            using (var annotationEditor = new PdfAnnotationEditor())
+            if (args.Length < 2)
             {
-                annotationEditor.BindPdf(pdfInput);
-                annotationEditor.DeleteAnnotations();
-                annotationEditor.Save(cleanedPdf);
+                Console.WriteLine("Usage: PdfProcessingConsole <input.pdf> <output.pdf>");
+                return;
             }
 
-            cleanedPdf.Position = 0;
-            return cleanedPdf;
-        }
-    }
+            string inputPath = args[0];
+            string outputPath = args[1];
 
-    // Minimal entry point to satisfy the compiler when the project is built as an executable.
-    internal class Program
-    {
-        private static void Main(string[] args)
+            // Validate input file existence
+            if (!File.Exists(inputPath))
+            {
+                Console.WriteLine($"Input file not found: {inputPath}");
+                return;
+            }
+
+            // Process the PDF: remove all annotations and write the cleaned PDF
+            using (FileStream inputStream = File.OpenRead(inputPath))
+            using (FileStream outputStream = File.Create(outputPath))
+            {
+                RemoveAnnotations(inputStream, outputStream);
+            }
+
+            Console.WriteLine($"Annotations removed. Clean PDF saved to: {outputPath}");
+        }
+
+        /// <summary>
+        /// Removes all annotations from a PDF document.
+        /// </summary>
+        /// <param name="input">Stream containing the original PDF.</param>
+        /// <param name="output">Stream where the cleaned PDF will be written.</param>
+        public static void RemoveAnnotations(Stream input, Stream output)
         {
-            // Placeholder – no operation required.
-            // Example usage (optional, can be removed in production):
-            // var service = new PdfService();
-            // using var input = File.OpenRead("input.pdf");
-            // using var output = service.RemoveAllAnnotations(input);
-            // File.WriteAllBytes("output.pdf", ((MemoryStream)output).ToArray());
+            // Aspose.Pdf.Facades.PdfAnnotationEditor provides annotation manipulation capabilities.
+            using var editor = new PdfAnnotationEditor();
+            editor.BindPdf(input);
+            editor.DeleteAnnotations();
+            editor.Save(output);
         }
     }
 }
