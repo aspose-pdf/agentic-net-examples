@@ -9,24 +9,29 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
+        // Verify source file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        using (Form form = new Form(inputPath))
+        // Initialize the Form facade with input and output PDF files
+        using (Form form = new Form(inputPath, outputPath))
         {
+            // Iterate over all form field names
             foreach (string fieldName in form.FieldNames)
             {
+                // Rename fields that start with "Old_"
                 if (fieldName.StartsWith("Old_"))
                 {
-                    string newFieldName = "New_" + fieldName.Substring(4);
-                    form.RenameField(fieldName, newFieldName);
+                    string newName = "New_" + fieldName.Substring("Old_".Length);
+                    form.RenameField(fieldName, newName);
                 }
             }
 
-            form.Save(outputPath);
+            // Persist the changes to the output PDF
+            form.Save();
         }
 
         Console.WriteLine($"Fields renamed and saved to '{outputPath}'.");

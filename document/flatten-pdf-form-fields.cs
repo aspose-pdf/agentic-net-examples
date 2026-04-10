@@ -6,31 +6,25 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "flattened.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "flattened_output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
+        // Load the PDF, flatten all form fields, and save the result.
+        using (Document doc = new Document(inputPath))
         {
-            using (Document doc = new Document(inputPath))
-            {
-                // Flatten all interactive form fields into static page content
-                doc.Flatten();
+            // Removes all interactive form fields and places their values directly on the page.
+            doc.Flatten();
 
-                // Save the resulting PDF
-                doc.Save(outputPath);
-            }
+            // Save the flattened PDF.
+            doc.Save(outputPath);
+        }
 
-            Console.WriteLine($"Flattened PDF saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"Flattened PDF saved to '{outputPath}'.");
     }
 }

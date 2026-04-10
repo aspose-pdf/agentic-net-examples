@@ -7,44 +7,51 @@ class Program
 {
     static void Main()
     {
-        // Folder containing input PDF files
-        const string inputFolder = "input_pdfs";
-        // Author to replace and the new author name
+        // Folder containing PDFs to process
+        const string inputFolder  = @"C:\PdfInput";
+        // Folder where modified PDFs will be saved
+        const string outputFolder = @"C:\PdfOutput";
+
+        // Author names: source (to replace) and destination (new)
         const string sourceAuthor = "Old Author";
-        const string destinationAuthor = "New Author";
+        const string newAuthor    = "New Author";
 
-        if (!Directory.Exists(inputFolder))
-        {
-            Console.Error.WriteLine($"Folder not found: {inputFolder}");
-            return;
-        }
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
-        if (pdfFiles.Length == 0)
-        {
-            Console.WriteLine("No PDF files found to process.");
-            return;
-        }
-
+        // Get all PDF files in the input folder
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
         foreach (string inputPath in pdfFiles)
         {
-            // Bind the PDF to the editor
-            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+            // Determine output file path (same name, different folder)
+            string outputPath = Path.Combine(outputFolder, Path.GetFileName(inputPath));
+
+            try
             {
-                editor.BindPdf(inputPath);
+                // Bind the PDF to the annotation editor
+                using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+                {
+                    editor.BindPdf(inputPath);
 
-                // Determine the total number of pages in the document
-                int pageCount = editor.Document.Pages.Count;
+                    // Load the document to obtain page count
+                    using (Document doc = new Document(inputPath))
+                    {
+                        int startPage = 1;                     // 1‑based indexing
+                        int endPage   = doc.Pages.Count;       // last page
+                        // Modify the author of all annotations in the page range
+                        editor.ModifyAnnotationsAuthor(startPage, endPage, sourceAuthor, newAuthor);
+                    }
 
-                // Modify the author of annotations on all pages
-                editor.ModifyAnnotationsAuthor(1, pageCount, sourceAuthor, destinationAuthor);
+                    // Save the modified PDF
+                    editor.Save(outputPath);
+                }
 
-                // Save the updated PDF with a simple filename (no directory path)
-                string outputFileName = Path.GetFileNameWithoutExtension(inputPath) + "_updated.pdf";
-                editor.Save(outputFileName);
+                Console.WriteLine($"Processed: {Path.GetFileName(inputPath)} → {outputPath}");
             }
-
-            Console.WriteLine($"Processed '{Path.GetFileName(inputPath)}' -> updated file saved.");
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
+            }
         }
     }
 }
