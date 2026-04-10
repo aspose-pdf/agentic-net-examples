@@ -1,27 +1,30 @@
 using System;
-using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string signatureFieldName = "ManagerSignature";
+        const string inputPdf = "input.pdf"; // PDF containing the signature field "ManagerSignature"
 
-        if (!File.Exists(inputPath))
+        // Ensure the file exists before proceeding
+        if (!System.IO.File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
+        // Use PdfFileSignature facade to work with digital signatures
         using (PdfFileSignature pdfSignature = new PdfFileSignature())
         {
-            pdfSignature.BindPdf(inputPath);
-            // Use the overload that accepts the signature name as a string.
-            bool isSignatureValid = pdfSignature.VerifySignature(signatureFieldName);
-            Console.WriteLine($"Signature '{signatureFieldName}' validity: {isSignatureValid}");
+            // Bind the PDF file to the facade
+            pdfSignature.BindPdf(inputPdf);
+
+            // Verify the integrity of the signature named "ManagerSignature"
+            bool isSignatureValid = pdfSignature.VerifySignature("ManagerSignature");
+
+            // Output the verification result
+            Console.WriteLine($"Signature 'ManagerSignature' valid: {isSignatureValid}");
         }
     }
 }

@@ -1,46 +1,61 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
+        // Paths for input PDF and output PDF
         const string inputPdfPath = "input.pdf";
         const string outputPdfPath = "output.pdf";
-        const string imagePath = "stamp.png";
 
+        // Path to the image file (could be any source stream)
+        const string imagePath = "logo.png";
+
+        // Validate input files
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine("Input PDF not found: " + inputPdfPath);
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-
         if (!File.Exists(imagePath))
         {
-            Console.Error.WriteLine("Image file not found: " + imagePath);
+            Console.Error.WriteLine($"Image file not found: {imagePath}");
             return;
         }
 
-        using (FileStream imageStream = new FileStream(imagePath, FileMode.Open, FileAccess.Read))
-        {
-            ImageStamp imageStamp = new ImageStamp(imageStream);
-            imageStamp.Background = false;
-            imageStamp.Opacity = 0.5f;
-            imageStamp.XIndent = 100;
-            imageStamp.YIndent = 200;
-            // Optional size settings:
-            // imageStamp.Width = 150;
-            // imageStamp.Height = 100;
+        // Create the PdfFileStamp facade
+        PdfFileStamp fileStamp = new PdfFileStamp();
 
-            using (Document pdfDocument = new Document(inputPdfPath))
-            {
-                // Apply the stamp to the first page (pages are 1‑based)
-                pdfDocument.Pages[1].AddStamp(imageStamp);
-                pdfDocument.Save(outputPdfPath);
-            }
+        // Bind the source PDF
+        fileStamp.BindPdf(inputPdfPath);
+
+        // Create a stamp object
+        Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
+
+        // Bind the image from a stream without writing to disk
+        using (FileStream imgStream = File.OpenRead(imagePath))
+        {
+            stamp.BindImage(imgStream);
         }
 
-        Console.WriteLine("Image stamp applied and saved to '" + outputPdfPath + "'.");
+        // Optional: set stamp appearance
+        stamp.SetOrigin(100, 500);          // Position (X, Y) from lower‑left corner
+        stamp.SetImageSize(150, 100);       // Width, Height
+        stamp.Opacity = 0.7f;               // Semi‑transparent
+        stamp.IsBackground = false;        // Place on top of page content
+
+        // Add the stamp to all pages of the PDF
+        fileStamp.AddStamp(stamp);
+
+        // Save the stamped PDF
+        fileStamp.Save(outputPdfPath);
+
+        // Close the facade (releases resources)
+        fileStamp.Close();
+
+        Console.WriteLine($"Stamped PDF saved to '{outputPdfPath}'.");
     }
 }
