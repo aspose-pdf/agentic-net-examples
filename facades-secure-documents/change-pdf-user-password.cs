@@ -6,34 +6,38 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "encrypted.pdf";
-        const string outputPath = "updated.pdf";
-        const string ownerPassword = "owner123";
-        const string newUserPassword = "newuser456";
-        const string newOwnerPassword = "newowner789";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string currentOwnerPassword = "ownerPass";   // original owner password
+        const string newUserPassword = "newUserPass";      // new user password
+        const string newOwnerPassword = null;              // null/empty generates a random owner password
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine("Input file not found: " + inputPath);
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         try
         {
-            PdfFileSecurity fileSecurity = new PdfFileSecurity();
-            fileSecurity.BindPdf(inputPath);
-            bool changed = fileSecurity.ChangePassword(ownerPassword, newUserPassword, newOwnerPassword);
-            if (!changed)
+            // Initialize the facade with source and destination files
+            using (PdfFileSecurity security = new PdfFileSecurity(inputPath, outputPath))
             {
-                Console.Error.WriteLine("Failed to change password.");
-                return;
+                // Change the user password while keeping existing encryption settings
+                bool changed = security.ChangePassword(currentOwnerPassword, newUserPassword, newOwnerPassword);
+                if (!changed)
+                {
+                    Console.Error.WriteLine("Failed to change the password.");
+                }
+                else
+                {
+                    Console.WriteLine($"Password changed successfully. Output saved to '{outputPath}'.");
+                }
             }
-            fileSecurity.Save(outputPath);
-            Console.WriteLine("Password changed successfully. Output saved to '" + outputPath + "'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine("Error: " + ex.Message);
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

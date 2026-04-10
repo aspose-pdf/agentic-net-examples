@@ -1,58 +1,69 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Facades;
 
-class Program
+namespace PdfEditLoggingExample
 {
-    static void Main()
+    // Simple logger that appends operation details to a text file.
+    internal static class Logger
     {
-        string inputPath = "input.pdf";
-        string outputPath = "output.pdf";
-        string logPath = "edit_log.txt";
+        private static readonly string LogFilePath = "edit_operations.log";
 
-        if (!File.Exists(inputPath))
+        // Logs the operation with timestamp and PDF file name.
+        public static void Log(string pdfFilePath, string operationDescription)
         {
-            Console.Error.WriteLine("Input file not found: " + inputPath);
-            return;
+            string entry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss}\t{Path.GetFileName(pdfFilePath)}\t{operationDescription}";
+            File.AppendAllText(LogFilePath, entry + Environment.NewLine);
         }
-
-        using (Document doc = new Document(inputPath))
-        {
-            // Add a text annotation
-            Page page = doc.Pages[1];
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-            TextAnnotation txtAnn = new TextAnnotation(page, rect);
-            txtAnn.Title = "Note";
-            txtAnn.Contents = "Added annotation";
-            txtAnn.Color = Aspose.Pdf.Color.Yellow;
-            page.Annotations.Add(txtAnn);
-            LogOperation(logPath, "Add Text Annotation", inputPath);
-
-            // Replace text using PdfContentEditor
-            PdfContentEditor editor = new PdfContentEditor(doc);
-            editor.ReplaceText("old text", "new text");
-            LogOperation(logPath, "Replace Text", inputPath);
-
-            // Delete first image on page 1
-            PdfContentEditor imageEditor = new PdfContentEditor(doc);
-            imageEditor.DeleteImage(1, new int[] { 1 });
-            LogOperation(logPath, "Delete Image", inputPath);
-
-            doc.Save(outputPath);
-        }
-
-        Console.WriteLine("PDF edited and saved to " + outputPath);
     }
 
-    private static void LogOperation(string logFile, string operation, string pdfFile)
+    class Program
     {
-        string timestamp = DateTime.Now.ToString("o");
-        string entry = string.Format("{0} - {1} - {2}", timestamp, Path.GetFileName(pdfFile), operation);
-        using (StreamWriter writer = new StreamWriter(logFile, true))
+        static void Main()
         {
-            writer.WriteLine(entry);
+            const string inputPdfPath = "input.pdf";
+            const string outputPdfPath = "edited_output.pdf";
+
+            // Ensure the input file exists.
+            if (!File.Exists(inputPdfPath))
+            {
+                Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+                return;
+            }
+
+            // Use PdfContentEditor (Facade) to perform edit operations.
+            // The facade is created, bound to the source PDF, edited, and saved.
+            using (PdfContentEditor editor = new PdfContentEditor())
+            {
+                // Load the PDF for editing.
+                editor.BindPdf(inputPdfPath);
+                Logger.Log(inputPdfPath, "BindPdf");
+
+                // Example edit operation 1: Replace text.
+                editor.ReplaceText("OldText", "NewText");
+                Logger.Log(inputPdfPath, "ReplaceText: 'OldText' -> 'NewText'");
+
+                // Example edit operation 2: Add a document attachment (no visual annotation).
+                const string attachmentPath = "sample_attachment.txt";
+                if (File.Exists(attachmentPath))
+                {
+                    editor.AddDocumentAttachment(attachmentPath, "Sample attachment");
+                    Logger.Log(inputPdfPath, $"AddDocumentAttachment: {Path.GetFileName(attachmentPath)}");
+                }
+
+                // Example edit operation 3: Create a web link annotation.
+                // Use System.Drawing.Rectangle (fully qualified) because CreateWebLink expects that type.
+                System.Drawing.Rectangle linkRect = new System.Drawing.Rectangle(100, 500, 200, 550);
+                editor.CreateWebLink(linkRect, "https://www.example.com", 0);
+                Logger.Log(inputPdfPath, "CreateWebLink to https://www.example.com");
+
+                // Save the edited PDF to a new file.
+                editor.Save(outputPdfPath);
+                Logger.Log(outputPdfPath, "Save edited PDF");
+            }
+
+            Console.WriteLine("PDF editing completed. Operations logged to edit_operations.log.");
         }
     }
 }

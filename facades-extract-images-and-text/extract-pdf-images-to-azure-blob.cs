@@ -1,106 +1,121 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Azure.Storage.Blobs;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf; // ImageFormat enum is defined here, but we will use the overload that does not require it
 
 // ---------------------------------------------------------------------------
-// Minimal stubs for Azure.Storage.Blobs (used when the real NuGet package is not
-// referenced). These provide just enough functionality for compilation and a
-// simple local‑file fallback for the Upload operation.
+// Minimal stubs for Azure.Storage.Blobs when the real NuGet package is not
+// referenced. They provide just enough members for the sample code to compile
+// and run in a local test environment. In a production project you should add
+// the official Azure.Storage.Blobs package instead of these stubs.
 // ---------------------------------------------------------------------------
 namespace Azure.Storage.Blobs
 {
-    public class BlobServiceClient
-    {
-        private readonly string _connectionString;
-        public BlobServiceClient(string connectionString) => _connectionString = connectionString;
-        public BlobContainerClient GetBlobContainerClient(string containerName) => new BlobContainerClient(containerName);
-    }
-
     public class BlobContainerClient
     {
+        private readonly string _connectionString;
         private readonly string _containerName;
-        public BlobContainerClient(string containerName) => _containerName = containerName;
+
+        public BlobContainerClient(string connectionString, string containerName)
+        {
+            _connectionString = connectionString;
+            _containerName = containerName;
+        }
+
+        // In the real SDK this creates the container if it does not exist.
+        // The stub simply does nothing.
         public void CreateIfNotExists()
         {
-            // No‑op for the stub – in a real scenario the container would be created.
+            // No‑op for stub.
         }
-        public BlobClient GetBlobClient(string blobName) => new BlobClient(_containerName, blobName);
+
+        // Returns a client that can upload a blob with the given name.
+        public BlobClient GetBlobClient(string blobName) => new BlobClient(blobName);
     }
 
     public class BlobClient
     {
-        private readonly string _containerName;
         private readonly string _blobName;
-        public BlobClient(string containerName, string blobName)
+
+        public BlobClient(string blobName)
         {
-            _containerName = containerName;
             _blobName = blobName;
         }
-        /// <summary>
-        /// Writes the stream to a local folder named "AzureBlobEmulation" mimicking
-        /// an upload to Azure Blob Storage. The folder structure mirrors the container
-        /// and blob names.
-        /// </summary>
+
+        // Stub implementation writes the stream to a file in the current
+        // working directory. The real SDK streams the data to Azure Blob
+        // Storage.
         public void Upload(Stream content, bool overwrite = false)
         {
-            string basePath = Path.Combine(Directory.GetCurrentDirectory(), "AzureBlobEmulation");
-            string containerPath = Path.Combine(basePath, _containerName);
-            Directory.CreateDirectory(containerPath);
-            string filePath = Path.Combine(containerPath, _blobName);
-            if (!overwrite && File.Exists(filePath))
-                throw new IOException($"Blob '{_blobName}' already exists in container '{_containerName}'.");
-            using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
-            {
-                content.CopyTo(fileStream);
-            }
+            string filePath = Path.Combine(Directory.GetCurrentDirectory(), _blobName);
+            // Ensure the directory exists (it will, because we use the cwd).
+            using var fileStream = File.Create(filePath);
+            content.CopyTo(fileStream);
         }
     }
 }
 
-class Program
+class PdfImageExtractor
 {
-    static void Main()
+    // Extracts all images from a PDF and uploads them to an Azure Blob container.
+    public static void ExtractImagesToBlob(string pdfPath, string azureConnectionString, string containerName)
     {
-        string inputPdfPath = "sample.pdf";
-        string azureConnectionString = "UseDevelopmentStorage=true"; // placeholder – not used by the stub
-        string containerName = "pdf-images";
-
-        // Ensure a PDF exists – create a minimal one if it does not.
-        if (!File.Exists(inputPdfPath))
+        // Validate input file.
+        if (!File.Exists(pdfPath))
         {
-            var doc = new Document();
-            doc.Pages.Add(); // add a blank page
-            doc.Save(inputPdfPath);
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            return;
         }
 
-        // Initialize Azure Blob container client (stub works without the real SDK)
-        var blobServiceClient = new Azure.Storage.Blobs.BlobServiceClient(azureConnectionString);
-        var containerClient = blobServiceClient.GetBlobContainerClient(containerName);
+        // Initialize Blob container client.
+        BlobContainerClient containerClient = new BlobContainerClient(azureConnectionString, containerName);
         containerClient.CreateIfNotExists();
 
-        // Extract images from PDF
+        // Use Aspose.Pdf.Facades.PdfExtractor to extract images.
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            extractor.BindPdf(inputPdfPath);
+            // Bind the PDF file to the extractor.
+            extractor.BindPdf(pdfPath);
+
+            // Perform the image extraction operation.
             extractor.ExtractImage();
 
             int imageIndex = 1;
+            // Iterate over all extracted images.
             while (extractor.HasNextImage())
             {
+                // Store the current image in a memory stream.
                 using (MemoryStream imageStream = new MemoryStream())
                 {
+                    // Save the image using the overload that does not require ImageFormat.
+                    // The image will be saved in its original format.
                     extractor.GetNextImage(imageStream);
-                    imageStream.Position = 0;
+                    imageStream.Position = 0; // Reset stream position before upload.
 
+                    // Define a unique blob name for each image. We keep the original
+                    // extension if possible; otherwise default to .png.
                     string blobName = $"image-{imageIndex}.png";
-                    var blobClient = containerClient.GetBlobClient(blobName);
+
+                    // Get a reference to the blob and upload the image.
+                    BlobClient blobClient = containerClient.GetBlobClient(blobName);
                     blobClient.Upload(imageStream, overwrite: true);
                 }
+
                 imageIndex++;
             }
         }
 
         Console.WriteLine("Image extraction and upload completed.");
+    }
+
+    // Example usage.
+    static void Main()
+    {
+        string pdfFilePath = "sample.pdf";
+        string azureConnStr = "DefaultEndpointsProtocol=https;AccountName=youraccount;AccountKey=yourkey;EndpointSuffix=core.windows.net";
+        string container = "pdf-images";
+
+        ExtractImagesToBlob(pdfFilePath, azureConnStr, container);
     }
 }

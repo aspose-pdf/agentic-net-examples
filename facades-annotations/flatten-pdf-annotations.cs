@@ -1,14 +1,13 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "flattened.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "flattened_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,13 +15,14 @@ class Program
             return;
         }
 
+        // Flatten all annotations using PdfAnnotationEditor
         using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            editor.BindPdf(inputPath);
-            editor.FlatteningAnnotations();
-            editor.Save(outputPath);
+            editor.BindPdf(inputPath);          // Load the PDF
+            editor.FlatteningAnnotations();    // Flatten all annotations
+            editor.Save(outputPath);            // Save the result
         }
 
-        Console.WriteLine($"Annotations flattened and saved to '{outputPath}'.");
+        Console.WriteLine($"Flattened PDF saved to '{outputPath}'.");
     }
 }

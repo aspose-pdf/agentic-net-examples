@@ -21,16 +21,15 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf;` (85/85 files) ← category-specific
-- `using Aspose.Pdf.Text;` (29/85 files)
-- `using Aspose.Pdf.Drawing;` (5/85 files)
-- `using Aspose.Pdf.Facades;` (1/85 files)
-- `using Aspose.Pdf.Operators;` (1/85 files)
-- `using System;` (84/85 files)
-- `using System.Runtime.InteropServices;` (21/85 files)
-- `using System.IO;` (20/85 files)
-- `using System.Collections.Generic;` (5/85 files)
-- `using System.Linq;` (2/85 files)
+- `using Aspose.Pdf;` (99/99 files) ← category-specific
+- `using Aspose.Pdf.Text;` (23/99 files)
+- `using Aspose.Pdf.Annotations;` (2/99 files)
+- `using Aspose.Pdf.Facades;` (2/99 files)
+- `using Aspose.Pdf.Drawing;` (1/99 files)
+- `using System;` (99/99 files)
+- `using System.IO;` (97/99 files)
+- `using System.Collections.Generic;` (6/99 files)
+- `using System.Linq;` (2/99 files)
 
 ## Common Code Pattern
 
@@ -48,40 +47,40 @@ using (Document doc = new Document("input.pdf"))
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [add-bates-numbering-increment-5](./add-bates-numbering-increment-5.cs) | Add Bates Numbering with Increment of 5 to PDFs | `Document`, `AddBatesNumbering`, `BatesNArtifact` | Demonstrates how to batch‑process PDF files and add Bates numbering starting at 5 (increment of 5... |
-| [add-bates-numbering-stamp](./add-bates-numbering-stamp.cs) | Add Bates Numbering Stamp to PDF Pages | `Document`, `AddBatesNumbering`, `BatesNArtifact` | Demonstrates how to add Bates numbering to each page of a PDF, starting at 1000 and using a dash ... |
-| [add-bates-numbering](./add-bates-numbering.cs) | Add Bates Numbering with Prefix and Suffix to PDF | `Document`, `Page`, `TextFragment` | Creates a sample PDF and adds Bates numbering with a custom prefix "DOC" and suffix "-2026" to ea... |
-| [add-bates-numbering__v2](./add-bates-numbering__v2.cs) | Add Alphanumeric Bates Numbering to PDF | `Document`, `AddBatesNumbering`, `BatesNArtifact` | Demonstrates how to add Bates numbering with a custom alphanumeric prefix to each page of a PDF d... |
-| [add-bates-numbering__v3](./add-bates-numbering__v3.cs) | Add Bates Numbering to PDF Pages | `Document`, `Page`, `AddBatesNumbering` | Demonstrates how to add year‑based Bates numbering (e.g., 2026‑0001) to each page of a PDF using ... |
-| [add-blank-page-with-label](./add-blank-page-with-label.cs) | Add Blank Page with Custom Roman Numeral Page Label | `Document`, `Page`, `PageLabel` | Shows how to insert a blank page at the start of a PDF and assign a custom page label using lower... |
-| [add-bold-uppercase-header](./add-bold-uppercase-header.cs) | Add Bold Uppercase Header to PDF Pages | `Document`, `Page`, `HeaderFooter` | Demonstrates how to add a bold, uppercase header to each page of a PDF using Aspose.Pdf for .NET. |
-| [add-centered-page-numbers](./add-centered-page-numbers.cs) | Add Centered Page Numbers to PDF | `Document`, `PageNumberStamp`, `AddStamp` | Demonstrates how to add a centered page number stamp starting at 1 to every page of a PDF document. |
-| [add-curved-text-watermark](./add-curved-text-watermark.cs) | Add Curved Text Watermark to PDF | `Document`, `Page`, `TextFragment` | Demonstrates how to add a text watermark that follows a curved path using WatermarkArtifact. |
-| [add-custom-page-numbers](./add-custom-page-numbers.cs) | Add Custom Page Numbers to PDF | `Document`, `Page`, `PageNumberStamp` | Demonstrates how to add a "Page X of Y" footer to each page of a PDF using Aspose.Pdf's PageNumbe... |
-| [add-custom-page-numbers__v2](./add-custom-page-numbers__v2.cs) | Add Custom Page Numbers with Separator | `Document`, `PageNumber`, `PageNumberStamp` | Demonstrates how to insert page numbers in the format current/total on each page of a PDF. |
-| [add-custom-prefix-page-numbers](./add-custom-prefix-page-numbers.cs) | Add Custom Prefix Page Numbers to PDF | `Document`, `PageNumberStamp`, `AddStamp` | Demonstrates how to add page numbers with a custom "Chapter" prefix to each page of a PDF using A... |
-| [add-diagonal-text-watermark](./add-diagonal-text-watermark.cs) | Add Diagonal Repeating Text Watermark to PDF | `Document`, `Page`, `WatermarkArtifact` | Demonstrates how to add a diagonal repeating text watermark to each page of a PDF using Watermark... |
-| [add-dynamic-year-watermark](./add-dynamic-year-watermark.cs) | Add Dynamic Year Watermark to PDF | `Document`, `Page`, `WatermarkArtifact` | Demonstrates adding a text watermark that includes the current year to a PDF page using Aspose.Pdf. |
-| [add-generation-date-footer](./add-generation-date-footer.cs) | Add Generation Date Footer to PDF Pages | `Document`, `Page`, `FooterArtifact` | Demonstrates how to add a text footer with the current generation date to each page of a PDF usin... |
-| [add-header-margininfo](./add-header-margininfo.cs) | Add Header to First PDF Page Using MarginInfo | `Document`, `Page`, `HeaderFooter` | Demonstrates how to add a text header to the first page of a PDF and configure its margins using ... |
-| [add-html-header-first-three-pages](./add-html-header-first-three-pages.cs) | Add HTML Header with CSS to First Three PDF Pages | `Document`, `Page`, `HeaderFooter` | Demonstrates how to add an HTML header with embedded CSS styling to the first three pages of a PD... |
-| [add-light-gray-background](./add-light-gray-background.cs) | Add Light Gray Background to All PDF Pages | `Document`, `Background`, `FromGray` | Demonstrates how to set a light gray background color for every page in a PDF using Aspose.PDF. |
-| [add-multiple-empty-pages](./add-multiple-empty-pages.cs) | Add Multiple Empty Pages Sequentially | `Document`, `Add` | Demonstrates how to add several empty pages to a PDF by iterating over a list of page counts. |
-| [add-odd-page-numbers](./add-odd-page-numbers.cs) | Add Page Numbers to Odd Pages in PDF | `Document`, `Page`, `PageNumberStamp` | Demonstrates how to insert page numbers only on odd-numbered pages of a PDF using Aspose.Pdf for ... |
-| [add-page-numbers-custom-font](./add-page-numbers-custom-font.cs) | Add Page Numbers with Custom Font to PDF | `Document`, `Page`, `PageNumberStamp` | Demonstrates how to insert page numbers using Arial 14pt font on each page of a PDF. |
-| [add-page-numbers-even-pages](./add-page-numbers-even-pages.cs) | Add Page Numbers to Even Pages in PDF | `Document`, `Page`, `PageNumberStamp` | Demonstrates how to insert page numbers only on even-numbered pages of a PDF using a loop. |
-| [add-page-numbers-leading-zeros](./add-page-numbers-leading-zeros.cs) | Add Page Numbers with Leading Zeros to PDF | `Document`, `Page`, `TextStamp` | Demonstrates how to insert page numbers padded with a leading zero for single‑digit pages in a PD... |
-| [add-roman-numeral-page-numbers](./add-roman-numeral-page-numbers.cs) | Add Roman Numeral Page Numbers to Introductory Pages | `Document`, `PageNumberStamp`, `NumberingStyle` | Demonstrates how to add page numbers in Roman numerals to the first pages of a PDF using Aspose.Pdf. |
-| [add-transparent-separator-page](./add-transparent-separator-page.cs) | Add Transparent Separator Page to PDF | `Document`, `Insert`, `Background` | Demonstrates inserting an empty page with a transparent background between existing pages in a PDF. |
-| [adjust-bleedbox](./adjust-bleedbox.cs) | Adjust BleedBox of PDF Pages for Printer Specifications | `Document`, `BleedBox`, `Rectangle` | Loads a PDF, expands each page's BleedBox by a specified margin, and saves the updated document. |
-| [alternate-page-background](./alternate-page-background.cs) | Alternate Page Background Colors in PDF | `Document`, `Page`, `Color` | Demonstrates how to set alternating background colors (LightGray and White) for each page in a PD... |
-| [append-a4-page](./append-a4-page.cs) | Append an Empty A4 Page to PDF | `Document`, `Add`, `PageInfo` | Loads an existing PDF, appends an empty A4‑sized page at the end, and saves the result. |
-| [append-page](./append-page.cs) | Append a Page from Another PDF to Existing PDF | `Document`, `Merge`, `TextFragment` | Demonstrates loading two PDFs, appending a page from the second PDF to the first, and saving the ... |
-| [batch-resize-pages](./batch-resize-pages.cs) | Batch Resize PDF Pages to Fixed Width | `Document`, `SetPageSize` | Demonstrates how to resize all pages of a PDF to a fixed width of 800 points while preserving the... |
-| ... | | | *and 55 more files* |
+| [add-alphanumeric-bates-numbering-to-pdf-pages](./add-alphanumeric-bates-numbering-to-pdf-pages.cs) | Add Alphanumeric Bates Numbering to PDF Pages | `Document`, `AddBatesNumbering`, `HorizontalAlignment` | Demonstrates how to add Bates numbering with a custom alphanumeric prefix to each page of a PDF u... |
+| [add-bates-numbering-to-pdf-pages](./add-bates-numbering-to-pdf-pages.cs) | Add Bates Numbering to PDF Pages | `Document`, `Save`, `AddBatesNumbering` | Shows how to insert year‑based Bates numbers in the format "2026-####" on every page of a PDF usi... |
+| [add-blank-front-matter-page-with-custom-label](./add-blank-front-matter-page-with-custom-label.cs) | Add Blank Front‑Matter Page with Custom Label | `Document`, `Save`, `Insert` | Shows how to insert a blank page at the start of a PDF and assign a custom page label prefix "i" ... |
+| [add-bleedbox-extend-cropbox](./add-bleedbox-extend-cropbox.cs) | Add BleedBox Extending 5 Points Beyond CropBox | `Document`, `Page`, `Rectangle` | Loads a PDF, iterates through each page, creates a BleedBox that extends 5 points beyond the exis... |
+| [add-bold-uppercase-header-to-pdf-pages](./add-bold-uppercase-header-to-pdf-pages.cs) | Add Bold Uppercase Header to Each PDF Page | `Document`, `Page`, `HeaderFooter` | Demonstrates how to add a centered bold uppercase header to every page of an existing PDF using A... |
+| [add-centered-page-numbers-to-pdf](./add-centered-page-numbers-to-pdf.cs) | Add Centered Page Numbers to PDF | `Document`, `Page`, `PageNumberStamp` | Shows how to insert a centered page number stamp on every page of a PDF document using Aspose.Pdf. |
+| [add-chapter-page-numbers-to-pdf](./add-chapter-page-numbers-to-pdf.cs) | Add Chapter Page Numbers to PDF | `Document`, `Page`, `TextFragment` | Shows how to iterate through each page of a PDF and add a footer with a custom "Chapter" prefix a... |
+| [add-diagonal-text-watermark-to-pdf-pages](./add-diagonal-text-watermark-to-pdf-pages.cs) | Add Diagonal Text Watermark to PDF Pages | `Document`, `TextStamp`, `FontRepository` | Demonstrates how to apply a semi‑transparent diagonal text watermark to every page of a PDF using... |
+| [add-generation-date-footer-to-pdf-pages](./add-generation-date-footer-to-pdf-pages.cs) | Add Generation Date Footer to PDF Pages | `Document`, `Page`, `FooterArtifact` | Shows how to insert a text footer with the current date on every page of a PDF document using Asp... |
+| [add-header-text-to-first-pdf-page](./add-header-text-to-first-pdf-page.cs) | Add Header Text to First PDF Page | `Document`, `HeaderFooter`, `MarginInfo` | Demonstrates how to add a text header to the first page of a PDF using Aspose.Pdf's HeaderFooter ... |
+| [add-html-header-to-first-three-pdf-pages](./add-html-header-to-first-three-pdf-pages.cs) | Add HTML Header with CSS to First Three PDF Pages | `Document`, `Page`, `HeaderFooter` | Shows how to insert an HTML‑styled header into the first three pages of a PDF document using Aspo... |
+| [add-image-footer-30-opacity-pdf](./add-image-footer-30-opacity-pdf.cs) | Add Image Footer with 30% Opacity to All PDF Pages | `Document`, `Save`, `Page` | Demonstrates how to add a semi‑transparent image footer to every page of a PDF using Aspose.Pdf. |
+| [add-image-watermark-20-opacity-pdf-pages](./add-image-watermark-20-opacity-pdf-pages.cs) | Add Image Watermark with 20% Opacity to PDF Pages | `Document`, `Page`, `WatermarkArtifact` | Shows how to apply an image watermark with 20% opacity to every page of a PDF document using Aspo... |
+| [add-leading-zero-page-numbers](./add-leading-zero-page-numbers.cs) | Add Leading Zero Page Numbers to PDF | `Document`, `PageNumberStamp`, `FindFont` | Shows how to insert page numbers on every page of a PDF using Aspose.Pdf, formatting single‑digit... |
+| [add-left-aligned-header-logo-to-pdf-pages](./add-left-aligned-header-logo-to-pdf-pages.cs) | Add Left-Aligned Header Logo to PDF Pages | `Document`, `Page`, `ImageStamp` | Loads an existing PDF, creates an ImageStamp from a logo image, adds it as a left‑aligned header ... |
+| [add-lightgray-background-to-pdf-pages](./add-lightgray-background-to-pdf-pages.cs) | Add LightGray Background to All PDF Pages | `Document`, `Page`, `Color` | Demonstrates loading a PDF with Aspose.Pdf, applying a LightGray background color to each page, a... |
+| [add-multiple-empty-pages](./add-multiple-empty-pages.cs) | Add Multiple Empty Pages Sequentially | `Document`, `Add`, `Save` | Demonstrates how to add a series of empty pages to a PDF by iterating over a list of page counts,... |
+| [add-page-numbers-arial-font](./add-page-numbers-arial-font.cs) | Add Page Numbers with Arial Font to PDF | `Document`, `Page`, `PageNumberStamp` | Demonstrates how to insert sequential page numbers on every page of a PDF using Aspose.Pdf, with ... |
+| [add-page-numbers-to-even-pdf-pages](./add-page-numbers-to-even-pdf-pages.cs) | Add Page Numbers to Even PDF Pages | `Document`, `Page`, `PageNumberStamp` | Demonstrates loading a PDF with Aspose.Pdf, iterating over even-numbered pages, and stamping each... |
+| [add-page-numbers-to-odd-pdf-pages](./add-page-numbers-to-odd-pdf-pages.cs) | Add Page Numbers to Odd PDF Pages | `Document`, `PageNumberStamp`, `Page` | Shows how to insert page numbers only on odd-numbered pages of a PDF using Aspose.Pdf. |
+| [add-page-numbers-to-pdf](./add-page-numbers-to-pdf.cs) | Add Page Numbers in "Page X of Y" Format to PDF | `Document`, `Page`, `PageNumberStamp` | Demonstrates how to insert page numbers with a custom "Page X of Y" format on every page of a PDF... |
+| [add-repeating-image-watermark-to-pdf-pages](./add-repeating-image-watermark-to-pdf-pages.cs) | Add Repeating Image Watermark to PDF Pages | `Document`, `ImageStamp`, `Page` | Demonstrates how to tile a semi‑transparent image stamp across every page of a PDF, creating a gr... |
+| [add-rotated-image-watermark-to-pdf-pages](./add-rotated-image-watermark-to-pdf-pages.cs) | Add Rotated Image Watermark to PDF Pages | `Document`, `ImageStamp`, `AddStamp` | Demonstrates how to add a PNG watermark image to each page of a PDF, scaling it to half the page ... |
+| [add-scaled-image-footer-to-pdf-pages](./add-scaled-image-footer-to-pdf-pages.cs) | Add Scaled Image Footer to Each PDF Page | `Document`, `Page`, `Rectangle` | Shows how to load a PDF with Aspose.Pdf, iterate over all pages, and insert a proportionally scal... |
+| [add-semi-transparent-text-watermark](./add-semi-transparent-text-watermark.cs) | Add Semi-Transparent Text Watermark with Outline to PDF Page... | `Document`, `Save`, `AddStamp` | Demonstrates how to add a semi‑transparent text watermark with a colored outline to every page of... |
+| [add-superscript-page-numbers-to-pdf](./add-superscript-page-numbers-to-pdf.cs) | Add Superscript-Style Page Numbers to PDF | `Document`, `Save`, `AddStamp` | Demonstrates how to insert page numbers at the bottom-center of each PDF page using a PageNumberS... |
+| [add-text-watermark-to-pdf-pages](./add-text-watermark-to-pdf-pages.cs) | Add Text Watermark to PDF Pages | `Document`, `Page`, `WatermarkArtifact` | Demonstrates how to add a semi‑transparent text watermark to each page of a PDF using Aspose.Pdf'... |
+| [add-year-watermark-to-pdf-pages](./add-year-watermark-to-pdf-pages.cs) | Add Year Watermark to PDF Pages | `Document`, `TextStamp`, `FontRepository` | Demonstrates how to add a semi‑transparent text watermark that includes the current year to every... |
+| [adjust-pdf-bleedbox-for-printer-specs](./adjust-pdf-bleedbox-for-printer-specs.cs) | Adjust PDF BleedBox for Printer Specifications | `Document`, `Page`, `Rectangle` | Loads a PDF, reads each page's BleedBox (or falls back to MediaBox), expands the box by a fixed o... |
+| [alternating-page-background-colors](./alternating-page-background-colors.cs) | Set Alternating Page Background Colors in PDF | `Document`, `Page`, `Color` | Shows how to load a PDF with Aspose.Pdf, iterate through its pages, assign LightGray to odd pages... |
+| ... | | | *and 69 more files* |
 
 ## Category Statistics
-- Total examples: 85
+- Total examples: 99
 
 ## Category-Specific Tips
 
@@ -121,5 +120,5 @@ using (Document doc = new Document("input.pdf"))
 - Review code examples in this folder for pages patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-04-07 | Run: `20260407_212044_4ffbd1`
+Updated: 2026-04-10 | Run: `20260410_121416_bd35e2`
 <!-- AUTOGENERATED:END -->

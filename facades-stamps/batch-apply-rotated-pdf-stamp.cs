@@ -6,43 +6,61 @@ class Program
 {
     static void Main()
     {
-        string sourceDirectory = @"\\networkshare\pdfs";
-        string stampPdfPath = @"\\networkshare\stamp\stamp.pdf";
+        // Network share folder containing PDFs to be stamped
+        const string sourceFolder = @"\\networkshare\pdfs";
 
-        if (!Directory.Exists(sourceDirectory))
+        // PDF file that provides the page to be used as a stamp
+        const string stampPdfPath = @"\\networkshare\stamp\stamp.pdf";
+        const int stampPageNumber = 1;          // page number in the stamp PDF
+        const float rotationAngle = 45f;        // rotation angle in degrees
+
+        // Validate paths
+        if (!Directory.Exists(sourceFolder))
         {
-            Console.Error.WriteLine("Source directory not found: " + sourceDirectory);
+            Console.Error.WriteLine($"Source folder not found: {sourceFolder}");
+            return;
+        }
+        if (!File.Exists(stampPdfPath))
+        {
+            Console.Error.WriteLine($"Stamp PDF not found: {stampPdfPath}");
             return;
         }
 
-        // Change current directory so that Save can use a simple filename
-        Directory.SetCurrentDirectory(sourceDirectory);
+        // Get all PDF files in the network share (non‑recursive)
+        string[] pdfFiles = Directory.GetFiles(sourceFolder, "*.pdf", SearchOption.TopDirectoryOnly);
 
-        string[] pdfFiles = Directory.GetFiles(sourceDirectory, "*.pdf");
-        foreach (string pdfFilePath in pdfFiles)
+        foreach (string inputPath in pdfFiles)
         {
-            string outputFileName = Path.GetFileNameWithoutExtension(pdfFilePath) + "_stamped.pdf";
+            // Build output file name (original name with "_stamped" suffix)
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(inputPath);
+            string outputPath = Path.Combine(sourceFolder, $"{fileNameWithoutExt}_stamped.pdf");
 
-            using (PdfFileStamp fileStamp = new PdfFileStamp())
-            {
-                // Load the target PDF
-                fileStamp.BindPdf(pdfFilePath);
+            // Initialize the PdfFileStamp facade (do NOT wrap in using – it is not IDisposable)
+            PdfFileStamp fileStamp = new PdfFileStamp();
 
-                // Prepare the stamp (first page of the stamp PDF)
-                Stamp stamp = new Stamp();
-                stamp.BindPdf(stampPdfPath, 1);
-                stamp.IsBackground = true;
-                stamp.Rotation = 45.0f; // rotate 45 degrees
+            // Bind the source PDF that will receive the stamp
+            fileStamp.BindPdf(inputPath);
 
-                // Apply the stamp to all pages of the target PDF
-                fileStamp.AddStamp(stamp);
+            // Create a stamp based on a page from another PDF
+            Stamp stamp = new Stamp();
+            stamp.BindPdf(stampPdfPath, stampPageNumber);
 
-                // Save using only the filename (current directory is sourceDirectory)
-                fileStamp.Save(outputFileName);
-                fileStamp.Close();
-            }
+            // Apply rotation (arbitrary angle)
+            stamp.Rotation = rotationAngle;
 
-            Console.WriteLine("Stamped: " + outputFileName);
+            // Place the stamp behind page content (optional)
+            stamp.IsBackground = true;
+
+            // Add the stamp to the document (null Pages means all pages)
+            fileStamp.AddStamp(stamp);
+
+            // Save the stamped PDF to the output path
+            fileStamp.Save(outputPath);
+
+            // Close the facade to release resources
+            fileStamp.Close();
         }
+
+        Console.WriteLine("Batch stamping completed.");
     }
 }

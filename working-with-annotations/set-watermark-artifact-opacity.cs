@@ -1,7 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades; // Facades namespace included as requested
+using Aspose.Pdf; // Core Aspose.Pdf namespace
 
 class Program
 {
@@ -16,30 +15,30 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                Page page = doc.Pages[pageIndex];
+                Page page = doc.Pages[i];
 
-                // Enumerate artifacts on the current page
+                // Iterate through the artifacts on the page
                 foreach (Artifact artifact in page.Artifacts)
                 {
-                    // Identify watermark artifacts by their subtype
-                    if (artifact.Subtype == Artifact.ArtifactSubtype.Watermark)
+                    // Identify WatermarkArtifact instances
+                    if (artifact is WatermarkArtifact watermark)
                     {
-                        // Set opacity to 50 % (range 0..1)
-                        artifact.Opacity = 0.5;
+                        // Set opacity to 50%
+                        watermark.Opacity = 0.5;
                     }
                 }
             }
 
-            // Save the modified document (PDF format)
+            // Save the modified PDF (lifecycle rule: save inside using block)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"All watermark artifacts updated to 50% opacity and saved as '{outputPath}'.");
+        Console.WriteLine($"Watermark artifacts opacity updated and saved to '{outputPath}'.");
     }
 }

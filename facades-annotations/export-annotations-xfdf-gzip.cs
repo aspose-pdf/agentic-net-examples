@@ -2,37 +2,48 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
-class Program
+class ExportAnnotationsCompressed
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "annotations.xfdf.gz";
+        // Input PDF file containing annotations
+        const string inputPdfPath = "input.pdf";
+        // Output compressed XFDF file (GZip format)
+        const string outputGzPath = "annotations.xfdf.gz";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine("Input file not found: " + inputPath);
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            using (MemoryStream xfdfStream = new MemoryStream())
+            // Initialize the annotation editor and bind it to the loaded document
+            using (PdfAnnotationEditor annotEditor = new PdfAnnotationEditor())
             {
-                doc.ExportAnnotationsToXfdf(xfdfStream);
-                xfdfStream.Position = 0;
+                annotEditor.BindPdf(pdfDoc);
 
-                using (FileStream fileStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                // Export all annotations to an in‑memory XFDF stream
+                using (MemoryStream xfdfStream = new MemoryStream())
                 {
-                    using (GZipStream gzipStream = new GZipStream(fileStream, CompressionMode.Compress))
+                    annotEditor.ExportAnnotationsToXfdf(xfdfStream);
+                    // Reset stream position before reading
+                    xfdfStream.Position = 0;
+
+                    // Compress the XFDF data using GZip and write to the output file
+                    using (FileStream fileOut = new FileStream(outputGzPath, FileMode.Create, FileAccess.Write))
+                    using (GZipStream gzipOut = new GZipStream(fileOut, CompressionLevel.Optimal))
                     {
-                        xfdfStream.CopyTo(gzipStream);
+                        xfdfStream.CopyTo(gzipOut);
                     }
                 }
             }
         }
 
-        Console.WriteLine("Annotations exported and compressed to '" + outputPath + "'.");
+        Console.WriteLine($"Annotations exported and compressed to '{outputGzPath}'.");
     }
 }
