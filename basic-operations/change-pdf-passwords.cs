@@ -6,30 +6,41 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "protected.pdf";
-        const string outputPath = "updated.pdf";
-        const string ownerPassword = "owner123";
+        const string inputPath = "protected_input.pdf";
+        const string outputPath = "protected_output.pdf";
+
+        // Existing owner password (must have owner rights to change passwords)
+        const string currentOwnerPassword = "owner123";
+
+        // New passwords to set
         const string newUserPassword = "newUser456";
         const string newOwnerPassword = "newOwner789";
 
+        // Verify that the input file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         try
         {
-            using (Document doc = new Document(inputPath, ownerPassword))
+            // Open the password‑protected PDF using the current owner password
+            using (Document doc = new Document(inputPath, currentOwnerPassword))
             {
-                // Change the user and owner passwords
-                doc.ChangePasswords(ownerPassword, newUserPassword, newOwnerPassword);
+                // Change the passwords: provide the current owner password,
+                // then the new user password and the new owner password.
+                doc.ChangePasswords(currentOwnerPassword, newUserPassword, newOwnerPassword);
 
-                // Save the PDF with the new credentials
+                // Save the PDF with the updated credentials
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Passwords updated and saved to '{outputPath}'.");
+            Console.WriteLine($"PDF passwords updated and saved to '{outputPath}'.");
+        }
+        catch (InvalidPasswordException ex)
+        {
+            Console.Error.WriteLine($"Invalid password: {ex.Message}");
         }
         catch (Exception ex)
         {
