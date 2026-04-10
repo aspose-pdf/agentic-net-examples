@@ -1,7 +1,7 @@
 {
-  "category": "working_with_attachments",
+  "category": "working-with-attachments",
   "nuget_version": "26.3.0",
-  "last_updated": "2026-04-07T11:41:21Z",
+  "last_updated": "2026-04-10T07:19:55Z",
   "examples": {
     "add-file-attachment-to-pdf": {
       "title": "Add File Attachment to PDF Using FileSpecification",
@@ -24,7 +24,7 @@
         "Aspose.Pdf.Page.Annotations.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "embed-file-attachment-in-pdf": {
@@ -48,7 +48,7 @@
         "Aspose.Pdf.Annotations.FileIcon"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "add-multiple-attachments-to-pdf": {
@@ -69,7 +69,7 @@
         "Aspose.Pdf.Document.EmbeddedFiles.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "set-attachment-description-and-mime-type": {
@@ -89,7 +89,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "save-pdf-with-attachments": {
@@ -108,7 +108,7 @@
         "Aspose.Pdf.FileSpecification"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "list-pdf-attachment-names-sizes": {
@@ -128,7 +128,7 @@
         "Aspose.Pdf.FileSpecification"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "extract-specific-attachment-from-pdf": {
@@ -148,7 +148,7 @@
         "Aspose.Pdf.EmbeddedFilesCollection.FindByName"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "extract-pdf-attachments-to-subfolders": {
@@ -167,7 +167,7 @@
         "Aspose.Pdf.EmbeddedFilesCollection"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "remove-pdf-attachment-by-index": {
@@ -187,7 +187,7 @@
         "Aspose.Pdf.EmbeddedFileCollection.Delete"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "delete-pdf-attachment-by-filename": {
@@ -207,7 +207,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "extract-pdf-attachment-metadata": {
@@ -228,7 +228,7 @@
         "Aspose.Pdf.Annotations.FileAttachmentAnnotation"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "update-attachment-description-in-pdf": {
@@ -251,7 +251,7 @@
         "Aspose.Pdf.FileSpecification"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "add-attachment-to-password-protected-pdf": {
@@ -271,7 +271,7 @@
         "Aspose.Pdf.Document.EmbeddedFiles.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "extract-attachments-from-encrypted-pdf": {
@@ -292,7 +292,7 @@
         "EmbeddedFile.Save(string)"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "add-file-attachment-with-size-validation": {
@@ -315,7 +315,7 @@
         "Aspose.Pdf.Annotations.FileAttachmentAnnotation"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "batch-add-attachment-to-pdfs": {
@@ -334,7 +334,7 @@
         "Aspose.Pdf.FileSpecification"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "batch-extract-pdf-attachments-to-zip": {
@@ -353,7 +353,7 @@
         "Aspose.Pdf.FileSpecification"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "create-pdf-portfolio": {
@@ -374,7 +374,7 @@
         "Aspose.Pdf.DocumentInfo"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "add-word-document-to-pdf-portfolio": {
@@ -396,7 +396,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "insert-excel-into-pdf-portfolio": {
@@ -418,7 +418,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "embed-image-into-pdf-portfolio": {
@@ -437,7 +437,7 @@
         "Aspose.Pdf.FileSpecification"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "add-nested-pdf-to-portfolio": {
@@ -458,7 +458,7 @@
         "Aspose.Pdf.EmbeddedFiles.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "add-multiple-files-to-pdf-portfolio": {
@@ -480,7 +480,7 @@
         "Aspose.Pdf.Document.Pages.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "compress-pdf-portfolio-using-optimization": {
@@ -501,7 +501,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "extract-embedded-files-from-pdf-portfolio": {
@@ -520,7 +520,7 @@
         "Aspose.Pdf.FileSpecification"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "extract-embedded-file-by-index": {
@@ -539,7 +539,7 @@
         "Aspose.Pdf.FileSpecification"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "remove-embedded-file-from-pdf-portfolio": {
@@ -559,7 +559,7 @@
         "Aspose.Pdf.EmbeddedFile"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "delete-pdf-outline-items-by-description": {
@@ -581,7 +581,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "reorder-pdf-bookmarks": {
@@ -601,7 +601,7 @@
         "Aspose.Pdf.Annotations.GoToAction"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "apply-custom-visual-template-to-pdf-portfolio": {
@@ -629,7 +629,7 @@
         "Aspose.Pdf.FontRepository.FindFont"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "generate-portfolio-thumbnails": {
@@ -652,30 +652,27 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
-    "merge-pdf-portfolios-preserve-attachments": {
-      "title": "Merge Two PDF Portfolios Preserving Attachments",
-      "filename": "merge-pdf-portfolios-preserve-attachments.cs",
-      "description": "Shows how to combine two PDF portfolios into a single document while retaining the embedded files and their metadata.",
+    "merge-pdf-portfolios-preserving-metadata": {
+      "title": "Merge Two PDF Portfolios Preserving Metadata",
+      "filename": "merge-pdf-portfolios-preserving-metadata.cs",
+      "description": "Shows how to combine two PDF portfolios into one document while retaining embedded files and their metadata using Aspose.Pdf.",
       "tags": [
-        "pdf-portfolio",
+        "pdf",
+        "portfolio",
         "merge",
-        "attachments",
         "metadata",
-        "aspose-pdf"
+        "attachments"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.Merge",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Collection",
-        "Aspose.Pdf.FileSpecification"
+        "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "create-pdf-portfolio-with-embedded-files": {
@@ -696,7 +693,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "flatten-pdf-portfolio": {
@@ -716,7 +713,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "read-pdf-metadata-attachment-count": {
@@ -735,7 +732,7 @@
         "Aspose.Pdf.DocumentInfo"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "generate-csv-report-of-pdf-attachments": {
@@ -753,7 +750,7 @@
         "Aspose.Pdf.Document"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "add-in-memory-attachment-to-pdf": {
@@ -773,7 +770,7 @@
         "Aspose.Pdf.FileSpecification"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "add-remote-file-attachment-to-pdf": {
@@ -796,7 +793,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "add-file-attachment-to-pdf-with-error-handling": {
@@ -819,28 +816,26 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
-    "validate-attachment-mime-type-and-add-to-pdf": {
+    "validate-attachment-mime-type-add-to-pdf": {
       "title": "Validate Attachment MIME Type and Add to PDF",
-      "filename": "validate-attachment-mime-type-and-add-to-pdf.cs",
-      "description": "The example checks that an attachment's MIME type matches its file extension and, if supported, adds the file as a document attachment to a PDF using Aspose.Pdf.",
+      "filename": "validate-attachment-mime-type-add-to-pdf.cs",
+      "description": "Demonstrates how to verify that an attachment's MIME type matches its file extension before embedding it into a PDF using Aspose.Pdf.",
       "tags": [
         "attachment",
         "mime-type",
-        "validation",
         "pdf",
-        "aspose"
+        "validation",
+        "aspose-pdf"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfContentEditor",
-        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfContentEditor.AddDocumentAttachment",
-        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "measure-attachment-performance": {
@@ -862,30 +857,27 @@
         "Aspose.Pdf.EmbeddedFilesCollection.Delete"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "embed-attachment-metadata-into-pdf": {
-      "title": "Embed Attachment Metadata into PDF Document Information",
+      "title": "Embed Attachment and Metadata into PDF",
       "filename": "embed-attachment-metadata-into-pdf.cs",
-      "description": "Shows how to add a file attachment to a PDF with PdfContentEditor and store custom attachment metadata in the document information dictionary.",
+      "description": "Shows how to add a file attachment to a PDF and store attachment metadata in the document information dictionary using Aspose.Pdf save options.",
       "tags": [
         "attachment",
         "metadata",
         "pdf",
         "aspose.pdf",
-        "document-info"
+        "save-options"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfContentEditor",
-        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfContentEditor.AddDocumentAttachment",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.DocumentInfo.Add"
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.PdfSaveOptions"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "add-unicode-file-attachment-to-pdf": {
@@ -911,7 +903,7 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "extract-pdf-attachments-sha256-hash": {
@@ -930,7 +922,7 @@
         "Aspose.Pdf.EmbeddedFile"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "add-text-watermark-to-pdf-pages": {
@@ -953,7 +945,7 @@
         "Aspose.Pdf.VerticalAlignment"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "add-file-attachment-with-retry": {
@@ -977,7 +969,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "extract-embedded-files-from-pdfs-in-parallel": {
@@ -997,7 +989,7 @@
         "Document.EmbeddedFiles"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "verify-pdf-size-after-attachment": {
@@ -1020,7 +1012,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "test-attachment-removal-updates-count": {
@@ -1039,7 +1031,7 @@
         "Aspose.Pdf.AI.ThreadMessageResponse"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     },
     "embed-xml-metadata-hidden-attachment": {
@@ -1062,7 +1054,7 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T11:41:21Z",
+      "generated_at": "2026-04-10T07:19:55Z",
       "status": "verified"
     }
   }

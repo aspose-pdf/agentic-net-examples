@@ -1,6 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Facades; // Added namespace for PdfFileInfo
 
 class Program
 {
@@ -8,16 +9,20 @@ class Program
     {
         const string inputPath = "sample.pdf";
 
+        // Ensure the PDF file exists – create a minimal one if it does not.
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine("File not found: " + inputPath);
-            return;
+            var doc = new Document();
+            doc.Info.Creator = "GeneratedByProgram"; // set a known creator value
+            doc.Pages.Add(); // add a blank page so the file is valid
+            doc.Save(inputPath);
         }
 
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
-        {
-            string creator = pdfInfo.Creator;
-            Console.WriteLine("Creator: " + creator);
-        }
+        // Use PdfFileInfo (from Aspose.Pdf.Facades) to read the Creator metadata without loading the whole document.
+        PdfFileInfo pdfInfo = new PdfFileInfo(inputPath);
+        string creator = pdfInfo.Creator;
+
+        // Example usage: output the value
+        Console.WriteLine($"Creator: {creator}");
     }
 }

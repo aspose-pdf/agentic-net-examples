@@ -1,28 +1,29 @@
 {
   "category": "stamping",
   "nuget_version": "26.3.0",
-  "last_updated": "2026-04-07T16:08:55Z",
+  "last_updated": "2026-04-10T07:17:48Z",
   "examples": {
     "add-semi-transparent-logo-stamp-to-first-pdf-page": {
       "title": "Add Semi-Transparent Logo Stamp to First PDF Page",
       "filename": "add-semi-transparent-logo-stamp-to-first-pdf-page.cs",
-      "description": "Demonstrates loading a PDF, creating an ImageStamp from a PNG logo, setting its opacity and alignment, and adding it to the first page.",
+      "description": "Shows how to load a PDF, create an image stamp from a logo, set its opacity for semi‑transparency, position it, and add it to the first page using Aspose.Pdf.",
       "tags": [
         "pdf",
         "stamp",
         "image",
         "opacity",
-        "logo"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.ImageStamp",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.HorizontalAlignment",
+        "Aspose.Pdf.VerticalAlignment",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.AddStamp"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-image-stamp-quality-opacity": {
@@ -44,7 +45,7 @@
         "Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-image-stamp-alt-text-page-3": {
@@ -65,7 +66,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "set-image-stamp-background-floatingbox-page-4": {
@@ -86,7 +87,7 @@
         "Aspose.Pdf.Image"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "apply-image-stamp-to-all-pdf-pages": {
@@ -106,7 +107,7 @@
         "Aspose.Pdf.Page.AddStamp"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "rotate-image-stamp-add-to-pdf": {
@@ -127,7 +128,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "align-image-stamp-top-right": {
@@ -149,27 +150,54 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
-    "scale-image-stamp-full-page-width": {
-      "title": "Scale Image Stamp to Full Page Width While Preserving Aspect Ratio",
-      "filename": "scale-image-stamp-full-page-width.cs",
-      "description": "Loads a PDF, adds an image stamp to each page, sets the stamp width to the page width, and lets Aspose.Pdf automatically scale the height to maintain the original aspect ratio.",
+    "scale-image-stamp-to-full-page-width": {
+      "title": "Scale Image Stamp to Full Page Width",
+      "filename": "scale-image-stamp-to-full-page-width.cs",
+      "description": "Demonstrates how to add an image stamp to each page of a PDF, scaling it to the page width while preserving its aspect ratio using Aspose.Pdf.",
       "tags": [
         "image-stamp",
         "pdf",
         "aspect-ratio",
-        "full-width",
-        "Aspose.Pdf"
+        "page-width",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.ImageStamp",
+        "Aspose.Pdf.PageInfo",
+        "Aspose.Pdf.Drawing.HorizontalAlignment",
+        "Aspose.Pdf.Drawing.VerticalAlignment",
         "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.ImageStamp"
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
+      "status": "verified"
+    },
+    "add-image-stamp-from-memory-stream": {
+      "title": "Add Image Stamp from Memory Stream to PDF",
+      "filename": "add-image-stamp-from-memory-stream.cs",
+      "description": "Demonstrates loading an image into a MemoryStream and applying it as a semi‑transparent stamp to every page of a PDF using Aspose.Pdf.",
+      "tags": [
+        "image-stamp",
+        "memory-stream",
+        "pdf",
+        "watermark",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.HorizontalAlignment",
+        "Aspose.Pdf.VerticalAlignment"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-low-quality-image-stamp-to-large-pdf": {
@@ -190,7 +218,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-opaque-image-stamp-watermark": {
@@ -212,7 +240,7 @@
         "Aspose.Pdf.Page.AddStamp"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-diagonal-image-watermark-to-pdf": {
@@ -234,7 +262,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-upside-down-image-stamp-to-pdf": {
@@ -256,7 +284,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "place-image-stamp-with-custom-coordinates": {
@@ -278,7 +306,7 @@
         "Aspose.Pdf.ImageStamp"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "apply-image-stamp-percentage-offsets": {
@@ -301,7 +329,7 @@
         "Aspose.Pdf.Page.AddStamp"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "fit-image-stamp-within-rectangle": {
@@ -324,7 +352,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-fixed-size-image-stamp-to-pdf-pages": {
@@ -346,7 +374,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-image-stamp-unicode-alt-text": {
@@ -367,29 +395,34 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-image-stamp-alt-text-pdfa1b": {
-      "title": "Add Image Stamp with Alt Text for PDF/A‑1b Output",
+      "title": "Add Image Stamp with Alt Text to PDF/A‑1b Document",
       "filename": "add-image-stamp-alt-text-pdfa1b.cs",
-      "description": "Demonstrates adding an image stamp with alternative text to each page of a PDF and converting the document to PDF/A‑1b compliance using Aspose.Pdf.",
+      "description": "Demonstrates converting a PDF to PDF/A‑1b and applying an image stamp with alternative text for accessibility.",
       "tags": [
+        "pdfa",
         "image-stamp",
-        "pdfa-1b",
         "accessibility",
-        "aspose-pdf",
+        "aspnet",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Convert",
+        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.ImageStamp",
         "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.AddStamp",
         "Aspose.Pdf.PdfFormat",
-        "Aspose.Pdf.ConvertErrorAction"
+        "Aspose.Pdf.ConvertErrorAction",
+        "Aspose.Pdf.HorizontalAlignment",
+        "Aspose.Pdf.VerticalAlignment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-image-stamp-to-encrypted-pdf": {
@@ -411,7 +444,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-image-stamp-to-signed-pdf": {
@@ -435,7 +468,7 @@
         "Aspose.Pdf.Page.AddStamp"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-image-stamp-to-pdf": {
@@ -457,7 +490,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-image-stamp-to-pdf-form": {
@@ -481,7 +514,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-image-stamp-and-flatten-annotations": {
@@ -507,36 +540,34 @@
         "Aspose.Pdf.Annotations.Annotation.Flatten"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-image-stamp-preserve-bookmarks": {
       "title": "Add Image Stamp While Preserving Bookmarks",
       "filename": "add-image-stamp-preserve-bookmarks.cs",
-      "description": "Shows how to overlay an image stamp on every page of a PDF using Aspose.Pdf, keeping existing bookmarks and the document outline unchanged.",
+      "description": "Demonstrates how to overlay an image stamp on every page of a PDF using Aspose.Pdf without affecting existing bookmarks or the document outline.",
       "tags": [
         "image-stamp",
-        "pdf",
         "bookmarks",
-        "Aspose.Pdf",
-        "watermark"
+        "outline",
+        "pdf",
+        "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.ImageStamp",
         "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.HorizontalAlignment",
-        "Aspose.Pdf.VerticalAlignment"
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-image-stamp-preserve-page-labels": {
-      "title": "Add Image Stamp While Preserving Page Labels",
+      "title": "Add Image Stamp to PDF While Preserving Page Labels",
       "filename": "add-image-stamp-preserve-page-labels.cs",
-      "description": "Demonstrates how to apply an image stamp to every page of a PDF using Aspose.Pdf without affecting existing page labels.",
+      "description": "Shows how to apply an image stamp to every page of a PDF using Aspose.Pdf and keep the existing page labels unchanged.",
       "tags": [
         "image-stamp",
         "pdf",
@@ -546,12 +577,11 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.ImageStamp",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.Page.AddStamp"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-image-stamp-preserve-xmp-metadata": {
@@ -577,7 +607,7 @@
         "Aspose.Pdf.Page.AddStamp"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-image-stamp-preserve-embedded-files": {
@@ -598,7 +628,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-image-stamp-preserve-javascript": {
@@ -619,7 +649,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-image-stamp-preserve-acroform": {
@@ -640,7 +670,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-custom-blue-text-stamp-to-first-page": {
@@ -666,7 +696,7 @@
         "Aspose.Pdf.Page.AddStamp"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-auto-adjusting-text-stamp-to-pdf": {
@@ -691,7 +721,7 @@
         "Aspose.Pdf.VerticalAlignment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-outlined-text-stamp-to-pdf": {
@@ -716,7 +746,7 @@
         "Aspose.Pdf.Page.AddStamp"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-bold-outlined-text-stamp": {
@@ -739,7 +769,7 @@
         "Aspose.Pdf.Page.AddStamp"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "align-text-stamp-bottom-left": {
@@ -763,7 +793,7 @@
         "Aspose.Pdf.Page.AddStamp"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "rotate-text-stamp-slanted-watermark": {
@@ -785,7 +815,7 @@
         "Aspose.Pdf.Page.AddStamp"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-confidential-text-stamp": {
@@ -805,7 +835,7 @@
         "Aspose.Pdf.Page.AddStamp"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-text-stamp-with-background-box": {
@@ -830,7 +860,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-multi-line-text-stamp-custom-line-spacing": {
@@ -854,7 +884,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-rtl-text-stamp-to-pdf": {
@@ -877,29 +907,31 @@
         "Page.AddStamp"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-full-page-image-watermark-to-pdf": {
       "title": "Add Full-Page Image Watermark to PDF",
       "filename": "add-full-page-image-watermark-to-pdf.cs",
-      "description": "Demonstrates how to overlay a semi‑transparent image across every page of a PDF as a background watermark using Aspose.Pdf.",
+      "description": "Shows how to place an image stamp as a full‑page background watermark on each page of a PDF using Aspose.Pdf.",
       "tags": [
         "watermark",
-        "image",
+        "image-stamp",
         "pdf",
-        "Aspose.Pdf",
-        "background"
+        "background",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Facades.ImageStamp",
+        "Aspose.Pdf.Facades.HorizontalAlignment",
+        "Aspose.Pdf.Facades.VerticalAlignment",
         "Aspose.Pdf.Page.AddStamp",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-diagonal-text-stamp-watermark": {
@@ -924,7 +956,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-background-image-stamp-to-pdf-pages": {
@@ -945,7 +977,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-faint-text-overlay-to-pdf-pages": {
@@ -968,32 +1000,34 @@
         "Aspose.Pdf.Text.VerticalAlignment"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
-    "add-rotated-page-stamp-to-pdf": {
-      "title": "Add Rotated Page Stamp to PDF Pages",
-      "filename": "add-rotated-page-stamp-to-pdf.cs",
-      "description": "Shows how to apply a page stamp rotated 90 degrees to every page of a PDF document using Aspose.Pdf.",
+    "add-rotated-text-stamp-to-pdf-pages": {
+      "title": "Add Rotated Text Stamp to PDF Pages",
+      "filename": "add-rotated-text-stamp-to-pdf-pages.cs",
+      "description": "Shows how to place a semi‑transparent red text stamp rotated 90 degrees on every page of a PDF using Aspose.Pdf.",
       "tags": [
-        "stamp",
+        "text-stamp",
         "rotation",
         "pdf",
-        "aspose",
-        "csharp"
+        "watermark",
+        "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Facades.PdfPageStamp",
-        "Aspose.Pdf.Rotation",
+        "Aspose.Pdf.Text.TextStamp",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.FontRepository",
+        "Aspose.Pdf.Color",
         "Aspose.Pdf.HorizontalAlignment",
-        "Aspose.Pdf.VerticalAlignment"
+        "Aspose.Pdf.VerticalAlignment",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-custom-sized-page-stamp": {
@@ -1015,7 +1049,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-page-stamp-to-specific-pdf-pages": {
@@ -1036,7 +1070,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "add-global-text-stamp-to-all-pdf-pages": {
@@ -1063,50 +1097,50 @@
         "Aspose.Pdf.Text.VerticalAlignment"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
-    "create-page-stamp-from-template": {
-      "title": "Create PDF Page Stamp from Template Page",
-      "filename": "create-page-stamp-from-template.cs",
-      "description": "Shows how to take a page from one PDF and use it as a stamp applied to every page of another PDF with Aspose.Pdf.",
+    "create-page-stamp-from-pdf-template": {
+      "title": "Create a Page Stamp from a PDF Template",
+      "filename": "create-page-stamp-from-pdf-template.cs",
+      "description": "Shows how to extract a page from one PDF and apply it as a stamp on another PDF using Aspose.Pdf.",
       "tags": [
         "pdf",
         "stamp",
         "template",
-        "aspose",
-        "csharp"
+        "aspose.pdf",
+        "c#"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Facades.PdfPageStamp",
+        "Aspose.Pdf.PdfPageStamp",
         "Aspose.Pdf.Page.AddStamp",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     },
     "apply-pdf-page-background-stamp": {
       "title": "Apply PDF Page as Background Stamp",
       "filename": "apply-pdf-page-background-stamp.cs",
-      "description": "Shows how to use a page from one PDF as a background stamp on every page of another PDF with Aspose.Pdf.",
+      "description": "Demonstrates how to use a page from another PDF as a background stamp and apply it to every page of a target PDF document using Aspose.Pdf.",
       "tags": [
-        "pdf",
-        "stamp",
         "background",
-        "aspose",
-        "csharp"
+        "stamp",
+        "pdf",
+        "Aspose.Pdf",
+        "page"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Facades.PdfPageStamp",
-        "Aspose.Pdf.Page.AddStamp"
+        "Aspose.Pdf.PdfPageStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-07T16:08:55Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T07:17:48Z",
       "status": "verified"
     }
   }

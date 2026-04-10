@@ -1,38 +1,39 @@
 {
-  "category": "Facades - Texts and Images",
-  "last_updated": "2026-04-01T10:08:21Z",
+  "category": "facades-texts-and-images",
+  "nuget_version": "26.3.0",
+  "last_updated": "2026-04-10T06:47:30Z",
   "examples": {
-    "add-png-image-pdf-filemend": {
-      "title": "Add PNG Image to PDF Page Using PdfFileMend",
-      "filename": "add-png-image-pdf-filemend.cs",
-      "description": "Demonstrates binding an existing PDF with PdfFileMend and inserting a PNG image onto page two at specified coordinates.",
+    "add-png-image-to-pdf-page": {
+      "title": "Add PNG Image to Specific PDF Page using PdfFileMend",
+      "filename": "add-png-image-to-pdf-page.cs",
+      "description": "Demonstrates binding an existing PDF with PdfFileMend, inserting a PNG image onto page two at given coordinates, and saving the modified document.",
       "tags": [
         "pdf",
         "image",
-        "PdfFileMend",
         "Aspose.Pdf",
-        "csharp"
+        "PdfFileMend",
+        "C#"
       ],
       "apis_used": [
-        "PdfFileMend",
-        "PdfFileMend.BindPdf",
-        "PdfFileMend.AddImage",
-        "PdfFileMend.Save"
+        "Aspose.Pdf.Facades.PdfFileMend",
+        "Aspose.Pdf.Facades.PdfFileMend.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileMend.AddImage",
+        "Aspose.Pdf.Facades.PdfFileMend.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-01T06:29:34Z",
+      "generated_at": "2026-04-10T06:47:30Z",
       "status": "verified"
     },
-    "replace-image-bmp": {
-      "title": "Replace JPEG Image on PDF Page with BMP using PdfContentEditor",
-      "filename": "replace-image-bmp.cs",
-      "description": "Demonstrates how to replace a JPEG image on the first page of a PDF with a higher‑resolution BMP file using Aspose.Pdf.Facades.PdfContentEditor.",
+    "replace-image-with-bmp": {
+      "title": "Replace Image on PDF Page with BMP",
+      "filename": "replace-image-with-bmp.cs",
+      "description": "Shows how to replace the first image on the first page of a PDF with a higher‑resolution BMP using Aspose.Pdf.Facades.PdfContentEditor.",
       "tags": [
-        "replace-image",
         "pdf",
-        "facades",
+        "image-replacement",
         "bmp",
-        "csharp"
+        "aspose.pdf",
+        "facade"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfContentEditor",
@@ -41,1005 +42,206 @@
         "Aspose.Pdf.Facades.PdfContentEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-01T06:30:04Z",
+      "generated_at": "2026-04-10T06:47:30Z",
       "status": "verified"
     },
-    "overlay-gif-onto-png": {
-      "title": "Overlay Semi-Transparent GIF onto PNG in PDF using CompositingParameters",
-      "filename": "overlay-gif-onto-png.cs",
-      "description": "Demonstrates how to overlay a semi‑transparent GIF image onto an existing PNG image on the same PDF page using PdfFileMend and CompositingParameters.",
+    "overlay-semi-transparent-gif-on-pdf": {
+      "title": "Overlay Semi-Transparent GIF on PDF Using CompositingParameters",
+      "filename": "overlay-semi-transparent-gif-on-pdf.cs",
+      "description": "Shows how to place a semi‑transparent GIF onto a specific page of an existing PDF by using PdfFileMend together with CompositingParameters and BlendMode.Normal.",
       "tags": [
-        "overlay",
+        "pdf",
         "gif",
-        "png",
+        "overlay",
         "compositing",
-        "pdf"
-      ],
-      "apis_used": [
-        "Document",
-        "PdfFileMend.AddImage",
-        "CompositingParameters",
-        "BlendMode"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-01T06:30:41Z",
-      "status": "verified"
-    },
-    "add-footer-word-wrap": {
-      "title": "Add Word‑by‑Word Wrapped Footer to PDF Pages",
-      "filename": "add-footer-word-wrap.cs",
-      "description": "Demonstrates adding a formatted text footer with automatic word‑by‑word wrapping to every page of a PDF using PdfFileStamp.",
-      "tags": [
-        "footer",
-        "formatted-text",
-        "pdf",
-        "aspdf",
-        "word-wrap"
-      ],
-      "apis_used": [
-        "PdfFileStamp",
-        "FormattedText",
-        "PdfFileStamp.AddFooter"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-01T06:34:10Z",
-      "status": "verified"
-    },
-    "add-promotional-text-pages": {
-      "title": "Add Promotional Text to Specific PDF Pages",
-      "filename": "add-promotional-text-pages.cs",
-      "description": "Demonstrates how to insert the same promotional message on pages 3, 5, and 7 of a PDF using PdfFileStamp.AddText with multiple page numbers.",
-      "tags": [
-        "pdf",
-        "text",
-        "stamp",
-        "addtext",
-        "facades"
-      ],
-      "apis_used": [
-        "PdfFileStamp",
-        "PdfFileStamp.BindPdf",
-        "PdfFileStamp.AddText",
-        "FormattedText",
-        "EncodingType"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-01T06:36:07Z",
-      "status": "verified"
-    },
-    "add-multi-line-text-page-three": {
-      "title": "Add Multi-Line Text Block with Custom Line Spacing to Page Three",
-      "filename": "add-multi-line-text-page-three.cs",
-      "description": "Demonstrates adding a left-aligned multi-line text paragraph with custom line spacing to the third page of a PDF.",
-      "tags": [
-        "text",
-        "paragraph",
-        "line-spacing",
-        "page",
-        "aspdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextParagraph",
-        "Aspose.Pdf.Text.TextBuilder",
-        "Aspose.Pdf.Text.TextParagraph.AppendLine",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-01T06:36:41Z",
-      "status": "verified"
-    },
-    "image-text-watermark": {
-      "title": "Add Image and Text Watermark to PDF",
-      "filename": "image-text-watermark.cs",
-      "description": "Demonstrates how to overlay a semi‑transparent text watermark on top of an image using Aspose.Pdf for .NET.",
-      "tags": [
-        "watermark",
-        "image",
-        "text",
-        "pdf",
-        "aspnet"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.WatermarkArtifact",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.Text.FontRepository"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-01T06:37:24Z",
-      "status": "verified"
-    },
-    "add-background-png-image": {
-      "title": "Add Background PNG Image to All PDF Pages",
-      "filename": "add-background-png-image.cs",
-      "description": "Demonstrates how to add a PNG image as a background to every page of a PDF by iterating through pages and using PdfFileMend.AddImage.",
-      "tags": [
-        "pdf",
-        "image",
-        "background",
-        "aspdf",
-        "facades"
-      ],
-      "apis_used": [
-        "PdfFileMend",
-        "PdfFileMend.AddImage",
-        "Document",
-        "Document.Pages.Count"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-01T06:37:59Z",
-      "status": "verified"
-    },
-    "add-header-image-multiple-pdfs": {
-      "title": "Add Header Image to Multiple PDFs",
-      "filename": "add-header-image-multiple-pdfs.cs",
-      "description": "Demonstrates how to iterate over a set of PDF files and add a header image to each using Aspose.Pdf.Facades.PdfFileStamp.",
-      "tags": [
-        "pdf",
-        "header",
-        "image",
-        "batch",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileStamp",
-        "Aspose.Pdf.Facades.PdfFileStamp.BindPdf",
-        "Aspose.Pdf.Facades.PdfFileStamp.AddHeader",
-        "Aspose.Pdf.Facades.PdfFileStamp.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-01T06:38:34Z",
-      "status": "verified"
-    },
-    "batch-add-company-logo": {
-      "title": "Batch Add Company Logo to PDFs",
-      "filename": "batch-add-company-logo.cs",
-      "description": "Processes all PDF files in a folder and adds a PNG logo to the top‑right corner of each page using Aspose.Pdf.",
-      "tags": [
-        "pdf",
-        "batch",
-        "image",
-        "stamp",
-        "logo"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.ImageStamp",
-        "Aspose.Pdf.Page.AddStamp"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-01T06:39:11Z",
-      "status": "verified"
-    },
-    "insert-png-signature-pdf": {
-      "title": "Insert PNG Signature on Every PDF Page using PdfFileMend",
-      "filename": "insert-png-signature-pdf.cs",
-      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfFileMend to add a PNG signature image to the bottom‑left corner of each page in a PDF.",
-      "tags": [
-        "pdf",
-        "signature",
-        "image",
-        "facade",
-        "csharp"
+        "aspose-pdf"
       ],
       "apis_used": [
         "PdfFileMend",
         "PdfFileMend.BindPdf",
         "PdfFileMend.AddImage",
         "PdfFileMend.Save",
-        "Document.Pages.Count"
+        "CompositingParameters",
+        "BlendMode"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-01T06:39:46Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:47:30Z",
       "status": "verified"
     },
-    "add-tiff-image-last-page": {
-      "title": "Add TIFF Image to Last PDF Page using PdfFileMend",
-      "filename": "add-tiff-image-last-page.cs",
-      "description": "Demonstrates how to use PdfFileMend to add a TIFF image to the last page of an existing PDF without altering existing content.",
+    "add-word-wrap-footer-to-pdf-pages": {
+      "title": "Add Word‑by‑Word Wrapped Footer to PDF Pages",
+      "filename": "add-word-wrap-footer-to-pdf-pages.cs",
+      "description": "Shows how to place a formatted footer that automatically wraps word‑by‑word across the page width on every page of a PDF using Aspose.Pdf's PdfFileStamp facade.",
       "tags": [
+        "footer",
+        "text-wrapping",
         "pdf",
-        "image",
-        "pdfmend",
-        "tiff",
-        "aspnet"
+        "Aspose.Pdf",
+        "PdfFileStamp"
       ],
       "apis_used": [
-        "PdfFileMend",
-        "PdfFileMend.BindPdf",
-        "PdfFileMend.AddImage",
-        "PdfFileMend.Save"
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.PdfFileStamp.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileStamp.AddFooter",
+        "Aspose.Pdf.Facades.PdfFileStamp.Save",
+        "Aspose.Pdf.Facades.PdfFileStamp.Close",
+        "Aspose.Pdf.Text.FormattedText"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-01T06:40:15Z",
+      "generated_at": "2026-04-10T06:47:30Z",
       "status": "verified"
     },
-    "place-image-dynamic": {
-      "title": "Place Image Dynamically Based on Page Size",
-      "filename": "place-image-dynamic.cs",
-      "description": "Demonstrates how to read a PDF page size, calculate image coordinates, and add an image at a computed position using Aspose.Pdf.",
+    "add-promotional-text-to-specific-pdf-pages": {
+      "title": "Add Promotional Text to Specific PDF Pages",
+      "filename": "add-promotional-text-to-specific-pdf-pages.cs",
+      "description": "Demonstrates how to insert the same promotional message on pages 3, 5, and 7 of a PDF using PdfFileMend.AddText with formatted text and a defined rectangle.",
       "tags": [
-        "image",
-        "placement",
-        "coordinates",
+        "pdf",
+        "text",
+        "watermark",
+        "Aspose.Pdf",
+        "AddText"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileMend",
+        "Aspose.Pdf.Facades.FormattedText",
+        "Aspose.Pdf.Facades.PdfFileMend.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileMend.AddText",
+        "Aspose.Pdf.Facades.PdfFileMend.Save",
+        "Aspose.Pdf.Facades.PdfFileMend.Close"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:47:30Z",
+      "status": "verified"
+    },
+    "add-multi-line-text-custom-spacing-page-3": {
+      "title": "Add Multi‑Line Text with Custom Line Spacing to Page 3",
+      "filename": "add-multi-line-text-custom-spacing-page-3.cs",
+      "description": "Demonstrates how to insert a multi‑line text block with custom line spacing into the left margin of the third page of a PDF using Aspose.Pdf.",
+      "tags": [
+        "text",
+        "paragraph",
+        "line-spacing",
         "pdf",
         "aspose"
       ],
       "apis_used": [
         "Document",
         "Page",
-        "PdfFileMend.AddImage"
+        "TextParagraph",
+        "Rectangle",
+        "TextFormattingOptions",
+        "TextBuilder"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-01T06:40:46Z",
+      "generated_at": "2026-04-10T06:47:30Z",
       "status": "verified"
     },
-    "add-image-with-format-validation": {
-      "title": "Add Image to PDF with Format Validation",
-      "filename": "add-image-with-format-validation.cs",
-      "description": "Demonstrates how to validate an image file's format before adding it to a PDF page using Aspose.Pdf.",
-      "tags": [
-        "image",
-        "validation",
-        "pdf",
-        "addimage"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page.AddImage",
-        "Aspose.Pdf.Rectangle"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-01T06:41:14Z",
-      "status": "verified"
-    },
-    "pdf-file-mend-close": {
-      "title": "Add Image to PDF with PdfFileMend and Ensure Close()",
-      "filename": "pdf-file-mend-close.cs",
-      "description": "Demonstrates using PdfFileMend to add an image to a PDF and guarantees the facade is closed with a try‑finally block.",
+    "add-image-and-text-watermark-to-pdf": {
+      "title": "Add Image and Semi‑Transparent Text Watermark to PDF",
+      "filename": "add-image-and-text-watermark-to-pdf.cs",
+      "description": "Demonstrates using Aspose.Pdf.Facades to stamp an image as a background and then overlay a semi‑transparent text watermark on each page of a PDF.",
       "tags": [
         "pdf",
-        "image",
-        "facade",
-        "close",
-        "csharp"
-      ],
-      "apis_used": [
-        "PdfFileMend",
-        "PdfFileMend.BindPdf",
-        "PdfFileMend.AddImage",
-        "PdfFileMend.Save",
-        "PdfFileMend.Close"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-01T06:41:42Z",
-      "status": "verified"
-    },
-    "add-images-with-error-handling": {
-      "title": "Add Images to PDF with Error Handling",
-      "filename": "add-images-with-error-handling.cs",
-      "description": "Demonstrates adding images to a PDF page while catching exceptions from AddImage and logging the problematic image file path.",
-      "tags": [
-        "pdf",
-        "image",
-        "error-handling",
-        "aspnet",
-        "console"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page.AddImage",
-        "Aspose.Pdf.Rectangle"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-01T06:42:13Z",
-      "status": "verified"
-    },
-    "log-pdf-add-operations": {
-      "title": "Log AddImage and AddText Operations in PDF for Audit",
-      "filename": "log-pdf-add-operations.cs",
-      "description": "Demonstrates adding an image and a text snippet to a PDF using PdfFileMend while logging each operation with timestamp, page number, and source information for audit purposes.",
-      "tags": [
-        "pdf",
-        "audit",
-        "addimage",
-        "addtext",
-        "logging"
-      ],
-      "apis_used": [
-        "PdfFileMend",
-        "PdfFileMend.BindPdf",
-        "PdfFileMend.AddImage",
-        "PdfFileMend.AddText",
-        "PdfFileMend.Save",
-        "FormattedText",
-        "Document"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-01T06:43:31Z",
-      "status": "verified"
-    },
-    "add-paragraph-word-wrap-bywords": {
-      "title": "Add Paragraph with Word Wrap ByWords",
-      "filename": "add-paragraph-word-wrap-bywords.cs",
-      "description": "Demonstrates configuring WordWrapMode.ByWords for a TextParagraph before adding long text that exceeds the defined rectangle width.",
-      "tags": [
-        "wordwrap",
-        "paragraph",
-        "textbuilder",
-        "aspdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextParagraph",
-        "Aspose.Pdf.Text.TextFormattingOptions.WordWrapMode",
-        "Aspose.Pdf.Text.TextBuilder.AppendParagraph"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-01T06:43:57Z",
-      "status": "verified"
-    },
-    "add-image-to-pdf-page": {
-      "title": "Add Image to PDF Page Helper",
-      "filename": "add-image-to-pdf-page.cs",
-      "description": "Demonstrates a reusable helper method that inserts an image onto a specified page of a PDF at given coordinates.",
-      "tags": [
-        "pdf",
-        "image",
-        "helper",
-        "aspdf",
-        "facades"
-      ],
-      "apis_used": [
-        "PdfFileMend",
-        "PdfFileMend.BindPdf",
-        "PdfFileMend.AddImage",
-        "PdfFileMend.Save",
-        "PdfFileMend.Close"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-01T06:47:50Z",
-      "status": "verified"
-    },
-    "add-image-http-response": {
-      "title": "Add Image to PDF and Return via HTTP Response",
-      "filename": "add-image-http-response.cs",
-      "description": "Demonstrates adding an image to a PDF using PdfFileMend, saving the result to a memory stream, and sending it to the client through an HttpResponse.",
-      "tags": [
-        "pdf",
-        "image",
-        "http",
-        "memory-stream",
-        "aspnet"
-      ],
-      "apis_used": [
-        "PdfFileMend",
-        "PdfFileMend.BindPdf",
-        "PdfFileMend.AddImage",
-        "PdfFileMend.Save",
-        "HttpResponse"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-01T06:50:53Z",
-      "status": "verified"
-    },
-    "add-png-image-pdffilemend": {
-      "title": "Add PNG Image to PDF Page Using PdfFileMend",
-      "filename": "add-png-image-pdffilemend.cs",
-      "description": "Demonstrates binding an existing PDF with PdfFileMend and inserting a PNG image onto page two at specified coordinates.",
-      "tags": [
-        "pdf",
-        "image",
-        "PdfFileMend",
-        "Aspose.Pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "PdfFileMend",
-        "PdfFileMend.BindPdf",
-        "PdfFileMend.AddImage",
-        "PdfFileMend.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-01T09:49:40Z",
-      "status": "verified"
-    },
-    "replace-image-bmp__v2": {
-      "title": "Replace JPEG Image on First Page with BMP Using PdfContentEditor",
-      "filename": "replace-image-bmp__v2.cs",
-      "description": "Demonstrates how to replace the first JPEG image on page one of a PDF with a higher‑resolution BMP file using Aspose.Pdf.Facades.PdfContentEditor.",
-      "tags": [
-        "replace-image",
-        "pdf",
-        "bmp",
-        "pdfcontenteditor",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfContentEditor",
-        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfContentEditor.ReplaceImage",
-        "Aspose.Pdf.Facades.PdfContentEditor.Save",
-        "Aspose.Pdf.Facades.PdfContentEditor.Close"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-01T09:50:05Z",
-      "status": "verified"
-    },
-    "overlay-gif-on-png": {
-      "title": "Overlay Semi-Transparent GIF onto PNG in PDF using CompositingParameters",
-      "filename": "overlay-gif-on-png.cs",
-      "description": "Demonstrates creating a PDF with a PNG image and then overlaying a semi‑transparent GIF on the same page using PdfFileMend and CompositingParameters.",
-      "tags": [
-        "overlay",
-        "gif",
-        "png",
-        "compositing",
-        "pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Image",
-        "Aspose.Pdf.Facades.PdfFileMend",
-        "Aspose.Pdf.Facades.CompositingParameters",
-        "Aspose.Pdf.BlendMode",
-        "Aspose.Pdf.Facades.PdfFileMend.AddImage"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-01T09:51:07Z",
-      "status": "verified"
-    },
-    "add-formatted-text-footer": {
-      "title": "Add Formatted Text Footer to PDF Pages",
-      "filename": "add-formatted-text-footer.cs",
-      "description": "Demonstrates adding a word‑by‑word wrapped formatted text footer to every page of a PDF using PdfFileStamp.",
-      "tags": [
-        "footer",
-        "formatted-text",
-        "pdf",
-        "aspdf",
-        "facades"
-      ],
-      "apis_used": [
-        "PdfFileStamp",
-        "FormattedText",
-        "PdfFileStamp.AddFooter"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-01T09:51:25Z",
-      "status": "verified"
-    },
-    "add-promotional-text": {
-      "title": "Add Promotional Text to Specific Pages",
-      "filename": "add-promotional-text.cs",
-      "description": "Demonstrates adding the same promotional message to pages 3, 5, and 7 of a PDF using PdfFileStamp.AddText with multiple page numbers.",
-      "tags": [
-        "pdf",
-        "stamp",
-        "addtext",
-        "facades",
-        "csharp"
-      ],
-      "apis_used": [
-        "PdfFileStamp",
-        "FormattedText",
-        "PdfFileStamp.AddText"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-01T09:52:01Z",
-      "status": "verified"
-    },
-    "add-multi-line-text-page3": {
-      "title": "Add Multi‑Line Text Block with Custom Line Spacing to Page 3",
-      "filename": "add-multi-line-text-page3.cs",
-      "description": "Demonstrates adding a multi‑line text paragraph with custom line spacing to the left margin of the third page of a PDF.",
-      "tags": [
-        "text",
-        "paragraph",
-        "line-spacing",
-        "page",
-        "aspdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextParagraph",
-        "Aspose.Pdf.Text.TextBuilder",
-        "Aspose.Pdf.Text.TextParagraph.AppendLine",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-01T09:52:31Z",
-      "status": "verified"
-    },
-    "image-text-watermark__v2": {
-      "title": "Add Semi-Transparent Text Watermark Over Image",
-      "filename": "image-text-watermark__v2.cs",
-      "description": "Demonstrates adding a semi‑transparent text watermark on top of an image using WatermarkArtifact.",
-      "tags": [
         "watermark",
         "image",
         "text",
-        "pdf",
-        "aspdf"
-      ],
-      "apis_used": [
-        "WatermarkArtifact",
-        "Document",
-        "Page",
-        "TextState",
-        "FontRepository",
-        "Aspose.Pdf.Color"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-01T09:53:03Z",
-      "status": "verified"
-    },
-    "add-background-png": {
-      "title": "Add Background PNG Image to All PDF Pages",
-      "filename": "add-background-png.cs",
-      "description": "Demonstrates how to add a PNG image as a background to every page of a PDF by iterating through pages and using PdfFileMend.AddImage.",
-      "tags": [
-        "background",
-        "image",
-        "pdf",
-        "aspdf",
-        "iteration"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfFileMend",
-        "Aspose.Pdf.Facades.PdfFileMend.AddImage"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-01T09:53:34Z",
-      "status": "verified"
-    },
-    "add-header-image-multiple-pdfs__v2": {
-      "title": "Add Header Image to Multiple PDFs",
-      "filename": "add-header-image-multiple-pdfs__v2.cs",
-      "description": "Demonstrates how to iterate over a list of PDF files and add a header image to each using PdfFileStamp.",
-      "tags": [
-        "pdf",
-        "header",
-        "image",
-        "batch",
         "stamp"
       ],
       "apis_used": [
         "PdfFileStamp",
         "PdfFileStamp.BindPdf",
-        "PdfFileStamp.AddHeader",
+        "PdfFileStamp.AddStamp",
         "PdfFileStamp.Save",
-        "PdfFileStamp.Close"
+        "PdfFileStamp.Close",
+        "Aspose.Pdf.Facades.Stamp",
+        "Aspose.Pdf.Facades.Stamp.BindImage",
+        "Aspose.Pdf.Facades.Stamp.BindLogo",
+        "Aspose.Pdf.Facades.Stamp.SetOrigin",
+        "Aspose.Pdf.Facades.Stamp.SetImageSize",
+        "Aspose.Pdf.Facades.Stamp.IsBackground",
+        "Aspose.Pdf.Facades.Stamp.Opacity",
+        "FormattedText",
+        "EncodingType"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-01T09:53:59Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:47:30Z",
       "status": "verified"
     },
-    "add-company-logo-batch": {
-      "title": "Add Company Logo to PDFs in Batch",
-      "filename": "add-company-logo-batch.cs",
-      "description": "Processes all PDF files in a folder and adds a PNG logo to the top‑right corner of each page.",
+    "add-background-png-image-to-all-pdf-pages": {
+      "title": "Add Background PNG Image to All PDF Pages",
+      "filename": "add-background-png-image-to-all-pdf-pages.cs",
+      "description": "Shows how to insert a PNG background image on every page of a PDF using the PdfFileMend facade.",
       "tags": [
         "pdf",
-        "batch",
-        "logo",
-        "stamp",
-        "aspnet"
+        "background-image",
+        "Aspose.Pdf",
+        "PdfFileMend",
+        "C#"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.ImageStamp",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.HorizontalAlignment",
-        "Aspose.Pdf.VerticalAlignment"
+        "Aspose.Pdf.Facades.PdfFileMend.AddImage"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-01T09:55:02Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:47:30Z",
       "status": "verified"
     },
-    "insert-png-signature-pdf__v2": {
-      "title": "Insert PNG Signature on All PDF Pages using PdfFileMend",
-      "filename": "insert-png-signature-pdf__v2.cs",
-      "description": "Demonstrates how to add a PNG signature image to the bottom‑left corner of each page of a PDF using Aspose.Pdf.Facades.PdfFileMend.",
+    "add-header-image-to-pdf-documents": {
+      "title": "Add Header Image to PDF Documents",
+      "filename": "add-header-image-to-pdf-documents.cs",
+      "description": "Shows how to insert a header image on every page of one or more PDF files using Aspose.Pdf.Facades.",
+      "tags": [
+        "pdf",
+        "header",
+        "image",
+        "Aspose.Pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.PdfFileStamp.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileStamp.AddHeader",
+        "Aspose.Pdf.Facades.PdfFileStamp.Save",
+        "Aspose.Pdf.Facades.PdfFileStamp.Close"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:47:30Z",
+      "status": "verified"
+    },
+    "batch-add-logo-to-pdf-pages": {
+      "title": "Batch Add Logo to PDF Pages",
+      "filename": "batch-add-logo-to-pdf-pages.cs",
+      "description": "Demonstrates how to process a folder of PDF files and add a company logo PNG to the top‑right corner of each page using Aspose.Pdf and its Facades API.",
+      "tags": [
+        "pdf",
+        "logo",
+        "batch",
+        "image",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Facades.PdfFileMend",
+        "Aspose.Pdf.Facades.PdfFileMend.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileMend.AddImage",
+        "Aspose.Pdf.Facades.PdfFileMend.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:47:30Z",
+      "status": "verified"
+    },
+    "insert-png-signature-on-every-pdf-page": {
+      "title": "Insert PNG Signature on Every PDF Page",
+      "filename": "insert-png-signature-on-every-pdf-page.cs",
+      "description": "Demonstrates how to use Aspose.Pdf's PdfFileMend facade to place a PNG signature image at the bottom‑left corner of each page in a PDF document.",
       "tags": [
         "pdf",
         "signature",
         "image",
-        "PdfFileMend",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "PdfFileMend",
-        "PdfFileMend.BindPdf",
-        "PdfFileMend.AddImage",
-        "PdfFileMend.Save",
-        "PdfFileMend.Close"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-01T09:55:23Z",
-      "status": "verified"
-    },
-    "add-tiff-image-last-page__v2": {
-      "title": "Add TIFF Image to Last Page of PDF using PdfFileMend",
-      "filename": "add-tiff-image-last-page__v2.cs",
-      "description": "Demonstrates how to bind an existing PDF with PdfFileMend, locate its last page, and add a TIFF image without altering existing content.",
-      "tags": [
-        "pdf",
-        "image",
-        "pdfmend",
-        "tiff",
-        "aspnet"
-      ],
-      "apis_used": [
-        "PdfFileMend",
-        "PdfFileMend.BindPdf",
-        "PdfFileMend.AddImage",
-        "PdfFileMend.Save",
-        "PdfFileMend.Document.Pages.Count"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-01T09:55:48Z",
-      "status": "verified"
-    },
-    "add-image-dynamic-coordinates": {
-      "title": "Add Image to PDF Page with Dynamic Coordinates",
-      "filename": "add-image-dynamic-coordinates.cs",
-      "description": "Demonstrates retrieving page dimensions from a PDF and placing an image at a calculated position based on those dimensions.",
-      "tags": [
-        "image",
-        "placement",
-        "pdf",
-        "coordinates",
-        "aspdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Facades.PdfFileMend"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-01T09:57:00Z",
-      "status": "verified"
-    },
-    "validate-image-format-add-image": {
-      "title": "Validate Image Format Before Adding to PDF",
-      "filename": "validate-image-format-add-image.cs",
-      "description": "Demonstrates checking an image file's format (JPG, PNG, GIF, BMP, TIFF) before adding it to a PDF page using Aspose.Pdf.",
-      "tags": [
-        "image",
-        "validation",
-        "pdf",
-        "addimage",
-        "aspdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page.AddImage",
-        "Aspose.Pdf.Rectangle"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-01T09:57:27Z",
-      "status": "verified"
-    },
-    "pdf-file-mend-close__v2": {
-      "title": "Add Image to PDF using PdfFileMend with guaranteed Close",
-      "filename": "pdf-file-mend-close__v2.cs",
-      "description": "Demonstrates how to modify a PDF with PdfFileMend and ensure the facade is closed using a try‑finally block.",
-      "tags": [
-        "pdf",
-        "facade",
-        "PdfFileMend",
-        "close",
-        "try-finally"
-      ],
-      "apis_used": [
-        "PdfFileMend",
-        "PdfFileMend.BindPdf",
-        "PdfFileMend.AddImage",
-        "PdfFileMend.Save",
-        "PdfFileMend.Close"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-01T09:57:53Z",
-      "status": "verified"
-    },
-    "add-images-with-error-handling__v2": {
-      "title": "Add Images to PDF with Error Handling",
-      "filename": "add-images-with-error-handling__v2.cs",
-      "description": "Demonstrates adding images to a PDF page while catching exceptions from AddImage and logging the problematic image file path.",
-      "tags": [
-        "image",
-        "error-handling",
-        "pdf",
-        "aspdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page.AddImage",
-        "Aspose.Pdf.Rectangle"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-01T09:58:28Z",
-      "status": "verified"
-    },
-    "add-image-text-audit": {
-      "title": "Add Image and Text to PDF with Audit Logging",
-      "filename": "add-image-text-audit.cs",
-      "description": "Demonstrates adding an image to a PDF using PdfFileMend and logs each AddImage and AddText operation with timestamp, page number, and file name for audit purposes.",
-      "tags": [
-        "pdf",
-        "image",
-        "text",
-        "audit",
-        "pdfmend"
-      ],
-      "apis_used": [
-        "PdfFileMend",
-        "Document",
-        "PdfFileMend.AddImage",
-        "PdfFileMend.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-01T09:58:57Z",
-      "status": "verified"
-    },
-    "add-paragraph-wordwrap-bywords": {
-      "title": "Add Paragraph with WordWrap ByWords",
-      "filename": "add-paragraph-wordwrap-bywords.cs",
-      "description": "Demonstrates configuring WordWrapMode.ByWords for a text paragraph that exceeds its rectangle width, causing the text to wrap at word boundaries.",
-      "tags": [
-        "wordwrap",
-        "paragraph",
-        "text",
-        "pdf",
-        "aspdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextParagraph",
-        "Aspose.Pdf.Text.TextFormattingOptions",
-        "Aspose.Pdf.Text.WordWrapMode",
-        "Aspose.Pdf.Text.TextBuilder",
-        "Aspose.Pdf.Rectangle"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-01T10:00:39Z",
-      "status": "verified"
-    },
-    "add-image-to-pdf-page__v2": {
-      "title": "Add Image to PDF Page Using PdfFileMend",
-      "filename": "add-image-to-pdf-page__v2.cs",
-      "description": "Demonstrates a reusable helper method that inserts an image onto a specified page of a PDF at given coordinates.",
-      "tags": [
-        "pdf",
-        "image",
-        "add",
-        "helper",
-        "aspdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileMend",
-        "Aspose.Pdf.Facades.PdfFileMend.AddImage"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-01T10:01:26Z",
-      "status": "verified"
-    },
-    "add-image-to-pdf-memory-stream": {
-      "title": "Add Image to PDF and Return as Memory Stream",
-      "filename": "add-image-to-pdf-memory-stream.cs",
-      "description": "Demonstrates adding an image to a PDF using PdfFileMend, saving the result into a MemoryStream, and writing it to a file (simulating an HTTP response).",
-      "tags": [
-        "pdf",
-        "image",
-        "memory-stream",
-        "aspose-pdf",
-        "facade"
-      ],
-      "apis_used": [
-        "PdfFileMend",
-        "PdfFileMend.BindPdf",
-        "PdfFileMend.AddImage",
-        "PdfFileMend.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-01T10:01:53Z",
-      "status": "verified"
-    },
-    "async-pdf-modification": {
-      "title": "Asynchronous PDF Modification with PdfFileMend",
-      "filename": "async-pdf-modification.cs",
-      "description": "Demonstrates how to modify a PDF asynchronously by adding an image using PdfFileMend wrapped in Task.Run.",
-      "tags": [
-        "async",
-        "pdf",
-        "image",
         "Aspose.Pdf",
         "PdfFileMend"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileMend",
-        "Aspose.Pdf.Facades.PdfFileMend.BindPdf",
-        "Aspose.Pdf.Facades.PdfFileMend.AddImage",
-        "Aspose.Pdf.Facades.PdfFileMend.Save",
-        "System.Threading.Tasks.Task.Run"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-01T10:02:14Z",
-      "status": "verified"
-    },
-    "extract-images-pdf-png": {
-      "title": "Extract Images from PDF to PNG Files",
-      "filename": "extract-images-pdf-png.cs",
-      "description": "Demonstrates how to extract all images from a PDF document and save each as a separate PNG file using Aspose.Pdf's PdfExtractor.",
-      "tags": [
-        "pdf",
-        "image-extraction",
-        "png",
-        "aspose-pdf",
-        "facade"
-      ],
-      "apis_used": [
-        "PdfExtractor",
-        "PdfExtractor.BindPdf",
-        "PdfExtractor.ExtractImage",
-        "PdfExtractor.HasNextImage",
-        "PdfExtractor.GetNextImage",
-        "PdfExtractor.Close"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-01T10:02:33Z",
-      "status": "verified"
-    },
-    "extract-images-from-pages": {
-      "title": "Extract Images from Specific PDF Pages",
-      "filename": "extract-images-from-pages.cs",
-      "description": "Extracts all images from pages 2 through 5 of a PDF and saves them into a temporary directory.",
-      "tags": [
-        "pdf",
-        "image-extraction",
-        "pages",
-        "aspdf",
-        "temp"
-      ],
-      "apis_used": [
-        "PdfFileEditor.Extract",
-        "PdfExtractor",
-        "PdfExtractor.ExtractImage",
-        "PdfExtractor.HasNextImage",
-        "PdfExtractor.GetNextImage"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-01T10:03:13Z",
-      "status": "verified"
-    },
-    "batch-extract-images": {
-      "title": "Batch Extract Images from PDFs with Page and Index Naming",
-      "filename": "batch-extract-images.cs",
-      "description": "Extracts all images from each PDF in a folder and saves them using the source PDF name, page number, and image index.",
-      "tags": [
-        "pdf",
-        "image-extraction",
-        "batch",
-        "aspdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfExtractor",
-        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
-        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
-        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
-        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage",
-        "Aspose.Pdf.Facades.PdfExtractor.GetCurrentPageNumber"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-01T10:04:43Z",
-      "status": "verified"
-    },
-    "remove-image-from-page": {
-      "title": "Remove Specific Image from PDF Page Using PdfContentEditor",
-      "filename": "remove-image-from-page.cs",
-      "description": "Demonstrates how to delete a specific image identified by its object ID from page four of a PDF using Aspose.Pdf's PdfContentEditor.",
-      "tags": [
-        "pdf",
-        "image",
-        "delete",
-        "aspose",
-        "facades"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfContentEditor",
-        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfContentEditor.DeleteImage",
-        "Aspose.Pdf.Facades.PdfContentEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-01T10:05:06Z",
-      "status": "verified"
-    },
-    "remove-all-images": {
-      "title": "Remove All Images from PDF",
-      "filename": "remove-all-images.cs",
-      "description": "Demonstrates how to delete every image from a PDF using Aspose.Pdf.Facades.PdfContentEditor and save the modified document.",
-      "tags": [
-        "pdf",
-        "images",
-        "delete",
-        "facade",
-        "aspnet"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfContentEditor",
-        "PdfContentEditor.BindPdf",
-        "PdfContentEditor.DeleteImage",
-        "PdfContentEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-01T10:05:23Z",
-      "status": "verified"
-    },
-    "replace-low-res-images": {
-      "title": "Replace Low-Resolution Images with High-Resolution PNGs in PDF",
-      "filename": "replace-low-res-images.cs",
-      "description": "Demonstrates how to loop through all images in a PDF and replace each with a higher‑resolution PNG file.",
-      "tags": [
-        "image-replacement",
-        "pdf",
-        "loop",
-        "aspdf",
-        "high-resolution"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page.Resources.Images",
-        "Aspose.Pdf.XImageCollection.Replace"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-01T10:05:46Z",
-      "status": "verified"
-    },
-    "add-text-position-test": {
-      "title": "Verify Text Position on PDF Page",
-      "filename": "add-text-position-test.cs",
-      "description": "Adds text at specific X/Y coordinates in a PDF and checks that the coordinates match using Aspose.Pdf text extraction.",
-      "tags": [
-        "pdf",
-        "text",
-        "position",
-        "verification",
-        "aspdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.Position",
-        "Aspose.Pdf.Text.TextBuilder",
-        "Aspose.Pdf.Text.TextFragmentAbsorber"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-01T10:06:13Z",
-      "status": "verified"
-    },
-    "compare-pdf-size-after-image": {
-      "title": "Compare PDF Size Before and After Adding Image",
-      "filename": "compare-pdf-size-after-image.cs",
-      "description": "Loads a PDF, records its byte size, adds an image to the first page, then compares the byte sizes to verify the modification.",
-      "tags": [
-        "pdf",
-        "image",
-        "size",
-        "verification",
-        "aspdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -1048,7 +250,406 @@
         "Aspose.Pdf.Facades.PdfFileMend.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-01T10:08:21Z",
+      "generated_at": "2026-04-10T06:47:30Z",
+      "status": "verified"
+    },
+    "add-tiff-image-to-last-page-pdf": {
+      "title": "Add TIFF Image to Last Page of PDF using PdfFileMend",
+      "filename": "add-tiff-image-to-last-page-pdf.cs",
+      "description": "Shows how to bind a PDF with PdfFileMend, determine the last page, and insert a TIFF image onto that page without altering existing content.",
+      "tags": [
+        "PdfFileMend",
+        "AddImage",
+        "TIFF",
+        "LastPage",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileMend",
+        "Aspose.Pdf.Facades.PdfFileMend.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileMend.AddImage",
+        "Aspose.Pdf.Facades.PdfFileMend.Save",
+        "Aspose.Pdf.Facades.PdfFileMend.Close",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages.Count"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:47:30Z",
+      "status": "verified"
+    },
+    "dynamic-image-placement-on-pdf": {
+      "title": "Dynamic Image Placement on PDF Page",
+      "filename": "dynamic-image-placement-on-pdf.cs",
+      "description": "Demonstrates how to retrieve a PDF page's dimensions, calculate image coordinates proportionally, and add the image to the page using Aspose.Pdf facades.",
+      "tags": [
+        "image",
+        "pdf",
+        "coordinates",
+        "Aspose.Pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Facades.PdfFileMend.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileMend.AddImage",
+        "Aspose.Pdf.Facades.PdfFileMend.Save",
+        "Aspose.Pdf.Facades.PdfFileMend.Close"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:47:30Z",
+      "status": "verified"
+    },
+    "add-image-to-pdf-with-format-validation": {
+      "title": "Add Image to PDF with Format Validation",
+      "filename": "add-image-to-pdf-with-format-validation.cs",
+      "description": "Demonstrates how to validate an image's file format before using Aspose.Pdf.Facades to insert it into a PDF page.",
+      "tags": [
+        "pdf",
+        "image",
+        "validation",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileMend",
+        "Aspose.Pdf.Facades.PdfFileMend.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileMend.AddImage",
+        "Aspose.Pdf.Facades.PdfFileMend.Save",
+        "Aspose.Pdf.Facades.PdfFileMend.Close"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:47:30Z",
+      "status": "verified"
+    },
+    "pdffilemend-try-finally-save": {
+      "title": "Modify PDF with PdfFileMend and Ensure Save Using Try‑Finally",
+      "filename": "pdffilemend-try-finally-save.cs",
+      "description": "Demonstrates how to bind, modify, and save a PDF using Aspose.Pdf.Facades.PdfFileMend while guaranteeing that resources are released with a try‑finally block.",
+      "tags": [
+        "pdf",
+        "aspose.pdf",
+        "facade",
+        "try-finally",
+        "resource-management"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileMend",
+        "Aspose.Pdf.Facades.PdfFileMend.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileMend.Save",
+        "Aspose.Pdf.Facades.PdfFileMend.Close",
+        "Aspose.Pdf.Document"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:47:30Z",
+      "status": "verified"
+    },
+    "add-images-to-pdf-with-error-handling": {
+      "title": "Add Images to PDF with Error Handling",
+      "filename": "add-images-to-pdf-with-error-handling.cs",
+      "description": "Shows how to insert multiple images into a PDF using Aspose.Pdf.Facades.PdfFileMend and gracefully handle missing files or exceptions during the AddImage operation.",
+      "tags": [
+        "pdf",
+        "image",
+        "addimage",
+        "error-handling",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileMend",
+        "Aspose.Pdf.Facades.PdfFileMend.AddImage",
+        "Aspose.Pdf.Facades.PdfFileMend.Close"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:47:30Z",
+      "status": "verified"
+    },
+    "add-image-and-text-with-audit-logging": {
+      "title": "Add Image and Text to PDF with Audit Logging",
+      "filename": "add-image-and-text-with-audit-logging.cs",
+      "description": "Demonstrates using PdfFileMend to insert an image and formatted text into a PDF page while logging each operation with timestamps for audit purposes.",
+      "tags": [
+        "pdf",
+        "image",
+        "text",
+        "audit",
+        "logging"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileMend",
+        "Aspose.Pdf.Facades.PdfFileMend.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileMend.AddImage",
+        "Aspose.Pdf.Facades.PdfFileMend.AddText",
+        "Aspose.Pdf.Facades.PdfFileMend.Save",
+        "Aspose.Pdf.Text.FormattedText",
+        "Aspose.Pdf.Text.EncodingType"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:47:30Z",
+      "status": "verified"
+    },
+    "add-word-wrapped-paragraph-to-pdf": {
+      "title": "Add Word‑Wrapped Paragraph to PDF",
+      "filename": "add-word-wrapped-paragraph-to-pdf.cs",
+      "description": "Demonstrates how to enable the ByWords word‑wrap mode with PdfFileMend and TextParagraph, then add a long paragraph that exceeds a defined rectangle so the text wraps by words in the resulting PDF.",
+      "tags": [
+        "word-wrap",
+        "paragraph",
+        "pdf",
+        "text",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfFileMend",
+        "Aspose.Pdf.Facades.WordWrapMode",
+        "Aspose.Pdf.Text.TextParagraph",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Text.TextFormattingOptions",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Facades.TextBuilder"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:47:30Z",
+      "status": "verified"
+    },
+    "add-image-to-pdf-page": {
+      "title": "Add Image to Specific PDF Page",
+      "filename": "add-image-to-pdf-page.cs",
+      "description": "Shows how to insert an image into a specified page of an existing PDF document using Aspose.Pdf's PdfFileMend facade.",
+      "tags": [
+        "pdf",
+        "image",
+        "Aspose.Pdf",
+        "PdfFileMend",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileMend",
+        "Aspose.Pdf.Facades.PdfFileMend.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileMend.AddImage",
+        "Aspose.Pdf.Facades.PdfFileMend.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:47:30Z",
+      "status": "verified"
+    },
+    "add-image-to-pdf-return-bytes": {
+      "title": "Add Image to PDF and Return as Byte Array",
+      "filename": "add-image-to-pdf-return-bytes.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades to load a PDF, place an image on the first page, and return the modified PDF as a byte array for writing to an HTTP response.",
+      "tags": [
+        "pdf",
+        "image",
+        "aspose",
+        "memory-stream",
+        "http-response"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileMend",
+        "Aspose.Pdf.Facades.PdfFileMend.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileMend.AddImage",
+        "Aspose.Pdf.Facades.PdfFileMend.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:47:30Z",
+      "status": "verified"
+    },
+    "async-add-image-to-pdf": {
+      "title": "Asynchronous Add Image to PDF with PdfFileMend",
+      "filename": "async-add-image-to-pdf.cs",
+      "description": "Demonstrates how to add an image to a specific PDF page asynchronously by wrapping PdfFileMend operations in Task.Run, including argument validation and cancellation support.",
+      "tags": [
+        "pdf",
+        "image",
+        "async",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileMend",
+        "Aspose.Pdf.Facades.PdfFileMend.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileMend.AddImage",
+        "Aspose.Pdf.Facades.PdfFileMend.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:47:30Z",
+      "status": "verified"
+    },
+    "extract-images-from-pdf-to-png": {
+      "title": "Extract Images from PDF to PNG",
+      "filename": "extract-images-from-pdf-to-png.cs",
+      "description": "Demonstrates how to use Aspose.Pdf's PdfExtractor to extract all images from a PDF file and save each image as an individual PNG file.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "png",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:47:30Z",
+      "status": "verified"
+    },
+    "extract-images-from-pdf-pages": {
+      "title": "Extract Images from Specific PDF Pages",
+      "filename": "extract-images-from-pdf-pages.cs",
+      "description": "Shows how to extract all images from pages 2‑5 of a PDF and save them to a temporary directory using Aspose.Pdf.Facades.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "aspose-pdf",
+        "facade",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:47:30Z",
+      "status": "verified"
+    },
+    "batch-extract-images-from-pdfs": {
+      "title": "Batch Extract Images from PDFs with Page and Index Naming",
+      "filename": "batch-extract-images-from-pdfs.cs",
+      "description": "Shows how to process all PDF files in a folder, extract images from each page using Aspose.Pdf.Facades.PdfExtractor, and save them with filenames that contain the original PDF name, page number, and image index.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "batch-processing",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:47:30Z",
+      "status": "verified"
+    },
+    "remove-image-from-pdf-page": {
+      "title": "Remove Image from PDF Page Using PdfContentEditor",
+      "filename": "remove-image-from-pdf-page.cs",
+      "description": "Demonstrates how to delete a specific image, identified by its object ID, from a given page of a PDF using Aspose.Pdf's PdfContentEditor.",
+      "tags": [
+        "pdf",
+        "image-removal",
+        "aspose",
+        "pdfcontenteditor",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.DeleteImage",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save",
+        "Aspose.Pdf.Facades.PdfContentEditor.Close"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:47:30Z",
+      "status": "verified"
+    },
+    "remove-all-images-from-pdf": {
+      "title": "Remove All Images from PDF",
+      "filename": "remove-all-images-from-pdf.cs",
+      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfContentEditor to delete every image from an existing PDF and save the modified document to a new file.",
+      "tags": [
+        "pdf",
+        "images",
+        "remove",
+        "Aspose.Pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.DeleteImage",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:47:30Z",
+      "status": "verified"
+    },
+    "replace-low-res-images-with-high-res-pngs": {
+      "title": "Replace Low-Resolution Images with High-Resolution PNGs",
+      "filename": "replace-low-res-images-with-high-res-pngs.cs",
+      "description": "Demonstrates how to iterate through PDF pages and replace each low‑resolution image with a corresponding high‑resolution PNG using Aspose.Pdf's PdfContentEditor facade.",
+      "tags": [
+        "image-replacement",
+        "pdf",
+        "aspose",
+        "facade",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.ReplaceImage",
+        "Aspose.Pdf.Facades.PdfContentEditor.Close",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:47:30Z",
+      "status": "verified"
+    },
+    "verify-text-position-in-pdf": {
+      "title": "Verify Text Position in PDF",
+      "filename": "verify-text-position-in-pdf.cs",
+      "description": "Creates a PDF, adds a text fragment at specific X/Y coordinates, saves and reloads the document, then extracts the fragment to assert that the coordinates match the expected values.",
+      "tags": [
+        "pdf",
+        "text",
+        "position",
+        "unit-test",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.TextBuilder",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.Position",
+        "Aspose.Pdf.Text.TextFragmentAbsorber"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:47:30Z",
+      "status": "verified"
+    },
+    "verify-pdf-size-after-adding-image": {
+      "title": "Verify PDF Size Increase After Adding Image",
+      "filename": "verify-pdf-size-after-adding-image.cs",
+      "description": "Creates a blank PDF, adds an image using PdfFileMend, and includes unit tests that confirm the PDF byte size grows and the file remains a valid PDF.",
+      "tags": [
+        "pdf",
+        "image",
+        "unit-test",
+        "Aspose.Pdf",
+        "PdfFileMend"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Facades.PdfFileMend",
+        "Aspose.Pdf.Facades.PdfFileMend.AddImage",
+        "Aspose.Pdf.Facades.PdfFileMend.Close"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:47:30Z",
       "status": "verified"
     }
   }

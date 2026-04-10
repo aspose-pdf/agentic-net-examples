@@ -2,57 +2,94 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
 
-class Program
+class ExportBookmarksToExcel
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputCsv = "bookmarks.csv"; // CSV works with Excel
+        const string inputPdfPath = "input.pdf";
+        const string outputExcelPath = "bookmarks.xlsx";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Extract bookmarks from the PDF
-        var bookmarkEditor = new PdfBookmarkEditor();
-        bookmarkEditor.BindPdf(inputPdf);
-        Bookmarks bookmarks = bookmarkEditor.ExtractBookmarks();
-        bookmarkEditor.Close();
-
-        // Create a CSV file that Excel can open
-        using (var writer = new StreamWriter(outputCsv))
+        // Extract bookmarks from the source PDF
+        Bookmarks rootBookmarks;
+        using (PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor())
         {
-            // Write header row
-            writer.WriteLine("Title,Level,Destination");
-
-            // Write bookmark data recursively
-            int currentRow = 1; // not used for CSV but kept for compatibility
-            foreach (Bookmark bm in bookmarks)
-            {
-                WriteBookmark(bm, 1, writer);
-            }
+            bookmarkEditor.BindPdf(inputPdfPath);
+            rootBookmarks = bookmarkEditor.ExtractBookmarks();
         }
 
-        Console.WriteLine($"Bookmarks exported to {outputCsv}");
-    }
-
-    static void WriteBookmark(Bookmark bm, int level, StreamWriter writer)
-    {
-        // Escape commas in the title by surrounding with double quotes if needed
-        string title = bm.Title?.Contains(",") == true ? $"\"{bm.Title}\"" : bm.Title;
-        string destination = bm.PageNumber > 0 ? $"Page {bm.PageNumber}" : (string.IsNullOrEmpty(bm.Action) ? "" : bm.Action);
-        destination = destination?.Contains(",") == true ? $"\"{destination}\"" : destination;
-        writer.WriteLine($"{title},{level},{destination}");
-
-        if (bm.ChildItem != null && bm.ChildItem.Count > 0)
+        // Create a new PDF document that will hold the bookmark data
+        using (Document doc = new Document())
         {
-            foreach (Bookmark child in bm.ChildItem)
+            // Add a single page
+            Page page = doc.Pages.Add();
+
+            // Create a table with three columns: Title, Level, Destination Page
+            Table table = new Table
             {
-                WriteBookmark(child, level + 1, writer);
+                ColumnWidths = "300 80 80"
+            };
+
+            // Header row
+            Row header = table.Rows.Add();
+            header.Cells[0].Paragraphs.Add(new TextFragment("Title"));
+            header.Cells[1].Paragraphs.Add(new TextFragment("Level"));
+            header.Cells[2].Paragraphs.Add(new TextFragment("Page"));
+
+            // Recursive helper to add bookmark rows
+            void AddBookmarkRows(Bookmark bm, int level)
+            {
+                Row row = table.Rows.Add();
+                row.Cells[0].Paragraphs.Add(new TextFragment(bm.Title ?? string.Empty));
+                row.Cells[1].Paragraphs.Add(new TextFragment(level.ToString()));
+
+                // Resolve destination page number (if any)
+                int destPage = 0;
+                if (bm.Destination != null)
+                {
+                    // Use reflection to obtain a PageNumber property if it exists.
+                    // This works for PageDestination and any other destination type that exposes PageNumber.
+                    var pageNumberProp = bm.Destination.GetType().GetProperty("PageNumber");
+                    if (pageNumberProp != null)
+                    {
+                        try
+                        {
+                            destPage = Convert.ToInt32(pageNumberProp.GetValue(bm.Destination));
+                        }
+                        catch { /* ignore – keep destPage as 0 */ }
+                    }
+                }
+                row.Cells[2].Paragraphs.Add(new TextFragment(destPage.ToString()));
+
+                if (bm.ChildItems != null)
+                {
+                    foreach (Bookmark child in bm.ChildItems)
+                    {
+                        AddBookmarkRows(child, level + 1);
+                    }
+                }
             }
+
+            // Populate table with all bookmarks (starting at level 1)
+            foreach (Bookmark bm in rootBookmarks)
+            {
+                AddBookmarkRows(bm, 1);
+            }
+
+            // Add the table to the page
+            page.Paragraphs.Add(table);
+
+            // Save the document as an Excel workbook
+            doc.Save(outputExcelPath, new ExcelSaveOptions());
         }
+
+        Console.WriteLine($"Bookmarks exported to Excel file: {outputExcelPath}");
     }
 }

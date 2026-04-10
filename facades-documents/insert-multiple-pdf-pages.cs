@@ -1,71 +1,104 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Paths to the base PDF and source PDFs
-        string basePdfPath = "base.pdf";
-        string sourcePdfPath1 = "source1.pdf";
-        string sourcePdfPath2 = "source2.pdf";
-        string intermediatePdfPath = "intermediate.pdf";
-        string finalPdfPath = "merged.pdf";
+        // Input PDF that will receive the inserted pages
+        const string targetPdf = "target.pdf";
 
-        // Verify that all input files exist
-        if (!File.Exists(basePdfPath))
+        // Output PDF after all insertions are done
+        const string finalOutputPdf = "merged_output.pdf";
+
+        // Ensure the target PDF exists – create an empty one if it does not.
+        if (!File.Exists(targetPdf))
         {
-            Console.Error.WriteLine($"Base PDF not found: {basePdfPath}");
-            return;
-        }
-        if (!File.Exists(sourcePdfPath1))
-        {
-            Console.Error.WriteLine($"Source PDF 1 not found: {sourcePdfPath1}");
-            return;
-        }
-        if (!File.Exists(sourcePdfPath2))
-        {
-            Console.Error.WriteLine($"Source PDF 2 not found: {sourcePdfPath2}");
-            return;
+            // Create a blank PDF with a single empty page (required by Insert operation).
+            using (var blankDoc = new Document())
+            {
+                blankDoc.Pages.Add();
+                blankDoc.Save(targetPdf);
+            }
         }
 
-        // Create the PdfFileEditor instance (it does not implement IDisposable)
+        // Array of source PDF file paths
+        string[] sourcePdfs = { "source1.pdf", "source2.pdf", "source3.pdf" };
+
+        // Corresponding page numbers to insert from each source PDF
+        // Each inner array contains the exact page numbers (1‑based) to take from the source file
+        int[][] pagesToInsert = {
+            new int[] { 2, 4 },          // from source1.pdf insert pages 2 and 4
+            new int[] { 1, 3, 5 },       // from source2.pdf insert pages 1, 3 and 5
+            new int[] { 7 }              // from source3.pdf insert page 7
+        };
+
+        // Validate that the arrays match
+        if (sourcePdfs.Length != pagesToInsert.Length)
+        {
+            Console.Error.WriteLine("Source files and page ranges count mismatch.");
+            return;
+        }
+
+        // PdfFileEditor does NOT implement IDisposable, so we instantiate it directly
         PdfFileEditor editor = new PdfFileEditor();
 
-        // Define page numbers to be taken from each source PDF (1‑based indexing)
-        int[] pagesFromSource1 = new int[] { 2, 4 };
-        int[] pagesFromSource2 = new int[] { 1, 3, 5 };
+        // We'll work with a temporary file that is updated after each insertion
+        string currentFile = targetPdf;
 
-        // Insert pages from the first source PDF after the first page of the base PDF
-        // The result is written to an intermediate file
-        int insertLocation = 1; // after page 1 of the base PDF
-        bool firstInsertSuccess = editor.Insert(basePdfPath, insertLocation, sourcePdfPath1, pagesFromSource1, intermediatePdfPath);
-        if (!firstInsertSuccess)
+        // Insert position inside the current PDF (1‑based). 
+        // Here we always insert at the beginning; adjust as needed.
+        int insertPosition = 1;
+
+        for (int i = 0; i < sourcePdfs.Length; i++)
         {
-            Console.Error.WriteLine("Failed to insert pages from source1.pdf.");
-            return;
+            // Verify source file exists before attempting insertion
+            if (!File.Exists(sourcePdfs[i]))
+            {
+                Console.Error.WriteLine($"Source file '{sourcePdfs[i]}' not found.");
+                return;
+            }
+
+            // Create a temporary file to hold the result of this insertion step
+            string tempFile = Path.GetTempFileName();
+
+            // Perform the insertion:
+            //   inputFile      : current PDF (initially the target)
+            //   insertLocation : where to insert pages (1 = beginning)
+            //   portFile       : source PDF from which pages are taken
+            //   pageNumber     : array of page numbers to insert
+            //   outputFile     : temporary file that receives the result
+            bool success = editor.Insert(
+                currentFile,
+                insertPosition,
+                sourcePdfs[i],
+                pagesToInsert[i],
+                tempFile);
+
+            if (!success)
+            {
+                Console.Error.WriteLine($"Insertion failed for source '{sourcePdfs[i]}'.");
+                // Clean up temporary file before exiting
+                File.Delete(tempFile);
+                return;
+            }
+
+            // Delete the previous intermediate file (except the original target)
+            if (currentFile != targetPdf && File.Exists(currentFile))
+                File.Delete(currentFile);
+
+            // The temporary file becomes the new current file for the next iteration
+            currentFile = tempFile;
         }
 
-        // Insert pages from the second source PDF after the first page of the intermediate PDF
-        // The final result is written to the output file
-        bool secondInsertSuccess = editor.Insert(intermediatePdfPath, insertLocation, sourcePdfPath2, pagesFromSource2, finalPdfPath);
-        if (!secondInsertSuccess)
-        {
-            Console.Error.WriteLine("Failed to insert pages from source2.pdf.");
-            return;
-        }
+        // Move the final temporary file to the desired output location
+        // If a file already exists at the destination, overwrite it
+        if (File.Exists(finalOutputPdf))
+            File.Delete(finalOutputPdf);
+        File.Move(currentFile, finalOutputPdf);
 
-        // Clean up the intermediate file
-        try
-        {
-            File.Delete(intermediatePdfPath);
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Could not delete intermediate file: {ex.Message}");
-        }
-
-        Console.WriteLine($"Pages inserted successfully. Output saved to '{finalPdfPath}'.");
+        Console.WriteLine($"Pages inserted successfully. Result saved to '{finalOutputPdf}'.");
     }
 }

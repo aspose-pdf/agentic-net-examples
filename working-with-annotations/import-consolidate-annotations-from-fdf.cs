@@ -3,54 +3,74 @@ using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Facades; // FdfReader resides here
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "source.pdf";
-        string[] fdfFiles = { "notes1.fdf", "notes2.fdf", "notes3.fdf" };
-        const string outputPdfPath = "consolidated.pdf";
+        // Input PDF that will receive the annotations
+        const string pdfPath = "source.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        // List of FDF files to import
+        string[] fdfFiles = { "annotations1.fdf", "annotations2.fdf", "annotations3.fdf" };
+
+        // Output PDF with all imported annotations
+        const string outputPath = "consolidated.pdf";
+
+        // Verify source PDF exists
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
-        using (Document doc = new Document(inputPdfPath))
+        // Verify each FDF file exists before processing
+        foreach (string fdf in fdfFiles)
         {
-            foreach (string fdfPath in fdfFiles)
+            if (!File.Exists(fdf))
             {
-                if (!File.Exists(fdfPath))
-                {
-                    Console.Error.WriteLine($"FDF file not found: {fdfPath}");
-                    continue;
-                }
-
-                using (FileStream fdfStream = File.OpenRead(fdfPath))
-                {
-                    // Import annotations from the FDF stream into the document
-                    FdfReader.ReadAnnotations(fdfStream, doc);
-                }
+                Console.Error.WriteLine($"FDF not found: {fdf}");
+                return;
             }
-
-            // Consolidate all annotations from all pages into a single collection
-            List<Annotation> allAnnotations = new List<Annotation>();
-            for (int i = 1; i <= doc.Pages.Count; i++)
-            {
-                Page page = doc.Pages[i];
-                foreach (Annotation ann in page.Annotations)
-                {
-                    allAnnotations.Add(ann);
-                }
-            }
-
-            Console.WriteLine($"Total annotations imported: {allAnnotations.Count}");
-            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Consolidated PDF saved to '{outputPdfPath}'.");
+        try
+        {
+            // Load the PDF document (lifecycle rule: wrap in using)
+            using (Document doc = new Document(pdfPath))
+            {
+                // Import annotations from each FDF file into the same document
+                foreach (string fdfPath in fdfFiles)
+                {
+                    using (FileStream fdfStream = File.OpenRead(fdfPath))
+                    {
+                        // Static method reads annotations and adds them to the document
+                        FdfReader.ReadAnnotations(fdfStream, doc);
+                    }
+                }
+
+                // Consolidate all annotations from all pages into a single collection
+                List<Annotation> allAnnotations = new List<Annotation>();
+                foreach (Page page in doc.Pages)
+                {
+                    // AnnotationCollection implements IEnumerable<Annotation>
+                    foreach (Annotation ann in page.Annotations)
+                    {
+                        allAnnotations.Add(ann);
+                    }
+                }
+
+                // Example usage: display total number of imported annotations
+                Console.WriteLine($"Total annotations imported: {allAnnotations.Count}");
+
+                // Save the updated PDF (lifecycle rule: use Document.Save)
+                doc.Save(outputPath);
+                Console.WriteLine($"Consolidated PDF saved to '{outputPath}'.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }
