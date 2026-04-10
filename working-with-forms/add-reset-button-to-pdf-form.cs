@@ -1,14 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations;      // JavascriptAction
+using Aspose.Pdf.Forms;           // ButtonField
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_reset.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,21 +17,39 @@ class Program
             return;
         }
 
-        // Open the PDF with FormEditor (facade API)
-        using (FormEditor editor = new FormEditor())
+        // Load the existing PDF (lifecycle rule: use Document constructor)
+        using (Document doc = new Document(inputPath))
         {
-            editor.BindPdf(inputPath);
+            // Ensure the document contains a form
+            Form form = doc.Form;
+            if (form == null)
+            {
+                Console.Error.WriteLine("The PDF does not contain a form.");
+                return;
+            }
 
-            // Add a push‑button field named "ResetBtn" on page 1.
-            // Coordinates: lower‑left (50, 750), upper‑right (150, 800)
-            editor.AddField(FieldType.PushButton, "ResetBtn", 1, 50f, 750f, 150f, 800f);
+            // Create a reset button on the first page
+            Page page = doc.Pages[1];
 
-            // Attach JavaScript that resets the form to its default values.
-            string resetScript = "this.resetForm();";
-            editor.SetFieldScript("ResetBtn", resetScript);
+            // Define button rectangle (llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle btnRect = new Aspose.Pdf.Rectangle(100, 500, 200, 530);
 
-            // Save the updated PDF.
-            editor.Save(outputPath);
+            // Instantiate the button field and set its visual properties
+            ButtonField resetButton = new ButtonField(page, btnRect);
+            resetButton.PartialName = "ResetButton";
+            resetButton.AlternateCaption = "Reset";
+            resetButton.Border = new Border(resetButton) { Width = 1 };
+            resetButton.Color = Color.LightGray;
+
+            // Assign a JavaScript action that resets the form to its default values
+            // (ResetFormAction is not available via AnnotationActionCollection, so we use JavaScript)
+            resetButton.Actions.OnReleaseMouseBtn = new JavascriptAction("this.resetForm();");
+
+            // Add the button annotation to the page
+            page.Annotations.Add(resetButton);
+
+            // Save the modified PDF (lifecycle rule: use Document.Save)
+            doc.Save(outputPath);
         }
 
         Console.WriteLine($"PDF with reset button saved to '{outputPath}'.");
