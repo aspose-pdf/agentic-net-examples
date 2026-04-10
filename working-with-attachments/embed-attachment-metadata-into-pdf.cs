@@ -1,14 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
         const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string outputPdf = "output_with_attachment.pdf";
         const string attachmentPath = "attachment.txt";
 
         if (!File.Exists(inputPdf))
@@ -23,25 +22,36 @@ class Program
             return;
         }
 
-        // Load the existing PDF document
         using (Document doc = new Document(inputPdf))
         {
-            // Add the attachment without creating an annotation
-            using (PdfContentEditor editor = new PdfContentEditor())
+            // -------------------------------------------------------------
+            // 1. Create a FileSpecification for the attachment and set its
+            //    contents via a stream. Then add it to the EmbeddedFiles
+            //    collection of the document.
+            // -------------------------------------------------------------
+            var fileSpec = new FileSpecification(attachmentPath, "Attachment");
+            using (FileStream attStream = File.OpenRead(attachmentPath))
             {
-                editor.BindPdf(doc);
-                editor.AddDocumentAttachment(attachmentPath, "Sample attachment");
+                var mem = new MemoryStream();
+                attStream.CopyTo(mem);
+                mem.Position = 0;
+                fileSpec.Contents = mem;
             }
+            doc.EmbeddedFiles.Add(fileSpec);
 
-            // Embed attachment metadata into the document information dictionary
-            // Custom keys can be any string; here we store file name and description
-            doc.Info.Add("AttachmentFileName", Path.GetFileName(attachmentPath));
-            doc.Info.Add("AttachmentDescription", "Sample attachment");
+            // -------------------------------------------------------------
+            // 2. Store attachment metadata (e.g., file name) into the
+            //    document information dictionary.
+            // -------------------------------------------------------------
+            doc.Info.Add("Attachment", Path.GetFileName(attachmentPath));
 
-            // Save the modified PDF
-            doc.Save(outputPdf);
+            // -------------------------------------------------------------
+            // 3. Save the document using explicit PdfSaveOptions.
+            // -------------------------------------------------------------
+            var saveOpts = new PdfSaveOptions();
+            doc.Save(outputPdf, saveOpts);
         }
 
-        Console.WriteLine($"PDF saved with attachment and metadata to '{outputPdf}'.");
+        Console.WriteLine($"PDF saved with attachment and metadata: {outputPdf}");
     }
 }

@@ -1,31 +1,40 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.txt";
+        const string inputPdf  = "sample.pdf";
+        const string outputTxt = "sample_text.txt";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        using (PdfExtractor extractor = new PdfExtractor())
-        {
-            extractor.BindPdf(inputPath);
-            // Configure extractor to ignore images by not invoking ExtractImage.
-            // Setting the mode explicitly (default is DefinedInResources) makes the intent clear.
-            extractor.ExtractImageMode = ExtractImageMode.DefinedInResources;
-            extractor.ExtractText();
-            extractor.GetText(outputPath);
-        }
+        // Initialize the PdfExtractor facade
+        PdfExtractor extractor = new PdfExtractor();
 
-        Console.WriteLine($"Text extracted to '{outputPath}'.");
+        // Bind the PDF document to the extractor
+        extractor.BindPdf(inputPdf);
+
+        // Do NOT invoke extractor.ExtractImage(); – this prevents any image extraction
+        // (If called, images would be extracted according to ExtractImageMode.)
+        // Optionally, you can set the mode, but it has no effect when ExtractImage() is not called.
+        // extractor.ExtractImageMode = ExtractImageMode.DefinedInResources;
+
+        // Extract only the textual content
+        extractor.ExtractText();
+
+        // Save the extracted text to a file
+        extractor.GetText(outputTxt);
+
+        // Release resources held by the extractor
+        extractor.Close();
+
+        Console.WriteLine($"Text extracted to '{outputTxt}'. Images were ignored.");
     }
 }

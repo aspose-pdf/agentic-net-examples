@@ -1,30 +1,46 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputXml = "form_fields.xml";
+        // Input PDF containing form fields
+        const string inputPdfPath = "input.pdf";
 
-        if (!File.Exists(inputPdf))
+        // Output XML file that will contain the exported form fields (document model)
+        const string outputXmlPath = "form_fields.xml";
+
+        // Verify that the input file exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Use the Facade Form class to export PDF form fields to XML
-        using (Form form = new Form())
+        // Load the PDF document
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
-            form.BindPdf(inputPdf);
-            using (FileStream xmlStream = new FileStream(outputXml, FileMode.Create, FileAccess.Write))
+            // Ensure the document actually contains a form
+            if (pdfDocument.Form == null || pdfDocument.Form.Count == 0)
             {
-                form.ExportXml(xmlStream);
+                Console.WriteLine("The PDF does not contain any form fields to export.");
             }
+
+            // Export the document (including its form fields) to XML.
+            // Document.SaveXml writes the entire PDF structure to an XML file.
+            pdfDocument.SaveXml(outputXmlPath);
         }
 
-        Console.WriteLine($"Form fields have been exported to '{outputXml}'.");
+        // Optionally, confirm that the XML file was created
+        if (File.Exists(outputXmlPath))
+        {
+            Console.WriteLine($"Form fields exported successfully to '{outputXmlPath}'.");
+        }
+        else
+        {
+            Console.Error.WriteLine("Failed to create the XML output file.");
+        }
     }
 }
