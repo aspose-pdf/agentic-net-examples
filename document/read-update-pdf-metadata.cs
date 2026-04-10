@@ -6,31 +6,40 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
+        const string newAuthor  = "John Doe";
+        const string newTitle   = "Updated Title";
 
+        // Verify the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Read existing metadata
-            string originalAuthor = doc.Info.Author;
-            string originalTitle = doc.Info.Title;
-            Console.WriteLine($"Original Author: {originalAuthor}");
-            Console.WriteLine($"Original Title: {originalTitle}");
+            // Load the PDF document (lifecycle rule: use Document constructor)
+            using (Document doc = new Document(inputPath))
+            {
+                // Read existing metadata
+                Console.WriteLine($"Original Author: {doc.Info.Author}");
+                Console.WriteLine($"Original Title : {doc.Info.Title}");
 
-            // Modify metadata
-            doc.Info.Author = "New Author Name";
-            doc.Info.Title = "New Document Title";
+                // Modify the Author and Title fields
+                doc.Info.Author = newAuthor;
+                doc.Info.Title  = newTitle;
 
-            // Save the updated PDF
-            doc.Save(outputPath);
+                // Save the updated PDF (lifecycle rule: use Document.Save)
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Metadata updated and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Metadata updated and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

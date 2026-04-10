@@ -1,86 +1,84 @@
 using System;
+using System.Data;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Forms; // needed for TextBoxField
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "form.pdf";
-        const string outputPath = "filled.pdf";
+        const string templatePath = "template.pdf";
+        const string outputPath   = "filled.pdf";
 
-        if (!File.Exists(inputPath))
+        // ---------------------------------------------------------------------
+        // Ensure that a template PDF exists. If it does not, create a minimal one
+        // containing the form fields that will be filled later. This prevents the
+        // runtime FileNotFoundException that was previously thrown.
+        // ---------------------------------------------------------------------
+        if (!File.Exists(templatePath))
         {
-            Console.Error.WriteLine($"Error: Input file '{inputPath}' not found.");
-            return;
+            CreateTemplate(templatePath);
         }
 
-        try
-        {
-            // Load the PDF document
-            Document pdfDocument = new Document(inputPath);
+        // ---------------------------------------------------------------------
+        // Prepare a DataTable whose column names match the form field names in the
+        // PDF ("Name" and "Address").
+        // ---------------------------------------------------------------------
+        DataTable data = new DataTable();
+        data.Columns.Add("Name",    typeof(string));
+        data.Columns.Add("Address", typeof(string));
 
-            // Fill text fields
-            FillFieldOrThrow(pdfDocument, "FirstName", "John");
-            FillFieldOrThrow(pdfDocument, "LastName", "Doe");
+        DataRow row = data.NewRow();
+        row["Name"]    = "John Doe";
+        row["Address"] = "123 Main St";
+        data.Rows.Add(row);
 
-            // Fill a checkbox field
-            FillFieldOrThrow(pdfDocument, "AgreeTerms", true);
+        // ---------------------------------------------------------------------
+        // Use a using‑statement so that AutoFiller is disposed automatically
+        // after the PDF is saved. This releases the unmanaged resources held by
+        // the facade.
+        // ---------------------------------------------------------------------
+        using (AutoFiller filler = new AutoFiller())
+        {
+            filler.BindPdf(templatePath);   // Bind the template PDF file
+            filler.ImportDataTable(data);   // Import the data table
+            filler.Save(outputPath);        // Save the filled PDF to a file
+        }
 
-            // Save the filled document
-            pdfDocument.Save(outputPath);
-            Console.WriteLine($"Form filled and saved to '{outputPath}'.");
-        }
-        catch (InvalidOperationException invEx)
-        {
-            // Specific handling for missing field errors
-            Console.Error.WriteLine($"Form field error: {invEx.Message}");
-        }
-        catch (FileNotFoundException fnfEx)
-        {
-            // Handles unexpected missing file errors (e.g., during Save)
-            Console.Error.WriteLine($"File error: {fnfEx.Message}");
-        }
-        catch (Exception ex)
-        {
-            // General unexpected errors (including file access issues)
-            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
-        }
+        Console.WriteLine($"Filled PDF saved to '{outputPath}'.");
     }
 
-    private static void FillFieldOrThrow(Document doc, string fieldName, string value)
+    // -------------------------------------------------------------------------
+    // Helper method that creates a very simple PDF containing two text box
+    // fields named "Name" and "Address". This method is only executed when the
+    // expected template file is missing, making the sample self‑contained.
+    // -------------------------------------------------------------------------
+    private static void CreateTemplate(string path)
     {
-        // Locate the text box field by its full name
-        var textField = doc.Form?.Fields?.FirstOrDefault(f => f.FullName == fieldName) as TextBoxField;
-        if (textField == null)
-        {
-            throw new InvalidOperationException($"Text field '{fieldName}' not found in the PDF form.");
-        }
-        textField.Value = value;
-    }
+        // Create a new PDF document.
+        Document doc = new Document();
+        Page page = doc.Pages.Add();
 
-    private static void FillFieldOrThrow(Document doc, string fieldName, bool check)
-    {
-        // Locate the field (could be a checkbox) by its full name
-        var field = doc.Form?.Fields?.FirstOrDefault(f => f.FullName == fieldName);
-        if (field == null)
+        // Define a rectangle for the "Name" field (left, bottom, right, top).
+        Rectangle nameRect = new Rectangle(100, 700, 300, 720);
+        Aspose.Pdf.Forms.TextBoxField nameField = new Aspose.Pdf.Forms.TextBoxField(page, nameRect)
         {
-            throw new InvalidOperationException($"Checkbox field '{fieldName}' not found in the PDF form.");
-        }
+            PartialName = "Name",
+            Value = string.Empty
+        };
+        doc.Form.Add(nameField);
 
-        // Try to set the Checked property via reflection (available on CheckBoxField)
-        var checkedProp = field.GetType().GetProperty("Checked");
-        if (checkedProp != null && checkedProp.CanWrite)
+        // Define a rectangle for the "Address" field.
+        Rectangle addressRect = new Rectangle(100, 650, 300, 670);
+        Aspose.Pdf.Forms.TextBoxField addressField = new Aspose.Pdf.Forms.TextBoxField(page, addressRect)
         {
-            checkedProp.SetValue(field, check);
-        }
-        else
-        {
-            // Fallback: set the raw value ("On"/"Off" are typical for PDF checkboxes)
-            field.Value = check ? "On" : "Off";
-        }
+            PartialName = "Address",
+            Value = string.Empty
+        };
+        doc.Form.Add(addressField);
+
+        // Save the template PDF.
+        doc.Save(path);
     }
 }
