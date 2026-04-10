@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Security;
 
 class Program
 {
@@ -18,15 +17,26 @@ class Program
             return;
         }
 
-        // Restrict all permissions (no printing, no copying, etc.)
-        Permissions permissions = (Permissions)0; // no permissions granted
-
-        using (Document document = new Document(inputPath))
+        try
         {
-            document.Encrypt(userPassword, ownerPassword, permissions, CryptoAlgorithm.AESx256);
-            document.Save(outputPath);
-        }
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
+            {
+                // No permissions granted => printing and copying are restricted
+                Permissions allowedPermissions = (Permissions)0;
 
-        Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
+                // Encrypt with AES‑256
+                doc.Encrypt(userPassword, ownerPassword, allowedPermissions, CryptoAlgorithm.AESx256);
+
+                // Save the encrypted PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

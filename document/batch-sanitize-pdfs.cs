@@ -1,61 +1,66 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Core Aspose.Pdf namespace
 
-class Program
+class PdfSanitizer
 {
     static void Main()
     {
-        string inputDirectory = "input-pdfs";
-        string outputDirectory = "sanitized-pdfs";
+        // Input folder containing PDFs to be sanitized
+        const string inputFolder = @"C:\InputPdfs";
+        // Output folder where sanitized PDFs will be saved
+        const string outputFolder = @"C:\SanitizedPdfs";
 
-        if (!Directory.Exists(inputDirectory))
+        // Verify input folder exists
+        if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"Input directory not found: {inputDirectory}");
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
             return;
         }
 
-        Directory.CreateDirectory(outputDirectory);
-        // Switch to output directory so Save uses a simple filename
-        string originalDirectory = Directory.GetCurrentDirectory();
-        Directory.SetCurrentDirectory(outputDirectory);
+        // Create output folder if it does not exist
+        Directory.CreateDirectory(outputFolder);
 
-        string[] pdfFiles = Directory.GetFiles(inputDirectory, "*.pdf");
-        foreach (string pdfPath in pdfFiles)
+        // Process each PDF file in the input folder
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+        foreach (string inputPath in pdfFiles)
         {
-            string fileName = Path.GetFileName(pdfPath);
             try
             {
-                using (Document doc = new Document(pdfPath))
+                // Load the PDF document
+                using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
                 {
-                    // Remove document metadata
+                    // Remove metadata (author, title, etc.)
                     doc.RemoveMetadata();
 
-                    // Flatten form fields (if any)
-                    doc.Flatten();
-
-                    // Remove PDF/A compliance
+                    // Remove PDF/A compliance if present
                     doc.RemovePdfaCompliance();
 
-                    // Remove PDF/UA compliance
+                    // Remove PDF/UA compliance if present
                     doc.RemovePdfUaCompliance();
 
-                    // Optimize resources (remove unused objects, merge duplicates)
-                    doc.OptimizeResources();
+                    // Delete all embedded file attachments, if any
+                    if (doc.EmbeddedFiles != null)
+                    {
+                        doc.EmbeddedFiles.Delete();
+                    }
 
-                    // Save sanitized PDF using the same file name in the current (output) directory
-                    doc.Save(fileName);
+                    // Build the output file path (preserve original file name)
+                    string fileName = Path.GetFileName(inputPath);
+                    string outputPath = Path.Combine(outputFolder, fileName);
+
+                    // Save the sanitized PDF
+                    doc.Save(outputPath);
                 }
 
-                Console.WriteLine($"Sanitized: {fileName}");
+                Console.WriteLine($"Sanitized: {Path.GetFileName(inputPath)} → {outputFolder}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing {fileName}: {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
             }
         }
 
-        // Restore original working directory
-        Directory.SetCurrentDirectory(originalDirectory);
+        Console.WriteLine("Batch sanitization completed.");
     }
 }
