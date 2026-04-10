@@ -1,7 +1,7 @@
 {
   "category": "working-with-text",
   "nuget_version": "26.3.0",
-  "last_updated": "2026-04-07T13:55:43Z",
+  "last_updated": "2026-04-10T07:25:20Z",
   "examples": {
     "add-plain-text-to-pdf-page": {
       "title": "Add Plain Text to a PDF Page Using TextFragment",
@@ -26,7 +26,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "insert-same-text-on-all-pdf-pages": {
@@ -47,7 +47,7 @@
         "Aspose.Pdf.Text.Position"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "load-custom-ttf-font-from-memory-stream": {
@@ -77,7 +77,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "apply-custom-otf-font-to-pdf": {
@@ -101,7 +101,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "set-character-spacing-in-pdf": {
@@ -127,7 +127,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "left-align-text-pdf": {
@@ -151,7 +151,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "center-text-horizontally-in-pdf": {
@@ -178,7 +178,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "right-align-text-on-pdf-page": {
@@ -202,7 +202,7 @@
         "Aspose.Pdf.Page.Paragraphs.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "create-multi-line-text-paragraph": {
@@ -228,7 +228,7 @@
         "Aspose.Pdf.Text.TextBuilder.AppendParagraph"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "insert-hyperlink-into-pdf-text-segment": {
@@ -251,7 +251,7 @@
         "Aspose.Pdf.Text.Position"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "add-styled-html-fragment-to-pdf-page": {
@@ -274,7 +274,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "create-footnote-with-image": {
@@ -298,7 +298,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "add-footnote-with-table-to-pdf": {
@@ -322,7 +322,7 @@
         "Aspose.Pdf.Cell"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "insert-formatted-endnote": {
@@ -346,7 +346,7 @@
         "Aspose.Pdf.Text.TextState"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "inline-text-image-paragraph": {
@@ -369,7 +369,7 @@
         "Aspose.Pdf.Image"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "add-invisible-tooltip-button-over-text": {
@@ -394,32 +394,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
-      "status": "verified"
-    },
-    "show-floating-box-on-button-hover": {
-      "title": "Show Floating Box on Button Hover Using HideAction",
-      "filename": "show-floating-box-on-button-hover.cs",
-      "description": "Demonstrates assigning a HideAction to a button's OnEnter and OnExit events to display and hide a floating text annotation when the mouse hovers over the button.",
-      "tags": [
-        "button",
-        "hideaction",
-        "annotation",
-        "pdf",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Annotations.TextAnnotation",
-        "Aspose.Pdf.Annotations.AnnotationFlags",
-        "Aspose.Pdf.Annotations.Border",
-        "Aspose.Pdf.Forms.ButtonField",
-        "Aspose.Pdf.Forms.HideAction"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "hide-floating-box-on-mouse-exit": {
@@ -445,7 +420,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "find-phrase-occurrences-pdf": {
@@ -467,7 +442,7 @@
         "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "replace-phrase-preserve-formatting": {
@@ -490,7 +465,7 @@
         "Aspose.Pdf.Page.Accept"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "add-header-to-all-pdf-pages": {
@@ -515,7 +490,7 @@
         "Aspose.Pdf.Text.TextState"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "add-page-number-footer-to-pdf": {
@@ -537,7 +512,7 @@
         "Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "add-semi-transparent-text-watermark": {
@@ -562,7 +537,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "rotate-text-in-pdf": {
@@ -586,7 +561,7 @@
         "Aspose.Pdf.Text.TextBuilder"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "apply-background-color-to-text": {
@@ -608,7 +583,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "style-textfragment-font-size-color": {
@@ -632,7 +607,7 @@
         "Aspose.Pdf.FontRepository.FindFont"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "add-text-to-pdf-using-memory-streams": {
@@ -658,7 +633,7 @@
         "Aspose.Pdf.Text.TextBuilder"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "save-pdf-to-byte-array": {
@@ -677,7 +652,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "add-text-and-encrypt-pdf": {
@@ -702,7 +677,7 @@
         "Aspose.Pdf.CryptoAlgorithm"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "add-underlined-text-to-pdf": {
@@ -727,7 +702,7 @@
         "Aspose.Pdf.Text.TextBuilder.AppendText"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "create-strikethrough-text-pdf": {
@@ -753,7 +728,7 @@
         "Aspose.Pdf.Page.Paragraphs.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "render-superscript-text": {
@@ -778,7 +753,7 @@
         "Aspose.Pdf.Text.FontRepository.FindFont"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "render-subscript-text-pdf": {
@@ -801,7 +776,7 @@
         "Aspose.Pdf.Text.TextState"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "add-text-with-custom-line-spacing": {
@@ -825,7 +800,7 @@
         "Aspose.Pdf.FontRepository.FindFont"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "adjust-word-spacing-in-pdf": {
@@ -852,7 +827,7 @@
         "Aspose.Pdf.FontRepository.FindFont"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "create-justified-text-pdf": {
@@ -879,7 +854,32 @@
         "Aspose.Pdf.Text.HorizontalAlignment"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
+      "status": "verified"
+    },
+    "enable-rtl-text-direction": {
+      "title": "Enable Right-to-Left Text Direction in PDF",
+      "filename": "enable-rtl-text-direction.cs",
+      "description": "Demonstrates setting a PDF's reading order to right‑to‑left and adding Arabic text using Aspose.Pdf.",
+      "tags": [
+        "rtl",
+        "arabic",
+        "text-direction",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Direction",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.FontRepository",
+        "Aspose.Pdf.Text.Font",
+        "Aspose.Pdf.Text.Position",
+        "Aspose.Pdf.Text.TextState"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "render-bidirectional-text-pdf": {
@@ -903,7 +903,7 @@
         "Aspose.Pdf.Text.TextState"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "set-custom-line-height-for-pdf-text": {
@@ -927,7 +927,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "simulate-kerning-using-character-spacing": {
@@ -952,7 +952,7 @@
         "Aspose.Pdf.Text.TextBuilder"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "add-text-with-automatic-ligatures-to-pdf": {
@@ -974,7 +974,7 @@
         "Aspose.Pdf.Text.TextState"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "enable-automatic-hyphenation-in-pdf": {
@@ -1000,7 +1000,7 @@
         "Aspose.Pdf.Text.TextBuilder.AppendText"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "embed-css-in-htmlfragment": {
@@ -1022,7 +1022,7 @@
         "Aspose.Pdf.Page.Paragraphs.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "create-text-link-goto-action": {
@@ -1048,7 +1048,7 @@
         "Aspose.Pdf.Annotations.GoToAction"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "add-clickable-hyperlink-text-to-pdf": {
@@ -1077,7 +1077,7 @@
         "Aspose.Pdf.Text.TextBuilder.AppendText"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "create-clickable-text-launch-action": {
@@ -1105,7 +1105,7 @@
         "Aspose.Pdf.Annotations.LaunchAction"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "set-text-opacity-pdf": {
@@ -1130,7 +1130,7 @@
         "Aspose.Pdf.Text.TextBuilder.AppendText"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "rotate-specific-text-fragment-pdf": {
@@ -1153,7 +1153,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "insert-rotated-text-second-page": {
@@ -1180,7 +1180,7 @@
         "Aspose.Pdf.Text.TextBuilder.AppendText"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "create-rotated-text-paragraph": {
@@ -1209,7 +1209,7 @@
         "TextBuilder.AppendParagraph"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "replace-confidential-with-public-in-pdf": {
@@ -1230,7 +1230,7 @@
         "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "extract-email-addresses-from-pdf": {
@@ -1252,50 +1252,34 @@
         "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
-    "identify-line-breaks-in-pdf-text-fragments": {
-      "title": "Identify and Process Line Breaks in PDF Text Fragments",
-      "filename": "identify-line-breaks-in-pdf-text-fragments.cs",
-      "description": "Shows how to use ParagraphAbsorber to retrieve markup paragraphs, iterate through TextFragment lines, detect soft hyphen line breaks, and merge fragments for custom layout handling.",
+    "iterate-textfragment-lines-detect-hard-breaks": {
+      "title": "Iterate TextFragment Lines to Detect Hard Line Breaks",
+      "filename": "iterate-textfragment-lines-detect-hard-breaks.cs",
+      "description": "Shows how to use ParagraphAbsorber to retrieve paragraph lines from a PDF, concatenate fragment text, and identify hard line‑breaks using heuristics on the last TextFragment.",
       "tags": [
-        "pdf",
-        "text-fragment",
+        "paragraph",
         "line-break",
-        "paragraph-absorber",
-        "aspnet"
+        "textfragment",
+        "aspose-pdf",
+        "layout"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.ParagraphAbsorber",
-        "Aspose.Pdf.Facades.ParagraphAbsorber.Visit",
-        "Aspose.Pdf.MarkupParagraph.Lines",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Text.ParagraphAbsorber",
+        "Aspose.Pdf.Text.ParagraphAbsorber.Visit",
+        "Aspose.Pdf.Text.ParagraphAbsorber.PageMarkups",
+        "Aspose.Pdf.Text.PageMarkup",
+        "Aspose.Pdf.Text.PageMarkup.Sections",
+        "Aspose.Pdf.Text.MarkupParagraph",
+        "Aspose.Pdf.Text.MarkupParagraph.Lines",
         "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
-      "status": "verified"
-    },
-    "retrieve-line-break-info-from-pdf": {
-      "title": "Retrieve Line Break Information from PDF Text Fragments",
-      "filename": "retrieve-line-break-info-from-pdf.cs",
-      "description": "Shows how to extract text fragments from a PDF, split them into logical lines, and log line‑break details along with the position of each text segment.",
-      "tags": [
-        "pdf",
-        "text-extraction",
-        "line-breaks",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.TextFragmentAbsorber",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.TextSegment"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "append-disclaimer-to-first-pdf-page": {
@@ -1319,7 +1303,7 @@
         "Aspose.Pdf.Text.TextBuilder.AppendText"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "rotate-header-text-fragments": {
@@ -1340,7 +1324,7 @@
         "Aspose.Pdf.Text.TextState"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "replace-text-rotate-pdf-page": {
@@ -1363,7 +1347,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "search-text-and-log-errors": {
@@ -1384,7 +1368,7 @@
         "Aspose.Pdf.Text.TextExtractionError"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "extract-text-from-pdf-to-utf8": {
@@ -1404,7 +1388,7 @@
         "Aspose.Pdf.PageCollection.Accept"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "extract-line-break-positions-pdf": {
@@ -1426,7 +1410,7 @@
         "Aspose.Pdf.Text.Position"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "add-rotated-text-watermark-to-pdf-pages": {
@@ -1450,7 +1434,7 @@
         "Aspose.Pdf.Text.Position"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "replace-text-on-specific-pdf-pages": {
@@ -1472,7 +1456,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "case-insensitive-keyword-highlighting": {
@@ -1496,7 +1480,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "add-rotated-mixed-style-text-paragraph": {
@@ -1524,7 +1508,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "batch-replace-text-in-pdfs": {
@@ -1546,7 +1530,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "extract-text-word-count-per-pdf-page": {
@@ -1566,7 +1550,7 @@
         "Aspose.Pdf.Page.Accept"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "rotate-draft-text-fragments": {
@@ -1586,7 +1570,7 @@
         "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "find-dates-in-pdf-using-regex": {
@@ -1607,7 +1591,7 @@
         "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "append-multi-line-textfragment-get-line-break-positions": {
@@ -1633,7 +1617,7 @@
         "Aspose.Pdf.Text.TextState"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "rotate-table-cell-text-60-degrees": {
@@ -1654,30 +1638,33 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "rotate-pdf-title-text-45-degrees": {
       "title": "Rotate PDF Title Text by 45 Degrees",
       "filename": "rotate-pdf-title-text-45-degrees.cs",
-      "description": "Shows how to use Aspose.Pdf's PdfPageEditor to rotate the title text (page content) of PDF files by 45 degrees and save the resulting documents.",
+      "description": "Shows how to load PDF files, create a rotated TextFragment for the document title, add it to every page, and save the updated PDFs.",
       "tags": [
         "pdf",
-        "rotation",
-        "aspose",
-        "facade",
+        "text-rotation",
+        "title",
+        "aspose-pdf",
         "csharp"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.Rotation",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save",
-        "Aspose.Pdf.Facades.PdfPageEditor.Close"
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.FontRepository",
+        "Aspose.Pdf.Text.FontRepository.FindFont",
+        "Aspose.Pdf.Text.Color",
+        "Aspose.Pdf.Position",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.Paragraphs.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "add-rotated-text-bottom-right-last-page": {
@@ -1699,7 +1686,7 @@
         "Aspose.Pdf.Text.TextBuilder"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "search-replace-text-with-hyperlink": {
@@ -1723,7 +1710,7 @@
         "Aspose.Pdf.Page"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "extract-pdf-text-sentences-pages": {
@@ -1748,7 +1735,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "rotate-pdf-form-field-text": {
@@ -1774,7 +1761,7 @@
         "Aspose.Pdf.Forms.Form.AddFieldAppearance"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "batch-replace-text-pdf-config": {
@@ -1796,7 +1783,7 @@
         "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     },
     "fuzzy-text-search-pdf": {
@@ -1817,7 +1804,7 @@
         "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-07T13:55:43Z",
+      "generated_at": "2026-04-10T07:25:20Z",
       "status": "verified"
     }
   }
