@@ -1,41 +1,41 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string templatePath = "template.pdf";
-        const string jsonPath = "data.json";
-        const string outputPath = "filled_form.pdf";
+        // Paths for the PDF form template, JSON data and the output PDF
+        const string templatePdfPath = "template.pdf";
+        const string jsonDataPath    = "data.json";
+        const string outputPdfPath   = "filled.pdf";
 
-        if (!File.Exists(templatePath))
+        // Verify that the required files exist
+        if (!File.Exists(templatePdfPath))
         {
-            Console.Error.WriteLine($"Template not found: {templatePath}");
+            Console.Error.WriteLine($"Template PDF not found: {templatePdfPath}");
+            return;
+        }
+        if (!File.Exists(jsonDataPath))
+        {
+            Console.Error.WriteLine($"JSON data file not found: {jsonDataPath}");
             return;
         }
 
-        if (!File.Exists(jsonPath))
+        // Load the PDF form using the Form facade and import JSON values
+        using (Form form = new Form(templatePdfPath))
         {
-            Console.Error.WriteLine($"JSON data not found: {jsonPath}");
-            return;
-        }
-
-        using (Document doc = new Document(templatePath))
-        {
-            using (Form form = new Form(doc))
+            // Import JSON stream – keys must match the full field names in the PDF
+            using (FileStream jsonStream = File.OpenRead(jsonDataPath))
             {
-                using (FileStream jsonStream = File.OpenRead(jsonPath))
-                {
-                    form.ImportJson(jsonStream);
-                }
+                form.ImportJson(jsonStream);
             }
 
-            doc.Save(outputPath);
+            // Save the PDF with fields populated from the JSON
+            form.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Form filled PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with pre‑filled form fields saved to '{outputPdfPath}'.");
     }
 }

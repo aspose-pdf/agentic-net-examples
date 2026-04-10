@@ -7,67 +7,65 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputDocx = "output.docx";
+        const string inputPdfPath = "input.pdf";
+        const string outputDocxPath = "output.docx";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        using (Document doc = new Document(inputPdf))
+        // Load the source PDF
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Add a new page at the end for the Table of Figures
-            Page tocPage = doc.Pages.Add();
+            // Create a new page at the end of the document to hold the Table of Figures
+            Page tocPage = pdfDoc.Pages.Add();
 
-            // Title for the table
-            TextFragment title = new TextFragment("Table of Figures");
-            title.TextState.FontSize = 16;
-            title.TextState.FontStyle = FontStyles.Bold;
-            tocPage.Paragraphs.Add(title);
-            tocPage.Paragraphs.Add(new TextFragment("\n"));
-
-            // Create a table with two columns: Figure and Page
-            Table table = new Table();
-            table.ColumnWidths = "30% 70%";
-
-            // Set default text style for all cells (used for header bold text)
-            table.DefaultCellTextState = new TextState { FontStyle = FontStyles.Bold };
-
-            // Header row
-            Row header = table.Rows.Add();
-            Cell h1 = header.Cells.Add("Figure");
-            Cell h2 = header.Cells.Add("Page");
-            foreach (Cell cell in header.Cells)
+            // Create a table with two columns: Figure number and Description (placeholder)
+            Table figuresTable = new Table
             {
-                cell.BackgroundColor = Color.LightGray;
-                // Font style is already applied via Table.DefaultCellTextState
-            }
+                // Adjust column widths as needed (e.g., 100 points for number, rest for description)
+                ColumnWidths = "100 400"
+            };
 
-            int figureIndex = 1;
+            // Add header row
+            Row header = figuresTable.Rows.Add();
+            header.Cells.Add("Figure");
+            header.Cells.Add("Description");
+
             // Iterate through all pages and collect images
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            int figureIndex = 1;
+            foreach (Page page in pdfDoc.Pages)
             {
-                Page page = doc.Pages[i];
                 foreach (XImage img in page.Resources.Images)
                 {
-                    Row row = table.Rows.Add();
+                    // For each image, add a row to the table
+                    Row row = figuresTable.Rows.Add();
                     row.Cells.Add($"Figure {figureIndex}");
-                    row.Cells.Add(i.ToString());
+                    row.Cells.Add($"Image on page {page.Number}"); // placeholder description
                     figureIndex++;
                 }
             }
 
-            // Add the table to the page
-            tocPage.Paragraphs.Add(table);
+            // Add the table to the new page
+            tocPage.Paragraphs.Add(figuresTable);
 
-            // Convert the PDF (with the added table) to DOCX
-            DocSaveOptions saveOptions = new DocSaveOptions();
-            saveOptions.Mode = DocSaveOptions.RecognitionMode.Flow;
-            doc.Save(outputDocx, saveOptions);
+            // Prepare DOCX save options
+            DocSaveOptions saveOptions = new DocSaveOptions
+            {
+                // Export as DOCX
+                Format = DocSaveOptions.DocFormat.DocX,
+                // Use Flow mode for better editability
+                Mode = DocSaveOptions.RecognitionMode.Flow,
+                // Optional: improve bullet recognition, etc.
+                RecognizeBullets = true
+            };
+
+            // Save the PDF (now containing the Table of Figures) as DOCX
+            pdfDoc.Save(outputDocxPath, saveOptions);
         }
 
-        Console.WriteLine($"PDF converted to DOCX with table of figures: {outputDocx}");
+        Console.WriteLine($"PDF converted to DOCX with Table of Figures: {outputDocxPath}");
     }
 }
