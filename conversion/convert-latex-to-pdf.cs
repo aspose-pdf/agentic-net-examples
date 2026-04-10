@@ -6,25 +6,33 @@ class Program
 {
     static void Main()
     {
-        // Path to the directory containing the .tex file.
-        string dataDir = "YOUR_DATA_DIRECTORY";
+        // Path to the directory containing the LaTeX source file.
+        string dataDir = @"YOUR_DATA_DIRECTORY";
+
+        // Input LaTeX file (.tex).
         string texFile = Path.Combine(dataDir, "sample.tex");
+
+        // Desired output PDF file.
         string pdfFile = Path.Combine(dataDir, "sample.pdf");
 
+        // Verify that the source file exists.
         if (!File.Exists(texFile))
         {
-            Console.Error.WriteLine($"TeX file not found: {texFile}");
+            Console.Error.WriteLine($"LaTeX file not found: {texFile}");
             return;
         }
 
-        // Load the LaTeX file with TeXLoadOptions.
-        TeXLoadOptions loadOptions = new TeXLoadOptions();
-        using (Document pdfDoc = new Document(texFile, loadOptions))
+        // Initialize TeXLoadOptions.
+        // Leaving RasterizeFormulas = false (default) preserves equations as vector graphics.
+        TeXLoadOptions texLoadOptions = new TeXLoadOptions();
+
+        // Load the LaTeX file and convert it to a PDF document.
+        using (Document pdfDocument = new Document(texFile, texLoadOptions))
         {
-            // Save the document as PDF – equations and formatting are preserved.
-            pdfDoc.Save(pdfFile);
+            // Save the resulting PDF.
+            pdfDocument.Save(pdfFile);
         }
 
-        Console.WriteLine($"Converted '{texFile}' to PDF '{pdfFile}'.");
+        Console.WriteLine($"LaTeX file successfully converted to PDF: {pdfFile}");
     }
 }
