@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -10,37 +9,43 @@ class Program
     {
         const string pdf1Path = "first.pdf";
         const string pdf2Path = "second.pdf";
-        const string outputPath = "merged.pdf";
-        const string tempRenamedPdf2 = "second_renamed.pdf";
+        const string outputPath = "merged_unique_fields.pdf";
 
         if (!File.Exists(pdf1Path) || !File.Exists(pdf2Path))
         {
-            Console.Error.WriteLine("One or both input files not found.");
+            Console.Error.WriteLine("One or both input files are missing.");
             return;
         }
 
-        // Load the second document, rename its form fields to avoid name collisions,
-        // and save it to a temporary file.
-        using (Document doc2 = new Document(pdf2Path))
+        try
         {
-            foreach (Field field in doc2.Form.Fields)
+            // Load the first PDF (target) – it will receive pages from the second PDF.
+            using (Document targetDoc = new Document(pdf1Path))
+            // Load the second PDF (source) – its fields will be renamed before merging.
+            using (Document sourceDoc = new Document(pdf2Path))
             {
-                field.Name = $"doc2_{field.Name}"; // make the name unique
+                // Prefix to make field names unique.
+                const string prefix = "Doc2_";
+
+                // Rename every form field in the source document.
+                foreach (Field field in sourceDoc.Form)
+                {
+                    // The FullName property is read‑only; rename via the PartialName property.
+                    field.PartialName = prefix + field.PartialName;
+                }
+
+                // Merge pages (including the renamed form fields) into the target document.
+                targetDoc.Pages.Add(sourceDoc.Pages);
+
+                // Save the merged PDF.
+                targetDoc.Save(outputPath);
             }
-            doc2.Save(tempRenamedPdf2);
+
+            Console.WriteLine($"Merged PDF saved to '{outputPath}'.");
         }
-
-        // Use PdfFileEditor.Concatenate to merge the first PDF with the renamed second PDF.
-        // Concatenate preserves AcroForm fields.
-        PdfFileEditor editor = new PdfFileEditor();
-        editor.Concatenate(new string[] { pdf1Path, tempRenamedPdf2 }, outputPath);
-
-        // Clean up the temporary file.
-        if (File.Exists(tempRenamedPdf2))
+        catch (Exception ex)
         {
-            File.Delete(tempRenamedPdf2);
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
-
-        Console.WriteLine($"Merged PDF saved to '{outputPath}'.");
     }
 }

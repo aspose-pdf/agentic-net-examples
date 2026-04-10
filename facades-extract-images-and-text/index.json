@@ -1,166 +1,63 @@
 {
-  "category": "Facades - Extract Images and Text",
-  "last_updated": "2026-03-30T08:42:17Z",
+  "category": "facades-extract-images-and-text",
+  "nuget_version": "26.3.0",
+  "last_updated": "2026-04-10T06:41:15Z",
   "examples": {
-    "extract-pdf-text": {
+    "extract-text-from-pdf-to-utf8-txt": {
       "title": "Extract Text from PDF to UTF-8 Text File",
-      "filename": "extract-pdf-text.cs",
-      "description": "Demonstrates how to extract all plain text from a PDF document using PdfExtractor and save it as a UTF‑8 encoded .txt file.",
+      "filename": "extract-text-from-pdf-to-utf8-txt.cs",
+      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfExtractor to extract all text from a PDF document and save it as a UTF-8 encoded .txt file.",
       "tags": [
         "pdf",
         "text-extraction",
         "utf-8",
-        "aspose-pdf",
+        "aspose",
         "facade"
-      ],
-      "apis_used": [
-        "PdfExtractor",
-        "PdfExtractor.BindPdf",
-        "PdfExtractor.ExtractText",
-        "PdfExtractor.GetText"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "check-pdf-contains-text": {
-      "title": "Check if PDF Contains Any Text via MemoryStream",
-      "filename": "check-pdf-contains-text.cs",
-      "description": "Extracts the PDF text to a MemoryStream using PdfExtractor and determines if any text is present by checking the stream length.",
-      "tags": [
-        "pdf",
-        "text-extraction",
-        "memorystream",
-        "facade",
-        "aspdf"
-      ],
-      "apis_used": [
-        "PdfExtractor",
-        "PdfExtractor.BindPdf",
-        "PdfExtractor.ExtractText",
-        "PdfExtractor.GetText",
-        "MemoryStream"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "batch-extract-pdf-text": {
-      "title": "Batch Extract Text from PDFs to Matching Text Files",
-      "filename": "batch-extract-pdf-text.cs",
-      "description": "Processes all PDF files in a folder, extracts their text using Aspose.Pdf.Facades.PdfExtractor, and saves each result as a .txt file with the same base name.",
-      "tags": [
-        "pdf",
-        "text-extraction",
-        "batch",
-        "aspdf",
-        "facades"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfExtractor",
-        "PdfExtractor.BindPdf",
-        "PdfExtractor.ExtractText",
-        "PdfExtractor.GetText"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "check-pdf-text-and-images": {
-      "title": "Check if PDF Contains Both Text and Images",
-      "filename": "check-pdf-text-and-images.cs",
-      "description": "Demonstrates how to use PdfExtractor to determine whether a PDF file contains any text and any images.",
-      "tags": [
-        "pdf",
-        "extractor",
-        "text",
-        "images",
-        "validation"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfExtractor",
         "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
         "Aspose.Pdf.Facades.PdfExtractor.ExtractText",
-        "Aspose.Pdf.Facades.PdfExtractor.HasNextPageText",
-        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
-        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage"
+        "Aspose.Pdf.Facades.PdfExtractor.GetText",
+        "Aspose.Pdf.Facades.PdfExtractor.Close"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "extract-text-and-images": {
-      "title": "Extract Text and Images from PDF using PdfExtractor",
-      "filename": "extract-text-and-images.cs",
-      "description": "Demonstrates how to bind a PDF file with PdfExtractor, enable both text and image extraction, and save the results to files.",
-      "tags": [
-        "pdf",
-        "extraction",
-        "text",
-        "image",
-        "pdfextractor"
-      ],
-      "apis_used": [
-        "PdfExtractor",
-        "PdfExtractor.BindPdf",
-        "PdfExtractor.ExtractText",
-        "PdfExtractor.ExtractImage",
-        "PdfExtractor.GetText",
-        "PdfExtractor.HasNextImage",
-        "PdfExtractor.GetNextImage"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-text-owner-protected-pdf": {
-      "title": "Extract Text from Owner-Password Protected PDF",
-      "filename": "extract-text-owner-protected-pdf.cs",
-      "description": "Shows how to open a PDF encrypted with an owner password and extract its text using Aspose.Pdf.",
+    "extract-pdf-text-to-memorystream": {
+      "title": "Extract PDF Text to MemoryStream Using Aspose.Pdf",
+      "filename": "extract-pdf-text-to-memorystream.cs",
+      "description": "Demonstrates loading a PDF from a MemoryStream, extracting its text with PdfExtractor, and writing the result to another MemoryStream for in‑memory processing.",
       "tags": [
         "pdf",
         "text-extraction",
-        "encryption",
-        "owner-password",
-        "aspnet"
+        "memorystream",
+        "aspose.pdf",
+        "facade"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.TextAbsorber"
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractText",
+        "Aspose.Pdf.Facades.PdfExtractor.GetText"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "extract-pdf-text-utf8": {
-      "title": "Extract PDF Text and Save to UTF-8 File",
-      "filename": "extract-pdf-text-utf8.cs",
-      "description": "Demonstrates extracting all text from a PDF using Aspose.Pdf and writing it to a UTF‑8 encoded text file.",
+    "check-pdf-contains-text": {
+      "title": "Check if PDF Contains Text",
+      "filename": "check-pdf-contains-text.cs",
+      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfExtractor to extract text from a PDF into a MemoryStream and determine if any text is present by checking the stream length.",
       "tags": [
         "pdf",
         "text-extraction",
-        "utf8",
-        "file-output",
-        "aspdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.TextAbsorber"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-text-from-pdf-byte-array": {
-      "title": "Extract Text from PDF Byte Array using PdfExtractor",
-      "filename": "extract-text-from-pdf-byte-array.cs",
-      "description": "Demonstrates how to extract all text from a PDF stored in a byte array using Aspose.Pdf.Facades.PdfExtractor without writing any files.",
-      "tags": [
-        "pdf",
-        "text-extraction",
-        "byte-array",
-        "pdfextractor",
-        "facades"
+        "memorystream",
+        "aspose",
+        "validation"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfExtractor",
@@ -169,35 +66,168 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetText"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "extract-pdf-text-per-page": {
-      "title": "Extract PDF Text Page-by-Page",
-      "filename": "extract-pdf-text-per-page.cs",
-      "description": "Extracts text from a PDF and saves each page's content into separate text files using PdfExtractor.",
+    "batch-pdf-text-extraction": {
+      "title": "Batch PDF Text Extraction",
+      "filename": "batch-pdf-text-extraction.cs",
+      "description": "Processes all PDF files in a specified folder, extracts their text using Aspose.Pdf.Facades.PdfExtractor, and saves each result as a .txt file with the same base name.",
       "tags": [
         "pdf",
         "text-extraction",
-        "page-split",
-        "aspdf",
-        "facades"
+        "batch",
+        "aspose-pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractText",
+        "Aspose.Pdf.Facades.PdfExtractor.GetText"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "check-pdf-for-text-and-images": {
+      "title": "Check PDF for Text and Images",
+      "filename": "check-pdf-for-text-and-images.cs",
+      "description": "Demonstrates using Aspose.Pdf.Facades.PdfExtractor to determine whether a PDF file contains both textual content and images.",
+      "tags": [
+        "pdf",
+        "text",
+        "image",
+        "extraction",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractText",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextPageText",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-text-and-images-from-pdf": {
+      "title": "Extract Text and Images from PDF Using PdfExtractor",
+      "filename": "extract-text-and-images-from-pdf.cs",
+      "description": "Demonstrates how to create a PdfExtractor, bind a PDF file, and simultaneously extract all text to a file and all images to separate PNG files.",
+      "tags": [
+        "pdf",
+        "text-extraction",
+        "image-extraction",
+        "pdfextractor",
+        "csharp"
       ],
       "apis_used": [
         "PdfExtractor",
         "PdfExtractor.BindPdf",
         "PdfExtractor.ExtractText",
-        "PdfExtractor.HasNextPageText",
-        "PdfExtractor.GetNextPageText"
+        "PdfExtractor.ExtractImage",
+        "PdfExtractor.GetText",
+        "PdfExtractor.HasNextImage",
+        "PdfExtractor.GetNextImage",
+        "PdfExtractor.Close"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "pdfextractor-text-extraction-test": {
-      "title": "Unit Test for PdfExtractor Text Extraction",
-      "filename": "pdfextractor-text-extraction-test.cs",
-      "description": "Demonstrates a unit test that creates a PDF, extracts its text using PdfExtractor, and verifies the extracted content.",
+    "extract-text-from-protected-pdf": {
+      "title": "Extract Text from Password-Protected PDF",
+      "filename": "extract-text-from-protected-pdf.cs",
+      "description": "Shows how to set the owner password on a PdfExtractor, bind an encrypted PDF, and extract its text to a .txt file.",
+      "tags": [
+        "pdf",
+        "text-extraction",
+        "password-protected",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.Password",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractText",
+        "Aspose.Pdf.Facades.PdfExtractor.GetText"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-pdf-text-save-utf8": {
+      "title": "Extract PDF Text and Save as UTF-8 File",
+      "filename": "extract-pdf-text-save-utf8.cs",
+      "description": "Demonstrates using Aspose.Pdf.Facades.PdfExtractor to extract Unicode text from a PDF and write it to a UTF-8 encoded text file.",
+      "tags": [
+        "pdf",
+        "text-extraction",
+        "utf-8",
+        "aspose",
+        "c#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractText",
+        "Aspose.Pdf.Facades.PdfExtractor.GetText"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-text-from-pdf-byte-array": {
+      "title": "Extract Text from PDF Byte Array",
+      "filename": "extract-text-from-pdf-byte-array.cs",
+      "description": "Demonstrates how to use Aspose.Pdf's PdfExtractor to read a PDF stored in a byte array, extract its text, and return it as a string without any file system access.",
+      "tags": [
+        "pdf",
+        "text-extraction",
+        "memorystream",
+        "aspose-pdf",
+        "byte-array"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Page"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-pdf-text-per-page": {
+      "title": "Extract PDF Text and Save Each Page to Separate Files",
+      "filename": "extract-pdf-text-per-page.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfExtractor to extract text from a PDF document and write the text of each page into individual .txt files.",
+      "tags": [
+        "pdf",
+        "text-extraction",
+        "page-splitting",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractText",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextPageText",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextPageText"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "pdf-extractor-unit-test": {
+      "title": "Unit Test for Extracting Text with PdfExtractor",
+      "filename": "pdf-extractor-unit-test.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfExtractor to extract text from a PDF file and verify the result with a simple MSTest unit test.",
       "tags": [
         "pdf",
         "text-extraction",
@@ -206,92 +236,70 @@
         "facade"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfExtractor",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Page",
         "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
         "Aspose.Pdf.Facades.PdfExtractor.ExtractText",
         "Aspose.Pdf.Facades.PdfExtractor.GetText"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "extract-pdf-text__v2": {
-      "title": "Extract Text from PDF and Print to Console",
-      "filename": "extract-pdf-text__v2.cs",
-      "description": "Demonstrates a console application that loads a PDF file, extracts all its text using Aspose.Pdf's TextAbsorber, and writes the result to the console.",
+    "extract-text-from-pdf": {
+      "title": "Extract Text from PDF Using Aspose.Pdf.Facades",
+      "filename": "extract-text-from-pdf.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfExtractor to extract all text from a PDF file and output it to the console.",
       "tags": [
         "pdf",
         "text-extraction",
+        "aspose",
         "console",
-        "aspdf",
         "csharp"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.TextAbsorber",
-        "Aspose.Pdf.Document.Pages.Accept",
-        "Aspose.Pdf.Text.TextAbsorber.Text"
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractText",
+        "Aspose.Pdf.Facades.PdfExtractor.GetText"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
     "extract-pdf-text-to-stringbuilder": {
-      "title": "Extract PDF Text to StringBuilder using Aspose.Pdf",
+      "title": "Extract PDF Text to StringBuilder and Save to File",
       "filename": "extract-pdf-text-to-stringbuilder.cs",
-      "description": "Demonstrates extracting all text from a PDF into a StringBuilder for manipulation before saving the result to a text file.",
+      "description": "Demonstrates extracting all text from a PDF into a StringBuilder using Aspose.Pdf's PdfExtractor, then writing the accumulated text to a Unicode text file.",
       "tags": [
         "pdf",
         "text-extraction",
         "stringbuilder",
         "aspose-pdf",
-        "c#"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.TextAbsorber",
-        "System.Text.StringBuilder",
-        "System.IO.File.WriteAllText"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "batch-extract-text-pdf": {
-      "title": "Batch Extract Text from PDFs Using PdfExtractor",
-      "filename": "batch-extract-text-pdf.cs",
-      "description": "Shows how to use Aspose.Pdf.Facades.PdfExtractor to extract text from every PDF file in a directory and save each as a .txt file.",
-      "tags": [
-        "pdf",
-        "text-extraction",
-        "batch",
-        "pdfextractor",
-        "csharp"
+        "memory"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfExtractor",
         "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
         "Aspose.Pdf.Facades.PdfExtractor.ExtractText",
         "Aspose.Pdf.Facades.PdfExtractor.GetText",
-        "Aspose.Pdf.Facades.PdfExtractor.Close"
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "extract-text-verify": {
-      "title": "Extract Text to File and Verify Content",
-      "filename": "extract-text-verify.cs",
-      "description": "Extracts text from a PDF using PdfExtractor, saves it to a file, reads it back, and verifies that the content matches the original extraction.",
+    "batch-extract-text-from-pdfs": {
+      "title": "Batch Extract Text from PDFs using PdfExtractor",
+      "filename": "batch-extract-text-from-pdfs.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfExtractor to extract text from every PDF in a folder and write each result to a .txt file.",
       "tags": [
-        "text extraction",
         "pdf",
-        "verification",
-        "facade",
-        "temporary file"
+        "text-extraction",
+        "batch",
+        "aspose",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfExtractor",
@@ -300,38 +308,61 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetText"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "extract-text-encrypt-aes": {
-      "title": "Extract Text from PDF and Encrypt with AES",
-      "filename": "extract-text-encrypt-aes.cs",
-      "description": "Extracts all text from a PDF using PdfExtractor, then encrypts the resulting text file with AES and saves the encrypted data.",
+    "extract-text-to-temp-file-verify": {
+      "title": "Extract Text to Temporary File and Verify Content",
+      "filename": "extract-text-to-temp-file-verify.cs",
+      "description": "Demonstrates extracting text from a PDF using PdfExtractor, saving it to a temporary file, reading it back, and confirming the extracted content matches the original extraction.",
+      "tags": [
+        "pdf",
+        "text-extraction",
+        "temporary-file",
+        "verification",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractText",
+        "Aspose.Pdf.Facades.PdfExtractor.GetText"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-pdf-text-and-encrypt-aes": {
+      "title": "Extract PDF Text and Encrypt with AES",
+      "filename": "extract-pdf-text-and-encrypt-aes.cs",
+      "description": "Shows how to extract all text from a PDF using Aspose.Pdf.Facades.PdfExtractor and then encrypt the resulting .txt file with AES (CBC, 256‑bit) before saving.",
       "tags": [
         "pdf",
         "text-extraction",
         "encryption",
         "aes",
-        "facades"
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfExtractor",
-        "System.Security.Cryptography.Aes",
-        "System.Security.Cryptography.SHA256"
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractText",
+        "Aspose.Pdf.Facades.PdfExtractor.GetText"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "determine-pdf-text-only": {
-      "title": "Determine if PDF is Text-Only by Extracting Images",
-      "filename": "determine-pdf-text-only.cs",
-      "description": "Extracts all images from a PDF using PdfExtractor and reports whether the document contains any images, indicating if it is text‑only.",
+    "check-pdf-text-only-by-extracting-images": {
+      "title": "Check if PDF Is Text‑Only by Extracting Images",
+      "filename": "check-pdf-text-only-by-extracting-images.cs",
+      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfExtractor to detect whether a PDF contains any images, thereby determining if the document is text‑only.",
       "tags": [
         "pdf",
         "image-extraction",
         "text-only",
-        "validation"
+        "aspose",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfExtractor",
@@ -341,196 +372,126 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "extract-pdf-text-to-postgresql": {
-      "title": "Extract PDF Text and Store in PostgreSQL",
-      "filename": "extract-pdf-text-to-postgresql.cs",
-      "description": "Extracts all text from a PDF using Aspose.Pdf and inserts it into a PostgreSQL table for searchable indexing.",
+    "extract-text-from-pdf__v2": {
+      "title": "Extract Text from PDF Using Aspose.Pdf Facade",
+      "filename": "extract-text-from-pdf__v2.cs",
+      "description": "Shows how to load a PDF into a memory stream, use Aspose.Pdf.Facades.PdfExtractor to extract all text, and return the text as a JSON payload.",
       "tags": [
         "pdf",
         "text-extraction",
-        "postgresql",
-        "aspnet",
-        "database"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfExtractor",
-        "PdfExtractor.BindPdf",
-        "PdfExtractor.ExtractText",
-        "PdfExtractor.GetText",
-        "Npgsql.NpgsqlConnection",
-        "Npgsql.NpgsqlCommand"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "cancel-pdfextractor-extraction": {
-      "title": "Cancel PdfExtractor Extraction with InterruptMonitor",
-      "filename": "cancel-pdfextractor-extraction.cs",
-      "description": "Shows how to abort a PdfExtractor operation using an InterruptMonitor and its cancellation token.",
-      "tags": [
-        "pdf",
-        "extraction",
-        "cancellation",
-        "interruptmonitor",
-        "multithreading"
-      ],
-      "apis_used": [
-        "PdfExtractor",
-        "InterruptMonitor",
-        "PdfExtractor.BindPdf",
-        "PdfExtractor.ExtractText",
-        "PdfExtractor.GetText",
-        "InterruptMonitor.Interrupt",
-        "InterruptMonitor.CancellationToken"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-text-to-stream": {
-      "title": "Extract PDF Text to MemoryStream and Generate New PDF",
-      "filename": "extract-text-to-stream.cs",
-      "description": "Demonstrates extracting text from a PDF into a MemoryStream using PdfExtractor and then creating a new PDF from the extracted text.",
-      "tags": [
-        "text-extraction",
-        "memorystream",
-        "pdf-generation",
-        "facades",
-        "aspnet"
-      ],
-      "apis_used": [
-        "PdfExtractor",
-        "PdfExtractor.BindPdf",
-        "PdfExtractor.ExtractText",
-        "PdfExtractor.GetText",
-        "Document",
-        "Document.Save",
-        "Page",
-        "TextFragment"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "azure-function-pdf-text-extraction": {
-      "title": "Scheduled Azure Function to Extract Text from PDFs in Queue",
-      "filename": "azure-function-pdf-text-extraction.cs",
-      "description": "An Azure Function triggered by a storage queue that downloads a PDF blob, extracts its text using Aspose.Pdf, and stores the result as a .txt file.",
-      "tags": [
-        "azure-functions",
-        "queue-trigger",
-        "pdf",
-        "text-extraction",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.TextAbsorber",
-        "Aspose.Pdf.Text.TextAbsorber.Accept"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-pdf-text-gzip": {
-      "title": "Extract PDF Text to GZip Compressed Stream",
-      "filename": "extract-pdf-text-gzip.cs",
-      "description": "Demonstrates extracting all text from a PDF using PdfExtractor and writing it directly to a GZip compressed file to reduce storage size.",
-      "tags": [
-        "pdf",
-        "text-extraction",
-        "gzip",
-        "compression",
-        "facades"
+        "aspose",
+        "json",
+        "console"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfExtractor",
         "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
         "Aspose.Pdf.Facades.PdfExtractor.ExtractText",
-        "Aspose.Pdf.Facades.PdfExtractor.GetText",
-        "System.IO.Compression.GZipStream"
+        "Aspose.Pdf.Facades.PdfExtractor.GetText"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "batch-extract-pdf-text__v2": {
-      "title": "Batch extract PDF text from Azure Blob storage",
-      "filename": "batch-extract-pdf-text__v2.cs",
-      "description": "Downloads PDF files from an Azure Blob container, extracts their text using Aspose.Pdf, and uploads the extracted text back as .txt files.",
+    "extract-pdf-text-to-postgresql": {
+      "title": "Extract PDF Text and Store in PostgreSQL",
+      "filename": "extract-pdf-text-to-postgresql.cs",
+      "description": "Demonstrates creating a PDF in memory, extracting its full text with Aspose.Pdf, and inserting the extracted content into a PostgreSQL table.",
       "tags": [
-        "azure",
-        "blob",
         "pdf",
         "text-extraction",
-        "aspose"
+        "postgresql",
+        "aspose",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.TextAbsorber",
-        "Azure.Storage.Blobs.BlobServiceClient",
-        "Azure.Storage.Blobs.BlobContainerClient",
-        "Azure.Storage.Blobs.BlobClient"
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.SaveFormat"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "pdf-diagnostic-count": {
-      "title": "PDF Diagnostic: Count Pages, Images, and Attachments",
-      "filename": "pdf-diagnostic-count.cs",
-      "description": "Shows how to count the total pages, embedded images, and file attachments in a PDF using Aspose.Pdf.",
-      "tags": [
-        "pages",
-        "images",
-        "attachments",
-        "diagnostic"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.PageCollection.Count",
-        "Aspose.Pdf.Page.Resources.Images",
-        "Aspose.Pdf.Facades.PdfExtractor.ExtractAttachment",
-        "Aspose.Pdf.Facades.PdfExtractor.GetAttachmentInfo"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "pdf-summary-first-three-pages": {
-      "title": "Create PDF Summary from First Three Pages",
-      "filename": "pdf-summary-first-three-pages.cs",
-      "description": "Extracts text from the first three pages of a PDF and creates a new PDF containing that extracted text as a summary.",
+    "cancel-pdf-text-extraction": {
+      "title": "Cancel PDF Text Extraction with CancellationToken",
+      "filename": "cancel-pdf-text-extraction.cs",
+      "description": "Demonstrates how to extract text from each page of a PDF using Aspose.Pdf's PdfExtractor while allowing the user to abort the operation via a CancellationToken triggered by a key press.",
       "tags": [
         "pdf",
-        "summary",
+        "cancellation",
         "text-extraction",
-        "aspnet",
-        "aspdf"
+        "aspose",
+        "multithreading"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextAbsorber",
-        "Aspose.Pdf.Text.TextFragment"
+        "PdfExtractor",
+        "PdfExtractor.BindPdf",
+        "PdfExtractor.ExtractText",
+        "PdfExtractor.HasNextPageText",
+        "PdfExtractor.GetNextPageText",
+        "PdfExtractor.Close",
+        "PdfExtractor.Document"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "retry-text-extraction": {
-      "title": "Retry Text Extraction with PdfExtractor",
-      "filename": "retry-text-extraction.cs",
-      "description": "Demonstrates how to retry PDF text extraction up to three times when an IOException occurs using Aspose.Pdf's PdfExtractor.",
+    "extract-text-to-memorystream": {
+      "title": "Extract PDF Text to MemoryStream and Forward to Generator",
+      "filename": "extract-text-to-memorystream.cs",
+      "description": "Demonstrates extracting text from a PDF using Aspose.Pdf.Facades.PdfExtractor, saving it into a MemoryStream, and preparing the stream for use by another PDF generation library.",
+      "tags": [
+        "text-extraction",
+        "memorystream",
+        "aspose",
+        "pdf-facade",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractText",
+        "Aspose.Pdf.Facades.PdfExtractor.GetText"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "azure-function-extract-pdf-text": {
+      "title": "Azure Function to Extract Text from PDFs in a Queue",
+      "filename": "azure-function-extract-pdf-text.cs",
+      "description": "Shows a scheduled Azure Function that reads a PDF blob name from an Azure Storage queue, extracts its text with Aspose.Pdf.Facades.PdfExtractor, and uploads the extracted text as a .txt file to another blob container.",
+      "tags": [
+        "azure-functions",
+        "pdf-extraction",
+        "aspose",
+        "storage-queue",
+        "blob-storage"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractText",
+        "Aspose.Pdf.Facades.PdfExtractor.GetText"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-pdf-text-to-gzip": {
+      "title": "Extract PDF Text and Compress to GZip",
+      "filename": "extract-pdf-text-to-gzip.cs",
+      "description": "Demonstrates how to use Aspose.Pdf's PdfExtractor facade to extract all text from a PDF and write it directly into a GZipStream for compressed storage.",
       "tags": [
         "pdf",
-        "extraction",
-        "retry",
-        "exception",
+        "text-extraction",
+        "gzip",
+        "compression",
         "facade"
       ],
       "apis_used": [
@@ -540,129 +501,238 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetText"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "extract-pdf-text__v3": {
-      "title": "Extract Text from PDF to Console",
-      "filename": "extract-pdf-text__v3.cs",
-      "description": "Command‑line utility that reads a PDF file and writes its extracted text to standard output.",
+    "extract-text-from-pdfs-azure-blob": {
+      "title": "Extract Text from PDFs in Azure Blob Storage",
+      "filename": "extract-text-from-pdfs-azure-blob.cs",
+      "description": "Demonstrates a batch job that reads PDF files from an Azure Blob container, extracts their text using Aspose.Pdf, and uploads the resulting .txt files back to Blob storage.",
       "tags": [
+        "azure-blob",
         "pdf",
         "text-extraction",
-        "command-line"
-      ],
-      "apis_used": [
-        "PdfExtractor",
-        "PdfExtractor.BindPdf",
-        "PdfExtractor.ExtractText",
-        "PdfExtractor.GetText"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "store-pdf-text-azure-table": {
-      "title": "Store Extracted PDF Text in Azure Table Storage",
-      "filename": "store-pdf-text-azure-table.cs",
-      "description": "Extracts all text from a PDF using Aspose.Pdf and inserts it into Azure Table storage, using the document name as the partition key.",
-      "tags": [
-        "pdf",
-        "azure-table",
-        "text-extraction",
-        "aspnet",
-        "cloud"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.TextAbsorber",
-        "Azure.Data.Tables.TableClient",
-        "Azure.Data.Tables.TableEntity"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "async-pdf-text-extraction": {
-      "title": "Asynchronous PDF Text Extraction with Aspose.Pdf",
-      "filename": "async-pdf-text-extraction.cs",
-      "description": "Demonstrates how to extract text from a PDF file asynchronously using PdfExtractor and async/await to keep the UI responsive.",
-      "tags": [
-        "pdf",
-        "async",
-        "extraction",
-        "text",
+        "batch",
         "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfExtractor",
-        "PdfExtractor.BindPdf",
-        "PdfExtractor.ExtractText",
-        "PdfExtractor.GetText",
-        "File.WriteAllTextAsync"
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractText",
+        "Aspose.Pdf.Facades.PdfExtractor.GetText"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "extract-pdf-text-to-stringwriter": {
-      "title": "Extract PDF Text to StringWriter",
-      "filename": "extract-pdf-text-to-stringwriter.cs",
-      "description": "Demonstrates extracting all text from a PDF using TextAbsorber and writing it into a StringWriter, suitable for logging frameworks.",
+    "count-pages-images-attachments": {
+      "title": "Count Pages, Images, and Attachments in a PDF",
+      "filename": "count-pages-images-attachments.cs",
+      "description": "Demonstrates how to use Aspose.Pdf to determine the total number of pages, embedded images, and file attachments in a PDF document.",
       "tags": [
-        "text extraction",
-        "StringWriter",
-        "logging",
-        "Aspose.Pdf",
-        "C#"
+        "pdf",
+        "count",
+        "images",
+        "attachments",
+        "pages"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.TextAbsorber"
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractAttachment",
+        "Aspose.Pdf.Facades.PdfExtractor.GetAttachmentInfo"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "create-pdf-summary-first-three-pages": {
+      "title": "Create PDF Summary with First Three Pages Text",
+      "filename": "create-pdf-summary-first-three-pages.cs",
+      "description": "Extracts text from the first three pages of a PDF using PdfExtractor and builds a new PDF that contains the extracted text as a summary.",
+      "tags": [
+        "pdf",
+        "text-extraction",
+        "summary",
+        "facade-api",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractText",
+        "Aspose.Pdf.Facades.PdfExtractor.GetText",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages.Add",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Position"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "retry-pdf-text-extraction": {
+      "title": "Retry Text Extraction from PDF with PdfExtractor",
+      "filename": "retry-pdf-text-extraction.cs",
+      "description": "Shows how to extract text from a PDF using Aspose.Pdf.Facades.PdfExtractor and implement a three‑attempt retry loop that handles IOException.",
+      "tags": [
+        "pdf",
+        "text-extraction",
+        "retry",
+        "aspose",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractText",
+        "Aspose.Pdf.Facades.PdfExtractor.GetText",
+        "Aspose.Pdf.Facades.PdfExtractor.Close"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-text-from-pdf__v3": {
+      "title": "Extract Text from PDF using PdfExtractor",
+      "filename": "extract-text-from-pdf__v3.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfExtractor to read a PDF file, extract its text, and output the result to the console.",
+      "tags": [
+        "pdf",
+        "text-extraction",
+        "command-line",
+        "aspose",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractText",
+        "Aspose.Pdf.Facades.PdfExtractor.GetText",
+        "Aspose.Pdf.Facades.PdfExtractor.Close"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-pdf-text-to-azure-table": {
+      "title": "Extract PDF Text and Store in Azure Table",
+      "filename": "extract-pdf-text-to-azure-table.cs",
+      "description": "Demonstrates how to use Aspose.Pdf's PdfExtractor facade to extract all text from a PDF document and then store the extracted content in Azure Table storage (using a stub implementation).",
+      "tags": [
+        "pdf",
+        "text-extraction",
+        "azure-table",
+        "aspose-pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractText",
+        "Aspose.Pdf.Facades.PdfExtractor.GetText",
+        "Aspose.Pdf.Facades.PdfExtractor.Close",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages.Add"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "async-pdf-text-image-extraction": {
+      "title": "Asynchronous PDF Text and Image Extraction with Aspose.Pdf",
+      "filename": "async-pdf-text-image-extraction.cs",
+      "description": "Shows how to extract all text and images from a PDF file asynchronously by wrapping Aspose.Pdf's blocking PdfExtractor calls in Task.Run, keeping UI threads responsive.",
+      "tags": [
+        "asynchronous",
+        "pdf",
+        "extraction",
+        "aspose",
+        "images"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractText",
+        "Aspose.Pdf.Facades.PdfExtractor.GetText",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextPageText",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextPageText"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-pdf-text-to-stringwriter": {
+      "title": "Extract PDF Text to StringWriter for Logging",
+      "filename": "extract-pdf-text-to-stringwriter.cs",
+      "description": "Demonstrates using Aspose.Pdf's PdfExtractor to extract text from a PDF file and write the result into a StringWriter, which can be fed to logging frameworks.",
+      "tags": [
+        "pdf",
+        "text-extraction",
+        "stringwriter",
+        "logging",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractText",
+        "Aspose.Pdf.Facades.PdfExtractor.GetText"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
     "configurable-pdf-extraction": {
-      "title": "Configurable PDF Extraction (Text, Images, Attachments)",
+      "title": "Configurable PDF Text, Image, and Attachment Extraction",
       "filename": "configurable-pdf-extraction.cs",
-      "description": "Shows how to toggle extraction of text, images, and attachments from a PDF using a JSON configuration file without modifying the code.",
+      "description": "Shows how to extract text, images, and attachments from a PDF with Aspose.Pdf while toggling each operation through a JSON configuration file.",
       "tags": [
         "pdf",
         "extraction",
         "configuration",
-        "aspdf",
-        "facade"
+        "aspose",
+        "csharp"
       ],
       "apis_used": [
-        "PdfExtractor",
-        "PdfExtractor.BindPdf",
-        "PdfExtractor.ExtractText",
-        "PdfExtractor.GetText",
-        "PdfExtractor.ExtractImage",
-        "PdfExtractor.HasNextImage",
-        "PdfExtractor.GetNextImage",
-        "PdfExtractor.ExtractAttachment",
-        "PdfExtractor.GetAttachNames",
-        "PdfExtractor.GetAttachment",
-        "Document",
-        "System.Text.Json.JsonSerializer"
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractText",
+        "Aspose.Pdf.Facades.PdfExtractor.GetText",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImageMode",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractAttachment",
+        "Aspose.Pdf.Facades.PdfExtractor.GetAttachNames",
+        "Aspose.Pdf.Facades.PdfExtractor.GetAttachment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "extract-images-pages-png": {
-      "title": "Extract Images from Specific Pages to PNG",
-      "filename": "extract-images-pages-png.cs",
-      "description": "Demonstrates how to configure PdfExtractor to extract images only from pages 5 through 10 of a PDF and save each image as a PNG file.",
+    "extract-images-from-pdf-pages-png": {
+      "title": "Extract Images from Specific PDF Pages as PNG",
+      "filename": "extract-images-from-pdf-pages-png.cs",
+      "description": "Demonstrates using Aspose.Pdf.Facades.PdfExtractor to extract images from pages 5 through 10 of a PDF and save each image as a PNG file.",
       "tags": [
         "pdf",
         "image-extraction",
-        "pages",
         "png",
-        "aspdf"
+        "pages",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfExtractor",
@@ -674,534 +744,612 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "extract-images-definedinresources": {
-      "title": "Extract Images from PDF Using DefinedInResources Mode",
-      "filename": "extract-images-definedinresources.cs",
-      "description": "Demonstrates how to set PdfExtractor.ExtractImageMode to DefinedInResources and extract all resource‑based images from a PDF.",
+    "extract-images-defined-in-resources": {
+      "title": "Extract Images Defined in Resources from PDF",
+      "filename": "extract-images-defined-in-resources.cs",
+      "description": "Demonstrates how to set ImageExtractionMode to DefinedInResources and extract all resource‑based images from a PDF using the PdfExtractor facade.",
       "tags": [
-        "pdf",
         "image-extraction",
-        "extractor",
-        "aspose-pdf"
+        "pdf",
+        "Aspose.Pdf",
+        "resources",
+        "PdfExtractor"
       ],
       "apis_used": [
-        "PdfExtractor",
-        "PdfExtractor.ExtractImageMode",
-        "PdfExtractor.BindPdf",
-        "PdfExtractor.ExtractImage",
-        "PdfExtractor.HasNextImage",
-        "PdfExtractor.GetNextImage"
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImageMode",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "extract-images-first-page": {
+    "extract-images-first-page-to-byte-arrays": {
       "title": "Extract Images from First PDF Page to Byte Arrays",
-      "filename": "extract-images-first-page.cs",
-      "description": "Demonstrates how to extract all images from the first page of a PDF using PdfExtractor and store each image directly into a byte array for further analysis.",
+      "filename": "extract-images-first-page-to-byte-arrays.cs",
+      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfExtractor to extract all images from the first page of a PDF and store each image directly in a byte array for further processing.",
       "tags": [
         "pdf",
         "image-extraction",
         "byte-array",
-        "facade",
-        "aspnet"
+        "aspose-pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-pdf-images-as-bmp": {
+      "title": "Extract PDF Images and Save as BMP with Original Resolution",
+      "filename": "extract-pdf-images-as-bmp.cs",
+      "description": "Demonstrates extracting embedded images from a PDF using Aspose.Pdf's PdfExtractor, setting a high DPI, and saving each image as a BMP file while preserving its original color depth.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "bmp",
+        "resolution",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "export-pdf-images-to-jpeg-quality-85": {
+      "title": "Export PDF Images to JPEG (Quality 85)",
+      "filename": "export-pdf-images-to-jpeg-quality-85.cs",
+      "description": "Demonstrates how to extract each page image from a PDF and save it as a JPEG file with a quality setting of 85 using Aspose.Pdf's PdfConverter facade.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "jpeg",
+        "aspose-pdf",
+        "quality"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfConverter",
+        "Aspose.Pdf.Facades.PdfConverter.BindPdf",
+        "Aspose.Pdf.Facades.PdfConverter.DoConvert",
+        "Aspose.Pdf.Facades.PdfConverter.HasNextImage",
+        "Aspose.Pdf.Facades.PdfConverter.GetNextImage"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-images-from-pdf": {
+      "title": "Extract Images from PDF to Temporary Folder",
+      "filename": "extract-images-from-pdf.cs",
+      "description": "Shows how to use Aspose.Pdf's PdfExtractor to extract all images from a PDF using the default extraction mode and save them into a temporary directory.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "aspose-pdf",
+        "csharp",
+        "temp-folder"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-images-to-base64": {
+      "title": "Extract Images from PDF and Convert to Base64",
+      "filename": "extract-images-to-base64.cs",
+      "description": "Demonstrates extracting each image from a PDF with Aspose.Pdf.Facades.PdfExtractor, converting the image streams to Base64 strings, and serializing the collection to JSON.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "base64",
+        "json",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-images-from-specific-pdf-page": {
+      "title": "Extract Images from a Specific PDF Page",
+      "filename": "extract-images-from-specific-pdf-page.cs",
+      "description": "Shows how to extract all images from a single PDF page by setting StartPage and EndPage to the same value using Aspose.Pdf.Facades.PdfExtractor.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "aspose",
+        "single-page",
+        "c#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-images-to-tiff": {
+      "title": "Extract Images from PDF and Save as TIFF",
+      "filename": "extract-images-to-tiff.cs",
+      "description": "Demonstrates using Aspose.Pdf.Facades.PdfExtractor to pull all images from a PDF and save each one as a lossless TIFF file for archival storage.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "tiff",
+        "archival",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-images-validate-signature": {
+      "title": "Extract Images from PDF and Validate Their Signatures",
+      "filename": "extract-images-validate-signature.cs",
+      "description": "Demonstrates extracting images from a PDF using Aspose.Pdf's PdfExtractor facade and verifying each saved image's file signature to ensure it is not corrupted.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "validation",
+        "signature",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "parallel-image-extraction-from-pdfs": {
+      "title": "Parallel Extraction of Images from Multiple PDFs",
+      "filename": "parallel-image-extraction-from-pdfs.cs",
+      "description": "Shows how to extract all images from several PDF documents concurrently using Aspose.Pdf's PdfExtractor together with Task.WhenAll for improved throughput.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "parallel",
+        "aspose-pdf",
+        "task"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-pdf-images-to-unc-share": {
+      "title": "Extract PDF Images to a UNC Network Share",
+      "filename": "extract-pdf-images-to-unc-share.cs",
+      "description": "Demonstrates how to extract all images from a PDF using Aspose.Pdf.Facades and save them to a UNC‑formatted network share, creating the destination folder if needed.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "unc",
+        "network-share",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-images-pdf-thumbnails": {
+      "title": "Extract Images from PDF and Create Thumbnails",
+      "filename": "extract-images-pdf-thumbnails.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfExtractor to pull images from a PDF and generate PNG thumbnails limited to 200 pixels in size.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "thumbnail",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-images-using-pdfextractor": {
+      "title": "Extract Images from PDF Using PdfExtractor with Using Block",
+      "filename": "extract-images-using-pdfextractor.cs",
+      "description": "Demonstrates how to extract all images from a PDF document using Aspose.Pdf's PdfExtractor within a using block for automatic disposal. The example creates an in‑memory PDF, binds it to the extractor, and saves each image to a folder.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "using-block",
+        "aspose-pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages.Add",
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-images-from-encrypted-pdf": {
+      "title": "Extract Images from Encrypted PDF with Password",
+      "filename": "extract-images-from-encrypted-pdf.cs",
+      "description": "Shows how to set the user password on a PdfExtractor and extract all images from an encrypted PDF document.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "encrypted",
+        "password",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.Password",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-text-ignore-images": {
+      "title": "Extract Text from PDF While Ignoring Images",
+      "filename": "extract-text-ignore-images.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfExtractor to extract only the textual content from a PDF by not calling the image extraction methods.",
+      "tags": [
+        "pdf",
+        "text-extraction",
+        "image-ignore",
+        "aspose",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractText",
+        "Aspose.Pdf.Facades.PdfExtractor.GetText",
+        "Aspose.Pdf.Facades.PdfExtractor.Close"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-images-to-html-report": {
+      "title": "Extract Images from PDF and Embed in HTML Report",
+      "filename": "extract-images-to-html-report.cs",
+      "description": "Demonstrates using Aspose.Pdf.Facades.PdfExtractor to extract images from a PDF, convert them to Base64 strings, and embed them directly into an HTML report via data URIs.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "html",
+        "base64",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "handle-pdf-extractor-binding-errors": {
+      "title": "Handle Errors When Binding a Corrupted PDF with PdfExtractor",
+      "filename": "handle-pdf-extractor-binding-errors.cs",
+      "description": "Demonstrates how to verify a PDF file's existence and use try‑catch blocks to handle specific Aspose.Pdf exceptions that occur when PdfExtractor attempts to bind a corrupted PDF.",
+      "tags": [
+        "pdf",
+        "error-handling",
+        "aspose",
+        "pdfextractor",
+        "exception"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.InvalidPdfFileFormatException",
+        "Aspose.Pdf.ObjectReferenceCorruptedException",
+        "Aspose.Pdf.PdfException"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-text-and-images-from-pdf-stream": {
+      "title": "Extract Text and Images from PDF Stream",
+      "filename": "extract-text-and-images-from-pdf-stream.cs",
+      "description": "Demonstrates how to receive PDF data over a TCP socket and use Aspose.Pdf's PdfExtractor to pull out page text and embedded images directly from a stream without creating temporary files.",
+      "tags": [
+        "pdf",
+        "text-extraction",
+        "image-extraction",
+        "stream",
+        "network"
+      ],
+      "apis_used": [
+        "PdfExtractor.BindPdf",
+        "PdfExtractor.ExtractText",
+        "PdfExtractor.HasNextPageText",
+        "PdfExtractor.GetNextPageText",
+        "PdfExtractor.ExtractImage",
+        "PdfExtractor.HasNextImage",
+        "PdfExtractor.GetNextImage"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-pdf-images-to-azure-blob": {
+      "title": "Extract PDF Images and Upload to Azure Blob",
+      "filename": "extract-pdf-images-to-azure-blob.cs",
+      "description": "Demonstrates extracting all images from a PDF using Aspose.Pdf.Facades.PdfExtractor and uploading each image to an Azure Blob container with the Azure.Storage.Blobs SDK.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "azure-blob",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-pdf-images-and-compress-zip": {
+      "title": "Extract PDF Images and Compress as PNG ZIP",
+      "filename": "extract-pdf-images-and-compress-zip.cs",
+      "description": "Demonstrates how to extract images from a PDF using Aspose.Pdf.Facades.PdfExtractor, save them as PNG files, and then compress the resulting images into a ZIP archive with lossless compression.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "zip",
+        "aspose-pdf",
+        "png"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-images-original-format": {
+      "title": "Extract Images from PDF in Original Format",
+      "filename": "extract-images-original-format.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfExtractor to extract embedded images from a PDF while preserving their original format.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "original-format",
+        "aspose",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImageMode",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-images-pdf-csv-manifest": {
+      "title": "Extract Images from PDF and Create CSV Manifest",
+      "filename": "extract-images-pdf-csv-manifest.cs",
+      "description": "Demonstrates extracting embedded images from each PDF page using Aspose.Pdf, saving them to files, and generating a CSV manifest with file name, page number, and image dimensions.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "csv",
+        "manifest",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.ImagePlacementAbsorber",
+        "Aspose.Pdf.ImagePlacement",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-pdf-images-to-s3": {
+      "title": "Extract Images from PDF and Upload to Amazon S3",
+      "filename": "extract-pdf-images-to-s3.cs",
+      "description": "Demonstrates how to extract each image from a PDF using Aspose.Pdf.Facades.PdfExtractor and upload the resulting JPEG streams to an Amazon S3 bucket with the AWS SDK.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "aws-s3",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "progress-reporter-pdf-text-extraction": {
+      "title": "Report Progress While Extracting Text from PDF Pages",
+      "filename": "progress-reporter-pdf-text-extraction.cs",
+      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfExtractor to extract text from each page of a large PDF while reporting progress to the console.",
+      "tags": [
+        "pdf",
+        "text-extraction",
+        "progress",
+        "aspose-pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "PdfExtractor",
+        "PdfExtractor.BindPdf",
+        "PdfExtractor.ExtractText",
+        "PdfExtractor.HasNextPageText",
+        "PdfExtractor.GetNextPageText",
+        "PdfExtractor.Document"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-all-images-from-pdf": {
+      "title": "Extract All Images from PDF Using PdfExtractor",
+      "filename": "extract-all-images-from-pdf.cs",
+      "description": "Demonstrates extracting images from every page of a PDF with Aspose.Pdf's PdfExtractor by setting StartPage to 1 and EndPage to 0 to process all pages.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "aspose",
+        "pdfextractor",
+        "c#"
       ],
       "apis_used": [
         "PdfExtractor",
         "PdfExtractor.BindPdf",
         "PdfExtractor.StartPage",
         "PdfExtractor.EndPage",
-        "PdfExtractor.ExtractImageMode",
         "PdfExtractor.ExtractImage",
         "PdfExtractor.HasNextImage",
-        "PdfExtractor.GetNextImage",
-        "PdfExtractor.Close"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-images-bmp": {
-      "title": "Extract Images from PDF and Save as BMP",
-      "filename": "extract-images-bmp.cs",
-      "description": "Extracts all images from a PDF file and saves each as a BMP file, preserving the original resolution and color depth.",
-      "tags": [
-        "pdf",
-        "image-extraction",
-        "bmp",
-        "aspose-pdf",
-        "converter"
-      ],
-      "apis_used": [
-        "PdfConverter",
-        "PdfConverter.BindPdf",
-        "PdfConverter.DoConvert",
-        "PdfConverter.HasNextImage",
-        "PdfConverter.GetNextImage"
+        "PdfExtractor.GetNextImage"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "export-pdf-images-to-jpeg": {
-      "title": "Export PDF Images to JPEG with Quality Setting",
-      "filename": "export-pdf-images-to-jpeg.cs",
-      "description": "Extracts each page of a PDF as a JPEG image using PdfConverter, setting the JPEG quality to 85.",
-      "tags": [
-        "pdf",
-        "image",
-        "export",
-        "jpeg",
-        "converter"
-      ],
-      "apis_used": [
-        "PdfConverter",
-        "PdfConverter.BindPdf",
-        "PdfConverter.DoConvert",
-        "PdfConverter.HasNextImage",
-        "PdfConverter.GetNextImage"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-images-pdf": {
-      "title": "Extract Images from PDF to Temporary Folder",
-      "filename": "extract-images-pdf.cs",
-      "description": "Extracts all images from a PDF using the default extraction mode and saves them to a temporary directory.",
-      "tags": [
-        "pdf",
-        "image-extraction",
-        "facade",
-        "temporary-folder"
-      ],
-      "apis_used": [
-        "PdfExtractor",
-        "PdfExtractor.BindPdf",
-        "PdfExtractor.ExtractImage",
-        "PdfExtractor.HasNextImage",
-        "PdfExtractor.GetNextImage",
-        "PdfExtractor.Close"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-images-to-base64": {
-      "title": "Extract Images from PDF and Convert to Base64 Strings",
-      "filename": "extract-images-to-base64.cs",
-      "description": "Demonstrates extracting each image from a PDF using PdfExtractor and immediately converting it to a Base64 string for JSON transmission.",
-      "tags": [
-        "pdf",
-        "image-extraction",
-        "base64",
-        "aspnet",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfExtractor",
-        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
-        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
-        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-single-page": {
-      "title": "Extract Single Page from PDF using PdfFileEditor",
-      "filename": "extract-single-page.cs",
-      "description": "Demonstrates how to extract a specific page from a PDF by setting StartPage and EndPage to the same value using Aspose.Pdf.Facades.PdfFileEditor.",
-      "tags": [
-        "pdf",
-        "extract",
-        "single-page",
-        "facades"
-      ],
-      "apis_used": [
-        "PdfFileEditor",
-        "PdfFileEditor.Extract"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-images-to-tiff": {
-      "title": "Extract PDF Pages as TIFF Images",
-      "filename": "extract-images-to-tiff.cs",
-      "description": "Converts each page of a PDF into a lossless TIFF image using Aspose.Pdf's PdfConverter.",
-      "tags": [
-        "pdf",
-        "tiff",
-        "conversion",
-        "images",
-        "archival"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfConverter.BindPdf",
-        "Aspose.Pdf.Facades.PdfConverter.DoConvert",
-        "Aspose.Pdf.Facades.PdfConverter.SaveAsTIFF"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "validate-extracted-image-signatures": {
-      "title": "Validate Extracted PDF Images by Checking File Signatures",
-      "filename": "validate-extracted-image-signatures.cs",
-      "description": "Extracts images from a PDF, saves them, and verifies each saved image's integrity by checking its file signature (magic number).",
-      "tags": [
-        "pdf",
-        "image-extraction",
-        "validation",
-        "signature",
-        "aspdf"
-      ],
-      "apis_used": [
-        "Document",
-        "Page",
-        "XImage"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "parallel-image-extraction": {
-      "title": "Parallel Extraction of Images from Multiple PDFs",
-      "filename": "parallel-image-extraction.cs",
-      "description": "Demonstrates how to extract images from several PDF files concurrently using PdfExtractor and Task.WhenAll for improved throughput.",
-      "tags": [
-        "pdf",
-        "image",
-        "parallel",
-        "task",
-        "extractor"
-      ],
-      "apis_used": [
-        "PdfExtractor",
-        "PdfExtractor.BindPdf",
-        "PdfExtractor.ExtractImage",
-        "PdfExtractor.HasNextImage",
-        "PdfExtractor.GetNextImage",
-        "Task.WhenAll"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-images-to-unc": {
-      "title": "Extract Images from PDF and Save to Network Share (UNC Path)",
-      "filename": "extract-images-to-unc.cs",
-      "description": "Demonstrates how to iterate through a PDF, extract each embedded image, and save it to a network share using a UNC path.",
-      "tags": [
-        "pdf",
-        "image-extraction",
-        "unc",
-        "network-share",
-        "aspdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.XImage"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-text-ignore-images": {
-      "title": "Extract Text from PDF While Ignoring Images",
-      "filename": "extract-text-ignore-images.cs",
-      "description": "Demonstrates how to use PdfExtractor to extract only text from a PDF document, configuring it to ignore image extraction.",
-      "tags": [
-        "pdf",
-        "text-extraction",
-        "images",
-        "pdfextractor"
-      ],
-      "apis_used": [
-        "PdfExtractor",
-        "PdfExtractor.BindPdf",
-        "PdfExtractor.ExtractText",
-        "PdfExtractor.GetText",
-        "ExtractImageMode"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-images-html-report": {
-      "title": "Extract Images from PDF and Embed in HTML Report",
-      "filename": "extract-images-html-report.cs",
-      "description": "Demonstrates extracting all images from a PDF using PdfExtractor and embedding them as base64 data URIs in a simple HTML report.",
-      "tags": [
-        "pdf",
-        "image-extraction",
-        "html",
-        "base64",
-        "report"
-      ],
-      "apis_used": [
-        "PdfExtractor",
-        "PdfExtractor.BindPdf",
-        "PdfExtractor.ExtractImage",
-        "PdfExtractor.HasNextImage",
-        "PdfExtractor.GetNextImage",
-        "File.WriteAllText"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "handle-corrupted-pdf-binding": {
-      "title": "Handle Corrupted PDF Binding with PdfExtractor",
-      "filename": "handle-corrupted-pdf-binding.cs",
-      "description": "Demonstrates how to catch exceptions when PdfExtractor fails to bind a corrupted PDF file.",
-      "tags": [
-        "pdf",
-        "error-handling",
-        "extractor",
-        "exception",
-        "aspnet"
-      ],
-      "apis_used": [
-        "PdfExtractor",
-        "PdfExtractor.BindPdf",
-        "InvalidPdfFileFormatException",
-        "PdfException"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-pdf-images-to-azure-blob": {
-      "title": "Extract Images from PDF and Upload to Azure Blob Storage",
-      "filename": "extract-pdf-images-to-azure-blob.cs",
-      "description": "Demonstrates extracting all images from a PDF using Aspose.Pdf's PdfExtractor and uploading them to an Azure Blob container.",
-      "tags": [
-        "pdf",
-        "image-extraction",
-        "azure-blob",
-        "aspose-pdf",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfExtractor",
-        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
-        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
-        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
-        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage",
-        "Azure.Storage.Blobs.BlobServiceClient",
-        "Azure.Storage.Blobs.BlobContainerClient",
-        "Azure.Storage.Blobs.BlobClient"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-images-compress-png": {
-      "title": "Extract Images from PDF and Compress PNGs",
-      "filename": "extract-images-compress-png.cs",
-      "description": "Demonstrates extracting images from a PDF using Aspose.Pdf and then losslessly compressing each PNG with ImageSharp.",
-      "tags": [
-        "pdf",
-        "image-extraction",
-        "compression",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfExtractor",
-        "PdfExtractor.BindPdf",
-        "PdfExtractor.ExtractImage",
-        "PdfExtractor.HasNextImage",
-        "PdfExtractor.GetNextImage",
-        "SixLabors.ImageSharp.Image.Load",
-        "Image.Save",
-        "PngEncoder"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-images-pdfextractor": {
-      "title": "Extract Images from PDF Using PdfExtractor",
-      "filename": "extract-images-pdfextractor.cs",
-      "description": "Demonstrates how to configure PdfExtractor to extract images in their original format from a PDF file.",
-      "tags": [
-        "pdf",
-        "image-extraction",
-        "pdfextractor",
-        "csharp",
-        "aspose"
-      ],
-      "apis_used": [
-        "PdfExtractor",
-        "PdfExtractor.BindPdf",
-        "PdfExtractor.ExtractImageMode",
-        "PdfExtractor.ExtractImage",
-        "PdfExtractor.HasNextImage",
-        "PdfExtractor.GetNextImage",
-        "PdfExtractor.Close"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-images-csv-manifest": {
-      "title": "Extract Images from PDF and Create CSV Manifest",
-      "filename": "extract-images-csv-manifest.cs",
-      "description": "Extracts all images from a PDF, saves them to files, and generates a CSV file listing each image's file name, page number, and dimensions.",
-      "tags": [
-        "pdf",
-        "image-extraction",
-        "csv",
-        "aspose-pdf",
-        "c#"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.XImage",
-        "Aspose.Pdf.XImage.Save",
-        "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.Page.Resources.Images"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-pdf-images-to-s3": {
-      "title": "Extract Images from PDF and Upload to Amazon S3",
-      "filename": "extract-pdf-images-to-s3.cs",
-      "description": "Demonstrates extracting each image from a PDF using Aspose.Pdf.PdfExtractor and uploading the saved image files to an Amazon S3 bucket.",
-      "tags": [
-        "pdf",
-        "image-extraction",
-        "aws-s3",
-        "aspose-pdf",
-        "c#"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfExtractor",
-        "Amazon.S3.AmazonS3Client",
-        "Amazon.S3.Transfer.TransferUtility"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-images-pdf-to-word": {
-      "title": "Extract Images from PDF and Embed into Word Document",
-      "filename": "extract-images-pdf-to-word.cs",
-      "description": "Extracts all images from a PDF using Aspose.Pdf and embeds them into a new Word document using the Open XML SDK.",
-      "tags": [
-        "pdf",
-        "image-extraction",
-        "word",
-        "openxml",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfExtractor",
-        "PdfExtractor.BindPdf",
-        "PdfExtractor.ExtractImage",
-        "PdfExtractor.HasNextImage",
-        "PdfExtractor.GetNextImage",
-        "DocumentFormat.OpenXml.Packaging.WordprocessingDocument",
-        "MainDocumentPart.AddImagePart"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-text-with-progress": {
-      "title": "Extract Text from PDF with Progress Reporting",
-      "filename": "extract-text-with-progress.cs",
-      "description": "Demonstrates using PdfExtractor to extract text page‑by‑page while reporting progress to the console.",
-      "tags": [
-        "pdf",
-        "text-extraction",
-        "progress",
-        "pdfextractor"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfExtractor",
-        "PdfExtractor.BindPdf",
-        "PdfExtractor.ExtractText",
-        "PdfExtractor.HasNextPageText",
-        "PdfExtractor.GetNextPageText",
-        "Document.Pages.Count"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-all-images": {
-      "title": "Extract All Images from PDF Using PdfExtractor",
-      "filename": "extract-all-images.cs",
-      "description": "Shows how to extract images from every page of a PDF by setting StartPage to 1 and EndPage to 0 with Aspose.Pdf.Facades.PdfExtractor.",
-      "tags": [
-        "pdf",
-        "image-extraction",
-        "pdfextractor",
-        "aspnet",
-        "beginner"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfExtractor",
-        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
-        "Aspose.Pdf.Facades.PdfExtractor.StartPage",
-        "Aspose.Pdf.Facades.PdfExtractor.EndPage",
-        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
-        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
-        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage",
-        "Aspose.Pdf.Facades.PdfExtractor.Close"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-images-ocr": {
-      "title": "Extract Images from PDF and Perform OCR using Aspose.Pdf AI",
-      "filename": "extract-images-ocr.cs",
-      "description": "Extracts all images from a PDF file, saves them as PNG files, and uses Aspose.Pdf AI OCR copilot to recognize hidden text in each image.",
+    "extract-images-ocr-openai": {
+      "title": "Extract Images from PDF and Perform OCR with OpenAI",
+      "filename": "extract-images-ocr-openai.cs",
+      "description": "The example extracts all images from a PDF using the Facades API, sends each image to the OpenAI OCR copilot, and saves the recognized text to separate files.",
       "tags": [
         "pdf",
         "image-extraction",
         "ocr",
-        "aspose-pdf",
-        "ai"
+        "openai",
+        "facades"
       ],
       "apis_used": [
-        "Document",
-        "PdfExtractor",
-        "OpenAIClient",
-        "OpenAIOcrCopilotOptions",
-        "AICopilotFactory",
-        "IOcrCopilot",
-        "TextRecognitionResult"
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage",
+        "Aspose.Pdf.AI.OpenAIClient",
+        "Aspose.Pdf.AI.OpenAIClient.CreateWithApiKey",
+        "Aspose.Pdf.AI.OpenAIClient.Build",
+        "Aspose.Pdf.AI.OpenAIOcrCopilotOptions",
+        "Aspose.Pdf.AI.OpenAIOcrCopilotOptions.Create",
+        "Aspose.Pdf.AI.OpenAIOcrCopilotOptions.WithDocument",
+        "Aspose.Pdf.AI.AICopilotFactory",
+        "Aspose.Pdf.AI.AICopilotFactory.CreateOcrCopilot",
+        "Aspose.Pdf.AI.IOcrCopilot",
+        "Aspose.Pdf.AI.IOcrCopilot.GetTextRecognitionResultAsync"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "list-pdf-attachment-names": {
-      "title": "List Embedded Attachment Names in PDF using PdfExtractor",
-      "filename": "list-pdf-attachment-names.cs",
-      "description": "Demonstrates how to use PdfExtractor to retrieve and display the names of all embedded attachments in a PDF without extracting them.",
+    "list-embedded-attachment-names": {
+      "title": "List Embedded Attachment Names from PDF",
+      "filename": "list-embedded-attachment-names.cs",
+      "description": "Demonstrates how to use PdfExtractor to retrieve the names of all embedded attachments in a PDF without saving the files.",
       "tags": [
         "pdf",
         "attachments",
-        "extractor",
         "list",
-        "aspdf"
+        "extractor",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfExtractor",
@@ -1210,110 +1358,107 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetAttachNames"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "extract-pdf-attachments": {
+    "extract-attachments-from-pdf": {
       "title": "Extract Attachments from PDF",
-      "filename": "extract-pdf-attachments.cs",
-      "description": "Extracts all embedded file attachments from a PDF and saves each attachment to a specified output directory.",
+      "filename": "extract-attachments-from-pdf.cs",
+      "description": "Demonstrates how to extract all embedded file attachments from a PDF using Aspose.Pdf.Facades and save each attachment to a specified output directory.",
       "tags": [
-        "pdf",
         "attachments",
+        "pdf",
         "extraction",
         "facade",
-        "aspnet"
+        "aspose"
       ],
       "apis_used": [
-        "PdfExtractor",
-        "PdfExtractor.BindPdf",
-        "PdfExtractor.ExtractAttachment",
-        "PdfExtractor.GetAttachNames",
-        "PdfExtractor.GetAttachment"
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractAttachment",
+        "Aspose.Pdf.Facades.PdfExtractor.GetAttachNames",
+        "Aspose.Pdf.Facades.PdfExtractor.GetAttachment"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "extract-rename-attachments": {
+    "extract-rename-pdf-attachments": {
       "title": "Extract and Rename PDF Attachments with Timestamp",
-      "filename": "extract-rename-attachments.cs",
-      "description": "Demonstrates how to extract all attachments from a PDF using PdfExtractor, prepend a timestamp to each filename, and save them to disk.",
+      "filename": "extract-rename-pdf-attachments.cs",
+      "description": "Demonstrates how to extract embedded attachments from a PDF using Aspose.Pdf.Facades.PdfExtractor, prepend a timestamp to each filename, and save them to disk.",
       "tags": [
         "pdf",
         "attachments",
         "extraction",
         "timestamp",
-        "aspdf"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfExtractor",
-        "PdfExtractor.BindPdf",
-        "PdfExtractor.ExtractAttachment",
-        "PdfExtractor.GetAttachNames",
-        "PdfExtractor.GetAttachment"
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractAttachment",
+        "Aspose.Pdf.Facades.PdfExtractor.GetAttachNames",
+        "Aspose.Pdf.Facades.PdfExtractor.GetAttachment"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "compute-sha256-attachment-hashes": {
-      "title": "Compute SHA-256 Hashes for Extracted PDF Attachments",
-      "filename": "compute-sha256-attachment-hashes.cs",
-      "description": "Extracts all attachments from a PDF, saves them to files, and computes a SHA‑256 hash for each saved attachment to verify integrity.",
-      "tags": [
-        "pdf",
-        "attachment",
-        "hash",
-        "sha256",
-        "extraction"
-      ],
-      "apis_used": [
-        "PdfExtractor",
-        "PdfExtractor.BindPdf",
-        "PdfExtractor.ExtractAttachment",
-        "PdfExtractor.GetAttachNames",
-        "PdfExtractor.GetAttachment",
-        "SHA256",
-        "FileStream",
-        "MemoryStream"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-pdf-attachments__v2": {
-      "title": "Extract PDF Attachments and Organize by File Extension",
-      "filename": "extract-pdf-attachments__v2.cs",
-      "description": "Extracts all attachments from a PDF using PdfExtractor and saves them into subfolders based on their original file extensions.",
+    "extract-pdf-attachments-sha256": {
+      "title": "Extract PDF Attachments and Compute SHA-256 Hashes",
+      "filename": "extract-pdf-attachments-sha256.cs",
+      "description": "Demonstrates extracting all attachments from a PDF using Aspose.Pdf.Facades, saving them to disk, and calculating a SHA-256 hash for each file to verify integrity.",
       "tags": [
         "pdf",
         "attachments",
         "extraction",
-        "filesystem",
-        "aspdf"
+        "hash",
+        "sha256"
       ],
       "apis_used": [
-        "PdfExtractor",
-        "PdfExtractor.BindPdf",
-        "PdfExtractor.ExtractAttachment",
-        "PdfExtractor.GetAttachNames",
-        "PdfExtractor.GetAttachment"
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractAttachment",
+        "Aspose.Pdf.Facades.PdfExtractor.GetAttachNames",
+        "Aspose.Pdf.Facades.PdfExtractor.GetAttachment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "verify-image-extraction-mode": {
-      "title": "Verify ImageExtractionMode Influences Extracted Image Count",
-      "filename": "verify-image-extraction-mode.cs",
-      "description": "Unit test that checks PdfExtractor.ExtractImageMode correctly changes the number of images extracted from a PDF.",
+    "extract-pdf-attachments-by-extension": {
+      "title": "Extract PDF Attachments and Organize by Extension",
+      "filename": "extract-pdf-attachments-by-extension.cs",
+      "description": "Demonstrates how to extract embedded files from a PDF using Aspose.Pdf.Facades and save them into subfolders grouped by their original file extensions.",
       "tags": [
         "pdf",
-        "image",
+        "attachments",
         "extraction",
+        "aspose",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractAttachment",
+        "Aspose.Pdf.Facades.PdfExtractor.GetAttachNames",
+        "Aspose.Pdf.Facades.PdfExtractor.GetAttachment"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "verify-imageextractionmode-affects-image-count": {
+      "title": "Verify ImageExtractionMode Affects Extracted Image Count",
+      "filename": "verify-imageextractionmode-affects-image-count.cs",
+      "description": "Creates a PDF containing a visible and a hidden image, then uses PdfExtractor with different ExtractImageMode settings to demonstrate that DefinedInResources returns all images while ActuallyUsed returns only the images placed on the page.",
+      "tags": [
+        "image-extraction",
+        "pdf",
         "unit-test",
-        "aspose"
+        "aspose-pdf",
+        "extractimagemode"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -1323,19 +1468,19 @@
         "Aspose.Pdf.Facades.ExtractImageMode"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "extract-images-guid": {
+    "extract-images-from-pdf-with-guid-filenames": {
       "title": "Extract Images from PDF with GUID Filenames",
-      "filename": "extract-images-guid.cs",
-      "description": "Extracts all images from a PDF file and saves each image using a unique GUID filename to avoid naming collisions.",
+      "filename": "extract-images-from-pdf-with-guid-filenames.cs",
+      "description": "Demonstrates how to extract all images from a PDF using Aspose.Pdf.Facades.PdfExtractor and save each image as a PNG with a unique GUID filename to avoid naming collisions.",
       "tags": [
         "pdf",
         "image-extraction",
         "guid",
-        "aspose-pdf",
-        "facades"
+        "aspose",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfExtractor",
@@ -1345,85 +1490,19 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "extract-images-zip": {
+    "extract-images-to-zip": {
       "title": "Extract Images from PDF and Save to ZIP Archive",
-      "filename": "extract-images-zip.cs",
-      "description": "Extracts all images from a PDF using PdfExtractor and stores them in a ZIP archive.",
+      "filename": "extract-images-to-zip.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfExtractor to pull all images from a PDF and store them as PNG files inside a ZIP archive.",
       "tags": [
         "pdf",
         "image-extraction",
         "zip",
-        "aspdf",
-        "facade"
-      ],
-      "apis_used": [
-        "PdfExtractor",
-        "PdfExtractor.BindPdf",
-        "PdfExtractor.ExtractImage",
-        "PdfExtractor.HasNextImage",
-        "PdfExtractor.GetNextImage",
-        "ZipArchive",
-        "ZipArchiveEntry"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-images-contact-sheet": {
-      "title": "Extract Images and Create Contact Sheet PDF",
-      "filename": "extract-images-contact-sheet.cs",
-      "description": "Extracts all images from a PDF and generates a new PDF that displays the images as thumbnails arranged in a grid.",
-      "tags": [
-        "images",
-        "contact-sheet",
-        "extraction",
-        "pdf",
-        "aspdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page.AddImage",
-        "Aspose.Pdf.XImage.Save",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.PageInfo"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-images-pdf-portfolio": {
-      "title": "Extract Images and Create PDF Portfolio",
-      "filename": "extract-images-pdf-portfolio.cs",
-      "description": "Extracts all images from a PDF using PdfExtractor and assembles them into a new PDF where each image appears on its own page.",
-      "tags": [
-        "pdf",
-        "image-extraction",
-        "portfolio",
-        "aspdf",
-        "c#"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfExtractor",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Pages.Add"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-images-watermark": {
-      "title": "Extract Images from PDF and Apply Watermark",
-      "filename": "extract-images-watermark.cs",
-      "description": "Extracts each image from a PDF using PdfExtractor, adds a semi‑transparent text watermark, and saves the watermarked images as PNG files.",
-      "tags": [
-        "pdf",
-        "image-extraction",
-        "watermark",
-        "aspdf",
-        "c#"
+        "aspose-pdf",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfExtractor",
@@ -1433,60 +1512,19 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "extract-images-pdf-json": {
-      "title": "Extract Images from PDF and Output Base64 JSON",
-      "filename": "extract-images-pdf-json.cs",
-      "description": "Extracts all images from a PDF, encodes them in Base64, and writes a JSON array with image metadata.",
+    "create-contact-sheet-pdf-from-images": {
+      "title": "Create Contact Sheet PDF with Image Thumbnails",
+      "filename": "create-contact-sheet-pdf-from-images.cs",
+      "description": "The example extracts all images from an existing PDF using PdfExtractor, arranges them as thumbnails on a grid, and saves the result as a new contact sheet PDF.",
       "tags": [
-        "pdf",
-        "images",
-        "base64",
-        "json",
-        "extraction"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.XImage",
-        "Aspose.Pdf.XImage.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-images-csv": {
-      "title": "Extract Images from PDF and Generate CSV Report",
-      "filename": "extract-images-csv.cs",
-      "description": "Extracts all images from a PDF, saves them as separate files, and creates a CSV listing each image's filename, page number, and dimensions.",
-      "tags": [
-        "pdf",
         "image-extraction",
-        "csv",
-        "aspose-pdf",
-        "beginner"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.XImage"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-images-sprite-sheet": {
-      "title": "Extract Images from PDF and Create Sprite Sheet PNG",
-      "filename": "extract-images-sprite-sheet.cs",
-      "description": "Extracts all images from a PDF using PdfExtractor and combines them into a single sprite sheet PNG.",
-      "tags": [
-        "pdf",
-        "image-extraction",
-        "sprite-sheet",
-        "aspdf",
-        "c#"
+        "contact-sheet",
+        "thumbnail",
+        "grid-layout",
+        "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfExtractor",
@@ -1494,136 +1532,216 @@
         "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
         "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage",
-        "System.Drawing.Image",
-        "System.Drawing.Bitmap",
-        "System.Drawing.Graphics"
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages.Add",
+        "Aspose.Pdf.Page.SetPageSize",
+        "Aspose.Pdf.Page.AddImage",
+        "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "extract-images-pdfa2b": {
-      "title": "Extract Images and Create PDF/A‑2b Document with XObject Images",
-      "filename": "extract-images-pdfa2b.cs",
-      "description": "Extracts all images from a PDF using PdfExtractor, embeds each image as an XObject on separate pages, and saves the result as a PDF/A‑2b compliant document.",
+    "extract-images-create-pdf-portfolio": {
+      "title": "Extract Images and Build PDF Portfolio",
+      "filename": "extract-images-create-pdf-portfolio.cs",
+      "description": "The example extracts all images from an existing PDF, saves them as temporary PNG files, and creates a new PDF where each image occupies its own page, forming a portfolio document.",
       "tags": [
-        "image extraction",
-        "pdfa",
-        "xobject",
+        "image-extraction",
+        "pdf-creation",
+        "aspose-pdf",
+        "csharp",
+        "portfolio"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.Close",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Drawing.Image"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-images-with-watermark": {
+      "title": "Extract Images from PDF After Adding Watermark",
+      "filename": "extract-images-with-watermark.cs",
+      "description": "The example adds a full‑page image watermark to each page of a PDF, saves the result to a temporary file, and then extracts all images (including the watermark) as PNG files.",
+      "tags": [
         "pdf",
+        "image-extraction",
+        "watermark",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfFileMend.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileMend.AddImage",
+        "Aspose.Pdf.Facades.PdfFileMend.Save",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-images-from-pdf-to-json": {
+      "title": "Extract Images from PDF and Output as Base64 JSON",
+      "filename": "extract-images-from-pdf-to-json.cs",
+      "description": "Demonstrates extracting all images from a PDF using Aspose.Pdf.Facades.PdfExtractor, converting each image to a Base64 string, and saving the images with metadata to a JSON file.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "base64",
+        "json",
         "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfExtractor",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.PdfFormat",
-        "Aspose.Pdf.ConvertErrorAction"
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "extract-pdf-images-to-s3__v2": {
-      "title": "Extract Images from PDF and Upload to Amazon S3 with Server‑Side Encryption",
-      "filename": "extract-pdf-images-to-s3__v2.cs",
-      "description": "Demonstrates how to extract all images from a PDF using Aspose.Pdf and upload them to an Amazon S3 bucket with AES‑256 server‑side encryption.",
+    "extract-images-from-pdf-csv-report": {
+      "title": "Extract Images from PDF and Generate CSV Report",
+      "filename": "extract-images-from-pdf-csv-report.cs",
+      "description": "The example extracts all images from each page of a PDF, saves them as PNG files, and creates a CSV file that lists each image's filename, page number, and displayed dimensions.",
       "tags": [
+        "image-extraction",
         "pdf",
-        "images",
-        "aws",
-        "s3",
-        "encryption"
+        "csv",
+        "aspose-pdf",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.XImage",
-        "Amazon.S3.AmazonS3Client",
-        "Amazon.S3.Transfer.TransferUtility",
-        "Amazon.S3.Transfer.TransferUtilityUploadRequest"
+        "Aspose.Pdf.Facades.ImagePlacementAbsorber",
+        "Aspose.Pdf.ImagePlacement"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "extract-images-unc": {
-      "title": "Extract Images from PDF to UNC Path",
-      "filename": "extract-images-unc.cs",
-      "description": "Extracts all images from a PDF file and saves them to a network‑mapped UNC folder.",
+    "extract-images-create-sprite-sheet": {
+      "title": "Extract Images from PDF and Create Sprite Sheet",
+      "filename": "extract-images-create-sprite-sheet.cs",
+      "description": "Shows how to extract all images from a PDF using Aspose.Pdf.Facades.PdfExtractor and combine them into a single PNG sprite sheet.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "sprite-sheet",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-images-to-pdfa2b": {
+      "title": "Extract Images from PDF and Create PDF/A‑2b Document with Embedded XObjects",
+      "filename": "extract-images-to-pdfa2b.cs",
+      "description": "Demonstrates extracting all images from an existing PDF using PdfExtractor, embedding each image on new pages as XObjects, and converting the result to a PDF/A‑2b compliant document.",
+      "tags": [
+        "pdf-extraction",
+        "pdfa",
+        "image-embedding",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.AddImage",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Document.Convert",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-pdf-images-to-s3-sse": {
+      "title": "Extract PDF Images and Upload to S3 with Server‑Side Encryption",
+      "filename": "extract-pdf-images-to-s3-sse.cs",
+      "description": "Demonstrates how to use Aspose.Pdf.Facades to extract images from a PDF and upload each image to an Amazon S3 bucket with AES‑256 server‑side encryption.",
+      "tags": [
+        "pdf",
+        "image",
+        "s3",
+        "encryption",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage",
+        "Aspose.Pdf.Facades.ImageFormat"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-images-from-pdf-to-unc-share": {
+      "title": "Extract Images from PDF to UNC Network Share",
+      "filename": "extract-images-from-pdf-to-unc-share.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfExtractor to extract all images from a PDF and save them as PNG files to a UNC network folder.",
       "tags": [
         "pdf",
         "image-extraction",
         "unc",
-        "facades",
-        "aspnet"
+        "aspose",
+        "facade"
       ],
       "apis_used": [
-        "PdfExtractor",
-        "PdfExtractor.BindPdf",
-        "PdfExtractor.ExtractImage",
-        "PdfExtractor.HasNextImage",
-        "PdfExtractor.GetNextImage"
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "extract-images-html-gallery": {
+    "extract-images-pdf-html-gallery": {
       "title": "Extract Images from PDF and Create HTML Gallery",
-      "filename": "extract-images-html-gallery.cs",
-      "description": "Extracts all images from a PDF using PdfExtractor, saves each image as a separate file, and generates an HTML page that displays the images as a simple gallery.",
+      "filename": "extract-images-pdf-html-gallery.cs",
+      "description": "The example extracts all images from a PDF using Aspose.Pdf.Facades.PdfExtractor, saves them as PNG files, and generates a simple HTML page that displays the extracted images in a gallery.",
       "tags": [
         "pdf",
         "image-extraction",
         "html",
         "gallery",
-        "aspdf"
-      ],
-      "apis_used": [
-        "PdfExtractor",
-        "PdfExtractor.BindPdf",
-        "PdfExtractor.ExtractImage",
-        "PdfExtractor.HasNextImage",
-        "PdfExtractor.GetNextImage",
-        "File.WriteAllText"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-images-video-slideshow": {
-      "title": "Extract Images from PDF and Create Video Slideshow with FFmpeg",
-      "filename": "extract-images-video-slideshow.cs",
-      "description": "Extracts all images from a PDF, saves them as PNG files, and uses FFmpeg to generate a video slideshow.",
-      "tags": [
-        "pdf",
-        "image-extraction",
-        "ffmpeg",
-        "video",
-        "aspnet"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.XImage",
-        "Aspose.Pdf.XImage.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-images-to-gcs": {
-      "title": "Extract Images from PDF and Upload to Google Cloud Storage",
-      "filename": "extract-images-to-gcs.cs",
-      "description": "Extracts all images from a PDF using Aspose.Pdf and uploads each image to a Google Cloud Storage bucket with public read access.",
-      "tags": [
-        "pdf",
-        "image-extraction",
-        "google-cloud-storage",
-        "aspose-pdf",
-        "upload"
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfExtractor",
@@ -1631,22 +1749,66 @@
         "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
         "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage",
-        "Google.Cloud.Storage.V1.StorageClient",
-        "Google.Cloud.Storage.V1.StorageClient.UploadObject"
+        "Aspose.Pdf.Facades.ExtractImageMode"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-images-pdf-create-video-slideshow": {
+      "title": "Extract Images from PDF and Create Video Slideshow",
+      "filename": "extract-images-pdf-create-video-slideshow.cs",
+      "description": "Demonstrates how to extract all images from a PDF using Aspose.Pdf.Facades and then generate a video slideshow from the extracted pictures with FFmpeg.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "ffmpeg",
+        "video-slideshow",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
+      "status": "verified"
+    },
+    "extract-pdf-images-to-gcs": {
+      "title": "Extract Images from PDF and Upload to Google Cloud Storage",
+      "filename": "extract-pdf-images-to-gcs.cs",
+      "description": "Demonstrates how to use Aspose.Pdf to extract all images from a PDF file and upload each image to a Google Cloud Storage bucket with public read access.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "google-cloud-storage",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
     "extract-images-by-keyword": {
-      "title": "Extract Images from Pages Containing a Keyword",
+      "title": "Extract Images from PDF Pages Containing a Keyword",
       "filename": "extract-images-by-keyword.cs",
-      "description": "Scans each PDF page for a specific keyword and extracts images only from pages where the keyword is found using PdfExtractor.",
+      "description": "Demonstrates how to scan each PDF page for a specific keyword and, only when the keyword is found, extract all images from that page using Aspose.Pdf.Facades.PdfExtractor.",
       "tags": [
         "pdf",
-        "image extraction",
-        "keyword search",
-        "pdfextractor"
+        "image-extraction",
+        "keyword-search",
+        "text-extraction",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfExtractor",
@@ -1654,67 +1816,72 @@
         "Aspose.Pdf.Facades.PdfExtractor.ExtractText",
         "Aspose.Pdf.Facades.PdfExtractor.GetText",
         "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
-        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage",
         "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
-        "Aspose.Pdf.Facades.PdfExtractor.Document",
-        "Aspose.Pdf.ExtractImageMode"
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "extract-text-progress-bar": {
-      "title": "Extract Text from PDF with Progress Bar",
-      "filename": "extract-text-progress-bar.cs",
-      "description": "Demonstrates extracting text from each PDF page while showing a console progress bar indicating the percentage of pages processed.",
+    "extract-pdf-text-with-progress": {
+      "title": "Extract PDF Text with Progress Indicator",
+      "filename": "extract-pdf-text-with-progress.cs",
+      "description": "Demonstrates how to extract text from each page of a PDF using Aspose.Pdf's PdfExtractor facade while displaying a progress percentage based on the total page count.",
       "tags": [
         "pdf",
         "text-extraction",
         "progress",
-        "console"
+        "facade",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractText",
         "Aspose.Pdf.Facades.PdfExtractor.HasNextPageText",
         "Aspose.Pdf.Facades.PdfExtractor.GetNextPageText"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
     "extract-images-markdown-gallery": {
-      "title": "Extract Images and Create Markdown Gallery",
+      "title": "Extract Images from PDF and Generate a Markdown Gallery",
       "filename": "extract-images-markdown-gallery.cs",
-      "description": "Extracts all images from a PDF using PdfExtractor and generates a markdown file with image links for documentation.",
+      "description": "The sample extracts all raster images from a PDF using Aspose.Pdf.Facades.PdfExtractor, saves them as JPEG files, and creates a Markdown file that displays the images as a simple gallery.",
       "tags": [
         "pdf",
         "image-extraction",
         "markdown",
         "gallery",
-        "aspdf"
+        "aspose-pdf"
       ],
       "apis_used": [
-        "PdfExtractor",
-        "PdfExtractor.BindPdf",
-        "PdfExtractor.ExtractImage",
-        "PdfExtractor.HasNextImage",
-        "PdfExtractor.GetNextImage"
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.ImageStamp"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     },
-    "extract-pdf-content": {
-      "title": "Extract Text and Images from PDFs Using PdfExtractor",
-      "filename": "extract-pdf-content.cs",
-      "description": "A .NET console service that scans a mounted directory for PDF files, extracts their text and images with Aspose.Pdf.Facades.PdfExtractor, and saves the results as separate files.",
+    "extract-text-images-from-pdf": {
+      "title": "Extract Text and Images from PDFs using Aspose PdfExtractor",
+      "filename": "extract-text-images-from-pdf.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfExtractor to read PDF files, extract the full text and all embedded images, and save them to a structured output directory.",
       "tags": [
         "pdf",
-        "extraction",
-        "docker",
+        "text-extraction",
+        "image-extraction",
         "aspose",
-        "c#"
+        "docker"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfExtractor",
@@ -1726,72 +1893,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-pdf-images-thumbnails": {
-      "title": "Extract PDF Images as PNG Thumbnails",
-      "filename": "extract-pdf-images-thumbnails.cs",
-      "description": "Extracts all images from a PDF file and saves them as PNG thumbnails with a maximum dimension of 200 pixels.",
-      "tags": [
-        "pdf",
-        "image extraction",
-        "thumbnail",
-        "aspdf",
-        "facades"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfConverter.BindPdf",
-        "Aspose.Pdf.Facades.PdfConverter.DoConvert",
-        "Aspose.Pdf.Facades.PdfConverter.HasNextImage",
-        "Aspose.Pdf.Facades.PdfConverter.GetNextImage"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-images-pdf-extractor": {
-      "title": "Extract Images from PDF Using PdfExtractor with Automatic Disposal",
-      "filename": "extract-images-pdf-extractor.cs",
-      "description": "Demonstrates how to extract all images from a PDF file using PdfExtractor inside a using block for automatic disposal.",
-      "tags": [
-        "pdf",
-        "image-extraction",
-        "facade",
-        "using",
-        "aspnet"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfExtractor",
-        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
-        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
-        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
-        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-03-30T08:42:17Z",
-      "status": "verified"
-    },
-    "extract-images-encrypted-pdf": {
-      "title": "Extract Images from Encrypted PDF Using Password",
-      "filename": "extract-images-encrypted-pdf.cs",
-      "description": "Shows how to provide a user password for an encrypted PDF and extract all images using Aspose.Pdf.Facades.PdfExtractor.",
-      "tags": [
-        "pdf",
-        "image-extraction",
-        "encryption",
-        "facade"
-      ],
-      "apis_used": [
-        "PdfExtractor",
-        "PdfExtractor.Password",
-        "PdfExtractor.BindPdf",
-        "PdfExtractor.ExtractImage",
-        "PdfExtractor.HasNextImage",
-        "PdfExtractor.GetNextImage"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-03-30T08:42:17Z",
+      "generated_at": "2026-04-10T06:41:15Z",
       "status": "verified"
     }
   }

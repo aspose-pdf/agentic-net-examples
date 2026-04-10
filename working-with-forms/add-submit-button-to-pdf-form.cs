@@ -1,44 +1,59 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf; // Contains SubmitFormFlag enum
+using Aspose.Pdf;
+using Aspose.Pdf.Annotations; // SubmitFormAction
+using Aspose.Pdf.Forms;      // ButtonField
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_with_submit.pdf";
-        const string submitUrl = "https://example.com/submit";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string submitUrl  = "https://example.com/submit";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Initialize FormEditor with the source PDF and the destination path.
-        using (FormEditor formEditor = new FormEditor(inputPdf, outputPdf))
+        // Load the PDF (lifecycle rule: use using for disposal)
+        using (Document doc = new Document(inputPath))
         {
-            // Add a submit button named "SubmitBtn" on page 1.
-            // The button rectangle is defined by lower‑left (100,100) and upper‑right (200,130).
-            formEditor.AddSubmitBtn(
-                fieldName: "SubmitBtn",
-                page: 1,
-                label: "Submit",
-                url: submitUrl,
-                llx: 100,
-                lly: 100,
-                urx: 200,
-                ury: 130);
+            // Ensure the document has a form object
+            Form form = doc.Form;
 
-            // Configure the button to submit the whole PDF file.
-            formEditor.SetSubmitFlag("SubmitBtn", SubmitFormFlag.Pdf);
+            // Define the button rectangle (llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle btnRect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
 
-            // Save the modified document.
-            formEditor.Save();
+            // Create a push button on the document (constructor: Document, Rectangle)
+            ButtonField submitBtn = new ButtonField(doc, btnRect)
+            {
+                PartialName      = "SubmitBtn",
+                NormalCaption    = "Submit",
+                AlternateCaption = "Submit"
+            };
+
+            // Create the submit-form action and set the target URL
+            SubmitFormAction submitAction = new SubmitFormAction
+            {
+                // Url property expects a FileSpecification, not a raw string
+                Url = new FileSpecification(submitUrl)
+                // Optional: submit as HTML form
+                // Flags = SubmitFormAction.ExportFormat
+            };
+
+            // Assign the action to be executed when the button is activated
+            submitBtn.OnActivated = submitAction;
+
+            // Add the button to the form (automatically placed on the page)
+            form.Add(submitBtn);
+
+            // Save the modified PDF (lifecycle rule: save inside using)
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Submit button added and saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF with submit button saved to '{outputPath}'.");
     }
 }

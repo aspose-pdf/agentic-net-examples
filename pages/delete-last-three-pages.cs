@@ -1,32 +1,35 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 
-public class Program
+class Program
 {
-    public static void Main()
+    static void Main()
     {
-        // Create a sample PDF with up to 4 pages (evaluation mode limit)
-        using (Document doc = new Document())
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+
+        if (!File.Exists(inputPath))
         {
-            // Add 4 pages to the document (Aspose.PDF evaluation mode allows a maximum of 4 elements in a collection)
-            for (int pageIndex = 0; pageIndex < 4; pageIndex++)
-            {
-                doc.Pages.Add();
-            }
-
-            // Optional: save the original document
-            doc.Save("sample.pdf");
-
-            // Delete the last three pages using PageCollection.Delete on each index
-            int originalCount = doc.Pages.Count; // should be 4
-            // Delete from the highest index downwards to keep indices valid after each removal
-            for (int i = originalCount; i > originalCount - 3; i--)
-            {
-                doc.Pages.Delete(i);
-            }
-
-            // Save the modified document (will contain only the first page)
-            doc.Save("output.pdf");
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
+
+        // Load the PDF document (using rule: wrap Document in a using block)
+        using (Document doc = new Document(inputPath))
+        {
+            // Delete the last three pages.
+            // Page numbers are 1‑based, so we repeatedly delete the current last page.
+            for (int i = 0; i < 3 && doc.Pages.Count > 0; i++)
+            {
+                int lastPageIndex = doc.Pages.Count; // current last page number
+                doc.Pages.Delete(lastPageIndex);
+            }
+
+            // Save the modified document (using rule: save inside the using block)
+            doc.Save(outputPath);
+        }
+
+        Console.WriteLine($"Last three pages removed. Result saved to '{outputPath}'.");
     }
 }
