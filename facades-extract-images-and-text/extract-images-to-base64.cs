@@ -1,53 +1,51 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Text.Json;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        string inputPdf = "sample.pdf";
+        const string pdfPath = "input.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine("File not found: " + inputPdf);
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        PdfExtractor extractor = new PdfExtractor();
-        extractor.BindPdf(inputPdf);
-        extractor.ExtractImage();
-
+        // List to hold Base64 strings of extracted images
         List<string> base64Images = new List<string>();
-        int imageIndex = 1;
-        while (extractor.HasNextImage())
+
+        // PdfExtractor implements IDisposable, use using for deterministic cleanup
+        using (PdfExtractor extractor = new PdfExtractor())
         {
-            using (MemoryStream imageStream = new MemoryStream())
+            // Bind the PDF file to the extractor
+            extractor.BindPdf(pdfPath);
+
+            // Prepare the extractor to work with images
+            extractor.ExtractImage();
+
+            // Iterate over all images in the PDF
+            while (extractor.HasNextImage())
             {
-                bool success = extractor.GetNextImage(imageStream);
-                if (success)
+                // Retrieve the next image into a memory stream (default format is JPEG)
+                using (MemoryStream imageStream = new MemoryStream())
                 {
-                    byte[] imageBytes = imageStream.ToArray();
-                    string base64 = Convert.ToBase64String(imageBytes);
+                    extractor.GetNextImage(imageStream);
+                    imageStream.Position = 0; // reset position before reading
+
+                    // Convert the image bytes to a Base64 string
+                    string base64 = Convert.ToBase64String(imageStream.ToArray());
                     base64Images.Add(base64);
-                    Console.WriteLine("Image " + imageIndex + " extracted, size: " + imageBytes.Length + " bytes");
-                }
-                else
-                {
-                    Console.Error.WriteLine("Failed to extract image " + imageIndex);
                 }
             }
-            imageIndex++;
         }
 
-        // Output the Base64 strings as a JSON array (for transmission)
-        Console.WriteLine("[");
-        for (int i = 0; i < base64Images.Count; i++)
-        {
-            string comma = (i < base64Images.Count - 1) ? "," : "";
-            Console.WriteLine("  \"" + base64Images[i] + "\"" + comma);
-        }
-        Console.WriteLine("]");
+        // Serialize the list of Base64 strings to JSON for transmission
+        string jsonPayload = JsonSerializer.Serialize(base64Images);
+        Console.WriteLine(jsonPayload);
     }
 }

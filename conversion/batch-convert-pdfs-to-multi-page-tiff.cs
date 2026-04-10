@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Devices;
 
@@ -8,32 +7,43 @@ class Program
 {
     static void Main()
     {
-        string inputFolder = "pdfs";   // folder containing source PDFs
-        string outputFolder = "tiffs"; // folder for generated TIFFs
+        // Directory containing PDF files
+        string inputDirectory = @"C:\PdfFiles";
+        // Directory where TIFF archives will be saved
+        string outputDirectory = @"C:\TiffArchives";
 
-        if (!Directory.Exists(inputFolder))
+        if (!Directory.Exists(inputDirectory))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Input directory not found: {inputDirectory}");
             return;
         }
 
-        Directory.CreateDirectory(outputFolder);
+        Directory.CreateDirectory(outputDirectory);
 
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
-        foreach (string pdfPath in pdfFiles)
+        // Process each PDF file in the input directory
+        foreach (string pdfPath in Directory.GetFiles(inputDirectory, "*.pdf"))
         {
-            string fileName = Path.GetFileNameWithoutExtension(pdfPath);
-            string tiffPath = Path.Combine(outputFolder, fileName + ".tiff");
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
+            string tiffPath = Path.Combine(outputDirectory, fileNameWithoutExt + ".tif");
 
-            using (Document pdfDoc = new Document(pdfPath))
-            using (FileStream tiffStream = new FileStream(tiffPath, FileMode.Create))
+            try
             {
-                // TiffDevice uses default compression when no options are set
-                TiffDevice tiffDevice = new TiffDevice();
-                tiffDevice.Process(pdfDoc, 1, pdfDoc.Pages.Count, tiffStream);
-            }
+                // Load PDF document
+                using (Document pdfDocument = new Document(pdfPath))
+                {
+                    // Create TiffDevice with default settings (default compression)
+                    TiffDevice tiffDevice = new TiffDevice();
 
-            Console.WriteLine($"Converted '{pdfPath}' to '{tiffPath}'.");
+                    // Convert entire PDF to a multi‑page TIFF archive
+                    tiffDevice.Process(pdfDocument, tiffPath);
+                }
+
+                Console.WriteLine($"Converted '{pdfPath}' to '{tiffPath}'.");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+            }
         }
     }
 }

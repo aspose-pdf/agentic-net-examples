@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Drawing.Imaging; // Added for ImageFormat
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -7,30 +8,42 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.tiff";
+        const string inputPdf  = "input.pdf";          // source PDF
+        const string outputDir = "ExtractedImages";    // folder for TIFF files
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        try
-        {
-            using (Document document = new Document(inputPath))
-            {
-                PdfConverter converter = new PdfConverter();
-                converter.BindPdf(document);
-                converter.DoConvert();
-                converter.SaveAsTIFF(outputPath);
-            }
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputDir);
 
-            Console.WriteLine($"TIFF file saved as '{outputPath}'.");
-        }
-        catch (Exception ex)
+        // Use PdfExtractor (Facade) to pull images from the PDF
+        using (PdfExtractor extractor = new PdfExtractor())
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            // Bind the PDF file
+            extractor.BindPdf(inputPdf);
+
+            // Tell the extractor to work on images
+            extractor.ExtractImage();
+
+            int imageIndex = 1;
+            // Iterate over all extracted images
+            while (extractor.HasNextImage())
+            {
+                // Build a TIFF file name for each image
+                string tiffPath = Path.Combine(outputDir, $"image-{imageIndex}.tiff");
+
+                // Save the current image as TIFF (lossless)
+                extractor.GetNextImage(tiffPath, ImageFormat.Tiff);
+
+                Console.WriteLine($"Saved image {imageIndex} → {tiffPath}");
+                imageIndex++;
+            }
         }
+
+        Console.WriteLine("Image extraction completed.");
     }
 }

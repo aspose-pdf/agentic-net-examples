@@ -1,126 +1,115 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Amazon.S3;
-using Amazon.S3.Transfer;
+using System.Threading.Tasks;
+using Aspose.Pdf.Facades;                     // PdfExtractor resides here
+using System.Drawing.Imaging;                // ImageFormat (fully qualified when needed)
 
-public class ExtractPdfImagesToS3
+// ---------------------------------------------------------------------------
+// Minimal stubs for the AWS SDK (Amazon.S3) when the real package is not
+// referenced. These allow the sample to compile and run (the stub client does
+// nothing) without pulling the full AWSSDK.S3 NuGet package. In a real project
+// you should add the package reference instead of using these stubs.
+// ---------------------------------------------------------------------------
+namespace Amazon
 {
-    public static void Main()
+    public class RegionEndpoint
     {
-        // Path to the source PDF file
-        string pdfPath = "sample.pdf";
-        // Name of the target S3 bucket
-        string bucketName = "my-bucket";
-
-        // Ensure the PDF exists – if not, create a minimal one on‑the‑fly.
-        if (!File.Exists(pdfPath))
-        {
-            CreatePlaceholderPdf(pdfPath);
-        }
-
-        // Create an instance of PdfExtractor to extract images
-        using (PdfExtractor extractor = new PdfExtractor())
-        {
-            extractor.BindPdf(pdfPath);
-            extractor.ExtractImage();
-
-            int imageIndex = 1;
-            while (extractor.HasNextImage())
-            {
-                string imageFileName = $"image-{imageIndex}.png";
-                // Save the extracted image to a local file
-                extractor.GetNextImage(imageFileName);
-
-                // Upload the image file to Amazon S3
-                using (AmazonS3Client s3Client = new AmazonS3Client())
-                using (TransferUtility transferUtility = new TransferUtility(s3Client))
-                {
-                    TransferUtilityUploadRequest uploadRequest = new TransferUtilityUploadRequest
-                    {
-                        BucketName = bucketName,
-                        FilePath   = imageFileName,
-                        Key        = imageFileName
-                    };
-                    transferUtility.Upload(uploadRequest);
-                }
-
-                // Optionally delete the local file after upload
-                try
-                {
-                    File.Delete(imageFileName);
-                }
-                catch (IOException)
-                {
-                    // Ignore any file deletion errors
-                }
-
-                imageIndex++;
-            }
-        }
-    }
-
-    /// <summary>
-    /// Creates a very small PDF containing a single blank page.
-    /// This method is used only when the expected source PDF is missing,
-    /// allowing the sample to run without throwing a FileNotFoundException.
-    /// </summary>
-    private static void CreatePlaceholderPdf(string path)
-    {
-        // Aspose.Pdf.Document is the high‑level API for creating PDFs.
-        using (Document doc = new Document())
-        {
-            // Add a single empty page (size A4).
-            Page page = doc.Pages.Add();
-            page.PageInfo.Width = 595;   // A4 width in points
-            page.PageInfo.Height = 842;  // A4 height in points
-            doc.Save(path);
-        }
+        public static readonly RegionEndpoint USEast1 = new RegionEndpoint("us-east-1");
+        public string SystemName { get; }
+        private RegionEndpoint(string systemName) => SystemName = systemName;
     }
 }
 
-// ---------------------------------------------------------------------------
-// Minimal stubs for the AWS SDK (Amazon.S3 & Amazon.S3.Transfer).
-// These allow the project to compile when the real SDK is not referenced.
-// In a production environment replace these stubs with the official
-// AWSSDK.S3 NuGet package.
-// ---------------------------------------------------------------------------
 namespace Amazon.S3
 {
+    using System.Threading;
+    using System.Threading.Tasks;
+
     public class AmazonS3Client : IDisposable
     {
-        // Add constructors that match the real client if needed.
-        public AmazonS3Client() { }
-        public void Dispose() { /* No resources to release in the stub */ }
+        private readonly Amazon.RegionEndpoint _region;
+        public AmazonS3Client(Amazon.RegionEndpoint region) => _region = region;
+        public void Dispose() { /* no resources to release in the stub */ }
+
+        // The real SDK returns a PutObjectResponse; the stub returns a minimal one.
+        public Task<PutObjectResponse> PutObjectAsync(PutObjectRequest request, CancellationToken cancellationToken = default)
+        {
+            // In a production scenario this would upload to S3. The stub simply
+            // pretends the operation succeeded.
+            return Task.FromResult(new PutObjectResponse { HttpStatusCode = System.Net.HttpStatusCode.OK });
+        }
+    }
+
+    public class PutObjectRequest
+    {
+        public string BucketName { get; set; }
+        public string Key { get; set; }
+        public Stream InputStream { get; set; }
+        public string ContentType { get; set; }
+    }
+
+    public class PutObjectResponse
+    {
+        public System.Net.HttpStatusCode HttpStatusCode { get; set; }
     }
 }
 
-namespace Amazon.S3.Transfer
+class Program
 {
-    public class TransferUtility : IDisposable
+    static void Main()
     {
-        private readonly AmazonS3Client _client;
-        public TransferUtility(AmazonS3Client client)
-        {
-            _client = client;
-        }
-        public void Upload(TransferUtilityUploadRequest request)
-        {
-            // Stub implementation – in real code this would upload the file.
-            // For compilation purposes we simply ensure the method exists.
-            Console.WriteLine($"[Stub] Uploading '{request.FilePath}' to bucket '{request.BucketName}' with key '{request.Key}'.");
-        }
-        public void Dispose()
-        {
-            // No unmanaged resources in the stub.
-        }
-    }
+        const string pdfPath = "input.pdf";               // source PDF
+        const string bucketName = "my-s3-bucket";          // target S3 bucket
+        // Choose the AWS region that matches your bucket
+        var region = Amazon.RegionEndpoint.USEast1;
 
-    public class TransferUtilityUploadRequest
-    {
-        public string BucketName { get; set; }
-        public string FilePath   { get; set; }
-        public string Key        { get; set; }
+        // Initialize the S3 client (credentials are taken from the default AWS SDK chain)
+        using (Amazon.S3.AmazonS3Client s3Client = new Amazon.S3.AmazonS3Client(region))
+        {
+            try
+            {
+                // Extract images from the PDF using Aspose.Pdf.Facades.PdfExtractor
+                using (PdfExtractor extractor = new PdfExtractor())
+                {
+                    extractor.BindPdf(pdfPath);            // bind the PDF file
+                    extractor.ExtractImage();              // prepare image extraction
+
+                    int imageIndex = 1;
+                    while (extractor.HasNextImage())
+                    {
+                        // Store the extracted image in a memory stream (default format is JPEG)
+                        using (MemoryStream imageStream = new MemoryStream())
+                        {
+                            bool extracted = extractor.GetNextImage(imageStream);
+                            if (!extracted)
+                                break; // no more images or extraction failed
+
+                            // Reset stream position before uploading
+                            imageStream.Position = 0;
+
+                            // Prepare the S3 upload request
+                            var putRequest = new Amazon.S3.PutObjectRequest
+                            {
+                                BucketName = bucketName,
+                                Key = $"image-{imageIndex}.jpg", // object key in S3
+                                InputStream = imageStream,
+                                ContentType = "image/jpeg"
+                            };
+
+                            // Upload synchronously (blocking) – adjust as needed for async usage
+                            s3Client.PutObjectAsync(putRequest).GetAwaiter().GetResult();
+                        }
+
+                        imageIndex++;
+                    }
+                }
+
+                Console.WriteLine("Image extraction and upload completed successfully.");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+            }
+        }
     }
 }
