@@ -61,12 +61,19 @@ jobs:
           echo "Template ready with Aspose.PDF ${{ steps.version.outputs.nuget_version }}"
 
       # ── Find .cs files changed in this PR ──
+      # Use merge-base (three-dot diff) so we only see files the PR itself
+      # changed — not files brought in from the base branch when the PR is
+      # updated via "Update branch" (which merges base into head).
       - name: Get changed .cs files
         id: changed
         run: |
           BASE="${{ github.event.pull_request.base.sha }}"
           HEAD="${{ github.event.pull_request.head.sha }}"
-          FILES=$(git diff --name-only "$BASE" "$HEAD" -- '*.cs' | grep '\.cs$' || true)
+          MERGE_BASE=$(git merge-base "$BASE" "$HEAD")
+          echo "PR base:   $BASE"
+          echo "PR head:   $HEAD"
+          echo "Merge base: $MERGE_BASE"
+          FILES=$(git diff --name-only "$MERGE_BASE" "$HEAD" -- '*.cs' | grep '\.cs$' || true)
           if [ -z "$FILES" ]; then
             echo "No .cs files changed in this PR"
             echo "has_cs=false" >> "$GITHUB_OUTPUT"
