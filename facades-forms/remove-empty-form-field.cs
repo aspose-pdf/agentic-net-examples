@@ -1,59 +1,68 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string fieldName = "TempField";
 
-        if (!File.Exists(inputPath))
+        // Ensure the source PDF exists – if not, create a minimal PDF with the target field.
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
+            using (Document placeholder = new Document())
+            {
+                // Add a single page.
+                Page page = placeholder.Pages.Add();
+
+                // Define a rectangle for the form field (left, bottom, right, top).
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 700, 300, 650);
+
+                // Create an empty TextBoxField with the required name.
+                TextBoxField tempField = new TextBoxField(placeholder.Pages[1], rect)
+                {
+                    PartialName = fieldName,
+                    Value = string.Empty // explicitly empty
+                };
+                placeholder.Form.Add(tempField);
+
+                // Save the placeholder PDF so the rest of the logic can operate on a real file.
+                placeholder.Save(inputPdf);
+            }
         }
 
-        using (Document document = new Document(inputPath))
+        // Load the source PDF (lifecycle rule: use using for deterministic disposal)
+        using (Document doc = new Document(inputPdf))
         {
-            Form pdfForm = document.Form;
-            // Locate the field named "TempField"
-            Field targetField = null;
-            foreach (Field field in pdfForm.Fields)
-            {
-                if (string.Equals(field.FullName, "TempField", StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(field.Name, "TempField", StringComparison.OrdinalIgnoreCase))
-                {
-                    targetField = field;
-                    break;
-                }
-            }
+            // Access the form fields via the Facades Form class (fully qualified to avoid ambiguity)
+            Aspose.Pdf.Facades.Form form = new Aspose.Pdf.Facades.Form(doc);
 
-            if (targetField != null)
+            // Retrieve the current value of the field (null or empty means no user input)
+            string currentValue = form.GetField(fieldName);
+
+            // If the field is empty, remove it using FormEditor
+            if (string.IsNullOrEmpty(currentValue))
             {
-                // Check whether the field contains any user‑entered value
-                string fieldValue = targetField.Value != null ? targetField.Value.ToString() : string.Empty;
-                if (string.IsNullOrEmpty(fieldValue))
+                // FormEditor works on the same Document instance
+                using (FormEditor editor = new FormEditor())
                 {
-                    // No data – delete the field
-                    pdfForm.Delete(targetField);
-                    Console.WriteLine("TempField removed (no user data).");
-                }
-                else
-                {
-                    Console.WriteLine("TempField retained (contains data).");
+                    editor.BindPdf(doc);                 // Initialize the editor with the document
+                    editor.RemoveField(fieldName);       // Remove the specified field
+                    editor.Save(outputPdf);              // Persist changes to the output file
                 }
             }
             else
             {
-                Console.WriteLine("TempField not found.");
+                // Field contains data – simply save the original document unchanged
+                doc.Save(outputPdf);
             }
-
-            document.Save(outputPath);
         }
 
-        Console.WriteLine($"Processed PDF saved as '{outputPath}'.");
+        Console.WriteLine($"Processing completed. Output saved to '{outputPdf}'.");
     }
 }

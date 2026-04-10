@@ -3,60 +3,51 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-namespace AsposePdfEncryptionDemo
+public static class PdfEncryptionHelper
 {
-    class Program
+    /// <summary>
+    /// Encrypts a PDF provided as a stream using RC4‑40 encryption and returns the encrypted PDF as a new stream.
+    /// </summary>
+    /// <param name="inputPdf">Stream containing the original PDF. Must be readable and seekable.</param>
+    /// <param name="userPassword">User password (can be null or empty).</param>
+    /// <param name="ownerPassword">Owner password (can be null or empty; a random one will be generated if null).</param>
+    /// <returns>A MemoryStream positioned at the beginning, containing the encrypted PDF.</returns>
+    public static Stream EncryptPdfStreamRc440(Stream inputPdf, string userPassword, string ownerPassword)
     {
-        static void Main()
+        if (inputPdf == null) throw new ArgumentNullException(nameof(inputPdf));
+        if (!inputPdf.CanRead) throw new ArgumentException("Input stream must be readable.", nameof(inputPdf));
+
+        // Ensure the input stream is positioned at the start.
+        if (inputPdf.CanSeek) inputPdf.Position = 0;
+
+        // Prepare the output stream that will hold the encrypted PDF.
+        MemoryStream encryptedStream = new MemoryStream();
+
+        // Use the PdfFileSecurity facade to bind, encrypt, and save the PDF.
+        using (PdfFileSecurity security = new PdfFileSecurity())
         {
-            const string inputPath = "input.pdf";
-            const string outputPath = "encrypted.pdf";
+            // Bind the source PDF stream.
+            security.BindPdf(inputPdf);
 
-            if (!File.Exists(inputPath))
-            {
-                Console.Error.WriteLine($"Input file not found: {inputPath}");
-                return;
-            }
+            // Encrypt using RC4 with a 40‑bit key.
+            // DocumentPrivilege can be set according to required permissions; here we allow printing.
+            security.EncryptFile(userPassword, ownerPassword, DocumentPrivilege.Print, KeySize.x40, Algorithm.RC4);
 
-            using (FileStream inputFileStream = new FileStream(inputPath, FileMode.Open, FileAccess.Read))
-            {
-                Stream encryptedStream = EncryptPdfStream(inputFileStream);
-                using (FileStream outputFileStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
-                {
-                    encryptedStream.CopyTo(outputFileStream);
-                }
-                encryptedStream.Dispose();
-                Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
-            }
+            // Save the encrypted PDF into the output stream.
+            security.Save(encryptedStream);
         }
 
-        /// <summary>
-        /// Encrypts the PDF data from the supplied stream using RC4‑40 encryption and returns a stream containing the encrypted PDF.
-        /// </summary>
-        /// <param name="inputPdfStream">Stream containing the original PDF.</param>
-        /// <returns>Stream with the encrypted PDF.</returns>
-        public static Stream EncryptPdfStream(Stream inputPdfStream)
-        {
-            MemoryStream outputStream = new MemoryStream();
-            using (PdfFileSecurity fileSecurity = new PdfFileSecurity())
-            {
-                // Bind the source PDF stream to the facade.
-                fileSecurity.BindPdf(inputPdfStream);
+        // Reset the output stream position so the caller can read from the beginning.
+        encryptedStream.Position = 0;
+        return encryptedStream;
+    }
+}
 
-                // Apply RC4‑40 encryption. Use any privilege you need; here we allow printing.
-                fileSecurity.EncryptFile(
-                    "userPassword",
-                    "ownerPassword",
-                    DocumentPrivilege.Print,
-                    KeySize.x40,
-                    Algorithm.RC4);
-
-                // Save the encrypted PDF to the output stream.
-                fileSecurity.Save(outputStream);
-            }
-            // Reset the position so the caller can read from the beginning.
-            outputStream.Position = 0;
-            return outputStream;
-        }
+// Dummy entry point to satisfy the compiler when the project is built as an executable.
+public class Program
+{
+    public static void Main()
+    {
+        // No operation – the library class can be used by other code.
     }
 }

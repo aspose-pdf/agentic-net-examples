@@ -1,41 +1,39 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 
-namespace AsposePdfExamples
+class Program
 {
-    class InsertBlankPageAfterEachPage
+    static void Main()
     {
-        static void Main(string[] args)
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_doubled.pdf";
+
+        if (!File.Exists(inputPath))
         {
-            // NOTE: Aspose.PDF evaluation mode allows a maximum of 4 pages in a document.
-            // To demonstrate the logic without a license we limit the sample to 2 pages.
-            // With a full license you can remove the limits and work with any number of pages.
-
-            // Create a sample PDF with a few pages (limited to 2 for evaluation mode)
-            using (Document sampleDoc = new Document())
-            {
-                // Add two blank pages as sample content (2 * 2 = 4 pages after insertion)
-                sampleDoc.Pages.Add();
-                sampleDoc.Pages.Add();
-                sampleDoc.Save("input.pdf");
-            }
-
-            // Open the sample PDF and insert a blank page after each existing page
-            using (Document doc = new Document("input.pdf"))
-            {
-                // In evaluation mode we cannot exceed 4 pages, so we cap the original page count to 2.
-                int maxOriginalPagesForEval = 2; // 2 original + 2 inserted = 4 pages total
-                int originalPageCount = Math.Min(doc.Pages.Count, maxOriginalPagesForEval);
-
-                // Iterate backwards to keep original page positions stable
-                for (int i = originalPageCount; i >= 1; i--)
-                {
-                    // Insert an empty page after the current page (i + 1)
-                    doc.Pages.Insert(i + 1);
-                }
-
-                doc.Save("output.pdf");
-            }
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
+
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Store the original page count (1‑based indexing)
+            int originalCount = doc.Pages.Count;
+
+            // Insert a blank page after each original page.
+            // Iterate backwards so that inserted pages do not affect the
+            // positions of pages we have yet to process.
+            for (int i = originalCount; i >= 1; i--)
+            {
+                // Insert an empty page at position i+1 (after page i)
+                doc.Pages.Insert(i + 1);
+            }
+
+            // Save the modified document
+            doc.Save(outputPath);
+        }
+
+        Console.WriteLine($"Document saved with doubled pages: {outputPath}");
     }
 }

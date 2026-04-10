@@ -1,68 +1,80 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
 
-class Program
+class BatchProcessPdf
 {
     static void Main()
     {
-        const string inputFolder = "input_pdfs";
-        const string disclaimerText = "This document is confidential and intended for the designated recipient only.";
+        const string inputDirectory = @"C:\InputPdfs";
+        const string outputDirectory = @"C:\OutputPdfs";
 
-        if (!Directory.Exists(inputFolder))
+        if (!Directory.Exists(inputDirectory))
         {
-            Console.Error.WriteLine("Input folder not found: " + inputFolder);
+            Console.Error.WriteLine($"Input directory not found: {inputDirectory}");
             return;
         }
 
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
-        foreach (string pdfPath in pdfFiles)
+        Directory.CreateDirectory(outputDirectory);
+
+        foreach (string inputFilePath in Directory.GetFiles(inputDirectory, "*.pdf"))
         {
-            string fileName = Path.GetFileName(pdfPath);
             try
             {
-                using (Document doc = new Document(pdfPath))
+                // ---------- Step 1: Remove all attachments ----------
+                string tempFilePath = Path.Combine(outputDirectory,
+                    Path.GetFileNameWithoutExtension(inputFilePath) + "_noattach.pdf");
+
+                PdfContentEditor contentEditor = new PdfContentEditor();
+                contentEditor.BindPdf(inputFilePath);
+                contentEditor.DeleteAttachments();
+                contentEditor.Save(tempFilePath);
+                contentEditor.Close(); // optional, releases resources
+
+                // ---------- Step 2: Add standardized disclaimer annotation ----------
+                using (Document doc = new Document(tempFilePath))
                 {
-                    // Remove all embedded files (attachments)
-                    if (doc.EmbeddedFiles != null && doc.EmbeddedFiles.Count > 0)
-                    {
-                        // EmbeddedFileCollection is 1‑based and does not expose RemoveAt.
-                        // Delete each file by its name.
-                        while (doc.EmbeddedFiles.Count > 0)
-                        {
-                            // Get the first embedded file (index 1)
-                            FileSpecification spec = doc.EmbeddedFiles[1];
-                            // Delete it using its Name property
-                            doc.EmbeddedFiles.Delete(spec.Name);
-                        }
-                    }
+                    // Use the first page (1‑based indexing)
+                    Aspose.Pdf.Page page = doc.Pages[1];
 
-                    // Add a disclaimer text annotation on the first page
-                    if (doc.Pages.Count > 0)
-                    {
-                        Page firstPage = doc.Pages[1];
-                        Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(50, 750, 550, 800);
-                        TextAnnotation disclaimer = new TextAnnotation(firstPage, rect)
-                        {
-                            Title = "Disclaimer",
-                            Contents = disclaimerText,
-                            Open = true,
-                            Icon = TextIcon.Note
-                        };
-                        firstPage.Annotations.Add(disclaimer);
-                    }
+                    // Define the rectangle where the disclaimer will appear
+                    Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(50, 50, 550, 100);
 
-                    // Overwrite the original file (use full path)
-                    doc.Save(pdfPath);
+                    // DefaultAppearance requires System.Drawing.Color for the text color
+                    DefaultAppearance appearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Gray);
+
+                    // Create the free‑text annotation with the disclaimer text
+                    FreeTextAnnotation disclaimer = new FreeTextAnnotation(page, rect, appearance)
+                    {
+                        Contents = "This document is confidential and intended solely for the recipient.",
+                        Color = Aspose.Pdf.Color.LightGray // background color of the annotation box
+                        // The 'Open' property does not exist on FreeTextAnnotation in current API versions
+                    };
+
+                    // Add the annotation to the page
+                    page.Annotations.Add(disclaimer);
+
+                    // Save the final PDF (overwrites the temporary file)
+                    string finalPath = Path.Combine(outputDirectory, Path.GetFileName(inputFilePath));
+                    doc.Save(finalPath);
                 }
 
-                Console.WriteLine("Processed: " + fileName);
+                // Optionally delete the intermediate temporary file
+                if (File.Exists(tempFilePath))
+                {
+                    File.Delete(tempFilePath);
+                }
+
+                Console.WriteLine($"Processed: {Path.GetFileName(inputFilePath)}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing {fileName}: {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{inputFilePath}': {ex.Message}");
             }
         }
+
+        Console.WriteLine("Batch processing completed.");
     }
 }
