@@ -1,69 +1,79 @@
 using System;
 using System.IO;
 using System.Net.Http;
+using System.Text;
+using System.Xml.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Forms; // <-- added for Field access
+using Aspose.Pdf.Forms;
 
 class Program
 {
+    // Entry point
     static void Main()
     {
-        const string pdfPath = "input.pdf";                 // Path to the PDF containing the form
-        const string endpoint = "https://example.com/submit"; // Remote XML endpoint URL
+        const string pdfPath = "input.pdf";          // Path to the PDF with form fields
+        const string endpointUrl = "https://example.com/submit"; // Remote XML endpoint
 
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF document to optionally set field values
-        using (Document doc = new Document(pdfPath))
+        try
         {
-            // OPTIONAL: set form field values before posting
-            // Use the Field class from Aspose.Pdf.Forms – it exposes the Value property.
-            Field nameField = doc.Form["Name"] as Field;
-            if (nameField != null)
+            // Load the PDF document
+            using (Document pdfDoc = new Document(pdfPath))
             {
-                nameField.Value = "John Doe";
-            }
-
-            // Save the (potentially modified) PDF into a memory stream so the Facade can work with it
-            using (MemoryStream pdfStream = new MemoryStream())
-            {
-                doc.Save(pdfStream);
-                pdfStream.Position = 0;
-
-                // Use the Facade Form class to export the form data as XML
-                using (Aspose.Pdf.Facades.Form facadeForm = new Aspose.Pdf.Facades.Form())
+                // Ensure the document contains a form
+                if (pdfDoc.Form == null || pdfDoc.Form.Count == 0)
                 {
-                    facadeForm.BindPdf(pdfStream);
-                    using (MemoryStream xmlStream = new MemoryStream())
-                    {
-                        facadeForm.ExportXml(xmlStream);
-                        xmlStream.Position = 0;
+                    Console.WriteLine("No form fields found in the PDF.");
+                    return;
+                }
 
-                        // POST the XML to the remote endpoint using HttpClient
-                        using (HttpClient client = new HttpClient())
-                        {
-                            var content = new StreamContent(xmlStream);
-                            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/xml");
+                // Build an XML document containing form field names and values
+                XDocument xmlDoc = new XDocument(
+                    new XElement("FormData",
+                        // Iterate over each field and add an element with its name and value
+                        BuildFieldElements(pdfDoc.Form)
+                    )
+                );
 
-                            HttpResponseMessage response = client.PostAsync(endpoint, content)
-                                                                 .GetAwaiter()
-                                                                 .GetResult();
+                // Convert the XML to a string for posting
+                string xmlString = xmlDoc.Declaration + xmlDoc.ToString();
 
-                            Console.WriteLine($"Status: {response.StatusCode}");
-                            string responseBody = response.Content.ReadAsStringAsync()
-                                                               .GetAwaiter()
-                                                               .GetResult();
-                            Console.WriteLine("Server response:");
-                            Console.WriteLine(responseBody);
-                        }
-                    }
+                // Post the XML to the remote endpoint
+                using (HttpClient client = new HttpClient())
+                {
+                    HttpContent content = new StringContent(xmlString, Encoding.UTF8, "application/xml");
+                    HttpResponseMessage response = client.PostAsync(endpointUrl, content).GetAwaiter().GetResult();
+
+                    Console.WriteLine($"POST status: {(int)response.StatusCode} {response.ReasonPhrase}");
                 }
             }
         }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    // Helper method to create XML elements for each form field
+    private static object[] BuildFieldElements(Form form)
+    {
+        var elements = new object[form.Count];
+        int index = 0;
+
+        foreach (Field field in form)
+        {
+            // Use the field's partial name as the element name and its value as the content
+            string fieldName = field.PartialName ?? $"Field{index}";
+            string fieldValue = field.Value?.ToString() ?? string.Empty;
+
+            elements[index++] = new XElement(fieldName, fieldValue);
+        }
+
+        return elements;
     }
 }
