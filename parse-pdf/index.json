@@ -1,27 +1,26 @@
 {
   "category": "parse-pdf",
   "nuget_version": "26.3.0",
-  "last_updated": "2026-04-08T09:19:04Z",
+  "last_updated": "2026-04-10T07:16:09Z",
   "examples": {
-    "extract-acroform-field-values": {
-      "title": "Extract AcroForm Field Values from a PDF",
-      "filename": "extract-acroform-field-values.cs",
-      "description": "Loads a PDF file, accesses its AcroForm via the Form facade, and prints each field name with its corresponding value.",
+    "load-pdf-list-acroform-fields": {
+      "title": "Load PDF and List AcroForm Fields",
+      "filename": "load-pdf-list-acroform-fields.cs",
+      "description": "Demonstrates loading a PDF file with Aspose.Pdf, accessing its AcroForm, and enumerating the form fields along with their current values.",
       "tags": [
-        "acroform",
         "pdf",
-        "field-extraction",
-        "aspose-pdf",
+        "acroform",
+        "fields",
+        "aspose.pdf",
         "c#"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.Form",
-        "Aspose.Pdf.Facades.Form.GetField",
-        "Aspose.Pdf.Facades.Form.FieldNames"
+        "Aspose.Pdf.Forms.Form",
+        "Aspose.Pdf.Forms.Field"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "read-acroform-fields-from-pdf-stream": {
@@ -46,7 +45,7 @@
         "Aspose.Pdf.Forms.SignatureField"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "retrieve-acroform-fields": {
@@ -67,7 +66,7 @@
         "Aspose.Pdf.Forms.Field"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "retrieve-pdf-form-field-by-name": {
@@ -86,7 +85,7 @@
         "Aspose.Pdf.Forms.Field"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "iterate-pdf-pages-list-form-fields": {
@@ -108,7 +107,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "enumerate-pdf-form-fields-on-page": {
@@ -128,7 +127,7 @@
         "Aspose.Pdf.Forms.Field"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "read-checkbox-value-to-boolean": {
@@ -148,7 +147,7 @@
         "Aspose.Pdf.Forms.CheckboxField"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "parse-update-numeric-pdf-form-field": {
@@ -168,7 +167,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "export-pdf-form-data-to-json": {
@@ -187,7 +186,7 @@
         "Aspose.Pdf.Form.ExportToJson"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "export-pdf-form-data-to-json__v2": {
@@ -206,33 +205,32 @@
         "Aspose.Pdf.Forms.Form.ExportToJson"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "export-pdf-form-fields-to-xml": {
       "title": "Export PDF Form Fields to XML",
       "filename": "export-pdf-form-fields-to-xml.cs",
-      "description": "Shows how to bind a PDF document with Aspose.Pdf.Facades.Form and export its form fields to an XML file using a FileStream.",
+      "description": "Shows how to load a PDF document with form fields using Aspose.Pdf and export the document model, including the form data, to an XML file.",
       "tags": [
         "pdf",
         "form",
-        "xml",
         "export",
+        "xml",
         "aspose"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.Form",
-        "Aspose.Pdf.Facades.Form.BindPdf",
-        "Aspose.Pdf.Facades.Form.ExportXml"
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.SaveXml"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "export-pdf-form-data-to-fdf": {
       "title": "Export PDF Form Data to FDF",
       "filename": "export-pdf-form-data-to-fdf.cs",
-      "description": "Shows how to load a PDF, bind it to the Form facade, and export its form fields to an FDF file using a FileStream.",
+      "description": "Shows how to extract all form field values from a PDF and write them to an FDF file using Aspose.Pdf's Form facade with a FileStream.",
       "tags": [
         "pdf",
         "form",
@@ -241,12 +239,11 @@
         "aspose"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.Form.BindPdf",
+        "Aspose.Pdf.Facades.Form",
         "Aspose.Pdf.Facades.Form.ExportFdf"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "export-acroform-fields-to-xfdf": {
@@ -265,7 +262,7 @@
         "Aspose.Pdf.Document.ExportAnnotationsToXfdf"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "export-pdf-to-html-png-xfdf": {
@@ -289,7 +286,7 @@
         "Aspose.Pdf.Devices.Resolution"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "modify-checkbox-appearance-extract-value": {
@@ -320,7 +317,7 @@
         "Aspose.Pdf.MarginInfo"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "extract-pdf-form-fields": {
@@ -339,7 +336,7 @@
         "Aspose.Pdf.Forms.Field"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "extract-pdf-form-data-to-json": {
@@ -358,7 +355,7 @@
         "Aspose.Pdf.Form.ExportToJson"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "combine-pdf-form-data-into-json-array": {
@@ -377,7 +374,7 @@
         "Aspose.Pdf.Form.ExportToJson"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "export-pdf-form-data-to-json__v3": {
@@ -396,7 +393,7 @@
         "Aspose.Pdf.Form.ExportToJson"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "log-pdf-form-extraction-timestamps": {
@@ -418,7 +415,7 @@
         "Aspose.Pdf.Text.TextAbsorber.Visit"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "extract-pdf-form-data-to-json-bytes": {
@@ -437,7 +434,7 @@
         "Aspose.Pdf.Forms.Form.ExportToJson"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "export-pdf-form-fields-with-prefix-to-json": {
@@ -456,7 +453,7 @@
         "Aspose.Pdf.Forms.Field"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "count-acroform-fields-in-pdf": {
@@ -476,7 +473,7 @@
         "Aspose.Pdf.Document.Form.Count"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "iterate-and-fill-pdf-form-fields": {
@@ -496,7 +493,7 @@
         "Aspose.Pdf.Forms.Field"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "retrieve-form-field-types-from-pdf": {
@@ -516,7 +513,7 @@
         "Aspose.Pdf.Forms.Field"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "export-pdf-form-data-to-json__v4": {
@@ -535,13 +532,13 @@
         "Aspose.Pdf.Forms.Form.ExportToJson"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
-    "export-pdf-form-data-to-xml": {
-      "title": "Export PDF Form Data to XML Using a MemoryStream",
-      "filename": "export-pdf-form-data-to-xml.cs",
-      "description": "Shows how to bind a PDF containing form fields, export the form data as XML directly into a MemoryStream, and read the XML content from the stream.",
+    "export-pdf-form-data-to-xml-memorystream": {
+      "title": "Export PDF Form Data to XML using MemoryStream",
+      "filename": "export-pdf-form-data-to-xml-memorystream.cs",
+      "description": "Demonstrates how to export form fields from a PDF directly into a MemoryStream as XML using Aspose.Pdf's Form.ExportXml method.",
       "tags": [
         "pdf",
         "form",
@@ -551,52 +548,49 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.Form",
-        "Aspose.Pdf.Facades.Form.BindPdf",
         "Aspose.Pdf.Facades.Form.ExportXml"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
-    "export-pdf-form-data-to-fdf__v2": {
-      "title": "Export PDF Form Data to FDF File",
-      "filename": "export-pdf-form-data-to-fdf__v2.cs",
-      "description": "Shows how to load a PDF, bind it to the Form facade, and export its form fields to an FDF file using a FileStream.",
+    "export-pdf-form-to-fdf": {
+      "title": "Export PDF Form Data to FDF",
+      "filename": "export-pdf-form-to-fdf.cs",
+      "description": "Shows how to use Aspose.Pdf's Form facade to export PDF form fields to an FDF file and ensure the stream and form are closed.",
       "tags": [
         "pdf",
-        "form",
         "fdf",
+        "form",
         "export",
         "aspose"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.Form",
-        "Aspose.Pdf.Facades.Form.BindPdf",
-        "Aspose.Pdf.Facades.Form.ExportFdf"
+        "Aspose.Pdf.Facades.Form.ExportFdf",
+        "Aspose.Pdf.Facades.Form.Close"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
-    "export-pdf-form-to-xfdf": {
-      "title": "Export PDF Form Data to XFDF Using Form Facade",
-      "filename": "export-pdf-form-to-xfdf.cs",
-      "description": "Shows how to bind a PDF document to the Aspose.Pdf.Facades.Form class and export its form annotations to an XFDF file via a FileStream.",
+    "export-pdf-annotations-to-xfdf": {
+      "title": "Export PDF Annotations to XFDF using a FileStream",
+      "filename": "export-pdf-annotations-to-xfdf.cs",
+      "description": "Demonstrates how to export all annotations from a PDF document to an XFDF file using Aspose.Pdf's ExportAnnotationsToXfdf method and a FileStream.",
       "tags": [
         "xfdf",
-        "form-export",
-        "file-stream",
-        "pdf",
-        "aspose"
+        "annotations",
+        "export",
+        "aspose-pdf",
+        "filestream"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.Form",
-        "Aspose.Pdf.Facades.Form.BindPdf",
-        "Aspose.Pdf.Facades.Form.ExportXfdf"
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.ExportAnnotationsToXfdf"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "log-form-field-count-per-pdf-page": {
@@ -617,7 +611,7 @@
         "Aspose.Pdf.Annotations.WidgetAnnotation"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "extract-vector-graphics-to-svg": {
@@ -639,7 +633,7 @@
         "Aspose.Pdf.Vector.SvgExtractor.Extract"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "extract-vector-graphics-to-svg__v2": {
@@ -659,7 +653,7 @@
         "Aspose.Pdf.Vector.SvgExtractor.Extract"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "combine-pdf-vector-graphics-into-svg": {
@@ -680,7 +674,7 @@
         "Aspose.Pdf.Vector.SvgExtractor.Extract"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "extract-subpaths-png-graphicsabsorber": {
@@ -711,7 +705,7 @@
         "Aspose.Pdf.SvgLoadOptions"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "export-pdf-page-as-raster-png": {
@@ -732,7 +726,7 @@
         "Aspose.Pdf.Devices.PngDevice.Process"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "extract-graphic-element-to-svg": {
@@ -756,7 +750,7 @@
         "Aspose.Pdf.PdfException"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "extract-first-page-text-to-utf8": {
@@ -776,7 +770,7 @@
         "Aspose.Pdf.Page.Accept"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "extract-text-from-pdf-to-txt": {
@@ -796,7 +790,7 @@
         "Aspose.Pdf.PageCollection.Accept"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "extract-stamp-text-from-pdf": {
@@ -817,7 +811,7 @@
         "Aspose.Pdf.Annotations.StampAnnotation"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "extract-superscripts-subscripts-from-pdf": {
@@ -840,7 +834,7 @@
         "Aspose.Pdf.Text.TextState"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "extract-paragraphs-with-line-breaks": {
@@ -864,7 +858,7 @@
         "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "extract-embedded-images-to-png": {
@@ -884,7 +878,7 @@
         "Aspose.Pdf.XImage"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "extract-fonts-from-pdf": {
@@ -904,7 +898,7 @@
         "Aspose.Pdf.Text.Font.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "extract-pdf-tables-to-csv": {
@@ -925,7 +919,7 @@
         "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "export-pdf-acroform-fields-to-json": {
@@ -944,7 +938,7 @@
         "Aspose.Pdf.Form.ExportToJson"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "batch-extract-vector-graphics-to-svg": {
@@ -964,7 +958,7 @@
         "Aspose.Pdf.Page.TrySaveVectorGraphics"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "parallel-pdf-text-extraction": {
@@ -984,7 +978,7 @@
         "Aspose.Pdf.PageCollection.Accept"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "export-pdf-to-svg-with-custom-options": {
@@ -1008,7 +1002,7 @@
         "Aspose.Pdf.Vector.SvgExtractor.Extract"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "export-large-graphics-from-pdf": {
@@ -1031,7 +1025,7 @@
         "Aspose.Pdf.Vector.SvgExtractor.Extract"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "extract-page-graphics-to-svg": {
@@ -1054,7 +1048,7 @@
         "Aspose.Pdf.Vector.SvgExtractor.Extract"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "combine-pdfs-into-multi-page-svg": {
@@ -1074,7 +1068,7 @@
         "Aspose.Pdf.Vector.SvgExtractor.Extract"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "export-pdf-subpaths-as-separate-svg": {
@@ -1096,7 +1090,7 @@
         "Aspose.Pdf.SvgExtractor.Extract"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "extract-vector-graphics-from-encrypted-pdf": {
@@ -1116,7 +1110,7 @@
         "Aspose.Pdf.InvalidPasswordException"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "extract-pdf-text-image-graphic-count": {
@@ -1136,7 +1130,7 @@
         "Aspose.Pdf.Page"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "extract-pdf-font-table-form-counts": {
@@ -1158,7 +1152,7 @@
         "Aspose.Pdf.Form"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "validate-pdf-fonts-against-system": {
@@ -1179,7 +1173,7 @@
         "Aspose.Pdf.Text.Font.IsAccessible"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "extract-pdf-metadata-to-svg": {
@@ -1199,7 +1193,7 @@
         "Aspose.Pdf.DocumentInfo"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "extract-images-using-graphicsabsorber": {
@@ -1228,7 +1222,7 @@
         "Aspose.Pdf.Image"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "convert-pdf-to-markdown-preserve-indentation": {
@@ -1249,7 +1243,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "extract-superscript-subscript-from-pdf": {
@@ -1270,7 +1264,7 @@
         "Aspose.Pdf.PageCollection.Accept"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "export-pdf-tables-to-csv-with-border-markers": {
@@ -1290,7 +1284,7 @@
         "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "extract-checkbox-states-from-pdf-acroform": {
@@ -1310,7 +1304,7 @@
         "Aspose.Pdf.Forms.CheckboxField"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "extract-selected-radio-button-values": {
@@ -1331,7 +1325,7 @@
         "Aspose.Pdf.Forms.RadioButtonOption"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "extract-svg-brand-color-transformation": {
@@ -1352,7 +1346,7 @@
         "Aspose.Pdf.Vector.SvgExtractor.Extract"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     },
     "preserve-pdf-coordinate-system-to-svg": {
@@ -1374,7 +1368,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-08T09:19:04Z",
+      "generated_at": "2026-04-10T07:16:09Z",
       "status": "verified"
     }
   }
