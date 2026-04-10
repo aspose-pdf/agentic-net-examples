@@ -1,40 +1,50 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // for ImageStamp (inherits from Stamp)
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
         const string inputPdf  = "input.pdf";
-        const string outputPdf = "stamped_output.pdf";
         const string stampImg  = "logo.png";
+        const string outputPdf = "stamped_output.pdf";
 
-        if (!File.Exists(inputPdf) || !File.Exists(stampImg))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine("Input PDF or stamp image not found.");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document
+        if (!File.Exists(stampImg))
+        {
+            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
+            return;
+        }
+
+        // Load the source PDF
         using (Document doc = new Document(inputPdf))
         {
-            // Apply the image stamp to each page. Stamping does not modify page labels,
-            // so we do not need to copy/restore them explicitly.
+            // Create an image stamp from the file
+            ImageStamp imgStamp = new ImageStamp(stampImg)
+            {
+                // Position the stamp 50 points from the left and 50 points from the bottom
+                XIndent = 50,
+                YIndent = 50,
+                // Optional visual settings
+                Opacity = 0.5,
+                // Keep the stamp on top of page content
+                Background = false
+            };
+
+            // Apply the same stamp to every page
             foreach (Page page in doc.Pages)
             {
-                ImageStamp imgStamp = new ImageStamp(stampImg)
-                {
-                    Background = false,               // stamp on top of content
-                    Opacity = 0.5,                    // semi‑transparent
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-
-                // Add the stamp to the current page
                 page.AddStamp(imgStamp);
             }
+
+            // No need to reassign PageLabels – the property is read‑only and stamping does not modify them.
 
             // Save the modified PDF
             doc.Save(outputPdf);

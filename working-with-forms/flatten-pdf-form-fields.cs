@@ -1,41 +1,42 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "flattened_output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "flattened.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF into the Form facade
-        using (Form form = new Form(inputPath))
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // ---- Fill form fields (replace with actual field names/values) ----
-            // Text field example
-            form.FillField("FirstName", "John");
-            form.FillField("LastName",  "Doe");
+            // OPTIONAL: fill form fields before flattening
+            if (doc.Form != null)
+            {
+                // Example field names – adjust to your PDF
+                Field? nameField = doc.Form["Name"] as Field;
+                if (nameField != null)
+                    nameField.Value = "John Doe";
 
-            // Checkbox field example
-            form.FillField("AgreeTerms", true);
+                Field? dateField = doc.Form["Date"] as Field;
+                if (dateField != null)
+                    dateField.Value = DateTime.Today.ToShortDateString();
+            }
 
-            // Radio button / list box / combo box can be filled similarly:
-            // form.FillField("Gender", 1);          // selects the first option
-            // form.FillField("Country", "USA");    // selects a value by name
-            // ------------------------------------------------------------------
+            // Flatten the form – fields become part of the page content and are no longer editable
+            doc.Form.Flatten();
 
-            // Flatten all fields so they become static content (non‑editable)
-            form.FlattenAllFields();
-
-            // Save the resulting PDF
-            form.Save(outputPath);
+            // Save the flattened PDF
+            doc.Save(outputPath);
         }
 
         Console.WriteLine($"Flattened PDF saved to '{outputPath}'.");

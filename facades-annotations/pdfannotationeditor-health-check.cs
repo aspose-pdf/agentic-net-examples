@@ -1,29 +1,39 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string samplePath = "sample.pdf";
+        const string samplePdf = "sample.pdf";
+        const string outputPdf = "health_check_output.pdf";
 
-        // Create a simple PDF with one blank page and save it
-        using (Document doc = new Document())
+        if (!File.Exists(samplePdf))
         {
-            Page page = doc.Pages.Add();
-            doc.Save(samplePath);
+            Console.Error.WriteLine($"Sample PDF not found: {samplePdf}");
+            return;
         }
 
-        // Verify that PdfAnnotationEditor can bind to the created PDF without errors
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        try
         {
-            editor.BindPdf(samplePath);
-            // Close releases the bound document; Dispose will be called automatically by using
-            editor.Close();
-        }
+            // Create the annotation editor and bind it to the sample PDF
+            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+            {
+                editor.BindPdf(samplePdf); // Initialize the facade with the PDF file
 
-        Console.WriteLine("PdfAnnotationEditor bound successfully to the sample PDF.");
+                // Simple verification: access the underlying document and read page count
+                int pageCount = editor.Document.Pages.Count;
+                Console.WriteLine($"Successfully bound. Page count: {pageCount}");
+
+                // Save the document to confirm that Save works without errors
+                editor.Save(outputPdf);
+                Console.WriteLine($"Health‑check PDF saved to '{outputPdf}'.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Health check failed: {ex.Message}");
+        }
     }
 }

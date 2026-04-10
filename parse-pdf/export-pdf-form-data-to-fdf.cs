@@ -1,40 +1,34 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf; // Core namespace only; do NOT add Aspose.Pdf.Facades using
 
-class ExportFormToFdf
+class Program
 {
     static void Main()
     {
-        // Path to the source PDF containing form fields
-        const string pdfPath = "input.pdf";
+        const string inputPdfPath = "input.pdf";
+        const string outputFdfPath = "output.fdf";
 
-        // Path where the FDF file will be written
-        const string fdfPath = "output.fdf";
-
-        // Ensure the source PDF exists
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document pdfDoc = new Document(pdfPath))
+        // Use the Form facade via its fully qualified name (no using directive for Aspose.Pdf.Facades)
+        using (var form = new Aspose.Pdf.Facades.Form(inputPdfPath))
         {
-            // Open a FileStream for the FDF output (create or overwrite)
-            using (FileStream fdfStream = new FileStream(fdfPath, FileMode.Create, FileAccess.Write))
+            // Open a writable FileStream for the FDF output
+            using (FileStream fdfStream = new FileStream(outputFdfPath, FileMode.Create, FileAccess.Write))
             {
-                // Use the Form facade to export form data to FDF
-                using (Form formFacade = new Form())
-                {
-                    formFacade.BindPdf(pdfDoc);
-                    formFacade.ExportFdf(fdfStream);
-                }
+                // Export all form field data to the FDF stream
+                form.ExportFdf(fdfStream);
             }
+
+            // The PDF itself is unchanged; if you need to save it explicitly you can call:
+            // form.Save(); // saves the original PDF (optional)
         }
 
-        Console.WriteLine($"Form data exported to FDF: {fdfPath}");
+        Console.WriteLine($"Form data successfully exported to '{outputFdfPath}'.");
     }
 }
