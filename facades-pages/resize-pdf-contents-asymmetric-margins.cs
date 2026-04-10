@@ -8,35 +8,41 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_asymmetric.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the source PDF
-        using (Document document = new Document(inputPath))
+        // Load the source PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Prepare page numbers (1‑based indexing)
-            int pageCount = document.Pages.Count;
-            int[] pageNumbers = new int[pageCount];
-            for (int i = 0; i < pageCount; i++)
-            {
-                pageNumbers[i] = i + 1;
-            }
+            // Define asymmetric margins as percentages of the original page size
+            var leftMargin   = PdfFileEditor.ContentsResizeValue.Percents(5);   // 5% left
+            var rightMargin  = PdfFileEditor.ContentsResizeValue.Percents(15);  // 15% right
+            var topMargin    = PdfFileEditor.ContentsResizeValue.Percents(10);  // 10% top
+            var bottomMargin = PdfFileEditor.ContentsResizeValue.Percents(10);  // 10% bottom
 
-            // Define asymmetric margins: left = 50 units, right = 20 units, top = 0, bottom = 0
-            PdfFileEditor.ContentsResizeParameters resizeParams = PdfFileEditor.ContentsResizeParameters.Margins(50.0, 20.0, 0.0, 0.0);
+            // Create resize parameters: specify margins, let content width/height be calculated automatically (null)
+            PdfFileEditor.ContentsResizeParameters resizeParams = new PdfFileEditor.ContentsResizeParameters(
+                leftMargin,    // left margin
+                null,          // content width (auto)
+                rightMargin,   // right margin
+                topMargin,     // top margin
+                null,          // content height (auto)
+                bottomMargin   // bottom margin
+            );
 
-            // Apply the resizing to the selected pages
+            // Perform the resize on all pages (pages argument = null)
             PdfFileEditor editor = new PdfFileEditor();
-            editor.ResizeContents(document, pageNumbers, resizeParams);
+            editor.ResizeContents(doc, null, resizeParams);
 
-            // Save the modified PDF
-            document.Save(outputPath);
-            Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
+            // Save the modified document
+            doc.Save(outputPath);
         }
+
+        Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
     }
 }

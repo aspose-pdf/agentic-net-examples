@@ -1,13 +1,13 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf.Facades;   // PdfPageEditor
+using Aspose.Pdf;          // PageSize
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "sample.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,21 +15,22 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Bind the PDF to the editor and rotate the first page.
+        using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // Rotate the first page 90 degrees clockwise
-            Page page = doc.Pages[1];
-            page.Rotate = Rotation.on90; // corrected enum value
+            editor.BindPdf(inputPath);
 
-            // Retrieve the page rectangle taking rotation into account
-            Aspose.Pdf.Rectangle rect = page.GetPageRect(true);
-            Console.WriteLine($"After rotation: Width = {rect.Width}, Height = {rect.Height}");
+            // Set rotation (applies to all pages unless ProcessPages is set).
+            editor.Rotation = 90;
+            editor.ApplyChanges();
 
-            // Save the modified document
-            doc.Save(outputPath);
+            // Retrieve the page size after rotation.
+            PageSize size = editor.GetPageSize(1);
+            Console.WriteLine($"Page 1 size after rotation: {size.Width} x {size.Height}");
+
+            // Verify the rotation value.
+            int rotation = editor.GetPageRotation(1);
+            Console.WriteLine($"Page 1 rotation: {rotation} degrees");
         }
-
-        Console.WriteLine("Operation completed.");
     }
 }
