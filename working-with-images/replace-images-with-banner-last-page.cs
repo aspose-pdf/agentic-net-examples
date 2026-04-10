@@ -1,15 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // for ImagePlacementAbsorber
 
 class ReplaceImagesWithBanner
 {
     static void Main()
     {
         const string inputPdfPath  = "input.pdf";
-        const string bannerImgPath = "banner.jpg";   // JPEG banner image
         const string outputPdfPath = "output.pdf";
+        const string bannerImgPath = "banner.jpg"; // JPEG banner image
 
         if (!File.Exists(inputPdfPath))
         {
@@ -23,11 +22,12 @@ class ReplaceImagesWithBanner
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
         using (Document doc = new Document(inputPdfPath))
         {
-            // Get the last page (1‑based indexing)
-            Page lastPage = doc.Pages[doc.Pages.Count];
+            // Get the last page (page indexing is 1‑based)
+            int lastPageIndex = doc.Pages.Count;
+            Page lastPage = doc.Pages[lastPageIndex];
 
             // Hide all existing images on the last page
             ImagePlacementAbsorber imgAbsorber = new ImagePlacementAbsorber();
@@ -37,28 +37,25 @@ class ReplaceImagesWithBanner
                 placement.Hide(); // removes the image from the page
             }
 
-            // Determine page width from MediaBox
-            Aspose.Pdf.Rectangle mediaBox = lastPage.MediaBox;
-            double pageWidth  = mediaBox.URX - mediaBox.LLX;
-            double pageHeight = mediaBox.URY - mediaBox.LLY;
-
-            // Define banner height (e.g., 100 points)
-            double bannerHeight = 100;
-
-            // Position banner at the top of the page
-            Aspose.Pdf.Rectangle bannerRect = new Aspose.Pdf.Rectangle(
-                mediaBox.LLX,                     // left
-                mediaBox.URY - bannerHeight,      // bottom (top minus height)
-                mediaBox.URX,                     // right
-                mediaBox.URY);                    // top
-
             // Add the banner image spanning the full page width
             using (FileStream bannerStream = File.OpenRead(bannerImgPath))
             {
+                // Full page rectangle
+                Aspose.Pdf.Rectangle pageRect = lastPage.Rect;
+
+                // Define banner rectangle: full width, fixed height (e.g., 100 points) at the bottom of the page
+                double bannerHeight = 100; // adjust as needed
+                Aspose.Pdf.Rectangle bannerRect = new Aspose.Pdf.Rectangle(
+                    pageRect.LLX,                     // left
+                    pageRect.LLY,                     // bottom
+                    pageRect.URX,                     // right
+                    pageRect.LLY + bannerHeight);    // top
+
+                // Add the banner image to the page
                 lastPage.AddImage(bannerStream, bannerRect);
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (lifecycle rule: use Save inside using block)
             doc.Save(outputPdfPath);
         }
 
