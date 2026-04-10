@@ -1,37 +1,44 @@
 using System;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "GenderForm.pdf";
-
-        // Create a new PDF document and add a blank page
+        // Create a new PDF document
         using (Document doc = new Document())
         {
-            doc.Pages.Add(); // page index will be 1 (1‑based)
+            // Add a blank page (default size)
+            Page page = doc.Pages.Add();
 
-            // Initialize FormEditor and bind it to the document
-            using (FormEditor formEditor = new FormEditor())
+            // Create a radio button field for gender selection.
+            // Use the constructor that receives only the Page object.
+            RadioButtonField genderField = new RadioButtonField(page)
             {
-                formEditor.BindPdf(doc);
+                Name = "Gender",
+                PartialName = "Gender",
+                // Allow no option to be selected initially
+                NoToggleToOff = false
+            };
 
-                // Define the radio button options for the gender field
-                formEditor.Items = new string[] { "Male", "Female", "Other" };
-                formEditor.RadioGap = 20;      // space between buttons (pixels)
-                formEditor.RadioHoriz = true; // arrange horizontally
+            // Add "Male" option
+            genderField.AddOption(
+                "Male",
+                new Rectangle(100f, 700f, 120f, 720f));
 
-                // Add the radio button group named "Gender" on page 1
-                // llx, lly, urx, ury define the rectangle that will contain the group
-                formEditor.AddField(FieldType.Radio, "Gender", 1, 100, 600, 250, 630);
+            // Add "Female" option at a specific position
+            genderField.AddOption(
+                "Female",
+                new Rectangle(100f, 660f, 120f, 680f));
 
-                // Persist the PDF with the newly added AcroForm
-                formEditor.Save(outputPath);
-            }
+            // Add the radio button field to the document's form
+            doc.Form.Add(genderField);
+
+            // Save the PDF with the AcroForm
+            doc.Save("GenderForm.pdf");
         }
 
-        Console.WriteLine($"PDF with gender radio button saved to '{outputPath}'.");
+        Console.WriteLine("PDF with gender radio button group created successfully.");
     }
 }

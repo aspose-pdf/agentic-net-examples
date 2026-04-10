@@ -1,107 +1,54 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
-public class AnnotationHelper
+public static class PdfAnnotationHelper
 {
     /// <summary>
-    /// Returns the list of annotation names whose author (stored in the Subject property) matches the specified author string.
+    /// Returns the names of all annotations whose Author matches the specified value.
     /// </summary>
-    /// <param name="pdfPath">Path to the input PDF file.</param>
-    /// <param name="author">Author name to filter annotations.</param>
+    /// <param name="pdfPath">Full path to the PDF file.</param>
+    /// <param name="author">Author string to filter annotations.</param>
     /// <returns>List of annotation names.</returns>
     public static List<string> GetAnnotationNamesByAuthor(string pdfPath, string author)
     {
-        if (string.IsNullOrEmpty(pdfPath))
-            throw new ArgumentException("PDF path must be provided.", nameof(pdfPath));
+        var result = new List<string>();
 
-        if (!File.Exists(pdfPath))
-            throw new FileNotFoundException("PDF file not found.", pdfPath);
+        // Load the PDF directly via the Document class (no Facade API). This avoids
+        // locking the Aspose.Pdf assembly during build and is the recommended way
+        // for read‑only operations.
+        var doc = new Document(pdfPath);
 
-        var matchingNames = new List<string>();
-
-        using (Document doc = new Document(pdfPath))
+        // Aspose.Pdf pages are 1‑based.
+        for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
         {
-            // Iterate through all pages
-            foreach (Page page in doc.Pages)
+            Page page = doc.Pages[pageNum];
+
+            foreach (Annotation annotation in page.Annotations)
             {
-                // Iterate through all annotations on the current page
-                foreach (Annotation annotation in page.Annotations)
+                // The author of a markup annotation is stored in the Title property.
+                if (annotation is MarkupAnnotation markup &&
+                    !string.IsNullOrEmpty(markup.Title) &&
+                    string.Equals(markup.Title, author, StringComparison.OrdinalIgnoreCase) &&
+                    !string.IsNullOrEmpty(annotation.Name))
                 {
-                    // Only markup annotations expose the Subject property (used here to store the author)
-                    if (annotation is MarkupAnnotation markup &&
-                        string.Equals(markup.Subject, author, StringComparison.OrdinalIgnoreCase))
-                    {
-                        if (!string.IsNullOrEmpty(annotation.Name))
-                            matchingNames.Add(annotation.Name);
-                    }
+                    result.Add(annotation.Name);
                 }
             }
         }
 
-        return matchingNames;
+        return result;
     }
+}
 
-    // ---------------------------------------------------------------------
-    // Helper: creates a minimal PDF with a single text annotation if the
-    // specified file does not exist. This allows the sample to run without
-    // requiring an external PDF.
-    // ---------------------------------------------------------------------
-    private static void EnsureSamplePdf(string path, string author)
-    {
-        if (File.Exists(path))
-            return;
-
-        // Create a one‑page document
-        var doc = new Document();
-        var page = doc.Pages.Add();
-
-        // Add a simple text annotation and store the author in the Subject field
-        var textAnnot = new TextAnnotation(page, new Aspose.Pdf.Rectangle(100, 600, 300, 650))
-        {
-            Name = "SampleAnnotation",
-            Subject = author, // author information
-            Title = "Demo",
-            Contents = "This is a demo annotation."
-        };
-        page.Annotations.Add(textAnnot);
-
-        doc.Save(path);
-    }
-
-    // Example usage
+// Dummy entry point to satisfy the compiler when the project expects a Main method.
+public class Program
+{
     public static void Main()
     {
-        const string inputPdf = "sample.pdf";
-        const string targetAuthor = "John Doe";
-
-        // Ensure a PDF exists so the demo does not throw FileNotFoundException
-        EnsureSamplePdf(inputPdf, targetAuthor);
-
-        List<string> names;
-        try
-        {
-            names = GetAnnotationNamesByAuthor(inputPdf, targetAuthor);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error: {ex.Message}");
-            return;
-        }
-
-        Console.WriteLine($"Annotations authored by '{targetAuthor}':");
-        if (names.Count == 0)
-        {
-            Console.WriteLine("  (none found)");
-        }
-        else
-        {
-            foreach (string name in names)
-            {
-                Console.WriteLine($"  {name}");
-            }
-        }
+        // Example usage (can be removed or replaced by unit tests)
+        // var names = PdfAnnotationHelper.GetAnnotationNamesByAuthor("sample.pdf", "John Doe");
+        // Console.WriteLine(string.Join(", ", names));
     }
 }

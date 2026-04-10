@@ -2,43 +2,40 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-namespace Example
+class Program
 {
-    class Program
+    static void Main()
     {
-        static void Main(string[] args)
+        const string inputPath = "input.pdf";
+        const string outputPath = "cropped.pdf";
+
+        if (!File.Exists(inputPath))
         {
-            // Determine the input PDF path – either from the first command‑line argument or the default "sample.pdf"
-            string inputPath = args.Length > 0 ? args[0] : "sample.pdf";
-            string outputPath = "cropped.pdf";
-
-            // Verify that the source file exists before attempting to load it
-            if (!File.Exists(inputPath))
-            {
-                Console.Error.WriteLine($"Error: The file '{inputPath}' was not found. Please provide a valid PDF file path.");
-                return;
-            }
-
-            // Load the PDF document
-            using (Document document = new Document(inputPath))
-            {
-                // Define a crop rectangle (left, bottom, right, top)
-                Rectangle cropRect = new Rectangle(50, 50, 500, 800);
-
-                // Apply the crop box to the first page
-                document.Pages[1].CropBox = cropRect;
-
-                // Retrieve the TrimBox after cropping – TrimBox reflects the visible area of the page
-                Rectangle trimBox = document.Pages[1].TrimBox;
-
-                // Output TrimBox coordinates
-                Console.WriteLine("TrimBox: LLX={0}, LLY={1}, URX={2}, URY={3}",
-                    trimBox.LLX, trimBox.LLY, trimBox.URX, trimBox.URY);
-
-                // Save the modified PDF (optional)
-                document.Save(outputPath);
-                Console.WriteLine($"Cropped PDF saved to '{outputPath}'.");
-            }
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
+
+        // Load the PDF document (using statement ensures proper disposal)
+        using (Document doc = new Document(inputPath))
+        {
+            // Pages are 1‑based; work with the first page as an example
+            Page page = doc.Pages[1];
+
+            // OPTIONAL: define a new CropBox to crop the page content
+            // Rectangle constructor: (llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle newCrop = new Aspose.Pdf.Rectangle(50, 50, 500, 750);
+            page.CropBox = newCrop;
+
+            // Retrieve the TrimBox after cropping
+            Aspose.Pdf.Rectangle trimBox = page.TrimBox;
+
+            // Output TrimBox coordinates
+            Console.WriteLine($"TrimBox: LLX={trimBox.LLX}, LLY={trimBox.LLY}, URX={trimBox.URX}, URY={trimBox.URY}");
+
+            // Save the (potentially) cropped document
+            doc.Save(outputPath);
+        }
+
+        Console.WriteLine("Processing completed.");
     }
 }

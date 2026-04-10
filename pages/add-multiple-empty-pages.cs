@@ -2,34 +2,47 @@ using System;
 using System.Collections.Generic;
 using Aspose.Pdf;
 
-public class Program
+class Program
 {
-    public static void Main()
+    static void Main()
     {
-        // List defining how many empty pages to add in each iteration
-        // (total pages are limited to 4 in evaluation mode)
-        List<int> pageCounts = new List<int> { 2, 3, 1 };
+        // Path for the resulting PDF
+        const string outputPath = "output.pdf";
 
-        // Create a new PDF document
+        // List defining how many empty pages to add in each iteration
+        // Example: first add 2 pages, then 3 pages, then 1 page
+        List<int> pagesToAdd = new List<int> { 2, 3, 1 };
+
+        // Aspose evaluation version allows a maximum of 4 pages to be added.
+        // If you have a licensed version you can remove this limit.
+        const int maxPagesAllowed = 4;
+
+        // Create a new empty PDF document
         using (Document doc = new Document())
         {
-            const int maxPagesInEvalMode = 4; // Aspose.PDF evaluation limit
-
-            // Iterate over the list and add the specified number of empty pages each time
-            foreach (int count in pageCounts)
+            // Iterate over the list and add the specified number of empty pages
+            foreach (int count in pagesToAdd)
             {
                 for (int i = 0; i < count; i++)
                 {
-                    if (doc.Pages.Count >= maxPagesInEvalMode)
-                        break; // stop adding when the limit is reached
+                    // Stop adding pages once the evaluation limit is reached
+                    if (doc.Pages.Count >= maxPagesAllowed)
+                    {
+                        Console.WriteLine($"Evaluation limit of {maxPagesAllowed} pages reached. Remaining pages are skipped.");
+                        break;
+                    }
+                    // Add() creates an empty page using the most common page size in the document
                     doc.Pages.Add();
                 }
-                if (doc.Pages.Count >= maxPagesInEvalMode)
-                    break; // exit outer loop as well
+                // If limit already reached, exit outer loop as well
+                if (doc.Pages.Count >= maxPagesAllowed)
+                    break;
             }
 
-            // Save the resulting PDF
-            doc.Save("output.pdf");
+            // Save the document – explicit SaveOptions are not required for PDF output
+            doc.Save(outputPath);
         }
+
+        Console.WriteLine($"PDF with added pages saved to '{outputPath}'.");
     }
 }
