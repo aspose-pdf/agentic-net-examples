@@ -17,29 +17,32 @@ class Program
             return;
         }
 
+        // Use PdfAnnotationEditor in a using block for deterministic disposal
         using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            // Load the PDF that contains the annotation to be updated
+            // Load the PDF document
             editor.BindPdf(inputPath);
 
-            // Obtain the page object required by the TextAnnotation constructor
-            Page page = editor.Document.Pages[1];
-            // A rectangle must be supplied; its actual values are irrelevant when only the
-            // Modified date is being updated, so a zero‑size rectangle is used.
+            // Get a reference to the first page (required for the TextAnnotation constructor)
+            Page firstPage = editor.Document.Pages[1];
+            // Create a zero‑size rectangle – the rectangle is not used when only modifying properties
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(0, 0, 0, 0);
 
-            // Create the annotation with the required (Page, Rectangle) constructor
-            TextAnnotation annotation = new TextAnnotation(page, rect)
+            // Create a TextAnnotation with the (Page, Rectangle) constructor and set the Modified date.
+            TextAnnotation annot = new TextAnnotation(firstPage, rect)
             {
                 Modified = DateTime.Now // set the modified date to the current system time
+                // Optional: you can also set Title, Contents, Color, Subject, Open here
             };
 
-            // Apply the modification to annotations on page 1 (start = 1, end = 1)
-            editor.ModifyAnnotations(1, 1, annotation);
+            // Apply the modification to all pages (pages are 1‑based)
+            int pageCount = editor.Document.Pages.Count;
+            editor.ModifyAnnotations(1, pageCount, annot);
 
             // Save the updated PDF
             editor.Save(outputPath);
-            Console.WriteLine($"Modified annotation saved to '{outputPath}'.");
         }
+
+        Console.WriteLine($"Annotation modified date updated and saved to '{outputPath}'.");
     }
 }

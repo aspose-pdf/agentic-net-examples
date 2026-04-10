@@ -1,8 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text;
 
 class Program
 {
@@ -13,28 +11,21 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Initialize the PdfFileStamp facade and bind the source PDF
+        // Use a using block to guarantee disposal of the PdfFileStamp facade.
         using (PdfFileStamp fileStamp = new PdfFileStamp())
         {
+            // Bind the source PDF.
             fileStamp.BindPdf(inputPath);
 
-            // Create formatted text containing the {file_name} placeholder
-            FormattedText headerText = new FormattedText(
-                "{file_name}",
-                System.Drawing.Color.Black,
-                "Helvetica",
-                EncodingType.Winansi,
-                false,
-                12);
+            // Add a header that automatically inserts the PDF file name.
+            // The placeholder {file_name} is replaced by Aspose.Pdf with the actual file name.
+            fileStamp.AddHeader("{file_name}", 20f);
 
-            // Add the header to each page; second argument is the vertical offset from the top
-            fileStamp.AddHeader(headerText, 20f);
-
-            // Save the stamped PDF
+            // Save the stamped PDF.
             fileStamp.Save(outputPath);
         }
 

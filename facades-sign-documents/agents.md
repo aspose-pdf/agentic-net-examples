@@ -21,70 +21,61 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf.Facades;` (30/32 files) ← category-specific
-- `using Aspose.Pdf;` (15/32 files)
-- `using Aspose.Pdf.Forms;` (13/32 files)
-- `using Aspose.Pdf.Text;` (1/32 files)
-- `using System;` (32/32 files)
-- `using System.IO;` (29/32 files)
-- `using System.Collections.Generic;` (8/32 files)
-- `using System.Drawing;` (8/32 files)
-- `using System.Globalization;` (2/32 files)
-- `using System.Security.Cryptography.X509Certificates;` (2/32 files)
-- `using System.Linq;` (1/32 files)
-- `using System.Text;` (1/32 files)
-- `using System.Text.Json;` (1/32 files)
-
-## Common Code Pattern
-
-Most files follow this pattern:
-
-```csharp
-using (Document doc = new Document("input.pdf"))
-{
-    // ... operations ...
-    doc.Save("output.pdf");
-}
-```
+- `using Aspose.Pdf.Facades;` (35/35 files) ← category-specific
+- `using Aspose.Pdf;` (9/35 files)
+- `using Aspose.Pdf.Forms;` (9/35 files)
+- `using Aspose.Pdf.Text;` (1/35 files)
+- `using System;` (35/35 files)
+- `using System.IO;` (28/35 files)
+- `using System.Drawing;` (9/35 files)
+- `using System.Collections.Generic;` (8/35 files)
+- `using System.Security.Cryptography.X509Certificates;` (4/35 files)
+- `using System.Globalization;` (2/35 files)
+- `using System.Data;` (1/35 files)
+- `using System.Net;` (1/35 files)
+- `using System.Security.Cryptography;` (1/35 files)
+- `using System.Text;` (1/35 files)
+- `using System.Text.Json;` (1/35 files)
+- `using System.Threading;` (1/35 files)
 
 ## Files in this folder
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [add-digital-signature](./add-digital-signature.cs) | Add Digital Signature with Reason and Location | `PdfFileSignature`, `BindPdf`, `SetCertificate` | Demonstrates how to add a visible digital signature to a PDF and set the signature reason and loc... |
-| [add-second-digital-signature-page-three](./add-second-digital-signature-page-three.cs) | Add a second digital signature on page three of a PDF | `PdfFileSignature`, `BindPdf`, `SetCertificate` | Demonstrates adding two digital signatures to a PDF, with the second placed on page three using a... |
-| [add-signature-field](./add-signature-field.cs) | Add Signature Field and Sign PDF | `Document`, `Form`, `SignatureField` | Demonstrates adding a signature field to a specific page and then signing the PDF using a certifi... |
-| [custom-signature-appearance](./custom-signature-appearance.cs) | Create Custom Signature Appearance without Default Caption | `Document`, `Page`, `Rectangle` | Demonstrates how to create a PDF signature field with a custom appearance that hides the default ... |
-| [digitally-sign-pdf-page-one](./digitally-sign-pdf-page-one.cs) | Digitally Sign PDF on First Page | `PdfFileSignature`, `BindPdf`, `SetCertificate` | Demonstrates how to bind a PDF with PdfFileSignature, set a certificate, and add a digital signat... |
-| [extract-certificate-details](./extract-certificate-details.cs) | Extract Certificate Issuer and Expiration from Signed PDF | `PdfFileSignature`, `GetSignatureNames`, `TryExtractCertificate` | Demonstrates how to read a signed PDF, retrieve each signature's X.509 certificate, and display i... |
-| [extract-certificate-serial-number](./extract-certificate-serial-number.cs) | Extract Signing Certificate Serial Number from PDF | `PdfFileSignature`, `BindPdf`, `GetSignatureNames` | Loads a signed PDF, extracts the signing certificate from the first signature field, and logs its... |
-| [extract-signature-image](./extract-signature-image.cs) | Extract Signature Field Image to PNG | `Document`, `Form`, `ExtractImage` | Demonstrates extracting the image from a signature form field named 'WitnessSignature' and saving... |
-| [extract-signature-images-html](./extract-signature-images-html.cs) | Extract Signature Images and Generate HTML Report | `Document`, `PdfFileSignature`, `SignatureName` | Extracts signature images from a signed PDF and creates an HTML file that displays each signature... |
-| [extract-signing-certificate](./extract-signing-certificate.cs) | Extract Signing Certificate from PDF Signature Field | `PdfFileSignature`, `ExtractCertificate`, `SignatureName` | Demonstrates how to extract the X.509 certificate from a PDF signature field named 'LegalSignatur... |
-| [list-pdf-signature-names](./list-pdf-signature-names.cs) | List Signature Names in PDF | `PdfFileSignature`, `BindPdf`, `GetSignNames` | Demonstrates how to retrieve and display all digital signature names from a PDF using Aspose.Pdf. |
-| [list-signature-reason-location](./list-signature-reason-location.cs) | List Signature Reasons and Locations in PDF | `PdfFileSignature`, `BindPdf`, `GetSignatureNames` | Demonstrates how to enumerate digital signatures in a PDF and output each signature's reason and ... |
-| [locale-specific-signature](./locale-specific-signature.cs) | Locale-Specific Signature Text in PDF | `PdfFileSignature`, `BindPdf`, `SetCertificate` | Adds a visible digital signature to a PDF with signature text adapted to German, Spanish, or Japa... |
-| [pdf-signature-report](./pdf-signature-report.cs) | Generate PDF Signature Report | `PdfFileSignature`, `BindPdf`, `GetSignatureNames` | Creates a PDF summarizing each digital signature's name, signer, and verification result from an ... |
-| [remove-all-signatures](./remove-all-signatures.cs) | Remove All Signatures from PDF | `PdfFileSignature`, `BindPdf`, `RemoveSignatures` | Demonstrates how to remove every digital signature from a PDF file using Aspose.Pdf's PdfFileSign... |
-| [remove-and-resign-pdf](./remove-and-resign-pdf.cs) | Remove Existing Signatures and Re‑sign PDF with New Certific... | `PdfFileSignature`, `BindPdf`, `RemoveSignatures` | Demonstrates how to remove all signatures from a PDF and then apply a new digital signature using... |
-| [remove-pdf-signature](./remove-pdf-signature.cs) | Remove Specific Signature from PDF | `PdfFileSignature`, `BindPdf`, `RemoveSignature` | Demonstrates how to remove a digital signature named 'ApprovalSignature' from a PDF using Aspose.... |
-| [remove-pdf-signatures](./remove-pdf-signatures.cs) | Remove All Signatures from PDFs in a Directory | `PdfFileSignature`, `BindPdf`, `RemoveSignatures` | Recursively scans a directory for PDF files, removes all digital signatures from each PDF, and sa... |
-| [remove-signature-with-error-handling](./remove-signature-with-error-handling.cs) | Remove Specific Signature with Error Handling | `PdfFileSignature`, `SignatureName`, `GetSignatureNames` | Shows how to safely remove a named digital signature from a PDF, checking for its existence and h... |
-| [set-french-language-signature](./set-french-language-signature.cs) | Set French Language for Digital Signature Caption | `PdfFileSignature`, `BindPdf`, `SetCertificate` | Demonstrates how to change the language of a digital signature caption to French by setting the S... |
-| [set-signature-background](./set-signature-background.cs) | Set Semi-Transparent Background for PDF Signature Appearance | `PdfFileSignature`, `SignatureCustomAppearance`, `Color` | Demonstrates how to configure a PDF signature's custom appearance with a semi‑transparent backgro... |
-| [sign-pdf-empty-signature-fields](./sign-pdf-empty-signature-fields.cs) | Sign PDF with Empty Reason, Contact, and Location | `PdfFileSignature`, `BindPdf`, `SetCertificate` | Demonstrates how to sign a PDF using Aspose.Pdf while suppressing the reason, contact, and locati... |
-| [sign-pdf-hidden-appearance](./sign-pdf-hidden-appearance.cs) | Sign PDF with Hidden Signature Appearance | `PdfFileSignature`, `PKCS7`, `BindPdf` | Demonstrates how to apply a cryptographically valid digital signature to a PDF while completely h... |
-| [sign-pdf-pfx](./sign-pdf-pfx.cs) | Sign PDF with PFX Certificate | `PdfFileSignature`, `BindPdf`, `SetCertificate` | Demonstrates how to digitally sign a PDF using a password‑protected PFX certificate. |
-| [sign-pdf-visible-last-page](./sign-pdf-visible-last-page.cs) | Sign PDF with Visible Signature on Last Page | `PdfFileSignature`, `Document`, `Page` | Demonstrates how to add a visible digital signature to the bottom‑right corner of the last page o... |
-| [sign-pdf-with-image](./sign-pdf-with-image.cs) | Sign PDF with Image Signature | `PdfFileSignature`, `Document`, `BindPdf` | Demonstrates how to apply an image signature to a PDF using Aspose.Pdf's PdfFileSignature facade. |
-| [signature-custom-appearance](./signature-custom-appearance.cs) | Configure SignatureCustomAppearance with Foreground Image an... | `PdfFileSignature`, `SignatureCustomAppearance`, `Document` | Demonstrates how to set a background color and draw the signature image as a foreground image usi... |
-| [validate-pdf-signature](./validate-pdf-signature.cs) | Validate PDF Signature Integrity | `PdfFileSignature`, `VerifySignature` | Demonstrates how to verify the cryptographic integrity of a PDF signature field named 'ManagerSig... |
-| [verify-multiple-signatures](./verify-multiple-signatures.cs) | Verify Multiple Signatures in PDF | `PdfFileSignature`, `BindPdf`, `GetSignNames` | Demonstrates how to list all signature names in a PDF and verify each signature using PdfFileSign... |
-| [verify-pdf-no-signatures](./verify-pdf-no-signatures.cs) | Verify PDF Without Signatures Returns False | `PdfFileSignature`, `BindPdf`, `ContainsSignature` | Demonstrates checking a PDF that has no digital signatures using PdfFileSignature.VerifySigned, w... |
-| ... | | | *and 2 more files* |
+| [add-second-digital-signature-page-3](./add-second-digital-signature-page-3.cs) | Add Second Digital Signature on Page 3 of PDF | `PdfFileSignature`, `BindPdf`, `SetCertificate` | Demonstrates how to apply two digital signatures to a PDF using Aspose.Pdf.Facades, with the seco... |
+| [add-signature-field-and-sign-pdf](./add-signature-field-and-sign-pdf.cs) | Add Signature Field and Sign PDF with Aspose.Pdf | `Document`, `FormEditor`, `AddField` | Demonstrates creating a PDF, adding a signature field on a specific page using FormEditor, and di... |
+| [create-invisible-pdf-digital-signature](./create-invisible-pdf-digital-signature.cs) | Create an Invisible Digital Signature in PDF | `PdfFileSignature`, `BindPdf`, `SetCertificate` | Demonstrates how to sign a PDF with Aspose.Pdf using a hidden appearance, preserving cryptographi... |
+| [custom-pdf-signature-appearance](./custom-pdf-signature-appearance.cs) | Create Custom PDF Signature Appearance Without Default Capti... | `Document`, `PdfFileSignature`, `BindPdf` | Shows how to sign a PDF using Aspose.Pdf and hide the default "Digitally signed by" label by conf... |
+| [custom-signature-appearance-with-image](./custom-signature-appearance-with-image.cs) | Configure Custom Signature Appearance with Image and Backgro... | `PdfFileSignature`, `BindPdf`, `Sign` | Demonstrates signing a PDF using a PKCS#7 certificate while customizing the visible signature app... |
+| [digitally-sign-first-page-pdf](./digitally-sign-first-page-pdf.cs) | Digitally Sign First Page of PDF | `PdfFileSignature`, `BindPdf`, `SetCertificate` | Shows how to bind a PDF, configure a certificate, and add a visible digital signature to page one... |
+| [digitally-sign-pdf-with-reason-location](./digitally-sign-pdf-with-reason-location.cs) | Digitally Sign PDF with Reason and Location | `PdfFileSignature`, `BindPdf`, `SetCertificate` | Shows how to use Aspose.Pdf.Facades to digitally sign a PDF, specifying the signature reason as '... |
+| [extract-certificate-details-from-pdf-signature](./extract-certificate-details-from-pdf-signature.cs) | Extract Certificate Details from PDF Signature | `PdfFileSignature`, `BindPdf`, `GetSignatureNames` | Demonstrates how to open a signed PDF, enumerate its signature fields, and retrieve the X.509 cer... |
+| [extract-certificate-serial-number](./extract-certificate-serial-number.cs) | Extract and Log Certificate Serial Number from PDF Signature... | `PdfFileSignature`, `BindPdf`, `GetSignatureNames` | Shows how to open a signed PDF, enumerate its signatures, extract the associated X509 certificate... |
+| [extract-signature-image-to-png](./extract-signature-image-to-png.cs) | Extract Signature Image from PDF and Save as PNG | `PdfFileSignature`, `BindPdf`, `ExtractImage` | Demonstrates how to bind a PDF, extract the image of a signature field named 'WitnessSignature', ... |
+| [extract-signature-images-html-report](./extract-signature-images-html-report.cs) | Extract Signature Images to HTML Report | `PdfFileSignature`, `BindPdf`, `GetSignatureNames` | Demonstrates how to extract visual signature images from a signed PDF using Aspose.Pdf.Facades.Pd... |
+| [extract-signing-certificate-from-pdf](./extract-signing-certificate-from-pdf.cs) | Extract Signing Certificate from PDF Signature Field | `PdfFileSignature`, `BindPdf`, `ExtractCertificate` | Shows how to retrieve the signing certificate from a named signature field in a PDF document and ... |
+| [extract-signing-certificate-subject-dn](./extract-signing-certificate-subject-dn.cs) | Extract Signing Certificate Subject DN from PDF | `PdfFileSignature`, `BindPdf`, `GetSignatureNames` | Demonstrates how to open a signed PDF with Aspose.Pdf, extract the signing certificate of the fir... |
+| [generate-pdf-signature-report](./generate-pdf-signature-report.cs) | Generate PDF Signature Report | `Document`, `PdfFileSignature`, `GetSignatureNames` | Loads a signed PDF, extracts each signature's details and verification status using PdfFileSignat... |
+| [list-signature-names-in-pdf](./list-signature-names-in-pdf.cs) | List Signature Names in PDF | `PdfFileSignature`, `BindPdf`, `GetSignatureNames` | Demonstrates how to open a PDF with Aspose.Pdf.Facades, retrieve all active signature names, and ... |
+| [list-signature-reasons-and-locations](./list-signature-reasons-and-locations.cs) | List Signature Reasons and Locations in a PDF | `PdfFileSignature`, `BindPdf`, `GetSignatureNames` | Shows how to open a PDF with Aspose.Pdf.Facades, retrieve all signature names, and output each si... |
+| [locale-specific-pdf-digital-signature](./locale-specific-pdf-digital-signature.cs) | Locale-Specific PDF Digital Signature with Custom Appearance | `PKCS7`, `SignatureCustomAppearance`, `PdfFileSignature` | Demonstrates signing a PDF with a PKCS#7 digital signature and a custom appearance that uses loca... |
+| [remove-all-signatures-from-pdf](./remove-all-signatures-from-pdf.cs) | Remove All Signatures from a PDF | `PdfFileSignature`, `BindPdf`, `RemoveSignatures` | Shows how to use Aspose.Pdf.Facades to delete every digital signature from a PDF file and save th... |
+| [remove-all-signatures-from-pdfs](./remove-all-signatures-from-pdfs.cs) | Remove All Signatures from PDFs | `PdfFileSignature`, `BindPdf`, `RemoveSignatures` | Shows how to recursively scan a directory for PDF files, open each with Aspose.Pdf.Facades.PdfFil... |
+| [remove-existing-signatures-and-resign-pdf](./remove-existing-signatures-and-resign-pdf.cs) | Remove Existing Signatures and Re‑sign PDF | `PdfFileSignature`, `BindPdf`, `RemoveSignatures` | Demonstrates how to delete all signatures from a PDF and then apply a new digital signature using... |
+| [remove-named-signature-from-pdf](./remove-named-signature-from-pdf.cs) | Remove a Named Signature from a PDF | `PdfFileSignature`, `BindPdf`, `RemoveSignature` | Shows how to bind a PDF, remove a specific signature by its name using Aspose.Pdf.Facades, and sa... |
+| [remove-specific-signature-from-pdf](./remove-specific-signature-from-pdf.cs) | Remove Specific Signature from PDF with Error Handling | `PdfFileSignature`, `BindPdf`, `GetSignatureNames` | Demonstrates locating a named digital signature in a PDF, removing it while keeping the field, an... |
+| [semi-transparent-signature-background](./semi-transparent-signature-background.cs) | Apply Semi-Transparent Background to PDF Signature | `Color`, `PdfFileSignature`, `PKCS1` | Demonstrates signing a PDF with Aspose.Pdf while configuring a semi‑transparent background color ... |
+| [sign-pdf-and-verify-signature](./sign-pdf-and-verify-signature.cs) | Sign PDF and Verify Signature using PdfFileSignature | `PdfFileSignature`, `BindPdf`, `SetCertificate` | Demonstrates how to digitally sign a PDF with a PKCS#12 certificate using Aspose.Pdf.Facades.PdfF... |
+| [sign-pdf-french-caption](./sign-pdf-french-caption.cs) | Sign PDF with French Digital Signature Caption | `PdfFileSignature`, `BindPdf`, `Sign` | Shows how to digitally sign a PDF and change the signature appearance labels to French by configu... |
+| [sign-pdf-visible-signature-last-page](./sign-pdf-visible-signature-last-page.cs) | Sign PDF with Visible Signature on Last Page | `PdfFileSignature`, `BindPdf`, `SetCertificate` | Demonstrates how to digitally sign a PDF using Aspose.Pdf.Facades, placing a visible signature im... |
+| [sign-pdf-with-pfx-certificate](./sign-pdf-with-pfx-certificate.cs) | Sign PDF with PFX Certificate using Aspose.Pdf | `PdfFileSignature`, `BindPdf`, `SetCertificate` | Demonstrates how to digitally sign a PDF file using a password‑protected PFX certificate with Asp... |
+| [sign-pdf-with-retry](./sign-pdf-with-retry.cs) | Sign PDF with Retry on File Lock | `PdfFileSignature`, `BindPdf`, `SetCertificate` | Demonstrates signing a PDF using Aspose.Pdf.Facades with a retry mechanism that handles file‑lock... |
+| [sign-pdf-with-visible-image](./sign-pdf-with-visible-image.cs) | Sign PDF with Visible Image Using PdfFileSignature | `PdfFileSignature`, `BindPdf`, `Sign` | Demonstrates how to add a visible signature image to a PDF file using Aspose.Pdf's PdfFileSignatu... |
+| [suppress-reason-location-when-signing-pdf](./suppress-reason-location-when-signing-pdf.cs) | Suppress Reason and Location When Signing PDF | `PdfFileSignature`, `BindPdf`, `SetCertificate` | Demonstrates how to sign a PDF with Aspose.Pdf while suppressing the Reason and Location fields b... |
+| ... | | | *and 5 more files* |
 
 ## Category Statistics
-- Total examples: 32
+- Total examples: 35
 
 ## Category-Specific Tips
 
@@ -128,5 +119,5 @@ using (Document doc = new Document("input.pdf"))
 - Review code examples in this folder for facades-sign-documents patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-04-07 | Run: `20260407_212044_4ffbd1`
+Updated: 2026-04-10 | Run: `20260410_113311_e93f13`
 <!-- AUTOGENERATED:END -->
