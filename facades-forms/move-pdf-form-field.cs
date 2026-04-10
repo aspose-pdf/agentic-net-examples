@@ -1,29 +1,41 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName = "DateField";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        using (FormEditor formEditor = new FormEditor(inputPath, outputPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Move the field to lower‑left (100,200) with width 150 and height 20 on page 2.
-            // Upper‑right coordinates are calculated as (llx + width, lly + height).
-            bool success = formEditor.MoveField(fieldName, 100f, 200f, 250f, 220f);
-            Console.WriteLine(success ? $"Field '{fieldName}' moved successfully." : $"Failed to move field '{fieldName}'.");
+            // Initialize FormEditor with the loaded document
+            using (FormEditor formEditor = new FormEditor(doc))
+            {
+                // Move the field named "DateField" to (100,200) with width 150 and height 20
+                // llx = 100, lly = 200, urx = 250 (100 + 150), ury = 220 (200 + 20)
+                bool moved = formEditor.MoveField("DateField", 100f, 200f, 250f, 220f);
+
+                if (!moved)
+                {
+                    Console.Error.WriteLine("Failed to move the field 'DateField'.");
+                }
+
+                // Save the modified PDF
+                formEditor.Save(outputPath);
+            }
         }
 
-        Console.WriteLine($"Modified PDF saved as '{outputPath}'.");
+        Console.WriteLine($"Field moved and PDF saved to '{outputPath}'.");
     }
 }

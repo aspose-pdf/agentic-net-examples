@@ -1,44 +1,88 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Facades;
 using Aspose.Pdf.Devices;
 
-class Program
+class PdfToBmpConverter
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPattern = "page_{0}.bmp";
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "BmpImages";
+        const string tempPdfPath = "temp_substituted.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine("File not found: " + inputPath);
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document pdfDocument = new Document(inputPath))
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputFolder);
+
+        // Load original PDF and apply font substitution (Times New Roman → Calibri)
+        using (Document originalDoc = new Document(inputPdfPath))
         {
-            // Apply font substitution for any missing fonts (example substitutes with Arial)
-            // Use FontRepository.Substitutions with SimpleFontSubstitution instead of the non‑existent Document.FontSubstitutions property
-            FontRepository.Substitutions.Add(new SimpleFontSubstitution("MissingFont", "Arial"));
-
-            // Create a BmpDevice with desired resolution
-            Resolution resolution = new Resolution(300);
-            BmpDevice bmpDevice = new BmpDevice(resolution);
-
-            // Convert each page to a BMP image
-            for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
+            PdfSaveOptions saveOpts = new PdfSaveOptions
             {
-                string outputPath = string.Format(outputPattern, pageNumber);
-                using (FileStream bmpStream = new FileStream(outputPath, FileMode.Create))
+                // When a font is not available, Aspose.Pdf will use this default font
+                DefaultFontName = "Calibri"
+            };
+
+            // Save to a temporary PDF with the substitution applied
+            originalDoc.Save(tempPdfPath, saveOpts);
+        }
+
+        // Load the temporary PDF (now using Calibri where Times New Roman was missing)
+        using (Document substitutedDoc = new Document(tempPdfPath))
+        {
+            // Initialize PdfConverter with the substituted document
+            using (PdfConverter converter = new PdfConverter(substitutedDoc))
+            {
+                // Set conversion range (all pages)
+                converter.StartPage = 1; // 1‑based indexing
+                converter.EndPage = substitutedDoc.Pages.Count;
+
+                // Set desired resolution (e.g., 300 DPI)
+                converter.Resolution = new Resolution(300);
+
+                // Prepare the converter
+                converter.DoConvert();
+
+                // Loop through each page and save as BMP
+                for (int pageNumber = converter.StartPage; pageNumber <= converter.EndPage; pageNumber++)
                 {
-                    bmpDevice.Process(pdfDocument.Pages[pageNumber], bmpStream);
+                    // Create a BmpDevice with the same resolution
+                    BmpDevice bmpDevice = new BmpDevice(converter.Resolution);
+
+                    // Define output BMP file name
+                    string bmpPath = Path.Combine(outputFolder, $"page_{pageNumber}.bmp");
+
+                    // Convert the current page to BMP and write to file
+                    using (FileStream bmpStream = new FileStream(bmpPath, FileMode.Create))
+                    {
+                        bmpDevice.Process(converter.Document.Pages[pageNumber], bmpStream);
+                    }
+
+                    Console.WriteLine($"Saved BMP: {bmpPath}");
                 }
+
+                // Release resources held by the converter
+                converter.Close();
             }
         }
 
-        Console.WriteLine("PDF pages have been converted to BMP images.");
+        // Clean up temporary PDF
+        try
+        {
+            File.Delete(tempPdfPath);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Could not delete temporary file: {ex.Message}");
+        }
+
+        Console.WriteLine("PDF to BMP conversion completed.");
     }
 }

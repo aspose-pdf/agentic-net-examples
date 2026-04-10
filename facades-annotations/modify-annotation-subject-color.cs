@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -17,26 +17,30 @@ class Program
             return;
         }
 
-        // Load the document to obtain a Page object required by TextAnnotation constructor
+        // Load the document to obtain a Page object – required for TextAnnotation construction.
         Document doc = new Document(inputPath);
-        Page page = doc.Pages[1];
-        // Define a rectangle for the annotation (position and size). Adjust coordinates as needed.
-        Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 100, 200, 200);
+        Page page = doc.Pages[1]; // target page (1‑based index)
 
-        // Create the TextAnnotation using the (Page, Rectangle) constructor
-        TextAnnotation annotation = new TextAnnotation(page, rect)
+        // Create a new TextAnnotation using the (Page, Rectangle) constructor.
+        // The rectangle defines the annotation's position on the page.
+        TextAnnotation newAnnotation = new TextAnnotation(page, new Aspose.Pdf.Rectangle(100, 700, 200, 750))
         {
             Subject = "Updated Subject",
-            Color = Aspose.Pdf.Color.Blue
+            Color   = Aspose.Pdf.Color.Blue
         };
 
-        // Use PdfAnnotationEditor to modify annotations on page 1 (start = 1, end = 1)
-        PdfAnnotationEditor editor = new PdfAnnotationEditor();
-        editor.BindPdf(inputPath);
-        editor.ModifyAnnotations(1, 1, annotation);
-        editor.Save(outputPath);
-        editor.Close();
+        // Bind the PDF to the annotation editor.
+        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        {
+            editor.BindPdf(inputPath);
 
-        Console.WriteLine($"Annotations updated and saved to '{outputPath}'.");
+            // Replace annotations on page 1 (start = end = 1) with the new annotation.
+            editor.ModifyAnnotations(start: 1, end: 1, annotation: newAnnotation);
+
+            // Save the updated PDF.
+            editor.Save(outputPath);
+        }
+
+        Console.WriteLine($"PDF saved with updated annotation to '{outputPath}'.");
     }
 }
