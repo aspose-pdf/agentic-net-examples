@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string targetAuthor = "John Doe";
+        const string outputPath = "output_filtered.pdf";
+        const string authorToDelete = "John Doe";
 
         if (!File.Exists(inputPath))
         {
@@ -18,43 +19,43 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            using (Document doc = new Document(inputPath))
+            // Collect the names of annotations whose Title (author) matches the target
+            List<string> namesToDelete = new List<string>();
+
+            foreach (Page page in doc.Pages)
             {
-                foreach (Page page in doc.Pages)
+                foreach (Annotation annot in page.Annotations)
                 {
-                    // 1. Filter annotations whose author information matches the target.
-                    //    In Aspose.Pdf the author is stored in the Subject property of a MarkupAnnotation.
-                    var indicesToDelete = new List<int>();
-
-                    for (int i = 1; i <= page.Annotations.Count; i++)
+                    // Title exists only on markup annotations, so cast first
+                    if (annot is MarkupAnnotation markup &&
+                        !string.IsNullOrEmpty(markup.Title) &&
+                        markup.Title.Equals(authorToDelete, StringComparison.OrdinalIgnoreCase))
                     {
-                        Annotation ann = page.Annotations[i];
-                        if (ann is MarkupAnnotation markup &&
-                            !string.IsNullOrEmpty(markup.Subject) &&
-                            markup.Subject.Equals(targetAuthor, StringComparison.OrdinalIgnoreCase))
-                        {
-                            indicesToDelete.Add(i);
-                        }
-                    }
-
-                    // 2. Delete the filtered annotations. Deleting from highest index to lowest
-                    //    preserves the validity of the remaining indices.
-                    indicesToDelete.Sort((a, b) => b.CompareTo(a));
-                    foreach (int idx in indicesToDelete)
-                    {
-                        page.Annotations.Delete(idx);
+                        // Name property uniquely identifies the annotation
+                        if (!string.IsNullOrEmpty(annot.Name))
+                            namesToDelete.Add(annot.Name);
                     }
                 }
+            }
 
-                doc.Save(outputPath);
-                Console.WriteLine($"Annotations by '{targetAuthor}' removed. Saved to '{outputPath}'.");
+            // Use PdfAnnotationEditor (Facades API) to delete the selected annotations
+            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+            {
+                editor.BindPdf(doc); // bind the loaded document
+
+                foreach (string annotName in namesToDelete)
+                {
+                    editor.DeleteAnnotation(annotName);
+                }
+
+                // Save the modified PDF
+                editor.Save(outputPath);
             }
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Filtered PDF saved to '{outputPath}'.");
     }
 }
