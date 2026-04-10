@@ -21,22 +21,24 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf.Facades;` (32/40 files) ← category-specific
-- `using Aspose.Pdf;` (16/40 files)
-- `using Aspose.Pdf.Forms;` (5/40 files)
-- `using Aspose.Pdf.Text;` (1/40 files)
-- `using System;` (40/40 files)
-- `using System.IO;` (40/40 files)
-- `using System.Collections.Generic;` (11/40 files)
-- `using System.Text.Json;` (6/40 files)
-- `using System.Linq;` (4/40 files)
-- `using System.Threading.Tasks;` (2/40 files)
-- `using System.Xml;` (2/40 files)
-- `using Newtonsoft.Json;` (1/40 files)
-- `using System.Collections;` (1/40 files)
-- `using System.Text;` (1/40 files)
-- `using System.Xml.Schema;` (1/40 files)
-- `using System.Xml.Xsl;` (1/40 files)
+- `using Aspose.Pdf.Facades;` (36/41 files) ← category-specific
+- `using Aspose.Pdf;` (13/41 files)
+- `using Aspose.Pdf.Forms;` (4/41 files)
+- `using Aspose.Pdf.Annotations;` (1/41 files)
+- `using System;` (40/41 files)
+- `using System.IO;` (39/41 files)
+- `using System.Collections.Generic;` (9/41 files)
+- `using System.Text.Json;` (5/41 files)
+- `using System.Text;` (4/41 files)
+- `using System.Linq;` (3/41 files)
+- `using System.Threading.Tasks;` (2/41 files)
+- `using System.Xml;` (2/41 files)
+- `using Newtonsoft.Json;` (1/41 files)
+- `using System.Collections;` (1/41 files)
+- `using System.Threading;` (1/41 files)
+- `using System.Xml.Linq;` (1/41 files)
+- `using System.Xml.Schema;` (1/41 files)
+- `using System.Xml.Xsl;` (1/41 files)
 
 ## Common Code Pattern
 
@@ -53,40 +55,40 @@ tool.Save("output.pdf");
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [add-radio-button-group](./add-radio-button-group.cs) | Add Radio Button Group with Default Selection using FormEdit... | `FormEditor`, `FieldType`, `AddField` | Demonstrates how to add a radio button group with three options to a PDF and set the default sele... |
-| [add-text-field-formeditor](./add-text-field-formeditor.cs) | Add Text Field to PDF Using FormEditor | `FormEditor`, `AddField`, `Save` | Demonstrates how to add a new text form field at specific coordinates to an existing PDF using As... |
-| [batch-export-form-data-xml](./batch-export-form-data-xml.cs) | Batch Export PDF Form Data to XML | `Form`, `ExportXml` | Exports the fields of multiple PDF forms to separate XML files using Aspose.Pdf.Facades.Form. |
-| [batch-import-form-json](./batch-import-form-json.cs) | Batch Import Form Data from JSON into PDFs in Parallel | `Form`, `ImportJson`, `Save` | Demonstrates how to import form field values from JSON files into matching PDF documents concurre... |
-| [combine-pdf-json-data](./combine-pdf-json-data.cs) | Combine JSON Data from Multiple PDFs into a Single JSON Arra... | `File`, `JsonDocument`, `JsonSerializer` | Reads JSON files exported from PDFs, merges their contents into one JSON array, and writes the re... |
-| [export-form-data-json-split](./export-form-data-json-split.cs) | Export PDF Form Data to JSON and Split into Multiple Files | `Document`, `ExportFormFieldsToJson`, `JsonSerializer` | Exports all form fields from a PDF to JSON, then splits the JSON into separate files each contain... |
-| [export-form-data-json](./export-form-data-json.cs) | Export PDF Form Data to JSON and Deserialize with Json.NET | `Document`, `ExportFormFieldsToJson`, `JsonConvert` | Demonstrates exporting PDF form fields to a JSON file using Aspose.Pdf and then deserializing the... |
-| [export-form-data-xml-memory](./export-form-data-xml-memory.cs) | Export PDF Form Data to XML Using MemoryStream | `Form`, `ExportXml`, `MemoryStream` | Demonstrates how to export the fields of a PDF form to an XML stream using Aspose.Pdf without cre... |
-| [export-form-data-xml-to-html](./export-form-data-xml-to-html.cs) | Export PDF Form Data to XML and Transform to HTML using XSLT | `Form`, `ExportXml`, `XslCompiledTransform` | Demonstrates exporting form fields from a PDF to an XML file and then converting that XML to an H... |
-| [export-form-fields-json](./export-form-fields-json.cs) | Export PDF Form Fields to JSON and Verify Structure | `Document`, `ExportToJson`, `JsonDocument` | Loads a PDF, exports all form field values to a JSON file using Aspose.Pdf, then reads the JSON t... |
-| [export-pdf-form-data-xml-async](./export-pdf-form-data-xml-async.cs) | Export PDF Form Data to XML Asynchronously | `Form`, `ExportXml`, `FileStream` | Demonstrates how to export form field data from a PDF to an XML file using Aspose.Pdf.Facades.For... |
-| [export-pdf-form-to-fdf](./export-pdf-form-to-fdf.cs) | Export PDF Form Data to FDF | `Form`, `ExportFdf`, `FileStream` | Demonstrates how to export the fields of an AcroForm PDF to an FDF file using Aspose.Pdf's Form f... |
-| [export-pdf-form-to-xfdf](./export-pdf-form-to-xfdf.cs) | Export PDF Form Fields to XFDF | `Form`, `ExportXfdf`, `FileStream` | Demonstrates how to export the fields of a PDF form to an XFDF file using Aspose.Pdf.Facades.Form. |
-| [export-pdf-form-to-xml](./export-pdf-form-to-xml.cs) | Export PDF Form Fields to XML | `Form`, `ExportXml` | Exports all form field values from a PDF document to an XML file using Aspose.Pdf.Facades.Form.Ex... |
-| [export-selected-form-fields-json](./export-selected-form-fields-json.cs) | Export Selected Form Fields to JSON | `Document`, `ExportFieldsToJsonOptions`, `ExportToJson` | Exports only the specified PDF form fields to a JSON file using Aspose.Pdf. |
-| [export-selected-form-fields](./export-selected-form-fields.cs) | Export Selected Form Fields to XML | `Form`, `GetField`, `FieldNames` | Exports only form fields whose names start with "Customer" from a PDF to an XML file. |
-| [export-text-field-names](./export-text-field-names.cs) | Export Text Form Field Names to JSON | `Document`, `Form`, `Field` | Loads a PDF, filters its form fields to include only text fields, and writes the field names to a... |
-| [fill-pdf-form-fields](./fill-pdf-form-fields.cs) | Fill PDF Form Fields and Save Document | `Form`, `FillField`, `Save` | Demonstrates how to open a PDF form, fill its fields from a dictionary, and save the updated docu... |
-| [fill-pdf-form-from-byte-array](./fill-pdf-form-from-byte-array.cs) | Fill PDF Form Fields from Byte Array | `Form`, `FillField`, `Save` | Loads a PDF from a byte array, fills specified form fields using the Form facade, and returns the... |
-| [fill-pdf-form-from-json](./fill-pdf-form-from-json.cs) | Fill PDF Form Fields from JSON Template | `Document`, `Form`, `ImportJson` | Loads a PDF form template, imports field values from a JSON file, and saves the populated PDF. |
-| [fill-textbox-field](./fill-textbox-field.cs) | Fill Textbox Field in PDF using Form.FillField | `Form`, `FillField`, `Save` | Demonstrates how to fill a textbox form field in an existing PDF using Aspose.Pdf.Facades.Form an... |
-| [form-fields-report](./form-fields-report.cs) | Generate PDF Report of Form Fields | `Document`, `Form`, `Table` | Creates a PDF report containing a table that lists the names, types, and current values of all fo... |
-| [get-radio-button-value](./get-radio-button-value.cs) | Get Selected Radio Button Value from PDF Form | `Form`, `GetButtonOptionCurrentValue` | Demonstrates how to retrieve the currently selected radio button option from a PDF form using Asp... |
-| [import-export-form-utf8](./import-export-form-utf8.cs) | Import and Export PDF Form Fields with UTF-8 Encoding | `Form`, `ImportXml`, `ExportXml` | Demonstrates importing Unicode form field values from an XML file and exporting them back to XML ... |
-| [import-form-data-fdf](./import-form-data-fdf.cs) | Import Form Data from FDF into PDF | `Form`, `ImportFdf`, `Save` | Shows how to import form field values from an FDF file into an existing PDF using Aspose.Pdf.Faca... |
-| [import-form-data-json](./import-form-data-json.cs) | Import Form Data from JSON into PDF | `Form`, `ImportJson`, `Save` | Demonstrates how to import AcroForm field values from a JSON file into a PDF using the Aspose.Pdf... |
-| [import-form-fields-missing-fields](./import-form-fields-missing-fields.cs) | Import Form Fields with Missing Field Handling | `Form`, `ImportXml`, `ImportResult` | Demonstrates importing form data from an XML file while handling missing fields by catching FormE... |
-| [import-form-fields-xfdf](./import-form-fields-xfdf.cs) | Import Form Field Values from XFDF into PDF | `Form`, `ImportXfdf`, `Save` | Demonstrates how to import AcroForm field values from an XFDF file into a PDF using the Aspose.Pd... |
-| [import-form-values-json](./import-form-values-json.cs) | Import PDF Form Values from JSON (ignore missing fields) | `Document`, `Form`, `ImportJson` | Shows how to import AcroForm field values from a JSON file into a PDF, automatically skipping any... |
-| [import-form-xml](./import-form-xml.cs) | Import Form Field Values from XML into PDF | `Form`, `ImportXml`, `Save` | Demonstrates how to import AcroForm field values from an XML file into a PDF using Aspose.Pdf.Fac... |
-| ... | | | *and 10 more files* |
+| [add-radio-button-group-default-selection](./add-radio-button-group-default-selection.cs) | Add Radio Button Group with Default Selection using FormEdit... | `FormEditor`, `AddField`, `Save` | Demonstrates how to create a radio button group with three options, arrange them, and set a defau... |
+| [add-text-field-to-pdf](./add-text-field-to-pdf.cs) | Add Text Field to PDF Using FormEditor | `FormEditor`, `AddField`, `Save` | Shows how to insert a new text field at given coordinates on a specific page of a PDF using Aspos... |
+| [async-export-pdf-form-data-to-xml](./async-export-pdf-form-data-to-xml.cs) | Asynchronously Export PDF Form Data to XML | `Form`, `ExportXml` | Shows how to export AcroForm fields from a PDF document to an XML file using async/await, prevent... |
+| [batch-export-pdf-form-data-to-xml](./batch-export-pdf-form-data-to-xml.cs) | Batch Export PDF Form Data to XML | `FormEditor`, `BindPdf`, `Form` | Shows how to iterate over several PDF files, load each with FormEditor, and export the AcroForm f... |
+| [batch-import-json-data-into-pdfs](./batch-import-json-data-into-pdfs.cs) | Batch Import JSON Data into PDFs in Parallel | `Document`, `Form`, `ImportJson` | Demonstrates how to import form data from matching JSON files into PDF documents using Aspose.Pdf... |
+| [combine-acroform-json-exports](./combine-acroform-json-exports.cs) | Combine AcroForm JSON Exports from Multiple PDFs | `Form`, `ExportJson` | Demonstrates how to export form data from several PDF files to JSON, merge the fragments into a s... |
+| [export-pdf-form-data-to-fdf](./export-pdf-form-data-to-fdf.cs) | Export PDF Form Data to FDF | `Form`, `ExportFdf` | Demonstrates how to export form field values from a PDF document to an FDF file using the Aspose.... |
+| [export-pdf-form-data-to-json](./export-pdf-form-data-to-json.cs) | Export PDF Form Data to JSON and Deserialize with Json.NET | `Form`, `ExportJson` | Demonstrates how to export AcroForm fields from a PDF to a JSON string using Aspose.Pdf.Facades.F... |
+| [export-pdf-form-data-to-xml](./export-pdf-form-data-to-xml.cs) | Export PDF Form Data to XML | `Form`, `ExportXml` | Shows how to export all AcroForm field values from a PDF document to an XML file using the Form f... |
+| [export-pdf-form-data-to-xml__v2](./export-pdf-form-data-to-xml__v2.cs) | Export PDF Form Data to XML Using MemoryStream | `Form`, `ExportXml` | Shows how to export AcroForm field data from a PDF directly to an XML stream with Aspose.Pdf, avo... |
+| [export-pdf-form-fields-to-csv](./export-pdf-form-fields-to-csv.cs) | Export PDF Form Fields to CSV | `Document`, `Form`, `Field` | Loads a PDF document, enumerates all AcroForm fields using Aspose.Pdf's FormEditor, and writes ea... |
+| [export-pdf-form-fields-to-json](./export-pdf-form-fields-to-json.cs) | Export PDF Form Fields to JSON and Verify Structure | `Form`, `ExportJson` | Demonstrates how to export AcroForm field values from a PDF to a JSON file using Form.ExportJson ... |
+| [export-pdf-form-fields-to-json__v2](./export-pdf-form-fields-to-json__v2.cs) | Export PDF Form Fields to JSON with File Splitting | `Document`, `Page`, `Rectangle` | Demonstrates loading a PDF, extracting AcroForm field names and values, serializing them to JSON,... |
+| [export-pdf-form-fields-to-xfdf](./export-pdf-form-fields-to-xfdf.cs) | Export PDF Form Fields to XFDF | `Form`, `ExportXfdf` | Demonstrates how to export AcroForm field data from a PDF to an XFDF file using the Form facade. |
+| [export-pdf-form-to-xml-and-html](./export-pdf-form-to-xml-and-html.cs) | Export PDF Form Data to XML and Convert to HTML via XSLT | `Form`, `ExportXml` | Shows how to export AcroForm field data from a PDF to an XML file using Aspose.Pdf.Facades and th... |
+| [export-selected-acroform-fields-to-json](./export-selected-acroform-fields-to-json.cs) | Export Selected AcroForm Fields to JSON | `Document`, `Form`, `WidgetAnnotation` | Demonstrates how to export only specific AcroForm fields from a PDF to a JSON file by using Widge... |
+| [export-text-field-names-to-json](./export-text-field-names-to-json.cs) | Export Text Field Names from PDF AcroForm to JSON | `Form`, `GetFieldType` | Shows how to iterate over AcroForm fields, filter for text fields, and write the field names to a... |
+| [fill-pdf-acroform-fields](./fill-pdf-acroform-fields.cs) | Fill PDF AcroForm Fields and Save | `Form`, `FillField`, `Save` | Shows how to open a PDF containing AcroForm fields, populate them from a dictionary of values usi... |
+| [fill-pdf-form-fields-from-byte-array](./fill-pdf-form-fields-from-byte-array.cs) | Fill PDF Form Fields from Byte Array | `Form`, `FillField`, `Save` | Loads a PDF from a byte array using a MemoryStream, fills the specified AcroForm fields, and retu... |
+| [fill-pdf-form-from-json](./fill-pdf-form-from-json.cs) | Fill PDF Form Fields from JSON using Aspose.Pdf | `Form`, `ImportJson`, `Save` | Demonstrates how to load a PDF form, import field values from a JSON file, and save the populated... |
+| [fill-textbox-field-pdf](./fill-textbox-field-pdf.cs) | Fill TextBox Field in PDF using Aspose.Pdf Form Facade | `Form`, `FillField`, `Save` | Demonstrates how to fill an existing AcroForm text box field with a string value using the Form f... |
+| [filter-customer-acroform-fields-to-xfdf](./filter-customer-acroform-fields-to-xfdf.cs) | Filter Exported AcroForm Fields Starting with "Customer" | `Document`, `TextBoxField`, `Rectangle` | Shows how to export AcroForm fields from a PDF to XFDF, keep only fields whose names begin with "... |
+| [generate-pdf-form-fields-report](./generate-pdf-form-fields-report.cs) | Generate PDF Form Fields Report | `Document`, `Page`, `Table` | Loads a PDF, iterates over its AcroForm fields, creates a new PDF containing a table with each fi... |
+| [get-selected-radio-button-value](./get-selected-radio-button-value.cs) | Get Selected Radio Button Value from PDF Form | `Document`, `RadioButtonOptionField` | Shows how to load a PDF with Aspose.Pdf, locate a radio button group, and read the currently sele... |
+| [import-fdf-data-into-pdf-form](./import-fdf-data-into-pdf-form.cs) | Import FDF Data into PDF Form | `Form`, `ImportFdf`, `Save` | Shows how to load an FDF file, import its field values into a PDF form using Aspose.Pdf.Facades.F... |
+| [import-form-data-from-json](./import-form-data-from-json.cs) | Import Form Data from JSON into PDF | `Form`, `ImportJson`, `Save` | Shows how to load a JSON file containing form field values and import them into an existing PDF u... |
+| [import-form-fields-from-xml](./import-form-fields-from-xml.cs) | Import Form Field Values from XML into PDF | `Form`, `BindPdf`, `ImportXml` | Shows how to bind a PDF with the Form facade, import AcroForm field values from an XML stream usi... |
+| [import-json-data-into-pdf-form](./import-json-data-into-pdf-form.cs) | Import JSON Data into PDF Form (Ignore Missing Fields) | `Form`, `BindPdf`, `ImportJson` | Demonstrates how to bind a PDF, import form field values from a JSON file, and save the updated d... |
+| [import-json-data-into-pdf-form__v2](./import-json-data-into-pdf-form__v2.cs) | Import JSON Data into PDF Form using Aspose.Pdf | `Form`, `ImportJson`, `Save` | Shows how to serialize a C# object to JSON, load it into a MemoryStream, and import the values in... |
+| [import-json-data-into-pdf-form__v3](./import-json-data-into-pdf-form__v3.cs) | Import JSON Data into PDF Form and Handle Missing Fields | `Form`, `ImportJson`, `Save` | Demonstrates loading a PDF form, importing field values from a JSON file, catching missing form f... |
+| ... | | | *and 11 more files* |
 
 ## Category Statistics
-- Total examples: 40
+- Total examples: 41
 
 ## General Tips
 - See parent [agents.md](../agents.md) for:
@@ -97,5 +99,5 @@ tool.Save("output.pdf");
 - Review code examples in this folder for facades-acroforms patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-04-07 | Run: `20260407_212044_4ffbd1`
+Updated: 2026-04-10 | Run: `20260410_113311_e93f13`
 <!-- AUTOGENERATED:END -->
