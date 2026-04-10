@@ -1,115 +1,119 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
+using System.Text;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text; // <-- added namespace for TextFragment
 
-// Minimal stubs for Npgsql types to allow compilation without the actual NuGet package.
+// ---------------------------------------------------------------------------
+// Stub implementation for Npgsql (PostgreSQL ADO.NET provider).
+// This allows the sample to compile without adding the real NuGet package.
+// In a production environment replace this stub with the official
+// Npgsql package (install‑package Npgsql) and remove the stub namespace.
+// ---------------------------------------------------------------------------
 namespace Npgsql
 {
-    // Simple stub for NpgsqlConnection – does nothing but satisfies the compiler.
     public class NpgsqlConnection : IDisposable
     {
         private readonly string _connectionString;
         public NpgsqlConnection(string connectionString) => _connectionString = connectionString;
-        public void Open() { /* In a real scenario this would open the DB connection. */ }
-        public void Dispose() { /* Cleanup resources if needed. */ }
+        public void Open() { /* No‑op stub – in real code opens a DB connection */ }
+        public void Dispose() { /* No‑op stub */ }
     }
 
-    // Stub for NpgsqlCommand – stores command text and parameters, and pretends to execute.
     public class NpgsqlCommand : IDisposable
     {
         private readonly string _commandText;
         private readonly NpgsqlConnection _connection;
-        public NpgsqlParameterCollection Parameters { get; } = new NpgsqlParameterCollection();
-
         public NpgsqlCommand(string commandText, NpgsqlConnection connection)
         {
             _commandText = commandText;
             _connection = connection;
+            Parameters = new NpgsqlParameterCollection();
         }
-
-        // In a real implementation this would send the command to PostgreSQL.
+        public NpgsqlParameterCollection Parameters { get; }
         public int ExecuteNonQuery()
         {
-            // For demonstration we just write the command and parameters to the console.
-            Console.WriteLine("Executing SQL: " + _commandText);
+            // Stub behaviour – just display what would be executed.
+            Console.WriteLine("[Stub Npgsql] Executing SQL: " + _commandText);
             foreach (var p in Parameters)
-                Console.WriteLine($"  Parameter {p.Key} = {p.Value}");
-            return 1; // pretend one row affected
+                Console.WriteLine($"    Parameter: {p.Name} = {p.Value}");
+            return 0; // indicate success
         }
-
-        public void Dispose() { /* No unmanaged resources to free in the stub. */ }
+        public void Dispose() { /* No‑op stub */ }
     }
 
-    // Very small collection that mimics NpgsqlParameterCollection's AddWithValue method.
-    public class NpgsqlParameterCollection : IEnumerable<KeyValuePair<string, object>>
+    public class NpgsqlParameter
     {
-        private readonly List<KeyValuePair<string, object>> _list = new List<KeyValuePair<string, object>>();
-        public void AddWithValue(string parameterName, object value) => _list.Add(new KeyValuePair<string, object>(parameterName, value));
-        public IEnumerator<KeyValuePair<string, object>> GetEnumerator() => _list.GetEnumerator();
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+        public string Name { get; }
+        public object Value { get; }
+        public NpgsqlParameter(string name, object value)
+        {
+            Name = name;
+            Value = value;
+        }
+    }
+
+    public class NpgsqlParameterCollection : System.Collections.Generic.List<NpgsqlParameter>
+    {
+        public void AddWithValue(string parameterName, object value) => Add(new NpgsqlParameter(parameterName, value));
     }
 }
 
 class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
-        // Allow overriding the PDF path via command‑line argument for flexibility.
-        string inputPdfPath = args.Length > 0 ? args[0] : "input.pdf";
-        string connectionString = "Host=localhost;Username=postgres;Password=yourpassword;Database=yourdb";
+        const string connectionString = "Host=localhost;Username=postgres;Password=secret;Database=mydb";
 
-        if (!File.Exists(inputPdfPath))
+        // -------------------------------------------------------------------
+        // 1. Create a simple PDF in memory (so we don't depend on an external file)
+        // -------------------------------------------------------------------
+        byte[] pdfBytes;
+        using (var pdfDoc = new Document())
         {
-            Console.Error.WriteLine($"Error: PDF file '{inputPdfPath}' not found. Please provide a valid path.");
-            return;
-        }
-
-        try
-        {
-            // Extract text from PDF
-            using (PdfExtractor extractor = new PdfExtractor())
+            // Add a single page with some sample text
+            var page = pdfDoc.Pages.Add();
+            page.Paragraphs.Add(new TextFragment("Hello Aspose PDF! This text will be indexed."));
+            using (var ms = new MemoryStream())
             {
-                extractor.BindPdf(inputPdfPath);
-                extractor.ExtractText();
-
-                using (MemoryStream textStream = new MemoryStream())
-                {
-                    extractor.GetText(textStream);
-                    textStream.Position = 0;
-                    using (StreamReader reader = new StreamReader(textStream))
-                    {
-                        string extractedText = reader.ReadToEnd();
-
-                        // Insert into PostgreSQL (stubbed implementation)
-                        using (Npgsql.NpgsqlConnection connection = new Npgsql.NpgsqlConnection(connectionString))
-                        {
-                            connection.Open();
-
-                            // Ensure table exists
-                            using (Npgsql.NpgsqlCommand createTable = new Npgsql.NpgsqlCommand(
-                                "CREATE TABLE IF NOT EXISTS pdf_text (id SERIAL PRIMARY KEY, content TEXT)", connection))
-                            {
-                                createTable.ExecuteNonQuery();
-                            }
-
-                            using (Npgsql.NpgsqlCommand insertCommand = new Npgsql.NpgsqlCommand(
-                                "INSERT INTO pdf_text (content) VALUES (@content)", connection))
-                            {
-                                insertCommand.Parameters.AddWithValue("@content", extractedText);
-                                insertCommand.ExecuteNonQuery();
-                            }
-                        }
-
-                        Console.WriteLine("Text extracted and stored in PostgreSQL.");
-                    }
-                }
+                pdfDoc.Save(ms, SaveFormat.Pdf);
+                pdfBytes = ms.ToArray();
             }
         }
-        catch (Exception ex)
+
+        // ---------------------------------------------------------------
+        // 2. Extract all text from the PDF using PdfExtractor (stream overload)
+        // ---------------------------------------------------------------
+        string extractedText;
+        using (var pdfStream = new MemoryStream(pdfBytes))
+        using (var extractor = new PdfExtractor())
         {
-            // Catch any unexpected errors and report them without crashing the program.
-            Console.Error.WriteLine($"An error occurred: {ex.Message}");
+            // Bind to the in‑memory stream instead of a file path
+            extractor.BindPdf(pdfStream);
+            extractor.ExtractText(); // Unicode extraction
+            using (var textMs = new MemoryStream())
+            {
+                extractor.GetText(textMs);
+                extractedText = Encoding.Unicode.GetString(textMs.ToArray());
+            }
         }
+
+        // ---------------------------------------------------------------
+        // 3. Store the extracted text in PostgreSQL (stubbed for demo only)
+        // ---------------------------------------------------------------
+        using (var conn = new Npgsql.NpgsqlConnection(connectionString))
+        {
+            conn.Open();
+            const string sql = "INSERT INTO pdf_documents (file_name, content) VALUES (@name, @content)";
+            using (var cmd = new Npgsql.NpgsqlCommand(sql, conn))
+            {
+                cmd.Parameters.AddWithValue("name", "generated.pdf");
+                cmd.Parameters.AddWithValue("content", extractedText);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        Console.WriteLine("Text extracted and stored successfully.");
     }
 }
