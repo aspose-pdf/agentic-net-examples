@@ -21,24 +21,23 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf;` (105/105 files) ← category-specific
-- `using Aspose.Pdf.Text;` (81/105 files) ← category-specific
-- `using Aspose.Pdf.Drawing;` (11/105 files)
-- `using Aspose.Pdf.Facades;` (5/105 files)
-- `using Aspose.Pdf.LogicalStructure;` (5/105 files)
-- `using Aspose.Pdf.Tagged;` (4/105 files)
-- `using Aspose.Pdf.Forms;` (3/105 files)
-- `using Aspose.Pdf.Annotations;` (2/105 files)
-- `using System;` (105/105 files)
-- `using System.IO;` (63/105 files)
-- `using System.Runtime.InteropServices;` (60/105 files) ← category-specific
-- `using System.Data;` (14/105 files)
-- `using System.Collections.Generic;` (8/105 files)
-- `using System.Linq;` (6/105 files)
-- `using System.Drawing;` (1/105 files)
-- `using System.Globalization;` (1/105 files)
-- `using System.Text;` (1/105 files)
-- `using System.Text.Json;` (1/105 files)
+- `using Aspose.Pdf;` (109/109 files) ← category-specific
+- `using Aspose.Pdf.Text;` (85/109 files) ← category-specific
+- `using Aspose.Pdf.Drawing;` (11/109 files)
+- `using Aspose.Pdf.LogicalStructure;` (5/109 files)
+- `using Aspose.Pdf.Tagged;` (4/109 files)
+- `using Aspose.Pdf.Forms;` (3/109 files)
+- `using Aspose.Pdf.Annotations;` (2/109 files)
+- `using System;` (109/109 files)
+- `using System.IO;` (67/109 files)
+- `using System.Runtime.InteropServices;` (59/109 files) ← category-specific
+- `using System.Data;` (16/109 files)
+- `using System.Collections.Generic;` (8/109 files)
+- `using System.Linq;` (8/109 files)
+- `using System.Drawing;` (1/109 files)
+- `using System.Globalization;` (1/109 files)
+- `using System.Text;` (1/109 files)
+- `using System.Text.Json;` (1/109 files)
 
 ## Common Code Pattern
 
@@ -58,7 +57,6 @@ using (Document doc = new Document("input.pdf"))
 |------|-------|----------|-------------|
 | [add-auto-numbered-column-to-pdf-table](./add-auto-numbered-column-to-pdf-table.cs) | Add Auto‑Numbered Column to PDF Table | `Document`, `Save`, `Page` | Demonstrates how to create a PDF table with Aspose.Pdf and insert sequential numbers into the fir... |
 | [add-bullet-list-in-table-cell](./add-bullet-list-in-table-cell.cs) | Add a Bullet List Inside a Table Cell | `Document`, `Page`, `Table` | Shows how to create a bullet list within a PDF table cell by adding separate TextFragment paragra... |
-| [add-centered-paragraph-to-table-cell](./add-centered-paragraph-to-table-cell.cs) | Center Text in Table Cell of a PDF | `Document`, `Save`, `Page` | Shows how to create a PDF, add a table, and place a centered paragraph (text fragment) inside a c... |
 | [add-checkbox-field-in-table-cell](./add-checkbox-field-in-table-cell.cs) | Add Checkbox Form Field Inside Table Cell | `Document`, `Page`, `Table` | Demonstrates creating a PDF with a table, adding text to a cell, and inserting a CheckboxField fo... |
 | [add-footer-row-to-tagged-pdf-table](./add-footer-row-to-tagged-pdf-table.cs) | Add Footer Row to Tagged PDF Table | `Document`, `ITaggedContent`, `StructureElement` | Shows how to create a table with header, body, and a footer that appears at the bottom of each pa... |
 | [add-footnote-references-in-table-cells](./add-footnote-references-in-table-cells.cs) | Add Footnote References in Table Cells | `Document`, `Save`, `ITaggedContent` | Demonstrates how to insert superscript footnote references inside table cells and associate them ... |
@@ -84,12 +82,13 @@ using (Document doc = new Document("input.pdf"))
 | [check-table-broken](./check-table-broken.cs) | Check if Table Breaks Across Pages | `Document`, `Page`, `Table` | Creates a PDF with a large table, adds it to a page, and checks the Table.IsBroken property to de... |
 | [count-tables-in-pdf-using-tableabsorber](./count-tables-in-pdf-using-tableabsorber.cs) | Count Tables in a PDF using TableAbsorber | `Document`, `TableAbsorber`, `Visit` | Demonstrates how to use Aspose.Pdf's TableAbsorber to detect and count tables in a PDF document. |
 | [create-modify-retrieve-table](./create-modify-retrieve-table.cs) | Create, Modify, and Retrieve Tables in PDF | `Document`, `Table`, `Row` | Demonstrates how to create a table in a PDF, save it, then extract and modify its content using T... |
-| [create-pdf-table-shadow-effect-limit](./create-pdf-table-shadow-effect-limit.cs) | Create PDF Table and Explain Shadow Effect Limitation | `Document`, `Page`, `Table` | Demonstrates how to build a formatted table in a PDF using Aspose.Pdf and notes that the Table cl... |
 | [create-pdf-table-with-dynamic-row-count](./create-pdf-table-with-dynamic-row-count.cs) | Create PDF Table with Dynamic Row Count | `Document`, `Table`, `Page` | Shows how to load a PDF, determine the number of rows in a DataTable, import the data into an Asp... |
-| ... | | | *and 75 more files* |
+| [create-table-pdf](./create-table-pdf.cs) | Create Table with Rows and Columns in PDF | `Document`, `Table`, `Row` | Demonstrates how to instantiate a Table, add rows and cells, and place it into a PDF document. |
+| [create-table-with-repeating-header](./create-table-with-repeating-header.cs) | Create PDF Table with Repeating Header Row | `Document`, `Page`, `Table` | Demonstrates how to build a PDF table and mark its first row as a header that repeats on each new... |
+| ... | | | *and 79 more files* |
 
 ## Category Statistics
-- Total examples: 105
+- Total examples: 109
 
 ## Category-Specific Tips
 
@@ -133,5 +132,5 @@ using (Document doc = new Document("input.pdf"))
 - Review code examples in this folder for working-with-tables patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-04-07 | Run: `20260407_212044_4ffbd1`
+Updated: 2026-04-10 | Run: `20260410_121416_bd35e2`
 <!-- AUTOGENERATED:END -->
