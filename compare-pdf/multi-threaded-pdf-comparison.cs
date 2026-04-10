@@ -5,63 +5,78 @@ using System.Threading.Tasks;
 using Aspose.Pdf;
 using Aspose.Pdf.Comparison;
 
-class Program
+class PdfComparisonMultiThreaded
 {
-    // Entry point can be async for cleaner awaiting of tasks.
-    static async Task Main(string[] args)
+    // Represents a pair of PDFs to compare and the path for the result file.
+    private class ComparisonJob
     {
-        // Base directory of the executable – helps to resolve relative paths reliably.
-        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        public string InputPath1 { get; }
+        public string InputPath2 { get; }
+        public string OutputPath { get; }
 
-        // Define pairs of PDF files to compare (relative to the base directory).
-        string[] firstFiles  = new string[] { "doc1a.pdf", "doc2a.pdf" };
-        string[] secondFiles = new string[] { "doc1b.pdf", "doc2b.pdf" };
-
-        if (firstFiles.Length != secondFiles.Length)
+        public ComparisonJob(string input1, string input2, string output)
         {
-            Console.WriteLine("The number of source files does not match the number of target files.");
-            return;
+            InputPath1 = input1;
+            InputPath2 = input2;
+            OutputPath = output;
+        }
+    }
+
+    static void Main()
+    {
+        // Example list of comparison jobs.
+        var jobs = new List<ComparisonJob>
+        {
+            new ComparisonJob("docA1.pdf", "docA2.pdf", "resultA.pdf"),
+            new ComparisonJob("docB1.pdf", "docB2.pdf", "resultB.pdf"),
+            new ComparisonJob("docC1.pdf", "docC2.pdf", "resultC.pdf")
+        };
+
+        // Validate that all source files exist before starting.
+        foreach (var job in jobs)
+        {
+            if (!File.Exists(job.InputPath1))
+                Console.Error.WriteLine($"File not found: {job.InputPath1}");
+            if (!File.Exists(job.InputPath2))
+                Console.Error.WriteLine($"File not found: {job.InputPath2}");
         }
 
-        List<Task> tasks = new List<Task>();
-        for (int i = 0; i < firstFiles.Length; i++)
+        // Prepare comparison options (default settings are sufficient for a basic side‑by‑side compare).
+        SideBySideComparisonOptions compareOptions = new SideBySideComparisonOptions();
+
+        // Create a list to hold the running tasks.
+        var tasks = new List<Task>();
+
+        // Launch each comparison in its own task.
+        foreach (var job in jobs)
         {
-            // Resolve full paths once – avoids the closure‑capture pitfall and makes debugging easier.
-            string firstPath  = Path.GetFullPath(Path.Combine(baseDir, firstFiles[i]));
-            string secondPath = Path.GetFullPath(Path.Combine(baseDir, secondFiles[i]));
-            string resultPath = Path.GetFullPath(Path.Combine(baseDir, $"result_{i + 1}.pdf"));
-
-            // Validate that the input files exist before queuing the work.
-            if (!File.Exists(firstPath))
+            var task = Task.Run(() =>
             {
-                Console.WriteLine($"Input file not found: {firstPath}");
-                continue; // Skip this pair and continue with the rest.
-            }
-            if (!File.Exists(secondPath))
-            {
-                Console.WriteLine($"Input file not found: {secondPath}");
-                continue;
-            }
-
-            // Queue the comparison work on the thread‑pool.
-            Task comparisonTask = Task.Run(() =>
-            {
-                // Each task works with its own local variables – no race conditions.
-                using (Document doc1 = new Document(firstPath))
-                using (Document doc2 = new Document(secondPath))
+                try
                 {
-                    SideBySideComparisonOptions options = new SideBySideComparisonOptions();
-                    // The static Compare method writes the result directly to the supplied path.
-                    SideBySidePdfComparer.Compare(doc1, doc2, resultPath, options);
+                    // Load each document inside its own using block to guarantee disposal.
+                    using (Document doc1 = new Document(job.InputPath1))
+                    using (Document doc2 = new Document(job.InputPath2))
+                    {
+                        // Perform the side‑by‑side comparison and save the result.
+                        SideBySidePdfComparer.Compare(doc1, doc2, job.OutputPath, compareOptions);
+                    }
+
+                    Console.WriteLine($"Comparison completed: {job.OutputPath}");
                 }
-                Console.WriteLine($"Comparison {i + 1} completed: {resultPath}");
+                catch (Exception ex)
+                {
+                    // Capture any errors for this specific job.
+                    Console.Error.WriteLine($"Error comparing '{job.InputPath1}' and '{job.InputPath2}': {ex.Message}");
+                }
             });
 
-            tasks.Add(comparisonTask);
+            tasks.Add(task);
         }
 
-        // Await all comparison tasks.
-        await Task.WhenAll(tasks);
-        Console.WriteLine("All PDF comparisons have been completed.");
+        // Wait for all comparison tasks to finish.
+        Task.WaitAll(tasks.ToArray());
+
+        Console.WriteLine("All PDF comparisons have finished.");
     }
 }
