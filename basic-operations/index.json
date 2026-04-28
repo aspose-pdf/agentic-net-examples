@@ -1,0 +1,1223 @@
+{
+  "category": "basic-operations",
+  "nuget_version": "26.4.0",
+  "last_updated": "2026-04-28T08:54:57Z",
+  "examples": {
+    "open-password-protected-pdf-without-password": {
+      "title": "Open Password-Protected PDF Without Password",
+      "filename": "open-password-protected-pdf-without-password.cs",
+      "description": "Demonstrates how to attempt opening an encrypted PDF using Aspose.Pdf without providing a password and handling the resulting InvalidPasswordException.",
+      "tags": [
+        "pdf",
+        "password",
+        "exception",
+        "aspose.pdf",
+        "document"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.InvalidPasswordException"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "open-pdf-get-page-count": {
+      "title": "Open PDF and Get Page Count",
+      "filename": "open-pdf-get-page-count.cs",
+      "description": "Shows how to open a PDF file from disk using Aspose.Pdf's Document constructor and retrieve the total number of pages.",
+      "tags": [
+        "pdf",
+        "page-count",
+        "aspose",
+        "csharp",
+        "document"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document..ctor",
+        "Aspose.Pdf.PageCollection",
+        "Aspose.Pdf.PageCollection.Count"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "open-pdf-from-filestream-and-save": {
+      "title": "Open PDF from FileStream and Save with Default Settings",
+      "filename": "open-pdf-from-filestream-and-save.cs",
+      "description": "Shows how to load a PDF document using a FileStream and then save it to another file using Aspose.Pdf with default options.",
+      "tags": [
+        "pdf",
+        "filestream",
+        "save",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "save-pdf-to-memorystream-and-write-to-file": {
+      "title": "Save PDF to MemoryStream and Write to File",
+      "filename": "save-pdf-to-memorystream-and-write-to-file.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, save it into a MemoryStream, and then copy the stream to a physical file on disk.",
+      "tags": [
+        "pdf",
+        "memorystream",
+        "file-io",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "add-blank-page-to-pdf-document": {
+      "title": "Add Blank Page to PDF Document",
+      "filename": "add-blank-page-to-pdf-document.cs",
+      "description": "Demonstrates how to load an existing PDF, append a new blank page, and save the updated file using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "blank-page",
+        "add-page",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.PageCollection",
+        "Aspose.Pdf.PageCollection.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "export-pdf-as-pdfx3": {
+      "title": "Export PDF as PDF/X-3 with Color Profiles",
+      "filename": "export-pdf-as-pdfx3.cs",
+      "description": "Shows how to load a PDF, convert it to PDF/X‑3 compliance while preserving ICC color profiles, and save the resulting file using Aspose.Pdf.",
+      "tags": [
+        "pdfx3",
+        "conversion",
+        "color-profiles",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Convert",
+        "Aspose.Pdf.PdfFormat",
+        "Aspose.Pdf.ConvertErrorAction",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "decrypt-encrypted-pdf": {
+      "title": "Decrypt Encrypted PDF Using User Password",
+      "filename": "decrypt-encrypted-pdf.cs",
+      "description": "Demonstrates opening a password‑protected PDF with Aspose.Pdf, removing its encryption, and saving an unprotected copy.",
+      "tags": [
+        "pdf",
+        "decryption",
+        "password",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Decrypt",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.InvalidPasswordException"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-pdfa-1b": {
+      "title": "Convert PDF to PDF/A-1b with Metadata Preservation",
+      "filename": "convert-pdf-to-pdfa-1b.cs",
+      "description": "Shows how to load a PDF, convert it to PDF/A‑1b compliance while preserving the document's metadata, and save the resulting file using Aspose.Pdf.",
+      "tags": [
+        "pdfa",
+        "conversion",
+        "metadata",
+        "csharp",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Convert",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.PdfFormat",
+        "Aspose.Pdf.ConvertErrorAction"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "encrypt-pdf-with-passwords-restrict-printing": {
+      "title": "Encrypt PDF with Passwords and Restrict Printing",
+      "filename": "encrypt-pdf-with-passwords-restrict-printing.cs",
+      "description": "Shows how to open a PDF, apply AES‑256 encryption with user and owner passwords, set permissions to disable printing, and save the encrypted document.",
+      "tags": [
+        "pdf",
+        "encryption",
+        "permissions",
+        "aes256",
+        "printing"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "remove-third-page-from-pdf": {
+      "title": "Remove Third Page from PDF",
+      "filename": "remove-third-page-from-pdf.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, delete the third page when present, and save the modified document.",
+      "tags": [
+        "pdf",
+        "delete-page",
+        "aspose",
+        "csharp",
+        "document-manipulation"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.PageCollection.Delete",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "insert-pdf-page-into-another-pdf": {
+      "title": "Insert a PDF Page into Another PDF at a Specific Position",
+      "filename": "insert-pdf-page-into-another-pdf.cs",
+      "description": "Demonstrates how to load two PDF documents, insert a page from one document into a specific position of the other using Aspose.Pdf, and save the result.",
+      "tags": [
+        "pdf",
+        "page-insertion",
+        "aspose.pdf",
+        "csharp",
+        "document-manipulation"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.PageCollection",
+        "Aspose.Pdf.PageCollection.Insert",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "batch-convert-pdfs-to-pdfa-1b": {
+      "title": "Batch Convert PDFs to PDF/A-1b",
+      "filename": "batch-convert-pdfs-to-pdfa-1b.cs",
+      "description": "Shows how to iterate over PDF files in a folder, convert each to PDF/A‑1b using Aspose.Pdf, and write the converted files (with optional error logs) to an output directory.",
+      "tags": [
+        "pdf",
+        "pdfa",
+        "batch",
+        "conversion",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Convert",
+        "Aspose.Pdf.PdfFormat",
+        "Aspose.Pdf.ConvertErrorAction",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "update-pdf-title-metadata": {
+      "title": "Update PDF Title Metadata from Byte Array",
+      "filename": "update-pdf-title-metadata.cs",
+      "description": "Shows how to load a PDF from a byte array, modify its title metadata, and save the updated document to disk using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "metadata",
+        "title",
+        "byte-array",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.SetTitle",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Document.Pages.Add"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "encrypt-pdf-form-filling-permission": {
+      "title": "Encrypt PDF with Form Filling Permission Only",
+      "filename": "encrypt-pdf-form-filling-permission.cs",
+      "description": "Demonstrates loading a PDF, applying AES‑256 encryption that permits only form filling (disabling content extraction), and saving the protected document.",
+      "tags": [
+        "pdf-encryption",
+        "permissions",
+        "form-filling",
+        "aes256",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "split-pdf-into-single-page-files": {
+      "title": "Split PDF into Single-Page Files",
+      "filename": "split-pdf-into-single-page-files.cs",
+      "description": "Demonstrates how to split a multi‑page PDF into separate one‑page PDF files using Aspose.Pdf's Document class and the Pages collection.",
+      "tags": [
+        "pdf",
+        "split",
+        "pages",
+        "aspose.pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Document.Pages.Add",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages.Count"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "create-pdfx3-document-multiple-pages": {
+      "title": "Create PDF/X‑3 Document with Multiple Pages",
+      "filename": "create-pdfx3-document-multiple-pages.cs",
+      "description": "Shows how to create a new PDF, add three blank pages, convert it to PDF/X‑3 format, and save the file, including cross‑platform handling for missing GDI+.",
+      "tags": [
+        "pdf",
+        "pdfx-3",
+        "document",
+        "pages",
+        "cross-platform"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages.Add",
+        "Aspose.Pdf.Document.Convert",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.PdfFormat",
+        "Aspose.Pdf.ConvertErrorAction"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "open-pdf-save-without-embedding-fonts": {
+      "title": "Open PDF and Save Without Embedding Fonts",
+      "filename": "open-pdf-save-without-embedding-fonts.cs",
+      "description": "Demonstrates loading a PDF via a FileStream, configuring save options to replace missing fonts with a system font, and saving the document without embedding fonts.",
+      "tags": [
+        "pdf",
+        "save",
+        "font-embedding",
+        "Aspose.Pdf",
+        "load"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PdfSaveOptions",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.PdfSaveOptions.DefaultFontName",
+        "Aspose.Pdf.Document..ctor(Stream)"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "save-pdf-incremental-update": {
+      "title": "Save PDF with Incremental Update Using Aspose.Pdf",
+      "filename": "save-pdf-incremental-update.cs",
+      "description": "Demonstrates copying an existing PDF, opening it with a read‑write stream, appending a new page, and saving the document using Aspose.Pdf's incremental update mode to preserve the original content.",
+      "tags": [
+        "incremental-save",
+        "pdf",
+        "aspose-pdf",
+        "add-page",
+        "readwrite"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.PageCollection.Add"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "rotate-second-page-pdf-90-degrees": {
+      "title": "Rotate Second Page of PDF by 90 Degrees",
+      "filename": "rotate-second-page-pdf-90-degrees.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, rotate the second page 90° clockwise, and save the modified document.",
+      "tags": [
+        "pdf",
+        "rotate",
+        "page",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rotation"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "compress-pdf-default-settings": {
+      "title": "Compress PDF Using Default Settings",
+      "filename": "compress-pdf-default-settings.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, save it using the default compression options, and compare the original and compressed file sizes.",
+      "tags": [
+        "pdf",
+        "compression",
+        "aspose",
+        "csharp",
+        "filesize"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Optimize",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-pdfa-1b__v2": {
+      "title": "Convert PDF to PDF/A-1b",
+      "filename": "convert-pdf-to-pdfa-1b__v2.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, convert it to PDF/A‑1b compliance, and save the resulting file while handling missing files and conversion errors.",
+      "tags": [
+        "pdf",
+        "pdfa",
+        "conversion",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Convert",
+        "Aspose.Pdf.PdfFormat",
+        "Aspose.Pdf.ConvertErrorAction",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "load-pdf-from-memorystream-set-version-1-4": {
+      "title": "Load PDF from MemoryStream and Convert to PDF 1.4",
+      "filename": "load-pdf-from-memorystream-set-version-1-4.cs",
+      "description": "The example demonstrates loading a PDF from a byte array via MemoryStream, converting its PDF version to 1.4 using Document.Convert, and saving the result to the file system.",
+      "tags": [
+        "pdf",
+        "memorystream",
+        "version",
+        "convert",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Convert",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.PdfFormat",
+        "Aspose.Pdf.ConvertErrorAction"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "update-pdf-author-metadata": {
+      "title": "Update PDF Author Metadata Using Aspose.Pdf",
+      "filename": "update-pdf-author-metadata.cs",
+      "description": "Shows how to open a PDF via a FileInfo object, modify the Author metadata, and overwrite the original file using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "metadata",
+        "author",
+        "aspose.pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.DocumentInfo",
+        "Aspose.Pdf.Document.Info",
+        "Aspose.Pdf.DocumentInfo.Author",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "split-pdf-at-page-ten": {
+      "title": "Split PDF into Two Parts at Page Ten",
+      "filename": "split-pdf-at-page-ten.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, extract pages before and after a specified split point, and save each segment as separate PDF files with descriptive filenames.",
+      "tags": [
+        "pdf",
+        "split",
+        "pages",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.PageCollection.Add",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.PageCollection.Count"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "batch-decrypt-encrypted-pdfs": {
+      "title": "Batch Decrypt Encrypted PDFs",
+      "filename": "batch-decrypt-encrypted-pdfs.cs",
+      "description": "Shows how to open a collection of encrypted PDF files with a shared owner password, remove their encryption, and save unprotected copies to an output folder.",
+      "tags": [
+        "pdf decryption",
+        "batch processing",
+        "owner password",
+        "Aspose.Pdf",
+        "file handling"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document..ctor(string, string)",
+        "Aspose.Pdf.Document.Decrypt",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.InvalidPasswordException"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "download-pdf-from-url-and-save-locally": {
+      "title": "Download PDF from URL and Save Locally with Aspose.Pdf",
+      "filename": "download-pdf-from-url-and-save-locally.cs",
+      "description": "Demonstrates how to download a PDF file using HttpClient, load it into an Aspose.Pdf Document from a stream, and save it to the local file system.",
+      "tags": [
+        "pdf",
+        "download",
+        "httpclient",
+        "stream",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "encrypt-pdf-aes256-disable-printing": {
+      "title": "Encrypt PDF with AES‑256 and Disable Printing",
+      "filename": "encrypt-pdf-aes256-disable-printing.cs",
+      "description": "Demonstrates how to encrypt a PDF using AES‑256, set no permissions to disable printing, and verify the encryption status with Aspose.Pdf.",
+      "tags": [
+        "encryption",
+        "AES-256",
+        "permissions",
+        "PDF",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.IsEncrypted",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "encrypt-pdf-stream": {
+      "title": "Encrypt PDF Stream with Passwords",
+      "filename": "encrypt-pdf-stream.cs",
+      "description": "Shows how to read a PDF from a stream, apply AES‑256 encryption with user and owner passwords and specific permissions, and write the secured PDF back to another stream using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "encryption",
+        "stream",
+        "permissions",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "encrypt-pdf-user-password-only": {
+      "title": "Encrypt PDF with User Password Only (No Editing or Copying)",
+      "filename": "encrypt-pdf-user-password-only.cs",
+      "description": "Shows how to encrypt a PDF using Aspose.Pdf by applying a user password, leaving the owner password empty, and disabling all permissions such as editing and copying.",
+      "tags": [
+        "pdf-encryption",
+        "user-password",
+        "permissions",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "create-pdfa1b-with-text-paragraph": {
+      "title": "Create PDF/A-1b Document with Text Paragraph",
+      "filename": "create-pdfa1b-with-text-paragraph.cs",
+      "description": "The example creates a new PDF document, adds a text paragraph to the first page, and converts the file to PDF/A‑1b format while handling platform‑specific GDI+ requirements.",
+      "tags": [
+        "pdf",
+        "pdfa-1b",
+        "text",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextParagraph",
+        "Aspose.Pdf.Text.TextBuilder",
+        "Aspose.Pdf.PdfFormat",
+        "Aspose.Pdf.ConvertErrorAction",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "update-pdf-passwords": {
+      "title": "Update Passwords of an Encrypted PDF",
+      "filename": "update-pdf-passwords.cs",
+      "description": "Shows how to open a password‑protected PDF with Aspose.Pdf, change its user and owner passwords, and save the PDF with the new credentials.",
+      "tags": [
+        "pdf",
+        "encryption",
+        "password",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.ChangePasswords",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.InvalidPasswordException"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "export-pdf-pages-to-separate-files": {
+      "title": "Export PDF Pages to Separate Files",
+      "filename": "export-pdf-pages-to-separate-files.cs",
+      "description": "Shows how to split a PDF into individual one‑page PDF files by iterating over each page with Aspose.Pdf and saving each page as a new document.",
+      "tags": [
+        "pdf",
+        "split",
+        "pages",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PageCollection.Add",
+        "Aspose.Pdf.PageCollection.Count",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-pdfx3-preserving-icc-profiles": {
+      "title": "Convert PDF to PDF/X‑3 Preserving ICC Profiles",
+      "filename": "convert-pdf-to-pdfx3-preserving-icc-profiles.cs",
+      "description": "Demonstrates how to convert an existing PDF to PDF/X‑3 format using Aspose.Pdf while keeping any embedded ICC color profiles intact for accurate printing.",
+      "tags": [
+        "pdf conversion",
+        "pdfx-3",
+        "icc profile",
+        "printing",
+        "aspose.pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PdfFormatConversionOptions",
+        "Aspose.Pdf.PdfFormat",
+        "Aspose.Pdf.Document.Convert",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-pdfa-1b-embed-fonts": {
+      "title": "Convert PDF to PDF/A-1b with Embedded Fonts",
+      "filename": "convert-pdf-to-pdfa-1b-embed-fonts.cs",
+      "description": "Shows how to load a PDF, convert it to PDF/A‑1b compliance (embedding any missing fonts), and save the resulting archival PDF using Aspose.Pdf.",
+      "tags": [
+        "pdfa",
+        "conversion",
+        "fonts",
+        "archival",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Convert",
+        "Aspose.Pdf.PdfFormat",
+        "Aspose.Pdf.ConvertErrorAction",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "compress-pdf-high-optimization": {
+      "title": "Compress PDF with High Optimization Level",
+      "filename": "compress-pdf-high-optimization.cs",
+      "description": "Loads a PDF, applies aggressive optimization (object compression, font subsetting, unused object removal) using Aspose.Pdf, and saves the result with PdfSaveOptions while reporting the size reduction.",
+      "tags": [
+        "pdf",
+        "compression",
+        "optimization",
+        "csharp",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Optimization.OptimizationOptions",
+        "Aspose.Pdf.Document.OptimizeResources",
+        "Aspose.Pdf.PdfSaveOptions",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-pdfa-1b__v3": {
+      "title": "Convert PDF to PDF/A-1b Compliance",
+      "filename": "convert-pdf-to-pdfa-1b__v3.cs",
+      "description": "Loads a PDF file, converts it to PDF/A‑1b compliance while logging conversion errors, and saves the compliant document.",
+      "tags": [
+        "pdfa",
+        "conversion",
+        "compliance",
+        "csharp",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Convert",
+        "Aspose.Pdf.PdfFormat",
+        "Aspose.Pdf.ConvertErrorAction",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "split-pdf-into-individual-pages": {
+      "title": "Split PDF into Individual Page PDFs",
+      "filename": "split-pdf-into-individual-pages.cs",
+      "description": "Shows how to split a large PDF into separate one‑page PDF files, each stored in its own folder, using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "split",
+        "pages",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.PageCollection.Add",
+        "Aspose.Pdf.Page"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "batch-encrypt-pdfs": {
+      "title": "Batch Encrypt PDFs with a User Password",
+      "filename": "batch-encrypt-pdfs.cs",
+      "description": "Shows how to encrypt every PDF in a folder using Aspose.Pdf by applying the same user and owner passwords and saving the encrypted files to a separate directory.",
+      "tags": [
+        "pdf encryption",
+        "batch processing",
+        "aspose.pdf",
+        "csharp",
+        "permissions"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "set-pdf-document-title-verify": {
+      "title": "Set PDF Document Title and Verify It",
+      "filename": "set-pdf-document-title-verify.cs",
+      "description": "Demonstrates how to open a PDF with Aspose.Pdf, set its document title metadata, save the file, and then re‑open it to confirm the title was persisted.",
+      "tags": [
+        "pdf",
+        "metadata",
+        "title",
+        "aspose.pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.SetTitle",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Info",
+        "Aspose.Pdf.Document.Info.Title"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "encrypt-pdf-allow-form-filling": {
+      "title": "Encrypt PDF Allowing Only Form Filling",
+      "filename": "encrypt-pdf-allow-form-filling.cs",
+      "description": "Demonstrates how to load a PDF, restrict permissions to form filling only, encrypt it with AES‑256, and save the protected document using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "encryption",
+        "permissions",
+        "form-filling",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "add-xmp-metadata-to-pdf": {
+      "title": "Add XMP Metadata to PDF and Save",
+      "filename": "add-xmp-metadata-to-pdf.cs",
+      "description": "Loads a PDF, builds a custom XMP packet, attaches it to the document, and saves the file while preserving the new metadata.",
+      "tags": [
+        "pdf",
+        "xmp",
+        "metadata",
+        "aspose.pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.SetXmpMetadata",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "split-pdf-into-sections-by-page-ranges": {
+      "title": "Split PDF into Sections Using Page Ranges",
+      "filename": "split-pdf-into-sections-by-page-ranges.cs",
+      "description": "Demonstrates how to read page‑range definitions from a text file, extract those pages from a source PDF, and save each range as a separate PDF document using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "split",
+        "page-ranges",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.PageCollection.Add",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "batch-convert-pdfs-to-pdfa-1b__v2": {
+      "title": "Batch Convert PDFs to PDF/A-1b with High Compression",
+      "filename": "batch-convert-pdfs-to-pdfa-1b__v2.cs",
+      "description": "Shows how to iterate over PDF files in a folder, convert each to PDF/A‑1b using Aspose.Pdf with file‑size optimization, and create a CSV summary report of the conversion results.",
+      "tags": [
+        "pdf",
+        "pdfa",
+        "batch-conversion",
+        "compression",
+        "report"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PdfFormatConversionOptions",
+        "Aspose.Pdf.PdfFormat",
+        "Aspose.Pdf.Document.Convert",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "update-pdf-version-to-1-5-incremental-save": {
+      "title": "Update PDF Version to 1.5 with Incremental Save",
+      "filename": "update-pdf-version-to-1-5-incremental-save.cs",
+      "description": "Shows how to load a PDF, convert it to PDF version 1.5, and save the changes using Aspose.Pdf's incremental update feature.",
+      "tags": [
+        "pdf version",
+        "incremental update",
+        "convert",
+        "Aspose.Pdf",
+        "document"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Convert",
+        "Aspose.Pdf.PdfFormat",
+        "Aspose.Pdf.ConvertErrorAction",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-pdfx3-cmyk": {
+      "title": "Convert PDF to PDF/X-3 with CMYK Color Space",
+      "filename": "convert-pdf-to-pdfx3-cmyk.cs",
+      "description": "Shows how to load a PDF, set up PdfFormatConversionOptions for PDF/X-3 compliance with a CMYK ICC profile, perform the conversion, and save the resulting file.",
+      "tags": [
+        "pdfx-3",
+        "cmyk",
+        "color-conversion",
+        "aspnet-pdf",
+        "icc-profile"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PdfFormatConversionOptions",
+        "Aspose.Pdf.PdfFormat",
+        "Aspose.Pdf.OutputIntent",
+        "Aspose.Pdf.Document.Convert",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "update-pdf-author-metadata__v2": {
+      "title": "Update PDF Author Metadata",
+      "filename": "update-pdf-author-metadata__v2.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, replace the Author metadata with the current user name, and save the updated document.",
+      "tags": [
+        "pdf",
+        "metadata",
+        "author",
+        "aspose.pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.DocumentInfo",
+        "Aspose.Pdf.DocumentInfo.Author",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "batch-encrypt-pdfs-from-config": {
+      "title": "Batch Encrypt PDFs with Passwords from Configuration",
+      "filename": "batch-encrypt-pdfs-from-config.cs",
+      "description": "Demonstrates how to read a JSON configuration file containing multiple encryption jobs and encrypt each PDF with user and owner passwords using Aspose.Pdf, while handling file validation and logging.",
+      "tags": [
+        "pdf",
+        "encryption",
+        "batch",
+        "json",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "batch-encrypt-pdfs-with-filename-passwords": {
+      "title": "Batch Encrypt PDFs with File‑Name Based Passwords",
+      "filename": "batch-encrypt-pdfs-with-filename-passwords.cs",
+      "description": "Shows how to encrypt multiple PDF files using Aspose.Pdf, generate a unique password from each file name, and log the passwords securely.",
+      "tags": [
+        "pdf encryption",
+        "batch processing",
+        "password generation",
+        "aspose.pdf",
+        "file I/O"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "encrypt-pdf-owner-password-aes256": {
+      "title": "Encrypt PDF with Owner Password Only (AES‑256)",
+      "filename": "encrypt-pdf-owner-password-aes256.cs",
+      "description": "Shows how to encrypt a PDF using Aspose.Pdf by applying an owner password only, using AES‑256 encryption and disabling all user permissions.",
+      "tags": [
+        "pdf encryption",
+        "owner password",
+        "aes256",
+        "permissions",
+        "aspose.pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.CryptoAlgorithm",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "batch-convert-pdfs-to-pdfa-1b__v3": {
+      "title": "Batch Convert PDFs to PDF/A-1b with CSV Log",
+      "filename": "batch-convert-pdfs-to-pdfa-1b__v3.cs",
+      "description": "Demonstrates how to process a folder of PDF files, convert each to PDF/A‑1b using Aspose.Pdf, and record the conversion outcome in a CSV log file.",
+      "tags": [
+        "pdf",
+        "pdfa",
+        "batch",
+        "conversion",
+        "csv"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Convert",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.PdfFormat",
+        "Aspose.Pdf.ConvertErrorAction"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "encrypt-pdf-form-fill-permission": {
+      "title": "Encrypt PDF with Password and Restrict to Form Filling",
+      "filename": "encrypt-pdf-form-fill-permission.cs",
+      "description": "Demonstrates how to load an existing PDF, encrypt it with user and owner passwords using AES‑256, and limit permissions to only form filling while disabling printing.",
+      "tags": [
+        "pdf-encryption",
+        "form-filling",
+        "permissions",
+        "aes256",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "encrypt-pdf-rc4-128-verify-size": {
+      "title": "Encrypt PDF with 128‑bit RC4 and Verify Size Increase",
+      "filename": "encrypt-pdf-rc4-128-verify-size.cs",
+      "description": "Loads a PDF, applies 128‑bit RC4 encryption with specific permissions, saves the encrypted file, and checks that the encrypted file size is slightly larger than the original.",
+      "tags": [
+        "pdf",
+        "encryption",
+        "rc4",
+        "aspose-pdf",
+        "file-size"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "rotate-pdf-pages-180-degrees": {
+      "title": "Rotate All PDF Pages 180 Degrees",
+      "filename": "rotate-pdf-pages-180-degrees.cs",
+      "description": "Shows how to open a PDF with Aspose.Pdf, rotate each page by 180 degrees, and save the modified document.",
+      "tags": [
+        "pdf",
+        "rotation",
+        "pages",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rotation",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "set-pdf-document-metadata": {
+      "title": "Set PDF Document Metadata (Author, Title, Subject) with Aspose.Pdf",
+      "filename": "set-pdf-document-metadata.cs",
+      "description": "Demonstrates how to open a PDF, assign author, title, and subject information using Aspose.Pdf, save the file, and then verify the metadata by re‑opening the document.",
+      "tags": [
+        "metadata",
+        "pdf",
+        "aspose-pdf",
+        "csharp",
+        "document-info"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.DocumentInfo",
+        "Aspose.Pdf.DocumentInfo.Author",
+        "Aspose.Pdf.DocumentInfo.Title",
+        "Aspose.Pdf.DocumentInfo.Subject",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "encrypt-pdf-aes128-set-print-permissions": {
+      "title": "Encrypt PDF with AES‑128 and Set Printing Permissions",
+      "filename": "encrypt-pdf-aes128-set-print-permissions.cs",
+      "description": "Demonstrates how to encrypt a PDF using AES‑128 with Aspose.Pdf, assign printing and high‑quality printing permissions, and verify the encryption by opening the file with the user password.",
+      "tags": [
+        "encryption",
+        "pdf",
+        "permissions",
+        "aes-128",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    },
+    "encrypt-pdf-rc4-verify-permissions": {
+      "title": "Encrypt PDF with RC4 and Verify Permissions",
+      "filename": "encrypt-pdf-rc4-verify-permissions.cs",
+      "description": "The example encrypts a PDF using the RC4 128‑bit algorithm, restricts permissions to printing only, and programmatically verifies the security settings by attempting to open the file with and without passwords.",
+      "tags": [
+        "encryption",
+        "RC4",
+        "permissions",
+        "Aspose.Pdf",
+        "PDF security"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Text.TextAbsorber",
+        "Aspose.Pdf.PdfException"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-04-28T08:54:57Z",
+      "status": "verified"
+    }
+  }
+}
