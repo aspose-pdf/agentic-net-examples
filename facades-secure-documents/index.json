@@ -1,0 +1,29 @@
+{
+  "category": "Facades - Secure Documents",
+  "last_updated": "2026-05-05T16:41:03Z",
+  "examples": {
+    "encrypt-pdf-to-memory-stream": {
+      "title": "Encrypt PDF and Save to MemoryStream",
+      "filename": "encrypt-pdf-to-memory-stream.cs",
+      "description": "Demonstrates how to encrypt a PDF with user and owner passwords using Aspose.Pdf.Facades.PdfFileSecurity and write the encrypted document directly to a MemoryStream for network transmission.",
+      "tags": [
+        "pdf-encryption",
+        "memory-stream",
+        "aspose-pdf",
+        "facade",
+        "security"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileSecurity",
+        "Aspose.Pdf.Facades.PdfFileSecurity.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileSecurity.EncryptFile",
+        "Aspose.Pdf.Facades.PdfFileSecurity.Save",
+        "Aspose.Pdf.Facades.DocumentPrivilege",
+        "Aspose.Pdf.Facades.KeySize"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-05-05T16:41:03Z",
+      "status": "verified"
+    }
+  }
+}
