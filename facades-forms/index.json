@@ -1,0 +1,98 @@
+{
+  "category": "Facades - Forms",
+  "last_updated": "2026-05-05T13:56:13Z",
+  "examples": {
+    "add-hidden-sessionid-field-with-guid-to-pdfs": {
+      "title": "Add Hidden SessionId Field with GUID to PDFs in Batch",
+      "filename": "add-hidden-sessionid-field-with-guid-to-pdfs.cs",
+      "description": "Shows how to batch‑process PDF files, add a hidden text field named \"SessionId\" on the first page, fill it with a generated GUID, and save the modified documents using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "form",
+        "hidden-field",
+        "batch-processing",
+        "guid"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.FormEditor.AddField",
+        "Aspose.Pdf.Facades.FormEditor.SetFieldAppearance",
+        "Aspose.Pdf.Facades.Form.FillField",
+        "Aspose.Pdf.Annotations.AnnotationFlags"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-05T13:51:37Z",
+      "status": "verified"
+    },
+    "add-digital-signature-field-and-sign-pdf": {
+      "title": "Add Digital Signature Field and Sign PDF with Appearance",
+      "filename": "add-digital-signature-field-and-sign-pdf.cs",
+      "description": "Shows how to add a signature field named \"DigitalSignature\" to a PDF, assign a visual appearance image, and sign the field using a PKCS#1 certificate with Aspose.Pdf.",
+      "tags": [
+        "signature",
+        "pdf",
+        "digital-signature",
+        "appearance",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.FormEditor.AddField",
+        "Aspose.Pdf.Forms.PKCS1",
+        "Aspose.Pdf.Facades.PdfFileSignature.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileSignature.SetCertificate",
+        "Aspose.Pdf.Facades.PdfFileSignature.Sign"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-05T13:52:07Z",
+      "status": "verified"
+    },
+    "set-field-appearance-format-price": {
+      "title": "Set Field Appearance and Format Value for PDF Form Field",
+      "filename": "set-field-appearance-format-price.cs",
+      "description": "Demonstrates how to change a form field's appearance using SetFieldAppearance and then fill the field with a value formatted to two decimal places.",
+      "tags": [
+        "pdf",
+        "form",
+        "field-appearance",
+        "formatting",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.FormEditor",
+        "Aspose.Pdf.Facades.FormEditor.BindPdf",
+        "Aspose.Pdf.Facades.FormEditor.SetFieldAppearance",
+        "Aspose.Pdf.Facades.FormEditor.Save",
+        "Aspose.Pdf.Facades.Form",
+        "Aspose.Pdf.Facades.Form.FillField",
+        "Aspose.Pdf.Facades.Form.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-05T13:53:37Z",
+      "status": "verified"
+    },
+    "export-checkbox-fields-to-fdf": {
+      "title": "Export Checkbox Fields to FDF File",
+      "filename": "export-checkbox-fields-to-fdf.cs",
+      "description": "Shows how to load a PDF, remove all non‑checkbox form fields, and export the remaining checkbox definitions to an FDF file using Aspose.Pdf facades.",
+      "tags": [
+        "pdf",
+        "form",
+        "checkbox",
+        "fdf",
+        "export"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.Form",
+        "Aspose.Pdf.Facades.FormEditor",
+        "Aspose.Pdf.Facades.Form.GetFieldType",
+        "Aspose.Pdf.Facades.FormEditor.RemoveField",
+        "Aspose.Pdf.Facades.Form.ExportFdf"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-05T13:56:13Z",
+      "status": "verified"
+    }
+  }
+}
