@@ -1,7 +1,7 @@
 {
   "category": "facades-bookmarks",
   "nuget_version": "26.4.0",
-  "last_updated": "2026-05-05T10:09:29Z",
+  "last_updated": "2026-05-05T10:45:54Z",
   "examples": {
     "delete-all-bookmarks-from-pdf": {
       "title": "Delete All Bookmarks from a PDF",
@@ -22,7 +22,7 @@
         "Aspose.Pdf.Facades.PdfBookmarkEditor.Close"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "merge-pdf-bookmarks-using-aspose": {
@@ -44,7 +44,7 @@
         "Aspose.Pdf.Facades.PdfBookmarkEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "export-pdf-bookmarks-to-csv": {
@@ -66,7 +66,7 @@
         "Aspose.Pdf.Facades.Bookmark"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "create-hierarchical-pdf-bookmarks": {
@@ -89,7 +89,7 @@
         "Bookmarks"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "export-pdf-bookmarks-to-json": {
@@ -111,7 +111,7 @@
         "Aspose.Pdf.Facades.Bookmark"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "import-bookmarks-from-json": {
@@ -134,7 +134,7 @@
         "Aspose.Pdf.Facades.Bookmarks"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "add-child-bookmarks-to-pdf": {
@@ -158,7 +158,7 @@
         "Aspose.Pdf.Bookmarks"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "add-top-level-blue-bookmark": {
@@ -180,7 +180,7 @@
         "Aspose.Pdf.Facades.Bookmark"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "delete-bookmarks-matching-regex": {
@@ -204,7 +204,7 @@
         "Aspose.Pdf.Bookmark"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "delete-bookmark-verify-removal": {
@@ -227,7 +227,7 @@
         "Bookmark"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "add-bookmarks-verify-count": {
@@ -250,7 +250,7 @@
         "Aspose.Pdf.Facades.Bookmarks.Count"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "update-pdf-bookmark-title": {
@@ -271,7 +271,7 @@
         "Aspose.Pdf.Facades.PdfBookmarkEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "batch-delete-bookmarks-from-encrypted-pdfs": {
@@ -293,7 +293,7 @@
         "Aspose.Pdf.Document(string, string)"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "batch-add-toc-bookmark-to-pdfs": {
@@ -314,7 +314,7 @@
         "Aspose.Pdf.Facades.PdfBookmarkEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "collapse-specific-pdf-bookmarks": {
@@ -338,7 +338,7 @@
         "Aspose.Pdf.Facades.PdfBookmarkEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "import-bookmarks-from-csv": {
@@ -362,7 +362,7 @@
         "Aspose.Pdf.Facades.Bookmarks"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "add-external-url-bookmarks-to-pdf": {
@@ -383,7 +383,7 @@
         "Aspose.Pdf.Facades.PdfContentEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "import-ofd-bookmarks-into-pdf": {
@@ -406,7 +406,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "update-bookmark-destination-to-page-10": {
@@ -429,7 +429,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "adjust-pdf-bookmarks-after-inserting-pages": {
@@ -454,7 +454,7 @@
         "Aspose.Pdf.Bookmarks"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "export-pdf-bookmarks-to-xml": {
@@ -475,7 +475,7 @@
         "PdfBookmarkEditor.Close"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "set-bookmark-zoom-150-percent": {
@@ -498,7 +498,7 @@
         "Aspose.Pdf.Bookmark.PageDisplay_Zoom"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "validate-pdf-bookmarks-against-toc": {
@@ -520,7 +520,7 @@
         "Aspose.Pdf.Facades.Bookmark"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "export-pdf-bookmarks-to-text": {
@@ -543,7 +543,7 @@
         "Bookmark"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "create-bookmarks-for-each-image": {
@@ -567,7 +567,7 @@
         "PdfBookmarkEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "remove-duplicate-bookmarks-from-pdf": {
@@ -591,7 +591,7 @@
         "Aspose.Pdf.Facades.PdfBookmarkEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "batch-add-reviewed-bookmark-to-pdfs": {
@@ -614,7 +614,7 @@
         "PdfBookmarkEditor.Document"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "rename-pdf-bookmarks-using-translation-dictionary": {
@@ -636,7 +636,7 @@
         "Aspose.Pdf.Facades"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "import-bookmarks-from-database": {
@@ -657,7 +657,7 @@
         "Aspose.Pdf.Facades.PdfBookmarkEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "update-pdf-bookmark-titles-to-title-case": {
@@ -681,7 +681,7 @@
         "Aspose.Pdf.Facades.Bookmark"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "add-javascript-bookmark-to-pdf": {
@@ -702,7 +702,7 @@
         "Aspose.Pdf.Facades.PdfContentEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "color-pdf-bookmarks-by-content": {
@@ -727,7 +727,7 @@
         "Aspose.Pdf.Facades.Bookmark"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "create-bookmark-to-named-destination": {
@@ -751,7 +751,7 @@
         "Bookmark"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "export-pdf-bookmarks-to-csv__v2": {
@@ -773,7 +773,7 @@
         "Aspose.Pdf.Facades.Bookmark"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     },
     "export-pdf-bookmarks-to-json__v2": {
@@ -795,7 +795,7 @@
         "Aspose.Pdf.Facades.Bookmark.ChildItem"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T10:09:29Z",
+      "generated_at": "2026-05-05T10:45:54Z",
       "status": "verified"
     }
   }
