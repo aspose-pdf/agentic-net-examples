@@ -1,7 +1,7 @@
 {
   "category": "compare-pdf",
   "nuget_version": "26.4.0",
-  "last_updated": "2026-04-28T09:14:56Z",
+  "last_updated": "2026-05-05T06:18:32Z",
   "examples": {
     "compare-pdf-page-range": {
       "title": "Compare Specific Page Range of Two PDFs",
@@ -22,7 +22,7 @@
         "Aspose.Pdf.Comparison.DiffOperation"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-28T09:14:56Z",
+      "generated_at": "2026-05-05T06:18:32Z",
       "status": "verified"
     },
     "compare-selected-pdf-pages": {
@@ -44,7 +44,7 @@
         "Aspose.Pdf.Page"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-28T09:14:56Z",
+      "generated_at": "2026-05-05T06:18:32Z",
       "status": "verified"
     },
     "compare-pdfs-page-by-page-diff": {
@@ -64,7 +64,7 @@
         "Aspose.Pdf.Comparison.TextPdfComparer.CompareDocumentsPageByPage"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-28T09:14:56Z",
+      "generated_at": "2026-05-05T06:18:32Z",
       "status": "verified"
     },
     "compare-pdfs-with-excluded-areas": {
@@ -86,7 +86,7 @@
         "Aspose.Pdf.Comparison.TextPdfComparer.CompareDocumentsPageByPage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-28T09:14:56Z",
+      "generated_at": "2026-05-05T06:18:32Z",
       "status": "verified"
     },
     "compare-pdfs-including-form-field-values": {
@@ -107,7 +107,7 @@
         "Aspose.Pdf.Comparison.TextPdfComparer.CompareDocumentsPageByPage"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-28T09:14:56Z",
+      "generated_at": "2026-05-05T06:18:32Z",
       "status": "verified"
     },
     "case-insensitive-pdf-text-comparison": {
@@ -129,7 +129,7 @@
         "Aspose.Pdf.Comparison.ComparisonOptions"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-28T09:14:56Z",
+      "generated_at": "2026-05-05T06:18:32Z",
       "status": "verified"
     },
     "compare-pdfs-excluding-digital-signature-fields": {
@@ -152,7 +152,7 @@
         "Aspose.Pdf.Comparison.TextPdfComparer.CompareDocumentsPageByPage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-28T09:14:56Z",
+      "generated_at": "2026-05-05T06:18:32Z",
       "status": "verified"
     },
     "compare-pdfs-unicode-text": {
@@ -173,7 +173,7 @@
         "Aspose.Pdf.Comparison.DiffOperation"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-28T09:14:56Z",
+      "generated_at": "2026-05-05T06:18:32Z",
       "status": "verified"
     },
     "compare-encrypted-pdfs-side-by-side": {
@@ -195,7 +195,7 @@
         "Aspose.Pdf.Page"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-28T09:14:56Z",
+      "generated_at": "2026-05-05T06:18:32Z",
       "status": "verified"
     },
     "generate-diff-pdf-with-highlighted-changes": {
@@ -217,7 +217,7 @@
         "Aspose.Pdf.Comparison.GraphicalPdfComparer.CompareDocumentsToPdf"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-28T09:14:56Z",
+      "generated_at": "2026-05-05T06:18:32Z",
       "status": "verified"
     },
     "set-custom-image-similarity-tolerance": {
@@ -238,7 +238,7 @@
         "Aspose.Pdf.Comparison.GraphicalPdfComparer.Threshold"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-28T09:14:56Z",
+      "generated_at": "2026-05-05T06:18:32Z",
       "status": "verified"
     },
     "get-image-differences-between-pdf-pages": {
@@ -260,7 +260,7 @@
         "Aspose.Pdf.Comparison.GraphicalPdfComparer.GetDifference"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-28T09:14:56Z",
+      "generated_at": "2026-05-05T06:18:32Z",
       "status": "verified"
     },
     "compare-two-pdfs-visual-difference": {
@@ -282,7 +282,7 @@
         "Aspose.Pdf.Comparison.DiffOperation"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-28T09:14:56Z",
+      "generated_at": "2026-05-05T06:18:32Z",
       "status": "verified"
     },
     "compare-pdfs-diff-memory": {
@@ -304,7 +304,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-28T09:14:56Z",
+      "generated_at": "2026-05-05T06:18:32Z",
       "status": "verified"
     },
     "exclude-annotations-from-pdf-comparison": {
@@ -327,7 +327,7 @@
         "Aspose.Pdf.Comparison.SideBySidePdfComparer.Compare"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-28T09:14:56Z",
+      "generated_at": "2026-05-05T06:18:32Z",
       "status": "verified"
     },
     "parallel-pdf-comparison": {
@@ -347,7 +347,7 @@
         "Aspose.Pdf.Comparison.SideBySideComparisonOptions"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-28T09:14:56Z",
+      "generated_at": "2026-05-05T06:18:32Z",
       "status": "verified"
     },
     "side-by-side-pdf-comparison": {
@@ -369,7 +369,7 @@
         "Aspose.Pdf.Comparison.SideBySidePdfComparer.Compare"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-28T09:14:56Z",
+      "generated_at": "2026-05-05T06:18:32Z",
       "status": "verified"
     },
     "compare-pdfs-detect-font-changes": {
@@ -391,7 +391,7 @@
         "Aspose.Pdf.Comparison.DiffOperation.Operation"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-28T09:14:56Z",
+      "generated_at": "2026-05-05T06:18:32Z",
       "status": "verified"
     },
     "compare-pdfs-excluding-footer-areas": {
@@ -413,7 +413,7 @@
         "Aspose.Pdf.PageInfo"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-28T09:14:56Z",
+      "generated_at": "2026-05-05T06:18:32Z",
       "status": "verified"
     },
     "create-pdf-diff-using-comparedocuments-to-pdf": {
@@ -433,7 +433,7 @@
         "Aspose.Pdf.Comparison.GraphicalPdfComparer.CompareDocumentsToPdf"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-28T09:14:56Z",
+      "generated_at": "2026-05-05T06:18:32Z",
       "status": "verified"
     },
     "generate-json-diff-report-pdf-comparison": {
@@ -455,7 +455,7 @@
         "Aspose.Pdf.Comparison.JsonDiffOutputGenerator.GenerateOutput"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-28T09:14:56Z",
+      "generated_at": "2026-05-05T06:18:32Z",
       "status": "verified"
     },
     "compare-pdfs-text-diff-ignore-compression": {
@@ -478,7 +478,7 @@
         "Aspose.Pdf.Comparison.DiffOperation.Text"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-28T09:14:56Z",
+      "generated_at": "2026-05-05T06:18:32Z",
       "status": "verified"
     },
     "copy-pdf-metadata-to-diff-document": {
@@ -501,7 +501,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-28T09:14:56Z",
+      "generated_at": "2026-05-05T06:18:32Z",
       "status": "verified"
     },
     "generate-visual-diff-pdf": {
@@ -521,7 +521,7 @@
         "Aspose.Pdf.Comparison.GraphicalPdfComparer.CompareDocumentsToPdf"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-28T09:14:56Z",
+      "generated_at": "2026-05-05T06:18:32Z",
       "status": "verified"
     },
     "parallel-batch-pdf-comparison": {
@@ -542,7 +542,7 @@
         "Aspose.Pdf.Comparison.TextPdfComparer.CompareFlatDocuments"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-28T09:14:56Z",
+      "generated_at": "2026-05-05T06:18:32Z",
       "status": "verified"
     },
     "compare-pdfs-log-differences": {
@@ -564,7 +564,7 @@
         "Aspose.Pdf.Comparison.DiffOperation.Operation"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-28T09:14:56Z",
+      "generated_at": "2026-05-05T06:18:32Z",
       "status": "verified"
     },
     "replace-inserted-text-using-diffoperation": {
@@ -588,7 +588,7 @@
         "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-28T09:14:56Z",
+      "generated_at": "2026-05-05T06:18:32Z",
       "status": "verified"
     },
     "generate-pdf-diff-images-zip": {
@@ -610,7 +610,7 @@
         "Aspose.Pdf.Comparison.PdfComparisonOptions"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-28T09:14:56Z",
+      "generated_at": "2026-05-05T06:18:32Z",
       "status": "verified"
     }
   }
