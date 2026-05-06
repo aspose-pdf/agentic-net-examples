@@ -1,7 +1,7 @@
 {
   "category": "facades-documents",
   "nuget_version": "26.4.0",
-  "last_updated": "2026-05-05T11:42:52Z",
+  "last_updated": "2026-05-06T06:11:00Z",
   "examples": {
     "insert-page-range-into-pdf": {
       "title": "Insert Page Range from One PDF into Another",
@@ -19,7 +19,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Insert"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "insert-specific-pages-into-pdf": {
@@ -38,7 +38,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Insert"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "insert-pages-at-beginning-of-pdf": {
@@ -60,7 +60,7 @@
         "Aspose.Pdf.PageCollection.Count"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "batch-insert-page-ranges-into-pdf": {
@@ -82,7 +82,7 @@
         "Aspose.Pdf.Document.Pages.Count"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "split-pdf-from-first-to-end-page": {
@@ -101,7 +101,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.SplitFromFirst"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "insert-pdf-pages-and-save-output": {
@@ -120,7 +120,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.TryInsert"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "insert-pages-into-pdf-from-memory": {
@@ -139,7 +139,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Insert"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "load-pdf-document-using-aspose-pdf": {
@@ -159,7 +159,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Extract"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "insert-pages-into-pdf-at-position": {
@@ -178,7 +178,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Insert"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "split-pdf-front-part-using-splitfromfirst": {
@@ -197,7 +197,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.SplitFromFirst"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "append-pages-to-pdf": {
@@ -218,7 +218,7 @@
         "Aspose.Pdf.Document.Pages.Count"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "split-pdf-from-page-to-end": {
@@ -240,7 +240,7 @@
         "Aspose.Pdf.Document.Pages.Count"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "split-pdf-into-individual-page-files": {
@@ -259,7 +259,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.SplitToPages"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "split-pdf-into-bulk-page-sets": {
@@ -278,7 +278,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.SplitToBulks"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "split-pdf-into-individual-pages": {
@@ -297,7 +297,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.SplitToPages"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "remove-first-and-last-pages-from-pdf": {
@@ -319,7 +319,7 @@
         "Aspose.Pdf.Document.Pages.Count"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "split-pdf-from-first-to-end-page-streams": {
@@ -338,7 +338,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.SplitFromFirst"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "split-pdf-from-page-to-end__v2": {
@@ -357,7 +357,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.SplitToEnd"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "delete-pages-from-pdf-file-path": {
@@ -376,7 +376,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Delete"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "split-pdf-into-bulk-ranges": {
@@ -395,7 +395,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.SplitToBulks"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "create-pdf-booklet": {
@@ -414,7 +414,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "extract-front-pages-using-splitfromfirst": {
@@ -433,7 +433,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.SplitFromFirst"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "measure-pdf-concatenation-performance": {
@@ -453,7 +453,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.CloseConcatenatedStreams"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "concatenate-multiple-pdfs-pdffileeditor": {
@@ -472,7 +472,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "insert-selected-pages-into-pdf-using-streams": {
@@ -491,7 +491,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Insert"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "log-batch-booklet-creation": {
@@ -511,7 +511,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.ConversionLog"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "create-booklet-pdf-with-custom-page-size": {
@@ -531,7 +531,7 @@
         "Aspose.Pdf.PageSize"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "split-pdf-into-bulk-page-ranges": {
@@ -550,7 +550,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.SplitToBulks"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "batch-delete-pages-from-multiple-pdfs": {
@@ -569,7 +569,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Delete"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "insert-page-range-into-pdf-using-streams": {
@@ -588,7 +588,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Insert"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "split-pdf-into-multiple-page-ranges": {
@@ -607,7 +607,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.SplitToBulks"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "delete-pages-resize-pdf": {
@@ -627,7 +627,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.ResizeContentsPct"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "create-booklet-a5-pdf": {
@@ -647,7 +647,7 @@
         "Aspose.Pdf.PageSize"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "insert-multiple-pages-into-pdf": {
@@ -666,7 +666,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Insert"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "split-pdf-into-individual-pages__v2": {
@@ -685,7 +685,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.SplitToPages"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "rotate-first-pdf-page-save-to-memorystream": {
@@ -707,7 +707,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "load-pdf-document-get-page-count": {
@@ -727,7 +727,7 @@
         "Aspose.Pdf.PageCollection"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "measure-pdf-resize-performance-file-path-vs-stream": {
@@ -749,7 +749,7 @@
         "Aspose.Pdf.Facades.PdfPageEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "resize-pdf-to-letter-size": {
@@ -772,7 +772,7 @@
         "PageSize"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "split-pdf-into-individual-page-pdfs": {
@@ -791,7 +791,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.SplitToPages"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "resize-pdf-pages-8-5x11-stream": {
@@ -812,7 +812,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.ResizeContents"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "split-pdf-into-individual-page-streams": {
@@ -831,7 +831,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.SplitToPages"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "concatenate-pdfs-using-stream-overloads": {
@@ -851,7 +851,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.CloseConcatenatedStreams"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "merge-pdf-streams-into-single-pdf": {
@@ -871,7 +871,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.CloseConcatenatedStreams"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "batch-concatenate-pdfs": {
@@ -890,7 +890,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "create-booklet-pdfs": {
@@ -909,7 +909,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "create-booklet-pdf-left-odd-pages": {
@@ -928,7 +928,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "concatenate-pdfs-from-memory-streams": {
@@ -948,7 +948,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.CloseConcatenatedStreams"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "delete-pdf-pages-verify-count": {
@@ -970,7 +970,7 @@
         "Aspose.Pdf.PageCollection.Count"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "delete-pages-concatenate-pdfs": {
@@ -991,7 +991,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.CloseConcatenatedStreams"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "create-pdf-booklet-custom-page-order": {
@@ -1010,7 +1010,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "create-booklet-pdf-interleaving-pages": {
@@ -1032,7 +1032,7 @@
         "Aspose.Pdf.Document.Pages.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "batch-nup-pdf-3x2": {
@@ -1051,7 +1051,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "create-booklet-with-custom-left-right-pages": {
@@ -1072,7 +1072,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "split-pdf-from-start-to-end": {
@@ -1091,7 +1091,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.SplitToEnd"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "batch-delete-pages-merge-pdfs": {
@@ -1111,7 +1111,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "create-2up-pdf-layout": {
@@ -1130,7 +1130,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "delete-pdf-pages-with-error-handling": {
@@ -1150,7 +1150,7 @@
         "Aspose.Pdf.InvalidPdfFileFormatException"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "log-deleted-pages-during-pdf-delete-operations": {
@@ -1170,7 +1170,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.TryDelete"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "batch-resize-pdfs-to-a4": {
@@ -1192,7 +1192,7 @@
         "Aspose.Pdf.PageSize"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "create-booklet-pdf-custom-page-size": {
@@ -1212,7 +1212,7 @@
         "Aspose.Pdf.PageSize"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "split-pdf-from-start-page-to-end-using-streams": {
@@ -1231,7 +1231,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.SplitToEnd"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "test-delete-invalid-page-number": {
@@ -1253,7 +1253,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "create-nup-and-booklet-pdf": {
@@ -1273,7 +1273,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "concatenate-two-pdfs-using-pdffileeditor": {
@@ -1292,7 +1292,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "merge-multiple-pdfs-with-logging": {
@@ -1312,7 +1312,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.ConversionLog"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "create-booklet-pdf-from-stream": {
@@ -1331,7 +1331,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "delete-specific-pages-from-pdfs": {
@@ -1350,7 +1350,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Delete"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "insert-selected-pages-into-pdf": {
@@ -1369,7 +1369,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Insert"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "delete-pdf-pages-get-size": {
@@ -1388,7 +1388,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Delete"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "create-booklet-pdf-delete-resize": {
@@ -1398,7 +1398,7 @@
       "tags": [],
       "apis_used": [],
       "difficulty": "",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "concatenate-multiple-pdfs": {
@@ -1420,7 +1420,7 @@
         "Aspose.Pdf.Facades"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "delete-pdf-pages-2up-layout": {
@@ -1440,7 +1440,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "parallel-delete-pages-from-pdfs": {
@@ -1459,7 +1459,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Delete"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "concatenate-pdfs-add-page-numbers": {
@@ -1481,7 +1481,7 @@
         "Aspose.Pdf.Facades.PdfFileStamp.Close"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "test-makebooklet-throws-exception-null-page-order": {
@@ -1503,7 +1503,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "delete-specified-pages-from-pdfs": {
@@ -1522,7 +1522,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Delete"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "batch-resize-pdf-a5-booklet": {
@@ -1544,7 +1544,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "delete-specific-pages-from-pdf": {
@@ -1563,7 +1563,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Delete"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "delete-pages-make-booklet": {
@@ -1584,7 +1584,7 @@
         "Aspose.Pdf.PageSize"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "compare-pdf-concatenate-memory-usage": {
@@ -1605,7 +1605,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.CloseConcatenatedStreams"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "merge-pdfs-from-urls": {
@@ -1625,7 +1625,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.CloseConcatenatedStreams"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "create-4up-pdf-in-memory": {
@@ -1644,7 +1644,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "delete-pdf-pages": {
@@ -1663,7 +1663,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Delete"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "pdffileeditor-concatenate-empty-input-test": {
@@ -1682,7 +1682,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "pdf-concatenation-with-aspose-pdffileeditor": {
@@ -1702,7 +1702,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.CloseConcatenatedStreams"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "validate-pdf-concatenation-page-order": {
@@ -1724,7 +1724,7 @@
         "Aspose.Pdf.Page.Accept"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "create-booklet-from-second-half-right-pages": {
@@ -1745,7 +1745,7 @@
         "Aspose.Pdf.Document.Pages.Count"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "concatenate-pdfs-in-zip": {
@@ -1764,7 +1764,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "delete-and-resize-pdf-pages": {
@@ -1786,7 +1786,7 @@
         "Aspose.Pdf.PageCollection.Delete"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "create-booklet-pdfs-custom-page-sizes": {
@@ -1807,7 +1807,7 @@
         "Aspose.Pdf.PageSize"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "concatenate-pdfs-with-blank-pages": {
@@ -1829,7 +1829,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "batch-resize-pdfs-concatenate": {
@@ -1850,7 +1850,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "add-blank-separator-pages-when-merging-pdfs": {
@@ -1872,7 +1872,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "resize-pdf-landscape-booklet": {
@@ -1896,7 +1896,7 @@
         "PdfFileEditor.MakeBooklet"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "create-custom-booklet-with-page-order": {
@@ -1918,7 +1918,7 @@
         "Aspose.Pdf.Page"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "create-booklet-pdf-left-pages": {
@@ -1939,7 +1939,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "remove-pages-from-multiple-pdfs-in-parallel": {
@@ -1958,7 +1958,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Delete"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "resize-pdf-pages-to-custom-pixel-dimensions": {
@@ -1980,7 +1980,7 @@
         "Aspose.Pdf.PageInfo"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "concatenate-pdfs-preserve-metadata": {
@@ -2002,7 +2002,7 @@
         "Aspose.Pdf.Facades.PdfFileInfo.Author"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     },
     "resize-pdfs-create-booklet": {
@@ -2025,7 +2025,7 @@
         "PdfFileEditor.MakeBooklet"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T11:42:52Z",
+      "generated_at": "2026-05-06T06:11:00Z",
       "status": "verified"
     }
   }
