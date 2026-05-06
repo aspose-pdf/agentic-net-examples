@@ -1,0 +1,29 @@
+{
+  "category": "Parse PDF",
+  "last_updated": "2026-05-06T05:35:55Z",
+  "examples": {
+    "modify-checkbox-appearance": {
+      "title": "Modify Checkbox Appearance and Read Its Value",
+      "filename": "modify-checkbox-appearance.cs",
+      "description": "Shows how to change a checkbox's visual style, color, border, and export value using Aspose.PDF, then retrieve its checked state and save the updated PDF.",
+      "tags": [
+        "checkbox",
+        "form",
+        "appearance",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.CheckboxField",
+        "Aspose.Pdf.Forms.BoxStyle",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Forms.Form"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-06T05:35:55Z",
+      "status": "verified"
+    }
+  }
+}
