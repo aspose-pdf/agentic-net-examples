@@ -1,0 +1,256 @@
+{
+  "category": "Working with Forms",
+  "last_updated": "2026-05-06T02:40:10Z",
+  "examples": {
+    "create-pdf-form-field-with-custom-embedded-font": {
+      "title": "Create PDF Form Field with Custom Embedded Font",
+      "filename": "create-pdf-form-field-with-custom-embedded-font.cs",
+      "description": "Demonstrates how to load an external TrueType font, embed it in a PDF, and apply it to a form TextBoxField's appearance using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "form",
+        "custom-font",
+        "embedding",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.FontRepository.OpenFont",
+        "Aspose.Pdf.Font",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Forms.TextBoxField",
+        "Aspose.Pdf.Text.DefaultAppearance",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-06T02:15:10Z",
+      "status": "verified"
+    },
+    "set-default-appearance-for-pdf-form-fields": {
+      "title": "Set Default Appearance for PDF Form Fields",
+      "filename": "set-default-appearance-for-pdf-form-fields.cs",
+      "description": "Demonstrates how to define a default font, size, and color for all form fields in a PDF by assigning a DefaultAppearance to the document's Form.",
+      "tags": [
+        "pdf",
+        "form",
+        "default-appearance",
+        "font",
+        "color"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Forms.Form",
+        "Aspose.Pdf.Annotations.DefaultAppearance"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-05-06T02:15:25Z",
+      "status": "verified"
+    },
+    "apply-background-image-to-pdf-form-field": {
+      "title": "Set Background Image for PDF Form Field",
+      "filename": "apply-background-image-to-pdf-form-field.cs",
+      "description": "Demonstrates how to apply an image as the background of a PDF form field (handling both XFA and AcroForm fields) using Aspose.Pdf and then save the updated document.",
+      "tags": [
+        "pdf",
+        "form-field",
+        "background-image",
+        "acroform",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Forms.TextBoxField.AddImage",
+        "Aspose.Pdf.Forms.ButtonField.AddImage",
+        "Aspose.Pdf.Forms.Form.Xfa.SetFieldImage"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-06T02:16:01Z",
+      "status": "verified"
+    },
+    "add-submit-button-with-url-action": {
+      "title": "Add Submit Button with URL Action to PDF",
+      "filename": "add-submit-button-with-url-action.cs",
+      "description": "Demonstrates how to programmatically add a push‑button to a PDF and configure its OnActivated action to submit the form to a specified URL using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "form",
+        "submit-button",
+        "url-action",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Forms.ButtonField",
+        "Aspose.Pdf.Forms.SubmitFormAction",
+        "Aspose.Pdf.FileSpecification"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-06T02:20:04Z",
+      "status": "verified"
+    },
+    "export-form-field-appearance-streams": {
+      "title": "Export Form Field Appearance Streams to Separate PDFs",
+      "filename": "export-form-field-appearance-streams.cs",
+      "description": "Shows how to extract each form field's appearance stream from a PDF and save it as an individual PDF file for visual inspection.",
+      "tags": [
+        "form-fields",
+        "appearance",
+        "export",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.WidgetAnnotation",
+        "Aspose.Pdf.Forms.Field.Clone",
+        "Aspose.Pdf.Forms.Form.Add",
+        "Aspose.Pdf.Forms.Form.AddFieldAppearance",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-06T02:24:31Z",
+      "status": "verified"
+    },
+    "assign-image-to-pdf-button-field": {
+      "title": "Assign Image to PDF Button Field",
+      "filename": "assign-image-to-pdf-button-field.cs",
+      "description": "Demonstrates loading a PDF, locating a button form field, and setting a custom appearance stream using an external image file, then saving the branded PDF.",
+      "tags": [
+        "pdf",
+        "form",
+        "button",
+        "image",
+        "branding"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.ButtonField",
+        "Aspose.Pdf.Forms.ButtonField.AddImage",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Forms.Form"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-05-06T02:25:26Z",
+      "status": "verified"
+    },
+    "create-pdf-form-template-from-json": {
+      "title": "Create PDF Form Template and Populate from JSON",
+      "filename": "create-pdf-form-template-from-json.cs",
+      "description": "Shows how to programmatically build a PDF form with placeholder fields using Aspose.Pdf, generate a sample JSON data file, and fill the form by importing the JSON values.",
+      "tags": [
+        "pdf",
+        "form",
+        "json",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Forms.TextBoxField",
+        "Aspose.Pdf.Forms.CheckboxField",
+        "Aspose.Pdf.Forms.DefaultAppearance",
+        "Aspose.Pdf.Forms.Form.ImportFromJson"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-06T02:28:25Z",
+      "status": "verified"
+    },
+    "create-pdf-form-with-qr-code": {
+      "title": "Create PDF Form with QR Code Field",
+      "filename": "create-pdf-form-with-qr-code.cs",
+      "description": "Shows how to build a PDF form that contains a user‑editable text box and a QR code field that reflects the entered data using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "form",
+        "qr-code",
+        "barcode",
+        "textbox"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Forms.TextBoxField",
+        "Aspose.Pdf.Forms.BarcodeField",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-05-06T02:36:04Z",
+      "status": "verified"
+    },
+    "auto-update-qr-code-from-text-field": {
+      "title": "Auto‑Update QR Code from Text Field in PDF",
+      "filename": "auto-update-qr-code-from-text-field.cs",
+      "description": "Demonstrates how to create a text box and a QR code barcode field in a PDF and use JavaScript to automatically update the QR code whenever the text field value changes.",
+      "tags": [
+        "pdf",
+        "form",
+        "qrcode",
+        "javascript",
+        "barcode"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.TextBoxField",
+        "Aspose.Pdf.Forms.BarcodeField",
+        "Aspose.Pdf.Annotations.JavascriptAction",
+        "Aspose.Pdf.Form"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-06T02:36:28Z",
+      "status": "verified"
+    },
+    "add-progress-bar-field-to-pdf-form": {
+      "title": "Add Progress Bar Field to PDF Form",
+      "filename": "add-progress-bar-field-to-pdf-form.cs",
+      "description": "Shows how to insert a read‑only TextBoxField that serves as a visual progress bar in an existing PDF form and optionally add a custom appearance using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "form",
+        "progress-bar",
+        "textboxfield",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.Form",
+        "Aspose.Pdf.Forms.TextBoxField",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Forms.Form.Add",
+        "Aspose.Pdf.Forms.Form.AddFieldAppearance",
+        "Aspose.Pdf.Drawing.Color",
+        "Aspose.Pdf.Text.HorizontalAlignment"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-06T02:38:36Z",
+      "status": "verified"
+    },
+    "language-specific-pdf-form-dynamic-label": {
+      "title": "Language‑Specific PDF Form with Dynamic Label",
+      "filename": "language-specific-pdf-form-dynamic-label.cs",
+      "description": "Shows how to create a PDF form that changes a label's text based on the selected locale using a combo box and JavaScript actions.",
+      "tags": [
+        "pdf-form",
+        "javascript",
+        "localization",
+        "combobox",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Forms.TextBoxField",
+        "Aspose.Pdf.Forms.ComboBoxField",
+        "Aspose.Pdf.Annotations.JavascriptAction"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-06T02:40:10Z",
+      "status": "verified"
+    }
+  }
+}
