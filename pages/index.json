@@ -1,0 +1,28 @@
+{
+  "category": "Pages",
+  "last_updated": "2026-05-06T05:31:52Z",
+  "examples": {
+    "insert-empty-page-custom-size": {
+      "title": "Insert Empty Page with Custom Size into PDF",
+      "filename": "insert-empty-page-custom-size.cs",
+      "description": "Shows how to load an existing PDF, add a blank page, set its width and height from user input, and save the modified document using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "page",
+        "custom-size",
+        "aspose.pdf",
+        "c#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.PageCollection.Add",
+        "Aspose.Pdf.Page.SetPageSize",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-05-06T05:31:52Z",
+      "status": "verified"
+    }
+  }
+}
