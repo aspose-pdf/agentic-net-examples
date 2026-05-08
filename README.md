@@ -1,0 +1,144 @@
+# Aspose.PDF for .NET Examples
+
+AI-friendly repository containing validated C# examples for Aspose.PDF for .NET API.
+
+## Overview
+
+This repository provides working code examples demonstrating Aspose.PDF for .NET capabilities. All examples are automatically generated, compiled, and validated using the Aspose.PDF Examples Generator.
+
+| Metric | Value |
+|--------|-------|
+| Total examples | 2631 |
+| Categories | 34 |
+| Target framework | net10.0 |
+| Aspose.PDF version | 26.4.0 |
+| Last updated | 2026-05-08 |
+
+## Repository Structure
+
+Examples are organized by feature category:
+- `accessibility-and-tagged-pdfs/` - 45 example(s)
+- `basic-operations/` - 56 example(s)
+- `compare-pdf/` - 27 example(s)
+- `conversion/` - 102 example(s)
+- `document/` - 118 example(s)
+- `facades-acroforms/` - 40 example(s)
+- `facades-annotations/` - 106 example(s)
+- `facades-bookmarks/` - 35 example(s)
+- `facades-convert-documents/` - 40 example(s)
+- `facades-documents/` - 101 example(s)
+- `facades-edit-document/` - 209 example(s)
+- `facades-extract-images-and-text/` - 82 example(s)
+- `facades-fill-forms/` - 28 example(s)
+- `facades-forms/` - 90 example(s)
+- `facades-metadata/` - 40 example(s)
+- `facades-pages/` - 117 example(s)
+- `facades-secure-documents/` - 40 example(s)
+- `facades-sign-documents/` - 34 example(s)
+- `facades-stamps/` - 45 example(s)
+- `facades-texts-and-images/` - 27 example(s)
+- `facades-xmp-metadata/` - 43 example(s)
+- `graphs-zugferd-operators/` - 83 example(s)
+- `pages/` - 99 example(s)
+- `parse-pdf/` - 65 example(s)
+- `securing-and-signing-pdf/` - 83 example(s)
+- `stamping/` - 50 example(s)
+- `working-with-annotations/` - 160 example(s)
+- `working-with-attachments/` - 50 example(s)
+- `working-with-forms/` - 239 example(s)
+- `working-with-graphs/` - 70 example(s)
+- `working-with-images/` - 70 example(s)
+- `working-with-tables/` - 91 example(s)
+- `working-with-text/` - 72 example(s)
+- `working-with-xml/` - 74 example(s)
+
+Each category contains standalone `.cs` files that can be compiled and run independently.
+
+## Getting Started
+
+### Prerequisites
+- .NET SDK (net10.0 or compatible version)
+- Aspose.PDF for .NET NuGet package (26.4.0)
+- Valid Aspose license (for production use)
+
+### Running Examples
+
+Each example is a self-contained C# file. To run an example:
+
+```bash
+cd <CategoryFolder>
+dotnet new console -o ExampleProject
+cd ExampleProject
+dotnet add package Aspose.PDF --version 26.4.0
+# Copy the example .cs file as Program.cs
+dotnet run
+```
+
+## Code Patterns
+
+### Loading a PDF
+```csharp
+using (Document pdfDoc = new Document("input.pdf"))
+{
+    // Work with document
+}
+```
+
+### Error Handling
+```csharp
+if (!File.Exists(inputPath))
+{
+    Console.Error.WriteLine($"Error: File not found - {inputPath}");
+    return;
+}
+
+try
+{
+    // Operations
+}
+catch (Exception ex)
+{
+    Console.Error.WriteLine($"Error: {ex.Message}");
+}
+```
+
+### Important Notes
+- **One-based indexing**: Aspose.PDF uses 1-based page indexing (`Pages[1]` = first page)
+- **Deterministic cleanup**: All IDisposable objects wrapped in `using` blocks
+- **Console output**: Success/error messages written to Console.WriteLine/Console.Error
+- **Fully qualified types**: Use `Aspose.Pdf.Drawing.Path` (not bare `Path`) to avoid ambiguity with `System.IO.Path`
+
+## Documentation
+
+- Each category folder contains an `agents.md` with category-specific guidance
+- Each category folder contains an `index.json` with per-example metadata
+- Root [`agents.md`](./agents.md) provides cumulative guidance across all categories
+- Root [`index.json`](./index.json) provides a machine-readable manifest of all examples
+
+## Related Resources
+
+### Official Documentation
+- [Aspose.PDF for .NET Documentation](https://docs.aspose.com/pdf/net/) — Guides, tutorials, and feature overviews
+- [API Reference](https://reference.aspose.com/pdf/net/) — Complete class/method reference
+- [Release Notes](https://releases.aspose.com/pdf/net/release-notes/) — Version history and changelogs
+
+### Downloads & Packages
+- [NuGet Package](https://www.nuget.org/packages/Aspose.PDF) — Install via `dotnet add package Aspose.PDF`
+- [Direct Downloads](https://releases.aspose.com/pdf/net/) — MSI/ZIP installers and DLLs
+
+### Community & Support
+- [Aspose.PDF Forum](https://forum.aspose.com/c/pdf/10) — Community Q&A and official support
+- [Aspose Blog - PDF](https://blog.aspose.com/category/pdf/) — Tutorials, tips, and product updates
+- [GitHub Issues](https://github.com/aspose-pdf/agentic-net-examples/issues) — Bug reports and feature requests
+
+### Licensing & Purchase
+- [Purchase](https://purchase.aspose.com/buy) — Commercial license options
+- [Temporary License](https://purchase.aspose.com/temporary-license/) — Full-feature evaluation license
+
+## License
+
+All examples use [Aspose.PDF for .NET](https://products.aspose.com/pdf/net/) and require a valid license for production use. See [licensing options](https://purchase.aspose.com/buy).
+
+---
+
+*This repository is maintained by automated code generation. For AI-friendly guidance, see [agents.md](./agents.md). Last updated: 2026-05-08*
