@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Forms;
 
 class Program
@@ -10,41 +9,33 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_no_buttons.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (required to access the Form fields collection)
+        // Load the PDF document
         Document pdfDocument = new Document(inputPath);
 
-        // Prepare the FormEditor for the same document instance
-        using (FormEditor editor = new FormEditor(pdfDocument))
+        // Collect all button fields that need to be removed
+        List<Field> buttonFields = new List<Field>();
+        foreach (Field field in pdfDocument.Form.Fields)
         {
-            // Collect the names of all button fields (ButtonField) to remove.
-            // We cannot modify the collection while iterating, so store names first.
-            List<string> buttonFieldNames = new List<string>();
-            foreach (Field field in pdfDocument.Form.Fields)
-            {
-                if (field is ButtonField) // covers push‑button, check‑box, radio‑button etc.
-                {
-                    // Use PartialName – the identifier used by FormEditor.RemoveField
-                    buttonFieldNames.Add(field.PartialName);
-                }
-            }
-
-            // Remove each button field
-            foreach (string name in buttonFieldNames)
-            {
-                editor.RemoveField(name);
-            }
-
-            // Save the modified PDF
-            editor.Save(outputPath);
+            if (field is ButtonField)
+                buttonFields.Add(field);
         }
+
+        // Remove the collected button fields from the form
+        foreach (Field btn in buttonFields)
+        {
+            pdfDocument.Form.Delete(btn);
+        }
+
+        // Save the resulting PDF without button fields
+        pdfDocument.Save(outputPath);
 
         Console.WriteLine($"All button fields removed. Output saved to '{outputPath}'.");
     }

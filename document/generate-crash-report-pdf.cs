@@ -1,49 +1,55 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // HtmlLoadOptions, CrashReportOptions, PdfException, Document are all in this namespace
+using Aspose.Pdf;
 
-class CrashReportGenerator
+class Program
 {
     static void Main()
     {
-        const string outputPdf = "CrashReport.pdf";
-
         try
         {
-            // Simulate an exception to demonstrate crash report generation
-            int zero = 0;
-            int _ = 1 / zero;
+            // Simulate an exception to generate a crash report for
+            ThrowDemoException();
         }
         catch (Exception ex)
         {
-            // Create crash report options based on the caught exception
+            // Prepare crash report options
             CrashReportOptions options = new CrashReportOptions(ex)
             {
-                // Optional: customize output directory and filename
+                // Optional customizations
                 CrashReportDirectory = Directory.GetCurrentDirectory(),
-                CrashReportFilename   = "MyCrashReport.html",
-                CustomMessage         = "An unexpected error occurred while processing the document."
+                CrashReportFilename = "MyCrashReport.html",
+                CustomMessage = "Additional context for the crash."
             };
 
             // Generate the HTML crash report
             PdfException.GenerateCrashReport(options);
 
-            // Convert the generated HTML report to PDF
+            // Build the full path to the generated HTML report (CrashReportPath property does not exist in some versions)
+            string htmlPath = Path.Combine(options.CrashReportDirectory, options.CrashReportFilename);
+            string pdfPath = Path.Combine(options.CrashReportDirectory, "MyCrashReport.pdf");
+
             try
             {
-                using (Document htmlDoc = new Document(options.CrashReportPath, new HtmlLoadOptions()))
+                // Load HTML (requires HtmlLoadOptions) and save as PDF
+                using (Document doc = new Document(htmlPath, new HtmlLoadOptions()))
                 {
-                    // Save as PDF (default format)
-                    htmlDoc.Save(outputPdf);
+                    doc.Save(pdfPath); // default format is PDF
                 }
 
-                Console.WriteLine($"Crash report PDF saved to '{outputPdf}'.");
+                Console.WriteLine($"Crash report PDF saved to '{pdfPath}'.");
             }
             catch (TypeInitializationException)
             {
-                // HTML conversion requires GDI+ (Windows only)
-                Console.WriteLine("HTML to PDF conversion is not supported on this platform.");
+                // HTML conversion relies on GDI+ (Windows only)
+                Console.WriteLine("HTML to PDF conversion requires Windows (GDI+). HTML report saved only.");
             }
         }
+    }
+
+    static void ThrowDemoException()
+    {
+        // Example exception
+        throw new InvalidOperationException("Demo exception for crash report.");
     }
 }

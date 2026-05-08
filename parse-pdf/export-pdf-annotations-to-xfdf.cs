@@ -1,35 +1,39 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;   // Core Aspose.Pdf namespace
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string xfdfPath = "annotations.xfdf";
+        const string inputPdfPath = "input.pdf";      // source PDF
+        const string xfdfOutputPath = "output.xfdf"; // destination XFDF file
 
-        if (!File.Exists(inputPdf))
+        // Verify the source PDF exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Create a FileStream to write XFDF data
-            using (FileStream xfdfStream = new FileStream(xfdfPath, FileMode.Create, FileAccess.Write))
+            // Create a FileStream for writing the XFDF data
+            // (lifecycle rule: wrap the stream in using to ensure it is closed)
+            using (FileStream xfdfStream = new FileStream(xfdfOutputPath,
+                                                          FileMode.Create,
+                                                          FileAccess.Write))
             {
-                // Export all annotations to the XFDF stream
-                doc.ExportAnnotationsToXfdf(xfdfStream);
-                // The using block ensures the stream is closed
+                // Export all annotations (including form fields) to XFDF via the stream
+                // Correct API: Document.ExportAnnotationsToXfdf(Stream)
+                pdfDoc.ExportAnnotationsToXfdf(xfdfStream);
+                // The using block will automatically close the stream
             }
 
-            // No changes to the PDF are made, so saving is optional
-            // doc.Save("output.pdf");
+            // No need to save the PDF here; we only exported XFDF data
         }
 
-        Console.WriteLine($"Annotations exported to '{xfdfPath}'.");
+        Console.WriteLine($"XFDF data successfully written to '{xfdfOutputPath}'.");
     }
 }

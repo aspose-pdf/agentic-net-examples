@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Core API only – no Facades or Plugins namespaces
 
 class Program
 {
@@ -15,16 +15,16 @@ class Program
             return;
         }
 
-        // Load the existing PDF, modify it, and ensure deterministic disposal.
+        // Load the existing PDF using the Document constructor (preferred over DocumentFactory)
         using (Document doc = new Document(inputPath))
         {
-            // Add an empty page at the end of the document.
+            // Append an empty page at the end of the document
             Page newPage = doc.Pages.Add();
 
-            // Resize the newly added page to A4 size.
-            newPage.Resize(PageSize.A4);
+            // Resize the newly added page to A4 dimensions (width & height are in points)
+            newPage.SetPageSize(PageSize.A4.Width, PageSize.A4.Height);
 
-            // Save the updated document.
+            // Save the modified document
             doc.Save(outputPath);
         }
 

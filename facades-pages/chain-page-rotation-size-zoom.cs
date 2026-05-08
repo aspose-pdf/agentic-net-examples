@@ -7,40 +7,41 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        // Verify that the source PDF exists
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Bind the PDF and chain page property modifications
-        using (PdfPageEditor editor = new PdfPageEditor())
+        // Load the PDF document – wrapped in a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the source PDF
-            editor.BindPdf(inputPdf);
+            // Initialize the PdfPageEditor facade with the loaded document
+            using (PdfPageEditor editor = new PdfPageEditor(doc))
+            {
+                // ---- Chain page property modifications ----
 
-            // Specify which pages to edit (optional; comment out to edit all pages)
-            editor.ProcessPages = new int[] { 1, 2, 3 };
+                // Rotate all pages by 90 degrees (allowed values: 0, 90, 180, 270)
+                editor.Rotation = 90;
 
-            // Rotate pages by 90 degrees
-            editor.Rotation = 90;
+                // Set the output page size (e.g., A4). PageSize enum is in Aspose.Pdf namespace.
+                editor.PageSize = PageSize.A4;
 
-            // Set a new page size (e.g., A4: 595 x 842 points)
-            editor.PageSize = new PageSize(595, 842);
+                // Apply a zoom factor; 1.0 = 100%, 0.5 = 50%
+                editor.Zoom = 0.5f;
 
-            // Apply a zoom factor (0.75 = 75%)
-            editor.Zoom = 0.75f;
+                // Apply the queued changes to the document
+                editor.ApplyChanges();
 
-            // Apply all changes to the document
-            editor.ApplyChanges();
-
-            // Save the modified PDF
-            editor.Save(outputPdf);
+                // Save the modified PDF to the specified file
+                editor.Save(outputPath);
+            }
         }
 
-        Console.WriteLine($"Edited PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }
 }

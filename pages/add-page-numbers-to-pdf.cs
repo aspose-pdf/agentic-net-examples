@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core API (Document, Page, PageNumberStamp, etc.)
+using Aspose.Pdf;
 
 class Program
 {
@@ -15,28 +15,22 @@ class Program
             return;
         }
 
-        // Load the PDF document (using statement ensures deterministic disposal)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Create a PageNumberStamp with the desired format.
-            // The character '#' is replaced by the current page number,
-            // and a second '#' is replaced by the total page count.
-            PageNumberStamp pageNumberStamp = new PageNumberStamp("Page # of #");
+            // Create a page number stamp with default format "#"
+            PageNumberStamp pageNumberStamp = new PageNumberStamp();
+            pageNumberStamp.StartingNumber = 1; // start numbering at 1
+            pageNumberStamp.HorizontalAlignment = HorizontalAlignment.Center; // center horizontally
+            pageNumberStamp.VerticalAlignment = VerticalAlignment.Bottom; // place at bottom (optional)
 
-            // Optional styling – adjust as needed.
-            pageNumberStamp.HorizontalAlignment = HorizontalAlignment.Center;
-            pageNumberStamp.VerticalAlignment   = VerticalAlignment.Bottom;
-            pageNumberStamp.BottomMargin        = 20;   // distance from bottom edge
-            pageNumberStamp.TextState.FontSize  = 12;
-            pageNumberStamp.TextState.ForegroundColor = Color.Black;
-
-            // Apply the stamp to every page (pages are 1‑based).
+            // Apply the same stamp instance to each page (no Clone needed)
             foreach (Page page in doc.Pages)
             {
                 page.AddStamp(pageNumberStamp);
             }
 
-            // Save the modified PDF.
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

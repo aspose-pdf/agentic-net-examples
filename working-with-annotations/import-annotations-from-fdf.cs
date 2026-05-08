@@ -5,14 +5,14 @@ using Aspose.Pdf.Annotations;
 
 class Program
 {
+    // Paths that are known only at runtime must be static readonly, not const
+    private static readonly string fdfPath = Path.Combine("Resources", "annotations.fdf");
+
     static void Main()
     {
-        // Paths to the source PDF and the FDF file located in the Resources folder
-        string pdfPath = Path.Combine("Resources", "sample.pdf");
-        string fdfPath = Path.Combine("Resources", "annotations.fdf");
-        string outputPath = "output.pdf";
+        const string pdfPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Verify that both files exist before proceeding
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"PDF not found: {pdfPath}");
@@ -24,30 +24,34 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document (deterministic disposal)
         using (Document doc = new Document(pdfPath))
         {
-            // Open the FDF file as a stream and import its annotations into the document
+            // Open the FDF file stream
             using (FileStream fdfStream = File.OpenRead(fdfPath))
             {
+                // Import annotations from the FDF into the PDF document
                 FdfReader.ReadAnnotations(fdfStream, doc);
             }
 
-            // OPTIONAL: process the imported annotations (e.g., list them on the first page)
-            if (doc.Pages.Count > 0)
-            {
-                Page firstPage = doc.Pages[1]; // Pages are 1‑based
-                for (int i = 1; i <= firstPage.Annotations.Count; i++)
-                {
-                    Annotation ann = firstPage.Annotations[i];
-                    Console.WriteLine($"Annotation {i}: {ann.GetType().Name}");
-                }
-            }
+            // Example processing: count total annotations after import
+            Console.WriteLine($"Total annotations after import: {CountAnnotations(doc)}");
 
-            // Save the modified PDF to the desired output location
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Annotations imported and saved to '{outputPath}'.");
+    }
+
+    // Helper to count all annotations across all pages
+    static int CountAnnotations(Document doc)
+    {
+        int total = 0;
+        for (int i = 1; i <= doc.Pages.Count; i++)
+        {
+            total += doc.Pages[i].Annotations.Count;
+        }
+        return total;
     }
 }

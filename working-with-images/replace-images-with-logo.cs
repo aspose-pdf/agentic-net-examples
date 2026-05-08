@@ -2,54 +2,59 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class Program
+class ReplaceImagesWithLogo
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string logoPath = "logo.png";
+        // Paths for the source PDF, the logo image, and the output PDF.
+        const string inputPdfPath  = "input.pdf";
+        const string logoImagePath = "logo.png";
+        const string outputPdfPath = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        // Validate that the required files exist.
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(logoPath))
+        if (!File.Exists(logoImagePath))
         {
-            Console.Error.WriteLine($"Logo file not found: {logoPath}");
+            Console.Error.WriteLine($"Logo image not found: {logoImagePath}");
             return;
         }
 
-        // Load the PDF document with deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Load the logo image once into memory; it will be used for all replacements.
+        byte[] logoBytes = File.ReadAllBytes(logoImagePath);
+
+        // Open the PDF document inside a using block for deterministic disposal.
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Open the new logo once; reuse its stream for each replacement
-            using (FileStream logoStream = File.OpenRead(logoPath))
+            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing).
+            for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
             {
-                // Iterate through all pages (1‑based indexing)
-                for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+                Page page = pdfDoc.Pages[pageIndex];
+
+                // Create an absorber that finds image placements on the current page.
+                ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
+
+                // Perform the search on the page.
+                page.Accept(absorber);
+
+                // Replace each found image with the logo.
+                foreach (ImagePlacement placement in absorber.ImagePlacements)
                 {
-                    Page page = doc.Pages[pageNum];
-
-                    // Search for image placements on the current page
-                    ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
-                    page.Accept(absorber);
-
-                    // Replace each found image with the new logo
-                    foreach (ImagePlacement placement in absorber.ImagePlacements)
+                    // Use a fresh MemoryStream for each replacement.
+                    using (MemoryStream logoStream = new MemoryStream(logoBytes))
                     {
-                        // Ensure the stream is positioned at the beginning for each replace call
-                        logoStream.Position = 0;
                         placement.Replace(logoStream);
                     }
                 }
             }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            // Save the modified document.
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Images replaced and saved to '{outputPath}'.");
+        Console.WriteLine($"Images replaced with logo. Output saved to '{outputPdfPath}'.");
     }
 }

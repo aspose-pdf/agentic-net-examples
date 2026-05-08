@@ -14,12 +14,12 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document (no saving required)
         using (Document doc = new Document(inputPath))
         {
             // Pages are 1‑based; Pages.Count gives the total number of pages
             int pageCount = doc.Pages.Count;
-            Console.WriteLine($"Document contains {pageCount} page(s).");
+            Console.WriteLine($"Document contains {pageCount} pages.");
         }
     }
 }

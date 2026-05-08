@@ -9,33 +9,35 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Verify the source file exists.
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal.
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Total pages before insertion (1‑based indexing).
-            int pageCount = doc.Pages.Count;
-
-            // Calculate the position where the new pages will be inserted.
-            // Adding 1 places the insertion point at the start of the second half.
-            int middle = (pageCount / 2) + 1;
-
-            // Insert ten empty pages at the midpoint.
-            for (int i = 0; i < 10; i++)
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                doc.Pages.Insert(middle);
+                // Calculate the 1‑based midpoint position
+                int insertPosition = (doc.Pages.Count / 2) + 1;
+
+                // Insert ten empty pages at the calculated position
+                for (int i = 0; i < 10; i++)
+                {
+                    doc.Pages.Insert(insertPosition);
+                }
+
+                // Save the modified document as PDF
+                doc.Save(outputPath);
             }
 
-            // Save the modified document.
-            doc.Save(outputPath);
+            Console.WriteLine($"Successfully inserted 10 pages at the midpoint. Saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Inserted 10 empty pages at the midpoint. Output saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

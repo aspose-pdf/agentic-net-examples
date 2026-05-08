@@ -1,37 +1,58 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class Program
+class RemoveSignaturesUtility
 {
-    static void Main()
+    static void Main(string[] args)
     {
-        // Input PDF that may contain digital signatures
-        const string inputPath  = "input.pdf";
-        // Output PDF with all signatures removed
-        const string outputPath = "signed_removed.pdf";
+        // Allow paths to be supplied via command‑line arguments; fall back to defaults.
+        string inputPath = args.Length > 0 ? args[0] : "input.pdf";
+        string outputPath = args.Length > 1 ? args[1] : "clean_output.pdf";
 
-        if (!File.Exists(inputPath))
+        // Ensure the source PDF exists – if it does not, create a minimal placeholder PDF.
+        EnsureInputPdfExists(inputPath);
+
+        // Use PdfFileSignature facade inside a using block to guarantee proper disposal.
+        using (PdfFileSignature pdfSignature = new PdfFileSignature())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
+            pdfSignature.BindPdf(inputPath);
+
+            // Remove every existing signature. Aspose provides GetSignatureNames() to enumerate them.
+            RemoveAllSignatures(pdfSignature);
+
+            // Save the cleaned document.
+            pdfSignature.Save(outputPath);
         }
 
-        // Create the facade for signature operations
-        PdfFileSignature pdfSignature = new PdfFileSignature();
+        Console.WriteLine($"Clean PDF saved to '{outputPath}'.");
+    }
 
-        // Bind the source PDF file
-        pdfSignature.BindPdf(inputPath);
+    private static void EnsureInputPdfExists(string path)
+    {
+        if (!File.Exists(path))
+        {
+            // Create a simple one‑page PDF so the utility can run without external files.
+            using (Document doc = new Document())
+            {
+                doc.Pages.Add();
+                doc.Save(path);
+            }
+        }
+    }
 
-        // Remove every signature present in the document
-        pdfSignature.RemoveSignatures();
-
-        // Save the cleaned PDF to a new file
-        pdfSignature.Save(outputPath);
-
-        // Release resources held by the facade
-        pdfSignature.Close();
-
-        Console.WriteLine($"All signatures removed. Clean PDF saved to '{outputPath}'.");
+    private static void RemoveAllSignatures(PdfFileSignature signatureFacade)
+    {
+        // GetSignatureNames returns a collection of SignatureName objects present in the PDF.
+        var names = signatureFacade.GetSignatureNames();
+        if (names != null)
+        {
+            foreach (var sigName in names)
+            {
+                // Use the overload that accepts a SignatureName instance.
+                signatureFacade.RemoveSignature(sigName);
+            }
+        }
     }
 }

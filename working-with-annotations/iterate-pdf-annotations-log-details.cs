@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Reflection;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -15,36 +16,53 @@ class Program
             return;
         }
 
-        // Document disposal must be wrapped in a using block (document-disposal-with-using rule)
+        // Load the PDF document (using block ensures proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (page-indexing-one-based rule)
+            // Iterate over all pages (1‑based indexing)
             foreach (Page page in doc.Pages)
             {
-                AnnotationCollection annotations = page.Annotations;
+                int annotationIndex = 1;
 
-                // Annotation collections are also 1‑based
-                for (int i = 1; i <= annotations.Count; i++)
+                // Iterate over each annotation on the current page
+                foreach (Annotation annotation in page.Annotations)
                 {
-                    Annotation ann = annotations[i];
-
                     // Annotation type (enum)
-                    string typeName = ann.AnnotationType.ToString();
+                    AnnotationType type = annotation.AnnotationType;
 
-                    // Rectangle – use fully qualified type to avoid ambiguity (fqtn-for-ambiguous-types rule)
-                    Aspose.Pdf.Rectangle rect = ann.Rect;
-                    string rectInfo = $"[{rect.LLX}, {rect.LLY}, {rect.URX}, {rect.URY}]";
+                    // Rectangle defining the annotation's position
+                    Aspose.Pdf.Rectangle rect = annotation.Rect;
 
-                    // Media file name – only some annotation types carry a file reference.
-                    // The FileSpecification property is not available in the current Aspose.Pdf version,
-                    // so we default to "N/A". If a future version adds the property, the code can be
-                    // extended to retrieve the file name via ann.FileSpecification?.Name.
-                    string mediaFile = "N/A";
+                    // Retrieve an associated media file name, if applicable
+                    string mediaFile = GetMediaFileName(annotation);
 
+                    // Log the details
                     Console.WriteLine(
-                        $"Page {page.Number}, Annotation {i}: Type={typeName}, Rect={rectInfo}, MediaFile={mediaFile}");
+                        $"Page {page.Number}, Annotation {annotationIndex}: " +
+                        $"Type={type}, " +
+                        $"Rect=[{rect.LLX}, {rect.LLY}, {rect.URX}, {rect.URY}], " +
+                        $"MediaFile={(mediaFile ?? "N/A")}" );
+
+                    annotationIndex++;
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Attempts to extract the file name associated with an annotation that can carry a file.
+    /// Uses reflection to avoid compile‑time dependencies on version‑specific properties such as
+    /// ScreenAnnotation.File, MovieAnnotation.File, RichMediaAnnotation.File, etc.
+    /// </summary>
+    private static string GetMediaFileName(Annotation annotation)
+    {
+        // Most file‑carrying annotations expose a property named "File" of type FileSpecification.
+        PropertyInfo fileProp = annotation.GetType().GetProperty("File", BindingFlags.Public | BindingFlags.Instance);
+        if (fileProp != null)
+        {
+            var fileSpec = fileProp.GetValue(annotation) as FileSpecification;
+            return fileSpec?.Name; // Name holds the original file name.
+        }
+        return null;
     }
 }

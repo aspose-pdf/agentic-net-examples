@@ -1,48 +1,44 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Forms;          // required for Field and form actions
+using Aspose.Pdf.Annotations;   // required for JavascriptAction
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string fieldName = "MyField"; // name of the field to monitor
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string fieldName  = "MyField"; // name of the field to monitor
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Retrieve the field by its name and cast to Field (WidgetAnnotation derives from Field)
-            Field field = doc.Form[fieldName] as Field;
+            // The Form indexer returns a WidgetAnnotation; cast it to a Field.
+            Field? field = doc.Form[fieldName] as Field;
             if (field == null)
             {
                 Console.Error.WriteLine($"Field '{fieldName}' not found or is not a form field.");
                 return;
             }
 
-            // Create a JavaScript action that will be executed when the field value changes.
-            // The OnValidate action is invoked whenever the user modifies the field's contents.
-            JavascriptAction jsAction = new JavascriptAction("myFunction();");
-            field.Actions.OnValidate = jsAction;
+            // Attach a JavaScript action that runs when the field value is changed.
+            // The OnValidate action is invoked after the user modifies the field.
+            field.Actions.OnValidate = new JavascriptAction(
+                "app.alert('The value of the field has changed.');"
+            );
 
-            // Define the JavaScript function at the document level.
-            // Document.OpenAction is used because Document.JavaScript.Add does not exist.
-            doc.OpenAction = new JavascriptAction(
-                "function myFunction() { app.alert('Field value changed!'); }");
-
-            // Save the modified PDF (lifecycle rule: save inside the using block)
-            doc.Save(outputPdf);
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with JavaScript listener to '{outputPdf}'.");
+        Console.WriteLine($"Document saved with JavaScript listener to '{outputPath}'.");
     }
 }

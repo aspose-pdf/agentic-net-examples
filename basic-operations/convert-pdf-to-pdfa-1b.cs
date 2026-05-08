@@ -1,40 +1,39 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Tagged; // for tagged content if needed (not required for conversion)
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_pdfa1b.pdf";
+        const string logPath = "conversion_log.xml";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the source PDF
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Set up conversion options for PDF/A‑1b
-            PdfFormatConversionOptions options = new PdfFormatConversionOptions(PdfFormat.PDF_A_1B);
-            // Preserve embedded fonts and structure (default behavior)
-            options.OptimizeFileSize = false; // do not down‑size fonts
-            // Perform the conversion
-            bool success = doc.Convert(options);
-            if (!success)
+            // Load the existing PDF document.
+            using (Document doc = new Document(inputPath))
             {
-                Console.Error.WriteLine("Conversion to PDF/A‑1b failed.");
-                return;
+                // Convert the document to PDF/A‑1b compliance.
+                // Metadata (Info dictionary) is preserved automatically.
+                doc.Convert(logPath, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
+
+                // Save the converted document.
+                doc.Save(outputPath);
             }
 
-            // Save the converted document as PDF (PDF/A‑1b)
-            doc.Save(outputPath);
+            Console.WriteLine($"PDF/A‑1b file saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF/A‑1b file saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

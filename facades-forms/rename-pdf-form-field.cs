@@ -6,22 +6,26 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string oldName    = "OldName";
-        const string newName    = "NewName";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF, rename the field, and save the result.
-        Form form = new Form(inputPath, outputPath);
-        form.RenameField(oldName, newName);
-        form.Save(); // writes to outputPath
+        // Form facade works with AcroForm/XFA fields.
+        // Constructor takes source and destination file names.
+        using (Form form = new Form(inputPdf, outputPdf))
+        {
+            // Rename the field throughout the document.
+            form.RenameField("OldName", "NewName");
 
-        Console.WriteLine($"Field '{oldName}' renamed to '{newName}' and saved as '{outputPath}'.");
+            // Persist changes.
+            form.Save();
+        }
+
+        Console.WriteLine($"Field renamed and saved to '{outputPdf}'.");
     }
 }

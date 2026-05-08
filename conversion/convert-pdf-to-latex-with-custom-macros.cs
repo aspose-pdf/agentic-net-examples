@@ -6,38 +6,30 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputTex = "output.tex";
+        const string inputPdfPath = "input.pdf";
+        const string outputTexPath = "output.tex";
 
-        // Define custom LaTeX macro definitions for special symbols.
-        // Adjust the definitions as needed for your symbols.
-        const string macroDefinitions = @"\newcommand{\specialsymbol}{\textbf{S}}";
+        // Define custom LaTeX macro definitions for special symbols
+        string customMacros = @"\newcommand{\specialsymbol}{\textsection}" + Environment.NewLine;
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document.
-        using (Aspose.Pdf.Document pdfDoc = new Aspose.Pdf.Document(inputPdf))
+        // Load the PDF document
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Save the document as LaTeX using TeXSaveOptions.
-            Aspose.Pdf.TeXSaveOptions texOptions = new Aspose.Pdf.TeXSaveOptions();
-            pdfDoc.Save(outputTex, texOptions);
+            // Save the document as LaTeX using TeXSaveOptions
+            TeXSaveOptions texSaveOptions = new TeXSaveOptions();
+            pdfDoc.Save(outputTexPath, texSaveOptions);
         }
 
-        // Prepend the custom macro definitions to the generated .tex file.
-        try
-        {
-            string originalContent = File.ReadAllText(outputTex);
-            string newContent = macroDefinitions + Environment.NewLine + originalContent;
-            File.WriteAllText(outputTex, newContent);
-            Console.WriteLine($"Conversion completed. LaTeX file saved to '{outputTex}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error updating TeX file: {ex.Message}");
-        }
+        // Prepend the custom macro definitions to the generated .tex file
+        string texContent = File.ReadAllText(outputTexPath);
+        File.WriteAllText(outputTexPath, customMacros + texContent);
+
+        Console.WriteLine($"Conversion completed. LaTeX file saved to '{outputTexPath}'.");
     }
 }

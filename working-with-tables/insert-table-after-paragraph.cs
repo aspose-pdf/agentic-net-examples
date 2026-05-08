@@ -1,84 +1,82 @@
 using System;
-using System.Runtime.InteropServices;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class Program
+class InsertTableAfterParagraph
 {
     static void Main()
     {
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
+        const string searchText = "Insert table after this paragraph";
 
-        // Create a new PDF document
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a page
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Add a paragraph that we will later locate
-            TextFragment targetParagraph = new TextFragment("Target paragraph");
-            page.Paragraphs.Add(targetParagraph);
+        // Open the PDF document
+        using (Document doc = new Document(inputPath))
+        {
+            // Assume the paragraph is on the first page; adjust as needed
+            Page page = doc.Pages[1];
 
-            // Locate the paragraph by its text
-            int targetIndex = -1;
+            // Locate the paragraph (TextFragment) that contains the target text
+            int paragraphIndex = -1;
             for (int i = 0; i < page.Paragraphs.Count; i++)
             {
-                if (page.Paragraphs[i] is TextFragment tf && tf.Text == "Target paragraph")
+                if (page.Paragraphs[i] is TextFragment tf && tf.Text.Contains(searchText))
                 {
-                    targetIndex = i;
+                    paragraphIndex = i;
                     break;
                 }
             }
 
-            if (targetIndex != -1)
+            if (paragraphIndex == -1)
             {
-                // Create a simple table
-                Table table = new Table { ColumnWidths = "100 100" };
-
-                // First row (header)
-                Row headerRow = table.Rows.Add();
-                headerRow.Cells.Add("Header 1");
-                headerRow.Cells.Add("Header 2");
-
-                // Second row (data)
-                Row dataRow = table.Rows.Add();
-                dataRow.Cells.Add("Cell 1");
-                dataRow.Cells.Add("Cell 2");
-
-                // Insert the table right after the located paragraph
-                page.Paragraphs.Insert(targetIndex + 1, table);
+                Console.Error.WriteLine("Target paragraph not found.");
+                doc.Save(outputPath); // Save unchanged document
+                return;
             }
 
-            // Save the resulting PDF – guard against missing GDI+ (libgdiplus) on non‑Windows platforms
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            // Create a new table
+            Table table = new Table
             {
-                doc.Save(outputPath);
-                Console.WriteLine($"PDF saved to '{outputPath}'.");
-            }
-            else
+                // Optional visual settings
+                Border = new BorderInfo(BorderSide.All, 0.5f),
+                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f),
+                DefaultCellPadding = new MarginInfo(5, 5, 5, 5)
+            };
+
+            // Define column widths (optional)
+            table.ColumnWidths = "100 150";
+
+            // Add a header row
+            Row header = table.Rows.Add();
+            header.Cells.Add("Header 1");
+            header.Cells.Add("Header 2");
+            header.DefaultCellTextState = new TextState
             {
-                try
-                {
-                    doc.Save(outputPath);
-                    Console.WriteLine($"PDF saved to '{outputPath}'.");
-                }
-                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
-                {
-                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. PDF was not saved.");
-                }
-            }
+                FontSize = 12,
+                FontStyle = FontStyles.Bold,
+                Font = FontRepository.FindFont("Helvetica")
+            };
+
+            // Add a data row
+            Row data = table.Rows.Add();
+            data.Cells.Add("Cell A1");
+            data.Cells.Add("Cell B1");
+
+            // Insert the table immediately after the located paragraph
+            // Paragraphs.Insert expects the index where the new element will be placed
+            page.Paragraphs.Insert(paragraphIndex + 1, table);
+
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-    }
 
-    // Helper to detect a nested DllNotFoundException (e.g., missing libgdiplus)
-    private static bool ContainsDllNotFound(Exception? ex)
-    {
-        while (ex != null)
-        {
-            if (ex is DllNotFoundException)
-                return true;
-            ex = ex.InnerException;
-        }
-        return false;
+        Console.WriteLine($"Table inserted and saved to '{outputPath}'.");
     }
 }

@@ -16,26 +16,26 @@ class Program
             return;
         }
 
-        // Load the PDF, set the EmployeeID field to read‑only, and save.
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the form field named "EmployeeID".
-            // The Form indexer returns a WidgetAnnotation, so cast it to Field.
-            Field employeeIdField = doc.Form["EmployeeID"] as Field;
-            if (employeeIdField != null)
+            // Retrieve the form field named "EmployeeID"
+            // The Form indexer returns a WidgetAnnotation, so we need to cast it to Field.
+            Field employeeField = doc.Form["EmployeeID"] as Field;
+            if (employeeField != null)
             {
-                // Prevent user modifications after generation.
-                employeeIdField.ReadOnly = true;
+                // Make the field read‑only to prevent user edits
+                employeeField.ReadOnly = true;
             }
             else
             {
-                Console.WriteLine("Field 'EmployeeID' not found or is not a form field.");
+                Console.WriteLine("Field 'EmployeeID' not found in the document.");
             }
 
-            // Persist the changes.
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with read‑only EmployeeID field: {outputPath}");
     }
 }

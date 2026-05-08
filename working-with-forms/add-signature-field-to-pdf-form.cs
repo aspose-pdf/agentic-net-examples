@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_signature.pdf";
+        const string outputPath = "signed_form.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,29 +16,35 @@ class Program
             return;
         }
 
-        // Load the PDF, add a signature field, and save.
+        // Load the existing PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Define the position and size of the signature field (llx, lly, urx, ury).
+            // Ensure the document has at least one page
+            if (doc.Pages.Count == 0)
+            {
+                Console.Error.WriteLine("The PDF has no pages.");
+                return;
+            }
+
+            // Define the rectangle where the signature field will appear
+            // (lower‑left‑x, lower‑left‑y, upper‑right‑x, upper‑right‑y)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 100, 300, 150);
 
-            // Create the signature field on the document.
-            SignatureField sigField = new SignatureField(doc, rect)
-            {
-                Name = "Signature1",          // Field name (used to identify the field)
-                PartialName = "Signature1",   // Partial name (optional, often same as Name)
-                AlternateName = "Sign Here", // Tooltip shown in PDF viewers
-                Required = true,             // Mark as required (optional)
-                ReadOnly = false             // Allow user to sign
-            };
+            // Create a signature field on the first page
+            Page firstPage = doc.Pages[1]; // 1‑based indexing
+            SignatureField signatureField = new SignatureField(firstPage, rect);
 
-            // Add the field to the form.
-            doc.Form.Add(sigField);
+            // Set a name and tooltip for the field (optional but recommended)
+            signatureField.Name = "Signature1";
+            signatureField.AlternateName = "Sign Here";
 
-            // Save the modified PDF.
+            // Add the field to the document's form collection
+            doc.Form.Add(signatureField);
+
+            // Save the modified PDF (still PDF format)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Signature field added and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with signature field saved to '{outputPath}'.");
     }
 }

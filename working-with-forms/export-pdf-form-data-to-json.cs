@@ -2,39 +2,39 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class Program
+class ExportFormDataToJson
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";      // Source PDF with form fields
-        const string txtPath = "formdata.txt";   // Destination text file for JSON
+        // Paths – adjust as needed
+        const string inputPdfPath = "input.pdf";
+        const string jsonTextPath = "formdata.json";
 
-        if (!File.Exists(pdfPath))
+        // Ensure the source PDF exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(pdfPath))
+        // Load the PDF document (lifecycle: load)
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Export form fields to a memory stream as JSON
-            using (MemoryStream ms = new MemoryStream())
+            // Export form fields to JSON using a memory stream
+            using (MemoryStream jsonStream = new MemoryStream())
             {
-                doc.Form.ExportToJson(ms);               // Writes JSON to the stream
-                ms.Position = 0;                         // Reset stream position for reading
+                // ExportToJson writes JSON to the provided stream
+                pdfDoc.Form.ExportToJson(jsonStream);
 
-                // Read the JSON content as a string
-                using (StreamReader reader = new StreamReader(ms))
-                {
-                    string json = reader.ReadToEnd();
+                // Convert the stream contents to a string
+                jsonStream.Position = 0; // rewind
+                string jsonString = new StreamReader(jsonStream).ReadToEnd();
 
-                    // Save the JSON string to a plain text file
-                    File.WriteAllText(txtPath, json);
-                }
+                // Save the JSON string to a text file
+                File.WriteAllText(jsonTextPath, jsonString);
             }
         }
 
-        Console.WriteLine($"Form data exported to '{txtPath}'.");
+        Console.WriteLine($"Form data exported to JSON file: {jsonTextPath}");
     }
 }

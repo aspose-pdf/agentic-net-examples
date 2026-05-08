@@ -7,9 +7,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // existing PDF
-        const string outputPdf = "output_with_attachment.pdf";
-        const string attachFile = "attachment.txt";    // file to embed
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string attachmentFile = "attachment.txt";
 
         if (!File.Exists(inputPdf))
         {
@@ -17,41 +17,42 @@ class Program
             return;
         }
 
-        if (!File.Exists(attachFile))
+        if (!File.Exists(attachmentFile))
         {
-            Console.Error.WriteLine($"Attachment file not found: {attachFile}");
+            Console.Error.WriteLine($"Attachment file not found: {attachmentFile}");
             return;
         }
 
-        // Load the PDF document (using block ensures proper disposal)
+        // Load the existing PDF document
         using (Document doc = new Document(inputPdf))
         {
-            // Choose the page where the attachment annotation will appear (first page)
-            Page page = doc.Pages[1]; // 1‑based indexing
+            // Create a FileSpecification for the attachment
+            FileSpecification fileSpec = new FileSpecification(attachmentFile);
 
-            // Define the rectangle that represents the annotation's border
-            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 150, 550);
+            // Add the file specification to the document's embedded files collection
+            doc.EmbeddedFiles.Add(fileSpec);
 
-            // Create a FileSpecification for the file to be attached
-            FileSpecification fileSpec = new FileSpecification(attachFile, "Sample attachment");
+            // Select the page where the annotation will be placed (first page)
+            Page page = doc.Pages[1];
 
-            // Create the FileAttachmentAnnotation using the page, rectangle, and file spec
+            // Define the rectangle that bounds the annotation
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
+
+            // Create the file attachment annotation using the page, rectangle, and file specification
             FileAttachmentAnnotation attachment = new FileAttachmentAnnotation(page, rect, fileSpec)
             {
-                // Optional: tooltip text shown when hovering
-                Contents = "Attached file: attachment.txt"
-                // Icon property can be set with a string value if desired, e.g.:
-                // Icon = "Paperclip"
+                // Optional visual properties
+                Contents = "Attached file",
+                Color = Aspose.Pdf.Color.Blue
             };
 
             // Add the annotation to the page's annotation collection
             page.Annotations.Add(attachment);
 
-            // Save the modified PDF
+            // Save the modified PDF to a new file
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved with attachment: {outputPdf}");
+        Console.WriteLine($"File attachment added and saved to '{outputPdf}'.");
     }
 }

@@ -2,31 +2,30 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class Program
+class PdfAValidator
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";               // PDF to validate
-        const string logFile  = "validation_report.txt";   // Validation report output
+        const string inputPdfPath = "input.pdf";
+        const string reportPath   = "validation_report.txt";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
         // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Validate against PDF/A‑1A standard; the method returns true if validation succeeded
-            bool validationResult = doc.Validate(logFile, PdfFormat.PDF_A_1A);
+            // Validate against PDF/A‑1A compliance; the method returns true if compliant
+            bool isCompliant = doc.Validate(reportPath, PdfFormat.PDF_A_1A);
 
-            // The IsPdfaCompliant property indicates whether the document conforms to PDF/A
-            bool isCompliant = doc.IsPdfaCompliant;
+            Console.WriteLine(isCompliant
+                ? "Document is PDF/A‑1A compliant."
+                : "Document is NOT PDF/A‑1A compliant. See report for details.");
 
-            Console.WriteLine($"Validation completed. Result: {(validationResult ? "Success" : "Failure")}");
-            Console.WriteLine($"PDF/A‑1A compliance: {(isCompliant ? "Compliant" : "Non‑compliant")}");
-            Console.WriteLine($"Detailed report saved to: {logFile}");
+            Console.WriteLine($"Validation report saved to: {reportPath}");
         }
     }
 }

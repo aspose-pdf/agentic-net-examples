@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -6,22 +7,26 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "link_annotation.pdf";
+        // Path to the output PDF file
+        const string outputPath = "LinkAnnotation.pdf";
 
-        // Create a new PDF document and ensure proper disposal
+        // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a blank page to the document
+            // Add a blank page (pages are 1‑based)
             Page page = doc.Pages.Add();
 
-            // Define the annotation rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            // Define the rectangle area for the link annotation
+            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
+            Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Create a link annotation that opens an external URL
-            LinkAnnotation link = new LinkAnnotation(page, rect)
+            // Create the link annotation on the specified page and rectangle
+            LinkAnnotation link = new LinkAnnotation(page, linkRect)
             {
-                Color = Aspose.Pdf.Color.Blue,                     // Visual appearance of the link border
-                Action = new GoToURIAction("https://www.example.com") // Open the URL when clicked
+                // Set a visible border color (optional)
+                Color = Aspose.Pdf.Color.Blue,
+                // Set the action to open an external URL
+                Action = new GoToURIAction("https://www.example.com")
             };
 
             // Add the annotation to the page's annotation collection

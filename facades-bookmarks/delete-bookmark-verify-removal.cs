@@ -1,18 +1,14 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF that contains bookmarks
-        const string inputPdf = "input.pdf";
-        // Output PDF after the bookmark is removed
-        const string outputPdf = "output_without_bookmark.pdf";
-        // Title of the bookmark to delete
-        const string bookmarkTitle = "Bookmark To Delete";
+        const string inputPdf  = "input.pdf";          // source PDF with bookmarks
+        const string outputPdf = "output.pdf";         // PDF after deletion
+        const string bookmarkTitle = "Bookmark To Delete"; // exact title of the bookmark to remove
 
         if (!File.Exists(inputPdf))
         {
@@ -20,36 +16,25 @@ class Program
             return;
         }
 
-        // ---------- Delete the specified bookmark ----------
-        PdfBookmarkEditor editor = new PdfBookmarkEditor();
-        editor.BindPdf(inputPdf);
-        // Delete the bookmark with the given title
-        editor.DeleteBookmarks(bookmarkTitle);
-        // Save the modified PDF
-        editor.Save(outputPdf);
-        // Release resources held by the facade
-        editor.Close();
-
-        // ---------- Verify removal by extracting remaining bookmarks ----------
-        PdfBookmarkEditor verifier = new PdfBookmarkEditor();
-        verifier.BindPdf(outputPdf);
-        // Extract all bookmarks from the updated document
-        Bookmarks remaining = verifier.ExtractBookmarks();
-
-        bool found = false;
-        Console.WriteLine("Remaining bookmarks after deletion:");
-        foreach (Bookmark bm in remaining)
+        // Delete the specified bookmark and save the result
+        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
         {
-            Console.WriteLine($"- {bm.Title}");
-            if (string.Equals(bm.Title, bookmarkTitle, StringComparison.OrdinalIgnoreCase))
-                found = true;
+            editor.BindPdf(inputPdf);
+            editor.DeleteBookmarks(bookmarkTitle);   // remove bookmark by title
+            editor.Save(outputPdf);
         }
 
-        if (found)
-            Console.WriteLine($"Error: Bookmark \"{bookmarkTitle}\" was not removed.");
-        else
-            Console.WriteLine($"Success: Bookmark \"{bookmarkTitle}\" has been removed.");
+        // Verify that the bookmark has been removed by extracting remaining bookmarks
+        using (PdfBookmarkEditor verifier = new PdfBookmarkEditor())
+        {
+            verifier.BindPdf(outputPdf);
+            var remaining = verifier.ExtractBookmarks(); // get all bookmarks
 
-        verifier.Close();
+            Console.WriteLine("Remaining bookmarks after deletion:");
+            foreach (Bookmark bm in remaining)
+            {
+                Console.WriteLine($"- Title: {bm.Title}, Page: {bm.PageNumber}");
+            }
+        }
     }
 }

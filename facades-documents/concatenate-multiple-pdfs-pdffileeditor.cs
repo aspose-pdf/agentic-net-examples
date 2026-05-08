@@ -6,19 +6,21 @@ class Program
 {
     static void Main()
     {
-        // Input PDF files to be concatenated
+        // Input PDF files – ensure they exist before proceeding
         const string firstPdf  = "file1.pdf";
         const string secondPdf = "file2.pdf";
         const string thirdPdf  = "file3.pdf";
 
-        // Temporary file for the first concatenation step
+        // Intermediate file used for the first concatenation step
         const string tempPdf   = "temp_concat.pdf";
 
-        // Final output file
+        // Final merged output
         const string outputPdf = "merged.pdf";
 
-        // Verify that all source files exist
-        if (!File.Exists(firstPdf)  || !File.Exists(secondPdf) || !File.Exists(thirdPdf))
+        // Verify input files are present
+        if (!File.Exists(firstPdf)  ||
+            !File.Exists(secondPdf) ||
+            !File.Exists(thirdPdf))
         {
             Console.Error.WriteLine("One or more input PDF files were not found.");
             return;
@@ -26,32 +28,32 @@ class Program
 
         try
         {
-            // Create the PdfFileEditor instance (does not implement IDisposable)
+            // Create the PdfFileEditor facade (no IDisposable implementation)
             PdfFileEditor editor = new PdfFileEditor();
 
-            // First concatenation: file1 + file2 -> tempPdf
-            bool firstResult = editor.Concatenate(firstPdf, secondPdf, tempPdf);
-            if (!firstResult)
+            // Step 1: concatenate the first two PDFs into a temporary file
+            bool firstStep = editor.Concatenate(firstPdf, secondPdf, tempPdf);
+            if (!firstStep)
             {
                 Console.Error.WriteLine("Failed to concatenate the first two PDFs.");
                 return;
             }
 
-            // Second concatenation: tempPdf + file3 -> outputPdf
-            bool secondResult = editor.Concatenate(tempPdf, thirdPdf, outputPdf);
-            if (!secondResult)
+            // Step 2: concatenate the temporary file with the third PDF into the final output
+            bool secondStep = editor.Concatenate(tempPdf, thirdPdf, outputPdf);
+            if (!secondStep)
             {
-                Console.Error.WriteLine("Failed to concatenate the temporary PDF with the third PDF.");
+                Console.Error.WriteLine("Failed to concatenate the third PDF.");
                 return;
             }
 
-            // Optional: clean up the temporary file
+            // Optional cleanup of the intermediate file
             if (File.Exists(tempPdf))
             {
                 File.Delete(tempPdf);
             }
 
-            Console.WriteLine($"Successfully concatenated PDFs into '{outputPdf}'.");
+            Console.WriteLine($"Successfully merged PDFs into '{outputPdf}'.");
         }
         catch (Exception ex)
         {

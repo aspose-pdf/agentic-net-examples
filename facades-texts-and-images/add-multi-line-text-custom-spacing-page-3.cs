@@ -1,13 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,42 +17,43 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Load the PDF using the Facades API
+        using (PdfFileMend mend = new PdfFileMend())
         {
-            // Ensure the document has at least three pages
+            mend.BindPdf(inputPath);               // initialize facade with source PDF
+            Document doc = mend.Document;          // underlying Document object
+
+            // Verify that page 3 exists (Aspose.Pdf uses 1‑based indexing)
             if (doc.Pages.Count < 3)
             {
-                Console.Error.WriteLine("The document does not contain a third page.");
+                Console.Error.WriteLine("The document has fewer than 3 pages.");
                 return;
             }
 
-            // Get page three (1‑based indexing)
-            Page page = doc.Pages[3];
+            Page page = doc.Pages[3];              // target page
 
             // Create a multi‑line text paragraph
             TextParagraph paragraph = new TextParagraph();
 
-            // Position the paragraph at the left margin.
-            // Rectangle(left, bottom, right, top) – using fully qualified type to avoid ambiguity.
-            paragraph.Rectangle = new Aspose.Pdf.Rectangle(50, 700, 300, 800);
+            // Position the paragraph at the left margin (adjust coordinates as needed)
+            paragraph.Rectangle = new Aspose.Pdf.Rectangle(0, 500, 150, 700);
 
-            // Optional: enable word wrapping
+            // Optional: enable word‑wrap
             paragraph.FormattingOptions.WrapMode = TextFormattingOptions.WordWrapMode.ByWords;
 
-            // Append lines with custom line spacing (additional spacing after each line)
-            paragraph.AppendLine("First line of the block", 5f);   // 5 points extra spacing
-            paragraph.AppendLine("Second line with more space", 10f);
+            // Append lines with custom additional line spacing (in points)
+            paragraph.AppendLine("First line of text", 5f);
+            paragraph.AppendLine("Second line with extra spacing", 10f);
             paragraph.AppendLine("Third line", 5f);
 
-            // Add the paragraph to the page using TextBuilder
+            // Add the paragraph to the page
             TextBuilder builder = new TextBuilder(page);
             builder.AppendParagraph(paragraph);
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            // Save the modified PDF via the facade
+            mend.Save(outputPath);
         }
 
-        Console.WriteLine($"Multi‑line text added to page 3 and saved as '{outputPath}'.");
+        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }
 }

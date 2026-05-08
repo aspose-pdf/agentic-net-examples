@@ -7,11 +7,10 @@ class Program
 {
     static void Main()
     {
-        const string sourcePdfPath = "source.pdf";   // PDF containing the XMP metadata
+        const string sourcePdfPath = "source.pdf";   // PDF to copy XMP metadata from
         const string targetPdfPath = "target.pdf";   // PDF that will receive the metadata
-        const string outputPdfPath = "merged.pdf";   // Resulting PDF after pages are merged
+        const string outputPdfPath = "merged_output.pdf";
 
-        // Verify that input files exist
         if (!File.Exists(sourcePdfPath))
         {
             Console.Error.WriteLine($"Source file not found: {sourcePdfPath}");
@@ -23,34 +22,38 @@ class Program
             return;
         }
 
-        // Extract XMP metadata from the source PDF
-        byte[] xmpData;
-        using (var xmpFacade = new PdfXmpMetadata())
+        try
         {
-            xmpFacade.BindPdf(sourcePdfPath);
-            xmpData = xmpFacade.GetXmpMetadata();
-        }
-
-        // Load the target PDF, apply the extracted XMP metadata, then merge pages
-        using (Document targetDoc = new Document(targetPdfPath))
-        {
-            // Apply XMP metadata to the target document
-            using (MemoryStream xmpStream = new MemoryStream(xmpData))
+            // ----- Extract XMP metadata from source PDF -----
+            byte[] xmpBytes;
+            using (PdfXmpMetadata xmp = new PdfXmpMetadata())
             {
-                targetDoc.SetXmpMetadata(xmpStream);
+                xmp.BindPdf(sourcePdfPath);
+                xmpBytes = xmp.GetXmpMetadata(); // returns the whole XMP packet as byte[]
             }
 
-            // Load the source PDF (pages to be merged) – separate instance to avoid disposing the earlier one
+            // ----- Load target PDF, apply XMP metadata, then merge pages -----
+            using (Document targetDoc = new Document(targetPdfPath))
             using (Document sourceDoc = new Document(sourcePdfPath))
             {
-                // Append all pages from the source PDF to the target PDF
+                // Apply extracted XMP metadata to the target document
+                using (MemoryStream xmpStream = new MemoryStream(xmpBytes))
+                {
+                    targetDoc.SetXmpMetadata(xmpStream);
+                }
+
+                // Merge pages from source into target (pages are 1‑based, Add works with collections)
                 targetDoc.Pages.Add(sourceDoc.Pages);
+
+                // Save the merged document with the transferred metadata
+                targetDoc.Save(outputPdfPath);
             }
 
-            // Save the merged document with the transferred XMP metadata
-            targetDoc.Save(outputPdfPath);
+            Console.WriteLine($"Merged PDF saved to '{outputPdfPath}'.");
         }
-
-        Console.WriteLine($"Merged PDF saved to '{outputPdfPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -16,19 +16,19 @@ class Program
             return;
         }
 
-        // Load the PDF, modify viewer preferences, and save.
+        // Edit PDF viewer preferences using PdfContentEditor (facade API)
         using (PdfContentEditor editor = new PdfContentEditor())
         {
-            // Bind the source PDF file.
+            // Load the source PDF
             editor.BindPdf(inputPath);
 
-            // Hide the toolbar when the document is opened.
+            // Hide the toolbar when the document is opened
             editor.ChangeViewerPreference(ViewerPreference.HideToolbar);
 
-            // Save the updated PDF.
+            // Persist the changes
             editor.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with hidden toolbar saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with hidden toolbar: '{outputPath}'.");
     }
 }

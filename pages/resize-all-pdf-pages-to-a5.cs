@@ -6,27 +6,28 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output_a5.pdf";
 
+        // Verify the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (using ensures proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based; iterate through all pages
+            // Pages are 1‑based; iterate through each page
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
-                // Resize each page to A5 dimensions
+                // Resize the current page to A5 dimensions
                 page.Resize(PageSize.A5);
             }
 
-            // Save the resized PDF
+            // Save the resized document
             doc.Save(outputPath);
         }
 

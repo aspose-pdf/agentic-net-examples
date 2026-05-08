@@ -15,39 +15,27 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Access the AcroForm of the document
+            // Get the AcroForm object
             Form form = doc.Form;
 
-            // If the document has no AcroForm fields, report and exit
+            // Check if the document contains any form fields
             if (form.Count == 0)
             {
-                Console.WriteLine("No AcroForm fields found in the document.");
+                Console.WriteLine("No form fields found in the document.");
                 return;
             }
 
-            Console.WriteLine("AcroForm field names:");
-            // Enumerate fields via the Fields property (returns Field[])
+            Console.WriteLine("Form field names:");
+
+            // Enumerate all fields and output their names
             foreach (Field field in form.Fields)
             {
-                // The Name property holds the field's identifier
-                Console.WriteLine($"- {field.Name}");
-            }
-
-            // If the document also contains an XFA form, list its field names
-            if (form.HasXfa)
-            {
-                string[] xfaNames = form.XFA.FieldNames;
-                if (xfaNames != null && xfaNames.Length > 0)
-                {
-                    Console.WriteLine("\nXFA field names:");
-                    foreach (string name in xfaNames)
-                    {
-                        Console.WriteLine($"- {name}");
-                    }
-                }
+                // Prefer the short Name; fall back to FullName if Name is empty
+                string fieldName = !string.IsNullOrEmpty(field.Name) ? field.Name : field.FullName;
+                Console.WriteLine($"- {fieldName}");
             }
         }
     }

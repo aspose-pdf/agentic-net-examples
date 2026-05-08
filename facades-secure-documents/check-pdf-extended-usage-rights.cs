@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -15,20 +14,15 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Initialize the PdfFileSignature facade and bind the PDF file
+        using (PdfFileSignature signature = new PdfFileSignature())
         {
-            // Initialize the signature facade
-            using (PdfFileSignature signature = new PdfFileSignature())
-            {
-                // Bind the document to the facade
-                signature.BindPdf(doc);
+            signature.BindPdf(inputPath);
 
-                // Detect extended usage rights
-                bool hasUsageRights = signature.ContainsUsageRights();
+            // Detect whether the PDF contains extended usage rights
+            bool hasUsageRights = signature.ContainsUsageRights();
 
-                Console.WriteLine($"Extended usage rights present: {hasUsageRights}");
-            }
+            Console.WriteLine($"Extended usage rights present: {hasUsageRights}");
         }
     }
 }

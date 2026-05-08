@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Linq;
+using System.Text;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Text;
@@ -8,49 +10,63 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output.pdf";
 
-        // Footer text that should wrap word‑by‑word.
-        const string footerText = "This is a sample footer text that should wrap word by word across the page width.";
-
-        // Margins control where the footer is placed and how wide the text area is.
-        const float bottomMargin = 20f;   // distance from the bottom edge
-        const float leftMargin   = 50f;   // left inset for wrapping
-        const float rightMargin  = 50f;   // right inset for wrapping
-
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Create a FormattedText object with desired styling.
-        // Constructor: (text, System.Drawing.Color, fontName, EncodingType, isEmbedded, fontSize)
-        FormattedText formattedFooter = new FormattedText(
-            footerText,
-            System.Drawing.Color.DarkGray,
-            "Helvetica",
-            EncodingType.Winansi,
-            false,
-            10);
-
-        // Use PdfFileStamp (Facade) to add the footer to every page.
-        using (PdfFileStamp stamp = new PdfFileStamp())
+        // Bind the source PDF to the facade
+        using (PdfFileMend mend = new PdfFileMend())
         {
-            // Load the source PDF.
-            stamp.BindPdf(inputPath);
+            mend.BindPdf(inputPdf);
 
-            // Add the footer. The left/right margins cause the text to wrap automatically.
-            stamp.AddFooter(formattedFooter, bottomMargin, leftMargin, rightMargin);
+            // Enable word‑by‑word wrapping for AddText operations
+            mend.IsWordWrap = true;
 
-            // Save the modified document.
-            stamp.Save(outputPath);
+            // Create formatted text (uses System.Drawing.Color for the constructor)
+            FormattedText footerText = new FormattedText(
+                "This is a sample footer that will wrap word by word across the page width.",
+                System.Drawing.Color.DarkGray,
+                "Helvetica",
+                EncodingType.Winansi,
+                false,
+                10); // font size
 
-            // Close releases internal resources (optional because of using).
-            stamp.Close();
+            // Determine page dimensions (assume all pages have the same size)
+            // Use the first page as a reference
+            using (Document tempDoc = new Document(inputPdf))
+            {
+                // PageInfo.Width and Height are double – cast to float for PdfFileMend.AddText
+                float pageWidth  = (float)tempDoc.Pages[1].PageInfo.Width;
+                float pageHeight = (float)tempDoc.Pages[1].PageInfo.Height;
+
+                // Define footer rectangle (bottom margin of 20 units, left/right margins of 30 units)
+                float leftMargin   = 30f;
+                float rightMargin  = 30f;
+                float bottomMargin = 20f;
+                float footerHeight = 40f; // enough height for wrapped text
+
+                float lowerLeftX = leftMargin;
+                float lowerLeftY = bottomMargin;
+                float upperRightX = pageWidth - rightMargin;
+                float upperRightY = bottomMargin + footerHeight;
+
+                // Build an array with all page numbers (1‑based indexing)
+                int[] allPages = Enumerable.Range(1, tempDoc.Pages.Count).ToArray();
+
+                // Add the formatted footer text to every page within the defined rectangle
+                mend.AddText(footerText, allPages, lowerLeftX, lowerLeftY, upperRightX, upperRightY);
+            }
+
+            // Save the modified PDF
+            mend.Save(outputPdf);
+            mend.Close();
         }
 
-        Console.WriteLine($"Footer added and saved to '{outputPath}'.");
+        Console.WriteLine($"Footer added to all pages: {outputPdf}");
     }
 }

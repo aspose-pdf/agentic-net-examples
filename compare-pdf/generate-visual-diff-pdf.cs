@@ -3,7 +3,7 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Comparison;
 
-class Program
+class VisualDiffGenerator
 {
     static void Main()
     {
@@ -11,28 +11,42 @@ class Program
         const string secondPdfPath = "second.pdf";
         const string resultPdfPath = "visual_diff.pdf";
 
-        // Verify that both source files exist
-        if (!File.Exists(firstPdfPath) || !File.Exists(secondPdfPath))
+        // Verify input files exist
+        if (!File.Exists(firstPdfPath))
         {
-            Console.Error.WriteLine("One or both input PDF files were not found.");
+            Console.Error.WriteLine($"File not found: {firstPdfPath}");
+            return;
+        }
+        if (!File.Exists(secondPdfPath))
+        {
+            Console.Error.WriteLine($"File not found: {secondPdfPath}");
             return;
         }
 
-        // Load the two documents inside using blocks for deterministic disposal
-        using (Document doc1 = new Document(firstPdfPath))
-        using (Document doc2 = new Document(secondPdfPath))
+        try
         {
-            // Create the comparer instance
-            GraphicalPdfComparer comparer = new GraphicalPdfComparer();
+            // Load the two documents inside using blocks (lifecycle rule)
+            using (Document doc1 = new Document(firstPdfPath))
+            using (Document doc2 = new Document(secondPdfPath))
+            {
+                // Create the comparer (default constructor)
+                GraphicalPdfComparer comparer = new GraphicalPdfComparer();
 
-            // Optional: customize comparison appearance
-            // comparer.Color = Aspose.Pdf.Color.Red;      // change flag color
-            // comparer.Threshold = 5;                     // ignore changes <5%
+                // Perform graphical comparison and save the result PDF
+                comparer.CompareDocumentsToPdf(doc1, doc2, resultPdfPath);
+            }
 
-            // Perform the visual comparison and generate the result PDF
-            comparer.CompareDocumentsToPdf(doc1, doc2, resultPdfPath);
+            Console.WriteLine($"Visual diff PDF created at '{resultPdfPath}'.");
         }
-
-        Console.WriteLine($"Visual diff PDF created at '{resultPdfPath}'.");
+        catch (ArgumentException ex)
+        {
+            // Thrown if pages have different sizes or result path is invalid
+            Console.Error.WriteLine($"Argument error: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            // General error handling
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

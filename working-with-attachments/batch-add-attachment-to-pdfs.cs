@@ -6,61 +6,49 @@ class BatchAttachmentProcessor
 {
     static void Main()
     {
-        // Input folder containing PDFs to process
+        // Folder containing source PDFs
         const string inputFolder = @"C:\PdfInput";
-        // Output folder where processed PDFs will be saved
+        // Folder where processed PDFs will be saved
         const string outputFolder = @"C:\PdfOutput";
-        // Path to the file that will be attached to every PDF
-        const string attachmentPath = @"C:\Attachments\sample.txt";
+        // Path to the file that will be attached to each PDF
+        const string attachmentPath = @"C:\Attachment\attachment.pdf";
 
-        // Validate paths
-        if (!Directory.Exists(inputFolder))
-        {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
-            return;
-        }
-
-        if (!File.Exists(attachmentPath))
-        {
-            Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
-            return;
-        }
-
-        // Ensure output folder exists
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Get all PDF files in the input folder (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-
-        foreach (string pdfPath in pdfFiles)
+        // Verify the attachment file exists
+        if (!File.Exists(attachmentPath))
         {
-            // Determine output file name (same name, different folder)
-            string outputPath = Path.Combine(outputFolder, Path.GetFileName(pdfPath));
+            Console.Error.WriteLine($"Attachment not found: {attachmentPath}");
+            return;
+        }
+
+        // Process each PDF file in the input folder
+        foreach (string pdfFile in Directory.GetFiles(inputFolder, "*.pdf"))
+        {
+            string fileName = Path.GetFileName(pdfFile);
+            string outputPath = Path.Combine(outputFolder, fileName);
 
             try
             {
                 // Load the PDF document inside a using block for deterministic disposal
-                using (Document doc = new Document(pdfPath))
+                using (Document doc = new Document(pdfFile))
                 {
-                    // Create a FileSpecification for the attachment.
-                    // The constructor takes the name that will appear in the PDF and a description.
-                    var fileSpec = new FileSpecification(Path.GetFileName(attachmentPath), "Attachment");
+                    // Create a file specification for the attachment using the constructor
+                    FileSpecification attachmentSpec = new FileSpecification(attachmentPath, "Embedded attachment");
 
-                    // Load the attachment bytes into a MemoryStream and assign it to the Contents property.
-                    fileSpec.Contents = new MemoryStream(File.ReadAllBytes(attachmentPath));
+                    // Add the attachment to the document's EmbeddedFiles collection
+                    doc.EmbeddedFiles.Add(attachmentSpec);
 
-                    // Add the file specification to the EmbeddedFiles collection.
-                    doc.EmbeddedFiles.Add(fileSpec);
-
-                    // Save the modified PDF to the output location
+                    // Save the modified PDF to the output folder
                     doc.Save(outputPath);
                 }
 
-                Console.WriteLine($"Processed: {Path.GetFileName(pdfPath)} → {outputPath}");
+                Console.WriteLine($"Processed: {fileName}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{fileName}': {ex.Message}");
             }
         }
 

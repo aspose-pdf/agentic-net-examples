@@ -17,29 +17,25 @@ class Program
         }
 
         // Load the PDF document
-        Document doc = new Document(inputPath);
-
-        // Text to replace
-        const string oldText = "Confidential";
-        const string newText = "Public";
-
-        // Use TextFragmentAbsorber to find all occurrences of the old text
-        TextFragmentAbsorber absorber = new TextFragmentAbsorber(oldText);
-        // Configure search options (case‑sensitive in this example; adjust as needed)
-        // TextSearchOptions does not have a parameterless constructor; use the constructor that accepts the case‑sensitive flag.
-        absorber.TextSearchOptions = new TextSearchOptions(true);
-
-        // Search the whole document
-        doc.Pages.Accept(absorber);
-
-        // Replace each found fragment with the new text
-        foreach (TextFragment fragment in absorber.TextFragments)
+        using (Document doc = new Document(inputPath))
         {
-            fragment.Text = newText;
-        }
+            // Create an absorber that finds the text to be replaced
+            TextFragmentAbsorber absorber = new TextFragmentAbsorber("Confidential");
+            // Configure search options (case‑insensitive in this example)
+            absorber.TextSearchOptions = new TextSearchOptions(false);
 
-        // Save the modified document
-        doc.Save(outputPath);
+            // Search all pages
+            doc.Pages.Accept(absorber);
+
+            // Replace each found fragment with the new text
+            foreach (TextFragment fragment in absorber.TextFragments)
+            {
+                fragment.Text = "Public";
+            }
+
+            // Save the modified document
+            doc.Save(outputPath);
+        }
 
         Console.WriteLine($"All occurrences replaced. Saved to '{outputPath}'.");
     }

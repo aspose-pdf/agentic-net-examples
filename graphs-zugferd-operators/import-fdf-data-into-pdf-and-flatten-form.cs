@@ -7,9 +7,9 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";   // PDF with form fields
-        const string fdfPath = "data.fdf";    // FDF containing field values
-        const string outputPath = "output.pdf";
+        const string pdfPath   = "input.pdf";   // PDF with form fields
+        const string fdfPath   = "data.fdf";    // FDF containing field values
+        const string outputPath = "filled_flattened.pdf";
 
         // Verify input files exist
         if (!File.Exists(pdfPath) || !File.Exists(fdfPath))
@@ -18,22 +18,22 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(pdfPath))
         {
-            // Import field values (and any annotations) from the FDF stream
+            // Import field values (and any associated annotations) from the FDF stream
             using (FileStream fdfStream = File.OpenRead(fdfPath))
             {
                 FdfReader.ReadAnnotations(fdfStream, doc);
             }
 
-            // Flatten the form so fields become static content and cannot be edited
+            // Flatten the form so that field values become part of the page content
             doc.Form.Flatten();
 
-            // Save the modified PDF (lifecycle rule: use Save without extra options)
+            // Save the resulting PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Form data imported and flattened. Saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with imported data saved to '{outputPath}'.");
     }
 }

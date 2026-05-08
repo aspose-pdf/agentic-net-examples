@@ -21,20 +21,18 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf;` (28/28 files) ← category-specific
-- `using Aspose.Pdf.Comparison;` (28/28 files) ← category-specific
-- `using Aspose.Pdf.Annotations;` (2/28 files)
-- `using Aspose.Pdf.Forms;` (1/28 files)
-- `using Aspose.Pdf.Text;` (1/28 files)
-- `using System;` (28/28 files)
-- `using System.IO;` (26/28 files)
-- `using System.Collections.Generic;` (12/28 files)
-- `using System.Threading.Tasks;` (2/28 files)
-- `using System.Drawing;` (1/28 files)
-- `using System.Drawing.Imaging;` (1/28 files)
-- `using System.IO.Compression;` (1/28 files)
-- `using System.Reflection;` (1/28 files)
-- `using System.Threading;` (1/28 files)
+- `using Aspose.Pdf;` (27/27 files) ← category-specific
+- `using Aspose.Pdf.Comparison;` (27/27 files) ← category-specific
+- `using Aspose.Pdf.Annotations;` (2/27 files)
+- `using Aspose.Pdf.Text;` (2/27 files)
+- `using Aspose.Pdf.Forms;` (1/27 files)
+- `using System;` (27/27 files)
+- `using System.IO;` (26/27 files)
+- `using System.Collections.Generic;` (11/27 files)
+- `using System.Threading.Tasks;` (2/27 files)
+- `using System.Collections.Concurrent;` (1/27 files)
+- `using System.Drawing.Imaging;` (1/27 files)
+- `using System.IO.Compression;` (1/27 files)
 
 ## Common Code Pattern
 
@@ -51,37 +49,36 @@ using (Document doc = new Document("input.pdf"))
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [compare-encrypted-pdfs-with-passwords](./compare-encrypted-pdfs-with-passwords.cs) | Compare Encrypted PDFs with Passwords | `Document`, `ComparisonOptions`, `CompareFlatDocuments` | Shows how to open password‑protected PDF files and compare them using flat text and side‑by‑side ... |
-| [compare-pdf-form-fields-diff](./compare-pdf-form-fields-diff.cs) | Compare PDFs Including Form Field Values | `Document`, `ComparisonOptions`, `CompareDocumentsPageByPage` | Loads two PDF documents, sets ComparisonOptions to include form field values, and generates a dif... |
-| [compare-pdf-text-compression](./compare-pdf-text-compression.cs) | Compare PDF Text with Different Compression Settings | `Document`, `ComparisonOptions`, `CompareFlatDocuments` | Shows how to compare two PDFs that have identical logical content but different compression, usin... |
-| [compare-pdfs-case-insensitive](./compare-pdfs-case-insensitive.cs) | Compare PDFs with Case‑Insensitive Text Comparison | `Document`, `ComparisonOptions`, `CompareFlatDocuments` | Demonstrates how to compare two PDF documents using Aspose.Pdf while attempting to ignore case di... |
-| [compare-pdfs-detect-font-differences](./compare-pdfs-detect-font-differences.cs) | Compare PDFs and Detect Font Differences | `Document`, `ComparisonOptions`, `CompareDocumentsPageByPage` | Demonstrates how to compare two PDF files with Aspose.Pdf, generate a visual diff PDF, and count ... |
-| [compare-pdfs-different-page-sizes](./compare-pdfs-different-page-sizes.cs) | Compare PDFs with Different Page Sizes Side‑by‑Side | `Document`, `SideBySideComparisonOptions`, `Compare` | Demonstrates how to compare two PDF documents that have different page dimensions using Aspose.Pd... |
-| [compare-pdfs-excluding-footer-areas](./compare-pdfs-excluding-footer-areas.cs) | Compare PDFs While Excluding Footer Regions | `Document`, `Rectangle`, `SideBySideComparisonOptions` | Demonstrates how to perform a side‑by‑side PDF comparison with Aspose.Pdf while excluding footers... |
-| [compare-pdfs-from-streams-to-diff-stream](./compare-pdfs-from-streams-to-diff-stream.cs) | Compare PDFs from Streams and Write Diff to Stream | `Document`, `Page`, `GraphicalPdfComparer` | Demonstrates loading two PDF files from in‑memory streams, comparing them page‑by‑page with Aspos... |
-| [compare-pdfs-generate-difference-pdf](./compare-pdfs-generate-difference-pdf.cs) | Flat PDF Comparison with Difference Report | `Document`, `ComparisonOptions`, `CompareFlatDocuments` | Shows how to compare two PDF files using Aspose.Pdf's TextPdfComparer, detect changes, and save a... |
-| [compare-pdfs-ignore-signature-fields](./compare-pdfs-ignore-signature-fields.cs) | Compare PDFs While Ignoring Signature Fields | `Document`, `ComparisonOptions`, `CompareDocumentsPageByPage` | Shows how to compare two PDF documents with Aspose.Pdf and exclude the rectangular areas of digit... |
-| [compare-pdfs-log-differences](./compare-pdfs-log-differences.cs) | Compare Two PDFs and Log Differences | `Document`, `ComparisonOptions`, `CompareDocumentsPageByPage` | Demonstrates how to compare two PDF documents page‑by‑page using Aspose.Pdf and write each diff o... |
-| [compare-pdfs-page-by-page-diff](./compare-pdfs-page-by-page-diff.cs) | Compare PDFs Page by Page and Generate Diff PDF | `Document`, `ComparisonOptions`, `CompareDocumentsPageByPage` | Shows how to compare two PDF documents page by page using Aspose.Pdf's default ComparisonOptions ... |
-| [compare-pdfs-unicode-text-differences](./compare-pdfs-unicode-text-differences.cs) | Detect Unicode Text Differences Between PDFs | `Document`, `ComparisonOptions`, `CompareFlatDocuments` | Loads two PDF files with different language encodings, performs a flat text comparison using Aspo... |
-| [compare-selected-pdf-pages-side-by-side](./compare-selected-pdf-pages-side-by-side.cs) | Compare Selected PDF Pages Side‑by‑Side | `Document`, `Compare`, `SideBySideComparisonOptions` | Demonstrates how to compare specific pages of two PDFs using Aspose.Pdf by extracting the desired... |
-| [compare-specific-page-range-of-two-pdfs](./compare-specific-page-range-of-two-pdfs.cs) | Compare Specific Page Range of Two PDFs | `Document`, `ComparePages`, `ComparisonOptions` | Loads two PDF files, sets a start and end page, and uses Aspose.Pdf's comparison API to detect te... |
-| [copy-pdf-metadata-to-diff-pdf](./copy-pdf-metadata-to-diff-pdf.cs) | Copy PDF Metadata to Comparison Diff PDF | `Document`, `Compare`, `SideBySideComparisonOptions` | Demonstrates how to compare two PDFs using Aspose.Pdf, generate a diff PDF, and then copy all pre... |
-| [exclude-annotations-from-pdf-comparison](./exclude-annotations-from-pdf-comparison.cs) | Exclude Annotations from PDF Comparison | `Document`, `Page`, `Annotation` | Shows how to gather annotation bounding rectangles from two PDFs and exclude those areas during a... |
-| [exclude-areas-pdf-comparison](./exclude-areas-pdf-comparison.cs) | Exclude Specific Areas in PDF Side‑by‑Side Comparison | `Document`, `Rectangle`, `SideBySideComparisonOptions` | Shows how to define rectangular regions to exclude from each PDF and perform a side‑by‑side compa... |
-| [extract-image-differences-between-pdfs](./extract-image-differences-between-pdfs.cs) | Extract Image Differences Between Two PDFs | `Document`, `Page`, `GraphicalPdfComparer` | Demonstrates how to compare pages of two PDF files using Aspose.Pdf's graphical comparer and save... |
-| [generate-diff-pdf-compare-documents](./generate-diff-pdf-compare-documents.cs) | Generate Diff PDF by Comparing Two Documents | `Document`, `GraphicalPdfComparer`, `CompareDocumentsToPdf` | Demonstrates how to compare two PDF files with Aspose.Pdf and create a diff PDF using GraphicalPd... |
-| [generate-diff-pdf-with-highlighted-changes](./generate-diff-pdf-with-highlighted-changes.cs) | Generate Diff PDF with Highlighted Text Changes | `Document`, `ComparisonOptions`, `CompareDocumentsPageByPage` | Demonstrates comparing two PDFs page‑by‑page, creating a diff PDF with default red/green highligh... |
-| [generate-json-diff-report-pdf-comparison](./generate-json-diff-report-pdf-comparison.cs) | Generate JSON Diff Report for PDF Comparison | `Document`, `ComparisonOptions`, `CompareDocumentsPageByPage` | This example compares two PDF documents page by page, enumerates text differences, and generates ... |
-| [generate-visual-diff-pdf](./generate-visual-diff-pdf.cs) | Generate Visual Diff PDF Using GraphicalPdfComparer | `Document`, `GraphicalPdfComparer`, `CompareDocumentsToPdf` | Shows how to compare two PDF documents visually and produce a diff PDF with Aspose.Pdf's Graphica... |
-| [multi-threaded-pdf-comparison](./multi-threaded-pdf-comparison.cs) | Multi-Threaded PDF Comparison Using Aspose.Pdf | `Document`, `Compare`, `SideBySideComparisonOptions` | Shows how to compare multiple PDF pairs concurrently by running each side‑by‑side comparison in i... |
-| [parallel-batch-pdf-comparison](./parallel-batch-pdf-comparison.cs) | Parallel Batch PDF Comparison with Limited Concurrency | `Document`, `ComparisonOptions`, `CompareFlatDocuments` | Shows how to compare a large batch of PDFs against a reference PDF in parallel while limiting the... |
-| [pdf-comparison-diff-images-zip](./pdf-comparison-diff-images-zip.cs) | Generate PDF Comparison Diff Images and Zip Archive | `Document`, `GraphicalPdfComparer`, `CompareDocumentsToImages` | Demonstrates how to compare two PDFs using Aspose.Pdf, export the visual differences as PNG image... |
-| [replace-changed-text-using-diffoperation](./replace-changed-text-using-diffoperation.cs) | Replace Changed Text in PDF Using DiffOperation | `Document`, `ComparePages`, `ComparisonOptions` | Demonstrates how to compare two PDFs, obtain DiffOperation objects, and replace the changed text ... |
-| [set-custom-tolerance-pdf-image-comparison](./set-custom-tolerance-pdf-image-comparison.cs) | Set Custom Tolerance for PDF Image Comparison | `Document`, `GraphicalPdfComparer`, `CompareDocumentsToImages` | Shows how to compare two PDFs that contain scanned images using Aspose.Pdf while applying a custo... |
+| [case-insensitive-pdf-text-comparison](./case-insensitive-pdf-text-comparison.cs) | Case‑Insensitive PDF Text Comparison | `Document`, `TextFragmentAbsorber`, `TextFragment` | Demonstrates how to perform a case‑insensitive comparison of two PDF files by normalizing all tex... |
+| [compare-encrypted-pdfs-side-by-side](./compare-encrypted-pdfs-side-by-side.cs) | Compare Encrypted PDFs Using Side‑by‑Side Comparison | `Document`, `Compare`, `SideBySideComparisonOptions` | The example opens two password‑protected PDF files by providing their passwords to the Document c... |
+| [compare-pdf-page-range](./compare-pdf-page-range.cs) | Compare Specific Page Range of Two PDFs | `Document`, `ComparisonOptions`, `ComparePages` | Loads two PDF files, validates a user‑defined page range, and uses Aspose.Pdf's comparison engine... |
+| [compare-pdfs-detect-font-changes](./compare-pdfs-detect-font-changes.cs) | Compare PDFs and Detect Font Changes | `Document`, `ComparisonOptions`, `CompareDocumentsPageByPage` | Shows how to use Aspose.Pdf's TextPdfComparer to compare two PDF documents page‑by‑page and repor... |
+| [compare-pdfs-excluding-digital-signature-fields](./compare-pdfs-excluding-digital-signature-fields.cs) | Compare PDFs Excluding Digital Signature Fields | `Document`, `Page`, `Annotation` | Demonstrates how to compare two PDF documents while treating digital signature fields as unchange... |
+| [compare-pdfs-excluding-footer-areas](./compare-pdfs-excluding-footer-areas.cs) | Compare PDFs While Excluding Footer Areas | `Document`, `Rectangle`, `SideBySideComparisonOptions` | Demonstrates how to compare two PDF documents side‑by‑side while excluding footer regions by defi... |
+| [compare-pdfs-including-form-field-values](./compare-pdfs-including-form-field-values.cs) | Compare PDFs Including Form Field Values | `Document`, `ComparisonOptions`, `TextPdfComparer` | Loads two PDF files, compares them page‑by‑page using Aspose.Pdf.Comparison, and saves a visual d... |
+| [compare-pdfs-log-differences](./compare-pdfs-log-differences.cs) | Compare PDFs and Log Differences by Page | `Document`, `ComparisonOptions`, `CompareDocumentsPageByPage` | Demonstrates how to compare two PDF documents page‑by‑page using Aspose.Pdf, extract the diff ope... |
+| [compare-pdfs-page-by-page-diff](./compare-pdfs-page-by-page-diff.cs) | Compare PDFs Page by Page and Generate Diff PDF | `Document`, `ComparisonOptions`, `CompareDocumentsPageByPage` | Demonstrates how to compare two PDF documents page by page using Aspose.Pdf's default ComparisonO... |
+| [compare-pdfs-text-diff-ignore-compression](./compare-pdfs-text-diff-ignore-compression.cs) | Compare PDFs Textually While Ignoring Compression | `Document`, `ComparisonOptions`, `CompareFlatDocuments` | Loads two PDFs with identical content but different compression settings and performs a flat text... |
+| [compare-pdfs-unicode-text](./compare-pdfs-unicode-text.cs) | Compare PDFs with Unicode Text Differences | `Document`, `ComparisonOptions`, `CompareFlatDocuments` | Demonstrates how to compare two PDF documents that use different language encodings, detect Unico... |
+| [compare-pdfs-with-excluded-areas](./compare-pdfs-with-excluded-areas.cs) | Compare PDFs with Excluded Areas | `Document`, `Rectangle`, `ComparisonOptions` | Demonstrates how to compare two PDF documents while excluding specific rectangular regions from e... |
+| [compare-selected-pdf-pages](./compare-selected-pdf-pages.cs) | Compare Selected PDF Pages | `Document`, `CompareDocumentsPageByPage`, `ComparisonOptions` | Demonstrates extracting specific pages from two PDFs and comparing them with Aspose.Pdf's TextPdf... |
+| [compare-two-pdfs-visual-difference](./compare-two-pdfs-visual-difference.cs) | Compare Two PDFs and Generate Visual Difference Report | `Document`, `ComparisonOptions`, `TextPdfComparer` | Demonstrates how to use Aspose.Pdf's comparison API to detect differences between two PDF files a... |
+| [copy-pdf-metadata-to-diff-document](./copy-pdf-metadata-to-diff-document.cs) | Copy PDF Metadata to Diff Document After Comparison | `Document`, `Compare`, `SideBySideComparisonOptions` | Demonstrates how to compare two PDFs with Aspose.Pdf, generate a diff PDF, and preserve the origi... |
+| [create-pdf-diff-using-comparedocuments-to-pdf](./create-pdf-diff-using-comparedocuments-to-pdf.cs) | Create Diff PDF Using CompareDocumentsToPdf | `Document`, `GraphicalPdfComparer`, `CompareDocumentsToPdf` | The example loads two PDF files, compares them with Aspose.Pdf.Comparison's GraphicalPdfComparer,... |
+| [exclude-annotations-from-pdf-comparison](./exclude-annotations-from-pdf-comparison.cs) | Exclude Annotations from PDF Comparison | `Document`, `Page`, `Annotation` | Shows how to gather annotation bounding rectangles from two PDFs and configure side‑by‑side compa... |
+| [generate-diff-pdf-with-highlighted-changes](./generate-diff-pdf-with-highlighted-changes.cs) | Generate Diff PDF with Highlighted Changes | `Document`, `GraphicalPdfComparer`, `Color` | Shows how to compare two PDFs using Aspose.Pdf's GraphicalPdfComparer to create a diff PDF with h... |
+| [generate-json-diff-report-pdf-comparison](./generate-json-diff-report-pdf-comparison.cs) | Generate JSON Diff Report for PDF Comparison | `Document`, `ComparisonOptions`, `CompareFlatDocuments` | Demonstrates how to compare two PDF files using Aspose.Pdf's TextPdfComparer, iterate over DiffOp... |
+| [generate-pdf-diff-images-zip](./generate-pdf-diff-images-zip.cs) | Generate PDF Diff Images and Zip Them | `Document`, `GraphicalPdfComparer`, `CompareDocumentsToImages` | Shows how to compare two PDF files with Aspose.Pdf, create visual diff images for each page, and ... |
+| [generate-visual-diff-pdf](./generate-visual-diff-pdf.cs) | Generate Visual Diff PDF Using GraphicalPdfComparer | `Document`, `GraphicalPdfComparer`, `CompareDocumentsToPdf` | Demonstrates how to compare two PDF files graphically and create a visual diff PDF with Aspose.Pd... |
+| [get-image-differences-between-pdf-pages](./get-image-differences-between-pdf-pages.cs) | Get Image Differences Between PDF Pages | `Document`, `Page`, `GraphicalPdfComparer` | Demonstrates how to compare corresponding pages of two PDF documents and retrieve the pixel‑level... |
+| [parallel-batch-pdf-comparison](./parallel-batch-pdf-comparison.cs) | Parallel Batch PDF Comparison with Concurrency Limit | `Document`, `ComparisonOptions`, `TextPdfComparer` | Demonstrates comparing multiple PDFs against a reference document in parallel while restricting t... |
+| [parallel-pdf-comparison](./parallel-pdf-comparison.cs) | Parallel PDF Comparison with Aspose.Pdf | `Document`, `SideBySidePdfComparer`, `SideBySideComparisonOptions` | Demonstrates how to compare multiple pairs of PDF files concurrently using Aspose.Pdf's side‑by‑s... |
+| [replace-inserted-text-using-diffoperation](./replace-inserted-text-using-diffoperation.cs) | Replace Inserted Text in PDF Using DiffOperation | `Document`, `Page`, `ComparisonOptions` | The example loads two PDFs, compares each page with TextPdfComparer to find insert operations, an... |
+| [set-custom-image-similarity-tolerance](./set-custom-image-similarity-tolerance.cs) | Set Custom Image Similarity Tolerance for PDF Comparison | `Document`, `GraphicalPdfComparer`, `CompareDocumentsToPdf` | Demonstrates how to compare two scanned‑image PDFs using Aspose.Pdf's GraphicalPdfComparer while ... |
+| [side-by-side-pdf-comparison](./side-by-side-pdf-comparison.cs) | Side‑by‑Side PDF Comparison with Page Size Alignment | `Document`, `SideBySideComparisonOptions`, `AdditionalChangeMarks` | Demonstrates comparing two PDFs that have different page sizes using Aspose.Pdf's side‑by‑side co... |
 
 ## Category Statistics
-- Total examples: 28
+- Total examples: 27
 
 ## Category-Specific Tips
 
@@ -118,5 +115,5 @@ using (Document doc = new Document("input.pdf"))
 - Review code examples in this folder for compare-pdf patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-04-10 | Run: `20260410_111705_7ee31f`
+Updated: 2026-05-08 | Run: `20260508_152858_8cb8c4`
 <!-- AUTOGENERATED:END -->

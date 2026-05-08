@@ -8,12 +8,12 @@ class Program
     {
         // Input PDF file path
         const string inputPath = "input.pdf";
-        // Desired end page (inclusive) for the split operation
+        // Output PDF file path (front part of the split)
+        const string outputPath = "output.pdf";
+        // Page number up to which the PDF will be split (inclusive)
         const int endPage = 5;
-        // Output PDF file path (front part from page 1 to endPage)
-        const string outputPath = "output_split.pdf";
 
-        // Validate input file existence
+        // Verify that the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
@@ -22,11 +22,10 @@ class Program
 
         try
         {
-            // PdfFileEditor does NOT implement IDisposable, so no using block is required
+            // PdfFileEditor does NOT implement IDisposable; do NOT wrap in using
             PdfFileEditor editor = new PdfFileEditor();
 
-            // SplitFromFirst splits the PDF from the first page up to the specified location
-            // and saves the front part as a new file.
+            // Split from the first page to the specified end page and save the front part
             bool success = editor.SplitFromFirst(inputPath, endPage, outputPath);
 
             if (success)
@@ -36,7 +35,8 @@ class Program
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during split: {ex.Message}");
+            // Handle any unexpected errors
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

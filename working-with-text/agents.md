@@ -21,18 +21,19 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf;` (75/75 files) ← category-specific
-- `using Aspose.Pdf.Text;` (72/75 files) ← category-specific
-- `using Aspose.Pdf.Annotations;` (5/75 files)
-- `using Aspose.Pdf.Forms;` (3/75 files)
-- `using Aspose.Pdf.Drawing;` (2/75 files)
-- `using System;` (75/75 files)
-- `using System.IO;` (69/75 files)
-- `using System.Collections.Generic;` (6/75 files)
-- `using System.Text.RegularExpressions;` (4/75 files)
-- `using System.Linq;` (1/75 files)
-- `using System.Text;` (1/75 files)
-- `using System.Text.Json;` (1/75 files)
+- `using Aspose.Pdf;` (72/72 files) ← category-specific
+- `using Aspose.Pdf.Text;` (69/72 files) ← category-specific
+- `using Aspose.Pdf.Annotations;` (7/72 files)
+- `using Aspose.Pdf.Drawing;` (2/72 files)
+- `using Aspose.Pdf.Forms;` (2/72 files)
+- `using System;` (72/72 files)
+- `using System.IO;` (63/72 files)
+- `using System.Runtime.InteropServices;` (10/72 files)
+- `using System.Collections.Generic;` (8/72 files)
+- `using System.Text.RegularExpressions;` (4/72 files)
+- `using System.Linq;` (3/72 files)
+- `using System.Text;` (1/72 files)
+- `using System.Text.Json;` (1/72 files)
 
 ## Common Code Pattern
 
@@ -50,40 +51,40 @@ using (Document doc = new Document("input.pdf"))
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [add-clickable-hyperlink-text-to-pdf](./add-clickable-hyperlink-text-to-pdf.cs) | Add Clickable Hyperlink Text to PDF | `Document`, `Save`, `Page` | Demonstrates how to insert a text segment with a web hyperlink into an existing PDF using Aspose.... |
-| [add-footnote-with-table-to-pdf](./add-footnote-with-table-to-pdf.cs) | Add Footnote with Table to PDF | `Document`, `Page`, `TextFragment` | Shows how to create a 2×2 table inside a footnote and attach it to a text fragment in an existing... |
-| [add-header-to-all-pdf-pages](./add-header-to-all-pdf-pages.cs) | Add Header to All PDF Pages | `Document`, `Save`, `Page` | Shows how to iterate through a PDF document's pages and add a centered header text to each page u... |
-| [add-invisible-tooltip-button-over-text](./add-invisible-tooltip-button-over-text.cs) | Add Invisible Tooltip Button Over Specific Text in PDF | `Document`, `TextFragmentAbsorber`, `TextFragment` | Shows how to locate a text fragment in a PDF and overlay an invisible button field that displays ... |
-| [add-page-number-footer-to-pdf](./add-page-number-footer-to-pdf.cs) | Add Page Number Footer to PDF | `Document`, `Page`, `PageNumberStamp` | Shows how to insert a footer containing page numbers on each page of a PDF using Aspose.Pdf's Pag... |
-| [add-plain-text-to-pdf-page](./add-plain-text-to-pdf-page.cs) | Add Plain Text to a PDF Page Using TextFragment | `Document`, `Page`, `TextFragment` | Demonstrates opening a PDF, placing a plain text string at specific coordinates on the first page... |
-| [add-rotated-mixed-style-text-paragraph](./add-rotated-mixed-style-text-paragraph.cs) | Add Rotated Mixed-Style Text Paragraph to PDF Page | `Document`, `Page`, `Rectangle` | Demonstrates creating a TextParagraph with bold, italic, and regular lines, rotating it, and inse... |
-| [add-rotated-text-bottom-right-last-page](./add-rotated-text-bottom-right-last-page.cs) | Add Rotated Text to Bottom-Right Corner of Last PDF Page | `Document`, `Page`, `Rectangle` | Demonstrates how to use Aspose.Pdf's TextBuilder to place a rotated text paragraph at the bottom-... |
+| [add-bidirectional-text-to-pdf](./add-bidirectional-text-to-pdf.cs) | Add Bidirectional Text to PDF | `Document`, `Page`, `TextFragment` | Shows how to insert right‑to‑left (RTL) text such as Arabic into a PDF by using a Unicode RTL mar... |
+| [add-clickable-text-hyperlink-to-pdf](./add-clickable-text-hyperlink-to-pdf.cs) | Add Clickable Text with Hyperlink to PDF | `Document`, `Page`, `TextFragment` | Shows how to create a TextFragment, assign a WebHyperlink to a TextSegment, and append the linked... |
+| [add-header-to-all-pdf-pages](./add-header-to-all-pdf-pages.cs) | Add Header to All PDF Pages | `Document`, `Page`, `HeaderFooter` | Shows how to loop through a PDF's Pages collection and add a header string to each page using Asp... |
+| [add-image-footnote-to-pdf](./add-image-footnote-to-pdf.cs) | Add Image Footnote to PDF Page | `Document`, `Page`, `TextFragment` | Shows how to create a footnote on a PDF page and insert an image into its Paragraphs collection u... |
+| [add-invisible-tooltip-button-over-text](./add-invisible-tooltip-button-over-text.cs) | Add Invisible Tooltip Button Over Text in PDF | `Document`, `TextFragmentAbsorber`, `TextFragment` | Shows how to locate specific text in a PDF and overlay an invisible button field that acts as a t... |
+| [add-launch-action-to-text](./add-launch-action-to-text.cs) | Add Launch Action to Text in PDF | `Document`, `Page`, `TextFragment` | Shows how to insert a clickable text fragment into a PDF and attach a LaunchAction that opens an ... |
+| [add-left-aligned-text-to-pdf](./add-left-aligned-text-to-pdf.cs) | Add Left-Aligned Text to PDF | `Document`, `TextFragment`, `TextState` | Demonstrates how to insert a text fragment into a PDF and align it to the left margin using Aspos... |
+| [add-page-number-footer-to-pdf](./add-page-number-footer-to-pdf.cs) | Add Page Number Footer to PDF | `Document`, `PageNumberStamp`, `AddStamp` | Shows how to insert a footer containing page numbers on each page of a PDF using Aspose.Pdf's Pag... |
+| [add-rotated-text-bottom-right-last-page](./add-rotated-text-bottom-right-last-page.cs) | Add Rotated Text to Bottom‑Right Corner of Last PDF Page | `Document`, `Page`, `PageInfo` | The example loads a PDF, calculates a rectangle at the bottom‑right corner of the last page, and ... |
 | [add-rotated-text-watermark-to-pdf-pages](./add-rotated-text-watermark-to-pdf-pages.cs) | Add Rotated Text Watermark to PDF Pages | `Document`, `Page`, `TextFragment` | Demonstrates how to use Aspose.Pdf's TextBuilder to place a rotated "CONFIDENTIAL" text fragment ... |
-| [add-semi-transparent-text-watermark](./add-semi-transparent-text-watermark.cs) | Add Semi-Transparent Text Watermark to PDF Pages | `Document`, `Page`, `TextStamp` | Demonstrates how to overlay a semi-transparent diagonal text watermark on each page of a PDF usin... |
-| [add-styled-html-fragment-to-pdf-page](./add-styled-html-fragment-to-pdf-page.cs) | Add Styled HTML Fragment to PDF Page | `Document`, `Page`, `HtmlFragment` | Shows how to load an existing PDF, create an HtmlFragment with inline CSS, optionally override it... |
-| [add-text-and-encrypt-pdf](./add-text-and-encrypt-pdf.cs) | Add Text and Encrypt PDF with Password | `Document`, `Page`, `TextFragment` | Loads an existing PDF, adds a red "Confidential" text fragment to the first page, then encrypts t... |
-| [add-text-to-pdf-using-memory-streams](./add-text-to-pdf-using-memory-streams.cs) | Add Text to PDF Using Memory Streams | `Document`, `Save`, `Page` | Demonstrates loading a PDF from a memory stream (or creating a new one), adding a text fragment t... |
-| [add-text-with-automatic-ligatures-to-pdf](./add-text-with-automatic-ligatures-to-pdf.cs) | Add Text with Automatic Ligatures to PDF | `Document`, `TextFragment`, `FontRepository` | Shows how to load a PDF, add a TextFragment, and rely on the font rendering engine to handle liga... |
-| [add-text-with-custom-line-spacing](./add-text-with-custom-line-spacing.cs) | Add Text with Custom Line Spacing to PDF | `Document`, `TextState`, `TextParagraph` | Shows how to insert a paragraph into a PDF page and control the line spacing by setting the TextS... |
-| [add-underlined-text-to-pdf](./add-underlined-text-to-pdf.cs) | Add Underlined Text to PDF using Aspose.Pdf | `Document`, `Page`, `TextFragment` | Shows how to create a PDF document, add a page, and insert an underlined text fragment by setting... |
-| [adjust-word-spacing-in-pdf](./adjust-word-spacing-in-pdf.cs) | Adjust Word Spacing of Inserted Text in PDF | `Document`, `Page`, `TextFragment` | Shows how to add a TextFragment to an existing PDF and change the spacing between words by settin... |
-| [append-disclaimer-to-first-pdf-page](./append-disclaimer-to-first-pdf-page.cs) | Append Disclaimer Text to First PDF Page | `Document`, `Page`, `TextFragment` | Shows how to add a disclaimer as a TextFragment to the end of the first page's paragraph collecti... |
-| [append-multi-line-textfragment-get-line-break-posi...](./append-multi-line-textfragment-get-line-break-positions.cs) | Append Multi‑Line TextFragment and Retrieve Line‑Break Posit... | `Document`, `Page`, `TextFragment` | Demonstrates how to add a multi‑line TextFragment to a PDF page and extract each line’s baseline ... |
-| [apply-background-color-to-text](./apply-background-color-to-text.cs) | Apply Background Color to Text in PDF | `Document`, `Page`, `TextFragment` | Shows how to set a TextFragment's background color via its TextState before adding the fragment t... |
-| [apply-custom-otf-font-to-pdf](./apply-custom-otf-font-to-pdf.cs) | Apply Custom OTF Font to PDF TextFragment | `Document`, `Save`, `TextFragment` | Demonstrates loading an OTF font, embedding it, and applying it to a TextFragment to create style... |
-| [batch-replace-text-in-pdfs](./batch-replace-text-in-pdfs.cs) | Batch Replace Text in PDF Files | `Document`, `TextFragmentAbsorber`, `TextFragment` | Demonstrates how to iterate through a folder of PDF documents and replace multiple strings using ... |
-| [batch-replace-text-pdf-config](./batch-replace-text-pdf-config.cs) | Batch Replace Text in PDF Using a Configuration File | `Document`, `Save`, `Accept` | Demonstrates how to load old‑new string pairs from a simple key=value file and replace all occurr... |
-| [case-insensitive-keyword-highlighting](./case-insensitive-keyword-highlighting.cs) | Case‑Insensitive Keyword Highlighting in PDF | `Document`, `Save`, `Accept` | Demonstrates how to search a PDF for a keyword without regard to case and highlight each occurren... |
-| [center-text-horizontally-in-pdf](./center-text-horizontally-in-pdf.cs) | Center Text Horizontally in a PDF | `Document`, `Page`, `TextFragment` | Shows how to center a TextFragment on a PDF page by setting TextState.HorizontalAlignment to Cent... |
-| [create-clickable-text-launch-action](./create-clickable-text-launch-action.cs) | Create Clickable Text with Launch Action to Open a File | `Document`, `Save`, `Page` | Demonstrates adding a text fragment to a PDF and attaching a LaunchAction annotation so clicking ... |
-| [create-footnote-with-image](./create-footnote-with-image.cs) | Create Footnote with Image in PDF | `Document`, `Page`, `TextFragment` | Demonstrates how to add a footnote to a PDF page and insert an image into the footnote's paragrap... |
-| [create-justified-text-pdf](./create-justified-text-pdf.cs) | Create Justified Text in a PDF using Aspose.Pdf | `Document`, `Save`, `Page` | Shows how to add a TextFragment to a PDF page, set its font, position, and apply HorizontalAlignm... |
-| [create-multi-line-text-paragraph](./create-multi-line-text-paragraph.cs) | Create Multi‑Line Text Paragraph in PDF | `Document`, `Save`, `Page` | Shows how to create a multi‑line TextParagraph, configure its rectangle, wrapping, alignment, mar... |
-| [create-rotated-text-paragraph](./create-rotated-text-paragraph.cs) | Create Rotated Text Paragraph with Multiple Fragments | `Document`, `Save`, `Page` | Demonstrates how to build a TextParagraph, add several TextFragment lines, set its bounding recta... |
-| ... | | | *and 45 more files* |
+| [add-semi-transparent-text-watermark](./add-semi-transparent-text-watermark.cs) | Add Semi-Transparent Text Watermark to PDF Pages | `Document`, `Page`, `WatermarkAnnotation` | Demonstrates how to overlay a semi‑transparent text watermark on each page of a PDF using Aspose.... |
+| [add-styled-html-fragment-to-pdf-page](./add-styled-html-fragment-to-pdf-page.cs) | Add Styled HTML Fragment to PDF Page | `Document`, `HtmlFragment`, `TextState` | Shows how to insert a styled HTML fragment into a PDF page using HtmlFragment and an optional Tex... |
+| [add-table-inside-footnote](./add-table-inside-footnote.cs) | Add a Table Inside a Footnote in a PDF | `Document`, `Note`, `Table` | Shows how to create a footnote containing a table and attach it to a text fragment in a PDF using... |
+| [add-text-and-encrypt-pdf](./add-text-and-encrypt-pdf.cs) | Add Text and Encrypt PDF with Password | `Document`, `Page`, `TextFragment` | Loads an existing PDF, adds a text fragment to the first page, then encrypts the document with us... |
+| [add-text-at-specific-coordinates-to-pdf-page](./add-text-at-specific-coordinates-to-pdf-page.cs) | Add Text at Specific Coordinates to a PDF Page | `Document`, `Page`, `TextFragment` | Demonstrates loading an existing PDF, creating a TextFragment, positioning it at given X/Y coordi... |
+| [add-text-to-pdf-from-memory-stream](./add-text-to-pdf-from-memory-stream.cs) | Add Text to PDF from Memory Stream | `Document`, `Page`, `TextFragment` | Demonstrates loading a PDF from a MemoryStream, inserting a text fragment on the first page, and ... |
+| [add-underlined-text-to-pdf](./add-underlined-text-to-pdf.cs) | Add Underlined Text to PDF | `Document`, `TextFragment`, `Position` | Shows how to load a PDF, create a TextFragment, enable underlining via TextState.Underline, and s... |
+| [adjust-word-spacing-in-pdf](./adjust-word-spacing-in-pdf.cs) | Adjust Word Spacing of Inserted Text in PDF | `Document`, `Page`, `TextFragment` | Shows how to increase the spacing between words by setting the TextState.WordSpacing property of ... |
+| [append-disclaimer-to-first-pdf-page](./append-disclaimer-to-first-pdf-page.cs) | Append Disclaimer to First PDF Page | `Document`, `Page`, `TextFragment` | Shows how to load a PDF, create a formatted TextFragment, and append it to the end of the first p... |
+| [append-multiline-textfragment-line-break-info](./append-multiline-textfragment-line-break-info.cs) | Append Multi-line TextFragment and Retrieve Line Break Infor... | `Document`, `Page`, `TextFragment` | The example loads a PDF, appends a multi-line TextFragment to the first page, and iterates the fr... |
+| [apply-background-color-to-text](./apply-background-color-to-text.cs) | Apply Background Color to Text in PDF | `Document`, `Page`, `TextFragment` | Demonstrates how to set a background color for a text fragment using the TextState property befor... |
+| [apply-custom-opentype-font-to-pdf](./apply-custom-opentype-font-to-pdf.cs) | Apply Custom OpenType Font to PDF Text | `OpenFont`, `IsEmbedded`, `Document` | Shows how to load an OTF font, embed it, and apply it to a TextFragment for styled PDF output. |
+| [attach-javascript-action-to-pdf-link-annotation](./attach-javascript-action-to-pdf-link-annotation.cs) | Attach JavaScript Action to PDF Link Annotation | `Document`, `LinkAnnotation`, `JavascriptAction` | Opens an existing PDF, creates a link annotation on the first page, assigns a JavaScript action t... |
+| [batch-replace-multiple-keywords-pdf](./batch-replace-multiple-keywords-pdf.cs) | Batch Replace Multiple Keywords in PDF Using a Config File | `Document`, `TextFragmentAbsorber`, `TextFragment` | Demonstrates how to load old‑new string mappings from a configuration file and replace all occurr... |
+| [batch-replace-text-in-pdfs](./batch-replace-text-in-pdfs.cs) | Batch Replace Text in PDFs Using Aspose.Pdf | `Document`, `TextFragmentAbsorber`, `TextFragment` | Shows how to iterate through PDF files in a folder and replace multiple old strings with new stri... |
+| [center-text-on-pdf-page](./center-text-on-pdf-page.cs) | Center Text on PDF Page | `Document`, `Page`, `TextFragment` | Demonstrates how to center a text fragment on a PDF page by setting the TextState's HorizontalAli... |
+| [create-goto-link-in-pdf](./create-goto-link-in-pdf.cs) | Create GoTo Link in PDF Using TextFragment | `Document`, `TextFragment`, `LocalHyperlink` | Shows how to add a text fragment that functions as a hyperlink to navigate to a specific page in ... |
+| [create-multi-line-text-paragraph](./create-multi-line-text-paragraph.cs) | Create Multi-Line Text Paragraph in PDF | `Document`, `Page`, `TextParagraph` | Demonstrates how to build a multi‑line TextParagraph, configure its layout, and render it onto a ... |
+| [create-rotated-text-paragraph](./create-rotated-text-paragraph.cs) | Create Rotated Text Paragraph with Multiple Fragments | `Document`, `Page`, `TextParagraph` | Shows how to build a TextParagraph with several TextFragments, apply a 30-degree rotation, and ad... |
+| [create-strikethrough-text-pdf](./create-strikethrough-text-pdf.cs) | Create Strikethrough Text in PDF with Aspose.Pdf | `Document`, `Page`, `TextFragment` | Demonstrates enabling the TextState.StrikeOut property of a TextFragment to render strikethrough ... |
+| ... | | | *and 42 more files* |
 
 ## Category Statistics
-- Total examples: 75
+- Total examples: 72
 
 ## Category-Specific Tips
 
@@ -127,5 +128,5 @@ using (Document doc = new Document("input.pdf"))
 - Review code examples in this folder for working-with-text patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-04-10 | Run: `20260410_121416_bd35e2`
+Updated: 2026-05-08 | Run: `20260508_152858_8cb8c4`
 <!-- AUTOGENERATED:END -->

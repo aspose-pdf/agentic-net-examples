@@ -1,74 +1,67 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Core Aspose.Pdf namespace
 
 class Program
 {
     static void Main()
     {
-        // Path to the PDF portfolio containing embedded files
-        const string inputPdfPath = "portfolio.pdf";
+        const string inputPdfPath = "portfolio.pdf";          // PDF portfolio file
+        const string outputDirectory = "ExtractedFiles";      // Destination folder
 
-        // Directory where extracted files will be saved
-        const string outputDirectory = "ExtractedFiles";
-
-        // Verify input PDF exists
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
         // Ensure the output directory exists
         Directory.CreateDirectory(outputDirectory);
 
-        // Load the PDF document (using statement ensures proper disposal)
-        using (Document pdfDocument = new Document(inputPdfPath))
+        try
         {
-            // Access the collection of embedded files
-            EmbeddedFileCollection embeddedFiles = pdfDocument.EmbeddedFiles;
-
-            // Check if there are any embedded files
-            if (embeddedFiles == null || embeddedFiles.Count == 0)
+            // Load the PDF document (core API, wrapped in using for proper disposal)
+            using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPdfPath))
             {
-                Console.WriteLine("No embedded files found in the PDF.");
-                return;
-            }
+                // Access the collection of embedded files
+                Aspose.Pdf.EmbeddedFileCollection embeddedFiles = doc.EmbeddedFiles;
 
-            // Iterate over each embedded file and save it to the output directory
-            foreach (var embeddedFile in embeddedFiles)
-            {
-                // Use reflection to obtain the file name (property "Name")
-                var nameProp = embeddedFile.GetType().GetProperty("Name");
-                string fileName = nameProp?.GetValue(embeddedFile) as string ?? "unknown";
-
-                // Build the full path for the extracted file
-                string outputFilePath = Path.Combine(outputDirectory, fileName);
-
-                // Try to invoke the Save(string) method via reflection
-                var saveMethod = embeddedFile.GetType().GetMethod("Save", new[] { typeof(string) });
-                if (saveMethod != null)
+                // If there are no embedded files, inform the user
+                if (embeddedFiles == null || embeddedFiles.Count == 0)
                 {
-                    saveMethod.Invoke(embeddedFile, new object[] { outputFilePath });
+                    Console.WriteLine("No embedded files found in the PDF portfolio.");
+                    return;
                 }
-                else
+
+                // Iterate over the embedded files (Aspose collections are 1‑based)
+                for (int i = 1; i <= embeddedFiles.Count; i++)
                 {
-                    // Fallback: retrieve the underlying file specification stream and copy it manually
-                    var fileSpec = embeddedFile.GetType().GetProperty("FileSpecification")?.GetValue(embeddedFile);
-                    var contents = fileSpec?.GetType().GetProperty("Contents")?.GetValue(fileSpec) as Stream;
-                    if (contents != null)
+                    // Each item is a FileSpecification representing an embedded file
+                    Aspose.Pdf.FileSpecification fileSpec = embeddedFiles[i];
+
+                    // Retrieve the original file name; fallback to a generated name if missing
+                    string fileName = !string.IsNullOrEmpty(fileSpec.Name)
+                        ? fileSpec.Name
+                        : $"EmbeddedFile_{i}";
+
+                    string outputPath = Path.Combine(outputDirectory, fileName);
+
+                    // Save the embedded file's contents to disk
+                    using (Stream contentStream = fileSpec.Contents)
+                    using (FileStream outStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
                     {
-                        using (var outStream = File.Create(outputFilePath))
-                        {
-                            contents.CopyTo(outStream);
-                        }
+                        contentStream.CopyTo(outStream);
                     }
+
+                    Console.WriteLine($"Extracted: {fileName}");
                 }
-
-                Console.WriteLine($"Extracted: {outputFilePath}");
             }
-        }
 
-        Console.WriteLine("Extraction completed.");
+            Console.WriteLine($"All embedded files have been saved to '{outputDirectory}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during extraction: {ex.Message}");
+        }
     }
 }

@@ -6,12 +6,12 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string inputPdf  = "input.pdf";
         const string outputHtml = "output.html";
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
@@ -20,35 +20,29 @@ class Program
             // Load the PDF document
             using (Document pdfDoc = new Document(inputPdf))
             {
-                // Configure HTML conversion options
+                // Configure HTML save options
                 HtmlSaveOptions htmlOpts = new HtmlSaveOptions
                 {
-                    // Ensure the result is a single HTML file (no page splitting)
-                    SplitIntoPages = false,
-
-                    // Embed all resources (images, CSS, fonts) into the HTML to keep formatting intact
+                    // Embed all resources (fonts, images, CSS) into the single HTML file
                     PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
-
-                    // Save fonts as WOFF to preserve original typography
-                    FontSavingMode = HtmlSaveOptions.FontSavingModes.AlwaysSaveAsWOFF
+                    // Save raster images as PNG embedded in SVG for better compatibility
+                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
                 };
 
-                try
-                {
-                    // Save as HTML using the configured options
-                    pdfDoc.Save(outputHtml, htmlOpts);
-                    Console.WriteLine($"HTML saved to '{outputHtml}'.");
-                }
-                catch (TypeInitializationException)
-                {
-                    // HTML conversion relies on GDI+ and is Windows‑only
-                    Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
-                }
+                // Save as a single‑page HTML preserving formatting and fonts
+                pdfDoc.Save(outputHtml, htmlOpts);
             }
+
+            Console.WriteLine($"PDF successfully converted to HTML: {outputHtml}");
+        }
+        catch (TypeInitializationException)
+        {
+            // HTML conversion relies on GDI+ and is Windows‑only
+            Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
         }
     }
 }

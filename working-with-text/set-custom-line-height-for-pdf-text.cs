@@ -7,31 +7,40 @@ class Program
 {
     static void Main()
     {
-        // Create a new PDF document
-        using (Document doc = new Document())
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+
+        if (!File.Exists(inputPath))
         {
-            // Add a blank page
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
+
+        // Load the existing PDF document
+        using (Document doc = new Document(inputPath))
+        {
+            // Add a new page to the document
             Page page = doc.Pages.Add();
 
             // Create a text fragment with multiple lines
             TextFragment fragment = new TextFragment("First line\nSecond line\nThird line");
 
-            // Set custom line spacing (line height) via TextState.LineSpacing
-            // The value is in points; here we set 20 points between lines
-            fragment.TextState.LineSpacing = 20f;
+            // Set a custom line height (line spacing) for the text
+            // NOTE: The correct property is LineSpacing, not LineHeight.
+            fragment.TextState.LineSpacing = 20f; // 20 points between lines
 
-            // Optionally set other text properties
+            // Optional: set font, size and a color for clarity
             fragment.TextState.Font = FontRepository.FindFont("Helvetica");
             fragment.TextState.FontSize = 12;
-            fragment.TextState.ForegroundColor = Color.Black;
+            fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
 
-            // Add the fragment to the page
+            // Add the text fragment to the page
             page.Paragraphs.Add(fragment);
 
-            // Save the PDF to a file
-            doc.Save("CustomLineHeight.pdf");
+            // Save the modified PDF document
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine("PDF created with custom line height.");
+        Console.WriteLine($"PDF saved with custom line height to '{outputPath}'.");
     }
 }

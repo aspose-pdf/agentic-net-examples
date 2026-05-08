@@ -1,44 +1,58 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";               // source PDF containing the signature field
-        const string signatureField = "LegalSignature";   // name of the signature field to extract from
-        const string outputCertPath = "LegalSignature.cer"; // destination file for the extracted certificate
+        const string inputPdf  = "input.pdf";          // PDF containing the 'LegalSignature' field
+        const string outputCer = "LegalSignature.cer"; // Destination for the extracted certificate
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // PdfFileSignature implements IDisposable, so wrap it in a using block
-        using (PdfFileSignature pdfSignature = new PdfFileSignature())
+        try
         {
-            // Bind the PDF document to the facade
-            pdfSignature.BindPdf(pdfPath);
-
-            // Extract the certificate stream from the specified signature field
-            using (Stream certStream = pdfSignature.ExtractCertificate(signatureField))
+            // Load the PDF document (Document implements IDisposable)
+            using (Document doc = new Document(inputPdf))
             {
-                if (certStream == null)
+                // Initialize the PdfFileSignature facade
+                using (PdfFileSignature pdfSign = new PdfFileSignature())
                 {
-                    Console.WriteLine("No certificate found in the specified signature field.");
-                    return;
-                }
+                    // Bind the already loaded Document instance
+                    pdfSign.BindPdf(doc);
 
-                // Write the certificate bytes to a .cer file
-                using (FileStream fileStream = new FileStream(outputCertPath, FileMode.Create, FileAccess.Write))
-                {
-                    certStream.CopyTo(fileStream);
-                }
+                    // Extract the certificate stream from the specified signature field
+                    Stream certStream = pdfSign.ExtractCertificate("LegalSignature");
 
-                Console.WriteLine($"Certificate extracted and saved to '{outputCertPath}'.");
+                    if (certStream == null)
+                    {
+                        Console.Error.WriteLine("Certificate not found in the 'LegalSignature' field.");
+                        return;
+                    }
+
+                    // Ensure the stream is positioned at the beginning
+                    if (certStream.CanSeek)
+                        certStream.Position = 0;
+
+                    // Write the certificate to a .cer file
+                    using (FileStream fileOut = new FileStream(outputCer, FileMode.Create, FileAccess.Write))
+                    {
+                        certStream.CopyTo(fileOut);
+                    }
+
+                    Console.WriteLine($"Certificate extracted and saved to '{outputCer}'.");
+                }
             }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

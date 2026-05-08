@@ -1,41 +1,33 @@
 using System;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Paths for the source PDF and the resulting PDF with the submit button
-        const string srcPdf  = "input.pdf";
-        const string dstPdf  = "output_with_submit.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Ensure the source file exists
-        if (!System.IO.File.Exists(srcPdf))
+        if (!System.IO.File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source file not found: {srcPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // FormEditor works with a source PDF and a destination PDF.
-        // The constructor takes the input file and the output file paths.
-        using (FormEditor formEditor = new FormEditor(srcPdf, dstPdf))
+        // FormEditor loads the source PDF and prepares the destination file.
+        using (FormEditor formEditor = new FormEditor(inputPath, outputPath))
         {
             // Add a submit button named "SubmitForm" on page 1.
-            // Parameters: fieldName, pageNumber, label, URL, llx, lly, urx, ury
-            formEditor.AddSubmitBtn(
-                fieldName: "SubmitForm",
-                page: 1,
-                label: "Submit",
-                url: "https://api.example.com/submit",
-                llx: 100f,
-                lly: 200f,
-                urx: 200f,
-                ury: 250f);
+            // Button label: "Submit"
+            // Submission URL: https://api.example.com/submit
+            // Position: lower‑left (100, 500), upper‑right (200, 550)
+            formEditor.AddSubmitBtn("SubmitForm", 1, "Submit", "https://api.example.com/submit", 100, 500, 200, 550);
 
-            // Save writes the changes to the destination file specified in the constructor.
+            // Save the modified PDF.
             formEditor.Save();
         }
 
-        Console.WriteLine($"Submit button added. Output saved to '{dstPdf}'.");
+        Console.WriteLine($"Submit button added and saved to '{outputPath}'.");
     }
 }

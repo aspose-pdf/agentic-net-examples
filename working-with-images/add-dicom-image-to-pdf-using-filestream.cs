@@ -6,39 +6,36 @@ class Program
 {
     static void Main()
     {
-        const string dicomPath = "image.dcm";   // Path to the DICOM file
-        const string outputPdf = "output.pdf"; // Destination PDF file
+        const string dicomPath = "medical.dcm";   // Path to the DICOM image file
+        const string outputPdf = "output.pdf";    // Desired PDF output path
 
-        // Verify that the DICOM file exists
         if (!File.Exists(dicomPath))
         {
             Console.Error.WriteLine($"File not found: {dicomPath}");
             return;
         }
 
-        // Open the DICOM file as a read‑only stream
-        using (FileStream dicomStream = File.OpenRead(dicomPath))
+        // Keep the DICOM stream open until the PDF is saved
+        using (FileStream dicomStream = new FileStream(dicomPath, FileMode.Open, FileAccess.Read))
         {
-            // Create a new PDF document (empty)
+            // Create a new PDF document
             using (Document pdfDoc = new Document())
             {
                 // Add a blank page to the document
                 pdfDoc.Pages.Add();
 
                 // Create an Image object and assign the DICOM stream
-                Image img = new Image();
-                img.ImageStream = dicomStream; // Image constructor does not accept a path; use ImageStream
+                Image dicomImage = new Image();
+                dicomImage.ImageStream = dicomStream;   // Use the stream as the image source
 
-                // Optional: set image dimensions and alignment on the page
-                img.FixWidth = 500;   // width in points
-                img.FixHeight = 500;  // height in points
-                img.HorizontalAlignment = HorizontalAlignment.Center;
-                img.VerticalAlignment = VerticalAlignment.Center;
+                // Optionally set size or scaling (commented out)
+                // dicomImage.FixWidth = 500;
+                // dicomImage.FixHeight = 500;
 
-                // Add the image to the first page's paragraph collection
-                pdfDoc.Pages[1].Paragraphs.Add(img);
+                // Add the image to the first page
+                pdfDoc.Pages[1].Paragraphs.Add(dicomImage);
 
-                // Save the resulting PDF
+                // Save the PDF document
                 pdfDoc.Save(outputPdf);
             }
         }

@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades;   // PdfContentEditor, ViewerPreference
 
 class Program
 {
@@ -11,43 +11,37 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
-        {
-            // Initialize the content editor facade
-            PdfContentEditor editor = new PdfContentEditor();
+        // Create the content editor and bind the source PDF
+        PdfContentEditor editor = new PdfContentEditor();
+        editor.BindPdf(inputPath);
 
-            // Bind the PDF file to the editor
-            editor.BindPdf(inputPath);
+        // ---- First edit operation ----
+        // Hide the menu bar
+        editor.ChangeViewerPreference(ViewerPreference.HideMenubar);
 
-            // Change 1: hide the menu bar
-            editor.ChangeViewerPreference(ViewerPreference.HideMenubar);
-            int prefAfterHideMenubar = editor.GetViewerPreference();
-            Console.WriteLine($"ViewerPreference after HideMenubar: 0x{prefAfterHideMenubar:X}");
+        // Retrieve and display the current viewer preferences
+        int prefAfterFirstChange = editor.GetViewerPreference();
+        Console.WriteLine($"Viewer preferences after HideMenubar: 0x{prefAfterFirstChange:X}");
 
-            // Change 2: fit window to first page
-            editor.ChangeViewerPreference(ViewerPreference.FitWindow);
-            int prefAfterFitWindow = editor.GetViewerPreference();
-            Console.WriteLine($"ViewerPreference after FitWindow: 0x{prefAfterFitWindow:X}");
+        // Save the document (incremental update is applied automatically)
+        editor.Save(outputPath);
 
-            // Change 3: set page mode to use outlines (correct enum name)
-            editor.ChangeViewerPreference(ViewerPreference.PageModeUseOutlines);
-            int prefAfterPageModeOutline = editor.GetViewerPreference();
-            Console.WriteLine($"ViewerPreference after PageModeUseOutlines: 0x{prefAfterPageModeOutline:X}");
+        // ---- Second edit operation ----
+        // Set page mode to display outlines
+        editor.ChangeViewerPreference(ViewerPreference.PageModeUseOutlines);
 
-            // Save the modified PDF
-            editor.Save(outputPath);
-            Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        // Retrieve and display the updated viewer preferences
+        int prefAfterSecondChange = editor.GetViewerPreference();
+        Console.WriteLine($"Viewer preferences after PageModeUseOutlines: 0x{prefAfterSecondChange:X}");
 
-            // Release resources held by the facade
-            editor.Close();
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        // Save again to persist the second change
+        editor.Save(outputPath);
+
+        // Release resources
+        editor.Close();
     }
 }

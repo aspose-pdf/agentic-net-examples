@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;   // needed for FontRepository and TextState
 
 class Program
 {
@@ -16,34 +15,32 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Loop through pages using 1‑based indexing and process only even pages
-            for (int i = 2; i <= doc.Pages.Count; i += 2)
+            // Iterate through all pages (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                Page page = doc.Pages[i];
+                // Apply numbering only to even pages
+                if (i % 2 == 0)
+                {
+                    // Create a page number stamp with default format "#"
+                    PageNumberStamp stamp = new PageNumberStamp();
 
-                // Create a page number stamp; default format is "#"
-                PageNumberStamp stamp = new PageNumberStamp();
+                    // Position the stamp at the bottom center of the page
+                    stamp.HorizontalAlignment = HorizontalAlignment.Center;
+                    stamp.VerticalAlignment   = VerticalAlignment.Bottom;
+                    stamp.BottomMargin        = 10; // distance from bottom edge
 
-                // Configure stamp appearance via TextState (FontSize is read‑only on the stamp itself)
-                stamp.TextState.Font = FontRepository.FindFont("Helvetica");
-                stamp.TextState.FontSize = 12;
-                stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-
-                // Position the stamp (center‑bottom of the page)
-                stamp.HorizontalAlignment = HorizontalAlignment.Center;
-                stamp.VerticalAlignment   = VerticalAlignment.Bottom;
-
-                // Add the stamp to the current even page
-                page.AddStamp(stamp);
+                    // Add the stamp to the current page
+                    doc.Pages[i].AddStamp(stamp);
+                }
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (lifecycle rule: use Save)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Even‑page numbers added and saved to '{outputPath}'.");
+        Console.WriteLine($"Even‑page numbers added. Output saved to '{outputPath}'.");
     }
 }

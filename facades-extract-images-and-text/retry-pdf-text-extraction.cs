@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Threading;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -7,7 +9,7 @@ class Program
     static void Main()
     {
         const string inputPdf  = "input.pdf";
-        const string outputTxt = "extracted.txt";
+        const string outputTxt = "output.txt";
 
         if (!File.Exists(inputPdf))
         {
@@ -15,50 +17,42 @@ class Program
             return;
         }
 
-        // Retry up to three times if an IOException occurs during extraction
-        const int maxAttempts = 3;
-        int attempt = 0;
         bool extracted = false;
 
-        while (attempt < maxAttempts && !extracted)
+        // Retry up to three times if an IOException occurs
+        for (int attempt = 1; attempt <= 3 && !extracted; attempt++)
         {
-            attempt++;
-            // PdfExtractor implements IDisposable, so use a using block for deterministic cleanup
-            using (PdfExtractor extractor = new PdfExtractor())
+            try
             {
-                try
+                // Create and bind the extractor (lifecycle: create → bind → extract → save)
+                using (PdfExtractor extractor = new PdfExtractor())
                 {
-                    // Load the PDF document
-                    extractor.BindPdf(inputPdf);
-
-                    // Perform the extraction
-                    extractor.ExtractText();
-
-                    // Save the extracted text to a file
-                    extractor.GetText(outputTxt);
-
-                    extracted = true; // success
+                    extractor.BindPdf(inputPdf);          // load PDF
+                    extractor.ExtractText();              // perform extraction
+                    extractor.GetText(outputTxt);         // save extracted text
                 }
-                catch (IOException ioEx)
+
+                extracted = true;
+                Console.WriteLine($"Extraction succeeded on attempt {attempt}.");
+            }
+            catch (IOException ioEx) // retry only on I/O errors
+            {
+                Console.Error.WriteLine($"IO exception on attempt {attempt}: {ioEx.Message}");
+                if (attempt == 3)
                 {
-                    Console.Error.WriteLine($"Attempt {attempt} failed with IOException: {ioEx.Message}");
-                    if (attempt >= maxAttempts)
-                    {
-                        Console.Error.WriteLine("Maximum retry attempts reached. Extraction aborted.");
-                        // Optionally rethrow or handle as needed
-                    }
+                    Console.Error.WriteLine("All retry attempts failed.");
                 }
-                finally
+                else
                 {
-                    // Ensure the facade releases any resources it holds
-                    extractor.Close();
+                    // Optional short delay before next attempt
+                    Thread.Sleep(500);
                 }
             }
-        }
-
-        if (extracted)
-        {
-            Console.WriteLine($"Text extraction succeeded. Output saved to '{outputTxt}'.");
+            catch (PdfException pdfEx) // non‑IO PDF errors are not retried
+            {
+                Console.Error.WriteLine($"PDF processing error: {pdfEx.Message}");
+                break;
+            }
         }
     }
 }

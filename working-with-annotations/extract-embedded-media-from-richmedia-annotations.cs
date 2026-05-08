@@ -7,72 +7,76 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputRoot   = "ExtractedMedia";
+        const string inputPath = "input.pdf";
+        const string outputRoot = "ExtractedMedia";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         // Ensure the root output folder exists
         Directory.CreateDirectory(outputRoot);
 
-        // Open the PDF document (deterministic disposal)
-        using (Document doc = new Document(inputPdfPath))
+        // Load the PDF document (wrapped in using for deterministic disposal)
+        using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing)
-            for (int pageIdx = 1; pageIdx <= doc.Pages.Count; pageIdx++)
+            // Pages are 1‑based in Aspose.Pdf
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                Page page = doc.Pages[pageIdx];
+                Page page = doc.Pages[pageIndex];
 
-                // Iterate through all annotations on the page
-                for (int annIdx = 1; annIdx <= page.Annotations.Count; annIdx++)
+                // Annotations collection is also 1‑based
+                for (int annIndex = 1; annIndex <= page.Annotations.Count; annIndex++)
                 {
-                    Annotation ann = page.Annotations[annIdx];
+                    Annotation annotation = page.Annotations[annIndex];
 
                     // Process only RichMediaAnnotation instances
-                    if (ann is RichMediaAnnotation richMedia)
+                    if (annotation is RichMediaAnnotation richMedia)
                     {
-                        // Use the annotation Name if available; otherwise generate a unique name
-                        string annName = !string.IsNullOrEmpty(richMedia.Name)
-                                         ? richMedia.Name
-                                         : $"RichMedia_{annIdx}";
+                        // Build a folder hierarchy: /ExtractedMedia/Page_{n}/Annotation_{m}_{Name}
+                        string annFolder = Path.Combine(
+                            outputRoot,
+                            $"Page_{pageIndex}",
+                            $"Annotation_{annIndex}_{richMedia.Name ?? "RichMedia"}");
 
-                        // Create a subfolder for this page (e.g., Page_1) and annotation
-                        string pageFolder = Path.Combine(outputRoot, $"Page_{pageIdx}");
-                        string annFolder  = Path.Combine(pageFolder, annName);
                         Directory.CreateDirectory(annFolder);
 
-                        // The Content property provides the embedded media stream
-                        // Copy it to a file preserving the original file name if possible
-                        // If the original file name is unknown, use a generic name with appropriate extension
-                        string fileName = $"{annName}.bin"; // fallback name
-                        // Attempt to infer extension from the ContentType enum
-                        switch (richMedia.Type)
+                        // The Content property holds the embedded media stream
+                        // (it returns a Stream; if null, nothing to extract)
+                        Stream contentStream = richMedia.Content as Stream;
+
+                        if (contentStream != null)
                         {
-                            case RichMediaAnnotation.ContentType.Audio:
-                                fileName = $"{annName}.mp3";
-                                break;
-                            case RichMediaAnnotation.ContentType.Video:
-                                fileName = $"{annName}.mp4";
-                                break;
+                            // Determine a file name for the extracted media
+                            string fileName = richMedia.Name;
+                            if (string.IsNullOrWhiteSpace(fileName))
+                            {
+                                // Fallback to a generic name based on the media type
+                                fileName = richMedia.Type == RichMediaAnnotation.ContentType.Video
+                                    ? "video.bin"
+                                    : "audio.bin";
+                            }
+                            else if (!Path.HasExtension(fileName))
+                            {
+                                // Ensure the file has an extension
+                                fileName += ".bin";
+                            }
+
+                            string outputPath = Path.Combine(annFolder, fileName);
+
+                            // Write the stream to disk
+                            using (FileStream fileStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                            {
+                                contentStream.CopyTo(fileStream);
+                            }
                         }
-
-                        string outputPath = Path.Combine(annFolder, fileName);
-
-                        // Write the stream to disk
-                        using (Stream contentStream = richMedia.Content)
-                        using (FileStream fileStream = File.Create(outputPath))
-                        {
-                            contentStream.CopyTo(fileStream);
-                        }
-
-                        Console.WriteLine($"Extracted media to: {outputPath}");
                     }
                 }
             }
         }
+
+        Console.WriteLine("All embedded media files have been extracted.");
     }
 }

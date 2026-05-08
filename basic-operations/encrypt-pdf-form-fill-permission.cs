@@ -6,27 +6,26 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "encrypted_formfill.pdf";
-        const string userPassword = "user123";
-        const string ownerPassword = "owner123";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "encrypted.pdf";
+        const string userPassword  = "user123";   // password required to open the PDF
+        const string ownerPassword = "owner123";  // password that grants full permissions
 
-        // Verify that the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Load the original PDF document
+            // Load the existing PDF
             using (Document doc = new Document(inputPath))
             {
-                // Allow only form filling; do NOT set ExtractContent permission
+                // Allow only form filling; do NOT include PrintDocument permission
                 Permissions perms = Permissions.FillForm;
 
-                // Encrypt using AES‑256 (preferred algorithm)
+                // Encrypt with AES-256 (recommended) and the specified permissions
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
                 // Save the encrypted PDF

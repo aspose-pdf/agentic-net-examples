@@ -7,59 +7,58 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputCsv = "annotations.csv";
+        const string inputPath = "input.pdf";
+        const string csvPath   = "annotations.csv";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle: load)
-        using (Document doc = new Document(inputPdf))
+        try
         {
-            // Create CSV file for output (lifecycle: create)
-            using (StreamWriter writer = new StreamWriter(outputCsv))
+            // Load the PDF and open a writer for the CSV
+            using (Document doc = new Document(inputPath))
+            using (StreamWriter writer = new StreamWriter(csvPath, false))
             {
-                // Write CSV header
-                writer.WriteLine("PageNumber,AnnotationType,Rect,Contents,Title,Color");
+                // CSV header
+                writer.WriteLine("PageNumber,AnnotationType,Rect,Title,Contents");
 
-                // Iterate through pages (1‑based indexing)
-                for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+                // Pages are 1‑based
+                for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    Page page = doc.Pages[pageIndex];
+                    Page page = doc.Pages[i];
 
-                    // Iterate through annotations on the page (1‑based indexing)
-                    for (int annIndex = 1; annIndex <= page.Annotations.Count; annIndex++)
+                    // Iterate all annotations on the page
+                    foreach (Annotation ann in page.Annotations)
                     {
-                        Annotation ann = page.Annotations[annIndex];
                         string typeName = ann.GetType().Name;
 
-                        // Rectangle coordinates (fully qualified to avoid ambiguity)
-                        Aspose.Pdf.Rectangle rect = ann.Rect;
-                        string rectStr = $"{rect.LLX},{rect.LLY},{rect.URX},{rect.URY}";
+                        // Rectangle coordinates (lower‑left x/y, upper‑right x/y)
+                        string rect = $"{ann.Rect.LLX},{ann.Rect.LLY},{ann.Rect.URX},{ann.Rect.URY}";
 
-                        // Contents may be null; escape double quotes for CSV
-                        string contents = ann.Contents?.Replace("\"", "\"\"") ?? "";
-
-                        // Title is available only on markup annotations
+                        // Title is only available on markup annotations
                         string title = "";
                         if (ann is MarkupAnnotation markup)
                         {
                             title = markup.Title?.Replace("\"", "\"\"") ?? "";
                         }
 
-                        // Color may be null; use its string representation
-                        string color = ann.Color?.ToString() ?? "";
+                        // Contents may be null
+                        string contents = ann.Contents?.Replace("\"", "\"\"") ?? "";
 
                         // Write a CSV line, quoting fields that may contain commas
-                        writer.WriteLine($"{pageIndex},\"{typeName}\",\"{rectStr}\",\"{contents}\",\"{title}\",\"{color}\"");
+                        writer.WriteLine($"{i},\"{typeName}\",\"{rect}\",\"{title}\",\"{contents}\"");
                     }
                 }
             }
-        }
 
-        Console.WriteLine($"Annotations exported to '{outputCsv}'.");
+            Console.WriteLine($"Annotations exported to '{csvPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

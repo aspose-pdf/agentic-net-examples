@@ -17,44 +17,46 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
+            // Iterate through all pages (1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
                 // Define the rectangle where the watermark will appear
                 // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(50, 750, 300, 800);
 
-                // Create a WatermarkAnnotation for the current page
+                // Create the WatermarkAnnotation for the current page
                 WatermarkAnnotation watermark = new WatermarkAnnotation(page, rect);
 
-                // Generate a dynamic date string (you can customize the format)
+                // Build a dynamic date string (you can customize the format)
                 string dateString = DateTime.Now.ToString("yyyy-MM-dd");
+                string watermarkText = $"Generated on {dateString} – Page {i}";
 
-                // Optionally include the page number in the watermark text
-                string[] textLines = { $"{dateString} – Page {i}" };
-
-                // Define the visual style of the watermark text
+                // Define the visual style of the text
                 TextState textState = new TextState
                 {
                     Font = FontRepository.FindFont("Helvetica"),
                     FontSize = 12,
                     ForegroundColor = Aspose.Pdf.Color.Gray,
-                    // You can adjust opacity via the annotation's Opacity property if needed
+                    // Optional: make the text semi‑transparent
+                    // Opacity = 0.5f   // not a TextState property; use watermark.Opacity if needed
                 };
 
-                // Apply the text and its style to the watermark annotation
-                watermark.SetTextAndState(textLines, textState);
+                // Set the text and its appearance state
+                watermark.SetTextAndState(new[] { watermarkText }, textState);
 
-                // Add the annotation to the page's annotation collection
+                // Optional: adjust opacity of the annotation itself
+                watermark.Opacity = 0.5f;
+
+                // Add the annotation to the page
                 page.Annotations.Add(watermark);
             }
 
-            // Save the modified PDF; the Document.Save method writes a PDF regardless of extension
+            // Save the modified document
             doc.Save(outputPath);
         }
 

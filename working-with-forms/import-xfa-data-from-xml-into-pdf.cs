@@ -7,51 +7,43 @@ class Program
 {
     static void Main()
     {
-        // Paths to the source PDF (with XFA form) and the XML data file
-        const string pdfPath = "input_with_xfa.pdf";
-        const string xmlPath = "xfa_data.xml";
-        const string outputPath = "output_filled.pdf";
+        const string pdfPath = "template.pdf";
+        const string xmlPath = "data.xml";
+        const string outputPath = "filled.pdf";
 
-        // Verify that the required files exist
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
+
         if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"XML file not found: {xmlPath}");
+            Console.Error.WriteLine($"XML not found: {xmlPath}");
             return;
         }
 
-        try
+        // Load the XFA XML data
+        XmlDocument xfaData = new XmlDocument();
+        xfaData.Load(xmlPath);
+
+        // Load the PDF that contains an XFA form
+        using (Document doc = new Document(pdfPath))
         {
-            // Load the XML data into an XmlDocument
-            XmlDocument xfaData = new XmlDocument();
-            xfaData.Load(xmlPath);
-
-            // Open the PDF document that contains an XFA form
-            using (Document pdfDoc = new Document(pdfPath))
+            // Verify that the PDF actually has an XFA form
+            if (!doc.Form.HasXfa)
             {
-                // Ensure the document actually has an XFA form
-                if (!pdfDoc.Form.HasXfa)
-                {
-                    Console.Error.WriteLine("The PDF does not contain an XFA form.");
-                    return;
-                }
-
-                // Assign the XFA data to the form
-                pdfDoc.Form.AssignXfa(xfaData);
-
-                // Save the updated PDF
-                pdfDoc.Save(outputPath);
+                Console.Error.WriteLine("The PDF does not contain an XFA form.");
+                return;
             }
 
-            Console.WriteLine($"XFA data imported successfully. Saved to '{outputPath}'.");
+            // Assign the XFA data to the form
+            doc.Form.AssignXfa(xfaData);
+
+            // Save the updated PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"XFA data imported successfully. Output saved to '{outputPath}'.");
     }
 }

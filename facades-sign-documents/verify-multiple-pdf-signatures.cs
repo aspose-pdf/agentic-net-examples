@@ -1,47 +1,37 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "signed.pdf";
+        const string inputPdf = "signed_document.pdf";
 
-        if (!System.IO.File.Exists(inputPath))
+        // Ensure the PDF file exists before attempting to bind it.
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.WriteLine($"File '{inputPdf}' not found.");
             return;
         }
 
-        // Bind the PDF file to the PdfFileSignature facade
-        using (PdfFileSignature pdfSign = new PdfFileSignature())
+        // Load the PDF and work with its signatures
+        using (PdfFileSignature pdfSignature = new PdfFileSignature())
         {
-            pdfSign.BindPdf(inputPath);
+            pdfSignature.BindPdf(inputPdf);
 
             // Retrieve all non‑empty signature names
-            IList<SignatureName> names = pdfSign.GetSignatureNames();
+            IList<SignatureName> signatureNames = pdfSignature.GetSignatureNames();
 
-            if (names == null || names.Count == 0)
+            // Verify each signature and output the result
+            foreach (SignatureName sigName in signatureNames)
             {
-                Console.WriteLine("No signatures found in the document.");
-                return;
-            }
-
-            // Iterate through each signature and verify it
-            foreach (SignatureName sigName in names)
-            {
-                string nameStr = sigName.ToString();
-
-                // Verify the signature validity
-                bool isValid = pdfSign.VerifySigned(nameStr);
-
-                Console.WriteLine($"Signature name: {nameStr}");
-                Console.WriteLine($"  Valid: {isValid}");
-                Console.WriteLine($"  Signer: {pdfSign.GetSignerName(sigName)}");
-                Console.WriteLine($"  Reason: {pdfSign.GetReason(sigName)}");
-                Console.WriteLine($"  Location: {pdfSign.GetLocation(sigName)}");
-                Console.WriteLine($"  DateTime: {pdfSign.GetDateTime(sigName)}");
+                // SignatureName exposes the actual name via the Name property
+                string name = sigName.Name;
+                // Use the non‑obsolete VerifySignature method
+                bool isValid = pdfSignature.VerifySignature(name);
+                Console.WriteLine($"Signature '{name}': Valid = {isValid}");
             }
         }
     }

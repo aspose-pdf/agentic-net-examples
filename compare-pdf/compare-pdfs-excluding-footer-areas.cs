@@ -13,50 +13,35 @@ class Program
 
         if (!File.Exists(docPath1) || !File.Exists(docPath2))
         {
-            Console.Error.WriteLine("One or both input PDF files are missing.");
+            Console.Error.WriteLine("One or both input files are missing.");
             return;
         }
 
-        try
+        // Load the two PDFs inside using blocks for deterministic disposal
+        using (Document doc1 = new Document(docPath1))
+        using (Document doc2 = new Document(docPath2))
         {
-            // Load the two PDFs to be compared
-            using (Document doc1 = new Document(docPath1))
-            using (Document doc2 = new Document(docPath2))
+            // Define footer rectangle for the first document (example coordinates)
+            // Adjust llx, lly, urx, ury to match the actual footer area on your pages
+            Aspose.Pdf.Rectangle footerArea1 = new Aspose.Pdf.Rectangle(0, 0, doc1.Pages[1].PageInfo.Width, 50);
+            // Define footer rectangle for the second document (example coordinates)
+            Aspose.Pdf.Rectangle footerArea2 = new Aspose.Pdf.Rectangle(0, 0, doc2.Pages[1].PageInfo.Width, 50);
+
+            // Configure side‑by‑side comparison options
+            SideBySideComparisonOptions options = new SideBySideComparisonOptions
             {
-                // Define footer rectangle for the first document (example coordinates)
-                // Adjust the coordinates to match the actual footer location.
-                Rectangle footerArea1 = new Rectangle(
-                    llx: 0,                     // left
-                    lly: 0,                     // bottom (footer at bottom of page)
-                    urx: doc1.Pages[1].PageInfo.Width, // right (full page width)
-                    ury: 50                     // top (height of footer region)
-                );
+                // Exclude the defined footer areas from both documents
+                ExcludeAreas1 = new[] { footerArea1 },
+                ExcludeAreas2 = new[] { footerArea2 },
 
-                // Define footer rectangle for the second document (example coordinates)
-                Rectangle footerArea2 = new Rectangle(
-                    llx: 0,
-                    lly: 0,
-                    urx: doc2.Pages[1].PageInfo.Width,
-                    ury: 50
-                );
+                // Optional: keep other defaults (e.g., ComparisonMode)
+                // ComparisonMode = ComparisonMode.IgnoreSpaces
+            };
 
-                // Configure comparison options with the exclude areas
-                SideBySideComparisonOptions options = new SideBySideComparisonOptions
-                {
-                    ExcludeAreas1 = new Rectangle[] { footerArea1 },
-                    ExcludeAreas2 = new Rectangle[] { footerArea2 },
-                    // Optional: exclude tables if not needed
-                    ExcludeTables = false
-                };
-
-                // Perform side‑by‑side comparison and save the result
-                SideBySidePdfComparer.Compare(doc1, doc2, resultPath, options);
-                Console.WriteLine($"Comparison completed. Result saved to '{resultPath}'.");
-            }
+            // Perform the comparison and save the result
+            SideBySidePdfComparer.Compare(doc1, doc2, resultPath, options);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during comparison: {ex.Message}");
-        }
+
+        Console.WriteLine($"Comparison completed. Result saved to '{resultPath}'.");
     }
 }

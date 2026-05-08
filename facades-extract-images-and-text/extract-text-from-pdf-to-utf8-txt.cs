@@ -7,30 +7,35 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputTxt = "output.txt";
+        const string inputPdfPath  = "input.pdf";   // Path to source PDF
+        const string outputTxtPath = "output.txt";  // Path for extracted text
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Error: File not found – {inputPdfPath}");
             return;
         }
 
-        // Initialize the PDF extractor facade
-        PdfExtractor extractor = new PdfExtractor();
+        try
+        {
+            // CREATE – initialize the PdfExtractor facade
+            using (PdfExtractor extractor = new PdfExtractor())
+            {
+                // LOAD – bind the PDF document to the extractor
+                extractor.BindPdf(inputPdfPath);
 
-        // Load the PDF document
-        extractor.BindPdf(inputPdf);
+                // EXTRACT – extract text using UTF‑8 encoding
+                extractor.ExtractText(Encoding.UTF8);
 
-        // Extract all text using UTF‑8 encoding
-        extractor.ExtractText(Encoding.UTF8);
+                // SAVE – write the extracted text to a UTF‑8 encoded .txt file
+                extractor.GetText(outputTxtPath);
+            }
 
-        // Write the extracted text to a UTF‑8 encoded .txt file
-        extractor.GetText(outputTxt);
-
-        // Release resources held by the extractor
-        extractor.Close();
-
-        Console.WriteLine($"Text successfully extracted to '{outputTxt}'.");
+            Console.WriteLine($"Text extracted successfully to '{outputTxtPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Extraction failed: {ex.Message}");
+        }
     }
 }

@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "encrypted_filled.pdf";
+        const string outputPath = "filled_encrypted.pdf";
         const string userPassword = "user123";
         const string ownerPassword = "owner123";
 
@@ -18,32 +18,40 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Fill form fields (example: a text field named "Name")
-            Field nameField = doc.Form["Name"] as Field; // cast WidgetAnnotation to Field
-            if (nameField != null)
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                nameField.Value = "John Doe";
+                // Fill form fields if the document contains a form
+                if (doc.Form != null && doc.Form.Count > 0)
+                {
+                    // Example: set the "Name" field
+                    Field nameField = doc.Form["Name"] as Field;
+                    if (nameField != null)
+                        nameField.Value = "John Doe";
+
+                    // Example: set the "Date" field
+                    Field dateField = doc.Form["Date"] as Field;
+                    if (dateField != null)
+                        dateField.Value = DateTime.Now.ToShortDateString();
+                }
+
+                // Define permissions for the encrypted PDF (allow printing and content extraction)
+                Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+
+                // Encrypt the document using AES-256 (preferred algorithm)
+                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+
+                // Save the encrypted PDF
+                doc.Save(outputPath);
             }
 
-            // Add additional field assignments here as needed
-            // e.g., fill a "Date" field
-            Field dateField = doc.Form["Date"] as Field; // cast WidgetAnnotation to Field
-            if (dateField != null)
-            {
-                dateField.Value = DateTime.Today.ToShortDateString();
-            }
-
-            // Define permissions and encrypt the document
-            Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent | Permissions.FillForm;
-            doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
-
-            // Save the encrypted PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"PDF saved and encrypted to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF has been filled and encrypted: '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

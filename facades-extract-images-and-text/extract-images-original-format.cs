@@ -1,16 +1,15 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf; // for ExtractImageMode enum
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "sample.pdf";
-        const string outputDir = "ExtractedImages";
+        const string inputPdf  = "sample.pdf";          // source PDF
+        const string outputDir = "ExtractedImages";     // folder for extracted images
 
-        // Verify input file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input file not found: {inputPdf}");
@@ -20,30 +19,34 @@ class Program
         // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Use PdfExtractor to extract images in their original format
+        // PdfExtractor implements IDisposable – use a using block for deterministic cleanup
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the PDF document to the extractor
+            // Bind the PDF file to the extractor
             extractor.BindPdf(inputPdf);
 
-            // Set extraction mode to extract images defined in resources (original format)
+            // Set extraction mode to retrieve images exactly as they are stored in the PDF
             extractor.ExtractImageMode = ExtractImageMode.DefinedInResources;
 
             // Start the extraction process
             extractor.ExtractImage();
 
             int imageIndex = 1;
-            // Retrieve each extracted image
+            // Iterate over all extracted images
             while (extractor.HasNextImage())
             {
-                // Build output file path (extension is determined by the original image format)
-                string outPath = Path.Combine(outputDir, $"image-{imageIndex}");
-                // GetNextImage without specifying format preserves the original image format
-                extractor.GetNextImage(outPath);
+                // Build output file name (original format is preserved by this overload)
+                string outputPath = Path.Combine(outputDir, $"image_{imageIndex}");
+
+                // The GetNextImage(string) overload saves the image in its original format.
+                // It automatically appends the appropriate file extension.
+                extractor.GetNextImage(outputPath);
+
+                Console.WriteLine($"Extracted image {imageIndex} to {outputPath}");
                 imageIndex++;
             }
         }
 
-        Console.WriteLine($"Images extracted to '{outputDir}'.");
+        Console.WriteLine("Image extraction completed.");
     }
 }

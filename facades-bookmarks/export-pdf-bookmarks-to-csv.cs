@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades;   // PdfBookmarkEditor, Bookmark, Bookmarks
 
 class Program
 {
@@ -11,50 +11,50 @@ class Program
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Use PdfBookmarkEditor to work with bookmarks
+        // Extract bookmarks using PdfBookmarkEditor (facade API)
         using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
         {
-            // Bind the PDF document
-            editor.BindPdf(inputPdf);
+            editor.BindPdf(inputPdf);                     // Load PDF into the editor
+            Bookmarks bookmarks = editor.ExtractBookmarks(); // Get all bookmarks (recursive)
 
-            // Extract all bookmarks (recursive)
-            Bookmarks bookmarks = editor.ExtractBookmarks();
-
-            // Write CSV file
             using (StreamWriter writer = new StreamWriter(outputCsv))
             {
                 // CSV header
-                writer.WriteLine("Title,Destination,Level");
+                writer.WriteLine("Title,DestinationPage,Level");
 
-                // Recursively write each bookmark
-                WriteBookmarks(writer, bookmarks, 0);
+                // Write each bookmark with its hierarchy level
+                foreach (Bookmark bm in bookmarks)
+                {
+                    WriteBookmark(bm, writer, 1);
+                }
             }
         }
 
         Console.WriteLine($"Bookmarks exported to '{outputCsv}'.");
     }
 
-    // Recursive helper to write bookmarks with their hierarchy level
-    static void WriteBookmarks(StreamWriter writer, Bookmarks bookmarks, int level)
+    // Recursive helper to write a bookmark and its children
+    static void WriteBookmark(Bookmark bm, StreamWriter writer, int level)
     {
-        foreach (Bookmark bm in bookmarks)
+        // Destination page is stored in the PageNumber property (0 if not set)
+        int destPage = bm.PageNumber;
+
+        // Escape double quotes for CSV compliance
+        string title = bm.Title?.Replace("\"", "\"\"") ?? string.Empty;
+
+        // Write CSV line: Title (quoted), DestinationPage, Level
+        writer.WriteLine($"\"{title}\",{destPage},{level}");
+
+        // Process child bookmarks, if any
+        if (bm.ChildItem != null && bm.ChildItem.Count > 0)
         {
-            // Destination: use page number if available; otherwise empty
-            string destination = bm.PageNumber > 0 ? bm.PageNumber.ToString() : string.Empty;
-
-            // Escape commas in title
-            string title = bm.Title?.Replace(",", "&#44;") ?? string.Empty;
-
-            writer.WriteLine($"{title},{destination},{level}");
-
-            // If the bookmark has child items, recurse with increased level
-            if (bm.ChildItem != null && bm.ChildItem.Count > 0)
+            foreach (Bookmark child in bm.ChildItem)
             {
-                WriteBookmarks(writer, bm.ChildItem, level + 1);
+                WriteBookmark(child, writer, level + 1);
             }
         }
     }

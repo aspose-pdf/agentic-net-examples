@@ -1,7 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades; // PdfBookmarkEditor resides here
 
 class Program
 {
@@ -11,7 +11,7 @@ class Program
         const string outputPdf = "output_collapsed.pdf";
 
         // Titles of bookmarks that should be collapsed (closed)
-        string[] titlesToCollapse = { "Chapter 1", "Appendix A" };
+        string[] bookmarksToCollapse = { "Chapter 1", "Appendix" };
 
         if (!File.Exists(inputPdf))
         {
@@ -24,33 +24,36 @@ class Program
         editor.BindPdf(inputPdf);
 
         // Extract all bookmarks from the document
-        Bookmarks allBookmarks = editor.ExtractBookmarks();
+        Aspose.Pdf.Facades.Bookmarks allBookmarks = editor.ExtractBookmarks();
 
-        // Iterate through the bookmark hierarchy and collapse matching titles
-        foreach (Bookmark bm in allBookmarks)
-        {
-            CollapseMatchingBookmarks(bm, titlesToCollapse);
-        }
+        // Recursively set the Open property to false for matching titles
+        SetBookmarksOpenState(allBookmarks, bookmarksToCollapse, false);
 
         // Save the modified PDF
         editor.Save(outputPdf);
+
         Console.WriteLine($"Bookmarks collapsed and saved to '{outputPdf}'.");
     }
 
-    // Recursively walks the bookmark tree and sets Open = false for matching titles
-    static void CollapseMatchingBookmarks(Bookmark bookmark, string[] titlesToCollapse)
+    // Recursive helper to walk through the bookmark hierarchy
+    static void SetBookmarksOpenState(Aspose.Pdf.Facades.Bookmarks bookmarks, string[] titles, bool openState)
     {
-        if (Array.Exists(titlesToCollapse, t => string.Equals(t, bookmark.Title, StringComparison.OrdinalIgnoreCase)))
+        foreach (Aspose.Pdf.Facades.Bookmark bm in bookmarks)
         {
-            bookmark.Open = false; // collapsed state
-        }
-
-        // Process child bookmarks if any
-        if (bookmark.ChildItems != null)
-        {
-            foreach (Bookmark child in bookmark.ChildItems)
+            // If the bookmark title matches one of the specified titles, set its Open state
+            foreach (string title in titles)
             {
-                CollapseMatchingBookmarks(child, titlesToCollapse);
+                if (string.Equals(bm.Title, title, StringComparison.OrdinalIgnoreCase))
+                {
+                    bm.Open = openState; // false collapses the bookmark
+                    break;
+                }
+            }
+
+            // Process child bookmarks recursively, if any
+            if (bm.ChildItems != null && bm.ChildItems.Count > 0)
+            {
+                SetBookmarksOpenState(bm.ChildItems, titles, openState);
             }
         }
     }

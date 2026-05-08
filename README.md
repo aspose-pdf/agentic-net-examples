@@ -8,49 +8,49 @@ This repository provides working code examples demonstrating Aspose.PDF for .NET
 
 | Metric | Value |
 |--------|-------|
-| Total examples | 2708 |
+| Total examples | 2631 |
 | Categories | 34 |
 | Target framework | net10.0 |
-| Aspose.PDF version | 26.3.0 |
-| Last updated | 2026-04-10 |
+| Aspose.PDF version | 26.4.0 |
+| Last updated | 2026-05-08 |
 
 ## Repository Structure
 
 Examples are organized by feature category:
 - `accessibility-and-tagged-pdfs/` - 45 example(s)
-- `basic-operations/` - 57 example(s)
-- `compare-pdf/` - 28 example(s)
+- `basic-operations/` - 56 example(s)
+- `compare-pdf/` - 27 example(s)
 - `conversion/` - 102 example(s)
-- `document/` - 122 example(s)
-- `facades-acroforms/` - 41 example(s)
-- `facades-annotations/` - 107 example(s)
+- `document/` - 118 example(s)
+- `facades-acroforms/` - 40 example(s)
+- `facades-annotations/` - 106 example(s)
 - `facades-bookmarks/` - 35 example(s)
 - `facades-convert-documents/` - 40 example(s)
 - `facades-documents/` - 101 example(s)
-- `facades-edit-document/` - 214 example(s)
-- `facades-extract-images-and-text/` - 83 example(s)
-- `facades-fill-forms/` - 35 example(s)
-- `facades-forms/` - 88 example(s)
+- `facades-edit-document/` - 209 example(s)
+- `facades-extract-images-and-text/` - 82 example(s)
+- `facades-fill-forms/` - 28 example(s)
+- `facades-forms/` - 90 example(s)
 - `facades-metadata/` - 40 example(s)
 - `facades-pages/` - 117 example(s)
 - `facades-secure-documents/` - 40 example(s)
-- `facades-sign-documents/` - 35 example(s)
-- `facades-stamps/` - 50 example(s)
-- `facades-texts-and-images/` - 29 example(s)
-- `facades-xmp-metadata/` - 45 example(s)
-- `graphs-zugferd-operators/` - 84 example(s)
+- `facades-sign-documents/` - 34 example(s)
+- `facades-stamps/` - 45 example(s)
+- `facades-texts-and-images/` - 27 example(s)
+- `facades-xmp-metadata/` - 43 example(s)
+- `graphs-zugferd-operators/` - 83 example(s)
 - `pages/` - 99 example(s)
 - `parse-pdf/` - 65 example(s)
-- `securing-and-signing-pdf/` - 87 example(s)
+- `securing-and-signing-pdf/` - 83 example(s)
 - `stamping/` - 50 example(s)
-- `working-with-annotations/` - 163 example(s)
+- `working-with-annotations/` - 160 example(s)
 - `working-with-attachments/` - 50 example(s)
-- `working-with-forms/` - 240 example(s)
-- `working-with-graphs/` - 85 example(s)
-- `working-with-images/` - 72 example(s)
-- `working-with-tables/` - 109 example(s)
-- `working-with-text/` - 75 example(s)
-- `working-with-xml/` - 75 example(s)
+- `working-with-forms/` - 239 example(s)
+- `working-with-graphs/` - 70 example(s)
+- `working-with-images/` - 70 example(s)
+- `working-with-tables/` - 91 example(s)
+- `working-with-text/` - 72 example(s)
+- `working-with-xml/` - 74 example(s)
 
 Each category contains standalone `.cs` files that can be compiled and run independently.
 
@@ -58,7 +58,7 @@ Each category contains standalone `.cs` files that can be compiled and run indep
 
 ### Prerequisites
 - .NET SDK (net10.0 or compatible version)
-- Aspose.PDF for .NET NuGet package (26.3.0)
+- Aspose.PDF for .NET NuGet package (26.4.0)
 - Valid Aspose license (for production use)
 
 ### Running Examples
@@ -69,7 +69,7 @@ Each example is a self-contained C# file. To run an example:
 cd <CategoryFolder>
 dotnet new console -o ExampleProject
 cd ExampleProject
-dotnet add package Aspose.PDF --version 26.3.0
+dotnet add package Aspose.PDF --version 26.4.0
 # Copy the example .cs file as Program.cs
 dotnet run
 ```
@@ -141,4 +141,4 @@ All examples use [Aspose.PDF for .NET](https://products.aspose.com/pdf/net/) and
 
 ---
 
-*This repository is maintained by automated code generation. For AI-friendly guidance, see [agents.md](./agents.md). Last updated: 2026-04-10*
+*This repository is maintained by automated code generation. For AI-friendly guidance, see [agents.md](./agents.md). Last updated: 2026-05-08*

@@ -7,29 +7,22 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_A3.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_a3.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Change page size to A3 using PdfPageEditor (facade)
+        using (Document doc = new Document(inputPath))
         using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // Load the source PDF
-            editor.BindPdf(inputPath);
-
-            // Set the output page size to A3
-            editor.PageSize = PageSize.A3;
-
-            // Apply the changes to all pages
-            editor.ApplyChanges();
-
-            // Save the modified PDF
-            editor.Save(outputPath);
+            editor.BindPdf(doc);
+            editor.PageSize = PageSize.A3; // Set target page size to A3
+            editor.ApplyChanges();        // Apply size change to all pages
+            editor.Save(outputPath);      // Save the modified PDF
         }
 
         Console.WriteLine($"PDF saved with A3 page size to '{outputPath}'.");

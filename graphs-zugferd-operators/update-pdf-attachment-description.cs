@@ -2,55 +2,48 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Drawing;
 
-class UpdateAttachmentDescription
+class Program
 {
     static void Main()
     {
-        const string outputPdf = "output.pdf";
-        const string dummyAttachment = "dummy.txt";
-        const string initialDescription = "Initial description";
-        const string newDescription = "Updated description for the latest version";
+        const string inputPdfPath = "input.pdf";          // Path to the source PDF
+        const string outputPdfPath = "output.pdf";        // Path where the updated PDF will be saved
+        const string newDescription = "Latest version of the attached file"; // New description text
 
-        // ------------------------------------------------------------
-        // Ensure the dummy file that will be attached exists.
-        // ------------------------------------------------------------
-        if (!File.Exists(dummyAttachment))
+        if (!File.Exists(inputPdfPath))
         {
-            File.WriteAllText(dummyAttachment, "This is a dummy attachment used for demonstration.");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            return;
         }
 
-        // ------------------------------------------------------------
-        // Create a new PDF, embed the attachment and update its description.
-        // ------------------------------------------------------------
-        using (Document doc = new Document())
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Add a blank page where the visual attachment annotation will be placed.
-            Page page = doc.Pages.Add();
+            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            {
+                Page page = doc.Pages[pageIndex];
 
-            // Create a FileSpecification for the attachment with the *initial* description.
-            FileSpecification fileSpec = new FileSpecification(dummyAttachment, initialDescription);
-            // Provide the file's raw bytes – required for PDF/A compliance and for a proper attachment.
-            fileSpec.Contents = new MemoryStream(File.ReadAllBytes(dummyAttachment));
+                // Iterate through all annotations on the current page
+                for (int annIndex = 1; annIndex <= page.Annotations.Count; annIndex++)
+                {
+                    Annotation ann = page.Annotations[annIndex];
 
-            // Embed the file in the PDF (makes it part of the document's EmbeddedFiles collection).
-            doc.EmbeddedFiles.Add(fileSpec);
+                    // Check if the annotation is a FileAttachmentAnnotation
+                    if (ann is FileAttachmentAnnotation fileAnn && fileAnn.File != null)
+                    {
+                        // Update the description of the attached file
+                        fileAnn.File.Description = newDescription;
+                        Console.WriteLine($"Updated description on page {pageIndex}, annotation {annIndex}.");
+                    }
+                }
+            }
 
-            // Create a visual annotation so the user can see and open the attachment in a PDF viewer.
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 150, 650);
-            FileAttachmentAnnotation attachmentAnn = new FileAttachmentAnnotation(page, rect, fileSpec);
-            page.Annotations.Add(attachmentAnn);
-
-            // --------------------------------------------------------
-            // Update the description to reflect the latest version.
-            // --------------------------------------------------------
-            fileSpec.Description = newDescription;
-
-            // Save the resulting PDF.
-            doc.Save(outputPdf);
+            // Save the modified document (standard Save overload)
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Attachment description updated and saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF saved with updated attachment description to '{outputPdfPath}'.");
     }
 }

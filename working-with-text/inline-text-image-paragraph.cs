@@ -7,48 +7,46 @@ class Program
 {
     static void Main()
     {
-        // Paths for the output PDF and the image to embed
-        const string outputPdfPath = "inline_text_image.pdf";
-        const string imagePath     = "sample.png";
+        const string outputPath = "inline_text_image.pdf";
+        const string imagePath  = "logo.png"; // replace with a valid image file path
 
-        // Verify that the image file exists
+        // Ensure the image file exists before proceeding
         if (!File.Exists(imagePath))
         {
             Console.Error.WriteLine($"Image file not found: {imagePath}");
             return;
         }
 
-        // Create a new PDF document and add a page
+        // Create a new PDF document
         using (Document doc = new Document())
         {
+            // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // First text fragment (before the image)
-            TextFragment tfBefore = new TextFragment("Hello ");
-            tfBefore.TextState.Font = FontRepository.FindFont("Helvetica");
-            tfBefore.TextState.FontSize = 12;
-            tfBefore.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-            page.Paragraphs.Add(tfBefore);
+            // ----- Text fragment (inline) -----
+            TextFragment textFragment = new TextFragment("Hello ");
+            textFragment.IsInLineParagraph = true;                     // make it inline
+            textFragment.TextState.FontSize = 12;
+            textFragment.TextState.Font = FontRepository.FindFont("Helvetica");
+            textFragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
 
-            // Inline image fragment
-            Image img = new Image();
-            img.File = imagePath;               // Load image from file
-            img.IsInLineParagraph = true;       // Make the image appear inline with surrounding text
-            img.FixWidth = 30;                  // Optional: set displayed width
-            img.FixHeight = 30;                 // Optional: set displayed height
-            page.Paragraphs.Add(img);
+            // ----- Image fragment (inline) -----
+            // Aspose.Pdf does not have an ImageFragment class; use Image instead.
+            Image imageFragment = new Image();
+            imageFragment.File = imagePath;                            // source image file
+            imageFragment.IsInLineParagraph = true;                    // make it inline
+            imageFragment.FixWidth = 50;                               // optional sizing
+            imageFragment.FixHeight = 20;
 
-            // Second text fragment (after the image)
-            TextFragment tfAfter = new TextFragment("world!");
-            tfAfter.TextState.Font = FontRepository.FindFont("Helvetica");
-            tfAfter.TextState.FontSize = 12;
-            tfAfter.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-            page.Paragraphs.Add(tfAfter);
+            // Add the text and image fragments to the page in sequence.
+            // Because both are marked as inline, they will appear on the same line.
+            page.Paragraphs.Add(textFragment);
+            page.Paragraphs.Add(imageFragment);
 
             // Save the resulting PDF
-            doc.Save(outputPdfPath);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with inline text and image saved to '{outputPdfPath}'.");
+        Console.WriteLine($"PDF with inline text and image saved to '{outputPath}'.");
     }
 }

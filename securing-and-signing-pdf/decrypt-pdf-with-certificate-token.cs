@@ -1,49 +1,67 @@
 using System;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
-using Aspose.Pdf; // Document, etc.
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "encrypted_certificate.pdf";
-        const string outputPdf = "decrypted.pdf";
+        const string inputPath = "encrypted.pdf";
+        const string outputPath = "decrypted.pdf";
 
-        if (!File.Exists(inputPdf))
+        // Verify that the encrypted PDF exists before attempting to open it.
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.WriteLine($"Input file '{inputPath}' was not found. Please place the encrypted PDF in the working directory or update the path.");
             return;
         }
 
-        // Load the public certificate (with private key) from the hardware token / store.
-        // Adjust StoreName/StoreLocation as needed for your token.
-        X509Certificate2 publicCert;
+        // Retrieve a certificate that contains a private key.
+        // If you know the exact subject, replace the empty string with the desired value.
+        X509Certificate2 cert = GetCertificateFromStore(string.Empty);
+
+        // Create certificate‑based encryption options (fully qualified type)
+        Aspose.Pdf.Security.CertificateEncryptionOptions certOptions =
+            new Aspose.Pdf.Security.CertificateEncryptionOptions(cert, StoreName.My, StoreLocation.CurrentUser);
+
+        // Open the PDF with the certificate options, decrypt, and save
+        using (Document doc = new Document(inputPath, certOptions))
+        {
+            doc.Decrypt();                     // Decrypt the document
+            doc.Save(outputPath);              // Save the decrypted PDF
+        }
+
+        Console.WriteLine($"Decrypted PDF saved to '{outputPath}'.");
+    }
+
+    // Helper: locate a certificate with a private key in the current user's store.
+    // If 'subjectContains' is null or empty, the first certificate with a private key is returned.
+    static X509Certificate2 GetCertificateFromStore(string subjectContains)
+    {
         using (X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser))
         {
             store.Open(OpenFlags.ReadOnly);
-            // Here we simply take the first certificate; replace with proper selection logic.
-            if (store.Certificates.Count == 0)
+            X509Certificate2Collection collection = store.Certificates;
+
+            // Prefer certificates that have a private key.
+            foreach (X509Certificate2 cert in collection)
             {
-                Console.Error.WriteLine("No certificates found in the specified store.");
-                return;
+                if (!cert.HasPrivateKey)
+                    continue;
+
+                if (string.IsNullOrEmpty(subjectContains) ||
+                    (!string.IsNullOrEmpty(cert.Subject) && cert.Subject.IndexOf(subjectContains, StringComparison.OrdinalIgnoreCase) >= 0))
+                {
+                    return cert;
+                }
             }
-            publicCert = store.Certificates[0];
         }
 
-        // Create certificate‑based encryption options.
-        Aspose.Pdf.Security.CertificateEncryptionOptions certOptions = new Aspose.Pdf.Security.CertificateEncryptionOptions(
-            publicCert,
-            StoreName.My,
-            StoreLocation.CurrentUser);
-
-        // Open the PDF using the certificate options, decrypt, and save.
-        using (Document doc = new Document(inputPdf, certOptions))
-        {
-            doc.Decrypt();                 // Decrypt the document.
-            doc.Save(outputPdf);            // Save the decrypted version.
-        }
-
-        Console.WriteLine($"Decrypted PDF saved to '{outputPdf}'.");
+        // If we reach this point, no suitable certificate was found.
+        throw new InvalidOperationException(
+            string.IsNullOrEmpty(subjectContains)
+                ? "No certificate with a private key was found in the current user's store."
+                : $"Certificate containing subject '{subjectContains}' with a private key was not found in the current user's store.");
     }
 }

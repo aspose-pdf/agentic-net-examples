@@ -6,8 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "sample.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,29 +14,25 @@ class Program
             return;
         }
 
-        // Create a PdfFileInfo facade and bind the PDF document
+        // Initialize PdfFileInfo and bind the PDF file
         using (PdfFileInfo pdfInfo = new PdfFileInfo())
         {
             pdfInfo.BindPdf(inputPath);
 
             // Read existing metadata
-            Console.WriteLine($"Title   : {pdfInfo.Title}");
-            Console.WriteLine($"Author  : {pdfInfo.Author}");
-            Console.WriteLine($"Subject : {pdfInfo.Subject}");
-            Console.WriteLine($"Keywords: {pdfInfo.Keywords}");
-            Console.WriteLine($"Pages   : {pdfInfo.NumberOfPages}");
-            Console.WriteLine($"Version : {pdfInfo.GetPdfVersion()}");
+            Console.WriteLine($"Title: {pdfInfo.Title}");
+            Console.WriteLine($"Author: {pdfInfo.Author}");
+            Console.WriteLine($"Number of pages: {pdfInfo.NumberOfPages}");
+            Console.WriteLine($"PDF version: {pdfInfo.GetPdfVersion()}");
 
-            // Modify metadata
-            pdfInfo.Title    = "Updated Document Title";
-            pdfInfo.Author   = "Jane Doe";
-            pdfInfo.Subject  = "Aspose.Pdf Metadata Example";
-            pdfInfo.Keywords = "Aspose.Pdf;Metadata;Example";
+            // Modify metadata as needed
+            pdfInfo.Title = "Updated Document Title";
+            pdfInfo.Author = "John Doe";
 
-            // Save the updated metadata to a new file
-            pdfInfo.SaveNewInfo(outputPath);
+            // Save the updated PDF to a new file
+            pdfInfo.SaveNewInfo("updated.pdf");
         }
 
-        Console.WriteLine($"Metadata updated and saved to '{outputPath}'.");
+        Console.WriteLine("Metadata operations completed.");
     }
 }

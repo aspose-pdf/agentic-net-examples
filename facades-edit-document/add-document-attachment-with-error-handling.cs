@@ -6,10 +6,10 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath      = "input.pdf";
-        const string attachmentPath    = "attachment_file.pdf";
-        const string outputPdfPath     = "output_with_attachment.pdf";
-        const string attachmentDesc    = "Description of the attachment file";
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "output_with_attachment.pdf";
+        const string attachmentPath = "attachment_file.pdf";
+        const string attachmentDescription = "Description of the attachment";
 
         // Verify source PDF exists
         if (!File.Exists(inputPdfPath))
@@ -21,27 +21,27 @@ class Program
         // Verify attachment file exists before attempting to add it
         if (!File.Exists(attachmentPath))
         {
-            Console.Error.WriteLine($"Error: Attachment file not found – '{attachmentPath}'. Skipping attachment.");
+            Console.Error.WriteLine($"Error: Attachment file not found – '{attachmentPath}'.");
+            return;
         }
 
         try
         {
-            // Create the facade and bind the source PDF
+            // Create and bind the PDF using PdfContentEditor (facade API)
             PdfContentEditor editor = new PdfContentEditor();
             editor.BindPdf(inputPdfPath);
 
-            // Add attachment only if the file is present
-            if (File.Exists(attachmentPath))
-            {
-                editor.AddDocumentAttachment(attachmentPath, attachmentDesc);
-            }
+            // Add the attachment (no annotation) – both parameters are strings
+            editor.AddDocumentAttachment(attachmentPath, attachmentDescription);
 
             // Save the modified PDF
             editor.Save(outputPdfPath);
-            Console.WriteLine($"PDF saved successfully to '{outputPdfPath}'.");
+
+            Console.WriteLine($"Attachment added successfully. Output saved to '{outputPdfPath}'.");
         }
         catch (Exception ex)
         {
+            // General error handling – logs any unexpected issues
             Console.Error.WriteLine($"An error occurred: {ex.Message}");
         }
     }

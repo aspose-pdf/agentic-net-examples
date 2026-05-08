@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text; // for ImagePlacementAbsorber
 
 class Program
 {
@@ -10,7 +11,6 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output_zoomed.pdf";
-        const float zoomFactor  = 0.5f; // 50% zoom
 
         if (!File.Exists(inputPath))
         {
@@ -18,7 +18,7 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using and Document.Save)
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
             // Collect page numbers that contain at least one image
@@ -27,34 +27,33 @@ class Program
             for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
                 // ImagePlacementAbsorber finds image placements on a page
-                ImagePlacementAbsorber imgAbsorber = new ImagePlacementAbsorber();
-                doc.Pages[pageNum].Accept(imgAbsorber);
+                ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
+                doc.Pages[pageNum].Accept(absorber);
 
-                if (imgAbsorber.ImagePlacements.Count > 0)
+                if (absorber.ImagePlacements.Count > 0)
                 {
                     pagesWithImages.Add(pageNum);
                 }
             }
 
+            // If any pages contain images, apply zoom only to those pages
             if (pagesWithImages.Count > 0)
             {
-                // Use PdfPageEditor to apply zoom only to the collected pages
+                // PdfPageEditor works on the same Document instance
                 PdfPageEditor editor = new PdfPageEditor();
-
-                // Bind the already loaded document to the editor
                 editor.BindPdf(doc);
 
-                // Specify which pages to edit
+                // Specify the pages to be edited
                 editor.ProcessPages = pagesWithImages.ToArray();
 
-                // Set the desired zoom factor (1.0 = 100%)
-                editor.Zoom = zoomFactor;
+                // Set desired zoom factor (e.g., 150% zoom)
+                editor.Zoom = 1.5f;
 
-                // Apply the changes to the document
+                // Apply the changes to the selected pages
                 editor.ApplyChanges();
             }
 
-            // Save the modified document (lifecycle rule: Document.Save)
+            // Save the modified document (PDF format)
             doc.Save(outputPath);
         }
 

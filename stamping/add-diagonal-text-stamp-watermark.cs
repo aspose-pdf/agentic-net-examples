@@ -1,13 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // needed for FontRepository and TextState
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "watermarked.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,35 +16,38 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a text stamp that will be applied to every page
+            // Create a text stamp that will be used on every page
             TextStamp stamp = new TextStamp("CONFIDENTIAL")
             {
                 // Center the stamp on the page
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment   = VerticalAlignment.Center,
 
-                // Rotate the stamp 45 degrees (diagonal watermark)
+                // Rotate 45 degrees (arbitrary angle)
                 RotateAngle = 45,
 
                 // Make the stamp semi‑transparent
-                Opacity = 0.3f
+                Opacity = 0.3,
+
+                // Keep the stamp on top of page content
+                Background = false
             };
 
-            // TextState is read‑only – modify the existing instance instead of assigning a new one
+            // Configure the visual appearance of the text
             stamp.TextState.Font = FontRepository.FindFont("Helvetica");
             stamp.TextState.FontSize = 72;
             stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
 
-            // Apply the stamp to each page
+            // Apply the same stamp to each page in the document
             foreach (Page page in doc.Pages)
             {
                 page.AddStamp(stamp);
             }
 
-            // Save the result as PDF
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

@@ -8,31 +8,38 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputTxtPath = "output.txt";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.txt";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdfPath))
+        try
         {
-            // Create a TextAbsorber to extract text from the whole document
-            TextAbsorber absorber = new TextAbsorber();
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
+            {
+                // Create a TextAbsorber to extract text from the document
+                TextAbsorber absorber = new TextAbsorber();
 
-            // Accept the absorber for all pages
-            doc.Pages.Accept(absorber);
+                // Accept the absorber for all pages
+                doc.Pages.Accept(absorber);
 
-            // Retrieve the extracted text
-            string extractedText = absorber.Text;
+                // Retrieve the extracted text (empty string if null)
+                string extractedText = absorber.Text ?? string.Empty;
 
-            // Write the text to a UTF-8 encoded file
-            File.WriteAllText(outputTxtPath, extractedText, Encoding.UTF8);
+                // Write the text to a UTF‑8 encoded file
+                File.WriteAllText(outputPath, extractedText, Encoding.UTF8);
+            }
+
+            Console.WriteLine($"Text extracted to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Text extracted to '{outputTxtPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

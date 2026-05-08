@@ -1,60 +1,109 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Paths for the target PDF (to be stamped) and the final output PDF
-        const string targetPdfPath = "target.pdf";
-        const string outputPdfPath = "stamped_output.pdf";
+        // Path to the PDF that will receive the stamps
+        const string targetPdf = "target.pdf";
 
-        // PDF files that will be combined into a multi‑page stamp
-        string[] stampPdfFiles = new string[]
+        // Paths to the PDF files that will be used as stamps (each may have multiple pages)
+        // For this example we assume each stamp PDF has at least one page and we use its first page.
+        var stampPdfFiles = new List<string>
         {
             "stamp1.pdf",
             "stamp2.pdf",
             "stamp3.pdf"
         };
 
-        // Ensure all required files exist before proceeding
-        if (!File.Exists(targetPdfPath))
+        // Output file that will contain the stamped document
+        const string outputPdf = "stamped_output.pdf";
+
+        // Verify that all files exist before proceeding
+        if (!File.Exists(targetPdf))
         {
-            Console.Error.WriteLine($"Target PDF not found: {targetPdfPath}");
+            Console.Error.WriteLine($"Target PDF not found: {targetPdf}");
             return;
         }
 
-        foreach (string stampFile in stampPdfFiles)
+        foreach (var sp in stampPdfFiles)
         {
-            if (!File.Exists(stampFile))
+            if (!File.Exists(sp))
             {
-                Console.Error.WriteLine($"Stamp PDF not found: {stampFile}");
+                Console.Error.WriteLine($"Stamp PDF not found: {sp}");
                 return;
             }
         }
 
-        // Initialize PdfFileStamp and bind the target PDF (input)
-        PdfFileStamp fileStamp = new PdfFileStamp();
-        fileStamp.BindPdf(targetPdfPath); // Bind only the input PDF
+        // Create the PdfFileStamp facade and bind the target document
+        var fileStamp = new PdfFileStamp();
+        fileStamp.BindPdf(targetPdf); // loads the document to be stamped
 
-        // Create a Stamp object for each source PDF and add it to the PdfFileStamp
-        foreach (string stampFile in stampPdfFiles)
+        // Create a Stamp for each source PDF and add it to the facade
+        foreach (var stampPath in stampPdfFiles)
         {
-            // The Stamp class works with a specific page of the source PDF.
-            // Here we use the first page of each source PDF as a stamp page.
-            Stamp stamp = new Stamp();
-            stamp.BindPdf(stampFile, 1);          // Bind the first page of the source PDF
-            stamp.IsBackground = true;            // Apply as background (watermark) – optional
-            stamp.Opacity = 0.5f;                 // Semi‑transparent – optional
+            // Create a new Stamp instance
+            var stamp = new Stamp();
+
+            // Bind the first page of the stamp PDF as the stamp content
+            // (page numbers are 1‑based)
+            stamp.BindPdf(stampPath, 1);
+
+            // Optional: make the stamp appear as a background element
+            stamp.IsBackground = true;
+
+            // Optional: set opacity (0.0 = fully transparent, 1.0 = fully opaque)
+            stamp.Opacity = 0.8f;
+
+            // Optional: position the stamp (origin is measured from the lower‑left corner)
+            stamp.SetOrigin(0, 0); // place at the lower‑left corner; adjust as needed
+
+            // Add the configured stamp to the PdfFileStamp object
             fileStamp.AddStamp(stamp);
         }
 
-        // Save the stamped PDF to the desired output path
-        fileStamp.Save(outputPdfPath);
-        // Release resources
-        fileStamp.Close();
+        // Save the result. PdfFileStamp.Save writes the output file.
+        // On non‑Windows platforms Aspose.Pdf may require libgdiplus for rendering.
+        // Guard the save operation to avoid TypeInitializationException on macOS/Linux.
+        try
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                fileStamp.Save(outputPdf);
+            }
+            else
+            {
+                // Attempt to save; if GDI+ is missing the exception will be caught below.
+                fileStamp.Save(outputPdf);
+            }
 
-        Console.WriteLine($"Multi‑page stamp applied successfully. Output saved to '{outputPdfPath}'.");
+            Console.WriteLine($"Stamped PDF saved to '{outputPdf}'.");
+        }
+        catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
+        {
+            Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. " +
+                              "The stamping operation could not be completed.");
+        }
+        finally
+        {
+            // Close releases any resources held by the facade.
+            fileStamp.Close();
+        }
+    }
+
+    // Helper to detect a nested DllNotFoundException (e.g., missing libgdiplus)
+    private static bool ContainsDllNotFound(Exception ex)
+    {
+        while (ex != null)
+        {
+            if (ex is DllNotFoundException)
+                return true;
+            ex = ex.InnerException;
+        }
+        return false;
     }
 }

@@ -1,47 +1,49 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Create a new PDF document
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // ---------- Page 1 ----------
-            Page page1 = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Add some visible text
-            page1.Paragraphs.Add(new TextFragment("Click the blue rectangle to jump to Page 2"));
+        // Load the PDF (lifecycle rule: use using)
+        using (Document doc = new Document(inputPath))
+        {
+            // -------------------------------------------------
+            // 1. Define a named destination called "MyDest"
+            //    that points to page 2 (fit the whole page)
+            // -------------------------------------------------
+            // Add the named destination directly via the collection.
+            // The collection expects a name and a destination object.
+            doc.NamedDestinations.Add("MyDest", new FitExplicitDestination(doc.Pages[2]));
 
-            // Define the rectangle area for the link annotation
-            Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(100, 700, 300, 750);
-
-            // Create the link annotation
-            LinkAnnotation link = new LinkAnnotation(page1, linkRect)
+            // -------------------------------------------------
+            // 2. Create a link annotation on page 1
+            // -------------------------------------------------
+            // Define the rectangle area for the link
+            var rect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
+            // Create the annotation and configure it
+            var link = new LinkAnnotation(doc.Pages[1], rect)
             {
-                Color = Aspose.Pdf.Color.Blue // optional visual cue
+                Action = new GoToAction(doc, "MyDest"),
+                Color = Aspose.Pdf.Color.Blue
             };
-
-            // The action refers to a named destination that will be defined later
-            link.Action = new GoToAction(doc, "MyDest");
-
             // Add the annotation to the page
-            page1.Annotations.Add(link);
+            doc.Pages[1].Annotations.Add(link);
 
-            // ---------- Page 2 (target) ----------
-            Page page2 = doc.Pages.Add();
-            page2.Paragraphs.Add(new TextFragment("You have arrived at the named destination."));
-
-            // Register a named destination that points to page2 (fit the whole page)
-            // In modern Aspose.PDF the NamedDestinations collection accepts a name and an IAppointment (destination) directly.
-            doc.NamedDestinations.Add("MyDest", new FitExplicitDestination(page2));
-
-            // Save the PDF
+            // -------------------------------------------------
+            // 3. Save the modified PDF (lifecycle rule: use Save)
+            // -------------------------------------------------
             doc.Save(outputPath);
         }
 

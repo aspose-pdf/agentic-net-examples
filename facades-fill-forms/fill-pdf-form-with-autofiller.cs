@@ -1,84 +1,68 @@
 using System;
 using System.Data;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
-    static void Main()
+    static void Main(string[] args)
     {
-        const string templatePath = "template.pdf";
-        const string outputPath   = "filled.pdf";
-
-        // ---------------------------------------------------------------------
-        // Ensure that a template PDF exists. If it does not, create a minimal one
-        // containing the form fields that will be filled later. This prevents the
-        // runtime FileNotFoundException that was previously thrown.
-        // ---------------------------------------------------------------------
-        if (!File.Exists(templatePath))
+        // Expected arguments:
+        // 0 - path to the PDF template that contains form fields
+        // 1 - path to the XLSX file with data (for demo purposes we will not actually read the XLSX)
+        // 2 - optional output PDF path
+        if (args.Length < 2)
         {
-            CreateTemplate(templatePath);
+            Console.Error.WriteLine("Usage: <template.pdf> <data.xlsx> [output.pdf]");
+            return;
         }
 
-        // ---------------------------------------------------------------------
-        // Prepare a DataTable whose column names match the form field names in the
-        // PDF ("Name" and "Address").
-        // ---------------------------------------------------------------------
-        DataTable data = new DataTable();
-        data.Columns.Add("Name",    typeof(string));
-        data.Columns.Add("Address", typeof(string));
+        string templatePath = args[0];
+        string excelPath    = args[1];
+        string outputPath   = args.Length > 2 ? args[2] : "filled_output.pdf";
 
-        DataRow row = data.NewRow();
-        row["Name"]    = "John Doe";
-        row["Address"] = "123 Main St";
-        data.Rows.Add(row);
+        // -----------------------------------------------------------------
+        // Build a DataTable that matches the field names in the PDF template.
+        // In a real scenario you would read the XLSX file (e.g., via
+        // ExcelDataReader, ClosedXML, or OleDb) and populate the table.
+        // Here we create a single row with dummy data for illustration.
+        // -----------------------------------------------------------------
+        DataTable dataTable = new DataTable("MailMerge");
+        dataTable.Columns.Add("CompanyName", typeof(string));
+        dataTable.Columns.Add("ContactName", typeof(string));
+        dataTable.Columns.Add("Address",     typeof(string));
+        dataTable.Columns.Add("PostalCode",  typeof(string));
+        dataTable.Columns.Add("City",        typeof(string));
+        dataTable.Columns.Add("Country",     typeof(string));
+        dataTable.Columns.Add("Heading",     typeof(string));
 
-        // ---------------------------------------------------------------------
-        // Use a using‑statement so that AutoFiller is disposed automatically
-        // after the PDF is saved. This releases the unmanaged resources held by
-        // the facade.
-        // ---------------------------------------------------------------------
-        using (AutoFiller filler = new AutoFiller())
+        dataTable.Rows.Add(
+            "Acme Corp",               // CompanyName
+            "John Doe",                // ContactName
+            "123 Main St",             // Address
+            "12345",                   // PostalCode
+            "Metropolis",              // City
+            "USA",                     // Country
+            "Dear Acme Corp,"          // Heading
+        );
+
+        // -----------------------------------------------------------------
+        // Use Aspose.Pdf.Facades.AutoFiller to bind the template, import the
+        // DataTable, and generate the filled PDF.
+        // -----------------------------------------------------------------
+        using (AutoFiller autoFiller = new AutoFiller())
         {
-            filler.BindPdf(templatePath);   // Bind the template PDF file
-            filler.ImportDataTable(data);   // Import the data table
-            filler.Save(outputPath);        // Save the filled PDF to a file
+            // Bind the PDF template file.
+            autoFiller.BindPdf(templatePath);
+
+            // Import the data. Column names must exactly match the field names
+            // in the PDF (case‑sensitive).
+            autoFiller.ImportDataTable(dataTable);
+
+            // Save the resulting PDF. This creates a single merged PDF stream.
+            autoFiller.Save(outputPath);
         }
 
         Console.WriteLine($"Filled PDF saved to '{outputPath}'.");
-    }
-
-    // -------------------------------------------------------------------------
-    // Helper method that creates a very simple PDF containing two text box
-    // fields named "Name" and "Address". This method is only executed when the
-    // expected template file is missing, making the sample self‑contained.
-    // -------------------------------------------------------------------------
-    private static void CreateTemplate(string path)
-    {
-        // Create a new PDF document.
-        Document doc = new Document();
-        Page page = doc.Pages.Add();
-
-        // Define a rectangle for the "Name" field (left, bottom, right, top).
-        Rectangle nameRect = new Rectangle(100, 700, 300, 720);
-        Aspose.Pdf.Forms.TextBoxField nameField = new Aspose.Pdf.Forms.TextBoxField(page, nameRect)
-        {
-            PartialName = "Name",
-            Value = string.Empty
-        };
-        doc.Form.Add(nameField);
-
-        // Define a rectangle for the "Address" field.
-        Rectangle addressRect = new Rectangle(100, 650, 300, 670);
-        Aspose.Pdf.Forms.TextBoxField addressField = new Aspose.Pdf.Forms.TextBoxField(page, addressRect)
-        {
-            PartialName = "Address",
-            Value = string.Empty
-        };
-        doc.Form.Add(addressField);
-
-        // Save the template PDF.
-        doc.Save(path);
     }
 }

@@ -7,31 +7,31 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_letter_page6.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Initialize the PdfPageEditor facade
+        // PdfPageEditor implements IDisposable via SaveableFacade, so wrap it in a using block.
         using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // Load the source PDF
+            // Bind the source PDF file.
             editor.BindPdf(inputPath);
 
-            // Process only page 6 (1‑based indexing)
+            // Specify that only page 6 should be processed.
             editor.ProcessPages = new int[] { 6 };
 
-            // Set the output page size to Letter
+            // Set the desired output page size to Letter.
             editor.PageSize = PageSize.PageLetter;
 
-            // Apply the changes to the document
+            // Apply the changes to the bound document.
             editor.ApplyChanges();
 
-            // Save the modified PDF
+            // Save the modified PDF.
             editor.Save(outputPath);
         }
 

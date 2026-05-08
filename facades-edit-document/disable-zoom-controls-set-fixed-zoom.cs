@@ -6,32 +6,46 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_fixed_zoom.pdf";
+        const string inputPdf  = "input.pdf";
+        const string tempPdf   = "temp_pref.pdf";
+        const string outputPdf = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Disable UI elements that provide zoom controls
-        using (PdfContentEditor editor = new PdfContentEditor())
+        try
         {
-            editor.BindPdf(inputPath);
-            editor.ChangeViewerPreference(ViewerPreference.HideToolbar);      // hide toolbar (contains zoom)
-            editor.ChangeViewerPreference(ViewerPreference.HideWindowUI);    // hide other UI elements
-            editor.Save(outputPath);
-        }
+            // 1. Set viewer preferences to hide UI elements (including zoom controls)
+            using (PdfContentEditor viewerEditor = new PdfContentEditor())
+            {
+                viewerEditor.BindPdf(inputPdf);
+                // Hide the entire window UI (toolbars, menus, scrollbars, etc.)
+                viewerEditor.ChangeViewerPreference(ViewerPreference.HideWindowUI);
+                // Additionally hide the toolbar if a more granular control is desired
+                viewerEditor.ChangeViewerPreference(ViewerPreference.HideToolbar);
+                viewerEditor.Save(tempPdf);
+            }
 
-        // Set a fixed zoom level (100%)
-        using (PdfPageEditor pageEditor = new PdfPageEditor())
+            // 2. Set a fixed zoom level (100% = 1.0) for all pages
+            using (PdfPageEditor zoomEditor = new PdfPageEditor())
+            {
+                zoomEditor.BindPdf(tempPdf);
+                zoomEditor.Zoom = 1.0f; // Fixed zoom (no scaling)
+                zoomEditor.Save(outputPdf);
+            }
+
+            // Optional: clean up the intermediate file
+            if (File.Exists(tempPdf))
+                File.Delete(tempPdf);
+
+            Console.WriteLine($"Viewer preferences applied and fixed zoom set. Output saved to '{outputPdf}'.");
+        }
+        catch (Exception ex)
         {
-            pageEditor.BindPdf(outputPath);
-            pageEditor.Zoom = 1.0f; // 1.0 = 100%
-            pageEditor.Save(outputPath);
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
-
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

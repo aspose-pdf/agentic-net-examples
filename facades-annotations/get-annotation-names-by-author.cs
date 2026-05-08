@@ -2,52 +2,62 @@ using System;
 using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Facades;
 
 public static class PdfAnnotationHelper
 {
     /// <summary>
-    /// Returns the names of all annotations whose Author matches the specified value.
+    /// Returns the names of all annotations whose author (Title) matches the specified author string.
     /// </summary>
-    /// <param name="pdfPath">Full path to the PDF file.</param>
-    /// <param name="author">Author string to filter annotations.</param>
+    /// <param name="pdfPath">Path to the PDF file.</param>
+    /// <param name="author">Author name to filter by (matches the Title property of markup annotations).</param>
     /// <returns>List of annotation names.</returns>
     public static List<string> GetAnnotationNamesByAuthor(string pdfPath, string author)
     {
-        var result = new List<string>();
+        var matchingNames = new List<string>();
 
-        // Load the PDF directly via the Document class (no Facade API). This avoids
-        // locking the Aspose.Pdf assembly during build and is the recommended way
-        // for read‑only operations.
-        var doc = new Document(pdfPath);
-
-        // Aspose.Pdf pages are 1‑based.
-        for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+        // Use PdfAnnotationEditor facade to open the document.
+        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            Page page = doc.Pages[pageNum];
+            editor.BindPdf(pdfPath);
 
-            foreach (Annotation annotation in page.Annotations)
+            // Access the underlying Document.
+            Document doc = editor.Document;
+
+            // Iterate through all pages (1‑based indexing).
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                // The author of a markup annotation is stored in the Title property.
-                if (annotation is MarkupAnnotation markup &&
-                    !string.IsNullOrEmpty(markup.Title) &&
-                    string.Equals(markup.Title, author, StringComparison.OrdinalIgnoreCase) &&
-                    !string.IsNullOrEmpty(annotation.Name))
+                Page page = doc.Pages[pageIndex];
+
+                // Iterate over the annotations on the current page.
+                foreach (Annotation annotation in page.Annotations)
                 {
-                    result.Add(annotation.Name);
+                    // Only markup annotations have the Title property (author).
+                    if (annotation is MarkupAnnotation markup && markup.Title == author)
+                    {
+                        // Annotation.Name may be null; add only if a name is present.
+                        if (!string.IsNullOrEmpty(annotation.Name))
+                        {
+                            matchingNames.Add(annotation.Name);
+                        }
+                    }
                 }
             }
+
+            // No need to save; we are only reading.
         }
 
-        return result;
+        return matchingNames;
     }
 }
 
-// Dummy entry point to satisfy the compiler when the project expects a Main method.
+// Dummy entry point to satisfy the compiler when building as an executable.
 public class Program
 {
-    public static void Main()
+    public static void Main(string[] args)
     {
-        // Example usage (can be removed or replaced by unit tests)
+        // The method can be called from here if needed.
+        // Example (commented out):
         // var names = PdfAnnotationHelper.GetAnnotationNamesByAuthor("sample.pdf", "John Doe");
         // Console.WriteLine(string.Join(", ", names));
     }

@@ -6,32 +6,32 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPptx = "output.pptx";
+        // Input PDF file path
+        const string inputPdfPath = "input.pdf";
+        // Output PPTX file path
+        const string outputPptxPath = "output.pptx";
 
-        if (!File.Exists(inputPdf))
+        // Verify the input file exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document inside a using block to guarantee disposal
-        using (Document pdfDocument = new Document(inputPdf))
+        // Load the PDF document inside a using block for proper disposal
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
-            // Configure PPTX save options to render each slide as a raster image
+            // Initialize PPTX save options
             PptxSaveOptions pptxOptions = new PptxSaveOptions
             {
+                // Render each slide as a raster image
                 SlidesAsImages = true
             };
 
             // Save the document as PPTX using the specified options
-            pdfDocument.Save(outputPptx, pptxOptions);
+            pdfDocument.Save(outputPptxPath, pptxOptions);
         }
 
-        // Ensure the Aspose.Pdf assembly is not locked by the process before the next build.
-        // The using statement above disposes the Document and releases all internal resources.
-        // No additional code is required; just make sure the application has exited before rebuilding.
-
-        Console.WriteLine($"Conversion completed: {outputPptx}");
+        Console.WriteLine($"PDF successfully converted to PPTX: {outputPptxPath}");
     }
 }

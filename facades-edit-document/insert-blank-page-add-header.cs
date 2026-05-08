@@ -1,38 +1,46 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text; // FormattedText
+using Aspose.Pdf.Text;               // For FontRepository, HorizontalAlignment, etc.
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF and insert a blank page at position 3 (1‑based indexing)
+        // Load the PDF, insert a blank page at position 3, then add a header to every page.
         using (Document doc = new Document(inputPath))
         {
-            doc.Pages.Insert(3); // Inserts an empty page
+            // Aspose.Pdf uses 1‑based indexing; insert a new empty page at index 3.
+            doc.Pages.Insert(3);
 
-            // Use PdfFileStamp facade to add a header to all pages
-            using (PdfFileStamp stamp = new PdfFileStamp(doc))
+            // Create a TextStamp that will act as the header.
+            TextStamp headerStamp = new TextStamp("Header Text");
+            headerStamp.TextState.Font = FontRepository.FindFont("Helvetica");
+            headerStamp.TextState.FontSize = 12;
+            headerStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+            headerStamp.HorizontalAlignment = HorizontalAlignment.Center;
+            headerStamp.VerticalAlignment = VerticalAlignment.Top;
+            headerStamp.YIndent = 20f; // distance from the top edge
+
+            // Apply the stamp to every page.
+            foreach (Page page in doc.Pages)
             {
-                // Add a simple text header with a top margin of 50 points
-                stamp.AddHeader(new FormattedText("Header Text"), 50);
-
-                // Save the modified PDF
-                stamp.Save(outputPath);
+                page.AddStamp(headerStamp);
             }
+
+            // Save the modified PDF.
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with inserted page and header saved to '{outputPath}'.");
     }
 }

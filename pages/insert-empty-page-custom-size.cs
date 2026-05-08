@@ -1,51 +1,33 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // Core Aspose.Pdf namespace
 
 class Program
 {
     static void Main()
     {
-        // Paths for the source PDF and the result PDF
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";   // existing PDF
+        const string outputPath = "output.pdf";  // PDF with new first page
 
-        // Verify that the source file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // ----- Collect custom page size from the user -----
-        Console.Write("Enter page width (points): ");
-        string widthInput = Console.ReadLine();
-
-        Console.Write("Enter page height (points): ");
-        string heightInput = Console.ReadLine();
-
-        // Parse the dimensions; abort if parsing fails
-        if (!double.TryParse(widthInput, out double width) ||
-            !double.TryParse(heightInput, out double height))
+        // Load the existing PDF, modify, and save – all within a using block for proper disposal
+        using (Document doc = new Document(inputPath))
         {
-            Console.Error.WriteLine("Invalid page dimensions entered.");
-            return;
-        }
+            // Insert an empty page at the very beginning (position 1, because Aspose.Pdf uses 1‑based indexing)
+            Page insertedPage = doc.Pages.Insert(1);
 
-        // ----- Open the PDF, insert an empty page, set its size, and save -----
-        using (Document doc = new Document(inputPath)) // document-disposal-with-using
-        {
-            // Insert after the last existing page (1‑based indexing)
-            int insertPosition = doc.Pages.Count + 1; // page-indexing-one-based
-            Page newPage = doc.Pages.Insert(insertPosition); // Insert an empty page
-
-            // Apply the custom size to the newly inserted page
-            newPage.SetPageSize(width, height); // Page.SetPageSize
+            // Set the custom dimensions: width = 200 points, height = 300 points
+            insertedPage.SetPageSize(200, 300);
 
             // Save the modified document
-            doc.Save(outputPath); // save to PDF format
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Empty page with size {width}×{height} inserted and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with new first page: '{outputPath}'");
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -15,22 +16,25 @@ class Program
             return;
         }
 
-        // Initialize the PdfPageEditor facade
-        using (PdfPageEditor editor = new PdfPageEditor())
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document
-            editor.BindPdf(inputPath);
+            // Initialize the page editor and bind the document
+            using (PdfPageEditor editor = new PdfPageEditor())
+            {
+                editor.BindPdf(doc);
 
-            // Edit only page 2
-            editor.ProcessPages = new int[] { 2 };
+                // Apply the transition only to page 2
+                editor.ProcessPages = new int[] { 2 };
+                editor.TransitionType = PdfPageEditor.OUTBOX; // BoxOut effect
+                editor.TransitionDuration = 3; // duration in seconds
 
-            // Set transition to BoxOut (outward box) and duration to 3 seconds
-            editor.TransitionType = PdfPageEditor.OUTBOX;
-            editor.TransitionDuration = 3;
+                // Commit the changes to the document
+                editor.ApplyChanges();
+            }
 
-            // Apply the changes and save the result
-            editor.ApplyChanges();
-            editor.Save(outputPath);
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
         Console.WriteLine($"Transition applied and saved to '{outputPath}'.");

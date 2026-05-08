@@ -16,23 +16,32 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the form field by its name using the Form indexer.
-            // The indexer returns a WidgetAnnotation, so cast it to Aspose.Pdf.Forms.Field.
-            Field? field = doc.Form[fieldName] as Field;
+            // Get the AcroForm object from the document
+            Form acroForm = doc.Form;
 
-            if (field == null)
+            try
             {
-                Console.WriteLine($"Field '{fieldName}' not found or is not a form field in the document.");
-                return;
-            }
+                // Retrieve the form field by its name using the indexer.
+                // The Form indexer returns a WidgetAnnotation, so we need to cast it to Field.
+                Field? field = acroForm[fieldName] as Field;
+                if (field == null)
+                {
+                    Console.Error.WriteLine($"Field '{fieldName}' not found or is not a form field.");
+                    return;
+                }
 
-            // Display basic information about the field
-            Console.WriteLine($"Field Name   : {field.PartialName}");
-            Console.WriteLine($"Full Name    : {field.FullName}");
-            Console.WriteLine($"Field Value  : {field.Value}");
+                // Output basic information about the retrieved field
+                Console.WriteLine($"Field '{fieldName}' found. Type: {field.GetType().Name}");
+                Console.WriteLine($"Current value: {field.Value}");
+            }
+            catch (Exception ex)
+            {
+                // The indexer throws if the field is not present
+                Console.Error.WriteLine($"Error retrieving field '{fieldName}': {ex.Message}");
+            }
         }
     }
 }

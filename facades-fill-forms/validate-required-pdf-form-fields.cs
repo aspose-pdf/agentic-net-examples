@@ -2,91 +2,90 @@ using System;
 using System.Data;
 using System.IO;
 using System.Collections.Generic;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class PdfFormImporter
+class Program
 {
-    /// <summary>
-    /// Validates that every required field in the PDF form has a matching column in the supplied DataTable.
-    /// Throws an exception if any required field is missing.
-    /// </summary>
-    /// <param name="pdfTemplatePath">Path to the PDF form template.</param>
-    /// <param name="data">DataTable containing data to be imported.</param>
-    public static void ValidateAndImport(string pdfTemplatePath, DataTable data)
+    static void Main()
     {
-        if (!File.Exists(pdfTemplatePath))
-            throw new FileNotFoundException($"Template PDF not found: {pdfTemplatePath}");
+        const string inputPdfPath  = "template.pdf";   // PDF with AcroForm
+        const string outputPdfPath = "filled.pdf";
 
-        // Bind the PDF form using the Form facade.
-        using (Form form = new Form(pdfTemplatePath))
+        // Verify that the template PDF exists before attempting to open it.
+        if (!File.Exists(inputPdfPath))
         {
-            // Collect required field names that are missing in the DataTable.
+            Console.Error.WriteLine($"Error: The PDF template file '{inputPdfPath}' was not found.");
+            return; // Abort execution – nothing to fill.
+        }
+
+        // Assume dataTable is populated elsewhere.
+        DataTable dataTable = GetDataTable();
+
+        // Load the PDF form using Form facade inside a using block for deterministic disposal.
+        using (Form pdfForm = new Form(inputPdfPath))
+        {
+            // Collect names of required fields that are missing in the DataTable.
             List<string> missingColumns = new List<string>();
 
-            foreach (string fieldName in form.FieldNames)
+            foreach (string fieldName in pdfForm.FieldNames)
             {
                 // Check if the field is marked as required.
-                if (form.IsRequiredField(fieldName))
+                if (pdfForm.IsRequiredField(fieldName))
                 {
                     // Verify that the DataTable contains a column with the same name (case‑sensitive).
-                    if (!data.Columns.Contains(fieldName))
+                    if (!dataTable.Columns.Contains(fieldName))
                     {
                         missingColumns.Add(fieldName);
                     }
                 }
             }
 
-            // If any required fields are missing, abort the operation.
+            // If any required field does not have a matching column, abort the import.
             if (missingColumns.Count > 0)
             {
-                string missing = string.Join(", ", missingColumns);
-                throw new InvalidOperationException(
-                    $"The following required form fields are missing in the DataTable: {missing}");
+                Console.Error.WriteLine("The following required form fields are missing in the DataTable:");
+                foreach (string name in missingColumns)
+                {
+                    Console.Error.WriteLine($"  - {name}");
+                }
+                return; // Stop processing.
             }
 
             // All required fields are present – proceed with the import.
-            // Use the AutoFiller facade which maps column names to field names.
-            using (AutoFiller autoFiller = new AutoFiller())
+            // Example: fill fields using Form.FillField for the first DataRow.
+            if (dataTable.Rows.Count > 0)
             {
-                // Bind the same PDF template to the AutoFiller.
-                autoFiller.BindPdf(pdfTemplatePath);
-
-                // Import the data. Column names must exactly match field names (case‑sensitive).
-                autoFiller.ImportDataTable(data);
-
-                // Save the filled PDF. The output path can be derived or passed as a parameter.
-                string outputPath = Path.Combine(
-                    Path.GetDirectoryName(pdfTemplatePath) ?? string.Empty,
-                    Path.GetFileNameWithoutExtension(pdfTemplatePath) + "_filled.pdf");
-
-                autoFiller.Save(outputPath);
-                Console.WriteLine($"Form successfully filled and saved to '{outputPath}'.");
+                DataRow row = dataTable.Rows[0];
+                foreach (DataColumn col in dataTable.Columns)
+                {
+                    // Fill only if the field exists in the PDF (optional safety check).
+                    if (pdfForm.FieldNames.Contains(col.ColumnName))
+                    {
+                        // Use the string overload; other overloads exist for different field types.
+                        pdfForm.FillField(col.ColumnName, row[col].ToString());
+                    }
+                }
             }
+
+            // Save the updated PDF.
+            pdfForm.Save(outputPdfPath);
         }
+
+        Console.WriteLine($"PDF saved to '{outputPdfPath}'.");
     }
 
-    // Example usage.
-    static void Main()
+    // Placeholder method to obtain a populated DataTable.
+    static DataTable GetDataTable()
     {
-        // Prepare a sample DataTable with columns that match the PDF form fields.
+        // In a real scenario, fill the DataTable from a database, CSV, etc.
         DataTable table = new DataTable();
         table.Columns.Add("FirstName", typeof(string));
         table.Columns.Add("LastName", typeof(string));
         table.Columns.Add("Email", typeof(string));
-        // Add a row of sample data.
+
+        // Example row.
         table.Rows.Add("John", "Doe", "john.doe@example.com");
 
-        // Path to the PDF form template.
-        const string templatePath = "template.pdf";
-
-        try
-        {
-            ValidateAndImport(templatePath, table);
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        return table;
     }
 }

@@ -1,54 +1,54 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades; // for ImageStamp (belongs to Aspose.Pdf namespace, but ImageStamp is in Aspose.Pdf)
+using Aspose.Pdf; // Core Aspose.Pdf namespace (no Facades)
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // source PDF
-        const string overlayPng = "overlay.png";       // transparent PNG to overlay
-        const string outputPdf = "output.pdf";         // result PDF
+        const string inputPdf   = "input.pdf";    // source PDF
+        const string overlayPng = "overlay.png"; // transparent PNG to overlay
+        const string outputPdf  = "output.pdf";   // result PDF
 
+        // Validate input files
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-
         if (!File.Exists(overlayPng))
         {
             Console.Error.WriteLine($"Overlay image not found: {overlayPng}");
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF (lifecycle rule: use Document constructor inside using)
         using (Document doc = new Document(inputPdf))
         {
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Create an ImageStamp for the PNG overlay.
+            // Background = false ensures the stamp is placed on top of existing content.
+            ImageStamp overlayStamp = new ImageStamp(overlayPng);
+            overlayStamp.Background = false; // foreground (over content)
+
+            // Apply the stamp to every page.
+            foreach (Page page in doc.Pages)
             {
-                Page page = doc.Pages[i];
+                // Resize the stamp to cover the whole page.
+                overlayStamp.Width  = page.MediaBox.Width;
+                overlayStamp.Height = page.MediaBox.Height;
 
-                // Create an ImageStamp for the overlay image
-                ImageStamp stamp = new ImageStamp(overlayPng)
-                {
-                    // Ensure the stamp is placed on top of existing content
-                    Background = false,          // false = top layer (default, kept for clarity)
-                    Opacity = 1.0f,              // full opacity; PNG's own alpha channel provides transparency
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment   = VerticalAlignment.Center
-                };
+                // Position the stamp at the lower‑left corner of the page.
+                overlayStamp.XIndent = 0; // horizontal offset from the left edge
+                overlayStamp.YIndent = 0; // vertical offset from the bottom edge
 
-                // Add the stamp to the current page
-                page.AddStamp(stamp);
+                // AddStamp adds the stamp at the current Z‑order (top of the page).
+                page.AddStamp(overlayStamp);
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (lifecycle rule: use Document.Save)
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Overlay applied and saved to '{outputPdf}'.");
+        Console.WriteLine($"Transparent overlay applied and saved to '{outputPdf}'.");
     }
 }

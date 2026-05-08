@@ -7,53 +7,41 @@ class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string xmlPath      = "input.xml";          // Source XML file
-        const string outputPdf    = "signed_output.pdf"; // Resulting signed PDF
-        const string certPath     = "certificate.pfx";   // PKCS#12 certificate file
-        const string certPassword = "yourPassword";      // Certificate password
+        // Paths to source XML, certificate and output PDF
+        const string xmlPath = "input.xml";
+        const string certPath = "certificate.pfx";
+        const string certPassword = "password";
+        const string outputPdf = "signed_output.pdf";
 
-        // Ensure the source files exist
-        if (!File.Exists(xmlPath))
+        // Verify required files exist
+        if (!File.Exists(xmlPath) || !File.Exists(certPath))
         {
-            Console.Error.WriteLine($"XML file not found: {xmlPath}");
-            return;
-        }
-        if (!File.Exists(certPath))
-        {
-            Console.Error.WriteLine($"Certificate file not found: {certPath}");
+            Console.Error.WriteLine("XML or certificate file not found.");
             return;
         }
 
-        // Create a new PDF document and bind the XML content to it
-        using (Document doc = new Document())
+        // Load XML and convert it to a PDF document
+        XmlLoadOptions xmlLoadOptions = new XmlLoadOptions();
+        using (Document pdfDoc = new Document(xmlPath, xmlLoadOptions))
         {
-            // BindXml loads the XML and creates PDF pages based on its structure
-            doc.BindXml(xmlPath);
+            // Define the rectangle where the signature field will appear
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Define the rectangle where the visible signature will appear
-            // Rectangle constructor: (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 300, 200);
+            // Create a signature field on the first page
+            SignatureField sigField = new SignatureField(pdfDoc.Pages[1], rect);
+            pdfDoc.Form.Add(sigField);
 
-            // Create a signature field on the first page (page index is 1‑based)
-            // The constructor (Document, Rectangle) places the field on page 1 by default
-            SignatureField sigField = new SignatureField(doc, sigRect);
+            // Use a concrete signature class (PKCS7) instead of the abstract Signature type
+            PKCS7 pkcs7 = new PKCS7(certPath, certPassword);
+            pkcs7.Reason = "Document approval";
+            pkcs7.Location = "Company HQ";
+            // Optional: pkcs7.ContactInfo = "contact@example.com";
 
-            // Add the signature field to the document's form collection
-            doc.Form.Add(sigField);
-
-            // Create a concrete signature object (PKCS7) using the certificate file
-            PKCS7 pkcs7Signature = new PKCS7(certPath, certPassword);
-            pkcs7Signature.Reason      = "Document approved";
-            pkcs7Signature.ContactInfo = "signer@example.com";
-            pkcs7Signature.Location    = "New York";
-
-            // Sign the field. The PKCS7 instance already contains the certificate,
-            // so we can use the overload that takes only the Signature object.
-            sigField.Sign(pkcs7Signature);
+            // Apply the digital signature to the field
+            sigField.Sign(pkcs7);
 
             // Save the signed PDF
-            doc.Save(outputPdf);
+            pdfDoc.Save(outputPdf);
         }
 
         Console.WriteLine($"Signed PDF saved to '{outputPdf}'.");

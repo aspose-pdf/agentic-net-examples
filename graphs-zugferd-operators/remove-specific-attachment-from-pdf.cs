@@ -8,7 +8,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string attachmentName = "example.txt"; // name of the attachment to remove
+        const string attachmentName = "myfile.txt";
 
         if (!File.Exists(inputPath))
         {
@@ -16,13 +16,13 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Remove the specific embedded file by its filename
+            // Remove the specified attachment while keeping others
             doc.EmbeddedFiles.Delete(attachmentName);
 
-            // Save the updated PDF (lifecycle rule: use Save)
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 

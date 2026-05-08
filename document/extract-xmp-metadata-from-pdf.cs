@@ -11,27 +11,21 @@ class Program
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        try
+        // Open the PDF document with deterministic disposal
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Load the PDF document
-            using (Document pdfDoc = new Document(inputPdf))
+            // Create a file stream to write the XMP metadata as XML
+            using (FileStream xmlStream = new FileStream(outputXml, FileMode.Create, FileAccess.Write))
             {
-                // Create or overwrite the XML file and write the XMP metadata into it
-                using (FileStream xmlStream = new FileStream(outputXml, FileMode.Create, FileAccess.Write))
-                {
-                    pdfDoc.GetXmpMetadata(xmlStream);
-                }
+                // Extract XMP metadata into the stream
+                pdfDoc.GetXmpMetadata(xmlStream);
             }
+        }
 
-            Console.WriteLine($"XMP metadata extracted to '{outputXml}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error extracting XMP metadata: {ex.Message}");
-        }
+        Console.WriteLine($"XMP metadata saved to '{outputXml}'.");
     }
 }

@@ -7,55 +7,43 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output.pdf";
-        const string attachmentPath = "attachment.bin";
-        const string attachmentDescription = "Attachment for integrity check";
+        const string inputPdfPath      = "input.pdf";          // source PDF
+        const string attachmentPath    = "attachment.bin";     // file to attach
+        const string outputPdfPath     = "output_with_checksum.pdf";
 
-        // Ensure files exist
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
+
         if (!File.Exists(attachmentPath))
         {
             Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
             return;
         }
 
-        // Add the attachment to the PDF using PdfContentEditor (Facades API)
-        using (PdfContentEditor editor = new PdfContentEditor())
+        // Load the PDF document inside a using block (lifecycle rule)
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            editor.BindPdf(inputPdfPath);
-            editor.AddDocumentAttachment(attachmentPath, attachmentDescription);
+            // Use PdfContentEditor to add the attachment (no annotation)
+            PdfContentEditor editor = new PdfContentEditor();
+            editor.BindPdf(pdfDoc);
+            editor.AddDocumentAttachment(attachmentPath, "Attached file for integrity check");
+            // At this point the attachment is part of the document's EmbeddedFiles collection
 
-            // Access the underlying Document to retrieve the checksum of the added attachment
-            Document doc = editor.Document;
-            string attachmentFileName = Path.GetFileName(attachmentPath);
-            string checksum = string.Empty;
+            // Retrieve the newly added attachment (last entry in the collection)
+            FileSpecification attachedFileSpec = pdfDoc.EmbeddedFiles[pdfDoc.EmbeddedFiles.Count];
+            // Access the checksum (MD5) of the embedded file
+            string checksum = attachedFileSpec.Params?.CheckSum ?? string.Empty;
 
-            foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
-            {
-                // Use the correct property "Name" to get the embedded file name
-                if (fileSpec.Name.Equals(attachmentFileName, StringComparison.OrdinalIgnoreCase))
-                {
-                    // The checksum is available via the Params.CheckSum property (MD5 of the uncompressed bytes)
-                    checksum = fileSpec.Params?.CheckSum ?? string.Empty;
-                    break;
-                }
-            }
+            // Store the checksum in a standard metadata field (Keywords) for later verification
+            pdfDoc.Info.Keywords = checksum;
 
-            // Store the checksum in custom metadata using PdfFileInfo
-            using (PdfFileInfo info = new PdfFileInfo(doc))
-            {
-                // Custom key "AttachmentChecksum" holds the calculated checksum
-                info.SetMetaInfo("AttachmentChecksum", checksum);
-                // Save the updated PDF with the new metadata
-                info.SaveNewInfo(outputPdfPath);
-            }
+            // Save the modified PDF (save rule)
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Attachment added and checksum stored in metadata. Output saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Attachment added and checksum stored in Keywords. Output saved to '{outputPdfPath}'.");
     }
 }

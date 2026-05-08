@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "compressed_output.pdf";
+        const string outputPath = "compressed.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,25 +17,24 @@ class Program
 
         // Get original file size
         long originalSize = new FileInfo(inputPath).Length;
-        Console.WriteLine($"Original size: {originalSize} bytes");
 
-        // Load, compress, and save the PDF
+        // Load the PDF, then save it again.
+        // Saving without explicit SaveOptions uses the default compression settings.
         using (Document doc = new Document(inputPath))
         {
-            // Apply default resource optimization (compression)
-            doc.OptimizeResources();
+            // Optional: linearize the document for faster web access.
+            // This does not affect compression but is a harmless optimization.
+            doc.Optimize();
 
-            // Save the compressed PDF
+            // Save the document with default compression.
             doc.Save(outputPath);
         }
 
         // Get compressed file size
         long compressedSize = new FileInfo(outputPath).Length;
-        Console.WriteLine($"Compressed size: {compressedSize} bytes");
 
-        // Show size reduction
-        long reduction = originalSize - compressedSize;
-        double percent = originalSize > 0 ? (double)reduction / originalSize * 100 : 0;
-        Console.WriteLine($"Size reduced by {reduction} bytes ({percent:F2}%).");
+        Console.WriteLine($"Original size : {originalSize} bytes");
+        Console.WriteLine($"Compressed size: {compressedSize} bytes");
+        Console.WriteLine($"Size reduction : {originalSize - compressedSize} bytes");
     }
 }

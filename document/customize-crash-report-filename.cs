@@ -7,26 +7,25 @@ class Program
     {
         try
         {
-            // Example code that throws an exception (divide by zero)
-            int zero = 0;
-            int result = 10 / zero;
+            // Simulate an operation that throws an exception
+            throw new InvalidOperationException("Sample error for crash report generation.");
         }
         catch (Exception ex)
         {
             // Create CrashReportOptions based on the caught exception
             CrashReportOptions options = new CrashReportOptions(ex);
 
-            // Set a custom message – you can embed the desired file name here
-            options.CustomMessage = "An unexpected error occurred. Desired report file: MyCrashReport.html";
+            // Set a custom message to be included in the crash report
+            options.CustomMessage = "Custom report for operation XYZ – additional context here.";
 
-            // Directly set the crash report file name (optional, but demonstrates customization)
-            options.CrashReportFilename = "MyCrashReport.html";
+            // Optionally, specify a custom filename for the report
+            options.CrashReportFilename = "MyCustomCrashReport.html";
 
             // Generate the HTML crash report
             PdfException.GenerateCrashReport(options);
 
-            // Output the full path of the generated report
-            Console.WriteLine($"Crash report generated at: {options.CrashReportPath}");
+            // Inform the user where the report was saved
+            Console.WriteLine("Crash report generated at: " + options.CrashReportPath);
         }
     }
 }

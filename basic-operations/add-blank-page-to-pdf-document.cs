@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // Core Aspose.Pdf namespace
 
 class Program
 {
@@ -19,10 +19,9 @@ class Program
         using (Document doc = new Document(inputPath))
         {
             // Add a new blank page at the end of the document
-            // PageCollection.Add() creates an empty page using the most common size
             doc.Pages.Add();
 
-            // Save the updated document (PDF format)
+            // Save the updated document
             doc.Save(outputPath);
         }
 

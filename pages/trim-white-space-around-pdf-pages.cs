@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class TrimWhiteSpace
+class Program
 {
     static void Main()
     {
@@ -15,37 +15,23 @@ class TrimWhiteSpace
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
             // Iterate through all pages (1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            foreach (Page page in doc.Pages)
             {
-                Page page = doc.Pages[i];
+                // Skip completely blank pages using the default fill‑threshold (e.g., 0.01)
+                if (page.IsBlank(0.01))
+                    continue;
 
-                // Calculate the bounding box of the actual content.
-                // This method analyses the page content (vector graphics, text, images)
-                // and returns the smallest rectangle that encloses everything.
+                // Calculate the bounding box of the actual content on the page
                 Aspose.Pdf.Rectangle contentBox = page.CalculateContentBBox();
 
-                // If the content box is valid, assign it to the TrimBox.
-                // TrimBox defines the visible area after trimming white space.
+                // If a valid content box is returned, set it as the new TrimBox
                 if (contentBox != null && contentBox.Width > 0 && contentBox.Height > 0)
                 {
                     page.TrimBox = contentBox;
-                }
-                else
-                {
-                    // Fallback: if the page appears blank, keep the original media box.
-                    // The IsBlank method uses a default fill‑threshold factor (e.g., 0.01).
-                    // Here we use the default threshold of 0.01 for safety.
-                    bool isBlank = page.IsBlank(0.01);
-                    if (isBlank)
-                    {
-                        // For a completely blank page we can set TrimBox to MediaBox
-                        // to avoid accidental cropping.
-                        page.TrimBox = page.MediaBox;
-                    }
                 }
             }
 

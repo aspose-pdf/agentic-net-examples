@@ -1,48 +1,52 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
+        // Path to the source PDF file
+        const string inputPdfPath = "input.pdf";
 
-        if (!File.Exists(pdfPath))
+        // Ensure the input PDF exists; create a minimal PDF if it does not.
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
-            return;
+            using (var doc = new Document())
+            {
+                doc.Pages.Add(); // add a blank page
+                doc.Save(inputPdfPath);
+            }
         }
 
-        // Create a temporary folder for extracted images
+        // Create a unique temporary folder for extracted images
         string tempFolder = Path.Combine(Path.GetTempPath(), "PdfImages_" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(tempFolder);
 
-        try
+        // Initialize the PdfExtractor facade
+        using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Initialize the extractor and bind the PDF file
-            using (PdfExtractor extractor = new PdfExtractor())
+            // Bind the PDF document to the extractor
+            extractor.BindPdf(inputPdfPath);
+
+            // Extract images using the default extraction mode (DefinedInResources)
+            extractor.ExtractImage();
+
+            int imageIndex = 1;
+            // Iterate through all extracted images
+            while (extractor.HasNextImage())
             {
-                extractor.BindPdf(pdfPath);
+                // Build the output file name (preserve original image format)
+                string outputImagePath = Path.Combine(tempFolder, $"image-{imageIndex}.img");
 
-                // Use the default extraction mode (DefinedInResources)
-                extractor.ExtractImage();
+                // Save the current image to the file system using the overload that does not require ImageFormat
+                extractor.GetNextImage(outputImagePath);
 
-                int imageIndex = 1;
-                while (extractor.HasNextImage())
-                {
-                    // Build output file name (preserves original image format)
-                    string outputFile = Path.Combine(tempFolder, $"image_{imageIndex}.pdf");
-                    extractor.GetNextImage(outputFile);
-                    imageIndex++;
-                }
+                imageIndex++;
             }
+        }
 
-            Console.WriteLine($"Images extracted to: {tempFolder}");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during extraction: {ex.Message}");
-        }
+        Console.WriteLine($"Images extracted to temporary folder: {tempFolder}");
     }
 }

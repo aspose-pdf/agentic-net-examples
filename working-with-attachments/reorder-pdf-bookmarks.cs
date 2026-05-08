@@ -1,48 +1,80 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations; // for GoToAction
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "portfolio.pdf";
-        const string outputPath = "reordered_portfolio.pdf";
+        const string inputPdf  = "portfolio.pdf";      // source PDF with outline items
+        const string outputPdf = "reordered.pdf";      // result PDF
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document doc = new Document(inputPath))
+        // Desired order of outline (bookmark) titles.
+        // Adjust this array to reflect the sequence you need.
+        string[] desiredOrder = new[]
         {
-            // Example: desired new order of pages (1‑based indexing)
-            int[] newOrder = { 3, 1, 2 }; // reorder bookmarks to page 3, then 1, then 2
+            "Executive Summary",
+            "Financial Overview",
+            "Market Analysis",
+            "Risk Assessment",
+            "Appendix"
+        };
 
-            // Remove all existing outline (bookmark) items
-            doc.Outlines.Delete();
+        using (Document doc = new Document(inputPdf))
+        {
+            // Get the document outline (bookmarks) collection.
+            OutlineCollection outlines = doc.Outlines;
 
-            // Re‑add outline items in the specified order
-            foreach (int pageNumber in newOrder)
+            // Preserve existing items in a list for later lookup.
+            List<OutlineItemCollection> existingItems = new List<OutlineItemCollection>();
+            foreach (OutlineItemCollection item in outlines)
+                existingItems.Add(item);
+
+            // Clear all current outline items.
+            outlines.Clear();
+
+            // Re‑add items following the desired order.
+            foreach (string title in desiredOrder)
             {
-                // Create a new outline entry
-                OutlineItemCollection outlineItem = new OutlineItemCollection(doc.Outlines);
-                outlineItem.Title = $"Page {pageNumber}";
+                // Find the original item that matches the title.
+                OutlineItemCollection original = existingItems
+                    .FirstOrDefault(i => string.Equals(i.Title, title, StringComparison.Ordinal));
 
-                // Set the action to navigate to the target page
-                outlineItem.Action = new GoToAction(doc.Pages[pageNumber]);
+                if (original == null)
+                {
+                    // Title not found – skip or handle as needed.
+                    Console.WriteLine($"Warning: outline item \"{title}\" not found in source PDF.");
+                    continue;
+                }
 
-                // Add the new outline entry to the document's outline collection
-                doc.Outlines.Add(outlineItem);
+                // Create a new outline item attached to the current OutlineCollection.
+                OutlineItemCollection newItem = new OutlineItemCollection(outlines)
+                {
+                    Title       = original.Title,
+                    Destination = original.Destination,
+                    Action      = original.Action,
+                    Bold        = original.Bold,
+                    Italic      = original.Italic,
+                    Color       = original.Color,
+                    Open        = original.Open
+                };
+
+                // Add the newly created item to the outline.
+                outlines.Add(newItem);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            // Save the reordered PDF.
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Reordered PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Reordered PDF saved to \"{outputPdf}\".");
     }
 }

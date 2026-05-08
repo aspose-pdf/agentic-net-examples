@@ -1,67 +1,70 @@
 using System;
-using System.Drawing;
+using System.IO;
 using System.Globalization;
+using System.Drawing; // for Rectangle
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf; // for SignatureCustomAppearance
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string inputPdf  = "input.pdf";
+        const string inputPdf = "input.pdf";
         const string outputPdf = "signed_french.pdf";
-        const string pfxPath   = "certificate.pfx";
-        const string pfxPass   = "password";
+        const string certificate = "certificate.pfx";
+        const string certPassword = "password";
 
-        // Verify input files exist
-        if (!System.IO.File.Exists(inputPdf))
+        if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!System.IO.File.Exists(pfxPath))
+        if (!File.Exists(certificate))
         {
-            Console.Error.WriteLine($"Certificate file not found: {pfxPath}");
+            Console.Error.WriteLine($"Certificate file not found: {certificate}");
             return;
         }
 
-        // Initialize the facade for signing
-        PdfFileSignature pdfSigner = new PdfFileSignature();
-        pdfSigner.BindPdf(inputPdf);
-
-        // Create PKCS#7 signature object
-        PKCS7 pkcs7 = new PKCS7(pfxPath, pfxPass);
-
-        // Customize appearance – set French culture for caption labels
-        SignatureCustomAppearance appearance = new SignatureCustomAppearance
+        using (PdfFileSignature pdfSign = new PdfFileSignature())
         {
-            Culture = new CultureInfo("fr-FR") // French (France)
-            // Optional: override specific labels if desired
-            // DigitalSignedLabel = "Signé numériquement par",
-            // ReasonLabel = "Raison",
-            // LocationLabel = "Lieu",
-            // DateSignedAtLabel = "Date"
-        };
-        pkcs7.CustomAppearance = appearance;
+            // Bind the source PDF
+            pdfSign.BindPdf(inputPdf);
 
-        // Optional metadata (can be left empty or set to French equivalents)
-        pkcs7.Reason = "Approbation du document";
-        pkcs7.Location = "Paris, France";
-        pkcs7.ContactInfo = "contact@example.com";
+            // Load the signing certificate
+            pdfSign.SetCertificate(certificate, certPassword);
 
-        // Define visible signature rectangle (x, y, width, height)
-        Rectangle signatureRect = new Rectangle(100, 100, 200, 100);
+            // Create PKCS#1 signature object
+            PKCS1 pkcs1 = new PKCS1(certificate, certPassword)
+            {
+                Reason = "Document approved",
+                ContactInfo = "contact@example.com",
+                Location = "Paris"
+            };
 
-        // Sign page 1, make the signature visible
-        pdfSigner.Sign(page: 1, visible: true, annotRect: signatureRect, sig: pkcs7);
+            // Set French locale for the signature appearance caption
+            pkcs1.CustomAppearance = new SignatureCustomAppearance
+            {
+                Culture = new CultureInfo("fr-FR")
+            };
 
-        // Save the signed PDF
-        pdfSigner.Save(outputPdf);
+            // The Sign overload expects System.Drawing.Rectangle, not Aspose.Pdf.Rectangle
+            System.Drawing.Rectangle rect = new System.Drawing.Rectangle(100, 100, 200, 100);
 
-        // Release resources
-        pdfSigner.Close();
+            // Sign page 1 with visible signature using the overload that takes positional arguments
+            pdfSign.Sign(
+                1,                     // page number (1‑based)
+                "Document approved", // reason
+                "contact@example.com", // contact info
+                "Paris",               // location
+                true,                   // visible signature flag
+                rect,                   // signature rectangle
+                pkcs1);                 // PKCS#1 signature object
 
-        Console.WriteLine($"PDF signed and saved to '{outputPdf}'.");
+            // Save the signed PDF
+            pdfSign.Save(outputPdf);
+        }
+
+        Console.WriteLine($"Signed PDF saved to '{outputPdf}'.");
     }
 }

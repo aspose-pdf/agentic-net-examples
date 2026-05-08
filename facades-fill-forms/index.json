@@ -1,58 +1,83 @@
 {
   "category": "facades-fill-forms",
-  "nuget_version": "26.3.0",
-  "last_updated": "2026-04-10T06:42:17Z",
+  "nuget_version": "26.4.0",
+  "last_updated": "2026-05-08T09:45:35Z",
   "examples": {
-    "bind-pdf-form-to-autofiller": {
-      "title": "Bind PDF Form to AutoFiller Instance",
-      "filename": "bind-pdf-form-to-autofiller.cs",
-      "description": "Shows how to create an AutoFiller object, bind a source PDF form from a file path, and prepare it for further operations such as importing data or saving the filled PDF.",
-      "tags": [
-        "autofiller",
-        "pdf-form",
-        "bind",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.AutoFiller",
-        "Aspose.Pdf.Facades.AutoFiller.BindPdf"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T06:42:17Z",
-      "status": "verified"
-    },
-    "fill-pdf-form-from-datatable": {
-      "title": "Fill PDF Form from DataTable (Excel‑derived)",
-      "filename": "fill-pdf-form-from-datatable.cs",
-      "description": "Shows how to create a DataTable (simulating Excel column headers) and use Aspose.Pdf.Facades.AutoFiller to bind a PDF template, import the table data, and save the filled PDF form.",
+    "fill-pdf-form-with-data-table-exception-handling": {
+      "title": "Fill PDF Form with DataTable and Handle Exceptions",
+      "filename": "fill-pdf-form-with-data-table-exception-handling.cs",
+      "description": "The example shows how to use Aspose.Pdf.Facades.AutoFiller to bind a PDF template, import data from a DataTable, and save the filled document while handling common PDF and file related exceptions.",
       "tags": [
         "pdf",
         "form-filling",
-        "datatable",
-        "aspose.pdf",
-        "facades"
+        "autofiller",
+        "exception-handling",
+        "datatable"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.AutoFiller",
-        "Aspose.Pdf.Facades.AutoFiller.BindPdf",
-        "Aspose.Pdf.Facades.AutoFiller.ImportDataTable",
-        "Aspose.Pdf.Facades.AutoFiller.Save"
+        "AutoFiller.BindPdf",
+        "AutoFiller.ImportDataTable",
+        "AutoFiller.Save",
+        "Aspose.Pdf.PdfException",
+        "Aspose.Pdf.InvalidPdfFileFormatException"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T06:42:17Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T09:45:35Z",
       "status": "verified"
     },
-    "import-datatable-into-pdf-form": {
-      "title": "Import DataTable with ReadOnly and Unique Columns into PDF Form",
-      "filename": "import-datatable-into-pdf-form.cs",
-      "description": "Shows how to configure DataColumn properties such as ReadOnly and Unique, then import the DataTable into a PDF form using Aspose.Pdf.Facades.AutoFiller.",
+    "convert-filled-pdf-to-byte-array": {
+      "title": "Convert Filled PDF to Byte Array Using PdfViewer",
+      "filename": "convert-filled-pdf-to-byte-array.cs",
+      "description": "Shows how to load a filled PDF with Aspose.Pdf.Facades.PdfViewer and return its content as a byte array directly from memory, avoiding any disk writes.",
       "tags": [
+        "pdf",
+        "byte-array",
+        "facade",
+        "aspose-pdf",
+        "memory-stream"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfViewer",
+        "Aspose.Pdf.Facades.PdfViewer.BindPdf",
+        "Aspose.Pdf.Facades.PdfViewer.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T09:45:35Z",
+      "status": "verified"
+    },
+    "fill-pdf-form-async-timeout": {
+      "title": "Fill PDF Form Asynchronously with Timeout Cancellation",
+      "filename": "fill-pdf-form-async-timeout.cs",
+      "description": "Demonstrates how to fill a PDF form using Aspose.Pdf.Facades, then save the document asynchronously while aborting the operation if it exceeds a specified timeout via a CancellationToken.",
+      "tags": [
+        "pdf",
+        "form-filling",
+        "async",
+        "cancellation-token",
+        "timeout"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.Form",
+        "Aspose.Pdf.Facades.Form.BindPdf",
+        "Aspose.Pdf.Facades.Form.FillField",
+        "Aspose.Pdf.Facades.Form.Document",
+        "Aspose.Pdf.Document.SaveAsync"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T09:45:35Z",
+      "status": "verified"
+    },
+    "batch-fill-pdf-template-with-multiple-datatables": {
+      "title": "Batch Fill PDF Template with Multiple DataTables",
+      "filename": "batch-fill-pdf-template-with-multiple-datatables.cs",
+      "description": "Shows how to repeatedly fill a single PDF form template using a list of DataTable objects, producing a separate filled PDF for each data set.",
+      "tags": [
+        "pdf",
+        "form-filling",
+        "batch",
         "datatable",
-        "pdf-form",
-        "readonly",
-        "unique",
-        "autofiller"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.AutoFiller",
@@ -61,18 +86,18 @@
         "Aspose.Pdf.Facades.AutoFiller.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T06:42:17Z",
+      "generated_at": "2026-05-08T09:45:35Z",
       "status": "verified"
     },
-    "import-datatable-into-pdf-form__v2": {
-      "title": "Import DataTable into PDF Form using AutoFiller",
-      "filename": "import-datatable-into-pdf-form__v2.cs",
-      "description": "Shows how to bind a PDF form template, import a DataTable whose column names match AcroForm fields, and save the filled PDF with Aspose.Pdf AutoFiller.",
+    "map-datatable-columns-to-pdf-form-fields": {
+      "title": "Map DataTable Columns to PDF Form Fields with AutoFiller",
+      "filename": "map-datatable-columns-to-pdf-form-fields.cs",
+      "description": "Shows how to rename DataTable columns to match PDF form field identifiers and use Aspose.Pdf.Facades.AutoFiller to automatically fill the PDF form.",
       "tags": [
         "AutoFiller",
         "DataTable",
-        "AcroForm",
-        "PDFForm",
+        "PDF form",
+        "field mapping",
         "Aspose.Pdf"
       ],
       "apis_used": [
@@ -81,256 +106,256 @@
         "Aspose.Pdf.Facades.AutoFiller.ImportDataTable",
         "Aspose.Pdf.Facades.AutoFiller.Save"
       ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T09:45:35Z",
+      "status": "verified"
+    },
+    "fill-pdf-form-per-datarow-merge-pages": {
+      "title": "Fill PDF Form per DataTable Row and Merge Pages with Logging",
+      "filename": "fill-pdf-form-per-datarow-merge-pages.cs",
+      "description": "Demonstrates how to fill a PDF form for each DataTable row using AutoFiller, merge the generated pages into a single document, and log the processed row and page numbers.",
+      "tags": [
+        "pdf",
+        "form-filling",
+        "datatable",
+        "merge",
+        "logging"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.AutoFiller",
+        "Aspose.Pdf.Facades.AutoFiller.BindPdf",
+        "Aspose.Pdf.Facades.AutoFiller.ImportDataTable",
+        "Aspose.Pdf.Facades.AutoFiller.Save",
+        "Aspose.Pdf.Document.Pages.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T09:45:35Z",
+      "status": "verified"
+    },
+    "generate-pdfs-from-multiple-csv-worksheets": {
+      "title": "Generate PDFs from Multiple CSV Worksheets using AutoFiller",
+      "filename": "generate-pdfs-from-multiple-csv-worksheets.cs",
+      "description": "The example reads each CSV file in a folder, converts it to a DataTable, and uses Aspose.Pdf.Facades.AutoFiller to populate a PDF form template, producing a separate PDF for each worksheet.",
+      "tags": [
+        "auto-filler",
+        "csv",
+        "datatable",
+        "pdf-generation",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.AutoFiller",
+        "AutoFiller.BindPdf",
+        "AutoFiller.ImportDataTable",
+        "AutoFiller.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T09:45:35Z",
+      "status": "verified"
+    },
+    "configure-datacolumn-properties-fill-pdf-form": {
+      "title": "Configure DataColumn Properties and Fill PDF Form with AutoFiller",
+      "filename": "configure-datacolumn-properties-fill-pdf-form.cs",
+      "description": "The example shows how to set DataColumn flags such as ReadOnly and Unique before importing a DataTable into a PDF form using Aspose.Pdf.Facades.AutoFiller, and how to create a simple PDF template with form fields.",
+      "tags": [
+        "datacolumn",
+        "autofiller",
+        "pdf-form",
+        "readonly",
+        "unique"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Forms.TextBoxField",
+        "Aspose.Pdf.Facades.AutoFiller",
+        "Aspose.Pdf.Facades.AutoFiller.BindPdf",
+        "Aspose.Pdf.Facades.AutoFiller.ImportDataTable",
+        "Aspose.Pdf.Facades.AutoFiller.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T09:45:35Z",
+      "status": "verified"
+    },
+    "merge-filled-pdfs-from-datatables": {
+      "title": "Merge Multiple Filled PDFs Generated from DataTables",
+      "filename": "merge-filled-pdfs-from-datatables.cs",
+      "description": "The example fills a PDF form template with data from several DataTables, saves each filled document, and then concatenates all PDFs into a single consolidated file.",
+      "tags": [
+        "pdf",
+        "form-filling",
+        "merge",
+        "datatable",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.AutoFiller.BindPdf",
+        "Aspose.Pdf.Facades.AutoFiller.ImportDataTable",
+        "Aspose.Pdf.Facades.AutoFiller.Save",
+        "Aspose.Pdf.Facades.PdfFileEditor.Concatenate",
+        "Aspose.Pdf.Document"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T09:45:35Z",
+      "status": "verified"
+    },
+    "stream-large-csv-fill-pdf-form": {
+      "title": "Stream Large CSV Data into PDF Form Using AutoFiller",
+      "filename": "stream-large-csv-fill-pdf-form.cs",
+      "description": "Demonstrates how to read a large CSV file row‑by‑row into a DataTable and use Aspose.Pdf.Facades.AutoFiller to merge the data into a PDF form without exhausting memory.",
+      "tags": [
+        "auto-filler",
+        "csv",
+        "pdf-form",
+        "streaming",
+        "datatable"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.AutoFiller",
+        "AutoFiller.BindPdf",
+        "AutoFiller.ImportDataTable",
+        "AutoFiller.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T09:45:35Z",
+      "status": "verified"
+    },
+    "bind-pdf-form-to-autofiller": {
+      "title": "Bind PDF Form to AutoFiller and Save",
+      "filename": "bind-pdf-form-to-autofiller.cs",
+      "description": "Demonstrates how to bind an existing PDF form to an Aspose.Pdf.Facades.AutoFiller instance and save the (potentially unchanged) document to a new file.",
+      "tags": [
+        "autofiller",
+        "pdf-form",
+        "bind",
+        "save",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.AutoFiller",
+        "Aspose.Pdf.Facades.AutoFiller.BindPdf",
+        "Aspose.Pdf.Facades.AutoFiller.Save"
+      ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T06:42:17Z",
+      "generated_at": "2026-05-08T09:45:35Z",
+      "status": "verified"
+    },
+    "fill-pdf-form-with-autofiller": {
+      "title": "Fill PDF Form Using AutoFiller and DataTable",
+      "filename": "fill-pdf-form-with-autofiller.cs",
+      "description": "Shows how to bind a PDF template, import data from a DataTable (simulating an XLSX source), and generate a filled PDF using Aspose.Pdf.Facades.AutoFiller.",
+      "tags": [
+        "pdf",
+        "autofiller",
+        "mailmerge",
+        "aspnet-core",
+        "xlsx"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.AutoFiller",
+        "Aspose.Pdf.Facades.AutoFiller.BindPdf",
+        "Aspose.Pdf.Facades.AutoFiller.ImportDataTable",
+        "Aspose.Pdf.Facades.AutoFiller.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T09:45:35Z",
       "status": "verified"
     },
     "save-filled-pdf-preserve-layout": {
       "title": "Save Filled PDF While Preserving Layout",
       "filename": "save-filled-pdf-preserve-layout.cs",
-      "description": "Shows how to load a previously filled PDF using the Form facade and save it to a new file, keeping the original layout unchanged.",
+      "description": "Shows how to bind a filled PDF using the Form facade and save it to a new file, keeping the original layout unchanged.",
       "tags": [
         "pdf",
         "form",
-        "preserve",
         "save",
+        "layout",
         "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.Form",
-        "Aspose.Pdf.Facades.Form.Save"
+        "Aspose.Pdf.Facades.Form.BindPdf",
+        "Aspose.Pdf.Facades.Form.Save",
+        "Aspose.Pdf.Facades.Form.Close",
+        "Aspose.Pdf.Facades.SaveableFacade"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T06:42:17Z",
+      "generated_at": "2026-05-08T09:45:35Z",
       "status": "verified"
     },
-    "generate-pdf-per-datatable-row": {
-      "title": "Generate PDF with One Page per DataTable Row",
-      "filename": "generate-pdf-per-datatable-row.cs",
-      "description": "Shows how to use Aspose.Pdf.Facades.AutoFiller to import a DataTable and create a merged PDF where each row is rendered on a separate page, then validates the page count.",
+    "fill-pdf-form-with-autofiller__v2": {
+      "title": "Fill PDF Form Using AutoFiller and Dispose Resources",
+      "filename": "fill-pdf-form-with-autofiller__v2.cs",
+      "description": "Demonstrates how to populate a PDF form from a DataTable using Aspose.Pdf.Facades.AutoFiller and automatically release unmanaged resources with a using block.",
       "tags": [
-        "auto-filler",
+        "pdf",
+        "form-filling",
+        "autofiller",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.AutoFiller",
+        "AutoFiller.InputFileName",
+        "AutoFiller.ImportDataTable",
+        "AutoFiller.Save",
+        "AutoFiller.Dispose"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T09:45:35Z",
+      "status": "verified"
+    },
+    "generate-pdf-per-datarow": {
+      "title": "Generate One‑Page PDFs from DataTable Rows",
+      "filename": "generate-pdf-per-datarow.cs",
+      "description": "Demonstrates loading a PDF form template, filling its fields with values from each DataTable row, saving each filled document as a separate one‑page PDF, and verifying the page count.",
+      "tags": [
+        "pdf",
+        "form",
         "datatable",
-        "pdf-merge",
-        "page-count",
+        "aspose",
         "verification"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.AutoFiller",
-        "Aspose.Pdf.Document"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T06:42:17Z",
-      "status": "verified"
-    },
-    "map-datatable-columns-to-pdf-fields": {
-      "title": "Map DataTable Columns to PDF Field Names for AutoFiller",
-      "filename": "map-datatable-columns-to-pdf-fields.cs",
-      "description": "Demonstrates how to rename DataTable columns to match PDF form field identifiers and then use Aspose.Pdf.Facades.AutoFiller to populate a PDF template automatically.",
-      "tags": [
-        "autofiller",
-        "datatable",
-        "field-mapping",
-        "pdf",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.AutoFiller",
-        "Aspose.Pdf.Facades.AutoFiller.BindPdf",
-        "Aspose.Pdf.Facades.AutoFiller.ImportDataTable",
-        "Aspose.Pdf.Facades.AutoFiller.Save",
-        "Aspose.Pdf.Facades.AutoFiller.Close"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T06:42:17Z",
-      "status": "verified"
-    },
-    "fill-pdf-form-with-datatable-custom-columns": {
-      "title": "Fill PDF Form Using DataTable with Custom Columns",
-      "filename": "fill-pdf-form-with-datatable-custom-columns.cs",
-      "description": "Demonstrates adding custom columns to a DataTable, binding it to a PDF template with Aspose.Pdf.Facades.AutoFiller, and saving the filled PDF.",
-      "tags": [
-        "pdf",
-        "autofiller",
-        "datatable",
-        "custom-columns",
-        "form-filling"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.AutoFiller",
-        "Aspose.Pdf.Facades.AutoFiller.BindPdf",
-        "Aspose.Pdf.Facades.AutoFiller.ImportDataTable",
-        "Aspose.Pdf.Facades.AutoFiller.Save",
-        "Aspose.Pdf.Facades.AutoFiller.Close"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T06:42:17Z",
-      "status": "verified"
-    },
-    "fill-pdf-form-from-multiple-csv-worksheets": {
-      "title": "Fill PDF Form from Multiple CSV Worksheets",
-      "filename": "fill-pdf-form-from-multiple-csv-worksheets.cs",
-      "description": "The example reads each CSV file (representing an Excel worksheet) into a DataTable and uses Aspose.Pdf's AutoFiller to merge the data into a PDF form, generating a separate filled PDF for each worksheet.",
-      "tags": [
-        "pdf",
-        "autofiller",
-        "csv",
-        "datatable",
-        "form-filling"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.AutoFiller",
-        "Aspose.Pdf.Facades.AutoFiller.BindPdf",
-        "Aspose.Pdf.Facades.AutoFiller.ImportDataTable",
-        "Aspose.Pdf.Facades.AutoFiller.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T06:42:17Z",
-      "status": "verified"
-    },
-    "fill-pdf-form-with-datatable-exception-handling": {
-      "title": "Fill PDF Form with DataTable and Handle Exceptions",
-      "filename": "fill-pdf-form-with-datatable-exception-handling.cs",
-      "description": "Demonstrates using Aspose.Pdf's AutoFiller to bind a template PDF, import a DataTable into form fields, save the filled document, and capture missing file or PDF errors with exception handling.",
-      "tags": [
-        "autofiller",
-        "pdf-form",
-        "datatable",
-        "exception-handling",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.AutoFiller",
-        "Aspose.Pdf.Facades.AutoFiller.BindPdf",
-        "Aspose.Pdf.Facades.AutoFiller.ImportDataTable",
-        "Aspose.Pdf.Facades.AutoFiller.Save",
-        "Aspose.Pdf.PdfException"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T06:42:17Z",
-      "status": "verified"
-    },
-    "fill-pdf-form-with-autofiller": {
-      "title": "Fill PDF Form with AutoFiller and Proper Disposal",
-      "filename": "fill-pdf-form-with-autofiller.cs",
-      "description": "Shows how to bind a PDF template, import data from a DataTable, fill form fields using AutoFiller, and automatically release unmanaged resources with a using statement.",
-      "tags": [
-        "pdf",
-        "form-filling",
-        "autofiller",
-        "resource-management",
-        "aspose"
-      ],
-      "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Rectangle",
         "Aspose.Pdf.Forms.TextBoxField",
-        "Aspose.Pdf.Facades.AutoFiller",
         "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Facades.AutoFiller.BindPdf",
-        "Aspose.Pdf.Facades.AutoFiller.ImportDataTable",
-        "Aspose.Pdf.Facades.AutoFiller.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T06:42:17Z",
-      "status": "verified"
-    },
-    "batch-fill-pdf-template-with-datatables": {
-      "title": "Batch Fill PDF Template with Multiple DataTables",
-      "filename": "batch-fill-pdf-template-with-datatables.cs",
-      "description": "Demonstrates how to fill a single PDF form template repeatedly using a list of DataTable objects, creating a separate filled PDF for each data set.",
-      "tags": [
-        "pdf",
-        "batch-fill",
-        "datatable",
-        "forms",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.AutoFiller",
-        "Aspose.Pdf.Facades.AutoFiller.BindPdf",
-        "Aspose.Pdf.Facades.AutoFiller.ImportDataTable",
-        "Aspose.Pdf.Facades.AutoFiller.Save"
+        "Aspose.Pdf.Document.Form.Add",
+        "Aspose.Pdf.Document.Form.Fields",
+        "Aspose.Pdf.Document.Pages.Count"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T06:42:17Z",
-      "status": "verified"
-    },
-    "fill-pdf-form-from-memory-stream": {
-      "title": "Fill PDF Form from Memory Stream using AutoFiller",
-      "filename": "fill-pdf-form-from-memory-stream.cs",
-      "description": "Demonstrates loading a PDF template from a byte array, filling its form fields with data via Aspose.Pdf.AutoFiller, and saving the result—all in memory without intermediate files.",
-      "tags": [
-        "pdf",
-        "form-filling",
-        "memory-stream",
-        "autofiller",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Forms.TextBoxField",
-        "Aspose.Pdf.Facades.AutoFiller",
-        "Aspose.Pdf.Facades.AutoFiller.BindPdf",
-        "Aspose.Pdf.Facades.AutoFiller.ImportDataTable",
-        "Aspose.Pdf.Facades.AutoFiller.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T06:42:17Z",
-      "status": "verified"
-    },
-    "generate-subset-pdf-from-filtered-datatable": {
-      "title": "Generate Subset PDF from Filtered DataTable",
-      "filename": "generate-subset-pdf-from-filtered-datatable.cs",
-      "description": "Creates a DataTable (simulating an exported Excel worksheet), filters rows by a column value, and writes the filtered data into a PDF table using Aspose.Pdf.",
-      "tags": [
-        "pdf",
-        "datatable",
-        "filter",
-        "aspose",
-        "export"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.BorderInfo",
-        "Aspose.Pdf.BorderSide",
-        "Aspose.Pdf.Color",
-        "Aspose.Pdf.Table.ImportDataTable"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T06:42:17Z",
+      "generated_at": "2026-05-08T09:45:35Z",
       "status": "verified"
     },
     "extract-pdf-pages-with-custom-names": {
       "title": "Extract PDF Pages with Custom File Names from DataTable",
       "filename": "extract-pdf-pages-with-custom-names.cs",
-      "description": "Shows how to extract specific pages from a multi‑page PDF and save each page as a separate PDF file using file names taken from a DataTable column.",
+      "description": "Shows how to split a PDF into individual pages using Aspose.Pdf.Facades.PdfFileEditor and name each generated PDF file according to values stored in a DataTable.",
       "tags": [
-        "pdf",
-        "page-extraction",
+        "pdf-split",
         "custom-naming",
-        "datatable",
-        "aspose-pdf"
+        "datatables",
+        "aspose-pdf",
+        "csharp"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfFileEditor",
         "Aspose.Pdf.Facades.PdfFileEditor.Extract"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T06:42:17Z",
+      "generated_at": "2026-05-08T09:45:35Z",
       "status": "verified"
     },
     "validate-required-pdf-form-fields": {
-      "title": "Validate Required PDF Form Fields Before Import",
+      "title": "Validate Required PDF Form Fields Against DataTable Columns",
       "filename": "validate-required-pdf-form-fields.cs",
-      "description": "Demonstrates how to verify that all required fields in a PDF form have matching columns in a DataTable before filling the form using Aspose.Pdf facades.",
+      "description": "Shows how to check that every required AcroForm field in a PDF has a matching column in a DataTable before filling the form, and then fills the fields if validation passes.",
       "tags": [
         "pdf",
         "form",
@@ -340,115 +365,114 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.Form",
+        "Aspose.Pdf.Facades.Form.FieldNames",
         "Aspose.Pdf.Facades.Form.IsRequiredField",
-        "Aspose.Pdf.Facades.AutoFiller",
-        "Aspose.Pdf.Facades.AutoFiller.BindPdf",
-        "Aspose.Pdf.Facades.AutoFiller.ImportDataTable",
-        "Aspose.Pdf.Facades.AutoFiller.Save"
+        "Aspose.Pdf.Facades.Form.FillField",
+        "Aspose.Pdf.Facades.Form.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T06:42:17Z",
+      "generated_at": "2026-05-08T09:45:35Z",
       "status": "verified"
     },
-    "log-datatable-row-processing-auto-filler": {
-      "title": "Log DataTable Row Processing While Generating PDFs with AutoFiller",
-      "filename": "log-datatable-row-processing-auto-filler.cs",
-      "description": "Demonstrates using Aspose.Pdf.Facades.AutoFiller to fill a PDF template from a DataTable, create a separate PDF per row, and log each processed row with its page number.",
+    "fill-pdf-form-with-datatable-custom-columns": {
+      "title": "Fill PDF Form Using DataTable with Custom Columns",
+      "filename": "fill-pdf-form-with-datatable-custom-columns.cs",
+      "description": "Shows how to create a PDF form, add matching DataTable columns (including extra custom columns) via DataColumnCollection, populate rows, and import the data into the form using Aspose.Pdf.Facades.AutoFiller.",
       "tags": [
-        "pdf",
-        "autofiller",
-        "logging",
+        "pdf-form",
         "datatable",
-        "generation"
+        "autofiller",
+        "aspose-pdf",
+        "custom-columns"
       ],
       "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Forms.TextBoxField",
         "Aspose.Pdf.Facades.AutoFiller",
         "Aspose.Pdf.Facades.AutoFiller.BindPdf",
         "Aspose.Pdf.Facades.AutoFiller.ImportDataTable",
         "Aspose.Pdf.Facades.AutoFiller.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T06:42:17Z",
+      "generated_at": "2026-05-08T09:45:35Z",
       "status": "verified"
     },
-    "encrypt-filled-pdf-with-password": {
-      "title": "Encrypt Filled PDF with Password",
-      "filename": "encrypt-filled-pdf-with-password.cs",
-      "description": "Demonstrates how to protect a previously filled PDF by applying user and owner passwords using Aspose.Pdf's Facade API. The example saves the filled document and then encrypts it with AES‑256 encryption and specific privileges.",
+    "password-protect-filled-pdf": {
+      "title": "Password‑Protect a Filled PDF with Aspose.Pdf",
+      "filename": "password-protect-filled-pdf.cs",
+      "description": "Demonstrates loading an already filled PDF and applying user and owner passwords with specific privileges using the PdfFileSecurity facade.",
       "tags": [
-        "pdf",
-        "encryption",
+        "pdf-protection",
         "password",
         "facade",
-        "aspnet"
+        "Aspose.Pdf",
+        "privilege"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.Facades.PdfFileSecurity",
-        "Aspose.Pdf.Facades.PdfFileSecurity.EncryptFile",
-        "Aspose.Pdf.DocumentPrivilege",
-        "Aspose.Pdf.KeySize"
+        "Aspose.Pdf.Facades.PdfFileSecurity.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileSecurity.SetPrivilege",
+        "Aspose.Pdf.Facades.PdfFileSecurity.Save",
+        "Aspose.Pdf.DocumentPrivilege"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T06:42:17Z",
+      "generated_at": "2026-05-08T09:45:35Z",
       "status": "verified"
     },
-    "merge-multiple-filled-pdfs": {
-      "title": "Merge Multiple Filled PDFs into a Single Document",
-      "filename": "merge-multiple-filled-pdfs.cs",
-      "description": "Shows how to fill a PDF form from DataTables using AutoFiller and then concatenate the generated PDFs into one consolidated file with PdfFileEditor.",
+    "fill-pdf-form-using-autofiller-datatable": {
+      "title": "Fill PDF Form Using AutoFiller and DataTable",
+      "filename": "fill-pdf-form-using-autofiller-datatable.cs",
+      "description": "Demonstrates how to bind a PDF template, import a DataTable whose column names match AcroForm fields, and save the filled PDF using Aspose.Pdf's AutoFiller.",
       "tags": [
         "pdf",
         "form-filling",
-        "merge",
         "autofiller",
+        "datatable",
         "aspose"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Forms.TextBoxField",
+        "Aspose.Pdf.Facades.AutoFiller",
         "Aspose.Pdf.Facades.AutoFiller.BindPdf",
         "Aspose.Pdf.Facades.AutoFiller.ImportDataTable",
-        "Aspose.Pdf.Facades.AutoFiller.Save",
-        "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T06:42:17Z",
-      "status": "verified"
-    },
-    "convert-filled-pdf-to-byte-array": {
-      "title": "Convert Filled PDF to Byte Array without Saving to Disk",
-      "filename": "convert-filled-pdf-to-byte-array.cs",
-      "description": "Shows how to load a filled PDF using Aspose.Pdf.Facades.PdfViewer and save it directly to a MemoryStream to obtain a byte array for web API transmission.",
-      "tags": [
-        "pdf",
-        "byte-array",
-        "memorystream",
-        "facade",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfViewer",
-        "Aspose.Pdf.Facades.PdfViewer.BindPdf",
-        "Aspose.Pdf.Facades.PdfViewer.Save",
-        "Aspose.Pdf.Facades.PdfViewer.Close"
+        "Aspose.Pdf.Facades.AutoFiller.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T06:42:17Z",
+      "generated_at": "2026-05-08T09:45:35Z",
       "status": "verified"
     },
-    "async-fill-pdf-from-excel": {
-      "title": "Asynchronously Fill PDF Form from Excel Using AutoFiller",
-      "filename": "async-fill-pdf-from-excel.cs",
-      "description": "Demonstrates loading Excel data asynchronously, binding it to a PDF template with AutoFiller, and writing the filled PDF to disk using async file I/O.",
+    "async-fill-pdf-form-from-xlsx": {
+      "title": "Asynchronously Fill PDF Form from XLSX Data",
+      "filename": "async-fill-pdf-form-from-xlsx.cs",
+      "description": "The example reads an XLSX file asynchronously, extracts field values, fills a PDF form using Aspose.Pdf's Form facade, and saves the filled PDF asynchronously.",
       "tags": [
         "async",
         "pdf-form",
-        "autofiller",
-        "excel",
+        "aspose-pdf",
+        "xlsx",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.Form",
+        "Aspose.Pdf.Facades.Form.FillField",
+        "Aspose.Pdf.Document.SaveAsync"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T09:45:35Z",
+      "status": "verified"
+    },
+    "fill-pdf-form-validate-size": {
+      "title": "Fill PDF Form and Validate Generated File Size",
+      "filename": "fill-pdf-form-validate-size.cs",
+      "description": "Demonstrates using Aspose.Pdf.Facades.AutoFiller to merge a DataTable into a PDF form, save the result, and verify that the output file does not exceed a predefined size limit.",
+      "tags": [
+        "pdf",
+        "autofill",
+        "datatable",
+        "size-validation",
         "aspose-pdf"
       ],
       "apis_used": [
@@ -458,42 +482,19 @@
         "Aspose.Pdf.Facades.AutoFiller.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T06:42:17Z",
+      "generated_at": "2026-05-08T09:45:35Z",
       "status": "verified"
     },
-    "verify-filled-pdf-fields-match-datatable": {
-      "title": "Unit Test to Verify Filled PDF Fields Match DataTable",
-      "filename": "verify-filled-pdf-fields-match-datatable.cs",
-      "description": "Shows how to fill a PDF form with Aspose.Pdf.Facades.AutoFiller and then use a unit test to compare each filled field against the original DataTable values.",
+    "fill-pdf-form-with-csv-dynamic-mapping": {
+      "title": "Fill PDF Form Using CSV Data with Dynamic Column Mapping",
+      "filename": "fill-pdf-form-with-csv-dynamic-mapping.cs",
+      "description": "Demonstrates loading CSV data into a DataTable, applying a JSON‑based column‑to‑PDF‑field mapping, and using Aspose.Pdf.Facades.AutoFiller to populate a PDF form.",
       "tags": [
-        "pdf",
-        "form-filling",
-        "unittest",
+        "csv",
+        "pdf-form",
+        "dynamic-mapping",
         "autofiller",
-        "datatable"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.AutoFiller",
-        "Aspose.Pdf.Facades.AutoFiller.BindPdf",
-        "Aspose.Pdf.Facades.AutoFiller.ImportDataTable",
-        "Aspose.Pdf.Facades.AutoFiller.Save",
-        "Aspose.Pdf.Facades.Form",
-        "Aspose.Pdf.Facades.Form.GetField"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T06:42:17Z",
-      "status": "verified"
-    },
-    "autofiller-retry-logic": {
-      "title": "AutoFiller PDF Merge with Retry Logic",
-      "filename": "autofiller-retry-logic.cs",
-      "description": "Demonstrates how to use Aspose.Pdf's AutoFiller to bind a PDF template, import data from a DataTable, and save the merged document while handling transient file‑access errors with an exponential back‑off retry mechanism.",
-      "tags": [
-        "autofiller",
-        "retry",
-        "pdf",
-        "mailmerge",
-        "aspose"
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.AutoFiller",
@@ -502,64 +503,64 @@
         "Aspose.Pdf.Facades.AutoFiller.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T06:42:17Z",
+      "generated_at": "2026-05-08T09:45:35Z",
       "status": "verified"
     },
-    "generate-summary-report-pdf-pages-datatable": {
-      "title": "Generate Summary Report Mapping PDF Pages to DataTable Rows",
-      "filename": "generate-summary-report-pdf-pages-datatable.cs",
-      "description": "Iterates through each PDF page, extracts tables with TableAbsorber, and writes a CSV that maps the page number to a corresponding DataTable row identifier.",
+    "process-pdf-with-temp-folder": {
+      "title": "Process PDF with Temporary Folder and Disk Buffer",
+      "filename": "process-pdf-with-temp-folder.cs",
+      "description": "Demonstrates how to use a unique temporary folder and disk buffering while processing large PDFs with Aspose.Pdf, including flattening, saving with intermediate files, and splitting into single‑page PDFs.",
       "tags": [
+        "temporary-folder",
         "pdf",
-        "datatable",
-        "csv",
-        "tableabsorption",
-        "facade"
+        "aspose-pdf",
+        "disk-buffer",
+        "split-pages"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.TableAbsorber",
-        "Aspose.Pdf.Facades.TableAbsorber.Visit",
-        "Aspose.Pdf.Facades.PdfExtractor",
-        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
-        "Aspose.Pdf.Facades.PdfExtractor.Close"
+        "Aspose.Pdf.PdfSaveOptions",
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Document.Flatten",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Facades.PdfFileEditor.SplitToPages"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T06:42:17Z",
+      "generated_at": "2026-05-08T09:45:35Z",
       "status": "verified"
     },
-    "add-date-header-to-pdf-pages": {
-      "title": "Add Date Header to PDF Pages",
-      "filename": "add-date-header-to-pdf-pages.cs",
-      "description": "Shows how to use Aspose.Pdf's PdfFileStamp to insert a header with the current date on every page of a PDF document.",
+    "add-current-date-header-to-pdf": {
+      "title": "Add Current Date Header to PDF Using AutoFiller",
+      "filename": "add-current-date-header-to-pdf.cs",
+      "description": "Shows how to generate a PDF from a template with AutoFiller and then add a header containing the current date on every page using PdfFileStamp.",
       "tags": [
-        "pdf",
+        "auto-filler",
         "header",
         "date",
-        "autofiller",
+        "pdf",
         "aspose"
       ],
       "apis_used": [
-        "Aspose.Pdf.Text.PageDate",
-        "Aspose.Pdf.Text.FormattedText",
-        "Aspose.Pdf.Facades.PdfFileStamp",
-        "PdfFileStamp.AddHeader",
-        "PdfFileStamp.Close"
+        "Aspose.Pdf.Facades.AutoFiller.BindPdf",
+        "Aspose.Pdf.Facades.AutoFiller.Save",
+        "Aspose.Pdf.Facades.PdfFileStamp.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileStamp.AddHeader",
+        "Aspose.Pdf.Facades.PdfFileStamp.Save"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T06:42:17Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T09:45:35Z",
       "status": "verified"
     },
-    "fill-pdf-form-using-csv-config-mapping": {
-      "title": "Fill PDF Form Using CSV Data with Configurable Column Mapping",
-      "filename": "fill-pdf-form-using-csv-config-mapping.cs",
-      "description": "Demonstrates loading a JSON mapping to translate CSV column names to PDF field names, reading the first data row, and filling an Aspose.Pdf form dynamically.",
+    "fill-pdf-form-from-csv": {
+      "title": "Fill PDF Form from CSV Data",
+      "filename": "fill-pdf-form-from-csv.cs",
+      "description": "Shows how to read a CSV file into a DataTable, map column names to PDF form field names, and use Aspose.Pdf.Facades.Form to fill and save the PDF.",
       "tags": [
         "pdf",
         "form-filling",
         "csv",
-        "json-mapping",
-        "aspose"
+        "aspose",
+        "facade"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.Form",
@@ -567,164 +568,35 @@
         "Aspose.Pdf.Facades.Form.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T06:42:17Z",
+      "generated_at": "2026-05-08T09:45:35Z",
       "status": "verified"
     },
-    "fill-pdf-form-from-large-csv": {
-      "title": "Fill PDF Form from Large CSV Using AutoFiller",
-      "filename": "fill-pdf-form-from-large-csv.cs",
-      "description": "Demonstrates loading a large CSV (converted from XLSX) row‑by‑row into a DataTable and using Aspose.Pdf.Facades.AutoFiller to merge the data into a PDF form without exhausting memory.",
+    "generate-pdf-page-summary-report": {
+      "title": "Generate PDF Page‑to‑DataTable Summary Report",
+      "filename": "generate-pdf-page-summary-report.cs",
+      "description": "Creates a PDF (or a blank one if missing), populates a DataTable with identifiers for each page, and writes a text report mapping page numbers to the corresponding DataTable row IDs using Aspose.Pdf and its Facade class.",
       "tags": [
         "pdf",
-        "autofiller",
-        "csv",
-        "data-table",
-        "streaming"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.AutoFiller",
-        "Aspose.Pdf.Facades.AutoFiller.BindPdf",
-        "Aspose.Pdf.Facades.AutoFiller.ImportDataTable",
-        "Aspose.Pdf.Facades.AutoFiller.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T06:42:17Z",
-      "status": "verified"
-    },
-    "fill-pdf-form-validate-size": {
-      "title": "Fill PDF Form from DataTable and Validate File Size",
-      "filename": "fill-pdf-form-validate-size.cs",
-      "description": "Demonstrates using Aspose.Pdf AutoFiller to populate a PDF form from a DataTable, creating a template if missing, and checking that the resulting PDF does not exceed a predefined size limit.",
-      "tags": [
-        "pdf",
-        "form-filling",
-        "autofiller",
-        "size-validation",
-        "datatable"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.AutoFiller",
-        "Aspose.Pdf.Facades.AutoFiller.BindPdf",
-        "Aspose.Pdf.Facades.AutoFiller.ImportDataTable",
-        "Aspose.Pdf.Facades.AutoFiller.Save",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Forms.TextBoxField"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T06:42:17Z",
-      "status": "verified"
-    },
-    "fill-pdf-form-from-xlsx-using-autofiller": {
-      "title": "Fill PDF Form from XLSX Using AutoFiller",
-      "filename": "fill-pdf-form-from-xlsx-using-autofiller.cs",
-      "description": "Shows how to create a DataTable (simulating XLSX data) and use Aspose.Pdf.Facades.AutoFiller to bind a PDF template, import the data, and save a filled PDF.",
-      "tags": [
-        "autofiller",
-        "pdf-form",
-        "xlsx",
-        "aspnet-core",
-        "data-table"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.AutoFiller",
-        "Aspose.Pdf.Facades.AutoFiller.BindPdf",
-        "Aspose.Pdf.Facades.AutoFiller.ImportDataTable",
-        "Aspose.Pdf.Facades.AutoFiller.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T06:42:17Z",
-      "status": "verified"
-    },
-    "fill-pdf-form-with-timeout-cancellation": {
-      "title": "Fill PDF Form with Timeout Cancellation",
-      "filename": "fill-pdf-form-with-timeout-cancellation.cs",
-      "description": "Demonstrates how to fill fields in a PDF form using Aspose.Pdf and abort the operation with a cancellation token if it exceeds a specified timeout.",
-      "tags": [
-        "pdf",
-        "form-filling",
-        "cancellation-token",
-        "timeout",
-        "aspose-pdf"
+        "datatable",
+        "report",
+        "facade",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.Form",
-        "Aspose.Pdf.Document.SaveAsync"
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.PageCollection.Add",
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T06:42:17Z",
-      "status": "verified"
-    },
-    "convert-large-pdf-to-excel-with-temp-folder": {
-      "title": "Convert Large PDF to Excel Using a Temporary Folder",
-      "filename": "convert-large-pdf-to-excel-with-temp-folder.cs",
-      "description": "Demonstrates processing a large PDF by extracting each page to temporary files, concatenating them, and converting the combined PDF to an Excel workbook while using disk buffering to limit memory usage.",
-      "tags": [
-        "pdf",
-        "excel",
-        "temporary-folder",
-        "large-files",
-        "disk-buffering"
-      ],
-      "apis_used": [
-        "PdfFileEditor",
-        "PdfFileEditor.Extract",
-        "PdfFileEditor.Concatenate",
-        "Document",
-        "Document.Save",
-        "ExcelSaveOptions"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T06:42:17Z",
-      "status": "verified"
-    },
-    "format-numeric-values-fill-pdf-form": {
-      "title": "Format Numeric Values and Fill PDF Form Fields",
-      "filename": "format-numeric-values-fill-pdf-form.cs",
-      "description": "Shows how to format numeric DataTable values as strings and use Aspose.Pdf.Facades.AutoFiller to populate PDF form fields.",
-      "tags": [
-        "pdf",
-        "form-filling",
-        "numeric-formatting",
-        "autofiller",
-        "datatable"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.AutoFiller",
-        "Aspose.Pdf.Facades.AutoFiller.BindPdf",
-        "Aspose.Pdf.Facades.AutoFiller.ImportDataTable",
-        "Aspose.Pdf.Facades.AutoFiller.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T06:42:17Z",
-      "status": "verified"
-    },
-    "add-image-watermark-to-filled-pdf-pages": {
-      "title": "Add Image Watermark to Filled PDF Pages",
-      "filename": "add-image-watermark-to-filled-pdf-pages.cs",
-      "description": "Demonstrates how to fill a PDF form using Aspose.Pdf.Facades.AutoFiller and then apply a semi‑transparent image watermark to every page of the resulting document.",
-      "tags": [
-        "watermark",
-        "pdf",
-        "autofiller",
-        "image",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.AutoFiller",
-        "Aspose.Pdf.Facades.PdfFileStamp",
-        "Aspose.Pdf.Facades.Stamp"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T06:42:17Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T09:45:35Z",
       "status": "verified"
     },
     "split-filled-pdf-into-single-page-pdfs": {
-      "title": "Split Filled PDF into Single‑Page PDFs",
+      "title": "Split Filled PDF into Single-Page PDFs",
       "filename": "split-filled-pdf-into-single-page-pdfs.cs",
-      "description": "Demonstrates how to split a filled PDF into individual one‑page PDF files using Aspose.Pdf.Facades.",
+      "description": "Demonstrates loading a filled PDF and using Aspose.Pdf.Facades.PdfFileEditor to split it into individual one‑page PDF files, naming each file with a page‑number placeholder.",
       "tags": [
         "pdf-split",
         "single-page",
@@ -737,27 +609,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.SplitToPages"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T06:42:17Z",
-      "status": "verified"
-    },
-    "fill-pdf-form-from-csv": {
-      "title": "Fill PDF Form from CSV using Aspose.Pdf",
-      "filename": "fill-pdf-form-from-csv.cs",
-      "description": "Demonstrates loading data from a CSV file into a DataTable and using Aspose.Pdf.Facades.Form to populate matching PDF form fields, then saving the filled PDF.",
-      "tags": [
-        "pdf",
-        "form-filling",
-        "csv",
-        "aspose",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.Form",
-        "Aspose.Pdf.Facades.Form.FillField",
-        "Aspose.Pdf.Facades.Form.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T06:42:17Z",
+      "generated_at": "2026-05-08T09:45:35Z",
       "status": "verified"
     }
   }

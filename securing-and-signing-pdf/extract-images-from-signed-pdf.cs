@@ -1,60 +1,61 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using System.Drawing.Imaging;
+using Aspose.Pdf;               // Core PDF API
+using Aspose.Pdf.Forms;        // For signature fields (if needed)
 
-class ExtractImagesFromSignedPdf
+class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "signed_input.pdf";
-        const string outputFolder = "ExtractedImages";
+        const string inputPdf  = "signed_input.pdf";   // Path to the signed PDF
+        const string outputDir = "ExtractedImages";    // Directory to store PNG files
 
-        if (!File.Exists(inputPdfPath))
+        // Verify input file exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
         // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
+        Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document (no special load options required)
-        using (Document pdfDoc = new Document(inputPdfPath))
+        try
         {
-            int imageCounter = 1;
-
-            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
+            // Load the PDF document (lifecycle: load)
+            using (Document doc = new Document(inputPdf))
             {
-                Page page = pdfDoc.Pages[pageIndex];
-
-                // Iterate over all images in the page's resources
-                foreach (XImage img in page.Resources.Images)
+                // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+                for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
                 {
-                    // Build a unique file name for each extracted image
-                    string outputPath = Path.Combine(
-                        outputFolder,
-                        $"Page{pageIndex}_Image{imageCounter}.png");
+                    Page page = doc.Pages[pageNum];
 
-                    // Aspose.Pdf XImage.Save only accepts a Stream. Save to a MemoryStream first,
-                    // then re‑encode the image as PNG using System.Drawing (available on Windows).
-                    using (MemoryStream ms = new MemoryStream())
+                    // Each page has a Resources.Images collection (XImageCollection)
+                    int imgIndex = 1;
+                    foreach (XImage img in page.Resources.Images)
                     {
-                        img.Save(ms);               // Save original image bytes to memory
-                        ms.Position = 0;            // Reset stream position for reading
-                        using (System.Drawing.Image sysImg = System.Drawing.Image.FromStream(ms))
-                        {
-                            sysImg.Save(outputPath, ImageFormat.Png);
-                        }
-                    }
+                        // Build a unique file name per page and image
+                        string outPath = Path.Combine(
+                            outputDir,
+                            $"page{pageNum}_img{imgIndex}.png");
 
-                    Console.WriteLine($"Saved image {imageCounter} from page {pageIndex} to '{outputPath}'");
-                    imageCounter++;
+                        // Save the image as PNG using a FileStream (overload expects Stream)
+                        using (FileStream fs = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+                        {
+                            img.Save(fs); // XImage.Save determines format from file extension
+                        }
+
+                        Console.WriteLine($"Saved image: {outPath}");
+                        imgIndex++;
+                    }
                 }
             }
-        }
 
-        Console.WriteLine("Image extraction completed.");
+            Console.WriteLine("Image extraction completed successfully.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during extraction: {ex.Message}");
+        }
     }
 }

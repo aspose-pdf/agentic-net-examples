@@ -6,38 +6,37 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputHtmlPath = "output.html";
+        const string inputPdf = "input.pdf";
+        const string outputHtml = "output.html";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         try
         {
-            // Load the PDF document (lifecycle: using for deterministic disposal)
-            using (Document pdfDocument = new Document(inputPdfPath))
+            // Load the PDF document
+            using (Document pdfDoc = new Document(inputPdf))
             {
-                // Configure HTML save options and enable SVG compression
-                HtmlSaveOptions htmlOptions = new HtmlSaveOptions
+                // Configure HTML conversion options
+                HtmlSaveOptions htmlOpts = new HtmlSaveOptions
                 {
+                    // Compress SVG graphics if any (available in recent versions)
                     CompressSvgGraphicsIfAny = true
                 };
 
-                // Save as HTML with explicit options (required for non‑PDF output)
-                // Wrap in try‑catch because HTML conversion may require GDI+ (Windows only)
-                try
-                {
-                    pdfDocument.Save(outputHtmlPath, htmlOptions);
-                    Console.WriteLine($"PDF successfully converted to HTML: {outputHtmlPath}");
-                }
-                catch (TypeInitializationException)
-                {
-                    Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
-                }
+                // Save as HTML using the configured options
+                pdfDoc.Save(outputHtml, htmlOpts);
             }
+
+            Console.WriteLine($"PDF successfully converted to HTML with compressed SVG assets: {outputHtml}");
+        }
+        catch (TypeInitializationException)
+        {
+            // HTML conversion relies on GDI+ and is Windows‑only
+            Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
         }
         catch (Exception ex)
         {

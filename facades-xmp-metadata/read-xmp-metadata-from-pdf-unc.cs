@@ -8,35 +8,29 @@ class Program
     static void Main()
     {
         // UNC path to the PDF file on a network share
-        const string pdfPath = @"\\ServerName\ShareFolder\Documents\sample.pdf";
+        const string pdfPath = @"\\server\share\documents\sample.pdf";
 
+        // Verify that the file exists before attempting to read it
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        try
+        // Use the PdfXmpMetadata facade to read XMP metadata
+        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
         {
-            // PdfXmpMetadata implements IDisposable, so use a using block for deterministic cleanup
-            using (PdfXmpMetadata xmp = new PdfXmpMetadata())
-            {
-                // Bind the PDF located at the UNC path
-                xmp.BindPdf(pdfPath);
+            // Bind the PDF located at the UNC path
+            xmp.BindPdf(pdfPath);
 
-                // Retrieve the entire XMP metadata as a byte array (XML format)
-                byte[] rawData = xmp.GetXmpMetadata();
+            // Retrieve the entire XMP metadata as an XML byte array
+            byte[] xmlBytes = xmp.GetXmpMetadata();
 
-                // Convert the byte array to a UTF‑8 string for display or further processing
-                string xmlMetadata = Encoding.UTF8.GetString(rawData);
+            // Convert the byte array to a UTF‑8 string for display or further processing
+            string xml = Encoding.UTF8.GetString(xmlBytes);
 
-                Console.WriteLine("XMP Metadata (XML):");
-                Console.WriteLine(xmlMetadata);
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error reading XMP metadata: {ex.Message}");
+            Console.WriteLine("XMP Metadata (XML):");
+            Console.WriteLine(xml);
         }
     }
 }

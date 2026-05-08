@@ -6,26 +6,31 @@ class Program
 {
     static void Main()
     {
-        // Paths to the source PCL file and the destination PDF file.
+        // Path to the source PCL file
         const string pclPath = "input.pcl";
+        // Path for the resulting PDF file
         const string pdfPath = "output.pdf";
 
-        // Verify that the source file exists.
         if (!File.Exists(pclPath))
         {
             Console.Error.WriteLine($"File not found: {pclPath}");
             return;
         }
 
-        // Create load options for PCL. HP‑GL/2 vectors are loaded automatically; no explicit flag is required.
+        // Create load options for PCL conversion
         PclLoadOptions loadOptions = new PclLoadOptions();
 
-        // Load the PCL file using the specified options and save it as PDF.
+        // Enable HP‑GL/2 vector loading.
+        // The NewEngine conversion engine supports HP‑GL/2 graphics.
+        loadOptions.ConversionEngine = PclLoadOptions.ConversionEngines.NewEngine;
+
+        // Load the PCL file into a Document using the specified options
         using (Document pdfDocument = new Document(pclPath, loadOptions))
         {
-            pdfDocument.Save(pdfPath); // Saves as PDF (default format for Save without options)
+            // Save the document as PDF
+            pdfDocument.Save(pdfPath);
         }
 
-        Console.WriteLine($"Conversion completed: '{pclPath}' → '{pdfPath}'.");
+        Console.WriteLine($"Successfully converted '{pclPath}' to PDF '{pdfPath}'.");
     }
 }

@@ -1,8 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using System.Drawing; // Required for System.Drawing.Rectangle and System.Drawing.Color (used by PdfContentEditor)
+using System.Drawing; // Rectangle and Color are defined here
 
 class Program
 {
@@ -17,26 +16,29 @@ class Program
             return;
         }
 
-        // Define the rectangle that will surround the diagram on page 6.
-        // Adjust the coordinates (x, y, width, height) as needed.
-        // Use System.Drawing.Rectangle because PdfContentEditor.CreateSquareCircle expects it.
-        System.Drawing.Rectangle diagramRect = new System.Drawing.Rectangle(100, 500, 200, 300);
+        // Initialize the facade that works with PDF annotations
+        PdfContentEditor editor = new PdfContentEditor();
 
-        // Use PdfContentEditor (Facades API) to add a circle annotation.
-        // CreateSquareCircle parameters:
-        //   rect          – annotation rectangle (System.Drawing.Rectangle)
-        //   contents      – optional text (empty here)
-        //   clr           – outline color (System.Drawing.Color)
-        //   square        – false => circle
-        //   page          – target page number (6, 1‑based)
-        //   borderWidth   – thickness of the outline (e.g., 5)
-        using (PdfContentEditor editor = new PdfContentEditor())
-        {
-            editor.BindPdf(inputPath);
-            editor.CreateSquareCircle(diagramRect, "", System.Drawing.Color.Green, false, 6, 5);
-            editor.Save(outputPath);
-        }
+        // Load the existing PDF document
+        editor.BindPdf(inputPath);
 
-        Console.WriteLine($"Circle annotation added to page 6 and saved as '{outputPath}'.");
+        // Define the annotation rectangle (position and size)
+        // Rectangle(x, y, width, height) – coordinates are in points
+        Rectangle rect = new Rectangle(100, 500, 200, 200);
+
+        // Create a circle annotation on page 2
+        // Parameters: rect, contents, fill color, square (false = circle), page number, border width
+        editor.CreateSquareCircle(
+            rect,
+            "Circle annotation",          // annotation contents
+            Color.Green,                  // fill color (green)
+            false,                        // false => circle shape
+            2,                            // page number (1‑based indexing)
+            3);                           // border width in points
+
+        // Save the modified PDF
+        editor.Save(outputPath);
+
+        Console.WriteLine($"Circle annotation added to page 2 and saved as '{outputPath}'.");
     }
 }

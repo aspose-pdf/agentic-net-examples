@@ -6,48 +6,49 @@ class ReplaceJpegWithPng
 {
     static void Main()
     {
-        // Paths to the source PDF, the PNG image to use as replacement, and the output PDF.
-        const string inputPdfPath = "input.pdf";
-        const string pngImagePath = "replacement.png";
+        const string inputPdfPath  = "input.pdf";
         const string outputPdfPath = "output.pdf";
+        const string pngReplacementPath = "replacement.png";
 
-        // Verify that the PNG replacement file exists before attempting to read it.
-        if (!File.Exists(pngImagePath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Error: Replacement image file '{pngImagePath}' was not found.");
-            Console.Error.WriteLine("Make sure the file exists in the working directory or provide a correct path.");
-            return; // Exit gracefully instead of throwing an unhandled exception.
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
         }
 
-        // Load the PNG image once into memory.
-        byte[] pngData = File.ReadAllBytes(pngImagePath);
-
-        // Open the PDF document inside a using block for deterministic disposal.
-        using (Document pdfDoc = new Document(inputPdfPath))
+        if (!File.Exists(pngReplacementPath))
         {
-            // Iterate over all pages in the document.
-            foreach (Page page in pdfDoc.Pages)
-            {
-                // Absorb all image placements on the current page.
-                ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
-                page.Accept(absorber);
+            Console.Error.WriteLine($"Replacement PNG not found: {pngReplacementPath}");
+            return;
+        }
 
-                // Replace each image (originally JPEG) with the PNG data.
-                foreach (ImagePlacement placement in absorber.ImagePlacements)
+        // Load the PDF document
+        using (Document doc = new Document(inputPdfPath))
+        {
+            // Iterate through all pages (1‑based indexing)
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            {
+                Page page = doc.Pages[pageNum];
+                // XImageCollection does not provide an indexer for direct access,
+                // but it supports 1‑based indexing via the collection itself.
+                // Replace each image resource with the PNG stream.
+                int imageCount = page.Resources.Images.Count;
+                for (int imgIndex = 1; imgIndex <= imageCount; imgIndex++)
                 {
-                    using (MemoryStream pngStream = new MemoryStream(pngData))
+                    // Load the PNG data into a memory stream
+                    using (FileStream pngStream = File.OpenRead(pngReplacementPath))
                     {
-                        // The Replace method updates the image while preserving its position,
-                        // size, rotation, and other transformation attributes.
-                        placement.Replace(pngStream);
+                        // Replace the image at the current index.
+                        // The Replace method expects a stream containing the new image data.
+                        page.Resources.Images.Replace(imgIndex, pngStream);
                     }
                 }
             }
 
-            // Save the modified PDF to the specified output path.
-            pdfDoc.Save(outputPdfPath);
+            // Save the modified PDF
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"All JPEG images have been replaced with PNG equivalents and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"PDF saved with PNG replacements: {outputPdfPath}");
     }
 }

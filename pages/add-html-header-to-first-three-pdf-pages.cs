@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_header.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -22,34 +22,45 @@ class Program
             // Determine how many pages we can process (max 3)
             int pagesToProcess = Math.Min(3, doc.Pages.Count);
 
-            // Loop through the first three pages (1‑based indexing)
+            // HTML content for the header (includes embedded CSS)
+            string headerHtml = @"
+                <style>
+                    .myHeader {
+                        font-family: Helvetica, Arial, sans-serif;
+                        font-size: 14pt;
+                        color: #0066CC;
+                        text-align: center;
+                        margin-top: 5pt;
+                    }
+                </style>
+                <div class='myHeader'>Confidential Report – Page {page}</div>";
+
+            // Apply the header to the first three pages
             for (int i = 1; i <= pagesToProcess; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Create a new header/footer object
+                // Create a new HeaderFooter object
                 HeaderFooter header = new HeaderFooter();
 
-                // HTML string with embedded CSS styling
-                string html = $@"
-                    <div style='font-family:Helvetica; font-size:12pt; color:#FF0000;'>
-                        Header for page {i}
-                    </div>";
+                // Replace placeholder with actual page number
+                string pageHeaderHtml = headerHtml.Replace("{page}", i.ToString());
 
-                // HtmlFragment renders the HTML inside the PDF
-                HtmlFragment htmlFragment = new HtmlFragment(html);
+                // Create an HtmlFragment containing the styled header
+                HtmlFragment htmlFragment = new HtmlFragment(pageHeaderHtml);
+                // No need to set IsHtml – HtmlFragment treats the string as HTML by default
 
-                // Add the HTML fragment to the header's paragraph collection
+                // Add the fragment to the header's paragraph collection
                 header.Paragraphs.Add(htmlFragment);
 
-                // Assign the header to the current page
+                // Assign the header to the page
                 page.Header = header;
             }
 
-            // Save the modified PDF
+            // Save the modified document (PDF format)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with HTML headers saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with HTML header on first three pages: '{outputPath}'");
     }
 }

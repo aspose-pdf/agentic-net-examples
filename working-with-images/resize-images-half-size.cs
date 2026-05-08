@@ -1,9 +1,8 @@
 using System;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices; // Required for ImagePlacementAbsorber
+using Aspose.Pdf.Text; // required for ImagePlacementAbsorber
 
 class Program
 {
@@ -21,40 +20,42 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through each page
-            foreach (Page page in doc.Pages)
+            // Iterate through all pages (1‑based indexing)
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
+                Page page = doc.Pages[pageNum];
+
                 // Absorb image placements on the current page
                 ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
                 page.Accept(absorber);
 
-                // Process each found image placement
+                // Process each image placement
                 foreach (ImagePlacement placement in absorber.ImagePlacements)
                 {
-                    // Extract the original image into a memory stream
+                    // Retrieve the original image as a stream
                     using (MemoryStream originalStream = new MemoryStream())
                     {
-                        placement.Image.Save(originalStream, ImageFormat.Png);
+                        placement.Image.Save(originalStream);
                         originalStream.Position = 0;
 
-                        // Load the image as a Bitmap
+                        // Load the image into a Bitmap for scaling
                         using (Bitmap originalBitmap = new Bitmap(originalStream))
                         {
                             // Calculate half size (ensure at least 1 pixel)
                             int newWidth  = Math.Max(1, originalBitmap.Width  / 2);
                             int newHeight = Math.Max(1, originalBitmap.Height / 2);
 
-                            // Create a resized bitmap
-                            using (Bitmap resizedBitmap = new Bitmap(originalBitmap, newWidth, newHeight))
+                            // Create a scaled bitmap
+                            using (Bitmap scaledBitmap = new Bitmap(originalBitmap, new Size(newWidth, newHeight)))
                             {
-                                // Save the resized bitmap to a new stream
-                                using (MemoryStream resizedStream = new MemoryStream())
+                                // Save the scaled bitmap to a new memory stream (PNG format)
+                                using (MemoryStream scaledStream = new MemoryStream())
                                 {
-                                    resizedBitmap.Save(resizedStream, ImageFormat.Png);
-                                    resizedStream.Position = 0;
+                                    scaledBitmap.Save(scaledStream, System.Drawing.Imaging.ImageFormat.Png);
+                                    scaledStream.Position = 0;
 
-                                    // Replace the image on the page with the resized version
-                                    placement.Replace(resizedStream);
+                                    // Replace the image in the PDF with the scaled version
+                                    placement.Replace(scaledStream);
                                 }
                             }
                         }

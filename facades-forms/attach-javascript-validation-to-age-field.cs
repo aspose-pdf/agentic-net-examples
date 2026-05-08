@@ -1,8 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;   // Annotation base class
-using Aspose.Pdf.Forms;        // Field and JavascriptAction classes
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -17,43 +16,27 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Locate the form field named "Age"
-            Field ageField = null;
-            foreach (Page page in doc.Pages)
+            // Initialize the FormEditor facade with the loaded document
+            using (FormEditor formEditor = new FormEditor(doc))
             {
-                foreach (Annotation annot in page.Annotations)
+                // JavaScript that shows a warning if the entered age is less than 18
+                string js = "if (event.value < 18) app.alert('You must be at least 18 years old');";
+
+                // Attach the script to the field named "Age"
+                bool attached = formEditor.SetFieldScript("Age", js);
+                if (!attached)
                 {
-                    if (annot is Field field &&
-                        (field.PartialName == "Age" || field.FullName.EndsWith("Age")))
-                    {
-                        ageField = field;
-                        break;
-                    }
+                    Console.Error.WriteLine("Failed to attach JavaScript to the 'Age' field.");
                 }
-                if (ageField != null) break;
-            }
 
-            if (ageField != null)
-            {
-                // JavaScript that shows a warning when the entered value is less than 18
-                string jsCode = "if (event.value < 18) { app.alert('You must be at least 18 years old.'); }";
-
-                // Create the JavaScript action and attach it to the field
-                JavascriptAction jsAction = new JavascriptAction(jsCode);
-                ageField.ExecuteFieldJavaScript(jsAction);
+                // Save the modified PDF
+                formEditor.Save(outputPath);
             }
-            else
-            {
-                Console.Error.WriteLine("Field \"Age\" not found in the document.");
-            }
-
-            // Save the modified PDF
-            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with JavaScript to '{outputPath}'.");
     }
 }

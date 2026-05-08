@@ -2,14 +2,13 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
-using Aspose.Pdf.Drawing; // for Color
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "rotated_stamp.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,33 +16,26 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        Document doc = new Document(inputPath);
-        Page firstPage = doc.Pages[1]; // 1‑based index
-
-        // Create a text stamp
-        TextStamp stamp = new TextStamp("Rotated Text");
-
+        // Create a text stamp with the desired content
+        TextStamp stamp = new TextStamp("Sample Stamp");
         // Configure text appearance
         stamp.TextState.Font = FontRepository.FindFont("Helvetica");
-        stamp.TextState.FontSize = 24;
-        stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+        stamp.TextState.FontSize = 36;
+        stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Red;
+        // Position the stamp (coordinates are from the lower‑left corner)
+        stamp.XIndent = 200f;
+        stamp.YIndent = 400f;
+        // Rotate the stamp 45 degrees around its centre
+        stamp.RotateAngle = 45f;
 
-        // Rotate 45 degrees around its centre
-        stamp.RotateAngle = 45.0; // <-- correct property for rotation
+        // Load the source PDF and apply the stamp to each page (or select pages as needed)
+        Document pdfDocument = new Document(inputPath);
+        foreach (Page page in pdfDocument.Pages)
+        {
+            page.AddStamp(stamp);
+        }
 
-        // Position the stamp at the centre of the page using XIndent/YIndent (SetOrigin is obsolete)
-        float pageWidth = (float)firstPage.PageInfo.Width;   // cast double → float
-        float pageHeight = (float)firstPage.PageInfo.Height; // cast double → float
-        stamp.XIndent = pageWidth / 2f;
-        stamp.YIndent = pageHeight / 2f;
-
-        // Add the stamp to the page
-        firstPage.AddStamp(stamp);
-
-        // Save the modified PDF
-        doc.Save(outputPath);
-
-        Console.WriteLine($"Stamp with 45° rotation applied and saved to '{outputPath}'.");
+        pdfDocument.Save(outputPath);
+        Console.WriteLine($"PDF with rotated text stamp saved to '{outputPath}'.");
     }
 }

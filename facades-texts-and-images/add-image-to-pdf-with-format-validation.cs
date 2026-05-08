@@ -4,70 +4,62 @@ using Aspose.Pdf.Facades;
 
 class Program
 {
-    // Allowed image extensions (case‑insensitive)
-    private static readonly string[] AllowedExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tif", ".tiff" };
-
-    // Returns true if the file has one of the allowed image extensions
-    private static bool IsSupportedImage(string imagePath)
-    {
-        if (string.IsNullOrWhiteSpace(imagePath))
-            return false;
-
-        string ext = Path.GetExtension(imagePath);
-        if (string.IsNullOrEmpty(ext))
-            return false;
-
-        ext = ext.ToLowerInvariant();
-        foreach (var allowed in AllowedExtensions)
-        {
-            if (ext == allowed)
-                return true;
-        }
-        return false;
-    }
-
     static void Main()
     {
         const string inputPdf  = "input.pdf";
-        const string imageFile = "picture.png";
         const string outputPdf = "output.pdf";
+        const string imagePath = "image.png";
 
-        // Verify source files exist
+        // Verify source PDF exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"PDF file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        if (!File.Exists(imageFile))
+        // Verify image file exists
+        if (!File.Exists(imagePath))
         {
-            Console.Error.WriteLine($"Image file not found: {imageFile}");
+            Console.Error.WriteLine($"Image file not found: {imagePath}");
             return;
         }
 
-        // Validate image format
-        if (!IsSupportedImage(imageFile))
+        // Validate image format (JPG, PNG, GIF, BMP, TIFF)
+        if (!IsSupportedImage(imagePath))
         {
-            Console.Error.WriteLine("Unsupported image format. Allowed formats: JPG, PNG, GIF, BMP, TIFF.");
+            Console.Error.WriteLine("Unsupported image format. Allowed extensions: .jpg, .jpeg, .png, .gif, .bmp, .tif, .tiff");
             return;
         }
 
-        // Add the image to page 1 at the specified rectangle
+        // Use PdfFileMend (Facade) to add the image
         using (PdfFileMend mender = new PdfFileMend())
         {
+            // Bind the existing PDF document
             mender.BindPdf(inputPdf);
-            // lowerLeftX, lowerLeftY, upperRightX, upperRightY define the image rectangle
-            bool added = mender.AddImage(imageFile, 1, 10f, 10f, 200f, 200f);
-            if (!added)
+
+            // Add the image to page 1 at the specified rectangle
+            using (FileStream imgStream = File.OpenRead(imagePath))
             {
-                Console.Error.WriteLine("Failed to add the image to the PDF.");
-                return;
+                // lower-left (10,10), upper-right (200,200) – adjust as needed
+                mender.AddImage(imgStream, 1, 10f, 10f, 200f, 200f);
             }
 
+            // Save the modified PDF
             mender.Save(outputPdf);
             mender.Close();
         }
 
         Console.WriteLine($"Image added successfully. Output saved to '{outputPdf}'.");
+    }
+
+    // Helper to check allowed image extensions
+    static bool IsSupportedImage(string filePath)
+    {
+        string ext = Path.GetExtension(filePath).ToLowerInvariant();
+        return ext == ".jpg" || ext == ".jpeg" ||
+               ext == ".png" ||
+               ext == ".gif" ||
+               ext == ".bmp" ||
+               ext == ".tif" || ext == ".tiff";
     }
 }

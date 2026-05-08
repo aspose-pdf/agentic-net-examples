@@ -1,41 +1,52 @@
 using System;
 using System.IO;
+using System.Text;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output.pdf";
+        // Paths to the input PDF and the output PDF
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "filled_output.pdf";
 
-        // JSON string containing form field names and values
+        // JSON string containing form field values (example format)
         string jsonData = @"{
-            ""FirstName"": ""John"",
-            ""LastName"": ""Doe"",
-            ""Email"": ""john.doe@example.com""
+            \""FirstName\"": \""John\"",
+            \""LastName\"":  \""Doe\"",
+            \""Age\"":        30,
+            \""Subscribe\"": true
         }";
 
+        // Ensure the input file exists
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Convert the JSON string to a memory stream (UTF‑8 encoded)
-        using (MemoryStream jsonStream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(jsonData)))
+        // Load the PDF document inside a using block (ensures proper disposal)
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
-            // Load the PDF document (lifecycle rule: use using for deterministic disposal)
-            using (Document doc = new Document(inputPdfPath))
+            // Convert the JSON string to a memory stream (UTF-8 encoding)
+            using (MemoryStream jsonStream = new MemoryStream(Encoding.UTF8.GetBytes(jsonData)))
             {
-                // Import form fields from the JSON stream into the PDF form
-                doc.Form.ImportFromJson(jsonStream);
+                // Import form field values from the JSON stream into the PDF form
+                // The method returns a collection of FieldSerializationResult which can be inspected if needed
+                var importResults = pdfDocument.Form.ImportFromJson(jsonStream);
 
-                // Save the updated PDF (lifecycle rule: save inside the using block)
-                doc.Save(outputPdfPath);
+                // Optional: log import results – use ToString() because specific properties may vary between versions
+                foreach (var result in importResults)
+                {
+                    Console.WriteLine(result.ToString());
+                }
             }
+
+            // Save the updated PDF (standard PDF output)
+            pdfDocument.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Form data imported and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Form data imported and PDF saved to '{outputPdfPath}'.");
     }
 }

@@ -19,10 +19,9 @@ class Program
             return;
         }
 
-        // List to hold metadata dictionaries for each PDF
         var allMetadata = new List<Dictionary<string, object>>();
 
-        // Iterate over all PDF files in the folder
+        // Iterate over each PDF file in the folder
         foreach (string pdfFile in Directory.GetFiles(folderPath, "*.pdf"))
         {
             try
@@ -30,23 +29,24 @@ class Program
                 // Use PdfFileInfo facade to read metadata
                 using (PdfFileInfo info = new PdfFileInfo())
                 {
-                    info.BindPdf(pdfFile); // Load the PDF
+                    info.BindPdf(pdfFile);
 
                     var meta = new Dictionary<string, object>
                     {
                         ["FileName"]        = Path.GetFileName(pdfFile),
                         ["Title"]           = info.Title,
                         ["Author"]          = info.Author,
+                        ["Creator"]         = info.Creator,
                         ["Subject"]         = info.Subject,
                         ["Keywords"]        = info.Keywords,
-                        ["Creator"]         = info.Creator,
-                        ["Producer"]        = info.Producer,
                         ["CreationDate"]    = info.CreationDate,
                         ["ModDate"]         = info.ModDate,
                         ["NumberOfPages"]   = info.NumberOfPages,
                         ["IsEncrypted"]     = info.IsEncrypted,
+                        ["IsPdfFile"]       = info.IsPdfFile,
                         ["HasOpenPassword"] = info.HasOpenPassword,
                         ["HasEditPassword"] = info.HasEditPassword,
+                        ["Producer"]        = info.Producer,
                         ["Header"]          = info.Header
                     };
 
@@ -59,12 +59,16 @@ class Program
             }
         }
 
-        // Serialize the list to JSON with indentation
-        JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-        string json = JsonSerializer.Serialize(allMetadata, jsonOptions);
-
-        // Write JSON to the output file
-        File.WriteAllText(outputJson, json);
-        Console.WriteLine($"Metadata exported to '{outputJson}'.");
+        // Serialize the collected metadata to JSON
+        try
+        {
+            string json = JsonSerializer.Serialize(allMetadata, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(outputJson, json);
+            Console.WriteLine($"Metadata exported to '{outputJson}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error writing JSON file: {ex.Message}");
+        }
     }
 }

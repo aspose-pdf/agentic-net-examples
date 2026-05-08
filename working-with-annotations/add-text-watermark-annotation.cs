@@ -8,8 +8,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_watermarked.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "watermarked_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,45 +17,41 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+            // Iterate pages using 1‑based indexing (Aspose.Pdf rule)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Define a rectangle positioned at the top of the page
-                // (llx, lly) = (0, page height - 50)
-                // (urx, ury) = (page width, page height)
+                // Define a rectangle that spans the top of the page
+                // Coordinates: left=0, bottom=page height‑50, right=page width, top=page height
                 Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(
                     0,
                     page.PageInfo.Height - 50,
                     page.PageInfo.Width,
                     page.PageInfo.Height);
 
-                // Create a WatermarkAnnotation for the current page
+                // Create the watermark annotation for the current page
                 WatermarkAnnotation watermark = new WatermarkAnnotation(page, rect);
 
-                // Configure the text appearance (bold font, size, color)
+                // Prepare text state: bold Helvetica, size 36, black color
                 TextState textState = new TextState
                 {
                     Font = FontRepository.FindFont("Helvetica-Bold"),
-                    FontSize = 24,
-                    ForegroundColor = Aspose.Pdf.Color.Red
+                    FontSize = 36,
+                    ForegroundColor = Aspose.Pdf.Color.Black
                 };
 
-                // Set the watermark text and its visual state
-                watermark.SetTextAndState(new string[] { "Confidential" }, textState);
-
-                // Optional: make the watermark semi‑transparent
-                watermark.Opacity = 0.5;
+                // Set the watermark text; SetTextAndState expects an array of lines
+                watermark.SetTextAndState(new[] { "Confidential" }, textState);
 
                 // Add the annotation to the page
                 page.Annotations.Add(watermark);
             }
 
-            // Save the modified PDF (lifecycle rule: save within using block)
+            // Save the modified document (using the standard Save method)
             doc.Save(outputPath);
         }
 

@@ -7,54 +7,42 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPdfPath = "input.pdf";
-        // Output SVG file that will contain the extracted vector graphics
-        const string outputSvgPath = "extracted_page1.svg";
+        const string inputPath = "input.pdf";
+        const string outputSvg = "page1_graphics.svg";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF document (lifecycle rule: using block for disposal)
+        using (Document doc = new Document(inputPath))
         {
-            // Choose the page to process (1‑based indexing)
-            int pageNumber = 1;
-            if (pageNumber < 1 || pageNumber > pdfDoc.Pages.Count)
+            // Pages are 1‑based (global rule)
+            Page page = doc.Pages[1];
+
+            // Verify that the page actually contains vector graphics
+            if (!page.HasVectorGraphics())
             {
-                Console.Error.WriteLine("Invalid page number.");
+                Console.WriteLine("The selected page does not contain vector graphics.");
                 return;
             }
 
-            Page page = pdfDoc.Pages[pageNumber];
+            // Create a GraphicsAbsorber and collect graphics from the page
+            GraphicsAbsorber absorber = new GraphicsAbsorber();
+            absorber.Visit(page);
 
-            // Create a GraphicsAbsorber which will collect all vector graphic elements on the page
-            using (GraphicsAbsorber graphicsAbsorber = new GraphicsAbsorber())
-            {
-                // Perform the search on the selected page
-                graphicsAbsorber.Visit(page);
+            // Create an SvgExtractor (default options)
+            SvgExtractor extractor = new SvgExtractor();
 
-                // If no vector graphics are found, inform the user
-                if (graphicsAbsorber.Elements.Count == 0)
-                {
-                    Console.WriteLine("No vector graphics found on the selected page.");
-                    return;
-                }
+            // Predicate that selects all graphic elements
+            Predicate<GraphicElement> allGraphics = g => true;
 
-                // Prepare a predicate that accepts every graphic element
-                Predicate<GraphicElement> acceptAll = element => true;
+            // Extract the collected graphics to an SVG file
+            extractor.Extract(absorber, allGraphics, page, outputSvg);
 
-                // Use SvgExtractor to convert the collected graphics to an SVG string
-                SvgExtractor svgExtractor = new SvgExtractor();
-                string svgContent = svgExtractor.Extract(graphicsAbsorber, acceptAll, page);
-
-                // Write the SVG content to a file for further manipulation
-                File.WriteAllText(outputSvgPath, svgContent);
-                Console.WriteLine($"Vector graphics extracted to SVG file: {outputSvgPath}");
-            }
+            Console.WriteLine($"Vector graphics extracted to '{outputSvg}'.");
         }
     }
 }

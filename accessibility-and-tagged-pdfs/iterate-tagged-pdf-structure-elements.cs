@@ -16,46 +16,38 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF document (using statement ensures proper disposal)
         using (Document doc = new Document(inputPath))
         {
+            // Access the tagged content interface
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Verify that the document contains a tagged structure
-            if (tagged?.RootElement == null)
-            {
-                Console.WriteLine("The PDF does not contain tagged content.");
-                return;
-            }
-
-            // Root element of the logical structure tree
+            // Get the root structure element (no cast required)
             StructureElement root = tagged.RootElement;
 
-            // Recursively walk the structure tree and log details
+            Console.WriteLine("Structure Elements:");
             WalkStructure(root, 0);
         }
     }
 
-    // Recursive traversal of structure elements
+    // Recursive traversal of the structure tree
     static void WalkStructure(StructureElement element, int depth)
     {
         string indent = new string(' ', depth * 2);
 
-        // Title, Language and custom Tag (if present)
-        string title    = element.Title    ?? "(none)";
-        string language = element.Language ?? "(none)";
+        // Retrieve properties (Title, Language, custom Tag if available)
+        string title = element.Title ?? string.Empty;
+        string language = element.Language ?? string.Empty;
 
-        // Custom tag is set via SetTag(string). Retrieve via reflection to avoid compile‑time dependency.
-        string tag = element.GetType()
-                            .GetProperty("Tag")
-                            ?.GetValue(element) as string ?? "(none)";
+        // Custom tag: some versions expose a Tag property; use null‑conditional access
+        string customTag = (element as dynamic)?.Tag as string ?? string.Empty;
 
         Console.WriteLine($"{indent}Element: {element.GetType().Name}");
         Console.WriteLine($"{indent}  Title   : {title}");
         Console.WriteLine($"{indent}  Language: {language}");
-        Console.WriteLine($"{indent}  Tag     : {tag}");
+        Console.WriteLine($"{indent}  Tag     : {customTag}");
 
-        // Iterate over child elements
+        // Recurse into child elements
         foreach (Element child in element.ChildElements)
         {
             if (child is StructureElement se)

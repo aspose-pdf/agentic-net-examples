@@ -6,50 +6,54 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // source PDF
-        const string outputPdf = "output.pdf";         // result PDF
-        const string bannerImg = "banner.jpg";         // new branding image (JPEG)
+        const string inputPdf  = "input.pdf";   // source PDF
+        const string outputPdf = "output.pdf";  // result PDF
+        const string bannerImg = "banner.jpg";  // new branding image
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdf) || !File.Exists(bannerImg))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(bannerImg))
-        {
-            Console.Error.WriteLine($"Banner image not found: {bannerImg}");
+            Console.Error.WriteLine("Input PDF or banner image not found.");
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF (lifecycle: load)
         using (Document doc = new Document(inputPdf))
         {
             // Assume the index page is the first page (1‑based indexing)
             Page indexPage = doc.Pages[1];
 
-            // Access the image collection of the page
-            XImageCollection images = indexPage.Resources.Images;
-
-            // If there are images on the page, replace each with the banner image
-            if (images.Count > 0)
+            // If the page already contains images, replace the first one
+            if (indexPage.Resources.Images.Count > 0)
             {
-                // Load banner image into a memory stream (JPEG format required by Replace)
                 using (FileStream bannerStream = File.OpenRead(bannerImg))
                 {
-                    // Replace every existing image with the banner
-                    for (int i = 1; i <= images.Count; i++)
-                    {
-                        // Reset stream position for each replacement
-                        bannerStream.Position = 0;
-                        images.Replace(i, bannerStream);
-                    }
+                    // XImageCollection.Replace uses 1‑based index
+                    indexPage.Resources.Images.Replace(1, bannerStream);
+                }
+            }
+            else
+            {
+                // No existing images – add the banner as a new image
+                using (FileStream bannerStream = File.OpenRead(bannerImg))
+                {
+                    // Define where the banner should appear (full width at top)
+                    double pageWidth  = indexPage.PageInfo.Width;
+                    double pageHeight = indexPage.PageInfo.Height;
+                    Aspose.Pdf.Rectangle bannerRect = new Aspose.Pdf.Rectangle(
+                        0,                     // left
+                        pageHeight - 100,      // bottom (100 pts height banner)
+                        pageWidth,             // right
+                        pageHeight);           // top
+
+                    // Add the image to the page at the specified rectangle
+                    indexPage.AddImage(bannerStream, bannerRect);
                 }
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (lifecycle: save)
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Branding updated. Saved to '{outputPdf}'.");
+        Console.WriteLine($"Branding updated and saved to '{outputPdf}'.");
     }
 }

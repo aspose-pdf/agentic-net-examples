@@ -6,9 +6,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string placeholderPath = "placeholder.jpg";
+        const string inputPath      = "input.pdf";
+        const string outputPath     = "output.pdf";
+        const string placeholderImg = "placeholder.jpg"; // low‑resolution placeholder
 
         if (!File.Exists(inputPath))
         {
@@ -16,32 +16,29 @@ class Program
             return;
         }
 
-        if (!File.Exists(placeholderPath))
+        if (!File.Exists(placeholderImg))
         {
-            Console.Error.WriteLine($"Placeholder image not found: {placeholderPath}");
+            Console.Error.WriteLine($"Placeholder image not found: {placeholderImg}");
             return;
         }
 
-        // Load the entire PDF document
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Read placeholder image once into memory
-            byte[] placeholderBytes = File.ReadAllBytes(placeholderPath);
-
             // Iterate over all pages (1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
-                Page page = doc.Pages[pageIndex];
-                var images = page.Resources.Images;
+                Page page = doc.Pages[pageNum];
+                var images = page.Resources.Images; // XImageCollection
 
                 // Replace each image on the page with the placeholder
-                int imageCount = images.Count; // 1‑based count
-                for (int imgIdx = 1; imgIdx <= imageCount; imgIdx++)
+                // XImageCollection uses 1‑based indexes as well
+                for (int imgIdx = 1; imgIdx <= images.Count; imgIdx++)
                 {
-                    // Create a fresh stream for each replacement
-                    using (MemoryStream ms = new MemoryStream(placeholderBytes))
+                    using (FileStream placeholderStream = File.OpenRead(placeholderImg))
                     {
-                        images.Replace(imgIdx, ms);
+                        // Replace the image at the current index
+                        images.Replace(imgIdx, placeholderStream);
                     }
                 }
             }

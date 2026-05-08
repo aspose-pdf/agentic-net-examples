@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
+using System.Linq;
 using Aspose.Pdf;
 
 class Program
@@ -7,35 +9,43 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "reordered_descending.pdf";
+        const string outputPath = "sorted_descending.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the source PDF (load rule)
-        using (Document sourceDoc = new Document(inputPath))
+        // Load the source PDF
+        using (Document srcDoc = new Document(inputPath))
         {
-            // Create a new empty PDF document (create rule)
-            using (Document targetDoc = new Document())
+            // Extract pages into a list for custom sorting
+            List<Page> pageList = srcDoc.Pages.Cast<Page>().ToList();
+
+            // Sort pages in descending order based on their original position
+            // (IndexOf returns 1‑based page numbers)
+            pageList = pageList
+                .OrderByDescending(p => srcDoc.Pages.IndexOf(p))
+                .ToList();
+
+            // Create a new empty document to hold the reordered pages
+            using (Document destDoc = new Document())
             {
-                // Copy pages from source to target in descending order
-                for (int i = sourceDoc.Pages.Count; i >= 1; i--)
+                // Add pages to the new document in the sorted order
+                foreach (Page pg in pageList)
                 {
-                    // Add a copy of the page to the target document
-                    targetDoc.Pages.Add(sourceDoc.Pages[i]);
+                    destDoc.Pages.Add(pg);
                 }
 
                 // Optional: reorganize the page tree for better performance
-                targetDoc.PageNodesToBalancedTree();
+                destDoc.PageNodesToBalancedTree();
 
-                // Save the reordered PDF (save rule)
-                targetDoc.Save(outputPath);
+                // Save the reordered PDF
+                destDoc.Save(outputPath);
             }
         }
 
-        Console.WriteLine($"Reordered PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Pages reordered and saved to '{outputPath}'.");
     }
 }

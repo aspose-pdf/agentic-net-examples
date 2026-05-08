@@ -15,19 +15,16 @@ class Program
             return;
         }
 
-        // Load the PDF document; using ensures proper disposal
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the current OS user name
-            string currentUser = Environment.UserName;
-
             // Replace the Author metadata with the current user name
-            doc.Info.Author = currentUser;
+            doc.Info.Author = Environment.UserName;
 
-            // Save the updated document (PDF format)
+            // Save the updated document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Author metadata updated. Saved to '{outputPath}'.");
+        Console.WriteLine($"Metadata updated and saved to '{outputPath}'.");
     }
 }

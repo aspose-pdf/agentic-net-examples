@@ -21,23 +21,18 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf;` (101/102 files) ← category-specific
-- `using Aspose.Pdf.Devices;` (17/102 files)
-- `using Aspose.Pdf.Text;` (13/102 files)
-- `using Aspose.Pdf.Drawing;` (3/102 files)
+- `using Aspose.Pdf;` (102/102 files) ← category-specific
+- `using Aspose.Pdf.Devices;` (16/102 files)
+- `using Aspose.Pdf.Text;` (14/102 files)
 - `using Aspose.Pdf.Annotations;` (2/102 files)
-- `using Aspose.Pdf.Printing;` (1/102 files)
-- `using System;` (101/102 files)
-- `using System.IO;` (101/102 files)
-- `using System.Text;` (6/102 files)
+- `using Aspose.Pdf.Facades;` (2/102 files)
+- `using System;` (102/102 files)
+- `using System.IO;` (102/102 files)
+- `using System.Collections.Generic;` (3/102 files)
 - `using System.IO.Compression;` (3/102 files)
-- `using System.Collections.Generic;` (2/102 files)
-- `using System.Drawing;` (2/102 files)
-- `using System.Drawing.Imaging;` (2/102 files)
-- `using System.Runtime.InteropServices;` (2/102 files)
-- `using System.Diagnostics;` (1/102 files)
-- `using System.Linq;` (1/102 files)
-- `using System.Reflection;` (1/102 files)
+- `using System.Text;` (3/102 files)
+- `using System.Linq;` (2/102 files)
+- `using System.Drawing;` (1/102 files)
 - `using System.Text.Json;` (1/102 files)
 - `using System.Text.RegularExpressions;` (1/102 files)
 - `using System.Xml;` (1/102 files)
@@ -58,36 +53,36 @@ using (Document doc = new Document("input.pdf"))
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [add-attachment-convert-to-pdfa-3b](./add-attachment-convert-to-pdfa-3b.cs) | Add Attachment and Convert PDF to PDF/A‑3b | `Document`, `FileSpecification`, `PdfFormat` | Demonstrates how to embed an external text file into a PDF, then convert the document to PDF/A‑3b... |
-| [add-logo-to-pdf-and-convert-to-pptx](./add-logo-to-pdf-and-convert-to-pptx.cs) | Add Logo to PDF and Convert to PPTX | `Document`, `Page`, `ImageStamp` | Demonstrates loading a PDF with Aspose.Pdf, stamping a logo image onto each page, and then saving... |
-| [add-xml-attachment-to-pdfa](./add-xml-attachment-to-pdfa.cs) | Add External XML Attachment to PDF/A-1b Document | `Document`, `Convert`, `Save` | Demonstrates converting a PDF to PDF/A-1b and embedding an external XML file as a file‑attachment... |
-| [batch-convert-pdfs-to-multi-page-tiff](./batch-convert-pdfs-to-multi-page-tiff.cs) | Batch Convert PDFs to Multi‑Page TIFF Archives | `Document`, `TiffDevice`, `Process` | Shows how to iterate through a directory of PDF files and convert each one into a multi‑page TIFF... |
-| [batch-convert-pdfs-to-pptx-slidesasimages](./batch-convert-pdfs-to-pptx-slidesasimages.cs) | Batch Convert PDFs to PPTX with SlidesAsImages | `Document`, `PptxSaveOptions`, `Save` | Demonstrates how to convert multiple PDF files in a folder to PPTX presentations using Aspose.Pdf... |
-| [batch-pdf-to-jpeg-converter](./batch-pdf-to-jpeg-converter.cs) | Batch Convert PDFs to JPEG Images with Custom Naming | `Document`, `JpegDevice`, `Resolution` | Demonstrates how to convert each page of multiple PDF files in a folder to separate JPEG images u... |
-| [batch-pdf-to-png-converter](./batch-pdf-to-png-converter.cs) | Batch Convert PDFs to PNG Images Preserving Folder Structure | `Document`, `Resolution`, `PngDevice` | Demonstrates how to recursively locate PDF files, convert each page to a PNG image using Aspose.P... |
-| [convert-epub-to-pdf-custom-page-size](./convert-epub-to-pdf-custom-page-size.cs) | Convert EPUB to PDF with Custom Page Size | `EpubLoadOptions`, `Document`, `Save` | Shows how to load an EPUB file using EpubLoadOptions with a custom page size and convert it to a ... |
-| [convert-latex-to-pdf](./convert-latex-to-pdf.cs) | Convert LaTeX File to PDF | `TeXLoadOptions`, `Document`, `Save` | Shows how to load a LaTeX (.tex) file with TeXLoadOptions and save it as a PDF, keeping equations... |
-| [convert-markdown-to-pdf-preserve-code-blocks](./convert-markdown-to-pdf-preserve-code-blocks.cs) | Convert Markdown to PDF Preserving Code Blocks | `MdLoadOptions`, `Document`, `Save` | Demonstrates loading a Markdown file with MdLoadOptions and converting it to a PDF while keeping ... |
-| [convert-ofd-to-pdf](./convert-ofd-to-pdf.cs) | Convert OFD File to PDF | `Document`, `OfdLoadOptions`, `Save` | Demonstrates loading an OFD document with OfdLoadOptions and saving it as a PDF using Aspose.Pdf'... |
-| [convert-pcl-to-pdf-hpgl2](./convert-pcl-to-pdf-hpgl2.cs) | Convert PCL to PDF with HP‑GL/2 Vector Support | `PclLoadOptions`, `Document`, `Save` | Demonstrates loading a PCL file (including HP‑GL/2 vectors) using PclLoadOptions and saving it as... |
-| [convert-pdf-page-to-jpeg](./convert-pdf-page-to-jpeg.cs) | Convert PDF Page to JPEG Image | `Document`, `JpegDevice`, `Process` | Shows how to load a PDF with Aspose.Pdf, select a specific page, and render it as a JPEG image us... |
-| [convert-pdf-to-bmp-images](./convert-pdf-to-bmp-images.cs) | Convert PDF to BMP Images Using BmpDevice | `Document`, `BmpDevice`, `Process` | Shows how to load a PDF document with Aspose.Pdf and convert each page to a BMP image using BmpDe... |
-| [convert-pdf-to-doc-default](./convert-pdf-to-doc-default.cs) | Convert PDF to DOC with Default Settings | `Document`, `DocSaveOptions`, `Save` | Demonstrates how to load a PDF file using Aspose.Pdf and save it as a DOC document using the defa... |
-| [convert-pdf-to-doc-image-extraction](./convert-pdf-to-doc-image-extraction.cs) | Convert PDF to DOC with Image Extraction | `Document`, `DocSaveOptions`, `Save` | Demonstrates how to convert a PDF file to a DOC document using Aspose.Pdf while extracting only i... |
-| [convert-pdf-to-doc-textbox-mode](./convert-pdf-to-doc-textbox-mode.cs) | Convert PDF to DOC with Textbox Mode | `Document`, `DocSaveOptions`, `Save` | Shows how to convert a PDF file to a DOC file using Aspose.Pdf while setting DocSaveOptions.Mode ... |
-| [convert-pdf-to-docx-add-table-of-figures](./convert-pdf-to-docx-add-table-of-figures.cs) | Convert PDF to DOCX and Add Table of Figures | `Document`, `Save`, `Page` | Demonstrates converting a PDF to DOCX using Aspose.Pdf and generating a Table of Figures by extra... |
-| [convert-pdf-to-docx-and-zip](./convert-pdf-to-docx-and-zip.cs) | Convert PDF to DOCX and Compress to ZIP | `Document`, `DocSaveOptions`, `TextFragment` | Demonstrates converting a PDF file to DOCX using Aspose.Pdf and then compressing the resulting DO... |
-| [convert-pdf-to-docx-auto-detection](./convert-pdf-to-docx-auto-detection.cs) | Convert PDF to DOCX with Automatic Content Detection | `Document`, `Save`, `DocSaveOptions` | Demonstrates converting a PDF file to DOCX using Aspose.Pdf with DocSaveOptions.Mode set to Flow ... |
-| [convert-pdf-to-docx-embed-custom-fonts](./convert-pdf-to-docx-embed-custom-fonts.cs) | Convert PDF to DOCX with Embedded Custom Fonts | `Document`, `DocSaveOptions`, `FontRepository` | Demonstrates converting a PDF to DOCX using Aspose.Pdf while registering and embedding a custom T... |
-| [convert-pdf-to-docx-enhanced](./convert-pdf-to-docx-enhanced.cs) | Convert PDF to DOCX with Enhanced Recognition | `Document`, `Save`, `DocSaveOptions` | Demonstrates converting a PDF file to a DOCX document using Aspose.Pdf with the default enhanced ... |
-| [convert-pdf-to-docx-extract-images](./convert-pdf-to-docx-extract-images.cs) | Convert PDF to DOCX and Extract Images | `Document`, `Save`, `DocSaveOptions` | The example loads a PDF, converts it to a DOCX file using Aspose.Pdf, and then extracts all embed... |
-| [convert-pdf-to-docx-preserve-layout](./convert-pdf-to-docx-preserve-layout.cs) | Convert PDF to DOCX with Layout Preservation | `Document`, `DocSaveOptions` | Shows how to convert a PDF file to a DOCX document using Aspose.Pdf's standard textbox recognitio... |
-| [convert-pdf-to-docx-then-pdfa](./convert-pdf-to-docx-then-pdfa.cs) | Convert PDF to DOCX and then to PDF/A | `Document`, `DocSaveOptions`, `PdfFormat` | Demonstrates how to use Aspose.Pdf to convert a PDF file to DOCX format and subsequently create a... |
-| [convert-pdf-to-docx-with-footnotes](./convert-pdf-to-docx-with-footnotes.cs) | Convert PDF to DOCX with Footnote Preservation | `Document`, `Save`, `DocSaveOptions` | Shows how to convert a PDF to DOCX using Aspose.Pdf with EnhancedFlow recognition mode to retain ... |
-| [convert-pdf-to-docx-with-hyphenation](./convert-pdf-to-docx-with-hyphenation.cs) | Convert PDF to DOCX with Hyphenation Settings | `Document`, `DocSaveOptions`, `Save` | Demonstrates loading a PDF using Aspose.Pdf, configuring DocSaveOptions, and saving it as a DOCX ... |
-| [convert-pdf-to-docx-with-json-report](./convert-pdf-to-docx-with-json-report.cs) | Convert PDF to DOCX with JSON Report | `Document`, `DocSaveOptions`, `Save` | Demonstrates how to use Aspose.Pdf to convert a PDF file to DOCX format, collect conversion stati... |
-| [convert-pdf-to-docx-with-metadata](./convert-pdf-to-docx-with-metadata.cs) | Convert PDF to DOCX with Custom Metadata | `Document`, `Save`, `DocSaveOptions` | Demonstrates loading a PDF, setting author and title metadata, and saving it as a DOCX file using... |
-| [convert-pdf-to-emf-images](./convert-pdf-to-emf-images.cs) | Convert PDF Pages to EMF Images | `Document`, `Resolution`, `EmfDevice` | Demonstrates how to load a PDF with Aspose.Pdf, iterate through its pages, and save each page as ... |
+| [add-company-logo-and-convert-pdf-to-pptx](./add-company-logo-and-convert-pdf-to-pptx.cs) | Add Company Logo to PDF and Convert to PPTX | `Document`, `Page`, `ImageStamp` | Demonstrates loading a PDF, stamping each page with a logo image, and converting the modified doc... |
+| [add-file-attachment-to-pdfa3b](./add-file-attachment-to-pdfa3b.cs) | Add File Attachment to PDF/A‑3b Document | `Document`, `FileSpecification`, `FileAttachmentAnnotation` | Demonstrates embedding an external text file as an attachment, adding a file‑attachment annotatio... |
+| [add-xml-attachment-to-pdfa1b](./add-xml-attachment-to-pdfa1b.cs) | Add XML Attachment to PDF/A-1b Document | `Document`, `Convert`, `PdfFormat` | Demonstrates loading a PDF, converting it to PDF/A‑1b compliance, embedding an external XML file ... |
+| [batch-convert-pdfs-to-jpeg-images](./batch-convert-pdfs-to-jpeg-images.cs) | Batch Convert PDFs to JPEG Images with Custom Naming | `Document`, `JpegDevice`, `Resolution` | Demonstrates how to iterate through a folder of PDF files, convert each page to a JPEG image usin... |
+| [batch-convert-pdfs-to-multi-page-tiff](./batch-convert-pdfs-to-multi-page-tiff.cs) | Batch Convert PDFs to Multi‑Page TIFF | `Document`, `Merge`, `TiffDevice` | Shows how to merge all PDF files in a folder and convert the combined document into a multi‑page ... |
+| [batch-convert-pdfs-to-png-preserve-folder-structur...](./batch-convert-pdfs-to-png-preserve-folder-structure.cs) | Batch Convert PDFs to PNG While Preserving Folder Structure | `Document`, `PngDevice`, `Resolution` | Demonstrates how to recursively convert all PDF files in a source directory to PNG images using A... |
+| [batch-convert-pdfs-to-pptx-slidesasimages](./batch-convert-pdfs-to-pptx-slidesasimages.cs) | Batch Convert PDFs to PPTX with SlidesAsImages | `Document`, `Save`, `Dispose` | Demonstrates how to convert multiple PDF files to PPTX format in a single run, using Aspose.Pdf w... |
+| [convert-epub-to-pdf-custom-page-size](./convert-epub-to-pdf-custom-page-size.cs) | Convert EPUB to PDF with Custom Page Size | `EpubLoadOptions`, `Document`, `Save` | Shows how to load an EPUB file using EpubLoadOptions to set a custom page size and convert it to ... |
+| [convert-latex-to-pdf](./convert-latex-to-pdf.cs) | Convert LaTeX File to PDF | `TeXLoadOptions`, `RasterizeFormulas`, `ShowTerminalOutput` | Demonstrates loading a LaTeX (.tex) file with Aspose.Pdf, configuring TeX options, and saving the... |
+| [convert-markdown-to-pdf](./convert-markdown-to-pdf.cs) | Convert Markdown to PDF Preserving Code Blocks | `Document`, `MdLoadOptions`, `LoadOptions` | Demonstrates how to load a Markdown file with MdLoadOptions and convert it directly to a PDF docu... |
+| [convert-ofd-to-pdf](./convert-ofd-to-pdf.cs) | Convert OFD to PDF with Aspose.Pdf | `Document`, `OfdLoadOptions`, `Save` | Shows how to load an OFD document using OfdLoadOptions and save it as a PDF with default settings... |
+| [convert-pcl-to-pdf-hpgl2](./convert-pcl-to-pdf-hpgl2.cs) | Convert PCL to PDF with HP‑GL/2 Vector Support | `PclLoadOptions`, `ConversionEngine`, `ConversionEngines` | Demonstrates loading a PCL file, enabling HP‑GL/2 vector graphics via the NewEngine conversion en... |
+| [convert-pdf-page-region-to-png](./convert-pdf-page-region-to-png.cs) | Convert PDF Page Region to PNG | `Document`, `Page`, `Rectangle` | Shows how to extract a defined rectangular region from a PDF page and render it as a PNG image us... |
+| [convert-pdf-page-to-jpeg](./convert-pdf-page-to-jpeg.cs) | Convert PDF Page to JPEG Image | `Document`, `Page`, `JpegDevice` | Shows how to load a PDF, validate a page number, and convert that specific page to a JPEG image u... |
+| [convert-pdf-pages-to-jpeg-images](./convert-pdf-pages-to-jpeg-images.cs) | Convert PDF Pages to JPEG Images | `Document`, `PageCollection`, `Page` | Shows how to load a PDF with Aspose.Pdf, iterate through each page, and save the pages as JPEG fi... |
+| [convert-pdf-pages-to-separate-html-files](./convert-pdf-pages-to-separate-html-files.cs) | Convert PDF Pages to Separate HTML Files | `Document`, `Save`, `HtmlSaveOptions` | Shows how to load a PDF with Aspose.Pdf, configure HtmlSaveOptions to split the document into pag... |
+| [convert-pdf-to-bmp-images](./convert-pdf-to-bmp-images.cs) | Convert PDF to BMP Images | `Document`, `BmpDevice`, `Page` | Shows how to load a PDF with Aspose.Pdf, iterate through its pages, and save each page as a BMP f... |
+| [convert-pdf-to-doc-image-only](./convert-pdf-to-doc-image-only.cs) | Convert PDF to DOC with Image‑Only Extraction | `Document`, `DocSaveOptions`, `Format` | Shows how to convert a PDF file to a DOC document using Aspose.Pdf while preserving images only v... |
+| [convert-pdf-to-doc-plain-text](./convert-pdf-to-doc-plain-text.cs) | Convert PDF to DOC with Plain Text Extraction | `Document`, `DocSaveOptions`, `RecognitionMode` | Shows how to convert a PDF file to a DOC file using Aspose.Pdf while configuring DocSaveOptions t... |
+| [convert-pdf-to-doc](./convert-pdf-to-doc.cs) | Convert PDF to DOC using Aspose.Pdf | `Document`, `DocSaveOptions`, `DocFormat` | Shows how to load a PDF file and save it as a DOC document with default text recognition using As... |
+| [convert-pdf-to-docx-and-zip](./convert-pdf-to-docx-and-zip.cs) | Convert PDF to DOCX and Zip the Result | `Document`, `DocSaveOptions`, `Format` | Shows how to use Aspose.Pdf to convert a PDF file to DOCX format and then compress the generated ... |
+| [convert-pdf-to-docx-auto-detection](./convert-pdf-to-docx-auto-detection.cs) | Convert PDF to DOCX with Automatic Layout Detection | `Document`, `DocSaveOptions`, `DocFormat` | Shows how to convert a PDF file to DOCX using Aspose.Pdf with DocSaveOptions.Mode set to Flow for... |
+| [convert-pdf-to-docx-embed-custom-fonts](./convert-pdf-to-docx-embed-custom-fonts.cs) | Convert PDF to DOCX with Embedded Custom Fonts | `FontRepository`, `OpenFont`, `Add` | Demonstrates converting a PDF to DOCX using Aspose.Pdf while registering a custom TrueType font a... |
+| [convert-pdf-to-docx-enhanced-recognition](./convert-pdf-to-docx-enhanced-recognition.cs) | Convert PDF to DOCX with Enhanced Table and Graphic Recognit... | `Document`, `DocSaveOptions`, `DocFormat` | Shows how to convert a PDF file to a DOCX document using Aspose.Pdf with enhanced recognition set... |
+| [convert-pdf-to-docx-extract-images](./convert-pdf-to-docx-extract-images.cs) | Convert PDF to DOCX and Extract Images | `Document`, `DocSaveOptions`, `Save` | Shows how to convert a PDF file to DOCX using Aspose.Pdf and then extract all embedded images to ... |
+| [convert-pdf-to-docx-layout-preservation](./convert-pdf-to-docx-layout-preservation.cs) | Convert PDF to DOCX with Layout Preservation | `Document`, `DocSaveOptions`, `DocFormat` | Demonstrates how to load a PDF file and save it as a DOCX document using Aspose.Pdf while preserv... |
+| [convert-pdf-to-docx-with-flow-hyphenation](./convert-pdf-to-docx-with-flow-hyphenation.cs) | Convert PDF to DOCX with Flow Recognition for Hyphenation | `Document`, `DocSaveOptions`, `Save` | Loads a PDF, configures DocSaveOptions to use Flow recognition mode and hyphenation‑friendly sett... |
+| [convert-pdf-to-docx-with-footnotes](./convert-pdf-to-docx-with-footnotes.cs) | Convert PDF to DOCX with Footnote Preservation | `Document`, `DocSaveOptions`, `RecognitionMode` | Demonstrates converting a PDF file to a DOCX document using Aspose.Pdf while preserving footnotes... |
+| [convert-pdf-to-docx-with-metadata](./convert-pdf-to-docx-with-metadata.cs) | Convert PDF to DOCX with Custom Metadata | `Document`, `Info`, `Save` | Shows how to convert a PDF file to DOCX using Aspose.Pdf while setting custom metadata properties... |
+| [convert-pdf-to-docx-with-report](./convert-pdf-to-docx-with-report.cs) | Convert PDF to DOCX and Generate Conversion Report | `Document`, `DocSaveOptions`, `Format` | Demonstrates loading a PDF with Aspose.Pdf, converting it to DOCX using DocSaveOptions, and creat... |
 | ... | | | *and 72 more files* |
 
 ## Category Statistics
@@ -135,5 +130,5 @@ using (Document doc = new Document("input.pdf"))
 - Review code examples in this folder for conversion patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-04-10 | Run: `20260410_113311_e93f13`
+Updated: 2026-04-28 | Run: `20260428_141822_cb9123`
 <!-- AUTOGENERATED:END -->

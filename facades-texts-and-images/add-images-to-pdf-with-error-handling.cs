@@ -6,53 +6,60 @@ class Program
 {
     static void Main()
     {
+        // Input PDF, output PDF and images to add
         const string inputPdf  = "input.pdf";
         const string outputPdf = "output.pdf";
+        string[] images = { "image1.jpg", "image2.png", "image3.bmp" };
 
-        // List of image files to add
-        string[] imagePaths = { "image1.jpg", "image2.png", "image3.bmp" };
-
-        // Verify the source PDF exists
+        // Verify input PDF exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Source PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Initialize the PdfFileMend facade with input and output files
-        PdfFileMend mend = new PdfFileMend(inputPdf, outputPdf);
-
-        foreach (string imgPath in imagePaths)
+        // Verify each image exists before processing
+        foreach (string imgPath in images)
         {
-            // Skip missing image files but continue processing others
             if (!File.Exists(imgPath))
             {
-                Console.Error.WriteLine($"Image file not found: {imgPath}");
-                continue;
-            }
-
-            try
-            {
-                // Attempt to add the image to page 1 at the specified rectangle
-                // (lowerLeftX, lowerLeftY) = (10,10), (upperRightX, upperRightY) = (100,100)
-                bool added = mend.AddImage(imgPath, 1, 10, 10, 100, 100);
-
-                // If the method returns false, treat it as a failure
-                if (!added)
-                {
-                    Console.Error.WriteLine($"AddImage returned false for: {imgPath}");
-                }
-            }
-            catch (Exception ex)
-            {
-                // Log the problematic image path along with the exception details
-                Console.Error.WriteLine($"Exception while adding image '{imgPath}': {ex.Message}");
+                Console.Error.WriteLine($"Image file not found and will be skipped: {imgPath}");
             }
         }
 
-        // Finalize and write the output PDF
-        mend.Close();
+        // Initialize PdfFileMend facade with input and output files
+        // PdfFileMend implements IDisposable via SaveableFacade, so we use using
+        using (PdfFileMend mender = new PdfFileMend(inputPdf, outputPdf))
+        {
+            // Add each image to page 1; coordinates are example values
+            foreach (string imgPath in images)
+            {
+                if (!File.Exists(imgPath))
+                {
+                    // Skip missing files
+                    continue;
+                }
 
-        Console.WriteLine($"Processing complete. Output saved to '{outputPdf}'.");
+                try
+                {
+                    // AddImage(string imagePath, int pageNum, float llx, float lly, float urx, float ury)
+                    bool success = mender.AddImage(imgPath, 1, 10, 10, 200, 200);
+                    if (!success)
+                    {
+                        Console.Error.WriteLine($"AddImage returned false for: {imgPath}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Log the problematic image file path and exception details
+                    Console.Error.WriteLine($"Failed to add image '{imgPath}': {ex.Message}");
+                }
+            }
+
+            // Close the facade to finalize the output PDF
+            mender.Close();
+        }
+
+        Console.WriteLine($"Processing completed. Output saved to '{outputPdf}'.");
     }
 }

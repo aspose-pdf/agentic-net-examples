@@ -1,48 +1,61 @@
 using System;
 using System.IO;
 using System.Text;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-// Minimal stubs for Azure.Data.Tables when the NuGet package is not available.
-// These stubs provide just enough functionality for the sample to compile and run.
+// ---------------------------------------------------------------------------
+// Minimal stubs for Azure.Data.Tables (used when the Azure SDK package is not
+// referenced). These provide just enough functionality for the sample to
+// compile and run in a test environment. In a real project you should add the
+// NuGet package "Azure.Data.Tables" instead of using these stubs.
+// ---------------------------------------------------------------------------
 namespace Azure.Data.Tables
 {
-    public class TableServiceClient
-    {
-        private readonly string _connectionString;
-        public TableServiceClient(string connectionString) => _connectionString = connectionString;
-        public TableClient GetTableClient(string tableName) => new TableClient(tableName);
-    }
+    using System.Collections.Generic;
 
-    public class TableClient
-    {
-        private readonly string _tableName;
-        public TableClient(string tableName) => _tableName = tableName;
-        public void CreateIfNotExists() { /* No‑op for stub */ }
-        public void AddEntity(TableEntity entity)
-        {
-            // Safely retrieve the "Content" property – it may be null.
-            string content = entity.ContainsKey("Content") && entity["Content"] != null
-                ? entity["Content"].ToString()
-                : string.Empty;
-
-            // In a real implementation this would send the entity to Azure Table storage.
-            // For the stub we simply write to console to demonstrate that the call succeeded.
-            Console.WriteLine($"[Stub] Entity added to table '{_tableName}': PartitionKey='{entity.PartitionKey}', RowKey='{entity.RowKey}', Content length={content.Length}");
-        }
-    }
-
-    public class TableEntity : System.Collections.Generic.Dictionary<string, object>
+    public class TableEntity
     {
         public string PartitionKey { get; set; }
         public string RowKey { get; set; }
+        private readonly Dictionary<string, object> _properties = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+
         public TableEntity(string partitionKey, string rowKey)
         {
             PartitionKey = partitionKey;
             RowKey = rowKey;
-            this["PartitionKey"] = partitionKey;
-            this["RowKey"] = rowKey;
+        }
+
+        // Indexer used in the sample: entity["Content"] = extractedText;
+        public object this[string key]
+        {
+            get => _properties.TryGetValue(key, out var value) ? value : null;
+            set => _properties[key] = value;
+        }
+    }
+
+    public class TableClient
+    {
+        private readonly string _connectionString;
+        private readonly string _tableName;
+        // Simple in‑memory store to emulate Azure Table storage for demo purposes.
+        private static readonly Dictionary<(string Table, string PartitionKey, string RowKey), TableEntity> _store
+            = new Dictionary<(string, string, string), TableEntity>();
+
+        public TableClient(string connectionString, string tableName)
+        {
+            _connectionString = connectionString;
+            _tableName = tableName;
+        }
+
+        public void CreateIfNotExists()
+        {
+            // No‑op for the stub – in real SDK this would create the table if missing.
+        }
+
+        public void UpsertEntity(TableEntity entity)
+        {
+            var key = (_tableName, entity.PartitionKey, entity.RowKey);
+            _store[key] = entity; // Insert or replace.
         }
     }
 }
@@ -51,62 +64,56 @@ class Program
 {
     static void Main()
     {
-        // Path to the source PDF file
-        const string inputPdfPath = "input.pdf";
+        // Path to the source PDF
+        const string pdfPath = "input.pdf";
 
-        // Azure Table storage connection details (stubbed – value not used by the stub implementation)
-        const string storageConnectionString = "YourAzureStorageConnectionString";
+        // Azure Table storage connection details (dummy values for the stub)
+        const string storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=youraccount;AccountKey=yourkey;EndpointSuffix=core.windows.net";
         const string tableName = "PdfTexts";
 
-        // Ensure a PDF file exists – create a minimal one if it does not.
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            using (Document placeholder = new Document())
-            {
-                placeholder.Pages.Add(); // add a blank page
-                placeholder.Save(inputPdfPath);
-                Console.WriteLine($"[Info] Created placeholder PDF at '{inputPdfPath}'.");
-            }
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            return;
         }
 
-        // Load the PDF document using the recommended Document lifecycle pattern
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // -------------------------------------------------
+        // Extract text from the PDF using PdfExtractor (Facades API)
+        // -------------------------------------------------
+        string extractedText;
+        using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Initialize the PdfExtractor facade and bind it to the loaded document
-            PdfExtractor extractor = new PdfExtractor();
-            extractor.BindPdf(pdfDoc);
+            // Bind the PDF file to the extractor
+            extractor.BindPdf(pdfPath);
 
-            // Extract all text from the document (Unicode encoding is default)
+            // Extract text using Unicode encoding (default)
             extractor.ExtractText();
 
             // Retrieve the extracted text into a memory stream
-            using (MemoryStream textStream = new MemoryStream())
+            using (MemoryStream ms = new MemoryStream())
             {
-                extractor.GetText(textStream);
-                string extractedText = Encoding.UTF8.GetString(textStream.ToArray());
-
-                // Store the extracted text in Azure Table storage (using the stub implementation)
-                var serviceClient = new Azure.Data.Tables.TableServiceClient(storageConnectionString);
-                var tableClient = serviceClient.GetTableClient(tableName);
-                tableClient.CreateIfNotExists();
-
-                // Use the PDF file name (without extension) as the PartitionKey
-                string partitionKey = Path.GetFileNameWithoutExtension(inputPdfPath) ?? "unknown";
-                // Use a GUID as the RowKey to ensure uniqueness
-                string rowKey = Guid.NewGuid().ToString();
-
-                var entity = new Azure.Data.Tables.TableEntity(partitionKey, rowKey)
-                {
-                    { "Content", extractedText }
-                };
-
-                tableClient.AddEntity(entity);
+                extractor.GetText(ms);
+                extractedText = Encoding.UTF8.GetString(ms.ToArray());
             }
-
-            // Release resources held by the extractor
-            extractor.Close();
         }
 
-        Console.WriteLine("Text extraction and storage completed.");
+        // -------------------------------------------------
+        // Store the extracted text in Azure Table storage
+        // -------------------------------------------------
+        // Create a TableClient for the target table
+        var tableClient = new Azure.Data.Tables.TableClient(storageConnectionString, tableName);
+        tableClient.CreateIfNotExists();
+
+        // Use the PDF file name (without extension) as the PartitionKey (document ID)
+        string documentId = Path.GetFileNameWithoutExtension(pdfPath);
+
+        // RowKey must be unique; using a GUID ensures uniqueness
+        var entity = new Azure.Data.Tables.TableEntity(documentId, Guid.NewGuid().ToString());
+        entity["Content"] = extractedText; // store the extracted text
+
+        // Insert or replace the entity in the table
+        tableClient.UpsertEntity(entity);
+
+        Console.WriteLine($"Extracted text stored in Azure Table '{tableName}' with PartitionKey='{documentId}'.");
     }
 }

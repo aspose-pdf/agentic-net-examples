@@ -16,29 +16,27 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        Document pdfDoc = new Document(inputPath);
+        // Load the source PDF
+        Document pdfDocument = new Document(inputPath);
 
         // Create a text stamp with the required appearance
-        TextStamp stamp = new TextStamp("Confidential");
-        stamp.TextState.Font = FontRepository.FindFont("Helvetica");
-        stamp.TextState.FontSize = 36;
-        stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Red; // red font
-        // semi‑transparent red background (alpha 128 out of 255 ≈ 50% opacity)
-        stamp.TextState.BackgroundColor = Aspose.Pdf.Color.FromArgb(128, 255, 0, 0);
-        stamp.Opacity = 0.5f; // overall stamp opacity (optional)
-        // Position the stamp – centered on each page
-        stamp.HorizontalAlignment = HorizontalAlignment.Center;
-        stamp.VerticalAlignment = VerticalAlignment.Center;
+        TextStamp textStamp = new TextStamp("Confidential");
+        textStamp.TextState.Font = FontRepository.FindFont("Helvetica");
+        textStamp.TextState.FontSize = 36;
+        textStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Red;               // red text
+        textStamp.TextState.BackgroundColor = Aspose.Pdf.Color.FromRgb(255,255,255); // optional white background
+        textStamp.Opacity = 0.5f;                                                // 50 % opacity (semi‑transparent)
+        textStamp.HorizontalAlignment = HorizontalAlignment.Center;            // centre horizontally
+        textStamp.VerticalAlignment   = VerticalAlignment.Center;              // centre vertically
 
-        // Apply the stamp to every page
-        foreach (Page page in pdfDoc.Pages)
+        // Apply the stamp to every page in the document
+        foreach (Page page in pdfDocument.Pages)
         {
-            page.AddStamp(stamp);
+            page.AddStamp(textStamp);
         }
 
-        // Save the result
-        pdfDoc.Save(outputPath);
+        // Save the stamped PDF
+        pdfDocument.Save(outputPath);
         Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
     }
 }

@@ -1,42 +1,47 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Facades;          // PdfAnnotationEditor
+using Aspose.Pdf.Annotations;      // AnnotationType
 
-class Program
+class ExportHighlightAnnotations
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputXfdf = "highlights.xfdf";
+        // Input PDF containing annotations
+        const string inputPdfPath = "input.pdf";
 
-        if (!File.Exists(inputPdf))
+        // Output XFDF file that will contain only Highlight annotations
+        const string outputXfdfPath = "highlights.xfdf";
+
+        // Ensure the source PDF exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document (disposal handled by using)
-        using (Document doc = new Document(inputPdf))
+        // Create the annotation editor facade
+        PdfAnnotationEditor editor = new PdfAnnotationEditor();
+
+        // Bind the PDF document to the editor
+        editor.BindPdf(inputPdfPath);
+
+        // Determine the page range (Aspose.Pdf uses 1‑based indexing)
+        int startPage = 1;
+        int endPage   = editor.Document.Pages.Count; // total pages in the PDF
+
+        // Specify the annotation types to export – only Highlight annotations
+        AnnotationType[] highlightTypes = new AnnotationType[] { AnnotationType.Highlight };
+
+        // Export the selected annotations to an XFDF file
+        using (FileStream xfdfStream = File.Create(outputXfdfPath))
         {
-            // Initialize the annotation editor with the loaded document
-            PdfAnnotationEditor editor = new PdfAnnotationEditor(doc);
-
-            // Specify that only Highlight annotations should be exported
-            AnnotationType[] types = new AnnotationType[] { AnnotationType.Highlight };
-
-            // Export the selected annotations to an XFDF file
-            using (FileStream xfdfStream = File.Create(outputXfdf))
-            {
-                // Export from the first to the last page of the document
-                editor.ExportAnnotationsXfdf(xfdfStream, 1, doc.Pages.Count, types);
-            }
-
-            // Release resources held by the editor
-            editor.Close();
+            editor.ExportAnnotationsXfdf(xfdfStream, startPage, endPage, highlightTypes);
         }
 
-        Console.WriteLine($"Highlight annotations exported to '{outputXfdf}'.");
+        // Clean up the editor (releases the bound document)
+        editor.Close();
+
+        Console.WriteLine($"Highlight annotations exported to '{outputXfdfPath}'.");
     }
 }

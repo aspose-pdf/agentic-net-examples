@@ -1,55 +1,80 @@
 using System;
+using System.IO;
+using System.Runtime.InteropServices;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Drawing; // Graph, BoundsCheckMode, GraphInfo, Color, Rectangle
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "boundscheck_graph.pdf";
-
-        // Document lifecycle must be wrapped in a using block for proper disposal
+        // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a new page to the document
+            // Add a blank page (1‑based indexing)
             Page page = doc.Pages.Add();
 
-            // Create a graph (container) with a defined width and height (double literals as required)
-            Graph graph = new Graph(400.0, 200.0); // width = 400 points, height = 200 points
-            graph.Left = 50;   // position from the left edge of the page
-            graph.Top = 600;   // position from the bottom edge of the page
+            // Define graph size (width x height in points)
+            double graphWidth = 400;
+            double graphHeight = 200;
 
-            // Create a rectangle shape to place inside the graph – fully qualified to avoid ambiguity
-            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(
-                0f,   // left
-                0f,   // bottom
-                100f, // width
-                50f   // height
-            );
-            rect.GraphInfo = new GraphInfo
+            // Create a Graph object with the desired dimensions
+            Graph graph = new Graph(graphWidth, graphHeight)
             {
-                FillColor = Aspose.Pdf.Color.LightGray,
-                Color = Aspose.Pdf.Color.Black,
-                LineWidth = 1f
+                // Position the graph on the page (optional)
+                Left = 50,
+                Top  = 600
             };
 
-            // Add the shape to the graph's Shapes collection
-            graph.Shapes.Add(rect);
-
-            // Enable bounds checking: throw an exception if any shape does not fit within the graph
-            // Supply the container dimensions as double values
+            // Enable bounds checking: throw if a shape does not fit inside the graph area
             graph.Shapes.UpdateBoundsCheckMode(
                 BoundsCheckMode.ThrowExceptionIfDoesNotFit,
-                graph.Width,
-                graph.Height);
+                graphWidth,
+                graphHeight);
+
+            // Example shape that fits within the graph bounds
+            var rectFit = new Aspose.Pdf.Drawing.Rectangle(
+                (float)10,   // X
+                (float)10,   // Y
+                (float)100,  // Width
+                (float)80);  // Height
+            rectFit.GraphInfo = new GraphInfo
+            {
+                FillColor = Color.LightGray,
+                Color     = Color.Black,
+                LineWidth = 1f
+            };
+            graph.Shapes.Add(rectFit);
+
+            // Uncomment the following block to see the exception in action.
+            // This shape exceeds the graph width and will cause a BoundsNotFitException.
+            /*
+            var rectOverflow = new Aspose.Pdf.Drawing.Rectangle(
+                (float)350, (float)150, (float)100, (float)80);
+            rectOverflow.GraphInfo = new GraphInfo
+            {
+                FillColor = Color.Yellow,
+                Color     = Color.Red,
+                LineWidth = 2f
+            };
+            // This line will throw because the shape does not fit.
+            graph.Shapes.Add(rectOverflow);
+            */
 
             // Add the graph to the page's paragraph collection
             page.Paragraphs.Add(graph);
 
-            // Save the PDF document
-            doc.Save(outputPath);
+            // Save the PDF to disk – guard against missing GDI+ (libgdiplus) on non‑Windows platforms
+            string outputPath = "BoundsCheckGraph.pdf";
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                doc.Save(outputPath);
+                Console.WriteLine($"PDF saved to '{outputPath}'.");
+            }
+            else
+            {
+                Console.WriteLine("libgdiplus is required for PDF creation on this platform. Skipping doc.Save().");
+            }
         }
-
-        Console.WriteLine($"PDF saved to {outputPath}");
     }
 }

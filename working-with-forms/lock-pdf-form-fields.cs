@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
@@ -18,16 +19,16 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Lock each form field by setting it to read‑only
-            foreach (var field in doc.Form)
+            // Set every form field to read‑only
+            foreach (Field field in doc.Form.Fields)
             {
                 field.ReadOnly = true;
             }
 
-            // Alternatively, you could flatten the entire form:
-            // doc.Form.Flatten();
+            // Optionally flatten the form to remove interactive fields completely
+            doc.Form.Flatten();
 
-            // Save the modified document
+            // Save the locked PDF
             doc.Save(outputPath);
         }
 

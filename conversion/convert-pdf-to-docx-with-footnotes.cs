@@ -1,45 +1,36 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core Aspose.Pdf namespace (contains Document, DocSaveOptions, etc.)
+using Aspose.Pdf;
 
-class PdfToDocxConverter
+class Program
 {
     static void Main()
     {
-        // Input PDF file (must exist)
-        const string inputPdfPath  = "input.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputDocx = "output.docx";
 
-        // Output DOCX file (extension determines format)
-        const string outputDocxPath = "output.docx";
-
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF, convert, and save using a using block for deterministic disposal
-        using (Document pdfDocument = new Document(inputPdfPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDocument = new Document(inputPdf))
         {
-            // Configure conversion options:
-            // - Use EnhancedFlow mode for the most accurate content recognition (tables, footnotes, etc.)
-            // - Set additional options if needed (e.g., ConvertType3Fonts = true to handle Type3 fonts)
-            DocSaveOptions saveOptions = new DocSaveOptions
+            // Configure save options for DOCX conversion
+            var saveOptions = new DocSaveOptions
             {
-                // Output format: DOCX
-                Format = DocSaveOptions.DocFormat.DocX,
-
-                // Enhanced recognition for better footnote handling
+                // Use EnhancedFlow mode for better recognition of footnotes, tables, etc.
                 Mode = DocSaveOptions.RecognitionMode.EnhancedFlow,
-
-                // Optional: improve handling of Type3 fonts (often used for footnote symbols)
-                ConvertType3Fonts = true
+                // Enable bullet detection (optional, improves list handling)
+                RecognizeBullets = true
             };
 
             // Save the document as DOCX using the configured options
-            pdfDocument.Save(outputDocxPath, saveOptions);
+            pdfDocument.Save(outputDocx, saveOptions);
         }
 
-        Console.WriteLine($"PDF successfully converted to DOCX: {outputDocxPath}");
+        Console.WriteLine($"Conversion completed: '{outputDocx}'");
     }
 }

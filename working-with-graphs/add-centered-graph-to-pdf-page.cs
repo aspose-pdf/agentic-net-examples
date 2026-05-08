@@ -1,5 +1,5 @@
 using System;
-using System.IO;
+using System.Runtime.InteropServices;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
 
@@ -7,31 +7,63 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "graph_centered.pdf";
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document and ensure deterministic disposal
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            // Add a blank page (first page)
+            Page page = doc.Pages.Add();
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
-        {
-            // Create a graph with desired width and height (in points)
-            Graph graph = new Graph(200, 100);
+            // Use the Graph constructor that accepts double values (as required by newer Aspose.Pdf versions)
+            Graph graph = new Graph(200.0, 100.0);
 
-            // Align the graph to the center of the page horizontally
+            // Align the graph to the center of the page (both horizontally and vertically)
             graph.HorizontalAlignment = HorizontalAlignment.Center;
+            graph.VerticalAlignment   = VerticalAlignment.Center;
 
-            // Add the graph to the first page's Paragraphs collection
-            doc.Pages[1].Paragraphs.Add(graph);
+            // Define visual appearance via GraphInfo. The border can be set through GraphInfo.Color and LineWidth.
+            graph.GraphInfo = new GraphInfo
+            {
+                FillColor = Color.LightGray,
+                Color     = Color.Black,   // stroke (border) color
+                LineWidth = 1f               // border thickness (float literal)
+            };
 
-            // Save the modified document
-            doc.Save(outputPath);
+            // Add the graph to the page's Paragraphs collection
+            page.Paragraphs.Add(graph);
+
+            // Save the PDF document – guard against missing GDI+ (libgdiplus) on non‑Windows platforms
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                doc.Save(outputPath);
+                Console.WriteLine($"PDF saved to '{outputPath}'.");
+            }
+            else
+            {
+                try
+                {
+                    doc.Save(outputPath);
+                    Console.WriteLine($"PDF saved to '{outputPath}'.");
+                }
+                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
+                {
+                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. " +
+                                      "The PDF was generated without rendering the Graph.");
+                }
+            }
         }
+    }
 
-        Console.WriteLine($"Graph added and saved to '{outputPath}'.");
+    // Helper method to walk the inner‑exception chain and detect a missing native library
+    private static bool ContainsDllNotFound(Exception? ex)
+    {
+        while (ex != null)
+        {
+            if (ex is DllNotFoundException)
+                return true;
+            ex = ex.InnerException;
+        }
+        return false;
     }
 }

@@ -6,49 +6,43 @@ class Program
 {
     static void Main()
     {
-        // Paths to the source PDF, the watermark image, and the output PDF.
-        const string inputPdfPath   = "input.pdf";
-        const string watermarkPath  = "watermark.png";
-        const string outputPdfPath  = "output.pdf";
+        // Paths to the source PDF, watermark image, and output PDF
+        const string inputPdfPath = "input.pdf";
+        const string watermarkImagePath = "watermark.png";
+        const string outputPdfPath = "output.pdf";
 
-        // Opacity value for the watermark (0.0 = fully transparent, 1.0 = fully opaque).
-        // In a real scenario this could be read from a configuration file.
-        const double watermarkOpacity = 0.35;
+        // Opacity can be read from a configuration source; here we set it directly
+        double watermarkOpacity = 0.3; // Range: 0.0 (transparent) to 1.0 (opaque)
 
-        // Validate input files.
+        // Validate required files
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-
-        if (!File.Exists(watermarkPath))
+        if (!File.Exists(watermarkImagePath))
         {
-            Console.Error.WriteLine($"Watermark image not found: {watermarkPath}");
+            Console.Error.WriteLine($"Watermark image not found: {watermarkImagePath}");
             return;
         }
 
-        // NOTE: Aspose.Pdf must be added to the project via the NuGet package "Aspose.PDF".
-        // Do NOT reference a local AsposePdfApi.dll file – the missing‑file build error is caused by that.
+        // Load the PDF document
         using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Iterate over all pages.
+            // Create an ImageStamp from the watermark image
+            ImageStamp stamp = new ImageStamp(watermarkImagePath);
+            stamp.Opacity = watermarkOpacity;               // Set semi‑transparent opacity
+            stamp.Background = false;                       // Place on top of page content
+            stamp.HorizontalAlignment = HorizontalAlignment.Center;
+            stamp.VerticalAlignment = VerticalAlignment.Center;
+
+            // Apply the stamp to every page
             foreach (Page page in pdfDoc.Pages)
             {
-                // Create an ImageStamp from the watermark image file.
-                ImageStamp stamp = new ImageStamp(watermarkPath)
-                {
-                    Opacity = watermarkOpacity,               // Set semi‑transparent opacity.
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment   = VerticalAlignment.Center,
-                    Background = false                       // Draw over page content.
-                };
-
-                // Apply the stamp to the current page.
                 page.AddStamp(stamp);
             }
 
-            // Save the modified PDF to the output path.
+            // Save the watermarked PDF
             pdfDoc.Save(outputPdfPath);
         }
 

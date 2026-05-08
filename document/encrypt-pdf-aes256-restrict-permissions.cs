@@ -22,10 +22,12 @@ class Program
             // Load the PDF document
             using (Document doc = new Document(inputPath))
             {
-                // No permissions granted => printing and copying are restricted
-                Permissions allowedPermissions = (Permissions)0;
+                // Define allowed permissions.
+                // Excluding PrintDocument and ExtractContent restricts printing and copying.
+                // Here we allow only content modification as an example.
+                Permissions allowedPermissions = Permissions.ModifyContent;
 
-                // Encrypt with AES‑256
+                // Encrypt with AES‑256 algorithm
                 doc.Encrypt(userPassword, ownerPassword, allowedPermissions, CryptoAlgorithm.AESx256);
 
                 // Save the encrypted PDF

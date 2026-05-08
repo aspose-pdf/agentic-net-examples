@@ -1,42 +1,49 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // Included as per requirement, though not directly used
 
 class Program
 {
     static void Main()
     {
-        // Input JPEG image and output PDF file names
-        const string imagePath = "Photo.jpg";
-        const string outputPdf = "Photo.pdf";
+        const string inputPath = "Photo.jpg";
+        const string outputPath = "Photo.pdf";
 
-        // Verify that the source image exists
-        if (!File.Exists(imagePath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Image file not found: {imagePath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Create a new PDF document and ensure it is disposed properly
-        using (Document pdfDoc = new Document())
+        try
         {
-            // Add a single page; default margins are applied automatically
-            Page page = pdfDoc.Pages.Add();
-
-            // Create an Aspose.Pdf.Image object and bind it to the JPEG file
-            Image img = new Image
+            // Create a new PDF document.
+            using (var doc = new Document())
             {
-                File = imagePath
-            };
+                // Add a single page (default size and margins).
+                var page = doc.Pages.Add();
 
-            // Insert the image into the page's content stream
-            page.Paragraphs.Add(img);
+                // Load the JPEG image and add it to the page.
+                using (var imgStream = new FileStream(inputPath, FileMode.Open, FileAccess.Read))
+                {
+                    var image = new Aspose.Pdf.Image
+                    {
+                        ImageStream = imgStream
+                    };
+                    // The image will be placed at the origin (0,0). Aspose.Pdf will scale it
+                    // to fit the page while respecting the default margins.
+                    page.Paragraphs.Add(image);
+                }
 
-            // Save the resulting PDF document
-            pdfDoc.Save(outputPdf);
+                // Save the document as a PDF.
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"PDF created successfully at '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF successfully created: {outputPdf}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
+        }
     }
 }

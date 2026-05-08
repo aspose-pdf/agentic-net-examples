@@ -1,56 +1,39 @@
 using System;
-using System.IO;
-using System.Drawing;                     // Required for DefaultAppearance color
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;            // DefaultAppearance resides here
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
         const string outputPath = "output_with_textfield.pdf";
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            // Add a blank page to host the form field
+            Page page = doc.Pages.Add();
 
-        // Load the existing PDF (lifecycle: load)
-        using (Document doc = new Document(inputPath))
-        {
-            // Choose the page where the field will be placed (pages are 1‑based)
-            Page page = doc.Pages[1];
+            // Define the rectangle where the text field will be placed (left, bottom, width, height)
+            // Rectangle constructor expects float values, so use the 'f' suffix
+            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100f, 500f, 300f, 530f);
 
-            // Define the field rectangle (fully qualified to avoid ambiguity)
-            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-
-            // Create a TextBoxField on the selected page
+            // Create a TextBoxField on the page with the specified rectangle
             TextBoxField textField = new TextBoxField(page, fieldRect)
             {
-                // Internal name of the field
-                PartialName = "SampleTextField",
-
-                // Default value displayed in the field
-                Value = "Default Value",
-
-                // Make the field read‑only
-                ReadOnly = true,
-
-                // Set default appearance (font, size, color)
-                // DefaultAppearance constructor requires System.Drawing.Color
-                DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black)
+                // Set the default value that appears in the field
+                Value = "Default Text",
+                // Make the field read‑only so the user cannot modify it
+                ReadOnly = true
             };
 
-            // Add the field to the page's annotation collection
-            page.Annotations.Add(textField);
+            // Add the field to the document's form collection
+            doc.Form.Add(textField);
 
-            // Save the modified PDF (lifecycle: save)
+            // Save the PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with read‑only text field: {outputPath}");
+        Console.WriteLine($"PDF with read‑only text field saved to '{outputPath}'.");
     }
 }

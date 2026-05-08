@@ -7,35 +7,42 @@ class Program
 {
     static void Main()
     {
+        const string inputPath = "input.pdf";
         const string outputPath = "rotated_text.pdf";
 
-        // Create a new PDF document and add a blank page
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
+
+        // Open the existing PDF document
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
+        {
+            // Add a new page (or use an existing one)
+            Aspose.Pdf.Page page = doc.Pages.Add();
 
             // Create a text fragment with the desired content
-            TextFragment text = new TextFragment("Rotated Text Example");
+            Aspose.Pdf.Text.TextFragment textFragment = new Aspose.Pdf.Text.TextFragment("Rotated Text");
 
-            // Set the position where the text will be placed (X, Y)
-            text.Position = new Position(200, 500);
+            // Set the position where the text will be placed
+            textFragment.Position = new Aspose.Pdf.Text.Position(200, 400);
 
             // Configure font and size
-            text.TextState.Font = FontRepository.FindFont("Helvetica");
-            text.TextState.FontSize = 24;
+            textFragment.TextState.Font = Aspose.Pdf.Text.FontRepository.FindFont("Helvetica");
+            textFragment.TextState.FontSize = 24;
 
             // Rotate the text by 45 degrees using the Rotation property of TextState
-            // (TextState does not expose a TextMatrix property; Rotation achieves the same effect)
-            text.TextState.Rotation = 45;
+            textFragment.TextState.Rotation = 45;
 
             // Append the text fragment to the page using TextBuilder
-            TextBuilder builder = new TextBuilder(page);
-            builder.AppendText(text);
+            Aspose.Pdf.Text.TextBuilder builder = new Aspose.Pdf.Text.TextBuilder(page);
+            builder.AppendText(textFragment);
 
-            // Save the resulting PDF
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with rotated text saved to '{outputPath}'.");
+        Console.WriteLine($"Document saved to '{outputPath}'.");
     }
 }

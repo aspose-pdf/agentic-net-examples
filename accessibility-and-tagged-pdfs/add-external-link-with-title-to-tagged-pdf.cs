@@ -1,16 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Tagged;                 // ITaggedContent
-using Aspose.Pdf.LogicalStructure;      // StructureElement, LinkElement
-using Aspose.Pdf;                       // WebHyperlink
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_link.pdf";
+        const string outputPath = "output.pdf";
         const string url        = "https://www.example.com";
         const string title      = "Example Site";
 
@@ -20,38 +19,34 @@ class Program
             return;
         }
 
-        // Load the PDF, modify its tagged structure, and save.
+        // Load the PDF inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the tagged content API.
+            // Access tagged content API
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Optional: set document language and title for accessibility.
-            tagged.SetLanguage("en-US");
-            tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
-
-            // Get the root structure element (no cast needed).
+            // Root element of the logical structure tree
             StructureElement root = tagged.RootElement;
 
-            // Create a LinkElement via the ITaggedContent factory.
-            LinkElement linkElem = tagged.CreateLinkElement();
+            // Create a LinkElement via the ITaggedContent factory
+            LinkElement link = tagged.CreateLinkElement();
 
-            // Set the visible text of the link (what screen readers will read).
-            linkElem.SetText("Visit Example Site");
+            // Optional: set the visible text for the link element
+            link.SetText("Visit Example");
 
-            // Assign the external URL using WebHyperlink.
-            linkElem.Hyperlink = new WebHyperlink(url);
+            // Assign an external web hyperlink
+            link.Hyperlink = new WebHyperlink(url);
 
-            // Define the Title attribute (tooltip / additional description).
-            linkElem.Title = title;
+            // Define the title attribute
+            link.Title = title;
 
-            // Append the link element to the document's structure tree.
-            root.AppendChild(linkElem);   // bool parameter omitted (default true)
+            // Attach the link element to the document's structure tree
+            root.AppendChild(link);
 
-            // Save the modified PDF.
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with link saved to '{outputPath}'.");
+        Console.WriteLine($"Link element added and saved to '{outputPath}'.");
     }
 }

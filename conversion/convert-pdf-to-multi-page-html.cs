@@ -1,66 +1,54 @@
-// ------------------------------------------------------------
-// File: Program.cs
-// ------------------------------------------------------------
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;   // Core Aspose.Pdf namespace (no Facades)
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputHtml = "output.html";
+        // Input PDF file path
+        const string inputPdfPath = "input.pdf";
 
-        // Verify source file exists
-        if (!File.Exists(inputPdf))
+        // Base output HTML file name.
+        // When SplitIntoPages is true, Aspose.Pdf will generate multiple files
+        // (e.g., output.html, output_1.html, output_2.html, ...).
+        const string outputHtmlPath = "output.html";
+
+        // Verify that the source PDF exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document (lifecycle rule: using block for disposal)
-            using (Document pdfDoc = new Document(inputPdf))
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document pdfDocument = new Document(inputPdfPath))
             {
-                // Configure HTML save options with multi‑page output
-                HtmlSaveOptions htmlOpts = new HtmlSaveOptions
+                // Create HtmlSaveOptions and enable multi‑page output
+                HtmlSaveOptions htmlOptions = new HtmlSaveOptions
                 {
                     SplitIntoPages = true
-                    // Additional options can be set here if needed
+                    // Additional options can be set here if needed, e.g.:
+                    // RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsEmbeddedPartsOfPngPageBackground,
+                    // PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml
                 };
 
-                // Save as HTML using explicit SaveOptions (required for non‑PDF formats)
-                pdfDoc.Save(outputHtml, htmlOpts);
+                // Save the document as HTML using the configured options
+                pdfDocument.Save(outputHtmlPath, htmlOptions);
             }
 
-            Console.WriteLine($"PDF successfully converted to multi‑page HTML: {outputHtml}");
+            Console.WriteLine("PDF successfully converted to multi‑page HTML.");
         }
-        // HTML conversion relies on GDI+; handle Windows‑only limitation gracefully
+        // HTML conversion relies on GDI+ and may fail on non‑Windows platforms
         catch (TypeInitializationException)
         {
-            Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
+            Console.WriteLine("HTML conversion requires Windows (GDI+). Operation skipped.");
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine($"Error during conversion: {ex.Message}");
         }
     }
-}
-
-// ------------------------------------------------------------
-// File: AsposePdfApi.GeneratedMSBuildEditorConfig.editorconfig
-// ------------------------------------------------------------
-// This file is intentionally empty but must exist so that the project
-// does not fail with CS2001 (source file not found). It is compiled as
-// a C# source file because the project file includes it under the
-// <Compile> item group. Providing a minimal valid C# construct satisfies
-// the compiler without affecting runtime behaviour.
-
-namespace AsposePdfApi.GeneratedMSBuildEditorConfig
-{
-    // No members are required – the presence of a valid namespace and
-    // an empty class is sufficient for compilation.
-    internal static class Placeholder { }
 }

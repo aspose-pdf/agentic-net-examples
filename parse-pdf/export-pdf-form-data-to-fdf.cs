@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core namespace only; do NOT add Aspose.Pdf.Facades using
+using Aspose.Pdf; // Core API for Document
 
 class Program
 {
@@ -15,18 +15,19 @@ class Program
             return;
         }
 
-        // Use the Form facade via its fully qualified name (no using directive for Aspose.Pdf.Facades)
-        using (var form = new Aspose.Pdf.Facades.Form(inputPdfPath))
+        // Load the PDF document using the core Document class
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Open a writable FileStream for the FDF output
-            using (FileStream fdfStream = new FileStream(outputFdfPath, FileMode.Create, FileAccess.Write))
+            // Bind the document to the Facade Form (fully qualified, no using directive)
+            using (Aspose.Pdf.Facades.Form form = new Aspose.Pdf.Facades.Form(pdfDoc))
             {
-                // Export all form field data to the FDF stream
-                form.ExportFdf(fdfStream);
+                // Export the form fields to an FDF file via a FileStream
+                using (FileStream fdfStream = new FileStream(outputFdfPath, FileMode.Create, FileAccess.Write))
+                {
+                    form.ExportFdf(fdfStream);
+                }
+                // The PDF itself is unchanged; no additional Save call is required
             }
-
-            // The PDF itself is unchanged; if you need to save it explicitly you can call:
-            // form.Save(); // saves the original PDF (optional)
         }
 
         Console.WriteLine($"Form data successfully exported to '{outputFdfPath}'.");

@@ -1,14 +1,14 @@
 using System;
 using System.IO;
+using System.Xml.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 
-class ExportPopupAnnotations
+class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // source PDF
-        const string outputXfdf = "popups.xfdf";       // XFDF file to create
+        const string inputPdf  = "input.pdf";
+        const string outputXfdf = "popups.xfdf";
 
         if (!File.Exists(inputPdf))
         {
@@ -16,27 +16,42 @@ class ExportPopupAnnotations
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+        // Load the source PDF
+        using (Document srcDoc = new Document(inputPdf))
         {
-            // Iterate through each page and remove all annotations except PopupAnnotation
-            foreach (Page page in doc.Pages)
+            // Export all annotations to an in‑memory XFDF stream
+            using (MemoryStream xfdfStream = new MemoryStream())
             {
-                // Delete annotations in reverse order to keep indexes valid
-                for (int idx = page.Annotations.Count; idx >= 1; idx--)
+                srcDoc.ExportAnnotationsToXfdf(xfdfStream);
+                xfdfStream.Position = 0; // rewind for reading
+
+                // Load the XFDF XML
+                XDocument xfdfXml = XDocument.Load(xfdfStream);
+
+                // The XFDF structure: <xfdf><annots>...</annots></xfdf>
+                // Keep only <popup> elements (and their children)
+                XElement root = xfdfXml.Root;
+                if (root != null)
                 {
-                    Annotation ann = page.Annotations[idx];
-                    if (!(ann is PopupAnnotation))
+                    XElement annots = root.Element("annots");
+                    if (annots != null)
                     {
-                        page.Annotations.Delete(idx);
+                        // Remove any annotation element that is not a popup
+                        foreach (XElement elem in annots.Elements())
+                        {
+                            // Popup annotations are represented by <popup> elements
+                            if (elem.Name != "popup")
+                            {
+                                elem.Remove();
+                            }
+                        }
                     }
                 }
+
+                // Save the filtered XFDF to the output file
+                xfdfXml.Save(outputXfdf);
+                Console.WriteLine($"Popup annotations exported to '{outputXfdf}'.");
             }
-
-            // Export the remaining (popup) annotations to XFDF
-            doc.ExportAnnotationsToXfdf(outputXfdf);
         }
-
-        Console.WriteLine($"Popup annotations exported to '{outputXfdf}'.");
     }
 }

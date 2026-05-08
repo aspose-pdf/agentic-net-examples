@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "template_page.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,16 +15,20 @@ class Program
             return;
         }
 
-        // Load the PDF, flatten the first page to remove all form fields
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Page indexing is 1‑based; flatten removes fields and makes their values static
-            doc.Pages[1].Flatten();
+            // Verify that the document has at least one page
+            if (doc.Pages.Count >= 1)
+            {
+                // Flatten the first page: removes all form fields and renders their values directly on the page
+                doc.Pages[1].Flatten();
+            }
 
-            // Save the modified PDF
+            // Save the resulting PDF with a clean first page
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"First page cleaned and saved to '{outputPath}'.");
+        Console.WriteLine($"First page template saved to '{outputPath}'.");
     }
 }

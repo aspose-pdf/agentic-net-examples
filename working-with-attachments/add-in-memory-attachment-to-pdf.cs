@@ -1,58 +1,44 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // Core PDF API
+using Aspose.Pdf.Tagged;        // For ITaggedContent if needed (not used here)
 
 class Program
 {
     static void Main()
     {
-        // Input PDF path (could be any existing PDF)
-        const string inputPdfPath = "input.pdf";
-
-        // Output PDF path (final result with attachment)
+        // Path to the source PDF (must exist)
+        const string inputPdfPath  = "input.pdf";
+        // Path where the resulting PDF with the attachment will be saved
         const string outputPdfPath = "output_with_attachment.pdf";
 
-        // Ensure the input file exists
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Load the source PDF into a MemoryStream (no direct disk write for the attachment)
-        using (FileStream sourceFile = File.OpenRead(inputPdfPath))
-        using (MemoryStream pdfStream = new MemoryStream())
+        // Create a memory stream containing the data to be attached.
+        // Here we embed a simple text file; replace the content as needed.
+        byte[] attachmentData = System.Text.Encoding.UTF8.GetBytes("This is the content of the in‑memory attachment.");
+        using (MemoryStream attachmentStream = new MemoryStream(attachmentData))
         {
-            sourceFile.CopyTo(pdfStream);
-            pdfStream.Position = 0; // reset for reading
+            // Ensure the stream position is at the beginning before using it.
+            attachmentStream.Position = 0;
 
-            // Open the PDF document from the memory stream
-            using (Document doc = new Document(pdfStream))
+            // Open the existing PDF inside a using block for deterministic disposal.
+            using (Document doc = new Document(inputPdfPath))
             {
-                // ------------------------------------------------------------
-                // Create attachment content in memory (e.g., a simple text file)
-                // ------------------------------------------------------------
-                string attachmentText = "This is the content of the in‑memory attachment.";
-                byte[] attachmentBytes = System.Text.Encoding.UTF8.GetBytes(attachmentText);
-                using (MemoryStream attachmentStream = new MemoryStream(attachmentBytes))
-                {
-                    // The FileSpecification constructor expects the stream first, then the file name.
-                    FileSpecification fileSpec = new FileSpecification(attachmentStream, "Attachment.txt");
+                // The FileSpecification constructor expects (Stream, string).
+                // The first argument is the stream containing the file data,
+                // the second argument is the name that will appear in the PDF attachment list.
+                FileSpecification fileSpec = new FileSpecification(attachmentStream, "SampleAttachment.txt");
 
-                    // Add the attachment to the PDF's EmbeddedFiles collection.
-                    // The key can be any unique identifier; using the file name here.
-                    doc.EmbeddedFiles.Add("Attachment.txt", fileSpec);
-                }
+                // Add the file specification to the document's embedded files collection.
+                doc.EmbeddedFiles.Add(fileSpec);
 
-                // ------------------------------------------------------------
-                // Save the modified PDF to a MemoryStream (still no intermediate file)
-                // ------------------------------------------------------------
-                using (MemoryStream outputStream = new MemoryStream())
-                {
-                    doc.Save(outputStream);
-                    // Write the resulting PDF from memory to the final file on disk
-                    File.WriteAllBytes(outputPdfPath, outputStream.ToArray());
-                }
+                // Save the modified PDF to the desired output path.
+                doc.Save(outputPdfPath);
             }
         }
 

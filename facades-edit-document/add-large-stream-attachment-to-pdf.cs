@@ -1,48 +1,58 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output_with_attachment.pdf";
-        const string attachmentPath = "large_file.bin";
-        const string description = "Large attachment";
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output_with_attachment.pdf";
+        const string attachmentFilePath = "large_attachment.bin";
 
-        // Verify source files exist
-        if (!File.Exists(inputPdf))
+        // Verify required files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(attachmentPath))
+        if (!File.Exists(attachmentFilePath))
         {
-            Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
+            Console.Error.WriteLine($"Attachment file not found: {attachmentFilePath}");
             return;
         }
 
-        // Load the PDF using the Facade (load rule)
-        PdfContentEditor editor = new PdfContentEditor();
-        editor.BindPdf(inputPdf);
-
-        // Open the attachment as a sequential read stream.
-        // Passing the stream directly to AddDocumentAttachment lets Aspose.Pdf read the data in chunks,
-        // avoiding loading the entire file into memory.
-        using (FileStream attStream = new FileStream(
-            attachmentPath,
-            FileMode.Open,
-            FileAccess.Read,
-            FileShare.Read,
-            bufferSize: 81920,   // 80 KB buffer (default) – suitable for large files
-            useAsync: false))
+        // Use PdfContentEditor (Facade) to add the attachment
+        using (PdfContentEditor editor = new PdfContentEditor())
         {
-            editor.AddDocumentAttachment(attStream, Path.GetFileName(attachmentPath), description);
+            // Bind the source PDF document
+            editor.BindPdf(inputPdfPath);
+
+            // Open the attachment as a FileStream with a moderate buffer.
+            // SequentialScan hints the OS to read the file sequentially,
+            // avoiding loading the whole file into memory.
+            const int bufferSize = 4 * 1024 * 1024; // 4 MiB buffer
+            using (FileStream attachmentStream = new FileStream(
+                       attachmentFilePath,
+                       FileMode.Open,
+                       FileAccess.Read,
+                       FileShare.Read,
+                       bufferSize,
+                       FileOptions.SequentialScan))
+            {
+                // Add the attachment. Aspose.Pdf reads from the stream on demand,
+                // so memory consumption stays low even for very large files.
+                editor.AddDocumentAttachment(
+                    attachmentStream,
+                    Path.GetFileName(attachmentFilePath), // attachment name inside PDF
+                    "Large file attachment");             // description
+            }
+
+            // Save the modified PDF
+            editor.Save(outputPdfPath);
         }
 
-        // Save the modified PDF (save rule)
-        editor.Save(outputPdf);
-        Console.WriteLine($"Attachment added successfully. Output saved to '{outputPdf}'.");
+        Console.WriteLine($"Attachment added successfully. Output saved to '{outputPdfPath}'.");
     }
 }

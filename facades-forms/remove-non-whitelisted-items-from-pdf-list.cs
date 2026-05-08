@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -8,56 +8,53 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPdf  = "FormWithStateList.pdf";
+        const string outputPdf = "FormWithStateList_Whitelisted.pdf";
 
-        // Verify that the source PDF exists before attempting to edit it.
+        // Define the whitelist of allowed state names
+        string[] whitelist = new[]
+        {
+            "Alabama", "Alaska", "Arizona", "Arkansas", "California",
+            "Colorado", "Connecticut", "Delaware", "Florida", "Georgia"
+            // add other allowed states as needed
+        };
+
+        // In a real scenario you would retrieve the existing list items from the PDF.
+        // For this example we assume we have an array with all current items.
+        string[] allStateItems = new[]
+        {
+            "Alabama", "Alaska", "Arizona", "Arkansas", "California",
+            "Colorado", "Connecticut", "Delaware", "Florida", "Georgia",
+            "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa"
+            // ... other states present in the list field
+        };
+
         if (!File.Exists(inputPdf))
         {
-            Console.WriteLine($"The file '{inputPdf}' was not found. Please provide a valid PDF file.");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Whitelist of allowed items for the "State" list field
-        var whitelist = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        // Load the PDF document
+        using (Document doc = new Document(inputPdf))
         {
-            "Alabama",
-            "Alaska",
-            "Arizona",
-            "Arkansas"
-            // Add other allowed states as needed
-        };
+            // Initialize the FormEditor facade for the document
+            FormEditor formEditor = new FormEditor(doc);
 
-        // Complete list of possible items in the "State" list field
-        var allStates = new[]
-        {
-            "Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware",
-            "Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky",
-            "Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi",
-            "Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico",
-            "New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania",
-            "Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont",
-            "Virginia","Washington","West Virginia","Wisconsin","Wyoming"
-        };
-
-        // Load the PDF document first (FormEditor expects a Document, not a file path)
-        using (Document pdfDocument = new Document(inputPdf))
-        {
-            // Initialize FormEditor with the loaded Document instance
-            using (FormEditor formEditor = new FormEditor(pdfDocument))
+            // Delete every item that is NOT in the whitelist
+            foreach (string item in allStateItems)
             {
-                // Delete items not present in the whitelist
-                foreach (var state in allStates)
+                if (!whitelist.Contains(item, StringComparer.OrdinalIgnoreCase))
                 {
-                    if (!whitelist.Contains(state))
-                    {
-                        formEditor.DelListItem("State", state);
-                    }
+                    // DelListItem removes the specified item from the list field named "State"
+                    formEditor.DelListItem("State", item);
                 }
             }
 
-            // Save the modified PDF to the desired output location
-            pdfDocument.Save(outputPdf);
+            // Save the modified PDF
+            doc.Save(outputPdf);
         }
+
+        Console.WriteLine($"Whitelisted PDF saved to '{outputPdf}'.");
     }
 }

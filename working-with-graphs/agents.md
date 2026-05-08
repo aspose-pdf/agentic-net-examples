@@ -21,20 +21,17 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf;` (84/85 files) ← category-specific
-- `using Aspose.Pdf.Drawing;` (81/85 files) ← category-specific
-- `using Aspose.Pdf.Text;` (10/85 files)
-- `using Aspose.Pdf.Operators;` (3/85 files)
-- `using Aspose.Pdf.Annotations;` (1/85 files)
-- `using Aspose.Pdf.Generator;` (1/85 files)
-- `using System;` (85/85 files)
-- `using System.IO;` (34/85 files)
-- `using System.Collections.Generic;` (5/85 files)
-- `using System.Runtime.InteropServices;` (3/85 files)
-- `using NUnit.Framework;` (1/85 files)
-- `using System.Reflection;` (1/85 files)
-- `using System.Text.Json;` (1/85 files)
-- `using System.Threading.Tasks;` (1/85 files)
+- `using Aspose.Pdf;` (69/70 files) ← category-specific
+- `using Aspose.Pdf.Drawing;` (66/70 files) ← category-specific
+- `using Aspose.Pdf.Text;` (11/70 files)
+- `using Aspose.Pdf.Operators;` (3/70 files)
+- `using Aspose.Pdf.Annotations;` (1/70 files)
+- `using System;` (70/70 files)
+- `using System.Runtime.InteropServices;` (50/70 files) ← category-specific
+- `using System.IO;` (30/70 files)
+- `using System.Collections.Generic;` (6/70 files)
+- `using System.Text.Json;` (1/70 files)
+- `using System.Threading.Tasks;` (1/70 files)
 
 ## Common Code Pattern
 
@@ -52,40 +49,40 @@ using (Document doc = new Document("input.pdf"))
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [add-background-image-and-overlay-graph](./add-background-image-and-overlay-graph.cs) | Add Background Image to PDF and Overlay Graph Shapes | `Document`, `Save`, `Page` | Shows how to insert a background image on a PDF page and draw vector shapes (rectangle and line) ... |
-| [add-centered-graph-to-pdf-page](./add-centered-graph-to-pdf-page.cs) | Add Centered Graph to PDF Page | `Document`, `Graph`, `HorizontalAlignment` | Loads an existing PDF, creates a Graph object, aligns it to the page center horizontally, adds it... |
-| [add-dashed-rectangle-to-pdf-graph](./add-dashed-rectangle-to-pdf-graph.cs) | Add Dashed Rectangle to PDF Graph | `Document`, `Save`, `Page` | Demonstrates drawing a rectangle with a 2‑point border and dashed line style inside a Graph conta... |
-| [add-ellipse-graph-to-pdf-pages-parallel](./add-ellipse-graph-to-pdf-pages-parallel.cs) | Add Ellipse Graph to PDF Pages Using Parallel.ForEach | `Document`, `Save`, `Page` | Demonstrates loading PDF files, iterating through each page, creating a Graph with an ellipse sha... |
-| [add-ellipse-with-bounds-checking-to-pdf](./add-ellipse-with-bounds-checking-to-pdf.cs) | Add Ellipse with Bounds Checking to PDF | `Document`, `Page`, `Graph` | Demonstrates creating a PDF, adding an ellipse inside a Graph, enabling bounds checking that thro... |
-| [add-filled-arc-with-radial-gradient](./add-filled-arc-with-radial-gradient.cs) | Add Filled Arc with Radial Gradient to PDF Graph | `Document`, `Save`, `Page` | Shows how to create an Arc shape inside a Graph and fill it with a radial gradient shading in a P... |
-| [add-filled-circle-to-pdf](./add-filled-circle-to-pdf.cs) | Add a Filled Circle to a PDF Using Aspose.Pdf | `Document`, `Page`, `Graph` | Shows how to create a PDF document, add a Graph container, and draw a filled circle with a given ... |
-| [add-filled-curve-to-pdf-graph](./add-filled-curve-to-pdf-graph.cs) | Add Filled Curve to PDF Graph | `Document`, `Page`, `Graph` | Shows how to create a PDF document, add a Graph container, draw a Bezier curve with a fill color ... |
-| [add-filled-rectangle-with-dashed-border](./add-filled-rectangle-with-dashed-border.cs) | Add Filled Rectangle with Dashed Border to PDF Graph | `Document`, `Page`, `Graph` | Demonstrates creating a PDF, adding a Graph container, drawing a filled rectangle with a custom d... |
-| [add-gradient-filled-ellipse-to-pdf-graph](./add-gradient-filled-ellipse-to-pdf-graph.cs) | Add Gradient-Filled Ellipse to PDF Graph | `Document`, `Page`, `Graph` | Creates a PDF document, adds a Graph container, draws an ellipse, and fills it with an axial grad... |
-| [add-gradient-rectangle-alpha-transparency](./add-gradient-rectangle-alpha-transparency.cs) | Add Gradient Rectangle with Alpha Transparency to PDF | `Document`, `Page`, `Graph` | Demonstrates how to draw a rectangle filled with a linear axial gradient that transitions from fu... |
-| [add-graph-shapes-to-pdf-page](./add-graph-shapes-to-pdf-page.cs) | Add Graph with Shapes to a New PDF Page | `Document`, `Save`, `Page` | The example loads an existing PDF, adds a blank page, creates a Graph object, draws rectangle, el... |
-| [add-graph-to-pdf](./add-graph-to-pdf.cs) | Add Graph to PDF Using Aspose.Pdf | `Document`, `Save`, `Page` | The example loads an existing PDF, creates a Graph containing a rectangle, ellipse, and line, add... |
-| [add-graph-with-labels-to-pdf](./add-graph-with-labels-to-pdf.cs) | Add Graph with Labels to PDF | `Document`, `Page`, `Graph` | Demonstrates loading a PDF from a byte array, creating a Graph with rectangle, line, and ellipse ... |
-| [add-multi-colored-line-segments-to-pdf-graph](./add-multi-colored-line-segments-to-pdf-graph.cs) | Add Multi-Colored Line Segments to a PDF Graph | `Document`, `Page`, `Graph` | Demonstrates how to create a PDF graph and add multiple line segments, each with its own color, u... |
-| [add-non-overlapping-rectangles-to-pdf-graph](./add-non-overlapping-rectangles-to-pdf-graph.cs) | Add Multiple Rectangles to a PDF Graph with Overlap Checking | `Document`, `Save`, `Page` | Creates a PDF document, adds a graph area, and places several rectangles of varying sizes while v... |
-| [add-radial-gradient-rectangle-to-pdf](./add-radial-gradient-rectangle-to-pdf.cs) | Add Radial Gradient Rectangle to PDF | `Document`, `Save`, `Page` | Demonstrates how to create a rectangle inside a graph and fill it with a radial gradient that tra... |
-| [add-rectangle-with-shadow-to-pdf](./add-rectangle-with-shadow-to-pdf.cs) | Add Rectangle with Shadow to PDF | `Document`, `Save`, `Page` | Shows how to create a PDF, add a Graph container, draw a semi‑transparent offset rectangle as a s... |
-| [add-red-filled-rectangle-to-pdf](./add-red-filled-rectangle-to-pdf.cs) | Add a Red Filled Rectangle to a PDF Using Aspose.Pdf Graph | `Document`, `Page`, `Graph` | Demonstrates how to create a PDF, add a Graph that covers the page, and draw a solid red rectangl... |
-| [add-regular-hexagon-to-pdf-graph](./add-regular-hexagon-to-pdf-graph.cs) | Add Regular Hexagon to PDF Graph | `Document`, `Page`, `Graph` | Demonstrates how to create a regular hexagon shape inside a PDF graph, set its border color and t... |
-| [add-shadow-effect-to-filled-rectangle](./add-shadow-effect-to-filled-rectangle.cs) | Add Shadow Effect to a Filled Rectangle in a PDF Graph | `Document`, `Page`, `Graph` | Shows how to simulate a shadow for a rectangle inside an Aspose.Pdf Graph by drawing an offset se... |
-| [add-shapes-with-bounds-checking-to-pdf](./add-shapes-with-bounds-checking-to-pdf.cs) | Add Shapes with Bounds Checking to PDF | `Document`, `Page`, `PageInfo` | Demonstrates creating a PDF, adding rectangles, ellipses and lines inside a Graph container, perf... |
-| [add-text-inside-graph](./add-text-inside-graph.cs) | Add Text Inside a Graph with Custom Font and Position | `Document`, `Save`, `Page` | Demonstrates creating a graph in a PDF, applying styling, and inserting a text fragment with a sp... |
-| [add-unfilled-arc-with-custom-stroke](./add-unfilled-arc-with-custom-stroke.cs) | Add Unfilled Arc with Custom Stroke to PDF | `Document`, `Page`, `Graph` | Demonstrates creating a PDF, adding a Graph container, drawing an unfilled arc, and configuring i... |
-| [adjust-shape-position-to-fit-page-bounds](./adjust-shape-position-to-fit-page-bounds.cs) | Adjust Shape Position to Fit Within PDF Page Bounds | `Document`, `Page`, `Graph` | Shows how to verify a rectangle's coordinates against a PDF page size and reposition it so the sh... |
-| [apply-clipping-region-to-pdf-graph](./apply-clipping-region-to-pdf-graph.cs) | Apply Clipping Region to PDF Graph | `Document`, `Page`, `MoveTo` | Demonstrates how to create a clipping rectangle with low‑level PDF operators and render a graph s... |
-| [apply-dictionary-fill-colors-to-pdf-shapes](./apply-dictionary-fill-colors-to-pdf-shapes.cs) | Apply Dictionary-Based Fill Colors to PDF Shapes | `Document`, `Save`, `Page` | Demonstrates using a Dictionary to map shape identifiers to Aspose.Pdf.Drawing.Color values and a... |
-| [apply-json-defined-fill-colors-to-pdf-shapes](./apply-json-defined-fill-colors-to-pdf-shapes.cs) | Apply JSON-Defined Fill Colors to PDF Shapes | `Document`, `Page`, `Graph` | The example loads a JSON configuration that maps shape types to color names, resolves the colors,... |
-| [apply-radial-gradient-ellipse](./apply-radial-gradient-ellipse.cs) | Apply Radial Gradient Fill to an Ellipse with Dark Gray Bord... | `Document`, `Page`, `Graph` | Shows how to create a PDF, add a Graph canvas, draw an ellipse, set a dark gray border, and fill ... |
-| [apply-texture-brush-to-ellipse](./apply-texture-brush-to-ellipse.cs) | Apply Texture Brush to Ellipse in PDF | `Document`, `Page`, `Add` | Demonstrates loading an image as a texture, adding it to a PDF page, and drawing an ellipse with ... |
-| ... | | | *and 55 more files* |
+| [add-background-image-and-draw-shapes](./add-background-image-and-draw-shapes.cs) | Add Background Image to PDF Page and Draw Shapes on Top | `Document`, `Page`, `Image` | Demonstrates how to set a background image for a PDF page using Aspose.Pdf and overlay a graph wi... |
+| [add-centered-graph-to-pdf-page](./add-centered-graph-to-pdf-page.cs) | Add Centered Graph to PDF Page | `Document`, `Page`, `Graph` | Shows how to create a Graph, set its horizontal and vertical alignment to center, configure its a... |
+| [add-dashed-rectangle-to-pdf-graph](./add-dashed-rectangle-to-pdf-graph.cs) | Add Dashed Rectangle to PDF Graph | `Document`, `Page`, `Graph` | Shows how to create a PDF, add a Graph container, define a rectangle with a 2‑point dashed border... |
+| [add-ellipse-with-border-and-centered-text](./add-ellipse-with-border-and-centered-text.cs) | Add Ellipse with Border and Centered Text to PDF | `Document`, `Ellipse`, `GraphInfo` | Shows how to draw an ellipse with a thick border and semi‑transparent fill and place a centered T... |
+| [add-filled-bezier-curve-to-pdf-graph](./add-filled-bezier-curve-to-pdf-graph.cs) | Add Filled Bezier Curve with Opacity to PDF Graph | `Document`, `Page`, `Graph` | Shows how to create a PDF, add a Graph, draw a Bezier curve, set a semi‑transparent fill color an... |
+| [add-filled-circle-to-pdf](./add-filled-circle-to-pdf.cs) | Add Filled Circle to PDF with Aspose.Pdf Graph | `Document`, `Page`, `Graph` | Demonstrates creating a PDF document, adding a Graph that spans the page, and drawing a filled ci... |
+| [add-filled-rectangle-dashed-border-to-pdf-graph](./add-filled-rectangle-dashed-border-to-pdf-graph.cs) | Add Filled Rectangle with Dashed Border to PDF Graph | `Document`, `Page`, `Graph` | Shows how to create a Graph on a PDF page and draw a rectangle with a light‑gray fill, black dash... |
+| [add-gradient-ellipse-graph-to-pdf-pages](./add-gradient-ellipse-graph-to-pdf-pages.cs) | Add Gradient Ellipse Graph to PDF Pages Concurrently | `Document`, `Page`, `Graph` | The example loads multiple PDF files in parallel, creates a full‑page graph on each page, and fil... |
+| [add-graph-to-pdf](./add-graph-to-pdf.cs) | Add Graph to PDF Document | `Document`, `Page`, `Graph` | Demonstrates loading an existing PDF, creating a Graph container with rectangle and line shapes, ... |
+| [add-graph-watermark-to-pdf-pages](./add-graph-watermark-to-pdf-pages.cs) | Add Graph Watermark to PDF Pages | `Document`, `Page`, `Graph` | The example iterates through PDF files in a folder, adds a Graph containing a rectangle shape as ... |
+| [add-multiple-colored-line-segments-to-pdf-graph](./add-multiple-colored-line-segments-to-pdf-graph.cs) | Add Multiple Colored Line Segments to a PDF Graph | `Document`, `Page`, `Graph` | Demonstrates creating a Graph in Aspose.Pdf, adding several Line shapes with different colors, an... |
+| [add-non-overlapping-random-rectangles-to-pdf-graph](./add-non-overlapping-random-rectangles-to-pdf-graph.cs) | Add Non-Overlapping Random Rectangles to a PDF Graph | `Document`, `Page`, `Graph` | Demonstrates placing multiple random-sized rectangles on a PDF page using Aspose.Pdf while ensuri... |
+| [add-page-draw-shapes-graph](./add-page-draw-shapes-graph.cs) | Add a New Page and Draw Shapes Using Graph | `Document`, `Page`, `Graph` | The example loads an existing PDF, adds a blank page, creates a Graph container, draws a rectangl... |
+| [add-rectangle-with-shadow-to-pdf](./add-rectangle-with-shadow-to-pdf.cs) | Add Rectangle with Shadow to PDF | `Document`, `Page`, `Graph` | Shows how to draw a rectangle with a drop‑shadow in a PDF by using a Graph container and a semi‑t... |
+| [add-red-filled-rectangle-to-pdf](./add-red-filled-rectangle-to-pdf.cs) | Add a Red Filled Rectangle to a PDF with Graph | `Document`, `Page`, `Graph` | Demonstrates how to create a PDF, add a Graph canvas, draw a rectangle using absolute coordinates... |
+| [add-regular-hexagon-to-pdf-graph](./add-regular-hexagon-to-pdf-graph.cs) | Add Regular Hexagon to PDF Graph | `Document`, `Page`, `Graph` | Shows how to create a Graph, calculate the vertices of a regular hexagon, draw its sides with cus... |
+| [add-rounded-rectangle-with-fill-to-pdf](./add-rounded-rectangle-with-fill-to-pdf.cs) | Add Rounded Rectangle with Fill to PDF | `Document`, `Page`, `Graph` | The example creates a PDF document, adds a Graph container, defines a rectangle with rounded corn... |
+| [add-rounded-rectangle-with-fill](./add-rounded-rectangle-with-fill.cs) | Add Rounded Rectangle with Fill to PDF | `Document`, `Page`, `Graph` | Shows how to create a PDF, add a Graph, draw a rectangle with rounded corners, apply a solid fill... |
+| [add-semi-transparent-rectangle-graph-layer](./add-semi-transparent-rectangle-graph-layer.cs) | Add Semi-Transparent Rectangle Using Graph Layer | `Document`, `Page`, `Graph` | Demonstrates how to begin a transparency layer with Aspose.Pdf's Graph container, draw a semi‑tra... |
+| [add-shapes-to-pdf-using-dictionary](./add-shapes-to-pdf-using-dictionary.cs) | Add Shapes to PDF Using Dictionary for Fill Colors | `Document`, `Page`, `Graph` | Shows how to map shape identifiers to fill colors with a dictionary and apply those colors when d... |
+| [add-shapes-with-bounds-checking-to-pdf](./add-shapes-with-bounds-checking-to-pdf.cs) | Add Shapes with Bounds Checking and Logging to PDF | `Document`, `Page`, `Graph` | Demonstrates creating a PDF, adding rectangle shapes inside a Graph container, performing pre‑val... |
+| [add-text-inside-graph-pdf](./add-text-inside-graph-pdf.cs) | Add Text Inside a Graph with Font Settings in PDF | `Document`, `Page`, `Graph` | Demonstrates how to create a PDF, add a Graph container with a background rectangle, and place a ... |
+| [add-unfilled-arc-with-line-width-and-dash-style](./add-unfilled-arc-with-line-width-and-dash-style.cs) | Add Unfilled Arc with Custom Line Width and Dash Style to PD... | `Document`, `Page`, `Graph` | Demonstrates creating an unfilled arc in a PDF using Aspose.Pdf, setting its line width and dash ... |
+| [adjust-ellipse-bounds-in-pdf](./adjust-ellipse-bounds-in-pdf.cs) | Adjust Ellipse Position Within PDF Page Bounds | `Document`, `Page`, `Graph` | Demonstrates loading a PDF, creating an ellipse shape, checking if it fits within the page, and r... |
+| [align-graph-left-margin-pdf](./align-graph-left-margin-pdf.cs) | Align Graph to Left Margin in PDF | `Document`, `Page`, `Graph` | Demonstrates loading a PDF, creating a Graph object, positioning it with a left offset, adding a ... |
+| [apply-clipping-region-to-pdf-graph](./apply-clipping-region-to-pdf-graph.cs) | Apply Clipping Region to PDF Graph | `Document`, `Page`, `MoveTo` | Demonstrates defining a rectangular clipping path on a PDF page and rendering a graph so that onl... |
+| [apply-clipping-region-to-pdf-shapes](./apply-clipping-region-to-pdf-shapes.cs) | Apply Clipping Region to PDF Shapes | `Document`, `Page`, `MoveTo` | Shows how to use the Clip and EOClip operators to restrict drawing of shapes within a defined rec... |
+| [batch-insert-logo-rectangle-into-pdfs](./batch-insert-logo-rectangle-into-pdfs.cs) | Batch Insert Logo Rectangle into PDFs | `Document`, `Page`, `Graph` | Loads each PDF from a source folder, adds a Graph containing a rectangle that represents a compan... |
+| [create-bezier-curve-pdf](./create-bezier-curve-pdf.cs) | Create Bezier Curve in PDF with Aspose.Pdf | `Document`, `Page`, `Graph` | Shows how to draw a cubic Bezier curve using four control points on a PDF page and set its stroke... |
+| [create-custom-star-shape-pdf](./create-custom-star-shape-pdf.cs) | Create Custom Star Shape in PDF | `Document`, `Page`, `Graph` | Shows how to compute star vertices, build a closed Path with Line segments, apply fill and stroke... |
+| ... | | | *and 40 more files* |
 
 ## Category Statistics
-- Total examples: 85
+- Total examples: 70
 
 ## Category-Specific Tips
 
@@ -129,5 +126,5 @@ using (Document doc = new Document("input.pdf"))
 - Review code examples in this folder for working-with-graphs patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-04-10 | Run: `20260410_121416_bd35e2`
+Updated: 2026-05-08 | Run: `20260508_145008_6ada82`
 <!-- AUTOGENERATED:END -->

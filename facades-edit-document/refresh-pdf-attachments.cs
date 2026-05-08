@@ -6,54 +6,47 @@ class Program
 {
     static void Main()
     {
-        // Input PDF that will be edited
         const string inputPdf = "input.pdf";
-        // Output PDF with refreshed attachments
         const string outputPdf = "output.pdf";
 
-        // Files to be attached (ensure they exist on disk)
-        string[] attachmentPaths = { "file1.txt", "image.png", "doc.pdf" };
-        // Corresponding description for each attachment
-        string[] attachmentDescriptions = { "Text file", "Image file", "PDF document" };
-
-        // Validate input PDF
+        // Verify the source PDF exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Validate each attachment file
-        for (int i = 0; i < attachmentPaths.Length; i++)
+        // Use PdfContentEditor (facade) to manipulate attachments
+        using (PdfContentEditor editor = new PdfContentEditor())
         {
-            if (!File.Exists(attachmentPaths[i]))
+            // Load the PDF document
+            editor.BindPdf(inputPdf);
+
+            // Remove all existing attachments
+            editor.DeleteAttachments();
+
+            // Define new files to attach and their descriptions
+            string[] attachmentPaths = { "doc1.txt", "image1.png" };
+            string[] descriptions = { "Sample text document", "Sample image file" };
+
+            // Add each attachment if the file exists
+            for (int i = 0; i < attachmentPaths.Length; i++)
             {
-                Console.Error.WriteLine($"Attachment not found: {attachmentPaths[i]}");
-                return;
+                string path = attachmentPaths[i];
+                if (!File.Exists(path))
+                {
+                    Console.Error.WriteLine($"Attachment not found: {path}");
+                    continue;
+                }
+
+                // Add the attachment without any annotation
+                editor.AddDocumentAttachment(path, descriptions[i]);
             }
+
+            // Save the updated PDF
+            editor.Save(outputPdf);
         }
 
-        // Initialize the PdfContentEditor facade (does NOT implement IDisposable)
-        PdfContentEditor editor = new PdfContentEditor();
-
-        // Bind the source PDF file
-        editor.BindPdf(inputPdf);
-
-        // Remove all existing attachments
-        editor.DeleteAttachments();
-
-        // Add the new set of attachments
-        for (int i = 0; i < attachmentPaths.Length; i++)
-        {
-            editor.AddDocumentAttachment(attachmentPaths[i], attachmentDescriptions[i]);
-        }
-
-        // Save the modified PDF to the output path
-        editor.Save(outputPdf);
-
-        // Close the facade (optional but recommended)
-        editor.Close();
-
-        Console.WriteLine($"All attachments refreshed. Output saved to '{outputPdf}'.");
+        Console.WriteLine($"Attachments refreshed. Output saved to '{outputPdf}'.");
     }
 }

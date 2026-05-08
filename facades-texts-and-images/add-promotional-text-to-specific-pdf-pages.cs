@@ -1,48 +1,59 @@
 using System;
 using System.IO;
+using System.Drawing; // for Color
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text; // for EncodingType
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string promoMessage = "Special Offer: 20% OFF!";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Create the facade for adding text
-        Aspose.Pdf.Facades.PdfFileMend mend = new Aspose.Pdf.Facades.PdfFileMend();
+        // Use PdfFileMend – it provides AddText that accepts an array of page numbers
+        PdfFileMend pdfMend = new PdfFileMend();
+        try
+        {
+            // Bind the source PDF
+            pdfMend.BindPdf(inputPdf);
 
-        // Load the source PDF
-        mend.BindPdf(inputPath);
+            // Prepare the promotional message as FormattedText (all styling via constructor)
+            FormattedText promoText = new FormattedText(
+                "Special Offer! Buy now.",   // text
+                Color.Red,                    // text color (System.Drawing.Color)
+                "Helvetica",                 // font name
+                EncodingType.Winansi,         // encoding
+                false,                        // embed font?
+                24);                          // font size
 
-        // Prepare formatted text (red Helvetica, size 24)
-        Aspose.Pdf.Facades.FormattedText formattedText = new Aspose.Pdf.Facades.FormattedText(
-            promoMessage,
-            System.Drawing.Color.Red,
-            "Helvetica",
-            Aspose.Pdf.Facades.EncodingType.Winansi,
-            false,
-            24);
+            // Pages on which the text will be placed (1‑based indexing)
+            int[] targetPages = new int[] { 3, 5, 7 };
 
-        // Pages on which the text will be placed (3, 5, 7)
-        int[] targetPages = new int[] { 3, 5, 7 };
+            // Define the rectangle where the text will appear (lower‑left and upper‑right coordinates)
+            float lowerLeftX = 100f;
+            float lowerLeftY = 500f;
+            float upperRightX = 300f;
+            float upperRightY = 600f;
 
-        // Add the text to the specified pages within the rectangle (100,500)-(300,550)
-        mend.AddText(formattedText, targetPages, 100f, 500f, 300f, 550f);
+            // Add the same promotional message to the specified pages
+            pdfMend.AddText(promoText, targetPages, lowerLeftX, lowerLeftY, upperRightX, upperRightY);
 
-        // Save the modified PDF
-        mend.Save(outputPath);
+            // Save the result
+            pdfMend.Save(outputPdf);
+        }
+        finally
+        {
+            // Release file handles
+            pdfMend.Close();
+        }
 
-        // Release resources
-        mend.Close();
-
-        Console.WriteLine($"Promotional message added to pages 3, 5, and 7. Saved as '{outputPath}'.");
+        Console.WriteLine($"Promotional message added to pages 3, 5, and 7. Output saved to '{outputPdf}'.");
     }
 }

@@ -1,50 +1,53 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // Core API
+using Aspose.Pdf.Facades;      // For ImageStamp (inherits from Stamp)
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string stampPath  = "stamp.png";
+        const string inputPdf  = "input.pdf";      // source PDF with embedded files
+        const string outputPdf = "output.pdf";     // result PDF
+        const string stampImagePath = "stamp.png"; // image to use as stamp
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
-            return;
-        }
-        if (!File.Exists(stampPath))
-        {
-            Console.Error.WriteLine($"Stamp image not found: {stampPath}");
+            Console.Error.WriteLine($"Source file not found: {inputPdf}");
             return;
         }
 
-        // Load the original PDF (embedded files are part of the document and stay intact)
-        using (Document doc = new Document(inputPath))
+        if (!File.Exists(stampImagePath))
         {
-            // Create an image stamp
-            ImageStamp stamp = new ImageStamp(stampPath)
+            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
+            return;
+        }
+
+        // Load the original PDF (embedded files are kept automatically)
+        using (Document doc = new Document(inputPdf))
+        {
+            // Create an ImageStamp – this stamp can be reused for all pages
+            ImageStamp imgStamp = new ImageStamp(stampImagePath)
             {
-                // Position the stamp in the bottom‑right corner with a small margin
+                // Example positioning – bottom‑right corner with some margin
                 HorizontalAlignment = HorizontalAlignment.Right,
                 VerticalAlignment   = VerticalAlignment.Bottom,
-                XIndent = 10,               // offset from the right edge when Right‑aligned
-                YIndent = 10,               // offset from the bottom edge when Bottom‑aligned
-                Opacity = 0.5f             // semi‑transparent
+                // Optional: set opacity, background flag, etc.
+                Opacity = 0.5f,
+                Background = false
             };
 
-            // Apply the stamp to every page
-            foreach (Page page in doc.Pages)
+            // Apply the stamp to every page (Aspose.Pdf uses 1‑based page indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                page.AddStamp(stamp);
+                Page page = doc.Pages[i];
+                page.AddStamp(imgStamp);   // Page.AddStamp adds the stamp to the page
             }
 
-            // Save the modified PDF; embedded files are preserved automatically
-            doc.Save(outputPath);
+            // Save the modified PDF – embedded files remain intact
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Image stamp added and saved to '{outputPath}'.");
+        Console.WriteLine($"Image stamp added and saved to '{outputPdf}'.");
     }
 }

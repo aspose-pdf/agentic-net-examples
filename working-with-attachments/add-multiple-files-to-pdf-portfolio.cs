@@ -1,44 +1,43 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // Core PDF API
+using Aspose.Pdf.Facades;      // For advanced features if needed (not used here)
 
-class Program
+class PortfolioExample
 {
     static void Main()
     {
-        // List of files of various types to embed in the portfolio
-        string[] filePaths = { "doc1.pdf", "image1.png", "report.docx", "notes.txt" };
-        const string outputPath = "portfolio.pdf";
+        // List of file paths of various types to embed in the PDF portfolio
+        List<string> filesToAdd = new List<string>
+        {
+            "sample.pdf",
+            "image.png",
+            "document.docx",
+            "notes.txt"
+        };
 
         // Create a new PDF document that will act as the portfolio container
-        using (Document portfolio = new Document())
+        using (Document portfolioDoc = new Document())
         {
-            // A portfolio PDF must contain at least one page
-            portfolio.Pages.Add();
-
-            // Iterate over each file and add it to the EmbeddedFiles collection
-            foreach (string path in filePaths)
+            // Ensure the EmbeddedFiles collection exists (it does by default)
+            foreach (string filePath in filesToAdd)
             {
-                if (!File.Exists(path))
-                {
-                    Console.Error.WriteLine($"File not found: {path}");
+                // Skip missing files to avoid runtime errors
+                if (!File.Exists(filePath))
                     continue;
-                }
 
-                // Create a FileSpecification for the current file
-                FileSpecification spec = new FileSpecification(path);
+                // Create a file specification for the current file
+                FileSpecification fileSpec = new FileSpecification(filePath);
 
-                // Optional: provide a description for the embedded file
-                spec.Description = $"Embedded {Path.GetFileName(path)}";
-
-                // Add the specification to the document's embedded file collection
-                portfolio.EmbeddedFiles.Add(spec);
+                // Add the file specification to the document's embedded files collection
+                portfolioDoc.EmbeddedFiles.Add(fileSpec);
             }
 
             // Save the resulting PDF portfolio
-            portfolio.Save(outputPath);
+            portfolioDoc.Save("PortfolioOutput.pdf");
         }
 
-        Console.WriteLine($"Portfolio created: {outputPath}");
+        Console.WriteLine("Portfolio PDF created successfully.");
     }
 }

@@ -1,104 +1,52 @@
 using System;
 using System.IO;
-using System.Text;
-using System.Xml;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
-    // Define the XMP fields that must be present before publishing.
-    private static readonly string[] MandatoryXmpFields = new[]
-    {
-        "dc:title",
-        "dc:creator",
-        "dc:description"
-    };
-
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "published.pdf";
-        const string validationLog = "validation.log";
+        const string inputPath = "input.pdf";
+        const string outputPath = "published.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document.
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Define the mandatory XMP fields that must be present
+        string[] requiredFields = new[]
         {
-            // Bind the PDF to the XMP metadata facade.
-            PdfXmpMetadata xmp = new PdfXmpMetadata();
-            xmp.BindPdf(inputPdfPath);
+            "dc:title",
+            "dc:creator",
+            "dc:description"
+        };
 
-            // Retrieve the XMP metadata as a byte array and convert to string.
-            byte[] rawXmp = xmp.GetXmpMetadata();
-            string xmpXml = Encoding.UTF8.GetString(rawXmp);
+        // Bind the PDF to the XMP metadata facade
+        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
+        {
+            xmp.BindPdf(inputPath);
 
-            // Load the XML for easy querying.
-            XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(xmpXml);
-
-            // Prepare namespace manager (XMP uses various namespaces).
-            XmlNamespaceManager nsMgr = new XmlNamespaceManager(xmlDoc.NameTable);
-            foreach (XmlAttribute attr in xmlDoc.DocumentElement.Attributes)
+            // Check each required field
+            foreach (string key in requiredFields)
             {
-                if (attr.Prefix == "xmlns")
+                if (!xmp.ContainsKey(key))
                 {
-                    nsMgr.AddNamespace(attr.LocalName, attr.Value);
+                    Console.Error.WriteLine($"Missing mandatory XMP field: {key}");
+                    return; // Abort publication
                 }
             }
 
-            // Check each mandatory field.
-            var missingFields = new System.Collections.Generic.List<string>();
-            foreach (string field in MandatoryXmpFields)
+            // All mandatory fields are present – proceed to publish
+            using (Document doc = new Document(inputPath))
             {
-                // Split prefix and local name (e.g., "dc:title").
-                string[] parts = field.Split(':');
-                if (parts.Length != 2)
-                {
-                    missingFields.Add(field);
-                    continue;
-                }
+                // Additional processing can be added here if needed
 
-                string prefix = parts[0];
-                string localName = parts[1];
-                string xpath = $"//{prefix}:{localName}";
-                XmlNode node = xmlDoc.SelectSingleNode(xpath, nsMgr);
-                if (node == null || string.IsNullOrWhiteSpace(node.InnerText))
-                {
-                    missingFields.Add(field);
-                }
+                doc.Save(outputPath);
+                Console.WriteLine($"PDF published successfully to '{outputPath}'.");
             }
-
-            // If any mandatory XMP fields are missing, abort publishing.
-            if (missingFields.Count > 0)
-            {
-                Console.Error.WriteLine("Cannot publish PDF. The following mandatory XMP fields are missing or empty:");
-                foreach (string f in missingFields)
-                {
-                    Console.Error.WriteLine($" - {f}");
-                }
-                // Optionally write a validation log.
-                File.WriteAllText(validationLog, "Missing XMP fields:\n" + string.Join("\n", missingFields));
-                return;
-            }
-
-            // All mandatory XMP fields are present. Optionally run PDF validation.
-            // The Validate method writes a log file and returns true if validation succeeds.
-            bool isValid = pdfDoc.Validate(validationLog, PdfFormat.PDF_A_1B);
-            if (!isValid)
-            {
-                Console.Error.WriteLine("PDF validation failed. See log for details.");
-                return;
-            }
-
-            // Save the validated and approved PDF.
-            pdfDoc.Save(outputPdfPath);
-            Console.WriteLine($"PDF published successfully to '{outputPdfPath}'.");
         }
     }
 }

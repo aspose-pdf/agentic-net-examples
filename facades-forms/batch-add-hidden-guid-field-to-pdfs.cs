@@ -1,63 +1,53 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputFolder  = "InputForms";
-        const string outputFolder = "OutputForms";
+        const string inputFolder = "InputForms";
 
-        // Ensure both input and output directories exist.
-        // If the input folder does not exist we create it and exit – the user can drop PDFs there.
         if (!Directory.Exists(inputFolder))
         {
-            Directory.CreateDirectory(inputFolder);
-            Console.WriteLine($"Input folder '{inputFolder}' was not found and has been created. Place PDF files there and re‑run the program.");
+            Console.Error.WriteLine($"Folder not found: {inputFolder}");
             return;
         }
-        Directory.CreateDirectory(outputFolder);
 
-        // Process each PDF file in the input folder
-        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Process each PDF file in the folder
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            string fileName   = Path.GetFileName(inputPath);
-            string outputPath = Path.Combine(outputFolder, fileName);
-
             try
             {
-                // ---------- Add hidden field ----------
-                using (FormEditor editor = new FormEditor())
+                // Load the PDF document
+                using (Document doc = new Document(pdfPath))
                 {
-                    // Bind the source PDF
-                    editor.BindPdf(inputPath);
+                    // Create a FormEditor bound to the loaded document
+                    using (FormEditor editor = new FormEditor(doc))
+                    {
+                        // Generate a new GUID for this document
+                        string guidValue = Guid.NewGuid().ToString();
 
-                    // Add a tiny text field on page 1 (coordinates are near‑zero so the field is invisible)
-                    editor.AddField(FieldType.Text, "ProcessedDate", 1, 0f, 0f, 1f, 1f);
+                        // Add a hidden text field named "ProcessedDate"
+                        // Coordinates are set to a zero‑size rectangle (invisible)
+                        // Page number is 1 (Aspose.Pdf uses 1‑based indexing)
+                        editor.AddField(FieldType.Text, "ProcessedDate", guidValue, 1, 0, 0, 0, 0);
 
-                    // Mark the field as read‑only – a read‑only field that is virtually zero‑size is hidden from the UI.
-                    editor.SetFieldAttribute("ProcessedDate", PropertyFlag.ReadOnly);
+                        // Mark the field as hidden so it does not appear in the UI
+                        editor.SetFieldAppearance("ProcessedDate", AnnotationFlags.Hidden);
 
-                    // Save the intermediate PDF (with the new field) to the output location
-                    editor.Save(outputPath);
+                        // Save changes back to the original file
+                        editor.Save(pdfPath);
+                    }
                 }
 
-                // ---------- Fill the hidden field with a GUID ----------
-                using (Form form = new Form(outputPath))
-                {
-                    string guidValue = Guid.NewGuid().ToString();
-                    form.FillField("ProcessedDate", guidValue);
-                    // Persist the change back to the same file
-                    form.Save(outputPath);
-                }
-
-                Console.WriteLine($"Processed '{fileName}' -> '{outputPath}'");
+                Console.WriteLine($"Processed: {Path.GetFileName(pdfPath)}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error processing '{fileName}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         }
     }

@@ -21,25 +21,26 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf;` (163/163 files) ← category-specific
-- `using Aspose.Pdf.Annotations;` (136/163 files) ← category-specific
-- `using Aspose.Pdf.Text;` (17/163 files)
-- `using Aspose.Pdf.Forms;` (11/163 files)
-- `using Aspose.Pdf.Drawing;` (8/163 files)
-- `using Aspose.Pdf.Devices;` (1/163 files)
-- `using Aspose.Pdf.LogicalStructure;` (1/163 files)
-- `using System;` (163/163 files)
-- `using System.IO;` (158/163 files)
-- `using System.Collections.Generic;` (14/163 files)
-- `using System.Drawing;` (5/163 files)
-- `using System.Text;` (3/163 files)
-- `using System.Net.Http;` (2/163 files)
-- `using Azure.Storage.Blobs;` (1/163 files)
-- `using System.Linq;` (1/163 files)
-- `using System.Net.Http.Headers;` (1/163 files)
-- `using System.Text.Json;` (1/163 files)
-- `using System.Threading.Tasks;` (1/163 files)
-- `using System.Xml.Linq;` (1/163 files)
+- `using Aspose.Pdf;` (160/160 files) ← category-specific
+- `using Aspose.Pdf.Annotations;` (131/160 files) ← category-specific
+- `using Aspose.Pdf.Text;` (14/160 files)
+- `using Aspose.Pdf.Forms;` (11/160 files)
+- `using Aspose.Pdf.Drawing;` (3/160 files)
+- `using Aspose.Pdf.Facades;` (2/160 files)
+- `using System;` (160/160 files)
+- `using System.IO;` (159/160 files)
+- `using System.Collections.Generic;` (16/160 files)
+- `using System.Text;` (3/160 files)
+- `using System.Threading.Tasks;` (3/160 files)
+- `using System.Drawing;` (2/160 files)
+- `using System.Linq;` (2/160 files)
+- `using System.Runtime.InteropServices;` (2/160 files)
+- `using System.Xml.Linq;` (2/160 files)
+- `using Azure.Storage.Blobs;` (1/160 files)
+- `using System.Net.Http;` (1/160 files)
+- `using System.Net.Http.Headers;` (1/160 files)
+- `using System.Reflection;` (1/160 files)
+- `using System.Text.Json;` (1/160 files)
 
 ## Common Code Pattern
 
@@ -57,40 +58,40 @@ using (Document doc = new Document("input.pdf"))
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [add-3d-annotation-custom-camera](./add-3d-annotation-custom-camera.cs) | Add 3D Annotation with Custom Camera to PDF | `Document`, `PDF3DContent`, `PDF3DArtwork` | Shows how to embed a 3D model into a PDF as a 3D annotation and configure a custom camera view us... |
-| [add-3d-annotation-front-view](./add-3d-annotation-front-view.cs) | Add 3D Annotation with Front View Rotation to PDF | `Document`, `PDF3DContent`, `PDF3DArtwork` | Demonstrates embedding a 3‑D model (U3D/PRC) into a PDF, creating a front‑view rotation, and addi... |
-| [add-3d-annotation-u3d-page-two](./add-3d-annotation-u3d-page-two.cs) | Add 3D Annotation with U3D Model and Set Initial View on Pag... | `Document`, `PDF3DContent`, `PDF3DArtwork` | Demonstrates how to embed a U3D 3‑D model as a PDF3DAnnotation on the second page of a PDF and se... |
-| [add-animated-gif-screen-annotation](./add-animated-gif-screen-annotation.cs) | Add Animated GIF Screen Annotation to PDF Page | `Document`, `Rectangle`, `ScreenAnnotation` | Shows how to embed an animated GIF as a ScreenAnnotation on the third page of a PDF, making the a... |
-| [add-arrow-line-annotation-to-pdf](./add-arrow-line-annotation-to-pdf.cs) | Add Arrow Line Annotation to PDF | `Document`, `Page`, `Rectangle` | Demonstrates how to create a line annotation with an arrow ending on a PDF page using Aspose.Pdf. |
-| [add-auto-play-background-audio](./add-auto-play-background-audio.cs) | Add Auto‑Play Background Audio with RichMediaAnnotation | `Document`, `Page`, `Rectangle` | Demonstrates how to embed an audio file in a PDF and configure a RichMediaAnnotation to play auto... |
-| [add-auto-play-rich-media-annotation](./add-auto-play-rich-media-annotation.cs) | Add Auto‑Play Rich Media Annotation to PDF | `Document`, `Page`, `Rectangle` | Demonstrates embedding a video as a RichMediaAnnotation in a PDF and configuring it to play autom... |
-| [add-background-image-artifact-to-pdf-page](./add-background-image-artifact-to-pdf-page.cs) | Add Background Image Artifact to PDF Page | `Document`, `Page`, `BackgroundArtifact` | Demonstrates how to create a BackgroundArtifact from an image file and attach it to a specific PD... |
-| [add-bates-numbering-with-prefix-six-digit](./add-bates-numbering-with-prefix-six-digit.cs) | Add Bates Numbering with Prefix and Six-Digit Format to PDF | `Document`, `AddBatesNumbering`, `BatesNumberingArtifact` | Demonstrates how to add Bates numbering to each page of a PDF using Aspose.Pdf, setting a custom ... |
-| [add-callout-to-freetext-annotation](./add-callout-to-freetext-annotation.cs) | Add Callout Leader Line to Free Text Annotation | `Document`, `Rectangle`, `DefaultAppearance` | Demonstrates how to create a free‑text annotation with a callout (leader line) on a PDF page usin... |
-| [add-diagonal-watermark-annotation](./add-diagonal-watermark-annotation.cs) | Add Diagonal Watermark Annotation to PDF | `Document`, `Page`, `Rectangle` | Loads a PDF, creates a full‑page WatermarkAnnotation with semi‑transparent color, adds it to the ... |
-| [add-dynamic-date-watermark-annotation](./add-dynamic-date-watermark-annotation.cs) | Add Dynamic Date Watermark Annotation to PDF Pages | `Document`, `Page`, `Rectangle` | Demonstrates how to add a WatermarkAnnotation containing a runtime‑generated date string (and pag... |
-| [add-dynamic-page-number-watermark](./add-dynamic-page-number-watermark.cs) | Add Dynamic Page Number Watermark to PDF | `Document`, `Page`, `Rectangle` | Shows how to create a WatermarkAnnotation that displays a page‑specific number on each page of a ... |
-| [add-figure-annotation-external-image](./add-figure-annotation-external-image.cs) | Add Figure Annotation with External Image | `Document`, `Page`, `Rectangle` | Demonstrates how to create a figure (file attachment) annotation in a PDF that references an exte... |
-| [add-figure-annotations-custom-line-width-color](./add-figure-annotations-custom-line-width-color.cs) | Add Figure Annotations with Custom Line Width and Color | `Document`, `Page`, `Rectangle` | Demonstrates how to programmatically add square figure annotations with a specified border color ... |
-| [add-footer-watermark-annotations-to-pdf-pages](./add-footer-watermark-annotations-to-pdf-pages.cs) | Add Footer Watermark Annotations to PDF Pages | `Document`, `Save`, `Page` | Loads a PDF, iterates through each page, and adds a unique WatermarkAnnotation in the footer area... |
-| [add-free-text-annotation-arial](./add-free-text-annotation-arial.cs) | Add Free‑Text Annotation with Arial Font to PDF | `Document`, `Page`, `Rectangle` | Demonstrates how to add a free‑text annotation with Arial, 12‑point font to a PDF page using Aspo... |
-| [add-free-text-annotation-with-background](./add-free-text-annotation-with-background.cs) | Add Free Text Annotation with Light Gray Background | `Document`, `Page`, `Rectangle` | Loads a PDF document, creates a free‑text annotation with a light gray background and border, add... |
-| [add-free-text-annotation-with-callout](./add-free-text-annotation-with-callout.cs) | Add Free‑Text Annotation with Callout to PDF | `Document`, `Page`, `Rectangle` | Demonstrates how to create a free‑text annotation with a callout line, customize its appearance, ... |
-| [add-highlight-annotation-70-opacity](./add-highlight-annotation-70-opacity.cs) | Add Highlight Annotation with 70% Opacity | `Document`, `Rectangle`, `HighlightAnnotation` | Demonstrates how to add a highlight annotation to a PDF page and set its opacity to 70% for subtl... |
-| [add-highlight-annotation-with-custom-opacity](./add-highlight-annotation-with-custom-opacity.cs) | Add Highlight Annotation with Custom Opacity to PDF | `Document`, `Page`, `Rectangle` | Demonstrates loading a PDF, creating a highlight annotation with a defined rectangle and 50% opac... |
-| [add-internal-link-annotation](./add-internal-link-annotation.cs) | Add Internal Link Annotation to PDF | `Document`, `Page`, `Rectangle` | Shows how to create a link annotation that jumps to a specific page within the same PDF document ... |
-| [add-javascript-button-annotation-to-pdf-page](./add-javascript-button-annotation-to-pdf-page.cs) | Add JavaScript Button Annotation to PDF Page | `Document`, `Page`, `Rectangle` | Demonstrates how to create a push button on page four of a PDF and attach a JavaScript action tha... |
+| [add-3d-annotation-custom-camera](./add-3d-annotation-custom-camera.cs) | Add 3D Annotation with Custom Camera to PDF | `Document`, `Page`, `PDF3DContent` | Shows how to embed a U3D/PRC model in a PDF, define a custom camera matrix, create a 3D view, and... |
+| [add-3d-annotation-front-view](./add-3d-annotation-front-view.cs) | Add 3D Annotation with Front View to PDF | `Document`, `Page`, `PDF3DContent` | Shows how to embed a 3‑D model (including its textures) into a PDF as a 3‑D annotation and set a ... |
+| [add-3d-annotation-u3d-to-pdf-page](./add-3d-annotation-u3d-to-pdf-page.cs) | Add 3D Annotation with U3D Model to PDF Page | `Document`, `Page`, `PDF3DContent` | Shows how to embed a U3D model as a 3D annotation on the second page of a PDF and set a default 3... |
+| [add-animated-gif-screen-annotation-page-3](./add-animated-gif-screen-annotation-page-3.cs) | Add Animated GIF Screen Annotation on Page 3 | `Document`, `Page`, `Rectangle` | Demonstrates how to place a ScreenAnnotation that shows an animated GIF, looping continuously, on... |
+| [add-arrow-line-annotation-to-pdf](./add-arrow-line-annotation-to-pdf.cs) | Add Arrow Line Annotation to PDF | `Document`, `Page`, `Rectangle` | Shows how to create a line annotation with an arrow ending on a PDF page using Aspose.Pdf. |
+| [add-auto-play-background-music-to-pdf](./add-auto-play-background-music-to-pdf.cs) | Add Auto-Play Background Music to PDF | `Document`, `Page`, `Rectangle` | Demonstrates how to embed an MP3 file as a RichMediaAnnotation and configure it to play automatic... |
+| [add-auto-play-rich-media-annotation](./add-auto-play-rich-media-annotation.cs) | Add Auto-Play Rich Media Annotation to PDF | `Document`, `Page`, `RichMediaAnnotation` | Shows how to embed a video or audio file in a PDF using a RichMediaAnnotation and configure it to... |
+| [add-background-artifact-to-pdf-page](./add-background-artifact-to-pdf-page.cs) | Add Background Artifact to PDF Page | `Document`, `Page`, `BackgroundArtifact` | Demonstrates creating a PDF, adding a BackgroundArtifact behind the page contents, setting a soli... |
+| [add-background-image-artifact-to-pdf-page](./add-background-image-artifact-to-pdf-page.cs) | Add Background Image Artifact to PDF Page | `Document`, `Page`, `BackgroundArtifact` | Shows how to create a BackgroundArtifact from an image file, configure its properties, and add it... |
+| [add-bates-numbering-to-pdf](./add-bates-numbering-to-pdf.cs) | Add Bates Numbering to PDF with Prefix and Fixed Digits | `Document`, `Page`, `TextFragment` | Demonstrates how to add Bates numbers with a custom prefix and six‑digit format to each page of a... |
+| [add-button-annotation-highlight-text-fields](./add-button-annotation-highlight-text-fields.cs) | Add Button Annotation with JavaScript to Highlight Text Fiel... | `Document`, `Page`, `Rectangle` | Demonstrates how to create a button annotation in a PDF using Aspose.Pdf, assign a JavaScript act... |
+| [add-button-export-annotations-json](./add-button-export-annotations-json.cs) | Add Button to Export Annotations as JSON | `Document`, `Rectangle`, `ButtonField` | Shows how to insert a push‑button field into a PDF that runs JavaScript to retrieve all annotatio... |
+| [add-callout-leader-line-to-freetext-annotation](./add-callout-leader-line-to-freetext-annotation.cs) | Add Callout Leader Line to Free‑Text Annotation | `Document`, `Page`, `FreeTextAnnotation` | Demonstrates how to create a FreeTextAnnotation, set its Callout property with three points to dr... |
+| [add-centered-watermark-annotation-page-6](./add-centered-watermark-annotation-page-6.cs) | Insert Centered Watermark Annotation on Page 6 | `Document`, `Page`, `WatermarkAnnotation` | The example loads a PDF, creates a WatermarkAnnotation with 30 % opacity, positions it at the cen... |
+| [add-diagonal-watermark-annotation](./add-diagonal-watermark-annotation.cs) | Add Diagonal Watermark Annotation to PDF | `Document`, `Page`, `Rectangle` | Demonstrates how to create a WatermarkAnnotation that covers an entire page, set its opacity and ... |
+| [add-dynamic-date-watermark-annotation](./add-dynamic-date-watermark-annotation.cs) | Add Dynamic Date Watermark Annotation to PDF Pages | `Document`, `Page`, `WatermarkAnnotation` | Loads a PDF, iterates through each page, and adds a WatermarkAnnotation that displays the current... |
+| [add-dynamic-page-number-watermark](./add-dynamic-page-number-watermark.cs) | Add Dynamic Page Number Watermark to PDF | `Document`, `Page`, `WatermarkAnnotation` | Shows how to create a WatermarkAnnotation on each PDF page that displays the current page number,... |
+| [add-figure-annotations-custom-line-width-color](./add-figure-annotations-custom-line-width-color.cs) | Add Figure Annotations with Custom Line Width and Color | `Document`, `Page`, `SquareAnnotation` | Demonstrates how to programmatically add square and circle annotations with specific line width a... |
+| [add-file-attachment-annotation](./add-file-attachment-annotation.cs) | Add File Attachment Annotation with External Image | `Document`, `Page`, `Rectangle` | Shows how to create a file attachment (figure) annotation in a PDF and use an external image file... |
+| [add-flash-rich-media-annotation](./add-flash-rich-media-annotation.cs) | Add Flash Rich Media Annotation to PDF | `Document`, `Page`, `RichMediaAnnotation` | Demonstrates how to embed a Flash video with a custom SWF player into a PDF using a RichMediaAnno... |
+| [add-footer-watermark-to-pdf-pages](./add-footer-watermark-to-pdf-pages.cs) | Add Footer Watermark to PDF Pages | `Document`, `Page`, `Rectangle` | Demonstrates loading a PDF, iterating through each page, and adding a WatermarkAnnotation as a fo... |
+| [add-free-text-annotation-arial](./add-free-text-annotation-arial.cs) | Add Free‑Text Annotation with Arial Font to PDF | `Document`, `Page`, `Rectangle` | Demonstrates how to add a free‑text annotation to a PDF page using Arial 12‑point font and save t... |
+| [add-free-text-annotation-light-gray](./add-free-text-annotation-light-gray.cs) | Add Free‑Text Annotation with Light Gray Background | `Document`, `Page`, `Rectangle` | Demonstrates how to add a free‑text annotation to a PDF page, set its appearance, background colo... |
+| [add-freetext-annotation-with-callout](./add-freetext-annotation-with-callout.cs) | Add Free‑Text Annotation with Callout to PDF | `Document`, `Page`, `Rectangle` | Demonstrates how to load a PDF, create a free‑text annotation with a callout line, set its appear... |
+| [add-goto-page-button-annotation](./add-goto-page-button-annotation.cs) | Add Go-To-Page Button Annotation | `Document`, `Page`, `ButtonField` | Demonstrates how to create a button annotation in a PDF that, when clicked, navigates to page 10 ... |
+| [add-highlight-annotation-70-opacity](./add-highlight-annotation-70-opacity.cs) | Add Highlight Annotation with 70% Opacity to PDF | `Document`, `Page`, `HighlightAnnotation` | Shows how to create a yellow highlight annotation with 70% opacity on the first page of a PDF and... |
+| [add-highlight-annotation-with-opacity](./add-highlight-annotation-with-opacity.cs) | Add Highlight Annotation with Custom Opacity to PDF | `Document`, `Page`, `Rectangle` | Demonstrates loading a PDF, creating a HighlightAnnotation with a specific color and opacity, add... |
+| [add-internal-link-annotation-to-pdf](./add-internal-link-annotation-to-pdf.cs) | Add Internal Link Annotation to PDF | `Document`, `Page`, `Rectangle` | Shows how to create a link annotation that navigates to a specific page within the same PDF docum... |
+| [add-javascript-button-annotation](./add-javascript-button-annotation.cs) | Add JavaScript Button Annotation to PDF Page | `Document`, `ButtonField`, `JavascriptAction` | Demonstrates how to place a button on the fourth page of a PDF and attach a JavaScript action tha... |
 | [add-javascript-link-annotation-modal-dialog](./add-javascript-link-annotation-modal-dialog.cs) | Add JavaScript Link Annotation to Show Modal Dialog | `Document`, `Page`, `Rectangle` | Demonstrates how to add a link annotation with a JavaScript action that displays a custom modal d... |
-| [add-javascript-link-annotation-open-url](./add-javascript-link-annotation-open-url.cs) | Add JavaScript Link Annotation to Open URL in New Window | `Document`, `Save`, `Page` | Demonstrates how to add a link annotation with a JavaScript action that opens a specified URL in ... |
-| [add-javascript-link-word-count](./add-javascript-link-word-count.cs) | Add JavaScript Link Annotation for Word Count | `Document`, `Page`, `Rectangle` | Demonstrates how to add a link annotation that runs JavaScript to calculate and display the PDF's... |
-| [add-js-button-export-annotations-json](./add-js-button-export-annotations-json.cs) | Add JavaScript Button to Export Annotations as JSON | `Document`, `Save`, `Rectangle` | Demonstrates how to add a push‑button form field to a PDF and attach JavaScript that gathers all ... |
-| [add-link-annotation-external-url](./add-link-annotation-external-url.cs) | Add Link Annotation with External URL to PDF | `Document`, `Page`, `Rectangle` | Demonstrates how to create a link annotation on a PDF page that opens an external web URL when cl... |
-| [add-looping-video-screen-annotation](./add-looping-video-screen-annotation.cs) | Add Looping Video Screen Annotation to PDF | `Document`, `Page`, `Rectangle` | Shows how to embed a video file in a PDF using Aspose.Pdf's ScreenAnnotation, set a title and con... |
-| [add-magenta-underline-annotation](./add-magenta-underline-annotation.cs) | Add Magenta Underline Annotation with Custom Thickness | `Document`, `Save`, `Rectangle` | Shows how to insert an underline annotation on a PDF page, set its color to magenta, and define a... |
-| ... | | | *and 133 more files* |
+| ... | | | *and 130 more files* |
 
 ## Category Statistics
-- Total examples: 163
+- Total examples: 160
 
 ## Category-Specific Tips
 
@@ -134,5 +135,5 @@ using (Document doc = new Document("input.pdf"))
 - Review code examples in this folder for working-with-annotations patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-04-10 | Run: `20260410_121416_bd35e2`
+Updated: 2026-05-08 | Run: `20260508_145008_6ada82`
 <!-- AUTOGENERATED:END -->

@@ -6,12 +6,11 @@ class Program
 {
     static void Main()
     {
-        const string sourcePdfPath = "source.pdf";   // PDF containing the page to append
         const string targetPdfPath = "target.pdf";   // PDF to which the page will be appended
-        const string outputPdfPath = "merged.pdf";   // Resulting PDF
+        const string sourcePdfPath = "source.pdf";   // PDF containing the page to copy
+        const string outputPdfPath = "output.pdf";   // Resulting PDF
 
-        // Verify that both input files exist
-        if (!File.Exists(sourcePdfPath) || !File.Exists(targetPdfPath))
+        if (!File.Exists(targetPdfPath) || !File.Exists(sourcePdfPath))
         {
             Console.Error.WriteLine("One or both input PDF files were not found.");
             return;
@@ -21,15 +20,13 @@ class Program
         using (Document targetDoc = new Document(targetPdfPath))
         using (Document sourceDoc = new Document(sourcePdfPath))
         {
-            // Aspose.Pdf uses 1‑based page indexing.
-            // Retrieve the page to be appended from the source document.
+            // Aspose.Pdf uses 1‑based page indexing
             Page pageToAppend = sourceDoc.Pages[1];
 
-            // Append the page to the end of the target document.
-            // This adds the page without altering its original content.
+            // Append the page to the end of the target document
             targetDoc.Pages.Add(pageToAppend);
 
-            // Save the combined document as PDF.
+            // Save the combined document
             targetDoc.Save(outputPdfPath);
         }
 

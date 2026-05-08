@@ -16,43 +16,36 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document
+        Document doc = new Document(inputPath);
+        // Target the first page (1‑based indexing)
+        Page page = doc.Pages[1];
+
+        // Create a Graph that spans the whole page (Graph constructor expects double values)
+        Graph graph = new Graph(page.MediaBox.Width, page.MediaBox.Height);
+
+        // Define a rectangle covering the page area – use fully‑qualified type to avoid ambiguity
+        Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(
+            0f,
+            0f,
+            (float)page.MediaBox.Width,
+            (float)page.MediaBox.Height);
+
+        // Set a semi‑transparent fill color (alpha 128 ≈ 0.5 opacity)
+        rect.GraphInfo = new GraphInfo
         {
-            // Get the first page (pages are 1‑based)
-            Page page = doc.Pages[1];
+            FillColor = Color.FromArgb(128, 255, 255, 0) // semi‑transparent yellow
+            // Stroke (border) is omitted; defaults to no outline
+        };
 
-            // Determine page size
-            double pageWidth = page.Rect.Width;
-            double pageHeight = page.Rect.Height;
+        // Add the rectangle to the graph
+        graph.Shapes.Add(rect);
 
-            // Create a Graph container that matches the page size
-            Graph graph = new Graph(pageWidth, pageHeight);
+        // Add the graph to the page's content
+        page.Paragraphs.Add(graph);
 
-            // Create a rectangle that covers the whole page (use Drawing.Rectangle, not Pdf.Rectangle)
-            var rect = new Aspose.Pdf.Drawing.Rectangle(
-                0f,
-                0f,
-                (float)pageWidth,
-                (float)pageHeight);
-
-            // Set fill color with alpha (opacity). 128 = 50% transparent.
-            rect.GraphInfo = new GraphInfo
-            {
-                FillColor = Aspose.Pdf.Color.FromArgb(128, 0, 0, 255), // semi‑transparent blue
-                Color = Aspose.Pdf.Color.Transparent, // no border
-                LineWidth = 0f
-            };
-
-            // Add the rectangle to the graph
-            graph.Shapes.Add(rect);
-
-            // Insert the graph as the first paragraph so it appears behind existing content
-            page.Paragraphs.Insert(0, graph);
-
-            // Save the modified PDF
-            doc.Save(outputPath);
-        }
+        // Save the modified PDF
+        doc.Save(outputPath);
 
         Console.WriteLine($"PDF saved with background color to '{outputPath}'.");
     }

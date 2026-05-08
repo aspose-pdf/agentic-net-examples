@@ -5,17 +5,18 @@ class Program
 {
     static void Main()
     {
+        // Input and output PDF file paths
         const string inputPath  = "input.pdf";
-        const string outputPath = "zoomed_output.pdf";
+        const string outputPath = "output_zoomed.pdf";
 
-        // Ensure the source file exists
+        // Ensure the input file exists
         if (!System.IO.File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Use PdfPageEditor facade to modify page zoom
+        // Use PdfPageEditor to modify page zoom for the whole document
         using (PdfPageEditor editor = new PdfPageEditor())
         {
             // Load the PDF document
@@ -24,7 +25,7 @@ class Program
             // Set zoom coefficient to 1.0 (100%)
             editor.Zoom = 1.0f;
 
-            // Apply the changes to the document pages
+            // Apply the changes to the document
             editor.ApplyChanges();
 
             // Save the modified PDF

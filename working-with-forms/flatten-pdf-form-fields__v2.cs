@@ -17,13 +17,13 @@ class Program
 
         try
         {
-            // Load the PDF document inside a using block for deterministic disposal.
+            // Load the PDF document inside a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
-                // Remove all interactive form fields and place their current values directly on the page.
+                // Flatten all form fields – their values become static page content
                 doc.Flatten();
 
-                // Save the modified document.
+                // Save the flattened PDF
                 doc.Save(outputPath);
             }
 

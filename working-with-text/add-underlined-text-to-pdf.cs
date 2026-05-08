@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -6,31 +7,40 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "underlined_text.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Create a new PDF document (wrapped in using for proper disposal)
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // A freshly created Document has no pages; add one first.
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
+        // Load the PDF document (lifecycle rule: use using for disposal)
+        using (Document doc = new Document(inputPath))
+        {
             // Create a text fragment with the desired content
-            TextFragment fragment = new TextFragment("This text is underlined");
+            TextFragment fragment = new TextFragment("Underlined text example");
 
-            // Set the underline property on the fragment's TextState before adding it to the page
+            // Set the position where the text will appear on the first page
+            fragment.Position = new Position(100, 700); // X=100, Y=700
+
+            // Enable underlining via the TextState property
             fragment.TextState.Underline = true;
 
-            // Optionally set the position where the text will appear
-            fragment.Position = new Position(100, 700); // X = 100, Y = 700
+            // Optionally set other visual properties (font, size, color)
+            fragment.TextState.Font = FontRepository.FindFont("Helvetica");
+            fragment.TextState.FontSize = 12;
+            fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
 
-            // Use TextBuilder to append the fragment to the page
-            TextBuilder builder = new TextBuilder(page);
-            builder.AppendText(fragment);
+            // Add the fragment to the first page
+            Page page = doc.Pages[1];
+            page.Paragraphs.Add(fragment);
 
-            // Save the document (Document.Save without SaveOptions writes PDF)
+            // Save the modified document (lifecycle rule: use Save inside using)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Underlined text added and saved to '{outputPath}'.");
     }
 }

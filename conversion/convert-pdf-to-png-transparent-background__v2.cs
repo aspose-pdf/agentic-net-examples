@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPdf = "input.pdf";
-        const string outputDir = "PngOutput";
+        const string outputDir = "output_images";
 
         if (!File.Exists(inputPdf))
         {
@@ -19,7 +19,7 @@ class Program
         // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        // Load the PDF document – wrapped in a using block for deterministic disposal
         using (Document pdfDoc = new Document(inputPdf))
         {
             // Create a PNG device with a desired resolution (e.g., 300 DPI)
@@ -30,7 +30,7 @@ class Program
                 TransparentBackground = true
             };
 
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+            // Pages are 1‑based indexed in Aspose.Pdf
             for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
             {
                 string outPath = Path.Combine(outputDir, $"page_{pageNum}.png");

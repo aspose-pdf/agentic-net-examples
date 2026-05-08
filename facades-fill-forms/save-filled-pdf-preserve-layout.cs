@@ -1,33 +1,37 @@
 using System;
+using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Paths for the source PDF (already filled) and the destination PDF
-        const string inputPdfPath  = "filled_input.pdf";
-        const string outputPdfPath = "preserved_output.pdf";
+        // Paths for the source (filled) PDF and the destination file
+        const string inputPath  = "filled_input.pdf";
+        const string outputPath = "preserved_output.pdf";
 
-        // Ensure the source file exists
-        if (!System.IO.File.Exists(inputPdfPath))
+        // Verify that the source PDF exists
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Source file not found: {inputPath}");
             return;
         }
 
-        // Use the Form facade to load the PDF and save it.
-        // The Form facade preserves the original layout when saving.
-        using (Form pdfForm = new Form(inputPdfPath))
-        {
-            // If additional field modifications are needed, they can be done here.
-            // Example (optional):
-            // pdfForm.FillField("CustomerName", "Acme Corp");
+        // Use the Form facade (inherits SaveableFacade) to bind the PDF.
+        // This facade works directly with the PDF document and preserves its layout.
+        Form formFacade = new Form();
+        formFacade.BindPdf(inputPath);
 
-            // Save the PDF to the specified output path.
-            pdfForm.Save(outputPdfPath);
-        }
+        // OPTIONAL: fill form fields if needed.
+        // formFacade.FillField("Form1.TextBox1", "Example value");
 
-        Console.WriteLine($"PDF saved successfully to '{outputPdfPath}'.");
+        // Save the PDF to the specified output path, keeping the original layout intact.
+        formFacade.Save(outputPath);
+
+        // Release any resources held by the facade.
+        formFacade.Close();
+
+        Console.WriteLine($"PDF successfully saved to '{outputPath}'.");
     }
 }

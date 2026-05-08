@@ -1,59 +1,57 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                     // Core API (Document, Page, ImageStamp, etc.)
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // source PDF
-        const string outputPdf = "output.pdf";         // result PDF
-        const string stampImagePath = "logo.png";      // image to stamp
-        const string altText = "Company logo for branding";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string stampImagePath = "stamp.png";
+        const string altText = "Company logo";
 
-        // Ensure input files exist
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
+
         if (!File.Exists(stampImagePath))
         {
             Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
             return;
         }
 
-        // Load the PDF (lifecycle: create -> load -> save)
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
             // Verify that the document has at least three pages
             if (doc.Pages.Count < 3)
             {
-                Console.Error.WriteLine("The document has fewer than 3 pages.");
+                Console.Error.WriteLine("Document does not contain a third page.");
                 return;
             }
 
             // Create an ImageStamp from the image file
             ImageStamp imgStamp = new ImageStamp(stampImagePath);
-
             // Set alternative text for accessibility
             imgStamp.AlternativeText = altText;
-
-            // Optional: position the stamp (example: top‑right corner)
+            // Position the stamp (optional)
             imgStamp.HorizontalAlignment = HorizontalAlignment.Right;
-            imgStamp.VerticalAlignment   = VerticalAlignment.Top;
+            imgStamp.VerticalAlignment = VerticalAlignment.Top;
             // Use XIndent/YIndent instead of the non‑existent Margin property
-            imgStamp.XIndent = 10f; // offset from the left edge (used together with alignment)
-            imgStamp.YIndent = 10f; // offset from the bottom edge (used together with alignment)
+            imgStamp.XIndent = 10f; // left offset in points
+            imgStamp.YIndent = 10f; // top offset in points
 
-            // Add the stamp to page 3 (pages are 1‑based)
+            // Add the stamp to page three
             Page pageThree = doc.Pages[3];
             pageThree.AddStamp(imgStamp);
 
             // Save the modified PDF
-            doc.Save(outputPdf);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Image stamp with alt text added to page 3 and saved as '{outputPdf}'.");
+        Console.WriteLine($"Image stamp added to page 3 and saved as '{outputPath}'.");
     }
 }

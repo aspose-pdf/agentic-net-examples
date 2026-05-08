@@ -4,24 +4,25 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
-public static class PdfFieldFiller
+public static class PdfFormFiller
 {
     /// <summary>
-    /// Loads a PDF from a byte array, fills the specified form fields, and returns the updated PDF as a byte array.
+    /// Loads a PDF from a byte array, fills its form fields with the supplied values,
+    /// and returns the resulting PDF as a byte array.
     /// </summary>
-    /// <param name="pdfBytes">The original PDF content.</param>
+    /// <param name="pdfBytes">The source PDF data.</param>
     /// <param name="fieldValues">Dictionary of field names and the values to set.</param>
-    /// <returns>Byte array containing the PDF with filled fields.</returns>
+    /// <returns>Byte array containing the filled PDF.</returns>
     public static byte[] FillFields(byte[] pdfBytes, Dictionary<string, string> fieldValues)
     {
         // Load the PDF from the input memory stream.
         using (MemoryStream inputStream = new MemoryStream(pdfBytes))
         using (Document doc = new Document(inputStream))
         {
-            // Iterate over the provided field values and assign them to the form fields.
+            // Iterate over the supplied field values and assign them to the form.
             foreach (KeyValuePair<string, string> kvp in fieldValues)
             {
-                // Retrieve the field as a generic Field object (not WidgetAnnotation).
+                // The Form indexer returns a generic Field object. Cast it to Field to access the Value property.
                 Field field = doc.Form[kvp.Key] as Field;
                 if (field != null)
                 {
@@ -39,10 +40,10 @@ public static class PdfFieldFiller
         }
     }
 
-    // Dummy entry point to satisfy the compiler when the project expects a Main method.
-    // In a library scenario this method will never be called.
+    // Dummy entry point to satisfy the compiler when the project is built as an executable.
+    // In a library project this method can be removed.
     public static void Main(string[] args)
     {
-        // No operation – placeholder only.
+        // No operation – the class is intended to be used programmatically.
     }
 }

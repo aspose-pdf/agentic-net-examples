@@ -7,41 +7,40 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output_with_js.pdf";
         const string resetButtonName = "ResetForm";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        using (Document doc = new Document(inputPdf))
+        // Initialize the FormEditor facade on the loaded document
+        using (FormEditor formEditor = new FormEditor(doc))
         {
-            // Initialize the FormEditor facade and bind the document
-            using (FormEditor formEditor = new FormEditor())
-            {
-                formEditor.BindPdf(doc);
+            // JavaScript that clears hidden fields and then resets the form
+            string js = @"
+                var fieldNames = this.getFieldNames();
+                for (var i = 0; i < fieldNames.length; i++) {
+                    var f = this.getField(fieldNames[i]);
+                    if (f.display == display.hidden) {
+                        f.value = '';
+                    }
+                }
+                this.resetForm();
+            ";
 
-                // JavaScript that resets the form and clears hidden fields
-                string js = @"
-resetForm();
-var hidden1 = this.getField('HiddenField1');
-if (hidden1 != null) hidden1.value = '';
-var hidden2 = this.getField('HiddenField2');
-if (hidden2 != null) hidden2.value = '';
-";
-
-                // Attach the script to the reset button field
-                formEditor.AddFieldScript(resetButtonName, js);
-            }
+            // Attach the script to the reset button field
+            formEditor.AddFieldScript(resetButtonName, js);
 
             // Save the modified PDF
-            doc.Save(outputPath);
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved with JavaScript to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with JavaScript attached: {outputPdf}");
     }
 }

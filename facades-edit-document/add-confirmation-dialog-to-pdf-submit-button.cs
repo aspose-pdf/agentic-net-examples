@@ -1,50 +1,48 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input_form.pdf";   // existing PDF with a form
-        const string outputPdf = "output_with_confirm.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string submitUrl  = "https://example.com/submit";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        // Edit the form using FormEditor (Aspose.Pdf.Facades)
+        using (FormEditor formEditor = new FormEditor())
         {
-            // Initialize the FormEditor facade on the loaded document
-            using (FormEditor formEditor = new FormEditor(doc))
-            {
-                // Add a submit button named "SubmitBtn" on page 1
-                // Parameters: field name, page number, button caption, submit URL,
-                // llx, lly, urx, ury (coordinates in points)
-                formEditor.AddSubmitBtn(
-                    "SubmitBtn",          // field name
-                    1,                    // page number (1‑based)
-                    "Submit",             // button caption
-                    "https://example.com/submit", // target URL
-                    100, 500, 200, 550); // rectangle bounds
+            // Load the existing PDF
+            formEditor.BindPdf(inputPath);
 
-                // Attach JavaScript to the button that shows a confirmation dialog.
-                // If the user clicks "Yes" (returns 0), the form is submitted.
-                string js = @"
-if (app.alert('Do you want to submit the form?', 2) == 0) {
-    this.submitForm();
-}";
-                formEditor.AddFieldScript("SubmitBtn", js);
-            }
+            // Add a submit button named "SubmitBtn" on page 1
+            // Parameters: field name, page number, button caption, submit URL,
+            //             lower‑left X, lower‑left Y, upper‑right X, upper‑right Y
+            formEditor.AddSubmitBtn(
+                "SubmitBtn",
+                1,
+                "Submit",
+                submitUrl,
+                100, 100, 200, 150);
 
-            // Save the modified PDF (the Document.Save method is the required lifecycle operation)
-            doc.Save(outputPdf);
+            // JavaScript that shows a confirmation dialog.
+            // app.alert returns 4 for "Yes" when using the 3‑button style.
+            string js = "if(app.alert('Are you sure you want to submit?', 3) == 4) this.submitForm();";
+
+            // Attach the script to the submit button.
+            formEditor.AddFieldScript("SubmitBtn", js);
+
+            // Save the modified PDF.
+            formEditor.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with confirmation script: {outputPdf}");
+        Console.WriteLine($"PDF with confirmation dialog saved to '{outputPath}'.");
     }
 }

@@ -6,18 +6,11 @@ class Program
 {
     static void Main()
     {
-        // Input PDF files to be merged (order matters)
-        string[] inputFiles = new string[]
-        {
-            "file1.pdf",
-            "file2.pdf",
-            "file3.pdf"
-        };
+        // Define the input PDF files to be merged and the output file name.
+        string[] inputFiles = { "file1.pdf", "file2.pdf", "file3.pdf" };
+        string outputFile = "merged.pdf";
 
-        // Output merged PDF file
-        const string outputFile = "merged_output.pdf";
-
-        // Verify that all input files exist before proceeding
+        // Verify that all input files exist before attempting concatenation.
         foreach (string file in inputFiles)
         {
             if (!File.Exists(file))
@@ -27,42 +20,28 @@ class Program
             }
         }
 
-        try
+        // Log the start of the merge operation and list all files involved.
+        Console.WriteLine("Starting multi‑file merge using Aspose.Pdf.Facades.PdfFileEditor.");
+        Console.WriteLine("Input files:");
+        foreach (string file in inputFiles)
         {
-            // Create the PdfFileEditor instance (no IDisposable, so no using block)
-            PdfFileEditor editor = new PdfFileEditor();
-
-            // Optional: copy logical structure and outlines from source PDFs
-            editor.CopyLogicalStructure = true;
-            editor.CopyOutlines = true;
-
-            // Log the concatenation operation details
-            Console.WriteLine("Starting PDF concatenation operation...");
-            Console.WriteLine("Input files:");
-            foreach (string file in inputFiles)
-            {
-                Console.WriteLine($"  - {Path.GetFileName(file)}");
-            }
-            Console.WriteLine($"Output file: {Path.GetFileName(outputFile)}");
-
-            // Perform the concatenation
-            bool success = editor.Concatenate(inputFiles, outputFile);
-
-            // Check result and log accordingly
-            if (success)
-            {
-                Console.WriteLine("Concatenation completed successfully.");
-            }
-            else
-            {
-                Console.Error.WriteLine("Concatenation failed. See editor.ConversionLog for details:");
-                Console.Error.WriteLine(editor.ConversionLog);
-            }
+            Console.WriteLine($"  {file}");
         }
-        catch (Exception ex)
+        Console.WriteLine($"Output file: {outputFile}");
+
+        // Create the PdfFileEditor instance and perform the concatenation.
+        PdfFileEditor editor = new PdfFileEditor();
+        bool result = editor.Concatenate(inputFiles, outputFile);
+
+        // Log the result of the operation.
+        if (result)
         {
-            // Log any unexpected exceptions
-            Console.Error.WriteLine($"Error during concatenation: {ex.Message}");
+            Console.WriteLine($"Merge completed successfully. Output saved to '{outputFile}'.");
+        }
+        else
+        {
+            Console.Error.WriteLine("Merge failed.");
+            Console.Error.WriteLine($"Conversion log: {editor.ConversionLog}");
         }
     }
 }

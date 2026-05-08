@@ -1,8 +1,10 @@
 using System;
 using System.IO;
-using System.Drawing; // needed for FormFieldFacade color properties
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -10,7 +12,6 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName  = "Comments";
 
         if (!File.Exists(inputPath))
         {
@@ -18,29 +19,34 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Initialize FormEditor with the loaded document
-            FormEditor formEditor = new FormEditor(doc);
+            // Retrieve the field named "Comments" and cast it to RichTextBoxField
+            RichTextBoxField commentsField = doc.Form["Comments"] as RichTextBoxField;
 
-            // Create a FormFieldFacade to define appearance settings
-            formEditor.Facade = new FormFieldFacade
+            if (commentsField == null)
             {
-                // Appearance settings – using System.Drawing.Color as required by FormFieldFacade
-                BackgroundColor = System.Drawing.Color.LightGray,
-                TextColor       = System.Drawing.Color.Black,
-                BorderColor     = System.Drawing.Color.DarkGray,
-                Alignment       = FormFieldFacade.AlignLeft
-            };
+                Console.Error.WriteLine("Field \"Comments\" not found or is not a RichTextBoxField.");
+                return;
+            }
 
-            // Apply the appearance settings to the "Comments" field (rich‑text enabled)
-            formEditor.DecorateField(fieldName);
+            // Set the default appearance (font, size, color) – required for rich‑text editing
+            commentsField.DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            // Enable multiline (rich‑text) editing
+            commentsField.Multiline = true;
+
+            // Optionally clear any existing rich‑text content
+            commentsField.RichTextValue = string.Empty;
+
+            // Save the changes using the FormEditor facade (as required)
+            using (FormEditor editor = new FormEditor(doc))
+            {
+                editor.Save(outputPath);
+            }
         }
 
-        Console.WriteLine($"Rich‑text field \"{fieldName}\" updated and saved to '{outputPath}'.");
+        Console.WriteLine($"Rich‑text field \"Comments\" updated and saved to '{outputPath}'.");
     }
 }

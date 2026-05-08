@@ -6,30 +6,21 @@ class Program
 {
     static void Main()
     {
-        // Path to the PDF file that may contain embedded attachments
-        const string inputPdf = "input.pdf";
+        const string inputPath = "input.pdf";
 
-        // Ensure the file exists before processing
-        if (!System.IO.File.Exists(inputPdf))
+        if (!System.IO.File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // PdfExtractor is a Facade; use a using block for deterministic disposal
+        // Create PdfExtractor, bind the PDF, extract attachments, then list their names.
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the PDF document to the extractor
-            extractor.BindPdf(inputPdf);
-
-            // Extract the attachment objects from the PDF (required before GetAttachNames)
-            extractor.ExtractAttachment();
-
-            // Retrieve the list of attachment names
+            extractor.BindPdf(inputPath);
+            extractor.ExtractAttachment(); // Must be called before GetAttachNames()
             IList<string> attachmentNames = extractor.GetAttachNames();
 
-            // Output each attachment name
-            Console.WriteLine("Embedded attachments:");
             foreach (string name in attachmentNames)
             {
                 Console.WriteLine(name);

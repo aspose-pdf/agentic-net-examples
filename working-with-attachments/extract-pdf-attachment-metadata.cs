@@ -7,46 +7,47 @@ using Aspose.Pdf.Annotations;
 
 class Program
 {
-    // Simple DTO for JSON output
-    private class AttachmentInfo
+    // Simple DTO for JSON serialization
+    public class AttachmentInfo
     {
-        public string FileName { get; set; }
+        // File name may be null if the annotation does not contain a file specification
+        public string? FileName { get; set; }
         public DateTime? CreationDate { get; set; }
     }
 
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string jsonOutputPath = "attachments.json";
+        const string inputPdfPath = "input.pdf";
+        const string outputJsonPath = "attachments.json";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
         var attachments = new List<AttachmentInfo>();
 
-        // Load the PDF document (using block ensures proper disposal)
-        using (Document doc = new Document(pdfPath))
+        // Load the PDF document (lifecycle rule: wrap in using)
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Iterate through all pages (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                Page page = doc.Pages[pageIndex];
+                Page page = doc.Pages[i];
 
-                // Iterate through all annotations on the page
-                for (int annIndex = 1; annIndex <= page.Annotations.Count; annIndex++)
+                // Iterate through annotations on the page
+                for (int j = 1; j <= page.Annotations.Count; j++)
                 {
-                    Annotation ann = page.Annotations[annIndex];
+                    Annotation ann = page.Annotations[j];
 
                     // We're interested only in file attachment annotations
                     if (ann is FileAttachmentAnnotation fileAnn)
                     {
                         AttachmentInfo info = new AttachmentInfo
                         {
-                            // FileSpecification may be null; guard against it
-                            FileName = fileAnn.File?.Name, // <-- corrected property
+                            // Use FileSpecification.Name to get the original file name
+                            FileName = fileAnn.File?.Name,
                             CreationDate = fileAnn.CreationDate
                         };
                         attachments.Add(info);
@@ -55,13 +56,13 @@ class Program
             }
         }
 
-        // Serialize the collected information to JSON
+        // Serialize the list to JSON (pretty printed)
         JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
         string json = JsonSerializer.Serialize(attachments, jsonOptions);
 
         // Write JSON to the output file
-        File.WriteAllText(jsonOutputPath, json);
+        File.WriteAllText(outputJsonPath, json);
 
-        Console.WriteLine($"Attachment metadata written to '{jsonOutputPath}'.");
+        Console.WriteLine($"Attachment metadata written to '{outputJsonPath}'.");
     }
 }

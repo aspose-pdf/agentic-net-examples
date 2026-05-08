@@ -1,64 +1,56 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Load option classes (e.g., XmlLoadOptions) are in this namespace
 
 class Program
 {
     static void Main()
     {
-        // Input XML files that will be converted to PDFs and then merged
-        string[] xmlFiles = new string[]
-        {
+        // Paths to the source XML files (each will be converted to a PDF)
+        string[] xmlFiles = {
             "invoice1.xml",
             "invoice2.xml",
             "invoice3.xml"
         };
 
-        // Output merged PDF file
-        const string outputPdf = "merged_output.pdf";
+        // Path for the final merged PDF
+        const string mergedPdfPath = "merged_output.pdf";
 
-        // Validate input files
-        foreach (string xmlPath in xmlFiles)
+        // Create an empty PDF document that will hold the merged result
+        using (Document mergedDocument = new Document())
         {
-            if (!File.Exists(xmlPath))
-            {
-                Console.Error.WriteLine($"Input file not found: {xmlPath}");
-                return;
-            }
-        }
+            // List to keep the intermediate PDF documents alive until merging is done
+            List<Document> intermediateDocs = new List<Document>();
 
-        // Load each XML into a separate Document instance
-        List<Document> sourceDocs = new List<Document>();
-        try
-        {
+            // Convert each XML file to a PDF document in memory
             foreach (string xmlPath in xmlFiles)
             {
-                // Load XML using XmlLoadOptions (required for XML input)
+                if (!File.Exists(xmlPath))
+                {
+                    Console.Error.WriteLine($"XML file not found: {xmlPath}");
+                    continue;
+                }
+
+                // Load the XML using XmlLoadOptions (required for XML → PDF conversion)
                 XmlLoadOptions loadOptions = new XmlLoadOptions();
-                Document doc = new Document(xmlPath, loadOptions);
-                sourceDocs.Add(doc);
+                Document xmlPdf = new Document(xmlPath, loadOptions);
+
+                // Keep the document for merging
+                intermediateDocs.Add(xmlPdf);
             }
 
-            // Create an empty target document that will hold the merged result
-            using (Document target = new Document())
-            {
-                // Merge all source documents into the target
-                target.Merge(sourceDocs.ToArray());
+            // Merge all intermediate PDF documents into the empty target document
+            // The Merge method accepts a params array of Document objects
+            mergedDocument.Merge(intermediateDocs.ToArray());
 
-                // Save the merged PDF
-                target.Save(outputPdf);
-            }
+            // Save the merged PDF to disk
+            mergedDocument.Save(mergedPdfPath);
+            Console.WriteLine($"Merged PDF saved to '{mergedPdfPath}'.");
 
-            Console.WriteLine($"Merged PDF saved to '{outputPdf}'.");
-        }
-        finally
-        {
-            // Ensure all source documents are properly disposed
-            foreach (Document doc in sourceDocs)
-            {
+            // Dispose the intermediate documents explicitly (they are not in using blocks)
+            foreach (Document doc in intermediateDocs)
                 doc.Dispose();
-            }
         }
     }
 }

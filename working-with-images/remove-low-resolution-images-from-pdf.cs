@@ -15,30 +15,34 @@ class Program
             return;
         }
 
-        // Load the PDF document (using statement ensures proper disposal)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Create an absorber to find image placements on the current page
+                // Create a fresh absorber for the current page
                 ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
 
-                // Perform the search
-                doc.Pages[pageIndex].Accept(absorber);
+                // Perform the search on the page
+                doc.Pages[i].Accept(absorber);
 
-                // Examine each found image
+                // Examine each found image placement
                 foreach (ImagePlacement placement in absorber.ImagePlacements)
                 {
-                    // If either horizontal or vertical DPI is below 72, remove the image
-                    if (placement.Resolution.X < 72 || placement.Resolution.Y < 72)
+                    // Resolution is expressed in DPI (dots per inch)
+                    double dpiX = placement.Resolution.X;
+                    double dpiY = placement.Resolution.Y;
+
+                    // If either horizontal or vertical DPI is lower than 72, remove the image
+                    if (dpiX < 72 || dpiY < 72)
                     {
                         placement.Hide(); // Deletes the image from the page
                     }
                 }
             }
 
-            // Clean up unused resources after deletions
+            // Optional: clean up unused resources after deletions
             doc.OptimizeResources();
 
             // Save the modified PDF

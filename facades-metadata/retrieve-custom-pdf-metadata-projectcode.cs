@@ -13,14 +13,17 @@ class Program
             return;
         }
 
-        // Initialize the PdfFileInfo facade for the PDF file
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(pdfPath))
+        // Initialize the PdfFileInfo facade for the specified PDF file
+        using (PdfFileInfo fileInfo = new PdfFileInfo(pdfPath))
         {
-            // Retrieve the custom metadata value for "ProjectCode"
-            string projectCode = pdfInfo.GetMetaInfo("ProjectCode");
+            // Retrieve the custom metadata value associated with the key "ProjectCode"
+            string projectCode = fileInfo.GetMetaInfo("ProjectCode");
 
-            // Display the retrieved value (empty string if the property does not exist)
-            Console.WriteLine($"ProjectCode: {projectCode}");
+            // Display the result; an empty string indicates the key was not present
+            if (string.IsNullOrEmpty(projectCode))
+                Console.WriteLine("ProjectCode metadata not found.");
+            else
+                Console.WriteLine($"ProjectCode: {projectCode}");
         }
     }
 }

@@ -1,55 +1,51 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;   // FormEditor, Form
-using Aspose.Pdf;          // Document (accessed via FormEditor)
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF files – adjust the paths as needed
-        string[] pdfFiles = new string[]
-        {
-            "Form1.pdf",
-            "Form2.pdf",
-            "Form3.pdf"
-        };
+        // Folder containing the PDF forms
+        const string inputFolder = "FormPdfs";
+        // Output folder for the exported XML files
+        const string outputFolder = "ExportedXml";
 
-        // Output directory for XML files
-        string outputDir = "ExportedXml";
-        Directory.CreateDirectory(outputDir);
+        if (!Directory.Exists(inputFolder))
+        {
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            return;
+        }
+
+        Directory.CreateDirectory(outputFolder);
+
+        // Get all PDF files in the input folder
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
 
         foreach (string pdfPath in pdfFiles)
         {
-            if (!File.Exists(pdfPath))
+            // Determine the XML output file name (same base name, .xml extension)
+            string xmlFileName = Path.GetFileNameWithoutExtension(pdfPath) + ".xml";
+            string xmlPath = Path.Combine(outputFolder, xmlFileName);
+
+            // Use FormEditor to bind the PDF (required by the task)
+            using (FormEditor editor = new FormEditor())
             {
-                Console.Error.WriteLine($"File not found: {pdfPath}");
-                continue;
-            }
+                editor.BindPdf(pdfPath);
 
-            // Use FormEditor to load each PDF (lifecycle managed by using)
-            using (FormEditor formEditor = new FormEditor())
-            {
-                formEditor.BindPdf(pdfPath);               // Load the PDF into the facade
-
-                // The underlying Document can be accessed via the Document property
-                Document doc = formEditor.Document;
-
-                // Create a Form object based on the loaded document to export form data
-                Form form = new Form(doc);
-
-                // Prepare output XML file path (same name as PDF, .xml extension)
-                string xmlFileName = Path.GetFileNameWithoutExtension(pdfPath) + ".xml";
-                string xmlPath = Path.Combine(outputDir, xmlFileName);
-
-                // Export form fields to XML
-                using (FileStream xmlStream = new FileStream(xmlPath, FileMode.Create, FileAccess.Write))
+                // Create a Form instance from the bound document to export data
+                using (Form form = new Form(editor.Document))
                 {
-                    form.ExportXml(xmlStream);
+                    // Export the form fields to an XML stream
+                    using (FileStream xmlStream = new FileStream(xmlPath, FileMode.Create, FileAccess.Write))
+                    {
+                        form.ExportXml(xmlStream);
+                    }
                 }
-
-                Console.WriteLine($"Exported form data from '{pdfPath}' to '{xmlPath}'.");
             }
+
+            Console.WriteLine($"Exported XML for '{Path.GetFileName(pdfPath)}' to '{xmlPath}'.");
         }
     }
 }

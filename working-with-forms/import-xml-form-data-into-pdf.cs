@@ -12,22 +12,21 @@ class Program
         const string inputPdfPath  = "input.pdf";
         const string outputPdfPath = "output.pdf";
 
-        // XML data to import into the form fields (as a string)
+        // XML data to be imported into the form (as a string)
         string xmlData = @"<?xml version=""1.0"" encoding=""UTF-8""?>
 <FormData>
-    <Field name=""FirstName"">John</Field>
-    <Field name=""LastName"">Doe</Field>
-    <Field name=""Email"">john.doe@example.com</Field>
+    <Field1>Value 1</Field1>
+    <Field2>Value 2</Field2>
 </FormData>";
 
         // Ensure the source PDF exists
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document pdfDoc = new Document(inputPdfPath))
         {
             // Parse the XML string into an XmlDocument
@@ -37,8 +36,9 @@ class Program
                 xmlDoc.Load(xmlStream);
             }
 
-            // Assign the XFA data (XML) to the form.
-            // This imports the XML data into the PDF form fields.
+            // Import the XML data into the form.
+            // For XFA forms, AssignXfa replaces the XFA data packet with the supplied XML.
+            // This method is part of the core Aspose.Pdf API (no Facades namespace required).
             pdfDoc.Form.AssignXfa(xmlDoc);
 
             // Save the updated PDF

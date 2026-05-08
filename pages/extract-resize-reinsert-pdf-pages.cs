@@ -1,24 +1,24 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf;                     // Core API
-using Aspose.Pdf.Text;                // For any text-related types (not used here)
+using System.Linq;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Input / output paths
+        // Input and output PDF files
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         // Define the range of pages to extract (1‑based inclusive)
-        const int rangeStart = 2;   // example: start at page 2
-        const int rangeEnd   = 4;   // example: end at page 4
+        const int rangeStart = 2;   // first page of the range
+        const int rangeEnd   = 4;   // last page of the range
 
         // Define the position where the extracted pages will be re‑inserted
-        // (1‑based). After removal the collection size changes, so adjust accordingly.
-        const int insertPosition = 1; // insert at the beginning
+        // (1‑based index where the first new page will appear)
+        const int insertPosition = 6;
 
         if (!File.Exists(inputPath))
         {
@@ -26,59 +26,57 @@ class Program
             return;
         }
 
-        // Open the source PDF inside a using block (ensures deterministic disposal)
+        // Load the source PDF
         using (Document doc = new Document(inputPath))
         {
-            // Validate range
-            if (rangeStart < 1 || rangeEnd > doc.Pages.Count || rangeStart > rangeEnd)
-            {
-                Console.Error.WriteLine("Invalid page range.");
-                return;
-            }
-
             // -----------------------------------------------------------------
-            // 1. Extract the pages into a temporary list
+            // 1. Collect the pages in the requested range
             // -----------------------------------------------------------------
             List<Page> extractedPages = new List<Page>();
             for (int i = rangeStart; i <= rangeEnd; i++)
             {
-                // Store a reference to the page object
-                extractedPages.Add(doc.Pages[i]);
+                extractedPages.Add(doc.Pages[i]); // Pages are 1‑based
             }
 
             // -----------------------------------------------------------------
-            // 2. Remove the extracted pages from the original document
-            //    (delete in descending order to keep indices stable)
+            // 2. Change each extracted page size to A4
             // -----------------------------------------------------------------
-            for (int i = rangeEnd; i >= rangeStart; i--)
-            {
-                doc.Pages.Delete(i);
-            }
-
-            // -----------------------------------------------------------------
-            // 3. Change each extracted page size to A4 (595 x 842 points)
-            // -----------------------------------------------------------------
-            const double a4Width  = 595; // points
-            const double a4Height = 842; // points
             foreach (Page pg in extractedPages)
             {
-                // Set the page rectangle to A4 dimensions
-                pg.Rect = new Aspose.Pdf.Rectangle(0, 0, a4Width, a4Height);
+                // PageSize.A4 provides Width and Height in points (1/72 inch)
+                pg.PageInfo.Width  = Aspose.Pdf.PageSize.A4.Width;
+                pg.PageInfo.Height = Aspose.Pdf.PageSize.A4.Height;
+                // Optional: ensure portrait orientation
+                pg.PageInfo.IsLandscape = false;
             }
 
             // -----------------------------------------------------------------
-            // 4. Re‑insert the pages at the desired position
+            // 3. Remove the original pages from the document
             // -----------------------------------------------------------------
-            // Insert overload that accepts an array of Page objects
-            doc.Pages.Insert(insertPosition, extractedPages.ToArray());
+            int pagesCount = rangeEnd - rangeStart + 1;
+            int[] pagesToDelete = Enumerable.Range(rangeStart, pagesCount).ToArray();
+            doc.Pages.Delete(pagesToDelete);
 
             // -----------------------------------------------------------------
-            // 5. Save the modified document
+            // 4. Adjust the insertion index if it was after the deleted range
+            // -----------------------------------------------------------------
+            int adjustedInsertPos = insertPosition;
+            if (insertPosition > rangeEnd)
+            {
+                adjustedInsertPos -= pagesCount;
+            }
+
+            // -----------------------------------------------------------------
+            // 5. Re‑insert the modified pages at the new position
+            // -----------------------------------------------------------------
+            doc.Pages.Insert(adjustedInsertPos, extractedPages.ToArray());
+
+            // -----------------------------------------------------------------
+            // 6. Save the resulting PDF
             // -----------------------------------------------------------------
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Pages {rangeStart}-{rangeEnd} resized to A4 and re‑inserted at position {insertPosition}.");
-        Console.WriteLine($"Result saved to '{outputPath}'.");
+        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

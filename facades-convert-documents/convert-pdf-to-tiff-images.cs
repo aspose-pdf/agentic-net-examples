@@ -1,47 +1,45 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging;
+using System.Drawing.Imaging; // Added for ImageFormat
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
+        const string inputPdf = "input.pdf";
         const string outputFolder = "TiffPages";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
         // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Use PdfConverter (Facade) to convert each page to a separate TIFF image
+        // Use PdfConverter facade to convert each page to a TIFF image
         using (PdfConverter converter = new PdfConverter())
         {
             // Bind the source PDF file
-            converter.BindPdf(inputPdfPath);
+            converter.BindPdf(inputPdf);
 
             // Prepare the converter (required before extracting images)
             converter.DoConvert();
 
-            int pageIndex = 1;
+            int pageNumber = 1;
+            // Extract images page by page; each call saves one TIFF file
             while (converter.HasNextImage())
             {
-                // Build the output file name for the current page
-                string tiffPath = Path.Combine(outputFolder, $"page_{pageIndex}.tiff");
-
+                string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.tiff");
                 // Save the current page as a TIFF image using default settings
-                // Use System.Drawing.Imaging.ImageFormat for the format specification
-                converter.GetNextImage(tiffPath, ImageFormat.Tiff);
-
-                pageIndex++;
+                converter.GetNextImage(outputPath, ImageFormat.Tiff); // Fixed namespace
+                pageNumber++;
             }
         }
 
-        Console.WriteLine("PDF has been converted to individual TIFF images.");
+        Console.WriteLine("PDF to TIFF conversion completed.");
     }
 }

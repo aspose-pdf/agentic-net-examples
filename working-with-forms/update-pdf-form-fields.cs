@@ -7,56 +7,61 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "filled.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document using the core Aspose.Pdf API (no Facades).
-        Document pdfDocument = new Document(inputPath);
+        // Load the PDF document using the core Aspose.Pdf API.
+        Document pdfDocument = new Document(inputPdf);
 
-        // ----- Modify a text field -----
-        if (pdfDocument.Form["CustomerName"] is TextBoxField txtField)
-        {
-            txtField.Value = "Acme Corp";
-        }
-        else
-        {
-            Console.Error.WriteLine("Text field 'CustomerName' not found or is not a TextBoxField.");
-        }
+        // Update form fields.
+        SetFieldValue(pdfDocument, "FirstName", "John");
+        SetFieldValue(pdfDocument, "LastName", "Doe");
+        SetFieldValue(pdfDocument, "Email", "john.doe@example.com");
+        SetCheckBoxValue(pdfDocument, "Subscribe", true);
 
-        // ----- Modify a checkbox field -----
-        if (pdfDocument.Form["AcceptTerms"] is CheckboxField chkField)
-        {
-            // The Checked property sets the state of the checkbox.
-            chkField.Checked = true;
-        }
-        else
-        {
-            Console.Error.WriteLine("Check box field 'AcceptTerms' not found or is not a CheckboxField.");
-        }
+        // Save the modified PDF.
+        pdfDocument.Save(outputPdf);
 
-        // ----- Modify a radio‑button field -----
-        // Radio buttons are represented by RadioButtonOptionField objects.
-        // To select an option, set the OptionName to the name of the desired option.
-        if (pdfDocument.Form["Gender"] is RadioButtonOptionField radioOption)
+        Console.WriteLine($"Form fields updated and saved to '{outputPdf}'.");
+    }
+
+    /// <summary>
+    /// Sets the value of a text‑type form field. Works with any field that derives from <see cref="Field"/>.
+    /// </summary>
+    private static void SetFieldValue(Document doc, string fieldName, string value)
+    {
+        // Retrieve the field from the form collection.
+        var field = doc.Form[fieldName] as Field;
+        if (field == null)
         {
-            // Select the option named "Male".
-            radioOption.OptionName = "Male";
-            // No separate "Selected" property exists; setting OptionName is sufficient.
-        }
-        else
-        {
-            Console.Error.WriteLine("Radio button field 'Gender' not found or is not a RadioButtonOptionField.");
+            Console.Error.WriteLine($"Field '{fieldName}' not found.");
+            return;
         }
 
-        // Save the updated PDF.
-        pdfDocument.Save(outputPath);
+        // For text boxes the Value property can be set directly.
+        field.Value = value;
+    }
 
-        Console.WriteLine($"Form fields updated and saved to '{outputPath}'.");
+    /// <summary>
+    /// Sets the checked state of a checkbox field without relying on the concrete <c>CheckBoxField</c> type.
+    /// The underlying PDF representation expects the value "On" for a checked box and "Off" for an unchecked one.
+    /// </summary>
+    private static void SetCheckBoxValue(Document doc, string fieldName, bool isChecked)
+    {
+        var field = doc.Form[fieldName] as Field;
+        if (field == null)
+        {
+            Console.Error.WriteLine($"Checkbox field '{fieldName}' not found.");
+            return;
+        }
+
+        // The generic Field class does not expose a "Checked" property, so we set the raw value.
+        field.Value = isChecked ? "On" : "Off";
     }
 }

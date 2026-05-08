@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -15,27 +16,29 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a page number stamp. Default format is "#" which will be replaced by the page number.
-            PageNumberStamp stamp = new PageNumberStamp();
-            // Position the stamp at the bottom‑center of each page.
-            stamp.HorizontalAlignment = HorizontalAlignment.Center;
-            stamp.VerticalAlignment   = VerticalAlignment.Bottom;
-            stamp.BottomMargin        = 20; // distance from the bottom edge
-
-            // Iterate over all pages (1‑based indexing) and add the stamp only to odd pages.
+            // Iterate over pages using 1‑based indexing
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                if (i % 2 == 1) // odd page
+                // Apply page number stamp only on odd pages
+                if (i % 2 == 1)
                 {
-                    Page page = doc.Pages[i];
-                    page.AddStamp(stamp);
+                    // Create a PageNumberStamp; default format "#" will be replaced by the page number
+                    PageNumberStamp stamp = new PageNumberStamp();
+
+                    // Optional: position the stamp (e.g., bottom‑center)
+                    stamp.HorizontalAlignment = HorizontalAlignment.Center;
+                    stamp.VerticalAlignment   = VerticalAlignment.Bottom;
+                    stamp.BottomMargin        = 20; // distance from bottom edge
+
+                    // Add the stamp to the current page
+                    doc.Pages[i].AddStamp(stamp);
                 }
             }
 
-            // Save the modified PDF (lifecycle rule: use the same Document instance)
+            // Save the modified document as PDF
             doc.Save(outputPath);
         }
 

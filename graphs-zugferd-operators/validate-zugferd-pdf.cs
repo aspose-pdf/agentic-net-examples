@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "invoice.pdf";
-        const string logFile   = "validation_log.txt";
+        const string inputPdf = "invoice.pdf";               // PDF with ZUGFeRD data
+        const string logFile  = "zugferd_validation.log";   // Validation report
 
         if (!File.Exists(inputPdf))
         {
@@ -15,21 +15,13 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF and validate it against the ZUGFeRD specification
+        using (Document doc = new Document(inputPdf))
         {
-            // Load the PDF containing ZUGFeRD data
-            using (Document doc = new Document(inputPdf))
-            {
-                // Validate against the ZUGFeRD specification and write log
-                bool isCompliant = doc.Validate(logFile, PdfFormat.ZUGFeRD);
+            bool isValid = doc.Validate(logFile, PdfFormat.ZUGFeRD);
 
-                Console.WriteLine($"ZUGFeRD validation result: {isCompliant}");
-                Console.WriteLine($"Log saved to: {logFile}");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Validation error: {ex.Message}");
+            Console.WriteLine($"ZUGFeRD validation result: {(isValid ? "Valid" : "Invalid")}");
+            Console.WriteLine($"Validation log saved to: {logFile}");
         }
     }
 }

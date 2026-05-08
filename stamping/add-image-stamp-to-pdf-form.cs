@@ -6,14 +6,13 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath   = "form.pdf";      // PDF that contains form fields
-        const string stampImagePath = "logo.png";      // Image to be used as stamp
-        const string outputPdfPath  = "form_stamped.pdf";
+        const string inputPath = "form.pdf";
+        const string outputPath = "form_stamped.pdf";
+        const string stampImagePath = "logo.png";
 
-        // Verify that required files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
         if (!File.Exists(stampImagePath))
@@ -22,29 +21,29 @@ class Program
             return;
         }
 
-        // Load the PDF document (form fields are preserved)
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF containing form fields
+        using (Document doc = new Document(inputPath))
         {
-            // Create an image stamp – the constructor accepts a file path
+            // Create an image stamp
             ImageStamp imgStamp = new ImageStamp(stampImagePath);
+            // Position the stamp (example: top‑right corner with a margin)
+            imgStamp.HorizontalAlignment = HorizontalAlignment.Right;
+            imgStamp.VerticalAlignment   = VerticalAlignment.Top;
+            // ImageStamp does not have a Margin property – use XIndent/YIndent instead
+            imgStamp.XIndent = 10; // 10 points from the right edge (when Right‑aligned)
+            imgStamp.YIndent = 10; // 10 points from the top edge
+            imgStamp.Opacity = 0.5; // semi‑transparent
 
-            // Configure stamp appearance (optional)
-            imgStamp.HorizontalAlignment = HorizontalAlignment.Right;   // align to right edge
-            imgStamp.VerticalAlignment   = VerticalAlignment.Top;      // align to top edge
-            imgStamp.XIndent = 10;   // margin from the right edge (when Right aligned)
-            imgStamp.YIndent = 10;   // margin from the top edge
-            imgStamp.Opacity = 0.8;  // semi‑transparent
-
-            // Apply the stamp to each page (or select specific pages)
-            foreach (Page page in pdfDoc.Pages)
+            // Apply the stamp to each page; form fields stay functional
+            foreach (Page page in doc.Pages)
             {
                 page.AddStamp(imgStamp);
             }
 
-            // Save the modified PDF; form fields remain interactive
-            pdfDoc.Save(outputPdfPath);
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Stamped PDF saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
     }
 }

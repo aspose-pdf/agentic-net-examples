@@ -6,10 +6,10 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const int    pageNumber = 4;          // target page (1‑based indexing)
-        const int    imageId    = 5;          // object ID of the image to remove
+        const int pageNumber = 4;               // Target page (1‑based indexing)
+        int[] imageIndexes = new int[] { 2 };   // Index of the image to remove on page 4 (replace with actual index)
 
         if (!File.Exists(inputPath))
         {
@@ -17,13 +17,19 @@ class Program
             return;
         }
 
-        // Load the PDF, delete the specified image, and save the result.
-        PdfContentEditor editor = new PdfContentEditor();
-        editor.BindPdf(inputPath);
-        editor.DeleteImage(pageNumber, new int[] { imageId });
-        editor.Save(outputPath);
-        editor.Close();
+        // PdfContentEditor implements IDisposable, so wrap it in a using block
+        using (PdfContentEditor editor = new PdfContentEditor())
+        {
+            // Load the PDF document
+            editor.BindPdf(inputPath);
 
-        Console.WriteLine($"Removed image ID {imageId} from page {pageNumber} and saved to '{outputPath}'.");
+            // Delete the specified image(s) from page 4
+            editor.DeleteImage(pageNumber, imageIndexes);
+
+            // Save the modified PDF
+            editor.Save(outputPath);
+        }
+
+        Console.WriteLine($"Specified image removed. Output saved to '{outputPath}'.");
     }
 }

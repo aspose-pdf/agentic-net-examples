@@ -16,47 +16,51 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use Document constructor)
+        // Load the PDF document using the standard load rule
         using (Document doc = new Document(inputPath))
         {
-            // Access the form object
+            // Access the form object; it may be empty
             Form form = doc.Form;
-            if (form == null || form.Fields == null || form.Fields.Count() == 0)
+            if (form == null || form.Count == 0)
             {
                 Console.WriteLine("No form fields found in the document.");
                 return;
             }
 
             // Iterate over all fields and process only signature fields
-            foreach (var field in form.Fields)
+            foreach (var field in form.Fields.OfType<SignatureField>())
             {
-                if (field is SignatureField sigField)
+                Console.WriteLine("=== Signature Field ===");
+                Console.WriteLine($"Name: {field.Name}");
+                Console.WriteLine($"FullName: {field.FullName}");
+                Console.WriteLine($"PartialName: {field.PartialName}");
+                Console.WriteLine($"AlternateName: {field.AlternateName}");
+                Console.WriteLine($"Modified: {field.Modified}");
+                Console.WriteLine($"ReadOnly: {field.ReadOnly}");
+                Console.WriteLine($"Required: {field.Required}");
+                Console.WriteLine($"PageIndex: {field.PageIndex}");
+                Console.WriteLine($"Rect: {field.Rect}");
+                Console.WriteLine($"Flags: {field.Flags}");
+                Console.WriteLine($"Color: {field.Color}");
+                Console.WriteLine($"Border Width: {field.Border?.Width}");
+
+                // Extract signature-specific metadata if a signature object exists
+                if (field.Signature != null)
                 {
-                    Console.WriteLine("=== Signature Field ===");
-                    Console.WriteLine($"Name: {sigField.Name}");
-                    Console.WriteLine($"FullName: {sigField.FullName}");
-                    Console.WriteLine($"PartialName: {sigField.PartialName}");
-                    Console.WriteLine($"AlternateName: {sigField.AlternateName}");
-                    Console.WriteLine($"Modified: {sigField.Modified}");
-                    Console.WriteLine($"ReadOnly: {sigField.ReadOnly}");
-                    Console.WriteLine($"Required: {sigField.Required}");
-                    Console.WriteLine($"PageIndex: {sigField.PageIndex}");
-
-                    // Extract signature object details
-                    Signature signature = sigField.Signature;
-                    if (signature != null)
-                    {
-                        Console.WriteLine("--- Signature Details ---");
-                        Console.WriteLine($"Authority: {signature.Authority}");
-                        Console.WriteLine($"Date: {signature.Date}");
-                        Console.WriteLine($"Reason: {signature.Reason}");
-                        Console.WriteLine($"Location: {signature.Location}");
-                        Console.WriteLine($"ContactInfo: {signature.ContactInfo}");
-                        Console.WriteLine($"ByteRange: {string.Join(", ", signature.ByteRange ?? Array.Empty<int>())}");
-                    }
-
-                    Console.WriteLine(); // Blank line for readability
+                    var signature = field.Signature;
+                    Console.WriteLine($"Signature Authority: {signature.Authority}");
+                    Console.WriteLine($"Signature ContactInfo: {signature.ContactInfo}");
+                    Console.WriteLine($"Signature Date: {signature.Date}");
+                    Console.WriteLine($"Signature Location: {signature.Location}");
+                    Console.WriteLine($"Signature Reason: {signature.Reason}");
+                    Console.WriteLine($"Signature ShowProperties: {signature.ShowProperties}");
                 }
+                else
+                {
+                    Console.WriteLine("Signature object not present (field may be unsigned).");
+                }
+
+                Console.WriteLine();
             }
         }
     }

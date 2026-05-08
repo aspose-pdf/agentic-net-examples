@@ -1,38 +1,41 @@
 using System;
+using System.IO;
+using System.Runtime.InteropServices;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "generated_with_timestamp.pdf";
+        const string outputPath = "output_with_timestamp.pdf";
 
-        // Create a new PDF document (lifecycle: create)
+        // Create a new PDF document and add a blank page.
         using (Document doc = new Document())
         {
-            // Add a page and a simple text fragment
-            Page page = doc.Pages.Add();
-            page.Paragraphs.Add(new TextFragment("Sample PDF generated with timestamp metadata."));
+            doc.Pages.Add();
 
-            // Initialize the XMP metadata facade on the document (lifecycle: create)
-            using (PdfXmpMetadata xmp = new PdfXmpMetadata(doc))
+            // Initialize the XMP metadata facade with the document.
+            using (Aspose.Pdf.Facades.PdfXmpMetadata xmp = new Aspose.Pdf.Facades.PdfXmpMetadata(doc))
             {
-                // Prepare an ISO‑8601 timestamp
-                string timestamp = DateTime.UtcNow.ToString("o"); // e.g., 2023-09-15T12:34:56.789Z
+                // Add a timestamp (ISO‑8601 format) to the ModifyDate property.
+                string timestamp = DateTime.UtcNow.ToString("o");
+                xmp.Add("xmp:ModifyDate", timestamp);
 
-                // Add the timestamp to a standard XMP property (CreateDate)
-                xmp.Add("xmp:CreateDate", timestamp);
-
-                // Optionally also set the MetadataDate property
-                xmp.Add("xmp:MetadataDate", timestamp);
-
-                // Save the PDF with the updated XMP metadata (lifecycle: save)
-                xmp.Save(outputPath);
+                // Save the PDF with the updated metadata.
+                // On non‑Windows platforms Document.Save may require libgdiplus; guard the call.
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    xmp.Save(outputPath);
+                }
+                else
+                {
+                    // Fallback: save via the Document object (metadata is already attached).
+                    doc.Save(outputPath);
+                }
             }
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}' with timestamp XMP metadata.");
+        Console.WriteLine($"PDF saved to '{outputPath}' with timestamp metadata.");
     }
 }

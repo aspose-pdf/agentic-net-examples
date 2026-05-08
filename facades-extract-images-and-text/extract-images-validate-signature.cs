@@ -4,41 +4,52 @@ using Aspose.Pdf.Facades;
 
 class Program
 {
+    // Known file signatures (magic numbers) for common image formats
+    private static readonly byte[] PngSignature = new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
+    private static readonly byte[] JpegSignature = new byte[] { 0xFF, 0xD8 };
+    private static readonly byte[] GifSignature = new byte[] { 0x47, 0x49, 0x46, 0x38 };
+    private static readonly byte[] BmpSignature = new byte[] { 0x42, 0x4D };
+
     static void Main()
     {
-        const string pdfPath = "input.pdf";
+        const string inputPdf = "sample.pdf";
         const string outputDir = "ExtractedImages";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Extract images using PdfExtractor (facade)
+        // Use PdfExtractor (facade) to extract images
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            extractor.BindPdf(pdfPath);
-            extractor.ExtractImage(); // start extraction
+            // Bind the source PDF file
+            extractor.BindPdf(inputPdf);
+
+            // Prepare the extractor for image extraction
+            extractor.ExtractImage();
 
             int imageIndex = 1;
             while (extractor.HasNextImage())
             {
-                // Save each extracted image; default format is PNG
-                string imagePath = Path.Combine(outputDir, $"image-{imageIndex}.png");
-                extractor.GetNextImage(imagePath);
-                Console.WriteLine($"Saved image {imageIndex} to {imagePath}");
+                // Build a file name for the extracted image
+                string imagePath = Path.Combine(outputDir, $"image_{imageIndex}.png");
 
-                // Validate file signature (magic number)
-                if (ValidateImageSignature(imagePath, out string format))
+                // Save the next image to the file system
+                extractor.GetNextImage(imagePath);
+
+                // Verify the saved image by checking its file signature (magic number)
+                if (IsFileSignatureValid(imagePath, out string format))
                 {
-                    Console.WriteLine($"Image {imageIndex} signature OK ({format})");
+                    Console.WriteLine($"Image {imageIndex}: valid {format} file saved to '{imagePath}'.");
                 }
                 else
                 {
-                    Console.WriteLine($"Image {imageIndex} signature INVALID");
+                    Console.WriteLine($"Image {imageIndex}: corrupted or unknown format at '{imagePath}'.");
                 }
 
                 imageIndex++;
@@ -46,64 +57,60 @@ class Program
         }
     }
 
-    // Checks the first bytes of a file against known image signatures.
-    static bool ValidateImageSignature(string filePath, out string format)
+    // Checks the file's magic number against known image signatures.
+    // Returns true if a known signature matches; also outputs the detected format.
+    private static bool IsFileSignatureValid(string filePath, out string format)
     {
-        format = "Unknown";
+        format = "unknown";
+
+        // Read enough bytes to cover the longest signature we check (PNG = 8 bytes)
         byte[] header = new byte[8];
+        int bytesRead = 0;
         try
         {
             using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
             {
-                int read = fs.Read(header, 0, header.Length);
-                if (read < 4) return false;
+                bytesRead = fs.Read(header, 0, header.Length);
             }
-
-            // JPEG: FF D8 FF
-            if (header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF)
-            {
-                format = "JPEG";
-                return true;
-            }
-            // PNG: 89 50 4E 47 0D 0A 1A 0A
-            if (header[0] == 0x89 && header[1] == 0x50 && header[2] == 0x4E && header[3] == 0x47 &&
-                header[4] == 0x0D && header[5] == 0x0A && header[6] == 0x1A && header[7] == 0x0A)
-            {
-                format = "PNG";
-                return true;
-            }
-            // GIF87a or GIF89a: 47 49 46 38 37 61 or 47 49 46 38 39 61
-            if (header[0] == 0x47 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x38 &&
-                (header[4] == 0x37 || header[4] == 0x39) && header[5] == 0x61)
-            {
-                format = "GIF";
-                return true;
-            }
-            // BMP: 42 4D
-            if (header[0] == 0x42 && header[1] == 0x4D)
-            {
-                format = "BMP";
-                return true;
-            }
-            // TIFF (little endian): 49 49 2A 00
-            if (header[0] == 0x49 && header[1] == 0x49 && header[2] == 0x2A && header[3] == 0x00)
-            {
-                format = "TIFF-LE";
-                return true;
-            }
-            // TIFF (big endian): 4D 4D 00 2A
-            if (header[0] == 0x4D && header[1] == 0x4D && header[2] == 0x00 && header[3] == 0x2A)
-            {
-                format = "TIFF-BE";
-                return true;
-            }
-
-            return false;
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error reading {filePath}: {ex.Message}");
+            Console.Error.WriteLine($"Failed to read file '{filePath}': {ex.Message}");
             return false;
         }
+
+        if (bytesRead >= PngSignature.Length && StartsWith(header, PngSignature))
+        {
+            format = "PNG";
+            return true;
+        }
+        if (bytesRead >= JpegSignature.Length && StartsWith(header, JpegSignature))
+        {
+            format = "JPEG";
+            return true;
+        }
+        if (bytesRead >= GifSignature.Length && StartsWith(header, GifSignature))
+        {
+            format = "GIF";
+            return true;
+        }
+        if (bytesRead >= BmpSignature.Length && StartsWith(header, BmpSignature))
+        {
+            format = "BMP";
+            return true;
+        }
+
+        return false;
+    }
+
+    // Helper to compare the start of a byte array with a signature pattern
+    private static bool StartsWith(byte[] source, byte[] signature)
+    {
+        if (source.Length < signature.Length) return false;
+        for (int i = 0; i < signature.Length; i++)
+        {
+            if (source[i] != signature[i]) return false;
+        }
+        return true;
     }
 }

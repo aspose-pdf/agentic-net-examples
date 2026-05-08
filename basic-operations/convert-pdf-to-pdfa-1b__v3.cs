@@ -21,15 +21,14 @@ class Program
             // Load the source PDF
             using (Document doc = new Document(inputPath))
             {
-                // Convert to PDF/A‑1B compliance.
-                // ConvertErrorAction.Delete removes objects that cannot be converted.
+                // Convert to PDF/A‑1b, logging any conversion errors
                 doc.Convert(logPath, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
 
-                // Save the converted document
+                // Save the PDF/A‑1b compliant document
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"PDF/A‑1B compliant file saved to '{outputPath}'.");
+            Console.WriteLine($"PDF/A‑1b compliant document saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

@@ -3,51 +3,44 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
-class PdfValidator
+class Program
 {
-    // Validates required form fields and saves the document if validation passes.
-    public static void ValidateAndSave(string inputPdfPath, string outputPdfPath)
+    static void Main()
     {
-        if (!File.Exists(inputPdfPath))
-            throw new FileNotFoundException($"Input file not found: {inputPdfPath}");
+        const string inputPdf = "input.pdf";
+        const string outputJson = "form_fields.json";
 
-        using (Document doc = new Document(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            // Iterate over all form fields (Field objects)
-            foreach (Field field in doc.Form)
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            return;
+        }
+
+        // Load the PDF document
+        using (Document doc = new Document(inputPdf))
+        {
+            // Validate required form fields
+            foreach (var field in doc.Form.Fields)
             {
-                // Check if the field is marked as required
+                // Only check fields marked as required
                 if (field.Required)
                 {
-                    // Retrieve the field value; treat null or empty string as not filled
-                    string value = field.Value?.ToString() ?? string.Empty;
-                    if (string.IsNullOrWhiteSpace(value))
+                    // Most field types expose their content via the Value property.
+                    // For checkboxes/radio buttons an unchecked state results in a null Value.
+                    string fieldValue = field.Value?.ToString() ?? string.Empty;
+
+                    if (string.IsNullOrWhiteSpace(fieldValue))
                     {
-                        throw new InvalidOperationException(
-                            $"Required field '{field.PartialName}' is not filled.");
+                        Console.Error.WriteLine(
+                            $"Required field '{field.PartialName}' is empty. Export aborted.");
+                        return;
                     }
                 }
             }
 
-            // All required fields are filled; save the document
-            doc.Save(outputPdfPath);
-        }
-    }
-
-    // Example usage
-    static void Main()
-    {
-        const string inputPath = "input.pdf";
-        const string outputPath = "validated_output.pdf";
-
-        try
-        {
-            ValidateAndSave(inputPath, outputPath);
-            Console.WriteLine($"Document saved successfully to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Validation failed: {ex.Message}");
+            // All required fields have values – export form data to JSON
+            doc.Form.ExportToJson(outputJson);
+            Console.WriteLine($"Form data exported successfully to '{outputJson}'.");
         }
     }
 }

@@ -8,7 +8,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        int attachmentIndex = 0; // zero‑based index of the attachment to remove
+        const int attachmentIndex = 0; // zero‑based index of the attachment to remove
 
         if (!File.Exists(inputPath))
         {
@@ -16,32 +16,26 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Verify that the index is within the range of existing attachments
-            if (doc.EmbeddedFiles.Count == 0)
+            // Validate the index against the collection count
+            if (attachmentIndex < 0 || attachmentIndex >= doc.EmbeddedFiles.Count)
             {
-                Console.WriteLine("No attachments found in the document.");
-            }
-            else if (attachmentIndex < 0 || attachmentIndex >= doc.EmbeddedFiles.Count)
-            {
-                Console.WriteLine($"Invalid attachment index. Available count: {doc.EmbeddedFiles.Count}");
-            }
-            else
-            {
-                // Retrieve the name of the embedded file at the specified zero‑based index
-                string attachmentName = doc.EmbeddedFiles[attachmentIndex].Name;
-
-                // Remove the attachment by its name (EmbeddedFileCollection has Delete(string))
-                doc.EmbeddedFiles.Delete(attachmentName);
-                Console.WriteLine($"Removed attachment: {attachmentName}");
+                Console.Error.WriteLine("Invalid attachment index.");
+                return;
             }
 
-            // Save the modified PDF (lifecycle rule: use Document.Save)
+            // Get the embedded file at the specified zero‑based index
+            var embeddedFile = doc.EmbeddedFiles[attachmentIndex];
+
+            // EmbeddedFileCollection only provides Delete(string name), so delete by name
+            doc.EmbeddedFiles.Delete(embeddedFile.Name);
+
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Attachment at index {attachmentIndex} removed. Saved to '{outputPath}'.");
     }
 }

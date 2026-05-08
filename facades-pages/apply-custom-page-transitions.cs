@@ -19,39 +19,42 @@ class Program
         // Load the source PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Initialize PdfPageEditor with the loaded document
+            // Initialize the PdfPageEditor facade with the loaded document
             using (PdfPageEditor editor = new PdfPageEditor(doc))
             {
-                // Iterate through all pages (1‑based indexing)
+                // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
                 for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    // Choose a transition type based on page index (example: cycle through three types)
+                    // Choose a transition style based on the page index.
+                    // This example cycles through three different transitions.
                     int transition;
                     switch (i % 3)
                     {
                         case 0:
-                            transition = PdfPageEditor.BLINDH;   // vertical blinds
+                            transition = PdfPageEditor.BLINDH;      // Vertical blinds
                             break;
                         case 1:
-                            transition = PdfPageEditor.DISSOLVE; // dissolve
+                            transition = PdfPageEditor.DISSOLVE;   // Dissolve effect
                             break;
                         default:
-                            transition = PdfPageEditor.SPLITVOUT; // out vertical split
+                            transition = PdfPageEditor.SPLITVOUT;  // Out vertical split
                             break;
                     }
 
-                    // Specify which page to edit
+                    // Specify the page to edit
                     editor.ProcessPages = new int[] { i };
-                    // Apply the chosen transition and set its duration (seconds)
+                    // Apply the chosen transition type
                     editor.TransitionType = transition;
-                    editor.TransitionDuration = 2; // 2‑second transition
-                    // Commit changes for this page
+                    // Set the duration of the transition (seconds)
+                    editor.TransitionDuration = 2;
+
+                    // Commit changes for the current page
                     editor.ApplyChanges();
                 }
-            }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+                // Save the modified PDF with the applied transitions
+                editor.Save(outputPath);
+            }
         }
 
         Console.WriteLine($"Presentation PDF saved to '{outputPath}'.");

@@ -9,47 +9,34 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Pages to delete (1‑based indexing). Adjust as needed.
+        // Pages to delete (1‑based indexing)
         int[] pagesToDelete = new int[] { 2, 3 };
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Delete pages and keep the result in a memory stream.
+        // Delete pages and store the result in a memory stream
         using (FileStream inputStream = new FileStream(inputPath, FileMode.Open, FileAccess.Read))
-        using (MemoryStream afterDelete = new MemoryStream())
+        using (MemoryStream afterDeleteStream = new MemoryStream())
         {
             PdfFileEditor editor = new PdfFileEditor();
+            editor.Delete(inputStream, pagesToDelete, afterDeleteStream);
 
-            bool deleteSuccess = editor.Delete(inputStream, pagesToDelete, afterDelete);
-            if (!deleteSuccess)
+            // Reset position for the next operation
+            afterDeleteStream.Position = 0;
+
+            // Resize contents of all pages (shrink to 80% of original size)
+            using (MemoryStream finalStream = new MemoryStream())
             {
-                Console.Error.WriteLine("Failed to delete pages.");
-                return;
-            }
+                PdfFileEditor resizeEditor = new PdfFileEditor();
+                // null pages array means all pages are processed
+                resizeEditor.ResizeContentsPct(afterDeleteStream, finalStream, null, 80, 80);
 
-            // Prepare the stream for reading the intermediate PDF.
-            afterDelete.Position = 0;
-
-            // Resize the contents of all pages to 80 % of the original size.
-            // Using the percentage‑based overload.
-            using (FileStream outputStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
-            {
-                bool resizeSuccess = editor.ResizeContentsPct(
-                    afterDelete,          // source PDF (after deletion)
-                    outputStream,        // destination PDF
-                    null,                // null = all pages
-                    80,                  // new width in percent
-                    80);                 // new height in percent
-
-                if (!resizeSuccess)
-                {
-                    Console.Error.WriteLine("Failed to resize contents.");
-                    return;
-                }
+                // Write the final PDF to disk
+                File.WriteAllBytes(outputPath, finalStream.ToArray());
             }
         }
 

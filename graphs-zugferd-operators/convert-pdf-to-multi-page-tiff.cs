@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices; // Resolution, TiffDevice, TiffSettings, CompressionType, ColorDepth, ShapeType
+using Aspose.Pdf.Devices;
 
 class Program
 {
@@ -10,29 +10,28 @@ class Program
         const string inputPdf = "input.pdf";
         const string outputTiff = "output.tif";
 
-        // Verify input file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document (lifecycle: using ensures proper disposal)
+        // Load the PDF document
         using (Document pdfDoc = new Document(inputPdf))
         {
-            // Set desired resolution for the TIFF images (e.g., 300 DPI)
+            // Define the resolution for the TIFF images (e.g., 300 DPI)
             Resolution resolution = new Resolution(300);
 
-            // Configure TIFF conversion settings
+            // Configure TIFF settings: no compression, default color depth, landscape orientation
             TiffSettings tiffSettings = new TiffSettings
             {
-                Compression = CompressionType.None,   // No compression
-                Depth = ColorDepth.Default,           // Default color depth
-                Shape = ShapeType.Landscape,          // Landscape orientation
-                SkipBlankPages = false                // Include blank pages
+                Compression = CompressionType.None,
+                Depth = ColorDepth.Default,
+                Shape = ShapeType.Landscape,
+                SkipBlankPages = false
             };
 
-            // Create the TIFF device with the resolution and settings
+            // Create a TiffDevice with the specified resolution and settings
             TiffDevice tiffDevice = new TiffDevice(resolution, tiffSettings);
 
             // Convert the entire PDF to a multi‑page TIFF file

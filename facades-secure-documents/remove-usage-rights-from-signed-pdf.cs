@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "signed_input.pdf";
-        const string outputPath = "usage_rights_removed.pdf";
+        const string outputPath = "signed_without_usage_rights.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,29 +17,23 @@ class Program
 
         try
         {
-            // Create the PdfFileSignature facade
-            PdfFileSignature pdfSignature = new PdfFileSignature();
-
-            // Load the signed PDF
-            pdfSignature.BindPdf(inputPath);
-
-            // Optional: check if usage rights are present
-            if (pdfSignature.ContainsUsageRights())
+            // PdfFileSignature implements IDisposable, so use a using block.
+            using (PdfFileSignature pdfSignature = new PdfFileSignature())
             {
-                // Remove the usage rights entry
-                pdfSignature.RemoveUsageRights();
-                Console.WriteLine("Usage rights removed.");
-            }
-            else
-            {
-                Console.WriteLine("No usage rights found in the document.");
+                // Load the signed PDF.
+                pdfSignature.BindPdf(inputPath);
+
+                // Remove usage rights if they exist.
+                if (pdfSignature.ContainsUsageRights())
+                {
+                    pdfSignature.RemoveUsageRights();
+                }
+
+                // Save the modified PDF.
+                pdfSignature.Save(outputPath);
             }
 
-            // Save the modified PDF
-            pdfSignature.Save(outputPath);
-            pdfSignature.Close(); // Release resources
-
-            Console.WriteLine($"Output saved to '{outputPath}'.");
+            Console.WriteLine($"Usage rights removed. Output saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

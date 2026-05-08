@@ -1,64 +1,43 @@
 using System;
 using System.IO;
-using System.Drawing; // for Color
-using Aspose.Pdf.Facades; // Facade classes (PdfFileStamp, Stamp, FormattedText, EncodingType)
+using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Input and output PDF paths
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string author     = "John Doe";
 
-        // Dynamic data to embed in the stamp
-        const string author = "John Doe";
-        string stampText = $"Author: {author}, Date: {DateTime.Now:yyyy-MM-dd}";
-
-        // Verify the source file exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // -------------------------------------------------
-        // Initialize the PdfFileStamp facade and bind the PDF
-        // -------------------------------------------------
-        PdfFileStamp fileStamp = new PdfFileStamp();
-        fileStamp.BindPdf(inputPdf);
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
+        {
+            // Create a text stamp with interpolated content (date and author)
+            string stampText = $"Created on {DateTime.Now:yyyy-MM-dd} by {author}";
+            Aspose.Pdf.TextStamp textStamp = new Aspose.Pdf.TextStamp(stampText);
 
-        // -------------------------------------------------
-        // Create a FormattedText object with the interpolated text
-        // -------------------------------------------------
-        FormattedText formattedText = new FormattedText(
-            stampText,                     // text content
-            Color.Blue,                    // foreground color (System.Drawing.Color)
-            "Helvetica",                  // font name
-            EncodingType.Winansi,          // encoding
-            false,                         // embed the font?
-            12);                           // font size
+            // Configure stamp appearance (optional)
+            textStamp.Background = false;                     // draw on top of page content
+            textStamp.Opacity    = 0.7;                       // semi‑transparent
+            textStamp.HorizontalAlignment = HorizontalAlignment.Center;
+            textStamp.VerticalAlignment   = VerticalAlignment.Bottom;
+            textStamp.YIndent = 20;                           // distance from bottom edge
 
-        // -------------------------------------------------
-        // Create a Stamp, bind the FormattedText, and set appearance
-        // -------------------------------------------------
-        Stamp stamp = new Stamp();
-        stamp.BindLogo(formattedText);
-        stamp.SetOrigin(100, 700);   // X and Y position (from left & bottom)
-        stamp.IsBackground = false; // place on top of page content
-        stamp.Opacity = 0.7f;        // semi‑transparent
+            // Add the stamp to the first page (pages are 1‑based)
+            doc.Pages[1].AddStamp(textStamp);
 
-        // -------------------------------------------------
-        // Add the stamp to the document (applies to all pages)
-        // -------------------------------------------------
-        fileStamp.AddStamp(stamp);
+            // Save the modified PDF
+            doc.Save(outputPath);
+        }
 
-        // -------------------------------------------------
-        // Save the stamped PDF and release resources
-        // -------------------------------------------------
-        fileStamp.Save(outputPdf);
-        fileStamp.Close();
-
-        Console.WriteLine($"Stamped PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Stamp added and saved to '{outputPath}'.");
     }
 }

@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,16 +15,16 @@ class Program
             return;
         }
 
-        // Load the PDF document; using ensures proper disposal
+        // Open the PDF document (lifecycle rule: use using)
         using (Document doc = new Document(inputPath))
         {
-            // Pages collection is 1‑based; retrieve the first page
+            // Pages are 1‑based (global rule)
             Page firstPage = doc.Pages[1];
 
-            // Change the page size to 500 × 700 points
+            // Change the size of the first page to 500 × 700 points
             firstPage.SetPageSize(500, 700);
 
-            // Save the modified PDF
+            // Save the modified document (lifecycle rule)
             doc.Save(outputPath);
         }
 

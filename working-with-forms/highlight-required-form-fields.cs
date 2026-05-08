@@ -2,9 +2,8 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
 
-class Program
+class HighlightRequiredFields
 {
     static void Main()
     {
@@ -17,23 +16,25 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for proper disposal.
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all form fields
-            foreach (Field field in doc.Form)
+            // Iterate over all form fields in the document.
+            foreach (Field field in doc.Form.Fields)
             {
-                // Mark the field as required (optional)
-                field.Required = true;
-
-                // Change the field's background/border color to highlight it
-                field.Color = Aspose.Pdf.Color.Yellow;
+                // The Required property indicates a required input field.
+                if (field.Required)
+                {
+                    // Set the field's background (appearance) color.
+                    // The Color property of a WidgetAnnotation (base of Field) is used for the background fill.
+                    field.Color = Aspose.Pdf.Color.Yellow;
+                }
             }
 
-            // Save the modified PDF
+            // Save the modified PDF.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Form fields highlighted and saved to '{outputPath}'.");
+        Console.WriteLine($"Required fields highlighted and saved to '{outputPath}'.");
     }
 }

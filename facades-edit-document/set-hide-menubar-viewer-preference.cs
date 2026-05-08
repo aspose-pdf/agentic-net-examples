@@ -1,39 +1,45 @@
 using System;
-using System.IO;
-using Aspose.Pdf.Facades;   // PdfContentEditor, ViewerPreference
+using System.Runtime.Versioning;
+using Aspose.Pdf.Facades;
+using Aspose.Pdf; // required for ViewerPreference enum
 
 class Program
 {
+    // Suppress the platform‑specific warning that can be raised by Aspose internals
+    #pragma warning disable CA1416 // Platform compatibility
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        // Ensure the source file exists
+        if (!System.IO.File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Create the facade, bind the PDF, modify viewer preferences, and save.
+        // Use PdfContentEditor (a Facades class) to edit viewer preferences
         using (PdfContentEditor editor = new PdfContentEditor())
         {
-            // Load the PDF file into the editor.
+            // Bind the existing PDF
             editor.BindPdf(inputPath);
 
-            // Retrieve current viewer preference flags.
+            // Read current viewer preferences (returns an int)
             int currentPrefs = editor.GetViewerPreference();
 
-            // Set the HideMenubar flag (bitwise OR with existing flags).
-            int newPrefs = currentPrefs | ViewerPreference.HideMenubar;
+            // Enable the HideMenubar flag while preserving other flags
+            // Cast the enum value to int for the bitwise operation
+            int newPrefs = currentPrefs | (int)ViewerPreference.HideMenubar;
 
-            // Apply the updated viewer preferences.
+            // Apply the modified preferences
             editor.ChangeViewerPreference(newPrefs);
 
-            // Save the modified PDF.
+            // Save the updated PDF
             editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Viewer preference updated. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Viewer preferences updated. Output saved to '{outputPath}'.");
     }
+    #pragma warning restore CA1416 // Platform compatibility
 }

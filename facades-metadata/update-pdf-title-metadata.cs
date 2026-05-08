@@ -6,27 +6,30 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string newTitle  = "Updated PDF Title";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string newTitle = "Updated PDF Title";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Initialize PdfFileInfo facade with the source PDF
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPdf))
+        // Initialize the PdfFileInfo facade with the source PDF
+        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
         {
-            // Set the Title metadata
+            // Update the Title metadata
             pdfInfo.Title = newTitle;
 
-            // Save the updated information to a new file
-            bool saved = pdfInfo.SaveNewInfo(outputPdf);
+            // Save the updated PDF to a new file. SaveNewInfo returns void, so we just call it.
+            pdfInfo.SaveNewInfo(outputPath);
+
+            // Optionally verify that the file was created
+            bool saved = File.Exists(outputPath);
             Console.WriteLine(saved
-                ? $"Title updated and saved to '{outputPdf}'."
-                : $"Failed to save updated PDF to '{outputPdf}'.");
+                ? $"Title updated and saved to '{outputPath}'."
+                : $"Failed to save updated PDF to '{outputPath}'.");
         }
     }
 }

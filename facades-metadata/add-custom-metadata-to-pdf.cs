@@ -8,24 +8,39 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
+        const string reviewer   = "John Doe";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF using the Facade class
-        PdfFileInfo pdfInfo = new PdfFileInfo(inputPath);
+        try
+        {
+            // Initialize the facade and bind the existing PDF
+            PdfFileInfo pdfInfo = new PdfFileInfo();
+            pdfInfo.BindPdf(inputPath);
 
-        // Add a custom metadata entry named "ProjectCode"
-        pdfInfo.SetMetaInfo("ProjectCode", "ABC-12345");
+            // Set a custom metadata field named "ReviewedBy"
+            pdfInfo.SetMetaInfo("ReviewedBy", reviewer);
 
-        // Save the updated PDF to a new file
-        bool saved = pdfInfo.SaveNewInfo(outputPath);
-        if (saved)
-            Console.WriteLine($"Custom metadata added. Saved to '{outputPath}'.");
-        else
-            Console.Error.WriteLine("Failed to save the updated PDF.");
+            // Persist the changes to a new file
+            bool saved = pdfInfo.SaveNewInfo(outputPath);
+            if (!saved)
+            {
+                Console.Error.WriteLine("Failed to save the updated PDF.");
+                return;
+            }
+
+            // Release resources held by the facade
+            pdfInfo.Close();
+
+            Console.WriteLine($"Custom metadata added and saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

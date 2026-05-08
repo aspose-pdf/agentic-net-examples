@@ -22,13 +22,14 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 ## Required Namespaces
 
 - `using Aspose.Pdf;` (50/50 files) ← category-specific
-- `using Aspose.Pdf.Text;` (12/50 files)
-- `using Aspose.Pdf.Annotations;` (7/50 files)
+- `using Aspose.Pdf.Text;` (10/50 files)
+- `using Aspose.Pdf.Annotations;` (6/50 files)
 - `using Aspose.Pdf.Drawing;` (1/50 files)
 - `using Aspose.Pdf.Facades;` (1/50 files)
-- `using Aspose.Pdf.Tagged;` (1/50 files)
 - `using System;` (50/50 files)
 - `using System.IO;` (50/50 files)
+- `using System.Drawing;` (1/50 files)
+- `using System.Runtime.InteropServices;` (1/50 files)
 
 ## Common Code Pattern
 
@@ -46,36 +47,36 @@ using (Document doc = new Document("input.pdf"))
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [add-auto-adjusting-text-stamp-to-pdf](./add-auto-adjusting-text-stamp-to-pdf.cs) | Add Auto-Adjusting Text Stamp to PDF | `Document`, `TextStamp`, `FontRepository` | Demonstrates how to place a text stamp on each PDF page that automatically scales its font size t... |
-| [add-background-image-stamp-to-pdf-pages](./add-background-image-stamp-to-pdf-pages.cs) | Add Background Image Stamp to PDF Pages | `Document`, `ImageStamp`, `AddStamp` | Shows how to place an image stamp behind the existing content of every page in a PDF using Aspose... |
-| [add-bold-outlined-text-stamp](./add-bold-outlined-text-stamp.cs) | Add Bold Outlined Text Stamp to PDF | `Document`, `TextStamp`, `FindFont` | Demonstrates creating a text stamp with fill‑stroke rendering to produce bold outlined text and a... |
-| [add-confidential-text-stamp](./add-confidential-text-stamp.cs) | Add Confidential Text Stamp with Opacity to PDF | `Document`, `TextStamp`, `AddStamp` | Shows how to place a semi‑transparent 'CONFIDENTIAL' text stamp on every page of a PDF using Aspo... |
-| [add-custom-blue-text-stamp-to-first-page](./add-custom-blue-text-stamp-to-first-page.cs) | Add Custom Blue Text Stamp to First PDF Page | `Document`, `Save`, `TextState` | Demonstrates how to add a text stamp with a custom font, size, and blue color to the first page o... |
-| [add-custom-sized-page-stamp](./add-custom-sized-page-stamp.cs) | Add Custom-Sized Page Stamp to Specific PDF Page | `Document`, `PdfPageStamp`, `Page` | Demonstrates creating a PdfPageStamp with custom width, height, and position, then applying it to... |
-| [add-diagonal-image-watermark-to-pdf](./add-diagonal-image-watermark-to-pdf.cs) | Add Diagonal Image Watermark to PDF | `Document`, `ImageStamp`, `Page` | Shows how to place a rotated image stamp as a diagonal watermark on every page of a PDF using Asp... |
-| [add-diagonal-text-stamp-watermark](./add-diagonal-text-stamp-watermark.cs) | Add Diagonal Text Stamp Watermark to PDF | `Document`, `TextStamp`, `HorizontalAlignment` | Demonstrates how to apply a semi‑transparent, 45° rotated text stamp as a diagonal watermark on e... |
-| [add-faint-text-overlay-to-pdf-pages](./add-faint-text-overlay-to-pdf-pages.cs) | Add Faint Text Overlay to PDF Pages | `Document`, `Page`, `TextStamp` | Demonstrates how to place a semi‑transparent 'CONFIDENTIAL' text stamp as a faint overlay on ever... |
-| [add-fixed-size-image-stamp-to-pdf-pages](./add-fixed-size-image-stamp-to-pdf-pages.cs) | Add Fixed-Size Image Stamp to PDF Pages | `Document`, `ImageStamp`, `Page` | Demonstrates how to place a fixed-size image stamp at the center of every page in a PDF, independ... |
-| [add-full-page-image-watermark-to-pdf](./add-full-page-image-watermark-to-pdf.cs) | Add Full-Page Image Watermark to PDF | `Document`, `Page`, `ImageStamp` | Shows how to place an image stamp as a full‑page background watermark on each page of a PDF using... |
-| [add-global-text-stamp-to-all-pdf-pages](./add-global-text-stamp-to-all-pdf-pages.cs) | Add Global Text Stamp to All PDF Pages | `Document`, `Save`, `Page` | Shows how to create a TextStamp and apply it to every page of a PDF document using Aspose.Pdf's D... |
-| [add-image-stamp-alt-text-page-3](./add-image-stamp-alt-text-page-3.cs) | Add Image Stamp with Alt Text to PDF Page 3 | `Document`, `ImageStamp`, `AddStamp` | Demonstrates how to add an image stamp with alternative text for accessibility to the third page ... |
-| [add-image-stamp-alt-text-pdfa1b](./add-image-stamp-alt-text-pdfa1b.cs) | Add Image Stamp with Alt Text to PDF/A‑1b Document | `Document`, `Convert`, `Save` | Demonstrates converting a PDF to PDF/A‑1b and applying an image stamp with alternative text for a... |
-| [add-image-stamp-and-flatten-annotations](./add-image-stamp-and-flatten-annotations.cs) | Add Image Stamp and Flatten Annotations to Create Read‑Only ... | `Document`, `ImageStamp`, `Page` | Demonstrates how to place an image stamp on every page of a PDF and then flatten all annotations ... |
-| [add-image-stamp-from-memory-stream](./add-image-stamp-from-memory-stream.cs) | Add Image Stamp from Memory Stream to PDF | `Document`, `ImageStamp`, `AddStamp` | Demonstrates loading an image into a MemoryStream and applying it as a semi‑transparent stamp to ... |
-| [add-image-stamp-preserve-acroform](./add-image-stamp-preserve-acroform.cs) | Add Image Stamp While Preserving AcroForm Fields | `Document`, `ImageStamp`, `AddStamp` | Demonstrates how to apply an image stamp to every page of a PDF using Aspose.Pdf while keeping ex... |
-| [add-image-stamp-preserve-bookmarks](./add-image-stamp-preserve-bookmarks.cs) | Add Image Stamp While Preserving Bookmarks | `Document`, `ImageStamp`, `AddStamp` | Demonstrates how to overlay an image stamp on every page of a PDF using Aspose.Pdf without affect... |
-| [add-image-stamp-preserve-embedded-files](./add-image-stamp-preserve-embedded-files.cs) | Add Image Stamp While Preserving Embedded Files | `Document`, `ImageStamp`, `AddStamp` | Demonstrates how to add a semi‑transparent image stamp to every page of a PDF using Aspose.Pdf wh... |
-| [add-image-stamp-preserve-javascript](./add-image-stamp-preserve-javascript.cs) | Add Image Stamp to PDF While Preserving JavaScript | `Document`, `ImageStamp`, `AddStamp` | Shows how to place a semi‑transparent image stamp on each page of a PDF using Aspose.Pdf, while k... |
-| [add-image-stamp-preserve-page-labels](./add-image-stamp-preserve-page-labels.cs) | Add Image Stamp to PDF While Preserving Page Labels | `Document`, `ImageStamp`, `AddStamp` | Shows how to apply an image stamp to every page of a PDF using Aspose.Pdf and keep the existing p... |
-| [add-image-stamp-preserve-xmp-metadata](./add-image-stamp-preserve-xmp-metadata.cs) | Add Image Stamp and Preserve XMP Metadata in PDF | `Document`, `ImageStamp`, `Page` | Demonstrates how to add a semi‑transparent image stamp to each page of a PDF while preserving the... |
-| [add-image-stamp-quality-opacity](./add-image-stamp-quality-opacity.cs) | Add Image Stamp with Quality and Opacity to PDF Page | `Document`, `Page`, `ImageStamp` | Demonstrates how to add an image stamp to the second page of a PDF using Aspose.Pdf, setting the ... |
-| [add-image-stamp-to-encrypted-pdf](./add-image-stamp-to-encrypted-pdf.cs) | Add Image Stamp to Encrypted PDF | `Document`, `ImageStamp`, `AddStamp` | Shows how to open an encrypted PDF with a password, decrypt it, apply an image stamp to each page... |
-| [add-image-stamp-to-pdf-form](./add-image-stamp-to-pdf-form.cs) | Add Image Stamp to PDF Form While Preserving Fields | `Document`, `ImageStamp`, `HorizontalAlignment` | Demonstrates how to overlay an image stamp on each page of a PDF that contains form fields using ... |
-| [add-image-stamp-to-pdf](./add-image-stamp-to-pdf.cs) | Add Image Stamp to PDF While Preserving Annotations | `Document`, `ImageStamp`, `Page` | Demonstrates loading a PDF, creating an ImageStamp with opacity and alignment, adding it to a pag... |
-| [add-image-stamp-to-signed-pdf](./add-image-stamp-to-signed-pdf.cs) | Add Image Stamp to Signed PDF Without Invalidating Signature | `Document`, `ImageStamp`, `Page` | Demonstrates loading an already digitally signed PDF, adding a semi‑transparent image stamp, and ... |
-| [add-image-stamp-unicode-alt-text](./add-image-stamp-unicode-alt-text.cs) | Add Image Stamp with Unicode Alt Text to PDF | `Document`, `ImageStamp`, `AddStamp` | Demonstrates how to add an image stamp to each page of a PDF and set Unicode alternative text for... |
-| [add-low-quality-image-stamp-to-large-pdf](./add-low-quality-image-stamp-to-large-pdf.cs) | Add Low‑Quality Image Stamp to Large PDF | `Document`, `ImageStamp`, `AddStamp` | Demonstrates how to add an image stamp with reduced quality (10 %) to each page of a PDF using As... |
-| [add-multi-line-text-stamp-custom-line-spacing](./add-multi-line-text-stamp-custom-line-spacing.cs) | Add Multi‑Line Text Stamp with Custom Line Spacing | `Document`, `AddStamp`, `Save` | Demonstrates how to add a multi‑line text stamp with custom line spacing to each page of a PDF us... |
+| [add-auto-adjusting-text-stamp](./add-auto-adjusting-text-stamp.cs) | Add Auto‑Adjusting Text Stamp to PDF | `Document`, `TextStamp`, `AddStamp` | Demonstrates how to place a text stamp on each page of a PDF and automatically adjust its font si... |
+| [add-background-image-stamp-to-pdf-pages](./add-background-image-stamp-to-pdf-pages.cs) | Add Background Image Stamp to PDF Pages | `Document`, `ImageStamp`, `Background` | Demonstrates how to place an image stamp behind the content of each page in a PDF by setting the ... |
+| [add-bold-outlined-text-stamp](./add-bold-outlined-text-stamp.cs) | Add Bold Outlined Text Stamp to PDF | `Document`, `TextStamp`, `FindFont` | Shows how to place a TextStamp with fill‑stroke rendering to create bold outlined text on a PDF p... |
+| [add-bottom-left-text-stamp](./add-bottom-left-text-stamp.cs) | Add Bottom‑Left Text Stamp with Margin to PDF | `Document`, `TextStamp`, `Page` | Demonstrates loading a PDF with Aspose.Pdf, creating a TextStamp, aligning it to the bottom‑left ... |
+| [add-confidential-text-stamp-to-pdf](./add-confidential-text-stamp-to-pdf.cs) | Add Confidential Text Stamp to PDF Pages | `Document`, `Page`, `TextStamp` | Demonstrates loading a PDF with Aspose.Pdf, creating a semi‑transparent "CONFIDENTIAL" TextStamp,... |
+| [add-custom-sized-page-stamp](./add-custom-sized-page-stamp.cs) | Add Custom-Sized Page Stamp to PDF | `Document`, `PdfPageStamp`, `AddStamp` | Demonstrates how to create a page stamp from another PDF, set custom width, height, and position,... |
+| [add-custom-text-stamp-to-first-pdf-page](./add-custom-text-stamp-to-first-pdf-page.cs) | Add Custom Text Stamp to First PDF Page | `Document`, `TextState`, `FindFont` | Demonstrates how to create a text stamp with a specific font, size, and blue color, and apply it ... |
+| [add-diagonal-image-watermark-to-pdf](./add-diagonal-image-watermark-to-pdf.cs) | Add Diagonal Image Watermark to PDF | `Document`, `ImageStamp`, `AddStamp` | Demonstrates how to apply an image stamp rotated 90° as a diagonal watermark on every page of a P... |
+| [add-diagonal-text-stamp-watermark](./add-diagonal-text-stamp-watermark.cs) | Add Diagonal Text Stamp Watermark to PDF | `Document`, `Page`, `TextStamp` | Demonstrates how to apply a semi‑transparent, 45° rotated text stamp as a diagonal watermark on e... |
+| [add-fixed-size-image-stamp-to-pdf](./add-fixed-size-image-stamp-to-pdf.cs) | Add Fixed-Size Image Stamp to PDF Pages | `Document`, `ImageStamp`, `AddStamp` | Demonstrates how to place a PNG image stamp with constant width and height on every page of a PDF... |
+| [add-full-page-image-watermark-to-pdf](./add-full-page-image-watermark-to-pdf.cs) | Add Full-Page Image Watermark to PDF | `Document`, `Page`, `ImageStamp` | Demonstrates how to apply an image stamp as a semi‑transparent background watermark that covers t... |
+| [add-image-background-floatingbox-page-4](./add-image-background-floatingbox-page-4.cs) | Add Image Background to Page 4 Using FloatingBox | `Document`, `Page`, `FloatingBox` | Shows how to place an image as the background of a FloatingBox that covers the entire fourth page... |
+| [add-image-stamp-alt-text-page-3](./add-image-stamp-alt-text-page-3.cs) | Add Image Stamp with Alt Text to PDF Page 3 | `Document`, `ImageStamp`, `AddStamp` | Shows how to place an image stamp with alternative text for accessibility on the third page of a ... |
+| [add-image-stamp-alt-text-pdfa1b](./add-image-stamp-alt-text-pdfa1b.cs) | Add Image Stamp with Alt Text for PDF/A‑1b Output | `Document`, `ImageStamp`, `AddStamp` | Shows how to add an image stamp with alternative text only when creating a PDF/A‑1b document and ... |
+| [add-image-stamp-flatten-annotations](./add-image-stamp-flatten-annotations.cs) | Add Image Stamp and Flatten Annotations to Create Read‑Only ... | `Document`, `AddStamp`, `ImageStamp` | Demonstrates how to add an image stamp to every page of a PDF and then flatten all annotations so... |
+| [add-image-stamp-from-memory-stream](./add-image-stamp-from-memory-stream.cs) | Add Image Stamp from Memory Stream to PDF | `Document`, `Page`, `ImageStamp` | Demonstrates how to create an ImageStamp from a MemoryStream and apply it to each page of a PDF d... |
+| [add-image-stamp-preserve-acroform-fields](./add-image-stamp-preserve-acroform-fields.cs) | Add Image Stamp While Preserving AcroForm Fields | `Document`, `ImageStamp`, `AddStamp` | Demonstrates how to place a semi‑transparent image stamp on every page of a PDF using Aspose.Pdf ... |
+| [add-image-stamp-preserve-bookmarks](./add-image-stamp-preserve-bookmarks.cs) | Add Image Stamp to PDF While Preserving Bookmarks | `Document`, `ImageStamp`, `AddStamp` | Demonstrates loading an existing PDF, creating an ImageStamp, applying it to every page, and savi... |
+| [add-image-stamp-preserve-embedded-files](./add-image-stamp-preserve-embedded-files.cs) | Add Image Stamp and Preserve Embedded Files | `Document`, `ImageStamp`, `AddStamp` | Loads a PDF containing embedded files, adds an image stamp to each page, and saves the document w... |
+| [add-image-stamp-preserve-javascript](./add-image-stamp-preserve-javascript.cs) | Add Image Stamp While Preserving JavaScript Actions | `Document`, `Page`, `ImageStamp` | Shows how to place an image stamp on every page of a PDF using Aspose.Pdf without removing existi... |
+| [add-image-stamp-preserve-page-labels](./add-image-stamp-preserve-page-labels.cs) | Add Image Stamp to PDF While Preserving Page Labels | `Document`, `ImageStamp`, `Page` | Demonstrates how to add a semi‑transparent image stamp to every page of a PDF using Aspose.Pdf an... |
+| [add-image-stamp-preserve-xmp-metadata](./add-image-stamp-preserve-xmp-metadata.cs) | Add Image Stamp and Preserve XMP Metadata in PDF | `Document`, `GetXmpMetadata`, `SetXmpMetadata` | Shows how to place an image stamp on every page of a PDF while retaining the original XMP metadat... |
+| [add-image-stamp-to-encrypted-pdf](./add-image-stamp-to-encrypted-pdf.cs) | Add Image Stamp to Encrypted PDF | `Document`, `ImageStamp`, `AddStamp` | Shows how to open an encrypted PDF with a password, decrypt it, apply an image stamp to every pag... |
+| [add-image-stamp-to-pdf-form](./add-image-stamp-to-pdf-form.cs) | Add Image Stamp to PDF Form While Preserving Fields | `Document`, `ImageStamp`, `AddStamp` | Demonstrates loading a PDF with form fields, creating an ImageStamp, positioning it, and applying... |
+| [add-image-stamp-to-pdf-page](./add-image-stamp-to-pdf-page.cs) | Add Image Stamp with Quality and Opacity to PDF Page | `Document`, `ImageStamp`, `AddStamp` | Demonstrates loading a PDF, creating an ImageStamp, setting its quality to 100 % and opacity to 0... |
+| [add-image-stamp-to-pdf-preserving-annotations](./add-image-stamp-to-pdf-preserving-annotations.cs) | Add Image Stamp to PDF While Preserving Annotations | `Document`, `Page`, `ImageStamp` | Demonstrates loading a PDF, creating an ImageStamp, positioning it, and adding it to a page witho... |
+| [add-image-stamp-to-signed-pdf](./add-image-stamp-to-signed-pdf.cs) | Add Image Stamp to Signed PDF without Invalidating Signature | `Document`, `ImageStamp`, `HorizontalAlignment` | Shows how to load a digitally signed PDF, place an image stamp on a page, and save the document u... |
+| [add-image-stamp-with-opacity-to-pdf-pages](./add-image-stamp-with-opacity-to-pdf-pages.cs) | Add Image Stamp with Opacity to PDF Pages | `Document`, `ImageStamp`, `Opacity` | Demonstrates how to overlay a semi‑transparent image stamp on every page of a PDF document using ... |
+| [add-image-stamp-with-percentage-offsets](./add-image-stamp-with-percentage-offsets.cs) | Add Image Stamp with Percentage Positioning | `Document`, `Page`, `ImageStamp` | Demonstrates how to place an image stamp on each page of a PDF using percentage‑based offsets rel... |
+| [add-image-stamp-with-unicode-alt-text](./add-image-stamp-with-unicode-alt-text.cs) | Add Image Stamp with Unicode Alternative Text | `Document`, `ImageStamp`, `AlternativeText` | Demonstrates how to add an image stamp to a PDF and set multilingual Unicode alternative text for... |
 | ... | | | *and 20 more files* |
 
 ## Category Statistics
@@ -90,5 +91,5 @@ using (Document doc = new Document("input.pdf"))
 - Review code examples in this folder for stamping patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-04-10 | Run: `20260410_121416_bd35e2`
+Updated: 2026-05-08 | Run: `20260508_123822_43348a`
 <!-- AUTOGENERATED:END -->

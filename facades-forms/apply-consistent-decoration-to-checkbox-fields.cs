@@ -1,62 +1,48 @@
 using System;
 using System.IO;
-using System.Drawing;
-using Aspose.Pdf.Facades;
+using System.Drawing;                     // System.Drawing.Color for visual attributes
+using Aspose.Pdf;                         // Document
+using Aspose.Pdf.Facades;                 // FormEditor, FormFieldFacade, FieldType
 
 class Program
 {
     static void Main()
     {
-        // Directory containing the PDF files to process
-        const string inputFolder = @"C:\PdfInput";
-        // Directory where the decorated PDFs will be saved
-        const string outputFolder = @"C:\PdfOutput";
+        // Input directory containing PDF files to be processed
+        // Use paths that are valid on the current OS. Here we build them relative to the current working directory.
+        string baseDir   = Directory.GetCurrentDirectory();
+        string inputDir  = Path.Combine(baseDir, "Pdf", "Input");
+        string outputDir = Path.Combine(baseDir, "Pdf", "Output");
 
-        if (!Directory.Exists(inputFolder))
-        {
-            Console.Error.WriteLine($"Input folder does not exist: {inputFolder}");
-            return;
-        }
-
-        Directory.CreateDirectory(outputFolder);
+        // Ensure the directories exist
+        Directory.CreateDirectory(inputDir);
+        Directory.CreateDirectory(outputDir);
 
         // Process each PDF file in the input directory
-        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        foreach (string inputPath in Directory.GetFiles(inputDir, "*.pdf"))
         {
-            string fileName = Path.GetFileNameWithoutExtension(pdfPath);
-            string outputPath = Path.Combine(outputFolder, fileName + "_decorated.pdf");
+            // Determine the corresponding output file path
+            string outputPath = Path.Combine(outputDir, Path.GetFileName(inputPath));
 
-            try
+            // Load the PDF document first – FormEditor now expects a Document instance, not a file path.
+            using (Document pdfDoc = new Document(inputPath))
+            using (FormEditor formEditor = new FormEditor(pdfDoc))
             {
-                // Bind the PDF to a FormEditor instance
-                using (FormEditor editor = new FormEditor())
-                {
-                    editor.BindPdf(pdfPath);
+                // Configure visual appearance for the fields
+                formEditor.Facade = new FormFieldFacade();
+                formEditor.Facade.BackgroundColor = System.Drawing.Color.LightGray;   // Field background
+                formEditor.Facade.TextColor       = System.Drawing.Color.Black;      // Check mark color
+                formEditor.Facade.BorderColor     = System.Drawing.Color.DarkBlue;   // Border color
+                formEditor.Facade.Alignment       = FormFieldFacade.AlignCenter;
 
-                    // Configure visual appearance for the fields
-                    editor.Facade = new FormFieldFacade
-                    {
-                        BackgroundColor = Color.LightYellow,
-                        TextColor       = Color.DarkBlue,
-                        BorderColor     = Color.Gray,
-                        Alignment       = FormFieldFacade.AlignCenter
-                    };
+                // Apply the appearance to all checkbox fields in the document
+                formEditor.DecorateField(FieldType.CheckBox);
 
-                    // Apply the appearance to all checkbox fields in the document
-                    editor.DecorateField(FieldType.CheckBox);
-
-                    // Save the modified PDF
-                    editor.Save(outputPath);
-                }
-
-                Console.WriteLine($"Processed: {pdfPath} -> {outputPath}");
+                // Persist the changes to the output file
+                formEditor.Save(outputPath);
             }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
-            }
+
+            Console.WriteLine($"Decorated PDF saved to: {outputPath}");
         }
-
-        Console.WriteLine("All files processed.");
     }
 }

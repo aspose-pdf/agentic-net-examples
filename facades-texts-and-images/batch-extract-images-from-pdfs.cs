@@ -1,67 +1,69 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging; // ImageFormat enum
-using Aspose.Pdf;               // Document class
-using Aspose.Pdf.Facades;       // PdfExtractor class
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class BatchImageExtractor
 {
     static void Main()
     {
-        // Folder containing source PDF files
-        const string inputFolder = @"C:\InputPdfs";
-        // Folder where extracted images will be saved
-        const string outputFolder = @"C:\ExtractedImages";
+        // Use platform‑agnostic paths (relative to the current working directory)
+        string inputFolder = Path.Combine(Directory.GetCurrentDirectory(), "InputPdfs");
+        string outputFolder = Path.Combine(Directory.GetCurrentDirectory(), "ExtractedImages");
 
-        // Ensure the output directory exists
+        // Ensure the directories exist (create if missing)
+        Directory.CreateDirectory(inputFolder);
         Directory.CreateDirectory(outputFolder);
 
         // Process each PDF file in the input folder
         foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            // Use Document only to obtain the page count (required for naming)
+            // Base name of the PDF (without extension) for naming output files
+            string pdfBaseName = Path.GetFileNameWithoutExtension(pdfPath);
+
+            // Get page count using Document (required for per‑page extraction)
+            int pageCount;
             using (Document doc = new Document(pdfPath))
             {
-                int pageCount = doc.Pages.Count; // 1‑based indexing
+                pageCount = doc.Pages.Count; // 1‑based indexing
+            }
 
-                // Iterate through each page to extract images per page
-                for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++)
+            // Create a PdfExtractor for the current PDF
+            using (PdfExtractor extractor = new PdfExtractor())
+            {
+                // Bind the PDF file to the extractor
+                extractor.BindPdf(pdfPath);
+
+                // Iterate over each page to extract images with page number context
+                for (int page = 1; page <= pageCount; page++)
                 {
-                    // PdfExtractor implements IDisposable, so wrap it in a using block
-                    using (PdfExtractor extractor = new PdfExtractor())
+                    // Restrict extraction to a single page
+                    extractor.StartPage = page;
+                    extractor.EndPage   = page;
+
+                    // Perform image extraction for the specified page
+                    extractor.ExtractImage();
+
+                    int imageIndex = 1;
+                    // Retrieve all images found on this page
+                    while (extractor.HasNextImage())
                     {
-                        // Bind the current PDF file
-                        extractor.BindPdf(pdfPath);
+                        // Build output file name: <pdfname>_page<page>_img<index>.png
+                        string outputFile = Path.Combine(
+                            outputFolder,
+                            $"{pdfBaseName}_page{page}_img{imageIndex}.png");
 
-                        // Restrict extraction to a single page
-                        extractor.StartPage = pageNumber;
-                        extractor.EndPage   = pageNumber;
-
-                        // Prepare the extractor for image extraction
-                        extractor.ExtractImage();
-
-                        int imageIndex = 1; // Counter for images on the current page
-
-                        // Retrieve all images on this page
-                        while (extractor.HasNextImage())
-                        {
-                            // Build a filename that includes the original PDF name,
-                            // page number, and image index (e.g., Report_page3_img2.png)
-                            string outputFileName = $"{Path.GetFileNameWithoutExtension(pdfPath)}_page{pageNumber}_img{imageIndex}.png";
-                            string outputPath = Path.Combine(outputFolder, outputFileName);
-
-                            // Save the extracted image as PNG
-                            extractor.GetNextImage(outputPath, ImageFormat.Png);
-
-                            imageIndex++;
-                        }
+                        // Save the image using the overload that does not require System.Drawing.ImageFormat
+                        // This avoids the CA1416 platform‑specific warning.
+                        extractor.GetNextImage(outputFile);
+                        imageIndex++;
                     }
                 }
             }
 
-            Console.WriteLine($"Finished extracting images from: {Path.GetFileName(pdfPath)}");
+            Console.WriteLine($"Images extracted from '{pdfPath}'.");
         }
 
-        Console.WriteLine("Batch image extraction completed.");
+        Console.WriteLine("Batch extraction completed.");
     }
 }

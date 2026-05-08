@@ -6,26 +6,29 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
+        // Verify the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Delete pages 5 through 10 in a single operation using Delete(int[])
-            int[] pagesToDelete = { 5, 6, 7, 8, 9, 10 };
+            // Pages to delete: 5 through 10 (inclusive)
+            int[] pagesToDelete = new int[] { 5, 6, 7, 8, 9, 10 };
+
+            // Single Delete operation using the int[] overload
             doc.Pages.Delete(pagesToDelete);
 
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Pages 5-10 removed. Result saved to '{outputPath}'.");
+        Console.WriteLine($"Pages 5‑10 removed. Saved to '{outputPath}'.");
     }
 }

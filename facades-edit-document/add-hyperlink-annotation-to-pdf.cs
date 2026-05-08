@@ -1,70 +1,42 @@
 using System;
-using System.Drawing;                     // System.Drawing.Rectangle
-using Aspose.Pdf;                     // Document class
-using Aspose.Pdf.Facades;           // PdfContentEditor facade
-using Aspose.Pdf.Text;               // TextFragment class
+using System.IO;
+using System.Drawing;                     // needed for Rectangle and Color
+using Aspose.Pdf.Facades;                // PdfContentEditor facade
 
 class Program
 {
     static void Main()
     {
-        // Paths to the source and the resulting PDF files
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf  = "input.pdf";      // source PDF
+        const string outputPdf = "output.pdf";     // PDF with added hyperlink
+        const int  sourcePage = 1;                 // page where the link rectangle will be placed (1‑based)
+        const int  targetPage = 3;                 // page to navigate to when the link is clicked (1‑based)
 
-        // Ensure a source PDF exists – create a simple three‑page document if it does not.
-        if (!System.IO.File.Exists(inputPath))
+        // Verify that the source file exists
+        if (!File.Exists(inputPdf))
         {
-            CreateSamplePdf(inputPath, 3);
+            Console.Error.WriteLine($"File not found: {inputPdf}");
+            return;
         }
 
-        // Define the rectangle (in points) where the clickable area will appear
-        // (x, y) = lower‑left corner, width and height specify the size
-        // System.Drawing.Rectangle expects (x, y, width, height)
-        System.Drawing.Rectangle linkRect = new System.Drawing.Rectangle(100, 500, 200, 50);
-
-        // Page on which the link rectangle will be placed (1‑based)
-        int originalPage = 1;
-
-        // Destination page number to jump to when the link is activated (1‑based)
-        int destinationPage = 3;
-
-        // Create and configure the content editor
+        // Create the editor, bind the PDF, add the local link, and save the result
         using (PdfContentEditor editor = new PdfContentEditor())
         {
-            // Load the PDF document into the editor
-            editor.BindPdf(inputPath);
+            // Load the PDF document into the facade
+            editor.BindPdf(inputPdf);
 
-            // Create a local link that points to another page in the same document
-            // Overload without color uses the default link appearance
-            editor.CreateLocalLink(linkRect, destinationPage, originalPage);
+            // Define the clickable rectangle (coordinates are in points, origin at bottom‑left)
+            // Example: rectangle at (100, 500) with width 200 and height 50
+            Rectangle linkRect = new Rectangle(100, 500, 300, 550);
 
-            // Save the modified PDF
-            editor.Save(outputPath);
+            // Create a local link that jumps from sourcePage to targetPage
+            // The overload without color uses the default link appearance
+            editor.CreateLocalLink(linkRect, targetPage, sourcePage, Color.Blue);
+
+            // Persist the changes to a new file
+            editor.Save(outputPdf);
         }
 
-        Console.WriteLine($"Hyperlink annotation added. Output saved to '{outputPath}'.");
-    }
-
-    /// <summary>
-    /// Creates a minimal PDF with the specified number of blank pages.
-    /// Each page contains a simple text paragraph so the file is not completely empty.
-    /// </summary>
-    private static void CreateSamplePdf(string path, int pageCount)
-    {
-        // Create a new document
-        Document doc = new Document();
-
-        for (int i = 1; i <= pageCount; i++)
-        {
-            // Add a new page
-            Page page = doc.Pages.Add();
-
-            // Add a paragraph that identifies the page number
-            page.Paragraphs.Add(new TextFragment($"Page {i}"));
-        }
-
-        // Save the document to the supplied path
-        doc.Save(path);
+        Console.WriteLine($"Hyperlink annotation added. Output saved to '{outputPdf}'.");
     }
 }

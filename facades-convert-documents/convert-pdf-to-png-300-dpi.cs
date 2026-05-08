@@ -1,47 +1,54 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using System.Drawing.Imaging;
+using Aspose.Pdf.Facades;
 using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";          // Path to source PDF
-        const string outputFolder = "output_images";     // Folder to store PNGs
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "output_images";
 
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF document
-        using (Document pdfDocument = new Document(inputPdfPath))
+        // Initialize the PDF converter facade
+        Aspose.Pdf.Facades.PdfConverter converter = new Aspose.Pdf.Facades.PdfConverter();
+
+        // Bind the PDF document to the converter
+        converter.BindPdf(inputPdfPath);
+
+        // Set the desired resolution (300 DPI)
+        converter.Resolution = new Aspose.Pdf.Devices.Resolution(300);
+
+        // Use default coordinate type (CropBox) – no explicit change needed
+
+        // Prepare the converter for image extraction
+        converter.DoConvert();
+
+        int pageIndex = 1;
+        while (converter.HasNextImage())
         {
-            // Create a Resolution object for 300 DPI
-            Resolution resolution = new Resolution(300);
+            // Build the output file path for each page
+            string outputPath = Path.Combine(outputFolder, $"page_{pageIndex}.png");
 
-            // Initialize the PNG device with the desired resolution
-            PngDevice pngDevice = new PngDevice(resolution);
+            // Extract the next page as a PNG image
+            converter.GetNextImage(outputPath, ImageFormat.Png);
 
-            // Iterate through all pages (1‑based indexing)
-            for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
-            {
-                string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.png");
-
-                // Convert the current page to PNG and write to file
-                using (FileStream pngStream = new FileStream(outputPath, FileMode.Create))
-                {
-                    pngDevice.Process(pdfDocument.Pages[pageNumber], pngStream);
-                }
-
-                Console.WriteLine($"Saved page {pageNumber} as PNG → {outputPath}");
-            }
+            pageIndex++;
         }
 
-        Console.WriteLine("PDF to PNG conversion completed.");
+        // Release resources
+        converter.Close();
+
+        Console.WriteLine("PDF successfully converted to PNG images.");
     }
 }

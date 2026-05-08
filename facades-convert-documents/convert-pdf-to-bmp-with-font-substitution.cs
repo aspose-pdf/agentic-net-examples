@@ -1,55 +1,65 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging; // Added for ImageFormat enum
+using System.Drawing.Imaging;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices; // for Resolution class
+using Aspose.Pdf.Devices; // for Resolution
+using Aspose.Pdf.Text;   // for SimpleFontSubstitution
 
-class PdfToBmpConverter
+class Program
 {
     static void Main()
     {
-        // Directory that contains the source PDF and where BMP files will be written
-        const string dataDir = @"YOUR_DATA_DIRECTORY";
+        const string inputPath = "input.pdf";
+        const string outputDir = "BmpImages";
 
-        // Full path to the input PDF file
-        string pdfPath = Path.Combine(dataDir, "input.pdf");
-
-        // Ensure the source file exists
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDocument = new Document(pdfPath))
-        using (PdfConverter converter = new PdfConverter())
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputDir);
+
+        // Load PDF document (lifecycle rule: use using for disposal)
+        using (Document pdfDoc = new Document(inputPath))
         {
-            // Bind the loaded document to the converter
-            converter.BindPdf(pdfDocument);
+            // Apply custom font substitution: Times New Roman → Calibri
+            // Use FontRepository.Substitutions with SimpleFontSubstitution
+            FontRepository.Substitutions.Add(new SimpleFontSubstitution("Times New Roman", "Calibri"));
 
-            // Set a higher resolution for better image quality (optional)
-            converter.Resolution = new Resolution(300);
-
-            // Font substitution is enabled by default in the current Aspose.PDF API.
-            // If a newer version exposes a specific property (e.g., FontSubstitutionEnabled),
-            // it can be set here. The previous "FontSubstitution" property no longer exists.
-
-            // Prepare the converter for processing
-            converter.DoConvert();
-
-            // Extract each page as a BMP image
-            int pageNumber = 1;
-            while (converter.HasNextImage())
+            // Initialize PdfConverter (facade for PDF‑to‑image conversion)
+            using (PdfConverter converter = new PdfConverter())
             {
-                string bmpPath = Path.Combine(dataDir, $"page_{pageNumber}_out.bmp");
-                // Use System.Drawing.Imaging.ImageFormat for BMP output
-                converter.GetNextImage(bmpPath, ImageFormat.Bmp);
-                pageNumber++;
+                // Bind the loaded document to the converter
+                converter.BindPdf(pdfDoc);
+
+                // Convert all pages (page indexing is 1‑based)
+                converter.StartPage = 1;
+                converter.EndPage   = pdfDoc.Pages.Count;
+
+                // Set desired resolution (dots per inch) using Resolution object
+                converter.Resolution = new Resolution(300);
+
+                // Prepare converter for processing
+                converter.DoConvert();
+
+                int pageNumber = 1;
+                // Iterate through pages and save each as BMP
+                while (converter.HasNextImage())
+                {
+                    string outPath = Path.Combine(outputDir, $"page_{pageNumber}.bmp");
+                    // Save current page image in BMP format
+                    converter.GetNextImage(outPath, ImageFormat.Bmp);
+                    pageNumber++;
+                }
+
+                // Release internal resources
+                converter.Close();
             }
         }
 
-        Console.WriteLine("PDF conversion to BMP completed.");
+        Console.WriteLine("PDF successfully converted to BMP images.");
     }
 }

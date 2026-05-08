@@ -6,30 +6,27 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
+        const string inputPdfPath  = "input.pdf";
         const string outputPdfPath = "output.pdf";
+        const string newKeywords   = "Aspose, PDF, Metadata";
 
-        // Ensure the source PDF exists
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Open a read‑only stream for the source PDF
+        // Open the source PDF as a stream and bind it to PdfFileInfo
         using (FileStream pdfStream = File.OpenRead(inputPdfPath))
+        using (PdfFileInfo info = new PdfFileInfo(pdfStream))
         {
-            // Initialize PdfFileInfo with the PDF stream
-            using (PdfFileInfo pdfInfo = new PdfFileInfo(pdfStream))
-            {
-                // Update the Keywords metadata
-                pdfInfo.Keywords = "Updated Keywords";
+            // Update the Keywords metadata
+            info.Keywords = newKeywords;
 
-                // Save the PDF with the modified metadata to a new file
-                pdfInfo.SaveNewInfo(outputPdfPath);
-            }
+            // Save the PDF with the updated metadata to a new file
+            info.SaveNewInfo(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF saved with updated keywords to '{outputPdfPath}'.");
+        Console.WriteLine($"Keywords updated and saved to '{outputPdfPath}'.");
     }
 }

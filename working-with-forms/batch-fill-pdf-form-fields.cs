@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
-class Program
+class BatchFillForms
 {
     static void Main()
     {
@@ -19,55 +19,44 @@ class Program
             return;
         }
 
-        // Ensure output directory exists
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Define the field names and the values to assign to every PDF
+        // Define the field names and the values to set in every document
         var fieldValues = new Dictionary<string, string>
         {
-            { "Name", "John Doe" },
-            { "Date", DateTime.Today.ToShortDateString() },
-            { "Approved", "Yes" }
+            { "FirstName", "John" },
+            { "LastName",  "Doe" },
+            { "Email",     "john.doe@example.com" }
         };
 
         // Process each PDF file in the input folder
-        foreach (string sourcePath in Directory.GetFiles(inputFolder, "*.pdf"))
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            string fileName = Path.GetFileName(sourcePath);
-            string destinationPath = Path.Combine(outputFolder, fileName);
+            string fileName   = Path.GetFileName(pdfPath);
+            string outputPath = Path.Combine(outputFolder, fileName);
 
             try
             {
-                // Load the PDF (using ensures deterministic disposal)
-                using (Document doc = new Document(sourcePath))
+                // Load the PDF document (wrapped in using for deterministic disposal)
+                using (Document doc = new Document(pdfPath))
                 {
-                    // Disable automatic recalculation for better performance when many fields are set
-                    doc.Form.AutoRecalculate = false;
-
-                    // Set each predefined field value if the field exists in the document
+                    // Fill the predefined fields if they exist in the form
                     foreach (var kvp in fieldValues)
                     {
                         if (doc.Form.HasField(kvp.Key))
                         {
-                            // Retrieve the field as a Field object (not WidgetAnnotation)
+                            // The Form indexer returns a WidgetAnnotation; cast it to Field
                             Field field = doc.Form[kvp.Key] as Field;
                             if (field != null)
                             {
-                                field.Value = kvp.Value; // <-- correct way to assign a value
+                                field.Value = kvp.Value;
                             }
-                            else
-                            {
-                                Console.WriteLine($"Field '{kvp.Key}' exists but is not a standard form field in {fileName}");
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine($"Field '{kvp.Key}' not found in {fileName}");
                         }
                     }
 
-                    // Save the modified PDF (overwrites the file in the output folder)
-                    doc.Save(destinationPath);
+                    // Save the modified document (overwrites or creates a new file)
+                    doc.Save(outputPath);
                 }
 
                 Console.WriteLine($"Processed: {fileName}");
@@ -77,5 +66,7 @@ class Program
                 Console.Error.WriteLine($"Error processing {fileName}: {ex.Message}");
             }
         }
+
+        Console.WriteLine("Batch processing completed.");
     }
 }

@@ -1,50 +1,51 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
+        // Output PDF file
+        const string outputPath = "country_dropdown.pdf";
+
         // Predefined list of country names
-        string[] countries = new string[]
+        string[] countries = new[]
         {
-            "United States", "Canada", "United Kingdom", "Germany",
-            "France", "Australia", "Japan", "China", "India", "Brazil"
+            "United States",
+            "Canada",
+            "United Kingdom",
+            "Australia",
+            "Germany"
         };
 
-        // Create a new PDF document and ensure deterministic disposal
+        // Create a new PDF document (disposed automatically)
         using (Document doc = new Document())
         {
-            // Add a blank page where the dropdown will be placed
+            // Add a page to place the dropdown
             Page page = doc.Pages.Add();
 
             // Define the rectangle for the ComboBox (left, bottom, right, top)
-            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 250, 650);
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 250, 630);
 
-            // Create the ComboBox field on the specified page and rectangle
+            // Create a ComboBox field attached to the page (not the document)
             ComboBoxField countryField = new ComboBoxField(page, rect);
+            countryField.Name = "Country";                 // field identifier
+            countryField.AlternateName = "Select Country"; // tooltip text
 
-            // Set the field name (used as the identifier in the PDF form)
-            countryField.Name = "Country";
-            countryField.PartialName = "Country";
-
-            // Populate the dropdown with the country options
-            foreach (string c in countries)
+            // Populate the dropdown with country options
+            foreach (string country in countries)
             {
-                countryField.AddOption(c);
+                countryField.AddOption(country);
             }
 
             // Add the field to the document's form collection
             doc.Form.Add(countryField);
 
-            // Save the resulting PDF
-            doc.Save("CountryDropdown.pdf");
+            // Save the PDF (PDF format is the default)
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine("PDF with 'Country' dropdown created successfully.");
+        Console.WriteLine($"PDF with 'Country' dropdown saved to '{outputPath}'.");
     }
 }

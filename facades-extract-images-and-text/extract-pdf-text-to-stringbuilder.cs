@@ -1,53 +1,55 @@
 using System;
 using System.IO;
 using System.Text;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text; // Added namespace for TextFragment
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputTxt = "extracted.txt";
+        const string inputPdfPath = "input.pdf";
+        const string outputTextPath = "extracted.txt";
 
-        // Ensure the source PDF exists – create a minimal one if it does not.
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            CreateSamplePdf(inputPdf);
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            return;
         }
 
-        // StringBuilder to accumulate extracted text.
+        // StringBuilder to hold extracted text for further manipulation
         StringBuilder sb = new StringBuilder();
 
-        // Extract text using PdfExtractor and keep everything in memory.
+        // Use PdfExtractor (Facade) to extract text from the PDF
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            extractor.BindPdf(inputPdf);
+            // Bind the PDF file to the extractor
+            extractor.BindPdf(inputPdfPath);
+
+            // Extract all text using Unicode encoding (default)
             extractor.ExtractText();
 
+            // Save extracted text to a memory stream
             using (MemoryStream ms = new MemoryStream())
             {
-                // Use the stream overload to avoid temporary files.
                 extractor.GetText(ms);
+                ms.Position = 0; // reset stream position
+
+                // Convert stream bytes to string (Unicode)
                 string extracted = Encoding.Unicode.GetString(ms.ToArray());
+
+                // Append to StringBuilder for any further processing
                 sb.Append(extracted);
             }
         }
 
-        // Write the accumulated text to disk using Unicode encoding.
-        File.WriteAllText(outputTxt, sb.ToString(), Encoding.Unicode);
-    }
+        // Example manipulation: trim and normalize line endings
+        string processed = sb.ToString()
+                             .Trim()
+                             .Replace("\r\n", "\n");
 
-    // Helper that creates a very simple PDF when the expected input file is missing.
-    private static void CreateSamplePdf(string path)
-    {
-        using (Document doc = new Document())
-        {
-            Page page = doc.Pages.Add();
-            page.Paragraphs.Add(new TextFragment("Sample PDF for text extraction."));
-            doc.Save(path);
-        }
+        // Write the final text to disk using Unicode encoding
+        File.WriteAllText(outputTextPath, processed, Encoding.Unicode);
+
+        Console.WriteLine($"Text extracted and saved to '{outputTextPath}'.");
     }
 }

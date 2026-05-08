@@ -1,41 +1,42 @@
 using System;
-using System.Drawing;
-using Aspose.Pdf.Facades;
+using System.IO;
+using System.Drawing;               // For System.Drawing.Color
+using Aspose.Pdf.Facades;          // PdfContentEditor resides here
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string bookmarkTitle = "Example Site";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!System.IO.File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Initialize the facade and bind the existing PDF
-        PdfContentEditor editor = new PdfContentEditor();
-        editor.BindPdf(inputPdf);
+        // Bind the existing PDF, add a bookmark that opens an external URL, and save.
+        using (PdfContentEditor editor = new PdfContentEditor())
+        {
+            editor.BindPdf(inputPath);
 
-        // Create a bookmark that opens an external URL when selected
-        // Parameters: title, color, bold flag, italic flag, file (null for URI), action type, destination URL
-        editor.CreateBookmarksAction(
-            bookmarkTitle,
-            Color.Blue,
-            true,   // bold
-            false,  // italic
-            null,   // no file needed for URI action
-            "URI",
-            "https://example.org"
-        );
+            // Create a bookmark titled "Example Org" that launches the URL https://example.org.
+            // Parameters: title, title color, bold flag, italic flag, file (null for URI), action type, destination.
+            editor.CreateBookmarksAction(
+                "Example Org",          // Bookmark title
+                Color.Blue,            // Title color
+                false,                 // Bold flag
+                false,                 // Italic flag
+                null,                  // No file needed for URI action
+                "URI",                 // Action type for external link
+                "https://example.org"  // Destination URL
+            );
 
-        // Save the updated PDF
-        editor.Save(outputPdf);
-        editor.Close();
+            // Persist the changes to a new PDF file.
+            editor.Save(outputPath);
+        }
 
-        Console.WriteLine($"Bookmark added and saved to '{outputPdf}'.");
+        Console.WriteLine($"Bookmark added and saved to '{outputPath}'.");
     }
 }

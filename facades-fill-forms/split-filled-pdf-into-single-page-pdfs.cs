@@ -6,10 +6,13 @@ class Program
 {
     static void Main()
     {
+        // Path to the filled PDF document
         const string inputPdf = "filled.pdf";
-        // %NUM% will be replaced with the page number (1‑based)
+
+        // Template for output files – %NUM% will be replaced with the page number
         const string outputTemplate = "output/page%NUM%.pdf";
 
+        // Verify the input file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input file not found: {inputPdf}");
@@ -18,15 +21,15 @@ class Program
 
         // Ensure the output directory exists
         string outputDir = Path.GetDirectoryName(outputTemplate);
-        if (!string.IsNullOrEmpty(outputDir) && !Directory.Exists(outputDir))
+        if (!string.IsNullOrEmpty(outputDir))
         {
             Directory.CreateDirectory(outputDir);
         }
 
-        // PdfFileEditor does NOT implement IDisposable, so do NOT use a using block
+        // PdfFileEditor does not implement IDisposable, so we instantiate it directly
         PdfFileEditor editor = new PdfFileEditor();
 
-        // Split the PDF into single‑page files using the template path
+        // Split the PDF into single‑page files using the template
         editor.SplitToPages(inputPdf, outputTemplate);
 
         Console.WriteLine("PDF split into individual pages successfully.");

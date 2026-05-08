@@ -1,51 +1,48 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_with_xmp.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_with_xmp.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        try
+        // Load the source PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the source PDF
-            using (Document doc = new Document(inputPdf))
+            // Determine whether any XMP metadata is already present.
+            // The Metadata collection is empty when no XMP packet exists.
+            bool hasMetadata = doc.Metadata.Count > 0;
+
+            if (!hasMetadata)
             {
-                // Bind the PDF to the XMP metadata facade
-                using (PdfXmpMetadata xmp = new PdfXmpMetadata())
-                {
-                    xmp.BindPdf(doc);
+                // Register the standard namespaces we are going to use.
+                doc.Metadata.RegisterNamespaceUri("dc", "http://purl.org/dc/elements/1.1/");
+                doc.Metadata.RegisterNamespaceUri("xmp", "http://ns.adobe.com/xap/1.0/");
 
-                    // If no XMP metadata is present, add a minimal set
-                    if (xmp.Count == 0)
-                    {
-                        // Add a few essential metadata fields
-                        xmp.Add(DefaultMetadataProperties.CreatorTool, "Aspose.Pdf");
-                        xmp.Add(DefaultMetadataProperties.CreateDate, DateTime.UtcNow);
-                        xmp.Add(DefaultMetadataProperties.ModifyDate, DateTime.UtcNow);
-                        xmp.Add(DefaultMetadataProperties.Nickname, "GeneratedMetadata");
-                    }
+                // Add a minimal set of XMP properties.
+                doc.Metadata["dc:title"] = "Untitled Document";
+                doc.Metadata["xmp:CreatorTool"] = "Aspose.Pdf";
+                doc.Metadata["xmp:ModifyDate"] = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ");
 
-                    // Save the PDF (with the XMP metadata) to the output file
-                    xmp.Save(outputPdf);
-                }
+                // Save the PDF with the newly created XMP metadata.
+                doc.Save(outputPath);
+                Console.WriteLine($"Minimal XMP metadata added and saved to '{outputPath}'.");
             }
-
-            Console.WriteLine($"Processed PDF saved to '{outputPdf}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            else
+            {
+                // Metadata already exists – simply copy the original PDF.
+                doc.Save(outputPath);
+                Console.WriteLine($"Existing XMP metadata preserved; saved to '{outputPath}'.");
+            }
         }
     }
 }

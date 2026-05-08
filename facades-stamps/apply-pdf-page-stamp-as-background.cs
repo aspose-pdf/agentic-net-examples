@@ -1,16 +1,14 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string inputPdf   = "input.pdf";   // PDF to be stamped
-        const string stampPdf   = "stamp.pdf";   // PDF whose first page will be used as stamp
-        const string outputPdf  = "output.pdf";  // Resulting PDF
+        const string inputPdf  = "input.pdf";   // source PDF
+        const string stampPdf  = "stamp.pdf";   // PDF whose first page will be used as stamp
+        const string outputPdf = "output.pdf";  // result PDF
 
         // Verify files exist
         if (!File.Exists(inputPdf))
@@ -24,22 +22,20 @@ class Program
             return;
         }
 
-        // Initialize the facade for stamping
+        // Initialize the facade and bind the source document
         PdfFileStamp fileStamp = new PdfFileStamp();
-
-        // Load the target PDF
-        fileStamp.BindPdf(inputPdf);
+        fileStamp.BindPdf(inputPdf); // load source PDF
 
         // Create a stamp that uses the first page of the stamp PDF
-        Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-        stamp.BindPdf(stampPdf, 1);   // page numbers are 1‑based
+        Stamp stamp = new Stamp();
+        stamp.BindPdf(stampPdf, 1);   // bind page 1 of stampPdf as stamp content
         stamp.IsBackground = true;   // place stamp behind page content
+        stamp.Pages = null;           // null means all pages are affected
 
-        // Apply the stamp to all pages (Pages = null means all pages)
-        // No need to set stamp.Pages because null is default
+        // Add the stamp to the document
         fileStamp.AddStamp(stamp);
 
-        // Save the result
+        // Save the stamped PDF
         fileStamp.Save(outputPdf);
         fileStamp.Close();
 

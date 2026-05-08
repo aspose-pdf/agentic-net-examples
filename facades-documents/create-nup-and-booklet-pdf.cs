@@ -6,52 +6,47 @@ class Program
 {
     static void Main()
     {
-        // Paths for the original PDF, the intermediate N‑up PDF, and the final booklet PDF
-        const string inputPdf   = "input.pdf";
-        const string nupPdf     = "temp_nup.pdf";
-        const string bookletPdf = "booklet_output.pdf";
+        // Input PDF file
+        const string inputPath = "input.pdf";
 
-        // Verify that the source file exists
-        if (!File.Exists(inputPdf))
+        // Intermediate N‑up PDF (2 columns × 2 rows)
+        const string nupPath = "temp_nup.pdf";
+
+        // Final booklet PDF
+        const string outputPath = "booklet_output.pdf";
+
+        // Verify the source file exists
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPdf}");
+            Console.Error.WriteLine($"Source file not found: {inputPath}");
             return;
         }
 
         try
         {
-            // ------------------------------------------------------------
-            // Step 1: Create an N‑up layout.
-            // ------------------------------------------------------------
-            // The MakeNUp method arranges multiple pages of the source PDF
-            // onto a single page. Here we use a 2 × 2 grid (4‑up) which
-            // reduces the page count and prepares the document for booklet
-            // pagination.
+            // Create a PdfFileEditor instance (does not implement IDisposable)
             PdfFileEditor editor = new PdfFileEditor();
-            // Parameters: input file, output file, columns (x), rows (y)
-            editor.MakeNUp(inputPdf, nupPdf, 2, 2);
 
-            // ------------------------------------------------------------
+            // Step 1: Create an N‑up layout.
+            // This will place 2 columns and 2 rows of pages on each output page.
+            // The overload used: MakeNUp(string inputFile, string outputFile, int x, int y)
+            editor.MakeNUp(inputPath, nupPath, 2, 2);
+
             // Step 2: Convert the N‑up PDF into a booklet.
-            // ------------------------------------------------------------
-            // The MakeBooklet method reorders pages so that when the PDF
-            // is printed double‑sided and folded, the pages appear in the
-            // correct order.
-            editor.MakeBooklet(nupPdf, bookletPdf);
+            // The overload used: MakeBooklet(string inputFile, string outputFile)
+            editor.MakeBooklet(nupPath, outputPath);
 
-            Console.WriteLine($"Booklet PDF created successfully: {bookletPdf}");
+            // Optional: clean up the intermediate N‑up file
+            if (File.Exists(nupPath))
+            {
+                File.Delete(nupPath);
+            }
+
+            Console.WriteLine($"Booklet created successfully: {outputPath}");
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine($"Error during processing: {ex.Message}");
-        }
-        finally
-        {
-            // Clean up the intermediate N‑up file if it exists
-            if (File.Exists(nupPdf))
-            {
-                try { File.Delete(nupPdf); } catch { /* ignore cleanup errors */ }
-            }
         }
     }
 }

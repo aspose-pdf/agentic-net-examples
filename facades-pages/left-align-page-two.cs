@@ -1,7 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // HorizontalAlignment enum
-using Aspose.Pdf.Facades;      // PdfPageEditor
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -12,29 +12,32 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Edit the PDF using PdfPageEditor (facade API)
+        // Use PdfPageEditor (Facade) to modify page layout.
         using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // Load the source PDF
+            // Load the source PDF.
             editor.BindPdf(inputPath);
 
-            // Process only page 2 (Aspose.Pdf uses 1‑based indexing)
+            // Specify that only page 2 should be processed.
             editor.ProcessPages = new int[] { 2 };
 
-            // Set horizontal alignment to left (explicitly)
-            editor.HorizontalAlignment = HorizontalAlignment.Left;
+            // Set horizontal alignment to left (default, but set explicitly as requested).
+            editor.HorizontalAlignment = Aspose.Pdf.HorizontalAlignment.Left;
 
-            // Apply the changes to the document
+            // Apply the changes to the document.
             editor.ApplyChanges();
 
-            // Save the modified PDF
+            // Save the modified PDF.
             editor.Save(outputPath);
+
+            // Close the facade (optional, as using will dispose it).
+            editor.Close();
         }
 
-        Console.WriteLine($"Page 2 left‑aligned PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Page 2 aligned left and saved to '{outputPath}'.");
     }
 }

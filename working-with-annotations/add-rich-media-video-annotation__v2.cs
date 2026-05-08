@@ -7,9 +7,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";          // source PDF
-        const string videoFile = "sample.mp4";        // video to embed
-        const string outputPdf = "output_with_richmedia.pdf";
+        const string inputPdf  = "input.pdf";      // source PDF
+        const string outputPdf = "output.pdf";     // result PDF
+        const string videoFile = "sample.mp4";     // video to embed
 
         if (!File.Exists(inputPdf))
         {
@@ -23,40 +23,35 @@ class Program
             return;
         }
 
-        // Load the PDF (lifecycle rule: use Document constructor with file path)
+        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
         using (Document doc = new Document(inputPdf))
         {
-            // Create a rectangle where the annotation will appear
-            var rect = new Aspose.Pdf.Rectangle(100, 500, 400, 800);
+            // Choose the page where the annotation will be placed (first page, 1‑based indexing)
+            Page page = doc.Pages[1];
 
-            // Initialize RichMediaAnnotation on the first page
-            var richMedia = new RichMediaAnnotation(doc.Pages[1], rect)
+            // Define the rectangle for the annotation (left, bottom, width, height)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 400, 300);
+
+            // Create the RichMediaAnnotation
+            RichMediaAnnotation richMedia = new RichMediaAnnotation(page, rect)
             {
-                // Set the type to video
+                // Set the type of the embedded content to Video
                 Type = RichMediaAnnotation.ContentType.Video,
 
-                // Activation: Aspose.PDF does not provide a double‑click activation event.
-                // The closest supported activation is on page open (or other supported events).
-                // Here we use the default (page open) activation. If a specific event is required,
-                // use a valid enum value such as RichMediaAnnotation.ActivationEvent.PageOpen.
-                // ActivateOn = RichMediaAnnotation.ActivationEvent.PageOpen, // optional
-
-                // Optional: set a description (Contents is defined on the base Annotation class)
-                Contents = "Double‑click to play the video. (Note: double‑click activation is not supported; video plays on page open.)"
+                // Activate only on click (Aspose.Pdf does not provide a double‑click event;
+                // Click is the closest available activation event)
+                ActivateOn = RichMediaAnnotation.ActivationEvent.Click
             };
 
-            // Note: RichMediaAnnotation does not inherit from MarkupAnnotation, so Title cannot be set.
-            // If a title is required, it can be stored in the Contents or as a custom property.
-
-            // Embed the video stream
+            // Embed the video stream into the annotation
             using (FileStream videoStream = File.OpenRead(videoFile))
             {
-                // The first argument is the name of the embedded stream
+                // The first parameter is the name of the stream inside the PDF
                 richMedia.SetContent(Path.GetFileName(videoFile), videoStream);
             }
 
             // Add the annotation to the page
-            doc.Pages[1].Annotations.Add(richMedia);
+            page.Annotations.Add(richMedia);
 
             // Save the modified PDF (lifecycle rule: use Document.Save)
             doc.Save(outputPdf);

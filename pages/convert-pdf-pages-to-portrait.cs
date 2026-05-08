@@ -1,6 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // Core Aspose.Pdf namespace
+using Aspose.Pdf.Text;          // For any text-related types if needed (not used here)
 
 class Program
 {
@@ -11,29 +12,35 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         // Load the PDF document (lifecycle rule: use using for deterministic disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing)
+            // Iterate pages using 1‑based indexing (global rule)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
+
+                // Get current MediaBox rectangle
                 Aspose.Pdf.Rectangle mediaBox = page.MediaBox;
 
+                // Calculate current width and height
+                double width  = mediaBox.URX - mediaBox.LLX;
+                double height = mediaBox.URY - mediaBox.LLY;
+
                 // If the page is landscape (width > height), swap dimensions to make it portrait
-                if (mediaBox.Width > mediaBox.Height)
+                if (width > height)
                 {
-                    // Set new page size: height becomes width, width becomes height
-                    page.SetPageSize(mediaBox.Height, mediaBox.Width);
+                    // Set new page size with width <= height
+                    page.SetPageSize(height, width);
                 }
                 // If already portrait, no action needed
             }
 
-            // Save the modified document (lifecycle rule: Document.Save)
+            // Save the modified document (PDF format, no SaveOptions needed)
             doc.Save(outputPath);
         }
 

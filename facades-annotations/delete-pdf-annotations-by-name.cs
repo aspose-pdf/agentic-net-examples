@@ -2,92 +2,75 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // added for annotation types
 
-class Program
+class DeleteAnnotationExample
 {
     static void Main()
     {
-        // ---------------------------------------------------------------------
-        // 1. Create a sample PDF that contains a named annotation.
-        //    The PDF is kept in memory so the example does not depend on an
-        //    external file on disk.
-        // ---------------------------------------------------------------------
-        byte[] pdfBytes = CreateSamplePdfWithAnnotation(out string annotationName);
+        // Input PDF containing annotations. If the file does not exist, create a simple PDF for demo purposes.
+        string inputPath = "example.pdf";
+        EnsureSamplePdfExists(inputPath);
 
-        // ---------------------------------------------------------------------
-        // Example A – Delete the annotation using a **string literal**.
-        // ---------------------------------------------------------------------
-        using (var editor = new PdfAnnotationEditor())
+        // ---------- Delete annotation using a string literal ----------
+        string outputLiteral = "example_literal_out.pdf";
+        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            // Bind the PDF from a memory stream (no file I/O required).
-            using (var input = new MemoryStream(pdfBytes))
-            {
-                editor.BindPdf(input);
-                // The literal can be written directly, but we reuse the generated name
-                // to keep the example functional.
-                editor.DeleteAnnotation(annotationName);
+            // Load the PDF into the facade
+            editor.BindPdf(inputPath);
 
-                // Save the result to a new file.
-                using (var output = new MemoryStream())
-                {
-                    editor.Save(output);
-                    File.WriteAllBytes("output_literal.pdf", output.ToArray());
-                }
-            }
+            // Delete the annotation whose name is known as a literal string
+            editor.DeleteAnnotation("4cfa69cd-9bff-49e0-9005-e22a77cebf38");
+
+            // Save the modified PDF
+            editor.Save(outputLiteral);
         }
 
-        // ---------------------------------------------------------------------
-        // Example B – Delete the annotation using a **variable** that holds the name.
-        // ---------------------------------------------------------------------
-        string nameFromVariable = annotationName; // could be any string variable
-        using (var editor = new PdfAnnotationEditor())
-        {
-            using (var input = new MemoryStream(pdfBytes))
-            {
-                editor.BindPdf(input);
-                editor.DeleteAnnotation(nameFromVariable);
+        // ---------- Delete annotation using a variable ----------
+        string outputVariable = "example_variable_out.pdf";
+        // Annotation name stored in a variable (could be obtained at runtime)
+        string annotName = "4cfa69cd-9bff-49e0-9005-e22a77cebf38";
 
-                using (var output = new MemoryStream())
-                {
-                    editor.Save(output);
-                    File.WriteAllBytes("output_variable.pdf", output.ToArray());
-                }
-            }
+        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        {
+            // Load the same PDF (or another one) into the facade
+            editor.BindPdf(inputPath);
+
+            // Delete the annotation using the variable
+            editor.DeleteAnnotation(annotName);
+
+            // Save the result
+            editor.Save(outputVariable);
         }
     }
 
     /// <summary>
-    /// Creates a minimal PDF document that contains a single TextAnnotation.
-    /// The annotation is given a unique name (GUID) which is returned via the
-    /// out parameter so the caller can later delete it.
+    /// Creates a minimal PDF file if the specified path does not exist.
+    /// This allows the example to run without requiring an external file.
     /// </summary>
-    private static byte[] CreateSamplePdfWithAnnotation(out string annotationName)
+    private static void EnsureSamplePdfExists(string path)
     {
-        // Generate a unique name for the annotation.
-        annotationName = Guid.NewGuid().ToString();
+        if (File.Exists(path))
+            return;
 
-        // Build the PDF in memory.
-        var doc = new Document();
-        var page = doc.Pages.Add();
-
-        // Define a rectangle where the annotation will appear.
-        var rect = new Aspose.Pdf.Rectangle(100, 600, 200, 650);
-
-        // Create a text annotation and assign the generated name.
-        var textAnnotation = new TextAnnotation(page, rect)
+        // Create a simple one‑page PDF
+        using (Document doc = new Document())
         {
-            Title = "Sample",
-            Contents = "This is a sample annotation",
-            Name = annotationName // <-- this is the identifier used by DeleteAnnotation
-        };
-        page.Annotations.Add(textAnnotation);
+            // Add a blank page
+            Page page = doc.Pages.Add();
 
-        // Save the document to a byte array.
-        using (var ms = new MemoryStream())
-        {
-            doc.Save(ms);
-            return ms.ToArray();
+            // Add a sample annotation with the expected name so the DeleteAnnotation call succeeds.
+            // Use the constructor that accepts a Page and a Rectangle (the overload that matches the types).
+            var annotationRect = new Aspose.Pdf.Rectangle(100, 600, 200, 650);
+            var annotation = new TextAnnotation(page, annotationRect)
+            {
+                Name = "4cfa69cd-9bff-49e0-9005-e22a77cebf38",
+                Contents = "Sample annotation"
+                // Rect is already set by the constructor; no need to set it again.
+            };
+            page.Annotations.Add(annotation);
+
+            doc.Save(path);
         }
     }
 }

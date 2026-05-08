@@ -21,18 +21,18 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf;` (57/57 files) ← category-specific
-- `using Aspose.Pdf.Optimization;` (1/57 files)
-- `using Aspose.Pdf.Security;` (1/57 files)
-- `using Aspose.Pdf.Tagged;` (1/57 files)
-- `using Aspose.Pdf.Text;` (1/57 files)
-- `using System;` (57/57 files)
-- `using System.IO;` (56/57 files)
-- `using System.Collections.Generic;` (1/57 files)
-- `using System.Net.Http;` (1/57 files)
-- `using System.Text;` (1/57 files)
-- `using System.Text.Json;` (1/57 files)
-- `using System.Threading.Tasks;` (1/57 files)
+- `using Aspose.Pdf;` (56/56 files) ← category-specific
+- `using Aspose.Pdf.Text;` (3/56 files)
+- `using Aspose.Pdf.Optimization;` (1/56 files)
+- `using Aspose.Pdf.Security;` (1/56 files)
+- `using System;` (56/56 files)
+- `using System.IO;` (54/56 files)
+- `using System.Runtime.InteropServices;` (2/56 files)
+- `using System.Text;` (2/56 files)
+- `using System.Collections.Generic;` (1/56 files)
+- `using System.Net.Http;` (1/56 files)
+- `using System.Text.Json;` (1/56 files)
+- `using System.Threading.Tasks;` (1/56 files)
 
 ## Common Code Pattern
 
@@ -50,40 +50,40 @@ using (Document doc = new Document("input.pdf"))
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [add-blank-page-to-pdf-document](./add-blank-page-to-pdf-document.cs) | Add Blank Page to PDF Document | `Document`, `Add`, `Save` | Shows how to load an existing PDF with Aspose.Pdf, insert a new blank page, and save the modified... |
-| [add-custom-xmp-metadata-to-pdf](./add-custom-xmp-metadata-to-pdf.cs) | Add Custom XMP Metadata to PDF | `Document`, `SetXmpMetadata`, `Save` | Loads an existing PDF, injects a custom XMP metadata block, and saves the document while preservi... |
-| [batch-convert-pdfs-to-pdfa-1b-with-compression](./batch-convert-pdfs-to-pdfa-1b-with-compression.cs) | Batch Convert PDFs to PDF/A‑1b with Compression and Reportin... | `Document`, `PdfFormatConversionOptions`, `PdfFormat` | Demonstrates how to convert multiple PDF files to PDF/A‑1b format with high compression using Asp... |
-| [batch-convert-pdfs-to-pdfa-1b](./batch-convert-pdfs-to-pdfa-1b.cs) | Batch Convert PDFs to PDF/A‑1b | `Document`, `Convert`, `Save` | Demonstrates how to process all PDF files in a folder, convert each to PDF/A‑1b format using Aspo... |
-| [batch-convert-pdfs-to-pdfa1b-csv-report](./batch-convert-pdfs-to-pdfa1b-csv-report.cs) | Batch Convert PDFs to PDF/A-1b with CSV Report | `Document`, `Convert`, `Save` | Shows how to convert multiple PDF files to PDF/A-1b using Aspose.Pdf, save the converted files, a... |
-| [batch-decrypt-encrypted-pdfs](./batch-decrypt-encrypted-pdfs.cs) | Batch Decrypt Encrypted PDFs with Owner Password | `Document`, `Decrypt`, `Save` | Shows how to open multiple password‑protected PDF files using a shared owner password, decrypt ea... |
-| [batch-encrypt-pdfs-with-derived-passwords](./batch-encrypt-pdfs-with-derived-passwords.cs) | Batch Encrypt PDFs with Passwords Derived from File Names | `Document`, `Encrypt`, `Save` | Demonstrates how to encrypt multiple PDF files using Aspose.Pdf, generating a deterministic passw... |
-| [batch-encrypt-pdfs](./batch-encrypt-pdfs.cs) | Batch Encrypt PDFs with a User Password | `Document`, `Encrypt`, `Save` | Shows how to encrypt every PDF in a directory using Aspose.Pdf, applying the same user password a... |
-| [batch-pdf-encryption-from-json-config](./batch-pdf-encryption-from-json-config.cs) | Batch PDF Encryption from JSON Config | `Document`, `Encrypt`, `Save` | Demonstrates reading a JSON configuration of encryption tasks, loading each PDF with Aspose.Pdf, ... |
-| [batch-split-pdf-by-page-ranges](./batch-split-pdf-by-page-ranges.cs) | Batch Split PDF into Sections by Page Ranges | `Document`, `Pages`, `Save` | Shows how to read page range definitions from a configuration file and split a PDF into separate ... |
-| [change-pdf-passwords](./change-pdf-passwords.cs) | Change PDF Passwords Using Aspose.Pdf | `Document`, `ChangePasswords`, `Save` | Shows how to open a password‑protected PDF with the owner password, change both the user and owne... |
-| [compress-pdf-default-settings](./compress-pdf-default-settings.cs) | Compress PDF with Default Optimization | `Document`, `OptimizeResources`, `Save` | Shows how to load a PDF, apply Aspose.Pdf's default resource optimization, save the compressed fi... |
-| [compress-pdf-high-compression](./compress-pdf-high-compression.cs) | Compress PDF with High Compression Level | `Document`, `OptimizeResources`, `Save` | Demonstrates how to load a PDF, apply high‑level compression using Aspose.Pdf optimization option... |
-| [convert-pdf-to-pdfa-1b](./convert-pdf-to-pdfa-1b.cs) | Convert PDF to PDF/A-1b with Embedded Fonts Preservation | `Document`, `PdfFormatConversionOptions`, `PdfFormat` | Demonstrates loading a PDF with Aspose.Pdf, converting it to PDF/A-1b while preserving the origin... |
-| [convert-pdf-to-pdfa-1b__v2](./convert-pdf-to-pdfa-1b__v2.cs) | Convert PDF to PDF/A‑1b with Font Embedding | `Document`, `Convert`, `Save` | Shows how to load a PDF, convert it to PDF/A‑1b compliance (embedding missing fonts) using Aspose... |
-| [convert-pdf-to-pdfa-1b__v3](./convert-pdf-to-pdfa-1b__v3.cs) | Convert PDF to PDF/A-1B Compliance | `Document`, `Convert`, `Save` | Loads a PDF file, converts it to PDF/A‑1B compliance using Aspose.Pdf, and saves the resulting do... |
-| [convert-pdf-to-pdfa1b-preserve-metadata](./convert-pdf-to-pdfa1b-preserve-metadata.cs) | Convert PDF to PDF/A-1b while Preserving Metadata | `Document`, `Convert`, `Save` | Demonstrates loading an existing PDF, converting it to PDF/A‑1b compliance using Aspose.Pdf, and ... |
-| [convert-pdf-to-pdfx3-cmyk](./convert-pdf-to-pdfx3-cmyk.cs) | Convert PDF to PDF/X‑3 with CMYK Color Space | `Document`, `PdfFormatConversionOptions`, `PdfFormat` | Demonstrates loading a PDF, converting it to PDF/X‑3 compliance while forcing all colors to CMYK ... |
-| [convert-pdf-to-pdfx3-preserve-icc](./convert-pdf-to-pdfx3-preserve-icc.cs) | Convert PDF to PDF/X‑3 while Preserving ICC Profile | `Document`, `PdfFormatConversionOptions`, `PdfFormat` | Demonstrates how to convert a regular PDF to PDF/X‑3 using Aspose.Pdf, keeping the original ICC c... |
-| [create-pdfa1b-with-text-paragraph](./create-pdfa1b-with-text-paragraph.cs) | Create PDF/A‑1b Document with Text Paragraph | `Document`, `Page`, `TextParagraph` | Demonstrates creating a PDF, adding a wrapped text paragraph to a page, converting the document t... |
-| [create-pdfx3-document-multiple-pages](./create-pdfx3-document-multiple-pages.cs) | Create PDF/X‑3 Document with Multiple Pages | `Document`, `Add`, `Convert` | Demonstrates creating a new PDF, adding three blank pages, converting it to PDF/X‑3 compliance, a... |
-| [decrypt-pdf-with-user-password](./decrypt-pdf-with-user-password.cs) | Decrypt Encrypted PDF with User Password | `Document`, `Decrypt`, `Save` | Shows how to open a password‑protected PDF using Aspose.Pdf, decrypt it, and save an unprotected ... |
-| [download-pdf-from-url-and-save-locally](./download-pdf-from-url-and-save-locally.cs) | Download PDF from URL and Save Locally | `Document`, `Save` | Demonstrates how to download a PDF from a network URL using HttpClient, load it into an Aspose.Pd... |
-| [encrypt-pdf-aes128-verify-print-permissions](./encrypt-pdf-aes128-verify-print-permissions.cs) | Encrypt PDF with AES‑128 and Verify Print Permissions | `Document`, `Permissions`, `CryptoAlgorithm` | Demonstrates encrypting a PDF using AES‑128, allowing high‑quality printing, and verifying the en... |
-| [encrypt-pdf-aes256-disable-printing](./encrypt-pdf-aes256-disable-printing.cs) | Encrypt PDF with AES‑256 and Disable Printing | `Document`, `Encrypt`, `Save` | Demonstrates applying AES‑256 encryption to a PDF, restricting printing permissions, and verifyin... |
-| [encrypt-pdf-form-fill-permission](./encrypt-pdf-form-fill-permission.cs) | Encrypt PDF with Form Fill Permission Only | `Document`, `Encrypt`, `Save` | Demonstrates how to encrypt a PDF using Aspose.Pdf, allowing only form filling while disabling co... |
-| [encrypt-pdf-form-fill-permission__v2](./encrypt-pdf-form-fill-permission__v2.cs) | Encrypt PDF with Form‑Fill Only Permission | `Document`, `Permissions`, `CryptoAlgorithm` | Demonstrates loading a PDF, applying AES‑256 encryption that restricts permissions to only form f... |
-| [encrypt-pdf-from-stream](./encrypt-pdf-from-stream.cs) | Encrypt PDF from Stream and Write to Output Stream | `Document`, `Encrypt`, `Save` | Demonstrates loading a PDF from a network stream, applying AES‑256 encryption with specific permi... |
-| [encrypt-pdf-owner-password-only](./encrypt-pdf-owner-password-only.cs) | Encrypt PDF with Owner Password Only | `Document`, `Encrypt`, `Save` | Shows how to encrypt a PDF using Aspose.Pdf by providing only an owner password, leaving the user... |
-| [encrypt-pdf-rc4-128-verify-size](./encrypt-pdf-rc4-128-verify-size.cs) | Encrypt PDF with 128‑bit RC4 and Verify Size Increase | `Document`, `Encrypt`, `Save` | Demonstrates loading a PDF with Aspose.Pdf, applying 128‑bit RC4 encryption with user and owner p... |
-| ... | | | *and 27 more files* |
+| [add-blank-page-to-pdf-document](./add-blank-page-to-pdf-document.cs) | Add Blank Page to PDF Document | `Document`, `Pages`, `PageCollection` | Demonstrates how to load an existing PDF, append a new blank page, and save the updated file usin... |
+| [add-xmp-metadata-to-pdf](./add-xmp-metadata-to-pdf.cs) | Add XMP Metadata to PDF and Save | `Document`, `SetXmpMetadata`, `Save` | Loads a PDF, builds a custom XMP packet, attaches it to the document, and saves the file while pr... |
+| [batch-convert-pdfs-to-pdfa-1b](./batch-convert-pdfs-to-pdfa-1b.cs) | Batch Convert PDFs to PDF/A-1b | `Document`, `Convert`, `PdfFormat` | Shows how to iterate over PDF files in a folder, convert each to PDF/A‑1b using Aspose.Pdf, and w... |
+| [batch-convert-pdfs-to-pdfa-1b__v2](./batch-convert-pdfs-to-pdfa-1b__v2.cs) | Batch Convert PDFs to PDF/A-1b with High Compression | `Document`, `PdfFormatConversionOptions`, `PdfFormat` | Shows how to iterate over PDF files in a folder, convert each to PDF/A‑1b using Aspose.Pdf with f... |
+| [batch-convert-pdfs-to-pdfa-1b__v3](./batch-convert-pdfs-to-pdfa-1b__v3.cs) | Batch Convert PDFs to PDF/A-1b with CSV Log | `Document`, `Convert`, `Save` | Demonstrates how to process a folder of PDF files, convert each to PDF/A‑1b using Aspose.Pdf, and... |
+| [batch-decrypt-encrypted-pdfs](./batch-decrypt-encrypted-pdfs.cs) | Batch Decrypt Encrypted PDFs | `Document`, `ctor(string, string)`, `Decrypt` | Shows how to open a collection of encrypted PDF files with a shared owner password, remove their ... |
+| [batch-encrypt-pdfs-from-config](./batch-encrypt-pdfs-from-config.cs) | Batch Encrypt PDFs with Passwords from Configuration | `Document`, `Permissions`, `CryptoAlgorithm` | Demonstrates how to read a JSON configuration file containing multiple encryption jobs and encryp... |
+| [batch-encrypt-pdfs-with-filename-passwords](./batch-encrypt-pdfs-with-filename-passwords.cs) | Batch Encrypt PDFs with File‑Name Based Passwords | `Document`, `Permissions`, `CryptoAlgorithm` | Shows how to encrypt multiple PDF files using Aspose.Pdf, generate a unique password from each fi... |
+| [batch-encrypt-pdfs](./batch-encrypt-pdfs.cs) | Batch Encrypt PDFs with a User Password | `Document`, `Encrypt`, `Save` | Shows how to encrypt every PDF in a folder using Aspose.Pdf by applying the same user and owner p... |
+| [compress-pdf-default-settings](./compress-pdf-default-settings.cs) | Compress PDF Using Default Settings | `Document`, `Optimize`, `Save` | Shows how to load a PDF with Aspose.Pdf, save it using the default compression options, and compa... |
+| [compress-pdf-high-optimization](./compress-pdf-high-optimization.cs) | Compress PDF with High Optimization Level | `Document`, `OptimizationOptions`, `OptimizeResources` | Loads a PDF, applies aggressive optimization (object compression, font subsetting, unused object ... |
+| [convert-pdf-to-pdfa-1b-embed-fonts](./convert-pdf-to-pdfa-1b-embed-fonts.cs) | Convert PDF to PDF/A-1b with Embedded Fonts | `Document`, `Convert`, `PdfFormat` | Shows how to load a PDF, convert it to PDF/A‑1b compliance (embedding any missing fonts), and sav... |
+| [convert-pdf-to-pdfa-1b](./convert-pdf-to-pdfa-1b.cs) | Convert PDF to PDF/A-1b with Metadata Preservation | `Document`, `Convert`, `Save` | Shows how to load a PDF, convert it to PDF/A‑1b compliance while preserving the document's metada... |
+| [convert-pdf-to-pdfa-1b__v2](./convert-pdf-to-pdfa-1b__v2.cs) | Convert PDF to PDF/A-1b | `Document`, `Convert`, `PdfFormat` | Shows how to load a PDF with Aspose.Pdf, convert it to PDF/A‑1b compliance, and save the resultin... |
+| [convert-pdf-to-pdfa-1b__v3](./convert-pdf-to-pdfa-1b__v3.cs) | Convert PDF to PDF/A-1b Compliance | `Document`, `Convert`, `PdfFormat` | Loads a PDF file, converts it to PDF/A‑1b compliance while logging conversion errors, and saves t... |
+| [convert-pdf-to-pdfx3-cmyk](./convert-pdf-to-pdfx3-cmyk.cs) | Convert PDF to PDF/X-3 with CMYK Color Space | `Document`, `PdfFormatConversionOptions`, `PdfFormat` | Shows how to load a PDF, set up PdfFormatConversionOptions for PDF/X-3 compliance with a CMYK ICC... |
+| [convert-pdf-to-pdfx3-preserving-icc-profiles](./convert-pdf-to-pdfx3-preserving-icc-profiles.cs) | Convert PDF to PDF/X‑3 Preserving ICC Profiles | `Document`, `PdfFormatConversionOptions`, `PdfFormat` | Demonstrates how to convert an existing PDF to PDF/X‑3 format using Aspose.Pdf while keeping any ... |
+| [create-pdfa1b-with-text-paragraph](./create-pdfa1b-with-text-paragraph.cs) | Create PDF/A-1b Document with Text Paragraph | `Document`, `Page`, `TextParagraph` | The example creates a new PDF document, adds a text paragraph to the first page, and converts the... |
+| [create-pdfx3-document-multiple-pages](./create-pdfx3-document-multiple-pages.cs) | Create PDF/X‑3 Document with Multiple Pages | `Document`, `Add`, `Convert` | Shows how to create a new PDF, add three blank pages, convert it to PDF/X‑3 format, and save the ... |
+| [decrypt-encrypted-pdf](./decrypt-encrypted-pdf.cs) | Decrypt Encrypted PDF Using User Password | `Document`, `Decrypt`, `Save` | Demonstrates opening a password‑protected PDF with Aspose.Pdf, removing its encryption, and savin... |
+| [download-pdf-from-url-and-save-locally](./download-pdf-from-url-and-save-locally.cs) | Download PDF from URL and Save Locally with Aspose.Pdf | `Document`, `Save` | Demonstrates how to download a PDF file using HttpClient, load it into an Aspose.Pdf Document fro... |
+| [encrypt-pdf-aes128-set-print-permissions](./encrypt-pdf-aes128-set-print-permissions.cs) | Encrypt PDF with AES‑128 and Set Printing Permissions | `Document`, `Encrypt`, `Save` | Demonstrates how to encrypt a PDF using AES‑128 with Aspose.Pdf, assign printing and high‑quality... |
+| [encrypt-pdf-aes256-disable-printing](./encrypt-pdf-aes256-disable-printing.cs) | Encrypt PDF with AES‑256 and Disable Printing | `Document`, `Encrypt`, `Save` | Demonstrates how to encrypt a PDF using AES‑256, set no permissions to disable printing, and veri... |
+| [encrypt-pdf-allow-form-filling](./encrypt-pdf-allow-form-filling.cs) | Encrypt PDF Allowing Only Form Filling | `Document`, `Permissions`, `CryptoAlgorithm` | Demonstrates how to load a PDF, restrict permissions to form filling only, encrypt it with AES‑25... |
+| [encrypt-pdf-form-fill-permission](./encrypt-pdf-form-fill-permission.cs) | Encrypt PDF with Password and Restrict to Form Filling | `Document`, `Permissions`, `Encrypt` | Demonstrates how to load an existing PDF, encrypt it with user and owner passwords using AES‑256,... |
+| [encrypt-pdf-form-filling-permission](./encrypt-pdf-form-filling-permission.cs) | Encrypt PDF with Form Filling Permission Only | `Document`, `Permissions`, `Encrypt` | Demonstrates loading a PDF, applying AES‑256 encryption that permits only form filling (disabling... |
+| [encrypt-pdf-owner-password-aes256](./encrypt-pdf-owner-password-aes256.cs) | Encrypt PDF with Owner Password Only (AES‑256) | `Document`, `Encrypt`, `CryptoAlgorithm` | Shows how to encrypt a PDF using Aspose.Pdf by applying an owner password only, using AES‑256 enc... |
+| [encrypt-pdf-rc4-128-verify-size](./encrypt-pdf-rc4-128-verify-size.cs) | Encrypt PDF with 128‑bit RC4 and Verify Size Increase | `Document`, `Permissions`, `CryptoAlgorithm` | Loads a PDF, applies 128‑bit RC4 encryption with specific permissions, saves the encrypted file, ... |
+| [encrypt-pdf-rc4-verify-permissions](./encrypt-pdf-rc4-verify-permissions.cs) | Encrypt PDF with RC4 and Verify Permissions | `Document`, `Permissions`, `CryptoAlgorithm` | The example encrypts a PDF using the RC4 128‑bit algorithm, restricts permissions to printing onl... |
+| [encrypt-pdf-stream](./encrypt-pdf-stream.cs) | Encrypt PDF Stream with Passwords | `Document`, `Encrypt`, `Save` | Shows how to read a PDF from a stream, apply AES‑256 encryption with user and owner passwords and... |
+| ... | | | *and 26 more files* |
 
 ## Category Statistics
-- Total examples: 57
+- Total examples: 56
 
 ## General Tips
 - See parent [agents.md](../agents.md) for:
@@ -94,5 +94,5 @@ using (Document doc = new Document("input.pdf"))
 - Review code examples in this folder for basic-operations patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-04-10 | Run: `20260410_111705_7ee31f`
+Updated: 2026-04-28 | Run: `20260428_135456_55d199`
 <!-- AUTOGENERATED:END -->

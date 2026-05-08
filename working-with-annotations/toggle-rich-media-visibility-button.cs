@@ -8,46 +8,47 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "ButtonToggleRichMedia.pdf";
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            // Add a page
+            Page page = doc.Pages.Add();
 
-        // Load the existing PDF
-        using (Document doc = new Document(inputPath))
-        {
-            // Use the first page (1‑based indexing)
-            Page page = doc.Pages[1];
-
-            // Create a RichMediaAnnotation
-            Aspose.Pdf.Rectangle richRect = new Aspose.Pdf.Rectangle(100, 500, 300, 700);
-            RichMediaAnnotation richMedia = new RichMediaAnnotation(page, richRect);
-            richMedia.Contents = "Rich media content placeholder";
+            // Define rectangle for the RichMedia annotation (e.g., a video placeholder)
+            Aspose.Pdf.Rectangle richMediaRect = new Aspose.Pdf.Rectangle(100, 500, 300, 700);
+            // Create the RichMedia annotation
+            RichMediaAnnotation richMedia = new RichMediaAnnotation(page, richMediaRect)
+            {
+                // Example: set a simple text as placeholder content
+                Contents = "Rich Media Content"
+            };
+            // Add the RichMedia annotation to the page
             page.Annotations.Add(richMedia);
 
-            // Create a button that will toggle the RichMediaAnnotation visibility
-            Aspose.Pdf.Rectangle btnRect = new Aspose.Pdf.Rectangle(350, 500, 450, 550);
-            ButtonField toggleButton = new ButtonField(page, btnRect);
-            toggleButton.Contents = "Toggle Media";
-            toggleButton.Color = Aspose.Pdf.Color.LightGray;
+            // Define rectangle for the button that will toggle visibility
+            Aspose.Pdf.Rectangle buttonRect = new Aspose.Pdf.Rectangle(350, 500, 450, 540);
+            // Create a push button field (instantiate first, then set properties)
+            ButtonField toggleButton = new ButtonField(page, buttonRect)
+            {
+                Color = Aspose.Pdf.Color.LightGray,
+                NormalCaption = "Toggle Media",
+                // A name is required for form fields; give it a unique identifier
+                Name = "ToggleRichMediaBtn"
+            };
+            // Border requires the parent annotation, set after the button is instantiated
+            toggleButton.Border = new Border(toggleButton) { Width = 1 };
 
-            // HideAction to hide the RichMediaAnnotation
-            HideAction hideAction = new HideAction(richMedia, true);
-            // HideAction to show the RichMediaAnnotation
-            HideAction showAction = new HideAction(richMedia, false);
+            // When the button is pressed, hide the RichMedia annotation
+            toggleButton.Actions.OnPressMouseBtn = new HideAction(richMedia, true);
+            // When the button is released, show the RichMedia annotation again
+            toggleButton.Actions.OnReleaseMouseBtn = new HideAction(richMedia, false);
 
-            // Assign actions: press hides, release shows (toggles visibility)
-            toggleButton.Actions.OnPressMouseBtn = hideAction;
-            toggleButton.Actions.OnReleaseMouseBtn = showAction;
+            // Add the button to the document's form collection (widgets cannot be added directly to page annotations)
+            doc.Form.Add(toggleButton);
 
-            // Add the button to the page
-            page.Annotations.Add(toggleButton);
-
-            // Save the modified PDF
+            // Save the PDF
             doc.Save(outputPath);
         }
 

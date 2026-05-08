@@ -9,81 +9,90 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
+        // Verify the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF file information using the Facade constructor (create/load rule)
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
+        // Ensure the output directory exists
+        string outputDir = Path.GetDirectoryName(outputPath);
+        if (!string.IsNullOrEmpty(outputDir) && !Directory.Exists(outputDir))
         {
-            // Example modification: change the title metadata
-            pdfInfo.Title = "Updated Title";
+            Directory.CreateDirectory(outputDir);
+        }
 
-            // Ensure the target file is writable before attempting to save
-            PrepareWritableOutput(outputPath);
+        try
+        {
+            // Load PDF meta‑information using the Facade class
+            using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
+            {
+                // Update desired metadata fields
+                pdfInfo.Title  = "Updated Title";
+                pdfInfo.Author = "John Doe";
 
-            bool saved = false;
-            try
-            {
-                saved = pdfInfo.SaveNewInfo(outputPath);
-            }
-            // Handle both the generic IOException and the more specific UnauthorizedAccessException
-            catch (IOException ioEx) when (IsReadOnlyError(ioEx))
-            {
-                // If the failure is due to a read‑only attribute, clear it and retry
-                ClearReadOnlyAttribute(outputPath);
-                saved = pdfInfo.SaveNewInfo(outputPath);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                // In case the OS throws UnauthorizedAccessException for a read‑only file
-                ClearReadOnlyAttribute(outputPath);
-                saved = pdfInfo.SaveNewInfo(outputPath);
-            }
+                bool saved = false;
 
-            Console.WriteLine(saved
-                ? $"Metadata saved successfully to '{outputPath}'."
-                : $"Failed to save metadata to '{outputPath}'.");
+                try
+                {
+                    // First attempt to save the updated information
+                    saved = pdfInfo.SaveNewInfo(outputPath);
+                }
+                catch (IOException ioEx) when (IsReadOnlyAttributeError(ioEx) || IsAccessDenied(ioEx))
+                {
+                    // The target file is read‑only or otherwise inaccessible – clear the attribute and retry
+                    TryClearReadOnly(outputPath);
+                    try
+                    {
+                        saved = pdfInfo.SaveNewInfo(outputPath);
+                    }
+                    catch (Exception retryEx)
+                    {
+                        Console.Error.WriteLine($"Retry failed: {retryEx.Message}");
+                        return;
+                    }
+                }
+
+                if (saved)
+                {
+                    Console.WriteLine($"Metadata successfully saved to '{outputPath}'.");
+                }
+                else
+                {
+                    Console.Error.WriteLine("SaveNewInfo returned false; the operation may have failed.");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
         }
     }
 
-    // Checks whether the IOException is caused by a read‑only file attribute
-    private static bool IsReadOnlyError(IOException ex)
+    // Helper to detect a read‑only file error from an IOException
+    static bool IsReadOnlyAttributeError(IOException ex)
     {
-        // Platform‑independent heuristic: look for typical messages
-        return ex.Message.IndexOf("read-only", StringComparison.OrdinalIgnoreCase) >= 0
-               || ex.Message.IndexOf("access to the path", StringComparison.OrdinalIgnoreCase) >= 0;
+        // Look for the typical Windows message that mentions the read‑only attribute
+        return ex.Message.IndexOf("read-only", StringComparison.OrdinalIgnoreCase) >= 0;
     }
 
-    // Removes the read‑only flag from the specified file if it exists
-    private static void ClearReadOnlyAttribute(string path)
+    // Helper to detect an access‑denied error (e.g., when the file is locked or read‑only on non‑Windows platforms)
+    static bool IsAccessDenied(IOException ex)
     {
-        if (!File.Exists(path))
-            return;
-
-        FileInfo fi = new FileInfo(path);
-        if (fi.IsReadOnly)
-        {
-            // Clear the read‑only flag and reset other attributes to Normal
-            fi.IsReadOnly = false;
-            fi.Attributes = FileAttributes.Normal;
-        }
+        return ex.HResult == unchecked((int)0x80070005); // HRESULT for ACCESS_DENIED
     }
 
-    // Ensures that the output file can be written to (creates an empty file if needed)
-    private static void PrepareWritableOutput(string path)
+    // Clears the ReadOnly attribute if the file exists
+    static void TryClearReadOnly(string path)
     {
         if (File.Exists(path))
         {
-            // If the file exists and is read‑only, clear the attribute now
-            ClearReadOnlyAttribute(path);
-        }
-        else
-        {
-            // Create an empty file so that SaveNewInfo has a target to overwrite
-            using (FileStream fs = File.Create(path)) { }
+            var attrs = File.GetAttributes(path);
+            if ((attrs & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
+            {
+                File.SetAttributes(path, attrs & ~FileAttributes.ReadOnly);
+            }
         }
     }
 }

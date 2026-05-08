@@ -6,36 +6,33 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";   // source PDF containing the filled textbox
-        const string outputPdf = "output.pdf";  // PDF after applying justified alignment
-        const string fieldName = "MyTextBox";   // fully qualified name of the textbox field
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string fieldName = "TextBox1"; // replace with the actual field name
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // FormEditor implements IDisposable, so use a using block for deterministic cleanup
+        // Initialize FormEditor and bind the PDF document
         using (FormEditor editor = new FormEditor())
         {
-            // Load the existing PDF document
             editor.BindPdf(inputPdf);
 
-            // Configure visual attributes via FormFieldFacade
-            editor.Facade = new FormFieldFacade
-            {
-                // Set text alignment to justified
-                Alignment = FormFieldFacade.AlignJustified
-            };
+            // Set up the visual facade with justified alignment
+            FormFieldFacade facade = new FormFieldFacade();
+            facade.Alignment = FormFieldFacade.AlignJustified;
+            editor.Facade = facade;
 
-            // Apply the facade settings to the specific field
+            // Apply the facade to the specified text field
             editor.DecorateField(fieldName);
 
-            // Save the modified PDF
+            // Save the updated PDF
             editor.Save(outputPdf);
         }
 
-        Console.WriteLine($"Justified textbox saved to '{outputPdf}'.");
+        Console.WriteLine($"Justified text saved to '{outputPdf}'.");
     }
 }

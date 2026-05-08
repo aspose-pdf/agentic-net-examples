@@ -3,82 +3,81 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
-class Program
+class BatchEncryptAndSign
 {
     static void Main()
     {
-        // Folder containing PDFs to process (absolute path). Adjust as needed.
-        const string inputFolderRelative  = @"C:\Pdf\Input";
-        const string outputFolderRelative = @"C:\Pdf\Output";
+        // Resolve folders relative to the current working directory – works on Windows, Linux and macOS
+        string baseDir = Directory.GetCurrentDirectory();
+        string inputFolder = Path.Combine(baseDir, "InputPdfs");
+        string encryptedFolder = Path.Combine(baseDir, "EncryptedPdfs");
+        string signedFolder = Path.Combine(baseDir, "SignedPdfs");
 
-        // Resolve to absolute paths – this works on Windows and non‑Windows platforms.
-        string inputFolder  = Path.GetFullPath(inputFolderRelative);
-        string outputFolder = Path.GetFullPath(outputFolderRelative);
-
-        // Certificate used for digital signatures
-        const string certPath     = @"C:\Certificates\mycert.pfx";
-        const string certPassword = "certPassword";
+        // Digital certificate (PFX) used for signing – also resolved relative to the base directory
+        string pfxPath = Path.Combine(baseDir, "Certificates", "signcert.pfx");
+        const string pfxPassword = "certPassword";
 
         // Encryption passwords
-        const string userPassword  = "user123";
+        const string userPassword = "user123";
         const string ownerPassword = "owner123";
 
-        // Ensure input folder exists before trying to enumerate files.
+        // Ensure output directories exist
+        Directory.CreateDirectory(encryptedFolder);
+        Directory.CreateDirectory(signedFolder);
+
+        // Verify that the input folder exists – if not, give a clear message
         if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"Input folder does not exist: {inputFolder}");
+            Console.WriteLine($"Input folder not found: {inputFolder}");
             return;
         }
 
-        // Ensure output folder exists
-        Directory.CreateDirectory(outputFolder);
-
         // Process each PDF file in the input folder
-        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            try
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
+            string encryptedPath = Path.Combine(encryptedFolder, fileNameWithoutExt + "_enc.pdf");
+            string signedPath = Path.Combine(signedFolder, fileNameWithoutExt + "_signed.pdf");
+
+            // ---------- Encrypt ----------
+            using (Document doc = new Document(pdfPath))
             {
-                // Load the PDF document
-                using (Document doc = new Document(inputPath))
-                {
-                    // Encrypt the document (AES‑256)
-                    doc.Encrypt(userPassword, ownerPassword,
-                                Permissions.PrintDocument | Permissions.ExtractContent,
-                                CryptoAlgorithm.AESx256);
+                // Set desired permissions (example: allow printing and content extraction)
+                Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-                    // Add a visible signature field on the first page
-                    Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 300, 150);
-                    SignatureField sigField = new SignatureField(doc.Pages[1], sigRect)
-                    {
-                        PartialName = "Signature1"
-                    };
-                    doc.Form.Add(sigField, 1);
+                // Encrypt using AES-256 algorithm
+                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-                    // Prepare the PKCS#1 signature object
-                    PKCS1 pkcs1 = new PKCS1(certPath, certPassword)
-                    {
-                        Reason      = "Document approved",
-                        ContactInfo = "contact@example.com",
-                        Location    = "New York, USA"
-                    };
-
-                    // Apply the digital signature to the field
-                    sigField.Sign(pkcs1);
-
-                    // Save the encrypted and signed PDF
-                    string fileName   = Path.GetFileNameWithoutExtension(inputPath);
-                    string outputPath = Path.Combine(outputFolder, $"{fileName}_signed.pdf");
-                    doc.Save(outputPath);
-                }
-
-                Console.WriteLine($"Processed: {Path.GetFileName(inputPath)}");
+                // Save encrypted PDF
+                doc.Save(encryptedPath);
             }
-            catch (Exception ex)
+
+            // ---------- Sign ----------
+            // Open the encrypted PDF using the user password
+            using (Document signedDoc = new Document(encryptedPath, userPassword))
             {
-                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
+                // Create a signature field on the first page (position can be adjusted as needed)
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+                SignatureField sigField = new SignatureField(signedDoc.Pages[1], rect);
+                signedDoc.Form.Add(sigField);
+
+                // Initialize the concrete PKCS7 signature object with the certificate
+                PKCS7 pkcs7 = new PKCS7(pfxPath, pfxPassword);
+                // Optional: set additional signature properties
+                pkcs7.Reason = "Document approved";
+                pkcs7.Location = "Office";
+                pkcs7.ContactInfo = "contact@example.com";
+
+                // Apply the digital signature to the field
+                sigField.Sign(pkcs7);
+
+                // Save the signed PDF
+                signedDoc.Save(signedPath);
             }
+
+            Console.WriteLine($"Processed: {pdfPath}");
+            Console.WriteLine($"  Encrypted -> {encryptedPath}");
+            Console.WriteLine($"  Signed     -> {signedPath}");
         }
-
-        Console.WriteLine("Batch encryption and signing completed.");
     }
 }

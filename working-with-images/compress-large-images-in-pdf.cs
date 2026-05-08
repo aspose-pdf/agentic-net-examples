@@ -16,25 +16,32 @@ class Program
             return;
         }
 
-        // Load the PDF document.
+        // Load the PDF document (using the lifecycle rule)
         using (Document doc = new Document(inputPath))
         {
-            // Configure optimization to compress images.
-            OptimizationOptions opt = new OptimizationOptions();
+            // Configure optimization options to compress images.
+            // This will replace large images with compressed JPEG versions.
+            OptimizationOptions opt = new OptimizationOptions
+            {
+                // Merge identical objects to reduce size.
+                CompressObjects = true,
 
-            // Enable image compression.
-            opt.ImageCompressionOptions.CompressImages = true;
+                // Configure image compression.
+                ImageCompressionOptions =
+                {
+                    CompressImages = true,   // Enable image compression.
+                    ImageQuality   = 75,     // JPEG quality (0‑100). Adjust as needed.
+                    // MaxResolution = 150; // Optional: limit image resolution (DPI).
+                }
+            };
 
-            // Set JPEG quality (0‑100). Lower value yields higher compression.
-            opt.ImageCompressionOptions.ImageQuality = 70;
-
-            // Optional: limit maximum image resolution (DPI) to avoid up‑scaling.
-            opt.ImageCompressionOptions.MaxResolution = 1500;
-
-            // Apply the optimization to the whole document.
+            // Apply the optimization to the document.
             doc.OptimizeResources(opt);
 
-            // Save the optimized PDF.
+            // Optional: enable additional stream merging.
+            doc.OptimizeSize = true;
+
+            // Save the optimized PDF (using the lifecycle rule).
             doc.Save(outputPath);
         }
 

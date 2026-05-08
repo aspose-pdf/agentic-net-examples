@@ -6,37 +6,33 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pptx";
+        const string inputPdfPath = "input.pdf";
+        const string outputPptxPath = "output.pptx";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPath))
+        // Load the PDF document (wrapped in using for deterministic disposal)
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
-            // Initialize PPTX save options
+            // Create PPTX save options and attach a custom progress handler
             PptxSaveOptions pptxOptions = new PptxSaveOptions();
 
-            // Assign a custom progress handler to receive conversion events
-            // The delegate signature matches ShowProgress, so we can assign it directly
-            pptxOptions.CustomProgressHandler = ShowProgress;
+            // Assign a lambda that matches the ConversionProgressEventHandler delegate.
+            // The concrete type of the parameter (ProgressEventHandlerInfo) is inferred by the compiler,
+            // so we avoid referencing the type name directly and eliminate the CS0246 error.
+            pptxOptions.CustomProgressHandler = info =>
+            {
+                Console.WriteLine($"Event: {info.EventType}, Value: {info.Value}/{info.MaxValue}");
+            };
 
             // Save the document as PPTX using the configured options
-            pdfDoc.Save(outputPath, pptxOptions);
+            pdfDocument.Save(outputPptxPath, pptxOptions);
         }
 
-        Console.WriteLine($"PDF successfully converted to PPTX: {outputPath}");
-    }
-
-    // Custom progress handler method
-    static void ShowProgress(PptxSaveOptions.ProgressEventHandlerInfo eventInfo)
-    {
-        // Log generic progress information. The specific enum values are not required for compilation.
-        // eventInfo.EventType provides a meaningful description of the event.
-        Console.WriteLine($"{DateTime.Now:T} - {eventInfo.EventType}: {eventInfo.Value}% (Max: {eventInfo.MaxValue})");
+        Console.WriteLine($"Conversion completed. PPTX saved to '{outputPptxPath}'.");
     }
 }

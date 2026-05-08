@@ -1,57 +1,61 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // Core API (Document, Page, ImageStamp)
 
 class Program
 {
     static void Main()
     {
-        // Paths for the source PDF, overlay image, and the output PDF
-        const string inputPdfPath   = "input.pdf";
-        const string overlayImgPath = "overlay.png";
-        const string outputPdfPath  = "output.pdf";
+        const string inputPdf  = "input.pdf";      // source PDF
+        const string overlayImg = "overlay.png";   // semi‑transparent image to overlay
+        const string outputPdf = "output.pdf";     // result PDF
 
-        // Verify that the required files exist
-        if (!File.Exists(inputPdfPath))
+        // Verify files exist
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(overlayImgPath))
+        if (!File.Exists(overlayImg))
         {
-            Console.Error.WriteLine($"Overlay image not found: {overlayImgPath}");
+            Console.Error.WriteLine($"Overlay image not found: {overlayImg}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
             // Create an ImageStamp from the overlay image
-            ImageStamp overlayStamp = new ImageStamp(overlayImgPath)
+            ImageStamp stamp = new ImageStamp(overlayImg)
             {
-                // Set semi‑transparent opacity (0.0 = fully transparent, 1.0 = opaque)
-                Opacity = 0.5,
-                // Place the stamp on top of existing content
-                Background = false
+                // Place the stamp over the page content (false = top layer)
+                Background = false,
+
+                // Semi‑transparent (0.0 = fully transparent, 1.0 = opaque)
+                Opacity = 0.5f,
+
+                // Center the image on each page
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center,
+
+                // Scale the image to fit the page while preserving aspect ratio
+                // (Zoom = 1.0 means original size; adjust if needed)
+                Zoom = 1.0f
             };
 
-            // Apply the stamp to every page, scaling it to cover the entire page
-            foreach (Page page in pdfDoc.Pages)
+            // Apply the stamp to every page (pages are 1‑based)
+            foreach (Page page in doc.Pages)
             {
-                // Adjust stamp size to match the current page dimensions
-                overlayStamp.Width  = page.PageInfo.Width;
-                overlayStamp.Height = page.PageInfo.Height;
-                overlayStamp.XIndent = 0;
-                overlayStamp.YIndent = 0;
-
-                // Add the stamp to the page
-                page.AddStamp(overlayStamp);
+                page.AddStamp(stamp);
             }
 
+            // Optional: replace any remaining transparency with opaque graphics
+            // doc.FlattenTransparency();
+
             // Save the modified PDF
-            pdfDoc.Save(outputPdfPath);
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Overlay applied and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Overlay applied and saved to '{outputPdf}'.");
     }
 }

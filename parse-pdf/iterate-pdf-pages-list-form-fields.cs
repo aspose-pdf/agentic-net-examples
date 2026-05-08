@@ -19,25 +19,27 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through each page (1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Pages are 1‑based in Aspose.Pdf
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                Page page = doc.Pages[i];
+                Page page = doc.Pages[pageIndex];
 
                 // Get all form fields on the current page in tab order
                 var fields = page.FieldsInTabOrder;
 
+                Console.WriteLine($"Page {pageIndex} contains {fields.Count} form field(s).");
+
                 foreach (Field field in fields)
                 {
-                    // Output basic information about each field
-                    Console.WriteLine($"Page {i}: Field Name = {field.FullName}, Type = {field.GetType().Name}");
+                    // Example: display field name and its concrete type
+                    Console.WriteLine($"  Field Name: {field.FullName}, Type: {field.GetType().Name}");
                 }
             }
 
-            // Save the (unchanged) document – required by lifecycle rule
+            // Save the (unchanged) document – required lifecycle step
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Processing complete. Document saved as '{outputPath}'.");
+        Console.WriteLine($"Processing complete. Output saved to '{outputPath}'.");
     }
 }

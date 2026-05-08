@@ -8,36 +8,29 @@ class Program
     static void Main()
     {
         const string inputPdf = "input.pdf";
-        const string outputFolder = "png_output";
+        const string outputDir = "output_images";
 
-        // Verify input file exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
+        Directory.CreateDirectory(outputDir);
 
-        // Use PdfConverter (Facade) to convert each page to PNG
+        // Use a using declaration for automatic disposal of PdfConverter
         using (PdfConverter converter = new PdfConverter())
         {
-            // Bind the source PDF
             converter.BindPdf(inputPdf);
-
-            // Set low resolution (72 DPI) for quick preview images
+            // Set DPI using Aspose.Pdf.Devices.Resolution (72 DPI for quick preview)
             converter.Resolution = new Resolution(72);
-
-            // Prepare the converter
             converter.DoConvert();
 
             int pageNumber = 1;
-            // Iterate through all pages and save as PNG
             while (converter.HasNextImage())
             {
-                string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.png");
-                // The overload without ImageFormat infers the format from the file extension
+                string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
+                // GetNextImage writes the image directly to the specified file path
                 converter.GetNextImage(outputPath);
                 pageNumber++;
             }

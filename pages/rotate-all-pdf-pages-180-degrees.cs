@@ -1,13 +1,13 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core API namespace
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "rotated_output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "rotated.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,14 +15,15 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Pages collection is 1‑based; iterate through all pages
+            // Iterate through all pages (1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Set each page rotation to 180 degrees (on180)
-                doc.Pages[i].Rotate = Rotation.on180;
+                Page page = doc.Pages[i];
+                // Rotate page 180 degrees clockwise
+                page.Rotate = Rotation.on180;
             }
 
             // Save the modified document

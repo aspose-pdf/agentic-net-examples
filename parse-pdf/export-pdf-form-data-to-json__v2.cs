@@ -3,37 +3,53 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
-class Program
+class ExportFormData
 {
-    static void Main()
+    static void Main(string[] args)
     {
-        // Path to the source PDF containing form fields
-        const string pdfPath = "input.pdf";
-
-        // Path where the JSON representation of the form data will be saved
-        const string jsonPath = "formdata.json";
-
-        // Ensure the source PDF exists
-        if (!File.Exists(pdfPath))
+        // Expect two arguments: input PDF path and output format flag (e.g., "json")
+        if (args.Length < 2)
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine("Usage: ExportFormData <input-pdf> <format>");
+            Console.Error.WriteLine("Supported formats: json");
             return;
         }
 
-        // Open the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(pdfPath))
+        string inputPath = args[0];
+        string format = args[1].ToLowerInvariant();
+
+        if (!File.Exists(inputPath))
         {
-            // Create a FileStream for writing the JSON output.
-            // FileMode.Create overwrites any existing file.
-            // FileAccess.Write allows writing bytes.
-            // The stream will be disposed automatically by the using block.
-            using (FileStream jsonStream = new FileStream(jsonPath, FileMode.Create, FileAccess.Write))
-            {
-                // Export all form fields to JSON. The ExportToJson method writes UTF‑8 encoded JSON by default.
-                doc.Form.ExportToJson(jsonStream);
-            }
+            Console.Error.WriteLine($"Error: File not found – '{inputPath}'.");
+            return;
         }
 
-        Console.WriteLine($"Form data exported to UTF‑8 JSON file: {jsonPath}");
+        // Determine output file name based on requested format
+        string outputPath;
+        switch (format)
+        {
+            case "json":
+                outputPath = Path.ChangeExtension(inputPath, ".json");
+                break;
+            default:
+                Console.Error.WriteLine($"Error: Unsupported format '{format}'. Only 'json' is supported.");
+                return;
+        }
+
+        try
+        {
+            // Load the PDF document (lifecycle: creation and loading)
+            using (Document doc = new Document(inputPath))
+            {
+                // Export form fields to JSON (writes directly to the file)
+                doc.Form.ExportToJson(outputPath);
+            }
+
+            Console.WriteLine($"Form data exported to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during export: {ex.Message}");
+        }
     }
 }

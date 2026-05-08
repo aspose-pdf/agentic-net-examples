@@ -1,29 +1,37 @@
 using System;
-using System.IO;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_continuous.pdf";
+        // Input and output PDF file paths
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "continuous_view.pdf";
 
-        if (!File.Exists(inputPath))
+        // Ensure the source file exists
+        if (!System.IO.File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {inputPdf}");
             return;
         }
 
-        // Initialize the content editor facade, bind the PDF, set continuous view, and save.
-        using (PdfContentEditor editor = new PdfContentEditor())
-        {
-            editor.BindPdf(inputPath);
-            // Continuous scrolling = one column layout.
-            editor.ChangeViewerPreference(ViewerPreference.PageLayoutOneColumn);
-            editor.Save(outputPath);
-        }
+        // Create a PdfContentEditor facade, bind the PDF, set continuous view mode,
+        // and save the result.
+        PdfContentEditor editor = new PdfContentEditor();
 
-        Console.WriteLine($"PDF saved with continuous view mode: '{outputPath}'.");
+        // Load the PDF document into the facade
+        editor.BindPdf(inputPdf);
+
+        // ViewerPreference.PageLayoutOneColumn enables continuous scrolling (single column layout)
+        editor.ChangeViewerPreference(ViewerPreference.PageLayoutOneColumn);
+
+        // Save the modified PDF
+        editor.Save(outputPdf);
+
+        // Release resources held by the facade
+        editor.Close();
+
+        Console.WriteLine($"PDF saved with continuous view mode: {outputPdf}");
     }
 }

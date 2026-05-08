@@ -1,36 +1,41 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
-class Program
+class ExportFormDataToJson
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputJson = "formdata.json";
+        // Input PDF containing form fields
+        const string inputPdfPath = "input.pdf";
 
-        if (!File.Exists(inputPdf))
+        // Output JSON file with indented formatting
+        const string outputJsonPath = "formData.json";
+
+        // Ensure the input file exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
         // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Set up export options with indentation enabled
-            ExportFieldsToJsonOptions options = new ExportFieldsToJsonOptions
+            // Configure export options: enable indentation for readability
+            ExportFieldsToJsonOptions jsonOptions = new ExportFieldsToJsonOptions
             {
                 WriteIndented = true
             };
 
-            // Export all form fields to a JSON file
-            using (FileStream jsonStream = new FileStream(outputJson, FileMode.Create, FileAccess.Write))
+            // Export all form fields to JSON using a file stream
+            using (FileStream jsonStream = new FileStream(outputJsonPath, FileMode.Create, FileAccess.Write))
             {
-                doc.Form.ExportToJson(jsonStream, options);
+                pdfDoc.Form.ExportToJson(jsonStream, jsonOptions);
             }
-        }
 
-        Console.WriteLine($"Form data exported to '{outputJson}' with indentation.");
+            Console.WriteLine($"Form data exported to '{outputJsonPath}' with indentation.");
+        }
     }
 }

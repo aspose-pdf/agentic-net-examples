@@ -2,75 +2,61 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations;   // NamedDestination, Bookmark
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_with_bookmark.pdf";
-        const string destName  = "MyNamedDestination";
+        const string inputPath  = "input.pdf";   // source PDF
+        const string outputPath = "output.pdf";  // PDF with new bookmark
+        const string destName   = "MyNamedDestination"; // name of the destination
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
+        // Use PdfBookmarkEditor facade (implements IDisposable)
+        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
         {
-            // Initialize the bookmark editor and bind the source PDF.
-            PdfBookmarkEditor editor = new PdfBookmarkEditor();
-            editor.BindPdf(inputPdf);
+            // Load the PDF document
+            editor.BindPdf(inputPath);
 
-            // Obtain the underlying Document object.
+            // Access the underlying Document to ensure the destination page exists
             Document doc = editor.Document;
+            if (doc.Pages.Count < 2) // example: we want the destination on page 2
+            {
+                Console.Error.WriteLine("The PDF does not contain page 2 for the named destination.");
+                return;
+            }
 
-            // ------------------------------------------------------------
-            // 1. Create a named destination that points to a specific page.
-            //    Here we point to page 2 (1‑based indexing).
-            // ------------------------------------------------------------
-            int targetPageNumber = 2;
-            Page targetPage = doc.Pages[targetPageNumber];
-
-            // Create the NamedDestination instance.
+            // Create a named destination (adds it to the document's name dictionary)
+            // The destination will point to page 2 (you can adjust as needed)
+            // Note: NamedDestination only registers the name; the actual location is the page it is associated with.
+            // Here we associate it with page 2 by creating a GoToAction later if needed.
             NamedDestination namedDest = new NamedDestination(doc, destName);
-            // Associate the destination with the desired page.
-            // The NamedDestination itself does not hold page info,
-            // so we set the action to a GoToAction that jumps to the page.
-            // This is done by adding the destination to the collection;
-            // the page reference is implicit when the bookmark uses it.
-            doc.NamedDestinations.Add(destName, namedDest);
+            // Optionally, you could create a GoToAction using the named destination:
+            // GoToAction action = new GoToAction(doc, destName);
+            // (Not required for the bookmark itself.)
 
-            // ------------------------------------------------------------
-            // 2. Create a bookmark that references the named destination.
-            // ------------------------------------------------------------
+            // Create a bookmark that references the named destination
             Bookmark bookmark = new Bookmark
             {
-                Title   = "Go to My Destination",
-                Action  = "Named",          // Use the "Named" action type.
-                Destination = destName,     // Name of the destination defined above.
-                // Optional visual styling:
-                TitleColor = System.Drawing.Color.Blue,
-                BoldFlag   = true,
-                ItalicFlag = false
+                Title      = $"Go to {destName}",
+                Action     = "Named",   // indicates that Destination is a named destination
+                Destination = destName   // the name defined above
+                // No PageNumber is set because the action type is "Named"
             };
 
-            // Add the bookmark to the PDF.
+            // Add the bookmark to the PDF outline
             editor.CreateBookmarks(bookmark);
 
-            // ------------------------------------------------------------
-            // 3. Save the modified PDF.
-            // ------------------------------------------------------------
-            editor.Save(outputPdf);
-            editor.Close();
+            // Save the modified PDF
+            editor.Save(outputPath);
+        }
 
-            Console.WriteLine($"Bookmark created and saved to '{outputPdf}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"Bookmark pointing to named destination '{destName}' saved to '{outputPath}'.");
     }
 }

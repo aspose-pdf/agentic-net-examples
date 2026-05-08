@@ -13,11 +13,11 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (using rule: document-disposal-with-using)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
             // Loop through all pages (1‑based indexing)
@@ -25,30 +25,25 @@ class Program
             {
                 Page page = doc.Pages[i];
 
-                // Create a HeaderFooter object for the current page
+                // Create a new header/footer container
                 HeaderFooter header = new HeaderFooter();
 
-                // Build a TextFragment that represents the header text
-                TextFragment tf = new TextFragment(headerText)
-                {
-                    // Position the text near the top of the page (Y coordinate is measured from bottom)
-                    // Adjust the Y value as needed; here we use 20 points from the top edge.
-                    Position = new Position(0, page.PageInfo.Height - 20),
-                    HorizontalAlignment = HorizontalAlignment.Center
-                };
-
-                // Set font and size via TextState (TextFragment does not expose Font/FontSize directly)
+                // Create a text fragment for the header
+                TextFragment tf = new TextFragment(headerText);
                 tf.TextState.Font = FontRepository.FindFont("Helvetica");
                 tf.TextState.FontSize = 12;
+                tf.TextState.FontStyle = FontStyles.Bold;
+                tf.TextState.ForegroundColor = Color.Black;
+                tf.Position = new Position(0, page.PageInfo.Height - 20); // optional positioning
 
-                // Add the TextFragment to the header's paragraph collection
+                // Add the fragment to the header's paragraph collection
                 header.Paragraphs.Add(tf);
 
-                // Assign the prepared header to the page
+                // Assign the header to the page
                 page.Header = header;
             }
 
-            // Save the modified PDF (PDF format, no extra SaveOptions needed)
+            // Save the modified document
             doc.Save(outputPath);
         }
 

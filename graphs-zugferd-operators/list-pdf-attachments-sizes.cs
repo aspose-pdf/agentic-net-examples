@@ -17,34 +17,24 @@ class Program
         // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the collection of embedded file attachments
-            var embeddedFiles = doc.EmbeddedFiles;
-
-            if (embeddedFiles == null || embeddedFiles.Count == 0)
+            // If there are no embedded files (attachments), inform the user
+            if (doc.EmbeddedFiles == null || doc.EmbeddedFiles.Count == 0)
             {
                 Console.WriteLine("No attachments found in the PDF.");
                 return;
             }
 
-            // The EmbeddedFiles collection is 1‑based, iterate accordingly
-            for (int i = 1; i <= embeddedFiles.Count; i++)
+            // Iterate over each embedded file using reflection to avoid a direct dependency on the concrete type
+            foreach (var embedded in doc.EmbeddedFiles)
             {
-                FileSpecification spec = embeddedFiles[i];
-                string name = spec.Name;
-                long size = 0;
+                // Retrieve the "Name" property (string)
+                var nameProp = embedded.GetType().GetProperty("Name");
+                string name = nameProp?.GetValue(embedded) as string ?? "(unnamed)";
 
-                // Prefer the size reported in the file parameters
-                if (spec.Params != null && spec.Params.Size != 0)
-                {
-                    size = spec.Params.Size;
-                }
-                else if (spec.Contents != null)
-                {
-                    // Fallback: determine size from the contents stream
-                    if (spec.Contents.CanSeek)
-                        spec.Contents.Position = 0;
-                    size = spec.Contents.Length;
-                }
+                // Retrieve the "Data" property (byte[]). Some versions expose it as a byte[]; if not present, fall back to 0 size.
+                var dataProp = embedded.GetType().GetProperty("Data");
+                byte[] data = dataProp?.GetValue(embedded) as byte[];
+                long size = data?.Length ?? 0;
 
                 Console.WriteLine($"Attachment: {name}, Size: {size} bytes");
             }

@@ -8,96 +8,104 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "nested_list.pdf";
-        const string validationReport = "validation_report.xml";
+        const string inputPdf  = "input.pdf";   // any existing PDF to start from
+        const string outputPdf = "tagged_list.pdf";
 
-        // Create a new PDF document
-        using (Document doc = new Document())
+        // Ensure the source PDF exists
+        if (!File.Exists(inputPdf))
         {
-            // Access tagged content API
+            Console.Error.WriteLine($"Source file not found: {inputPdf}");
+            return;
+        }
+
+        // Open the document and obtain the tagged‑content interface
+        using (Document doc = new Document(inputPdf))
+        {
             ITaggedContent tagged = doc.TaggedContent;
+
+            // Set language and title for the tagged PDF
             tagged.SetLanguage("en-US");
             tagged.SetTitle("Nested List Example");
 
-            // Root element of the logical structure
+            // Root element of the logical structure tree
             StructureElement root = tagged.RootElement;
 
             // -------------------------------------------------
-            // Create a top‑level bullet list (L)
+            // Create a top‑level bullet list (disc style)
             // -------------------------------------------------
             ListElement bulletList = tagged.CreateListElement();
-            root.AppendChild(bulletList); // Append list to the root
+            bulletList.SetTag("L");                     // assign list tag
+            // (optional) set a custom attribute for bullet style
+            // bulletList.Attributes[AttributeKey.ListNumbering] = AttributeName.ListNumbering_Disc;
 
             // First bullet item
             ListLIElement bulletItem1 = tagged.CreateListLIElement();
-            bulletList.AppendChild(bulletItem1, true);
-
-            // Label for the bullet (optional – the list attribute defines the bullet style)
-            ListLblElement bulletLbl1 = tagged.CreateListLblElement();
-            bulletLbl1.ActualText = ""; // empty – bullet rendered by list attribute
-            bulletItem1.AppendChild(bulletLbl1, true);
-
-            // Body of the bullet item
+            bulletItem1.SetTag("LI");
             ListLBodyElement bulletBody1 = tagged.CreateListLBodyElement();
-            bulletBody1.ActualText = "Bullet item 1";
-            bulletItem1.AppendChild(bulletBody1, true);
+            // Add visible text to the list body
+            ParagraphElement para1 = tagged.CreateParagraphElement();
+            para1.SetText("First bullet item");
+            bulletBody1.AppendChild(para1);
+            bulletItem1.AppendChild(bulletBody1);
+            bulletList.AppendChild(bulletItem1);
+
+            // Second bullet item with a nested numbered list
+            ListLIElement bulletItem2 = tagged.CreateListLIElement();
+            bulletItem2.SetTag("LI");
+            ListLBodyElement bulletBody2 = tagged.CreateListLBodyElement();
+
+            // Text for the second bullet item
+            ParagraphElement para2 = tagged.CreateParagraphElement();
+            para2.SetText("Second bullet item with sublist");
+            bulletBody2.AppendChild(para2);
 
             // -------------------------------------------------
-            // Nested numbered list inside the first bullet item
+            // Create a nested numbered list (no auto‑numbering)
             // -------------------------------------------------
             ListElement numberedList = tagged.CreateListElement();
-            bulletBody1.AppendChild(numberedList, true); // attach sub‑list to the body
+            numberedList.SetTag("L");
+            // numberedList.Attributes[AttributeKey.ListNumbering] = AttributeName.ListNumbering_None;
 
-            // First numbered item
+            // First numbered sub‑item
             ListLIElement numItem1 = tagged.CreateListLIElement();
-            numberedList.AppendChild(numItem1, true);
-
-            ListLblElement numLbl1 = tagged.CreateListLblElement();
-            numLbl1.ActualText = "1."; // explicit number label
-            numItem1.AppendChild(numLbl1, true);
-
+            numItem1.SetTag("LI");
             ListLBodyElement numBody1 = tagged.CreateListLBodyElement();
-            numBody1.ActualText = "Numbered sub‑item A";
-            numItem1.AppendChild(numBody1, true);
+            ParagraphElement numPara1 = tagged.CreateParagraphElement();
+            numPara1.SetText("First sub‑item");
+            numBody1.AppendChild(numPara1);
+            numItem1.AppendChild(numBody1);
+            numberedList.AppendChild(numItem1);
 
-            // Second numbered item
+            // Second numbered sub‑item
             ListLIElement numItem2 = tagged.CreateListLIElement();
-            numberedList.AppendChild(numItem2, true);
-
-            ListLblElement numLbl2 = tagged.CreateListLblElement();
-            numLbl2.ActualText = "2."; // explicit number label
-            numItem2.AppendChild(numLbl2, true);
-
+            numItem2.SetTag("LI");
             ListLBodyElement numBody2 = tagged.CreateListLBodyElement();
-            numBody2.ActualText = "Numbered sub‑item B";
-            numItem2.AppendChild(numBody2, true);
+            ParagraphElement numPara2 = tagged.CreateParagraphElement();
+            numPara2.SetText("Second sub‑item");
+            numBody2.AppendChild(numPara2);
+            numItem2.AppendChild(numBody2);
+            numberedList.AppendChild(numItem2);
+
+            // Attach the nested numbered list to the second bullet item's body
+            bulletBody2.AppendChild(numberedList);
+            bulletItem2.AppendChild(bulletBody2);
+            bulletList.AppendChild(bulletItem2);
 
             // -------------------------------------------------
-            // Second bullet item (same level as the first)
+            // Attach the top‑level list to the document root
             // -------------------------------------------------
-            ListLIElement bulletItem2 = tagged.CreateListLIElement();
-            bulletList.AppendChild(bulletItem2, true);
+            root.AppendChild(bulletList);
 
-            ListLblElement bulletLbl2 = tagged.CreateListLblElement();
-            bulletLbl2.ActualText = "";
-            bulletItem2.AppendChild(bulletLbl2, true);
+            // Simple validation: ensure the root now contains at least one child element
+            if (root.ChildElements.Count > 0)
+                Console.WriteLine("Structure tree successfully updated with nested list.");
+            else
+                Console.WriteLine("Failed to add list to the structure tree.");
 
-            ListLBodyElement bulletBody2 = tagged.CreateListLBodyElement();
-            bulletBody2.ActualText = "Bullet item 2";
-            bulletItem2.AppendChild(bulletBody2, true);
-
-            // -------------------------------------------------
-            // Save the document
-            // -------------------------------------------------
-            doc.Save(outputPath);
-
-            // -------------------------------------------------
-            // Validate the tagged PDF against PDF/UA (PDF_UA_1)
-            // -------------------------------------------------
-            doc.Validate(validationReport, PdfFormat.PDF_UA_1);
+            // Save the modified PDF (no PreSave call required)
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF with nested list saved to '{outputPath}'.");
-        Console.WriteLine($"Validation report written to '{validationReport}'.");
+        Console.WriteLine($"Tagged PDF with nested list saved to '{outputPdf}'.");
     }
 }

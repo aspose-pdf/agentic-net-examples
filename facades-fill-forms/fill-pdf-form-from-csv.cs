@@ -1,121 +1,123 @@
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-class PdfFormFiller
+class Program
 {
     static void Main(string[] args)
     {
-        // Expected arguments: inputPdfPath inputCsvPath outputPdfPath
-        if (args.Length < 3)
+        // Expect three arguments: input PDF form, input CSV data (originally XLSX), output PDF path
+        if (args.Length != 3)
         {
-            Console.Error.WriteLine("Usage: PdfFormFiller <inputPdf> <inputCsv> <outputPdf>");
+            Console.Error.WriteLine("Usage: <program> <form.pdf> <data.csv> <output.pdf>");
             return;
         }
 
-        string inputPdfPath   = args[0];
-        string inputCsvPath   = args[1];
-        string outputPdfPath  = args[2];
+        string pdfFormPath   = args[0];
+        string csvDataPath   = args[1]; // CSV file that contains the data (replaces XLSX)
+        string outputPdfPath = args[2];
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfFormPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Form PDF not found: {pdfFormPath}");
             return;
         }
 
-        if (!File.Exists(inputCsvPath))
+        if (!File.Exists(csvDataPath))
         {
-            Console.Error.WriteLine($"CSV file not found: {inputCsvPath}");
+            Console.Error.WriteLine($"CSV file not found: {csvDataPath}");
             return;
         }
 
-        try
+        // Load data from the CSV file into a DataTable
+        DataTable dataTable = LoadCsvToDataTable(csvDataPath);
+        if (dataTable == null || dataTable.Rows.Count == 0)
         {
-            // Load CSV data into a DataTable (first row = column names)
-            DataTable csvData = LoadCsvToDataTable(inputCsvPath);
+            Console.Error.WriteLine("No data found in the CSV file.");
+            return;
+        }
 
-            // Fill the PDF form using Aspose.Pdf.Facades.Form
-            using (Form form = new Form(inputPdfPath))
+        // Use the first row to fill the form fields
+        DataRow row = dataTable.Rows[0];
+
+        // Initialize the Form facade with the source PDF
+        using (Form form = new Form(pdfFormPath))
+        {
+            // Iterate over each column; column name must match the full field name in the PDF
+            foreach (DataColumn column in dataTable.Columns)
             {
-                // Iterate over each row (typically only one row for a single form)
-                foreach (DataRow row in csvData.Rows)
-                {
-                    foreach (DataColumn column in csvData.Columns)
-                    {
-                        string fieldName  = column.ColumnName;               // CSV header must match PDF field name
-                        string fieldValue = row[column]?.ToString() ?? string.Empty;
-                        form.FillField(fieldName, fieldValue);
-                    }
-                }
+                string fieldName = column.ColumnName;
+                string fieldValue = row[column]?.ToString() ?? string.Empty;
 
-                // Save the filled PDF to the specified output path
-                form.Save(outputPdfPath);
+                // Fill the field; ignore the return value (true if field exists)
+                form.FillField(fieldName, fieldValue);
             }
 
-            Console.WriteLine($"Form filled and saved to '{outputPdfPath}'.");
+            // Save the filled PDF to the specified output path
+            form.Save(outputPdfPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Form filled and saved to '{outputPdfPath}'.");
     }
 
-    // Helper method to read a CSV file into a DataTable.
+    // Helper method to load a CSV file into a DataTable.
     // The first line is treated as the header row.
-    private static DataTable LoadCsvToDataTable(string csvPath)
+    private static DataTable LoadCsvToDataTable(string csvFilePath)
     {
-        var dt = new DataTable();
-        using (var reader = new StreamReader(csvPath))
+        var table = new DataTable();
+        using (var reader = new StreamReader(csvFilePath))
         {
-            bool isFirstLine = true;
+            if (reader.EndOfStream)
+                return table; // empty file
+
+            // Read header line
+            string headerLine = reader.ReadLine();
+            if (headerLine == null)
+                return table;
+
+            string[] headers = SplitCsvLine(headerLine);
+            foreach (var header in headers)
+            {
+                // Trim spaces and use string type for all columns (sufficient for form filling)
+                table.Columns.Add(header.Trim(), typeof(string));
+            }
+
+            // Read data rows
             while (!reader.EndOfStream)
             {
-                var line = reader.ReadLine();
-                if (line == null) continue;
-                var fields = ParseCsvLine(line);
+                string line = reader.ReadLine();
+                if (string.IsNullOrWhiteSpace(line))
+                    continue; // skip empty lines
 
-                if (isFirstLine)
+                string[] fields = SplitCsvLine(line);
+                var row = table.NewRow();
+                for (int i = 0; i < table.Columns.Count && i < fields.Length; i++)
                 {
-                    // Create columns from header
-                    foreach (var header in fields)
-                    {
-                        dt.Columns.Add(header.Trim());
-                    }
-                    isFirstLine = false;
+                    row[i] = fields[i].Trim();
                 }
-                else
-                {
-                    // Add data row
-                    var dr = dt.NewRow();
-                    for (int i = 0; i < dt.Columns.Count && i < fields.Length; i++)
-                    {
-                        dr[i] = fields[i];
-                    }
-                    dt.Rows.Add(dr);
-                }
+                table.Rows.Add(row);
             }
         }
-        return dt;
+        return table;
     }
 
-    // Very simple CSV parser that handles commas inside quoted fields.
-    private static string[] ParseCsvLine(string line)
+    // Very simple CSV splitter that handles commas inside quoted fields.
+    private static string[] SplitCsvLine(string line)
     {
-        var result = new List<string>();
+        var fields = new System.Collections.Generic.List<string>();
         bool inQuotes = false;
-        var value = string.Empty;
+        var current = new System.Text.StringBuilder();
         for (int i = 0; i < line.Length; i++)
         {
             char c = line[i];
             if (c == '"')
             {
+                // Toggle quote state; if double quote inside quoted field, treat as literal quote
                 if (inQuotes && i + 1 < line.Length && line[i + 1] == '"')
                 {
-                    // Escaped quote
-                    value += '"';
-                    i++; // skip next quote
+                    current.Append('"');
+                    i++; // skip the escaped quote
                 }
                 else
                 {
@@ -124,15 +126,15 @@ class PdfFormFiller
             }
             else if (c == ',' && !inQuotes)
             {
-                result.Add(value);
-                value = string.Empty;
+                fields.Add(current.ToString());
+                current.Clear();
             }
             else
             {
-                value += c;
+                current.Append(c);
             }
         }
-        result.Add(value);
-        return result.ToArray();
+        fields.Add(current.ToString());
+        return fields.ToArray();
     }
 }

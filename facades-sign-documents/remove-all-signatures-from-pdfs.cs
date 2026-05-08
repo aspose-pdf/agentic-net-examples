@@ -2,43 +2,43 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-class RemoveAllSignatures
+class Program
 {
     static void Main(string[] args)
     {
-        // Expect a directory path as the first argument; if not provided, use the current directory.
-        string rootDir = args.Length > 0 ? args[0] : Directory.GetCurrentDirectory();
+        // Directory to process – passed as first argument or current directory if none provided
+        string rootPath = args.Length > 0 ? args[0] : Directory.GetCurrentDirectory();
 
-        if (!Directory.Exists(rootDir))
-        {
-            Console.Error.WriteLine($"Directory not found: {rootDir}");
-            return;
-        }
+        // Find all PDF files recursively
+        string[] pdfFiles = Directory.GetFiles(rootPath, "*.pdf", SearchOption.AllDirectories);
 
-        // Process every PDF file in the directory tree.
-        foreach (string pdfPath in Directory.EnumerateFiles(rootDir, "*.pdf", SearchOption.AllDirectories))
+        foreach (string pdfPath in pdfFiles)
         {
             try
             {
-                // Build an output file name – original name with "_nosig" suffix before the extension.
-                string dir = Path.GetDirectoryName(pdfPath);
-                string nameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
-                string outPath = Path.Combine(dir, $"{nameWithoutExt}_nosig.pdf");
+                // Initialize the facade and bind the PDF file
+                PdfFileSignature pdfSign = new PdfFileSignature();
+                pdfSign.BindPdf(pdfPath);
 
-                // Use the PdfFileSignature facade to open, modify, and save the PDF.
-                using (PdfFileSignature signer = new PdfFileSignature())
-                {
-                    signer.BindPdf(pdfPath);          // Load the PDF.
-                    signer.RemoveSignatures();        // Remove all digital signatures.
-                    signer.Save(outPath);             // Save the modified PDF.
-                }
+                // Remove every signature from the document
+                pdfSign.RemoveSignatures();
 
-                Console.WriteLine($"Processed: {pdfPath} → {outPath}");
+                // Save the result – create a new file to avoid overwriting the original
+                string outputPath = Path.Combine(
+                    Path.GetDirectoryName(pdfPath),
+                    Path.GetFileNameWithoutExtension(pdfPath) + "_unsigned.pdf");
+
+                pdfSign.Save(outputPath);
+
+                // Release resources held by the facade
+                pdfSign.Close();
             }
             catch (Exception ex)
             {
                 Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         }
+
+        Console.WriteLine("All signatures have been removed.");
     }
 }

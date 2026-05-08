@@ -1,62 +1,44 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Comparison;
 
-class DiffPdfGenerator
+class Program
 {
     static void Main()
     {
-        const string doc1Path = "doc1.pdf";
-        const string doc2Path = "doc2.pdf";
-        const string diffPdfPath = "diff_output.pdf";
+        const string pdf1Path = "doc1.pdf";
+        const string pdf2Path = "doc2.pdf";
+        const string diffPath = "diff.pdf";
 
-        if (!File.Exists(doc1Path) || !File.Exists(doc2Path))
+        // Verify input files exist
+        if (!File.Exists(pdf1Path) || !File.Exists(pdf2Path))
         {
-            Console.Error.WriteLine("Input PDF files not found.");
+            Console.Error.WriteLine("One or both input PDF files were not found.");
             return;
         }
 
-        // Load the two source PDFs
-        using (Document doc1 = new Document(doc1Path))
-        using (Document doc2 = new Document(doc2Path))
+        // Load the two PDFs within using blocks for deterministic disposal
+        using (Document doc1 = new Document(pdf1Path))
+        using (Document doc2 = new Document(pdf2Path))
         {
-            // Default comparison options
-            ComparisonOptions options = new ComparisonOptions();
+            // Instantiate the graphical comparer
+            GraphicalPdfComparer comparer = new GraphicalPdfComparer();
 
-            // Perform a page‑by‑page text comparison
-            List<List<DiffOperation>> pageDiffs =
-                TextPdfComparer.CompareDocumentsPageByPage(doc1, doc2, options);
-
-            // Create a PdfOutputGenerator with the default style (default highlight colors)
-            PdfOutputGenerator generator = new PdfOutputGenerator();
-
-            // Generate the diff PDF and save it
-            generator.GenerateOutput(pageDiffs, diffPdfPath);
-        }
-
-        // Simple verification that highlight colors match the defaults
-        // (Deletion = red, Insertion = green in the default style)
-        using (Document diffDoc = new Document(diffPdfPath))
-        {
-            foreach (Page page in diffDoc.Pages)
+            // Verify that the default highlight color matches the documentation (red)
+            if (comparer.Color != Aspose.Pdf.Color.Red)
             {
-                foreach (Annotation ann in page.Annotations)
-                {
-                    if (ann is MarkupAnnotation markup)
-                    {
-                        Aspose.Pdf.Color color = markup.Color;
-                        bool isDefault = color.Equals(Aspose.Pdf.Color.Red) ||
-                                         color.Equals(Aspose.Pdf.Color.Green);
-                        Console.WriteLine(
-                            $"Page {page.Number} annotation color: {color} (default? {isDefault})");
-                    }
-                }
+                Console.WriteLine("Warning: Default highlight color is not red.");
             }
+            else
+            {
+                Console.WriteLine("Default highlight color verified as red.");
+            }
+
+            // Generate the diff PDF; the method saves the result to the specified path
+            comparer.CompareDocumentsToPdf(doc1, doc2, diffPath);
         }
 
-        Console.WriteLine($"Diff PDF generated at '{diffPdfPath}'.");
+        Console.WriteLine($"Diff PDF generated and saved to '{diffPath}'.");
     }
 }

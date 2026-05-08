@@ -1,44 +1,44 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core Aspose.Pdf namespace
-using Aspose.Pdf;               // For PageLabel, NumberingStyle, etc.
+using Aspose.Pdf;               // Core API (Document, Page, PageLabel, NumberingStyle)
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";      // Existing PDF (can be empty)
-        const string outputPath = "output_with_label.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF, add a blank page, set a custom page label “i”, and save.
+        // Load the existing PDF (Document implements IDisposable, so wrap in using)
         using (Document doc = new Document(inputPath))
         {
-            // Insert a new blank page at the beginning (position 1, 1‑based indexing)
-            // The inserted page will adopt the most common page size in the document.
-            Page blankPage = doc.Pages.Insert(1);
+            // Insert a blank page at the very beginning.
+            // PageCollection.Insert expects a 1‑based position.
+            doc.Pages.Insert(1);
 
-            // Create a PageLabel with the desired prefix "i" and no numbering.
-            PageLabel label = new PageLabel
+            // Create a custom page label.
+            // NumberingStyle.None means no automatic number is added;
+            // Prefix supplies the literal label text.
+            PageLabel customLabel = new PageLabel
             {
-                Prefix = "i",
                 NumberingStyle = NumberingStyle.None,
-                StartingValue = 1   // Value is ignored when NumberingStyle is None
+                Prefix = "i"
             };
 
-            // PageLabelCollection uses zero‑based page indexes.
-            // The newly inserted page is at index 0.
-            doc.PageLabels.UpdateLabel(0, label);
+            // PageLabelCollection uses zero‑based indexes.
+            // Update the label for the newly inserted first page (index 0).
+            doc.PageLabels.UpdateLabel(0, customLabel);
 
-            // Save the modified document.
+            // Save the modified PDF.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with custom front‑matter label to '{outputPath}'.");
+        Console.WriteLine($"Blank page with label \"i\" added. Saved to '{outputPath}'.");
     }
 }

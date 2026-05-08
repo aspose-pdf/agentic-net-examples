@@ -1,12 +1,13 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Folder containing PDFs to process
+        // Folder containing PDF files to process
         const string inputFolder = @"C:\PdfFolder";
 
         if (!Directory.Exists(inputFolder))
@@ -20,7 +21,7 @@ class Program
         {
             try
             {
-                // Build output file name with "_flattened" suffix
+                // Build output file name with "_flattened" suffix before the extension
                 string directory = Path.GetDirectoryName(pdfPath);
                 string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
                 string outputPath = Path.Combine(directory, $"{fileNameWithoutExt}_flattened.pdf");
@@ -28,12 +29,17 @@ class Program
                 // Use PdfAnnotationEditor to flatten annotations
                 using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
                 {
-                    editor.BindPdf(pdfPath);               // Load the PDF
-                    editor.FlatteningAnnotations();        // Flatten all annotations
-                    editor.Save(outputPath);                // Save the flattened PDF
+                    // Bind the source PDF
+                    editor.BindPdf(pdfPath);
+
+                    // Flatten all annotations in the document
+                    editor.FlatteningAnnotations();
+
+                    // Save the flattened PDF
+                    editor.Save(outputPath);
                 }
 
-                Console.WriteLine($"Flattened: {Path.GetFileName(pdfPath)} → {Path.GetFileName(outputPath)}");
+                Console.WriteLine($"Flattened: '{pdfPath}' → '{outputPath}'");
             }
             catch (Exception ex)
             {

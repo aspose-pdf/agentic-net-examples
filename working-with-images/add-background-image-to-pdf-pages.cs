@@ -1,56 +1,48 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace
+using Aspose.Pdf;               // Core Aspose.Pdf namespace
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";   // source PDF
-        const string outputPdfPath = "output.pdf";  // result PDF
-        const string backgroundImg = "background.png"; // image to use as background
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_with_background.pdf";
+        const string imagePath  = "background.png";   // Path to the background image
 
-        // Validate input files
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(backgroundImg))
-        {
-            Console.Error.WriteLine($"Background image not found: {backgroundImg}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (load rule)
-        using (Document pdfDoc = new Document(inputPdfPath))
+        if (!File.Exists(imagePath))
         {
-            // Iterate over all pages (pages are 1‑based internally)
-            foreach (Page page in pdfDoc.Pages)
+            Console.Error.WriteLine($"Background image not found: {imagePath}");
+            return;
+        }
+
+        // Load the existing PDF document
+        using (Document doc = new Document(inputPath))
+        {
+            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Create an image stamp (create rule)
-                ImageStamp imgStamp = new ImageStamp(backgroundImg);
+                Page page = doc.Pages[i];
 
-                // Place the stamp behind page content
-                imgStamp.Background = true;
+                // Create a background artifact, set the image and opacity (30%)
+                BackgroundArtifact bgArtifact = new BackgroundArtifact();
+                bgArtifact.SetImage(imagePath);   // Load image from file
+                bgArtifact.Opacity = 0.3;        // 30 percent opacity
 
-                // Set opacity to 30 % (0.3)
-                imgStamp.Opacity = 0.3;
-
-                // Stretch the stamp to cover the whole page
-                imgStamp.Width  = page.Rect.Width;
-                imgStamp.Height = page.Rect.Height;
-                imgStamp.HorizontalAlignment = HorizontalAlignment.Center;
-                imgStamp.VerticalAlignment   = VerticalAlignment.Center;
-
-                // Add the stamp to the current page (per‑page AddStamp)
-                page.AddStamp(imgStamp);
+                // Add the artifact to the page's artifact collection
+                page.Artifacts.Add(bgArtifact);
             }
 
-            // Save the modified PDF (save rule)
-            pdfDoc.Save(outputPdfPath);
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Background image applied and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"PDF saved with background image: {outputPath}");
     }
 }

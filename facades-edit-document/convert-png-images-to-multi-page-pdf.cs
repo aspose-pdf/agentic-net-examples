@@ -1,31 +1,31 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core API for PDF creation
-using Aspose.Pdf.Facades;      // Required by task specification
+using Aspose.Pdf;                     // Core PDF API
+using Aspose.Pdf.Drawing;            // Image class lives here
 
 class Program
 {
     static void Main()
     {
-        // Folder containing the PNG images (adjust as needed)
+        // Input folder containing PNG images (adjust as needed)
         const string imagesFolder = "Images";
         // Output PDF file path
         const string outputPdf = "output.pdf";
 
-        // Verify the images folder exists
+        // Validate input folder
         if (!Directory.Exists(imagesFolder))
         {
             Console.Error.WriteLine($"Folder not found: {imagesFolder}");
             return;
         }
 
-        // Get all PNG files in the folder, sorted alphabetically
+        // Get PNG files sorted alphabetically (default order)
         string[] pngFiles = Directory.GetFiles(imagesFolder, "*.png");
-        Array.Sort(pngFiles, StringComparer.OrdinalIgnoreCase);
+        Array.Sort(pngFiles, StringComparer.InvariantCulture);
 
         if (pngFiles.Length == 0)
         {
-            Console.Error.WriteLine("No PNG images found to convert.");
+            Console.Error.WriteLine("No PNG files found in the specified folder.");
             return;
         }
 
@@ -35,23 +35,21 @@ class Program
             // Add each PNG as a separate page
             foreach (string pngPath in pngFiles)
             {
-                // Add a new page to the document (1‑based indexing)
+                // Create a new page (default size & margins)
                 Page page = pdfDoc.Pages.Add();
 
-                // Create an Image object and set its source file
+                // Add the image to the page
                 Image img = new Image
                 {
                     File = pngPath
                 };
-
-                // Add the image to the page's paragraphs collection
                 page.Paragraphs.Add(img);
             }
 
-            // Save the assembled PDF; extension is .pdf so no SaveOptions needed
+            // Save the multi‑page PDF with default margins
             pdfDoc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Successfully created multi‑page PDF: {outputPdf}");
+        Console.WriteLine($"PDF created successfully: {outputPdf}");
     }
 }

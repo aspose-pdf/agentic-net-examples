@@ -6,41 +6,22 @@ class Program
 {
     static void Main()
     {
-        // Input PDF containing form fields
-        const string inputPdfPath = "input.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputXml = "form_fields.xml";
 
-        // Output XML file that will contain the exported form fields (document model)
-        const string outputXmlPath = "form_fields.xml";
-
-        // Verify that the input file exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         // Load the PDF document
-        using (Document pdfDocument = new Document(inputPdfPath))
+        using (Document doc = new Document(inputPdf))
         {
-            // Ensure the document actually contains a form
-            if (pdfDocument.Form == null || pdfDocument.Form.Count == 0)
-            {
-                Console.WriteLine("The PDF does not contain any form fields to export.");
-            }
-
-            // Export the document (including its form fields) to XML.
-            // Document.SaveXml writes the entire PDF structure to an XML file.
-            pdfDocument.SaveXml(outputXmlPath);
+            // Export the document (including its form fields) to an XML file
+            doc.SaveXml(outputXml);
         }
 
-        // Optionally, confirm that the XML file was created
-        if (File.Exists(outputXmlPath))
-        {
-            Console.WriteLine($"Form fields exported successfully to '{outputXmlPath}'.");
-        }
-        else
-        {
-            Console.Error.WriteLine("Failed to create the XML output file.");
-        }
+        Console.WriteLine($"Form fields exported to XML file: {outputXml}");
     }
 }

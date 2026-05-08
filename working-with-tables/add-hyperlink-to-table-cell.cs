@@ -1,81 +1,64 @@
 using System;
-using System.Runtime.InteropServices;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Text;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Create a new PDF document
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a page to the document
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Create a table with a single column
-            Table table = new Table { ColumnWidths = "200" };
+        // Load the existing PDF
+        using (Document doc = new Document(inputPath))
+        {
+            // Get the first page (1‑based indexing)
+            Page page = doc.Pages[1];
 
-            // Add a row to the table
-            Row row = table.Rows.Add();
-
-            // Add a cell (no initial text – we will add a TextFragment with a hyperlink)
-            Cell cell = row.Cells.Add();
-
-            // Define text appearance for the cell
-            TextState textState = new TextState
-            {
-                FontSize = 12,
-                Font = FontRepository.FindFont("Arial")
-            };
-            cell.DefaultCellTextState = textState;
-
-            // Create a TextFragment that contains a hyperlink
-            TextFragment tf = new TextFragment("Click here")
-            {
-                Hyperlink = new WebHyperlink("https://example.com")
-            };
-            // Apply the same text state to the fragment (modify the existing TextState instance)
-            tf.TextState.FontSize = textState.FontSize;
-            tf.TextState.Font = textState.Font;
-
-            cell.Paragraphs.Add(tf);
-
-            // Add the table to the page
+            // Create a table and add it to the page
+            Table table = new Table();
             page.Paragraphs.Add(table);
 
-            // Save the PDF – guard against missing GDI+ (libgdiplus) on non‑Windows platforms
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                doc.Save(outputPath);
-            }
-            else
-            {
-                try
-                {
-                    doc.Save(outputPath);
-                }
-                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
-                {
-                    Console.WriteLine("GDI+ (libgdiplus) is not available on this platform. PDF saved without GDI‑dependent features.");
-                }
-            }
-        }
-    }
+            // Add a single row and a single cell
+            Row row = table.Rows.Add();
+            Cell cell = row.Cells.Add();
 
-    // Helper to detect a nested DllNotFoundException (e.g., missing libgdiplus)
-    private static bool ContainsDllNotFound(Exception ex)
-    {
-        while (ex != null)
-        {
-            if (ex is DllNotFoundException)
-                return true;
-            ex = ex.InnerException;
+            // Add visible text to the cell
+            cell.Paragraphs.Add(new TextFragment("Click here for more info"));
+
+            // Define the rectangle area for the hyperlink.
+            // Coordinates are in points, origin is bottom‑left of the page.
+            // Adjust these values to fit the actual cell position as needed.
+            Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(
+                llx: 100,   // left
+                lly: 500,   // bottom
+                urx: 250,   // right
+                ury: 520    // top
+            );
+
+            // Create a LinkAnnotation that points to an external URL
+            LinkAnnotation link = new LinkAnnotation(page, linkRect)
+            {
+                // Use GoToURIAction for external web links (preferred over Hyperlink property)
+                Action = new GoToURIAction("https://www.example.com")
+            };
+
+            // Add the annotation to the cell's paragraph collection.
+            // LinkAnnotation derives from BaseParagraph, so it can be added here.
+            cell.Paragraphs.Add(link);
+
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        return false;
+
+        Console.WriteLine($"PDF with hyperlink saved to '{outputPath}'.");
     }
 }

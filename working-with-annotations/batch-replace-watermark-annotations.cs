@@ -2,58 +2,72 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";          // source PDF
+        const string outputPath = "output.pdf";        // result PDF
+        const string logoPath = "corporate_logo.png"; // new watermark image
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        if (!File.Exists(logoPath))
+        {
+            Console.Error.WriteLine($"Logo image not found: {logoPath}");
+            return;
+        }
+
+        // Load the PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
+            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
             for (int pageIdx = 1; pageIdx <= doc.Pages.Count; pageIdx++)
             {
                 Page page = doc.Pages[pageIdx];
 
-                // Iterate over all annotations on the page (1‑based indexing)
-                for (int annIdx = 1; annIdx <= page.Annotations.Count; annIdx++)
+                // Iterate backwards because we may delete/replace annotations
+                for (int i = page.Annotations.Count; i >= 1; i--)
                 {
-                    Annotation ann = page.Annotations[annIdx];
+                    Annotation ann = page.Annotations[i];
 
-                    // Process only WatermarkAnnotation instances
-                    if (ann is WatermarkAnnotation watermark)
+                    // Identify WatermarkAnnotation instances
+                    if (ann is WatermarkAnnotation watermarkAnn)
                     {
-                        // New text that includes the current date
-                        string[] newText = { $"Updated on {DateTime.Now:yyyy-MM-dd}" };
+                        // Preserve the existing opacity
+                        double originalOpacity = watermarkAnn.Opacity;
 
-                        // Define the visual style for the watermark text
-                        TextState textState = new TextState
-                        {
-                            Font = FontRepository.FindFont("Helvetica"),
-                            FontSize = 12,
-                            ForegroundColor = Aspose.Pdf.Color.Black
-                        };
+                        // Preserve the original rectangle (position & size)
+                        Aspose.Pdf.Rectangle rect = watermarkAnn.Rect;
 
-                        // Replace the existing watermark text with the new content
-                        watermark.SetTextAndState(newText, textState);
+                        // Remove the old watermark annotation
+                        page.Annotations.Delete(i);
+
+                        // Create a new StampAnnotation that uses the corporate logo image
+                        var stampAnn = new StampAnnotation(page, rect);
+
+                        // Load image bytes and assign a MemoryStream (required type for StampAnnotation.Image)
+                        byte[] imgBytes = File.ReadAllBytes(logoPath);
+                        stampAnn.Image = new MemoryStream(imgBytes);
+
+                        // Preserve opacity
+                        stampAnn.Opacity = originalOpacity;
+
+                        // Add the new annotation to the page
+                        page.Annotations.Add(stampAnn);
                     }
                 }
             }
 
-            // Save the modified PDF
+            // Save the modified document (lifecycle rule: use Save inside using)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Watermarks updated and saved to '{outputPath}'.");
+        Console.WriteLine($"Watermarks replaced and saved to '{outputPath}'.");
     }
 }

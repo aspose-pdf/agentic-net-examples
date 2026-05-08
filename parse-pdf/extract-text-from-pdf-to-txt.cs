@@ -7,32 +7,31 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputTxt = "output.txt";
+        const string inputPdfPath  = "input.pdf";
+        const string outputTxtPath = "output.txt";
 
-        // Verify the source PDF exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
         // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Create a TextAbsorber to collect text from the document
+            // Create a TextAbsorber to extract text from all pages
             TextAbsorber absorber = new TextAbsorber();
 
-            // Accept the absorber for all pages of the document
-            doc.Pages.Accept(absorber);
+            // Accept the absorber for the entire Pages collection
+            pdfDoc.Pages.Accept(absorber);
 
-            // Retrieve the concatenated text (empty string if null)
-            string allText = absorber.Text ?? string.Empty;
+            // Retrieve the concatenated text
+            string extractedText = absorber.Text;
 
-            // Write the extracted text to a plain .txt file
-            File.WriteAllText(outputTxt, allText);
+            // Write the text to a .txt file
+            File.WriteAllText(outputTxtPath, extractedText);
         }
 
-        Console.WriteLine($"Extracted text saved to '{outputTxt}'.");
+        Console.WriteLine($"Text extracted to '{outputTxtPath}'.");
     }
 }

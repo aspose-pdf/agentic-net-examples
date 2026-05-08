@@ -7,22 +7,26 @@ class Program
 {
     static void Main()
     {
+        // Input PDF file
         const string inputPdfPath = "input.pdf";
-        const string outputFolder = "output_images";
 
+        // Directory where PNG images will be saved
+        const string outputDirectory = "output_images";
+
+        // Verify input file exists
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputDirectory);
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load PDF document inside a using block for deterministic disposal
         using (Document pdfDocument = new Document(inputPdfPath))
         {
-            // Set resolution to 150 DPI
+            // Create a Resolution object for 150 DPI
             Resolution resolution = new Resolution(150);
 
             // Initialize PNG device with the desired resolution
@@ -35,9 +39,10 @@ class Program
             // Iterate over all pages (1‑based indexing)
             for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
             {
-                string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.png");
+                // Build output file path for the current page
+                string outputPath = Path.Combine(outputDirectory, $"page_{pageNumber}.png");
 
-                // Save each page to a PNG file using a FileStream
+                // Write each page to a PNG file using a FileStream
                 using (FileStream pngStream = new FileStream(outputPath, FileMode.Create))
                 {
                     pngDevice.Process(pdfDocument.Pages[pageNumber], pngStream);
@@ -45,6 +50,6 @@ class Program
             }
         }
 
-        Console.WriteLine("All pages have been converted to PNG with transparent background at 150 DPI.");
+        Console.WriteLine("All pages have been converted to PNG images with transparent background at 150 DPI.");
     }
 }

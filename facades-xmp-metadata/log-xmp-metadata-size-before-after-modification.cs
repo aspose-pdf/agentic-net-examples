@@ -7,38 +7,35 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output_modified.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Bind the PDF to the XMP metadata facade
+        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
         {
-            // Initialize the XMP metadata facade for the loaded document
-            PdfXmpMetadata xmp = new PdfXmpMetadata(doc);
+            xmp.BindPdf(inputPdf);
 
-            // Retrieve XMP metadata before any changes
+            // Retrieve XMP metadata before modification
             byte[] beforeData = xmp.GetXmpMetadata();
-            int beforeSize = beforeData?.Length ?? 0;
-            Console.WriteLine($"XMP size before modification: {beforeSize} bytes");
+            Console.WriteLine($"XMP size before modification: {beforeData.Length} bytes");
 
-            // Example modification: add a creator entry
-            xmp.Add("dc:creator", "AsposeUser");
+            // Add a custom XMP property (modification)
+            xmp.Add("my:custom", "CustomValue");
 
-            // Retrieve XMP metadata after the modification
+            // Retrieve XMP metadata after modification
             byte[] afterData = xmp.GetXmpMetadata();
-            int afterSize = afterData?.Length ?? 0;
-            Console.WriteLine($"XMP size after modification: {afterSize} bytes");
+            Console.WriteLine($"XMP size after modification: {afterData.Length} bytes");
 
-            // Save the updated PDF document
-            xmp.Save(outputPath);
+            // Save the PDF with updated XMP metadata
+            xmp.Save(outputPdf);
         }
 
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Modified PDF saved to '{outputPdf}'.");
     }
 }

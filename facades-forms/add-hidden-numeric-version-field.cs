@@ -1,40 +1,35 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the existing PDF document
-        using (Document doc = new Document(inputPath))
+        // Initialize FormEditor and bind the existing PDF
+        using (FormEditor formEditor = new FormEditor())
         {
-            // Initialize the FormEditor facade with the loaded document
-            using (FormEditor editor = new FormEditor(doc))
-            {
-                // Add a hidden text field named "Version" with the value "2"
-                // The field is placed on page 1; a zero‑size rectangle is sufficient because the field will be hidden
-                editor.AddField(FieldType.Text, "Version", "2", 1, 0, 0, 0, 0);
+            formEditor.BindPdf(inputPath);
 
-                // Hide the field by setting the Hidden annotation flag
-                editor.SetFieldAppearance("Version", AnnotationFlags.Hidden);
-            }
+            // Add a hidden numeric field named "Version" with initial value "2"
+            // Placed at a zero‑size rectangle on page 1 (effectively invisible)
+            formEditor.AddField(FieldType.Numeric, "Version", "2", 1, 0, 0, 0, 0);
 
-            // Save the updated PDF
-            doc.Save(outputPath);
+            // No need to set a hidden flag – the zero‑size rectangle makes the field invisible.
+
+            // Save the modified PDF
+            formEditor.Save(outputPath);
         }
 
-        Console.WriteLine($"Hidden numeric field 'Version' added and saved to '{outputPath}'.");
+        Console.WriteLine($"Hidden field added and saved to '{outputPath}'.");
     }
 }

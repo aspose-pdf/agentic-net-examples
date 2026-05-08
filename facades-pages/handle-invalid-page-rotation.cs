@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -7,36 +6,46 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "rotated.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "rotated_output.pdf";
 
-        if (!File.Exists(inputPath))
+        // Ensure the source file exists
+        if (!System.IO.File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Use PdfPageEditor to rotate pages
+        // Use PdfPageEditor (facade) to edit page rotation
         using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // Load the PDF document
+            // Bind the existing PDF document
             editor.BindPdf(inputPath);
 
-            // Try setting an invalid rotation value
             try
             {
-                editor.Rotation = 45; // Invalid: must be 0, 90, 180, or 270
-                editor.ApplyChanges(); // Triggers validation
+                // Attempt to assign an invalid rotation value (must be 0, 90, 180, or 270)
+                editor.Rotation = 45; // Invalid – will trigger an exception
             }
             catch (InvalidValueFormatException ex)
             {
+                // Handle the specific exception thrown for invalid rotation values
                 Console.WriteLine($"Invalid rotation value: {ex.Message}");
-                // Set a valid rotation instead
+                // Fallback to a valid rotation
                 editor.Rotation = 90;
-                editor.ApplyChanges();
+            }
+            catch (Exception ex)
+            {
+                // Catch any other unexpected errors
+                Console.WriteLine($"Unexpected error: {ex.Message}");
+                // Optionally rethrow or exit
+                return;
             }
 
-            // Save the rotated PDF
+            // Apply the rotation change to the document
+            editor.ApplyChanges();
+
+            // Save the modified PDF
             editor.Save(outputPath);
         }
 

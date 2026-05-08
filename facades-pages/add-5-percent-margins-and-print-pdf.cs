@@ -1,14 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Printing; // Added for Aspose printer settings
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_with_margin.pdf";
+        const string outputPath = "output_with_margins.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -18,38 +17,31 @@ class Program
 
         // Add a 5% margin on all sides of every page
         PdfFileEditor fileEditor = new PdfFileEditor();
-        using (FileStream src = new FileStream(inputPath, FileMode.Open, FileAccess.Read))
-        using (FileStream dest = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+        bool added = fileEditor.AddMarginsPct(
+            inputPath,               // source PDF
+            outputPath,              // destination PDF
+            null,                    // null = all pages
+            5,                       // left margin (%)
+            5,                       // right margin (%)
+            5,                       // top margin (%)
+            5);                      // bottom margin (%)
+
+        if (!added)
         {
-            // null pages array processes all pages
-            bool success = fileEditor.AddMarginsPct(src, dest, null, 5, 5, 5, 5);
-            if (!success)
-            {
-                Console.Error.WriteLine("Failed to add margins to the PDF.");
-                return;
-            }
+            Console.Error.WriteLine("Failed to add margins to the PDF.");
+            return;
         }
 
-        // Print the resized PDF with auto‑scaling to fit the printable area
-        PdfViewer viewer = new PdfViewer();
-        try
+        // Print the resulting PDF with automatic resizing to fit the printable area
+        using (PdfViewer viewer = new PdfViewer())
         {
             viewer.BindPdf(outputPath);
-            viewer.AutoResize = true; // ensure content fits the page when printing
-
-            // Use Aspose.Pdf.Printing.PrinterSettings (not System.Drawing.Printing.PrinterSettings)
-            PrinterSettings printerSettings = new PrinterSettings(); // default printer settings for Aspose
-            // Additional printer settings can be configured here if needed, e.g.:
-            // printerSettings.Copies = 1;
-            // printerSettings.PrinterName = "YourPrinterName";
-
-            viewer.PrintDocumentWithSettings(printerSettings);
-        }
-        finally
-        {
-            viewer.Close();
+            viewer.AutoResize = true;   // ensure content fits the page when printing
+            viewer.PrintDocument();     // print using the default printer
+            viewer.Close();             // close the viewer (optional, disposed by using)
         }
 
-        Console.WriteLine($"Successfully printed PDF with 5% margins: {outputPath}");
+        // Clean up temporary file if desired
+        try { File.Delete(outputPath); } catch { }
     }
 }

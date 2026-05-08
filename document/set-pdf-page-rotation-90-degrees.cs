@@ -15,19 +15,20 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Set initial rotation to 90° for each page (portrait view on landscape devices)
+            // Set each page's rotation to 90 degrees (portrait on landscape devices)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                doc.Pages[i].Rotate = Rotation.on90; // correct enum value
+                // Correct enum values use the "on" prefix
+                doc.Pages[i].Rotate = Rotation.on90;
             }
 
             // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Document saved with 90° rotation to '{outputPath}'.");
+        Console.WriteLine($"Document saved with rotation applied: '{outputPath}'");
     }
 }

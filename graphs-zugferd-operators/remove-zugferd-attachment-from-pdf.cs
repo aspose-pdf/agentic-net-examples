@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
 
 class Program
@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_without_zugferd.pdf";
+        const string outputPath = "output_no_zugferd.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,36 +16,37 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Collect the names of all embedded files that match the ZUGFeRD pattern
-            List<string> namesToDelete = new List<string>();
-
-            // EmbeddedFiles collection uses 1‑based indexing
-            for (int i = 1; i <= doc.EmbeddedFiles.Count; i++)
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
             {
-                var fileSpec = doc.EmbeddedFiles[i];
-                if (fileSpec != null && !string.IsNullOrEmpty(fileSpec.Name))
+                // Identify embedded files whose name contains "ZUGFeRD"
+                var namesToDelete = new List<string>();
+                foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
                 {
-                    // ZUGFeRD attachments usually contain "ZUGFeRD" in the file name
-                    if (fileSpec.Name.IndexOf("ZUGFeRD", StringComparison.OrdinalIgnoreCase) >= 0)
+                    if (!string.IsNullOrEmpty(fileSpec.Name) &&
+                        fileSpec.Name.IndexOf("ZUGFeRD", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
                         namesToDelete.Add(fileSpec.Name);
                     }
                 }
+
+                // Delete the identified ZUGFeRD attachments
+                foreach (string name in namesToDelete)
+                {
+                    doc.EmbeddedFiles.Delete(name);
+                }
+
+                // Save the modified PDF, preserving all other content
+                doc.Save(outputPath);
             }
 
-            // Delete the identified ZUGFeRD attachments by name
-            foreach (string name in namesToDelete)
-            {
-                doc.EmbeddedFiles.Delete(name);
-            }
-
-            // Save the modified PDF, preserving all other content
-            doc.Save(outputPath);
+            Console.WriteLine($"ZUGFeRD attachment removed. Saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"ZUGFeRD attachment removed. Output saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

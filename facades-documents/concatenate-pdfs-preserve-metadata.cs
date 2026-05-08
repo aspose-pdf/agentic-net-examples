@@ -9,7 +9,7 @@ class Program
         // Input PDF files to concatenate
         string[] inputFiles = { "file1.pdf", "file2.pdf", "file3.pdf" };
         // Output file path
-        string outputFile = "merged.pdf";
+        const string outputFile = "merged.pdf";
 
         // Verify that all input files exist
         foreach (string file in inputFiles)
@@ -21,56 +21,35 @@ class Program
             }
         }
 
-        // -----------------------------------------------------------------
-        // Preserve metadata from the first input PDF (author, title, etc.)
-        // -----------------------------------------------------------------
-        // PdfFileInfo provides access to document metadata without loading the
-        // full Document object.
-        PdfFileInfo sourceInfo = new PdfFileInfo(inputFiles[0]);
+        // Initialize the PdfFileEditor facade
+        PdfFileEditor editor = new PdfFileEditor();
 
-        string author = sourceInfo.Author;
-        string title = sourceInfo.Title;
-        string subject = sourceInfo.Subject;
-        string keywords = sourceInfo.Keywords;
-        // CreationDate and ModDate are stored as PDF‑date formatted strings, not DateTime.
-        string creationDate = sourceInfo.CreationDate;
-        string modDate = sourceInfo.ModDate;
+        // Preserve outlines, logical structure and user rights during concatenation
+        editor.CopyOutlines = true;
+        editor.CopyLogicalStructure = true;
+        editor.PreserveUserRights = true;
 
-        // -----------------------------------------------------------------
-        // Concatenate the PDFs using PdfFileEditor
-        // -----------------------------------------------------------------
-        PdfFileEditor editor = new PdfFileEditor
+        // Perform concatenation
+        bool concatenated = editor.Concatenate(inputFiles, outputFile);
+        if (!concatenated)
         {
-            // Optional: close streams after operation (not needed here because we use file paths)
-            CloseConcatenatedStreams = true
-        };
-
-        // Perform concatenation; returns true if successful
-        bool success = editor.Concatenate(inputFiles, outputFile);
-        if (!success)
-        {
-            Console.Error.WriteLine("Concatenation failed.");
+            Console.Error.WriteLine("Failed to concatenate PDF files.");
             return;
         }
 
-        // -----------------------------------------------------------------
-        // Apply the preserved metadata to the merged PDF
-        // -----------------------------------------------------------------
-        // Load the merged file's info, set the metadata, and save it back.
-        PdfFileInfo mergedInfo = new PdfFileInfo(outputFile);
+        // Preserve metadata (author, title, subject, keywords) from the first PDF
+        using (PdfFileInfo sourceInfo = new PdfFileInfo(inputFiles[0]))
+        using (PdfFileInfo destInfo = new PdfFileInfo(outputFile))
+        {
+            destInfo.Author   = sourceInfo.Author;
+            destInfo.Title    = sourceInfo.Title;
+            destInfo.Subject  = sourceInfo.Subject;
+            destInfo.Keywords = sourceInfo.Keywords;
 
-        // Preserve original metadata (fallback to empty strings if null)
-        mergedInfo.Author = author ?? string.Empty;
-        mergedInfo.Title = title ?? Path.GetFileNameWithoutExtension(outputFile);
-        mergedInfo.Subject = subject ?? string.Empty;
-        mergedInfo.Keywords = keywords ?? string.Empty;
+            // Save the updated metadata back to the output file
+            destInfo.SaveNewInfo(outputFile);
+        }
 
-        if (!string.IsNullOrEmpty(creationDate)) mergedInfo.CreationDate = creationDate;
-        if (!string.IsNullOrEmpty(modDate)) mergedInfo.ModDate = modDate;
-
-        // Save the updated metadata back to the same file
-        mergedInfo.SaveNewInfo(outputFile);
-
-        Console.WriteLine($"Successfully concatenated PDFs to '{outputFile}' with preserved metadata.");
+        Console.WriteLine($"PDF files successfully concatenated to '{outputFile}'.");
     }
 }

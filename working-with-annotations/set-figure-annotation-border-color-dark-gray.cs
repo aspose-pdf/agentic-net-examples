@@ -7,49 +7,43 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
+        // Verify the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPath))
+            // Pages are 1‑based in Aspose.Pdf
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                // Iterate over all pages
-                foreach (Page page in doc.Pages)
-                {
-                    // Annotations collection uses 1‑based indexing
-                    for (int i = 1; i <= page.Annotations.Count; i++)
-                    {
-                        Annotation ann = page.Annotations[i];
+                Page page = doc.Pages[pageIndex];
 
-                        // Identify figure annotations (square, circle, polygon, polyline)
-                        if (ann is SquareAnnotation ||
-                            ann is CircleAnnotation ||
-                            ann is PolygonAnnotation ||
-                            ann is PolylineAnnotation)
-                        {
-                            // Change the border color to dark gray
-                            ann.Color = Aspose.Pdf.Color.DarkGray;
-                        }
+                // Annotations collection is also 1‑based
+                for (int annIndex = 1; annIndex <= page.Annotations.Count; annIndex++)
+                {
+                    Annotation annotation = page.Annotations[annIndex];
+
+                    // Figure annotations derive from CommonFigureAnnotation (e.g., SquareAnnotation, CircleAnnotation)
+                    if (annotation is CommonFigureAnnotation)
+                    {
+                        // Set the border color to dark gray.
+                        // The border color is controlled by the annotation's Color property.
+                        annotation.Color = Aspose.Pdf.Color.DarkGray;
                     }
                 }
-
-                // Save the modified PDF
-                doc.Save(outputPath);
             }
 
-            Console.WriteLine($"All figure annotation borders set to dark gray. Saved as '{outputPath}'.");
+            // Save the modified document
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"All figure annotation borders set to dark gray. Saved to '{outputPath}'.");
     }
 }

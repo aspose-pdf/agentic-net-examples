@@ -6,9 +6,10 @@ using Aspose.Pdf.Facades;
 public static class PdfEncryptionHelper
 {
     /// <summary>
-    /// Loads a PDF from a byte array, encrypts it, and returns the encrypted PDF as a byte array.
+    /// Encrypts a PDF supplied as a byte array and returns the encrypted PDF as a byte array.
+    /// Uses Aspose.Pdf.Facades.PdfFileSecurity for encryption.
     /// </summary>
-    /// <param name="pdfBytes">The original PDF content.</param>
+    /// <param name="pdfBytes">Input PDF bytes.</param>
     /// <param name="userPassword">User password (can be null or empty).</param>
     /// <param name="ownerPassword">Owner password (can be null or empty).</param>
     /// <returns>Encrypted PDF bytes.</returns>
@@ -20,14 +21,14 @@ public static class PdfEncryptionHelper
         using (MemoryStream inputStream = new MemoryStream(pdfBytes))
         // Output stream for the encrypted PDF
         using (MemoryStream outputStream = new MemoryStream())
-        // PdfFileSecurity facade to perform encryption
+        // PdfFileSecurity facade handles encryption
         using (PdfFileSecurity fileSecurity = new PdfFileSecurity())
         {
-            // Bind the source PDF stream to the facade
+            // Bind the source PDF from the input stream
             fileSecurity.BindPdf(inputStream);
 
             // Encrypt the PDF.
-            // DocumentPrivilege.Print is used as an example; adjust as needed.
+            // DocumentPrivilege.Print is an example; adjust as needed.
             // KeySize.x256 provides strong AES‑256 encryption.
             fileSecurity.EncryptFile(
                 userPassword ?? string.Empty,
@@ -44,11 +45,17 @@ public static class PdfEncryptionHelper
     }
 }
 
-// Dummy entry point required for a console‑type project build.
-public class Program
+// ---------------------------------------------------------------------------
+// The original project was compiled as an executable, which requires an entry
+// point (a static Main method).  Adding a minimal Program class satisfies the
+// compiler while keeping the helper class usable from other code.
+// ---------------------------------------------------------------------------
+public static class Program
 {
     public static void Main(string[] args)
     {
-        // Intentionally left blank – the library functionality is accessed via PdfEncryptionHelper.
+        // No operation – this method exists solely to provide an entry point
+        // for the console application build.  The PdfEncryptionHelper can be
+        // invoked from other projects or unit tests.
     }
 }

@@ -1,47 +1,78 @@
 using System;
-using System.IO;
+using System.Runtime.InteropServices;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Text; // <-- added for TextFragment
 
 class Program
 {
     static void Main()
     {
         const string outputPath = "multi_page_graph.pdf";
+        const int totalPages = 3; // adjust as needed
 
-        // Create a new PDF document and ensure it is disposed properly
+        // Document lifecycle must be wrapped in a using block for proper disposal
         using (Document doc = new Document())
         {
-            // Example: create 3 pages, each containing a graph that fills the page
-            for (int i = 1; i <= 3; i++)
+            bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
+            // Create the required number of pages
+            for (int i = 1; i <= totalPages; i++)
             {
-                // Add a new page (default size will be used)
+                // Add a new page (1‑based indexing)
                 Page page = doc.Pages.Add();
 
-                // Retrieve the page dimensions (width and height in points)
+                // Retrieve the page dimensions (width & height in points)
                 double pageWidth  = page.Rect.Width;
                 double pageHeight = page.Rect.Height;
 
-                // Create a Graph whose size matches the page dimensions
-                Graph graph = new Graph(pageWidth, pageHeight);
-
-                // OPTIONAL: add a simple border for visual reference.
-                // The Border class may not be available in some older Aspose.PDF versions.
-                // If you have a version that includes Border, you can uncomment the following lines:
-                // graph.Border = new Border(graph)
-                // {
-                //     Width = 1,
-                //     Color = Color.Black
-                // };
-
-                // Add the graph to the page's paragraph collection
-                page.Paragraphs.Add(graph);
+                if (isWindows)
+                {
+                    // Create a Graph that matches the page size (Windows platforms have GDI+ support)
+                    Graph graph = new Graph(pageWidth, pageHeight)
+                    {
+                        Left = 0,   // position at the left edge
+                        Top  = 0    // position at the top edge
+                    };
+                    page.Paragraphs.Add(graph);
+                }
+                else
+                {
+                    // On non‑Windows platforms GDI+ (libgdiplus) may be missing; add a placeholder text instead.
+                    page.Paragraphs.Add(new TextFragment($"Page {i}: graph omitted on non‑Windows platform"));
+                }
             }
 
-            // Save the resulting PDF
-            doc.Save(outputPath);
+            // Save the document – guard the call for platforms without GDI+ support.
+            if (isWindows)
+            {
+                doc.Save(outputPath);
+                Console.WriteLine($"PDF saved to '{outputPath}'.");
+            }
+            else
+            {
+                try
+                {
+                    doc.Save(outputPath);
+                    Console.WriteLine($"PDF saved to '{outputPath}' (no Graphs rendered).");
+                }
+                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
+                {
+                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform; PDF not saved.");
+                }
+            }
         }
+    }
 
-        Console.WriteLine($"PDF with graphs saved to '{outputPath}'.");
+    // Helper to detect a nested DllNotFoundException (e.g., missing libgdiplus)
+    private static bool ContainsDllNotFound(Exception? ex)
+    {
+        while (ex != null)
+        {
+            if (ex is DllNotFoundException)
+                return true;
+            ex = ex.InnerException;
+        }
+        return false;
     }
 }

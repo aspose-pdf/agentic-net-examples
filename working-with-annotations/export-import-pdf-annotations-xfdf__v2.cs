@@ -1,71 +1,59 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        // Paths for source PDF, XFDF file, and destination PDF
-        const string sourcePdfPath = "source.pdf";
-        const string xfdfPath      = "annotations.xfdf";
+        // Paths for source PDF (with annotations), destination PDF, and temporary XFDF file
+        const string sourcePdfPath = "source_with_annotations.pdf";
         const string targetPdfPath = "target.pdf";
-        const string outputPdfPath = "target_with_annotations.pdf";
+        const string xfdfPath       = "annotations.xfdf";
 
-        // ------------------------------------------------------------
-        // Ensure the source PDF exists and contains at least one annotation.
-        // If the file is missing we create a minimal PDF with a TextAnnotation.
-        // ------------------------------------------------------------
+        // Verify source files exist
         if (!File.Exists(sourcePdfPath))
         {
-            using (Document srcDoc = new Document())
-            {
-                Page page = srcDoc.Pages.Add();
-                // Create a simple text annotation.
-                var textAnnotation = new TextAnnotation(
-                    srcDoc.Pages[1],
-                    new Rectangle(100, 600, 200, 650) // left, bottom, right, top
-                )
-                {
-                    Title    = "Sample",
-                    Subject  = "Demo",
-                    Contents = "This is a sample annotation created programmatically."
-                };
-                page.Annotations.Add(textAnnotation);
-                srcDoc.Save(sourcePdfPath);
-            }
+            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
+            return;
         }
-
-        // ------------------------------------------------------------
-        // Ensure the target PDF exists. If it does not, create a blank PDF.
-        // ------------------------------------------------------------
         if (!File.Exists(targetPdfPath))
         {
-            using (Document tgtDoc = new Document())
+            Console.Error.WriteLine($"Target PDF not found: {targetPdfPath}");
+            return;
+        }
+
+        try
+        {
+            // ---------- Export annotations from the source PDF ----------
+            using (Document sourceDoc = new Document(sourcePdfPath))
             {
-                tgtDoc.Pages.Add();
-                tgtDoc.Save(targetPdfPath);
+                // Export all annotations to an XFDF file
+                sourceDoc.ExportAnnotationsToXfdf(xfdfPath);
+                Console.WriteLine($"Annotations exported to XFDF: {xfdfPath}");
+            }
+
+            // ---------- Import annotations into the target PDF ----------
+            using (Document targetDoc = new Document(targetPdfPath))
+            {
+                // Import annotations from the previously created XFDF file
+                targetDoc.ImportAnnotationsFromXfdf(xfdfPath);
+
+                // Save the updated PDF (you may choose a different output name)
+                const string outputPdfPath = "target_with_imported_annotations.pdf";
+                targetDoc.Save(outputPdfPath);
+                Console.WriteLine($"Annotations imported and saved to: {outputPdfPath}");
+            }
+
+            // Optional: clean up the temporary XFDF file
+            if (File.Exists(xfdfPath))
+            {
+                File.Delete(xfdfPath);
             }
         }
-
-        // ------------------------------------------------------------
-        // Export annotations from the source PDF to an XFDF file.
-        // ------------------------------------------------------------
-        using (Document sourceDoc = new Document(sourcePdfPath))
+        catch (Exception ex)
         {
-            sourceDoc.ExportAnnotationsToXfdf(xfdfPath);
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
-
-        // ------------------------------------------------------------
-        // Import the XFDF annotations into the target PDF and save the result.
-        // ------------------------------------------------------------
-        using (Document targetDoc = new Document(targetPdfPath))
-        {
-            targetDoc.ImportAnnotationsFromXfdf(xfdfPath);
-            targetDoc.Save(outputPdfPath);
-        }
-
-        Console.WriteLine("Annotations exported from source PDF and imported into target PDF successfully.");
     }
 }

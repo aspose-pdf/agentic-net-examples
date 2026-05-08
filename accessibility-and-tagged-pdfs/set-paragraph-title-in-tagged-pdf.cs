@@ -8,8 +8,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_tagged.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,35 +17,37 @@ class Program
             return;
         }
 
-        // Load the existing PDF document
+        // Load the PDF and work with its tagged content
         using (Document doc = new Document(inputPath))
         {
-            // Access (or create) the tagged content of the document
+            // Obtain the tagged content interface
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Optional: set document language and title for accessibility
+            // Set document language (optional)
             tagged.SetLanguage("en-US");
-            tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
-            // Get the root structure element of the tagged content tree
+            // Set a document title for accessibility (optional)
+            tagged.SetTitle("Accessible PDF with Paragraph Title");
+
+            // Get the root structure element (no cast required)
             StructureElement root = tagged.RootElement;
 
-            // Create a new paragraph structure element
+            // Create a new paragraph element
             ParagraphElement paragraph = tagged.CreateParagraphElement();
 
-            // Set a concise summary as the title of the paragraph
-            paragraph.Title = "Summary of Section 1";
-
             // Set the visible text of the paragraph
-            paragraph.SetText("This paragraph provides a concise summary of the first section.");
+            paragraph.SetText("This paragraph provides a concise summary of the document content.");
 
-            // Attach the paragraph to the root element
+            // Set the title (summary) for the paragraph element
+            paragraph.Title = "Summary Paragraph";
+
+            // Append the paragraph to the root of the structure tree
             root.AppendChild(paragraph);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Tagged PDF saved to '{outputPath}'.");
     }
 }

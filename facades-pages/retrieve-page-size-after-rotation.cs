@@ -1,13 +1,14 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;   // PdfPageEditor
-using Aspose.Pdf;          // PageSize
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "sample.pdf";
+        const string inputPath  = "sample.pdf";
+        const string outputPath = "rotated_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,22 +16,28 @@ class Program
             return;
         }
 
-        // Bind the PDF to the editor and rotate the first page.
-        using (PdfPageEditor editor = new PdfPageEditor())
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            editor.BindPdf(inputPath);
+            // Initialize the PdfPageEditor facade with the loaded document
+            PdfPageEditor editor = new PdfPageEditor(doc);
 
-            // Set rotation (applies to all pages unless ProcessPages is set).
-            editor.Rotation = 90;
-            editor.ApplyChanges();
+            // Rotate the first page by 90 degrees
+            editor.PageRotations[1] = 90;   // page numbers are 1‑based
+            editor.ApplyChanges();          // apply the rotation to the document
 
-            // Retrieve the page size after rotation.
-            PageSize size = editor.GetPageSize(1);
-            Console.WriteLine($"Page 1 size after rotation: {size.Width} x {size.Height}");
-
-            // Verify the rotation value.
+            // Retrieve the rotation of the first page to verify the change
             int rotation = editor.GetPageRotation(1);
-            Console.WriteLine($"Page 1 rotation: {rotation} degrees");
+            Console.WriteLine($"Rotation of page 1 after change: {rotation} degrees");
+
+            // Retrieve the page size after rotation
+            PageSize size = editor.GetPageSize(1);
+            Console.WriteLine($"Page 1 size after rotation: Width = {size.Width}, Height = {size.Height}");
+
+            // Save the modified document
+            doc.Save(outputPath);
         }
+
+        Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
     }
 }

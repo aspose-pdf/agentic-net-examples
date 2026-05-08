@@ -7,29 +7,26 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_no_images.pdf";
+        const string outputPath = "images_removed.pdf";
 
-        // Verify the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based in Aspose.Pdf
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Iterate over all pages (1‑based indexing)
+            foreach (Page page in doc.Pages)
             {
-                Page page = doc.Pages[i];
-
-                // Delete all images on the current page.
-                // XImageCollection provides a Delete() method that removes every image.
+                // Delete all images from the current page
+                // XImageCollection provides a Delete() method that removes every image
                 page.Resources.Images.Delete();
             }
 
-            // Save the modified document (PDF format)
+            // Save the modified document
             doc.Save(outputPath);
         }
 

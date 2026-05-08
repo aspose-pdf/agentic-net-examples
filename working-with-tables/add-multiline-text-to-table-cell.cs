@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
@@ -7,16 +8,21 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "MultilineCell.pdf";
+        const string outputPath = "multiline_cell.pdf";
 
         // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a page to the document
+            // Add a page
             Page page = doc.Pages.Add();
 
-            // Create a table with a single column
-            Table table = new Table { ColumnWidths = "300" };
+            // Create a table and add it to the page
+            Table table = new Table
+            {
+                // Optional: set column widths (single column in this example)
+                ColumnWidths = "200"
+            };
+            page.Paragraphs.Add(table);
 
             // Add a row to the table
             Row row = table.Rows.Add();
@@ -25,36 +31,45 @@ class Program
             Cell cell = row.Cells.Add();
 
             // First line of text
-            var line1 = new TextFragment("First line of text")
-            {
-                TextState = { FontSize = 12, Font = FontRepository.FindFont("Helvetica") }
-            };
-            cell.Paragraphs.Add(line1);
+            TextFragment line1 = new TextFragment("First line of text");
+            line1.TextState.FontSize = 12;
+            line1.TextState.Font = FontRepository.FindFont("Helvetica");
+            line1.TextState.ForegroundColor = Color.Black;
 
-            // Insert a line‑break fragment
-            var lineBreak = new TextFragment("\n");
-            cell.Paragraphs.Add(lineBreak);
+            // Line break fragment (empty text with a newline)
+            TextFragment lineBreak = new TextFragment("\n");
 
             // Second line of text
-            var line2 = new TextFragment("Second line of text")
-            {
-                TextState = { FontSize = 12, Font = FontRepository.FindFont("Helvetica") }
-            };
+            TextFragment line2 = new TextFragment("Second line of text");
+            line2.TextState.FontSize = 12;
+            line2.TextState.Font = FontRepository.FindFont("Helvetica");
+            line2.TextState.ForegroundColor = Color.Black;
+
+            // Third line of text
+            TextFragment line3 = new TextFragment("Third line of text");
+            line3.TextState.FontSize = 12;
+            line3.TextState.Font = FontRepository.FindFont("Helvetica");
+            line3.TextState.ForegroundColor = Color.Black;
+
+            // Add the fragments to the cell, separating them with line‑break fragments
+            cell.Paragraphs.Add(line1);
+            cell.Paragraphs.Add(lineBreak);
             cell.Paragraphs.Add(line2);
+            cell.Paragraphs.Add(lineBreak);
+            cell.Paragraphs.Add(line3);
 
-            // Add the table to the page
-            page.Paragraphs.Add(table);
-
-            // Save the PDF – guard against missing GDI+ (libgdiplus) on non‑Windows platforms
+            // Save the document (guard against missing GDI+ on non‑Windows platforms)
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 doc.Save(outputPath);
+                Console.WriteLine($"PDF saved to '{outputPath}'.");
             }
             else
             {
                 try
                 {
                     doc.Save(outputPath);
+                    Console.WriteLine($"PDF saved to '{outputPath}'.");
                 }
                 catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
                 {
@@ -62,12 +77,10 @@ class Program
                 }
             }
         }
-
-        Console.WriteLine("Program finished.");
     }
 
-    // Helper to detect a nested DllNotFoundException caused by missing libgdiplus
-    private static bool ContainsDllNotFound(Exception? ex)
+    // Helper to detect a nested DllNotFoundException
+    static bool ContainsDllNotFound(Exception ex)
     {
         while (ex != null)
         {

@@ -6,40 +6,43 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "invoice.pdf";          // Existing PDF
-        const string zugferdXmlPath = "invoice.xml";        // ZUGFeRD XML file
-        const string outputPdfPath = "invoice_with_zugferd.pdf";
+        const string pdfPath = "invoice.pdf";
+        const string xmlPath = "invoice.xml";
+        const string outputPath = "invoice_with_zugferd.pdf";
 
-        // Verify files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(zugferdXmlPath))
-        {
-            Console.Error.WriteLine($"ZUGFeRD XML not found: {zugferdXmlPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF, embed the ZUGFeRD XML, and save as PDF/A‑3B (ZUGFeRD‑compatible)
-        using (Document pdfDoc = new Document(inputPdfPath))
+        if (!File.Exists(xmlPath))
         {
-            // Embed the XML as an attached file with the proper AFRelationship
-            using (FileStream xmlStream = File.OpenRead(zugferdXmlPath))
+            Console.Error.WriteLine($"ZUGFeRD XML not found: {xmlPath}");
+            return;
+        }
+
+        // Load the PDF document inside a using block for proper disposal
+        using (Document doc = new Document(pdfPath))
+        {
+            // Embed the ZUGFeRD XML as an attached file (AFRelationship.Data)
+            using (FileStream xmlStream = File.OpenRead(xmlPath))
             {
-                var fileSpec = new FileSpecification(xmlStream, Path.GetFileName(zugferdXmlPath), "ZUGFeRD Invoice XML")
+                var fileSpec = new FileSpecification(xmlStream, Path.GetFileName(xmlPath), "ZUGFeRD Invoice XML")
                 {
                     MIMEType = "application/xml",
                     AFRelationship = AFRelationship.Data
                 };
-                pdfDoc.EmbeddedFiles.Add(fileSpec);
+                doc.EmbeddedFiles.Add(fileSpec);
             }
 
-            // Convert the document to PDF/A‑3B to satisfy ZUGFeRD requirements
-            pdfDoc.Convert(outputPdfPath, PdfFormat.PDF_A_3B, ConvertErrorAction.Delete);
+            // Convert to PDF/A‑3B to meet ZUGFeRD compliance (optional but recommended)
+            doc.Convert("log.xml", PdfFormat.PDF_A_3B, ConvertErrorAction.Delete);
+
+            // Save the PDF with the attached ZUGFeRD data
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"ZUGFeRD XML embedded and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"PDF saved with ZUGFeRD attachment: {outputPath}");
     }
 }

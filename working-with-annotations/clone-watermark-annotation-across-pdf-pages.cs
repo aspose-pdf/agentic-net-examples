@@ -16,63 +16,71 @@ class Program
             return;
         }
 
-        // Load the source PDF
+        // Wrap Document in a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Assume the watermark to clone is on the first page
-            Page sourcePage = doc.Pages[1];
-            WatermarkAnnotation original = null;
+            // Define the base rectangle for the watermark (lower‑left x/y, upper‑right x/y)
+            Aspose.Pdf.Rectangle baseRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Locate the first WatermarkAnnotation on the source page
-            foreach (Annotation ann in sourcePage.Annotations)
+            // Create the original WatermarkAnnotation on the first page
+            WatermarkAnnotation original = new WatermarkAnnotation(doc.Pages[1], baseRect)
             {
-                if (ann is WatermarkAnnotation wm)
+                Opacity  = 0.3,                                 // semi‑transparent
+                Color    = Aspose.Pdf.Color.LightGray,          // gray tint
+                Contents = "CONFIDENTIAL"                       // visible text
+            };
+            doc.Pages[1].Annotations.Add(original);
+
+            // Apply a cloned watermark to each subsequent page, shifting it vertically
+            for (int pageIndex = 2; pageIndex <= doc.Pages.Count; pageIndex++)
+            {
+                // Attempt to clone the original annotation
+                WatermarkAnnotation cloned = original.Clone() as WatermarkAnnotation;
+
+                // If Clone() returns null (as documented), create a new instance and copy properties
+                if (cloned == null)
                 {
-                    original = wm;
-                    break;
+                    // Adjust the rectangle position for the current page
+                    double yOffset = 20 * (pageIndex - 1); // move down 20 units per page
+                    Aspose.Pdf.Rectangle shiftedRect = new Aspose.Pdf.Rectangle(
+                        baseRect.LLX,
+                        baseRect.LLY - yOffset,
+                        baseRect.URX,
+                        baseRect.URY - yOffset);
+
+                    cloned = new WatermarkAnnotation(doc.Pages[pageIndex], shiftedRect)
+                    {
+                        Opacity  = original.Opacity,
+                        Color    = original.Color,
+                        Contents = original.Contents
+                    };
                 }
-            }
-
-            if (original == null)
-            {
-                Console.Error.WriteLine("No WatermarkAnnotation found on the first page.");
-                return;
-            }
-
-            // Clone the watermark to all other pages with adjusted positions
-            for (int i = 2; i <= doc.Pages.Count; i++)
-            {
-                Page targetPage = doc.Pages[i];
-
-                // Compute a new rectangle by offsetting the original position
-                double offsetX = 20 * (i - 2); // example offset per page
-                double offsetY = 10 * (i - 2);
-
-                Aspose.Pdf.Rectangle origRect = original.Rect;
-                Aspose.Pdf.Rectangle newRect = new Aspose.Pdf.Rectangle(
-                    origRect.LLX + offsetX,
-                    origRect.LLY + offsetY,
-                    origRect.URX + offsetX,
-                    origRect.URY + offsetY);
-
-                // Create a new WatermarkAnnotation for the target page
-                WatermarkAnnotation clone = new WatermarkAnnotation(targetPage, newRect)
+                else
                 {
-                    // Copy visual properties from the original
-                    Color   = original.Color,
-                    Opacity = original.Opacity,
-                    Contents = original.Contents,
-                    Border   = original.Border
-                };
+                    // When Clone() succeeds, update the page reference and rectangle
+                    // (Page property is read‑only, so we recreate the rectangle)
+                    double yOffset = 20 * (pageIndex - 1);
+                    Aspose.Pdf.Rectangle shiftedRect = new Aspose.Pdf.Rectangle(
+                        baseRect.LLX,
+                        baseRect.LLY - yOffset,
+                        baseRect.URX,
+                        baseRect.URY - yOffset);
+                    cloned = new WatermarkAnnotation(doc.Pages[pageIndex], shiftedRect)
+                    {
+                        Opacity  = cloned.Opacity,
+                        Color    = cloned.Color,
+                        Contents = cloned.Contents
+                    };
+                }
 
-                // Add the cloned annotation to the target page
-                targetPage.Annotations.Add(clone);
+                // Add the (cloned or recreated) watermark to the current page
+                doc.Pages[pageIndex].Annotations.Add(cloned);
             }
 
             // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Watermark cloned and saved to '{outputPath}'.");
+        Console.WriteLine($"Watermarks applied and saved to '{outputPath}'.");
     }
 }

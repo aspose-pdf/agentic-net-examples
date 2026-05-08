@@ -1,39 +1,47 @@
 using System;
 using System.IO;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf; // for ExtractImageMode enum
+using System.Drawing.Imaging; // for ImageFormat
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string inputPdfPath = "input.pdf";
         const string outputFolder = "ExtractedImages";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
+        // Use PdfExtractor facade to extract images
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            extractor.BindPdf(inputPdf);
-            // Optional: extract only images actually used on pages
-            // extractor.ExtractImageMode = ExtractImageMode.ActuallyUsed;
+            // Bind the source PDF file
+            extractor.BindPdf(inputPdfPath);
+
+            // Extract images from the bound PDF
             extractor.ExtractImage();
 
-            int index = 1;
+            int imageIndex = 1;
             while (extractor.HasNextImage())
             {
-                string outputPath = Path.Combine(outputFolder, $"image-{index}.jpg");
-                extractor.GetNextImage(outputPath);
-                index++;
+                // Build output file name (e.g., image-1.png, image-2.png, ...)
+                string outputFile = Path.Combine(outputFolder, $"image-{imageIndex}.png");
+
+                // Retrieve the next image and save it as PNG
+                // GetNextImage(string, ImageFormat) returns void; it writes the file directly
+                extractor.GetNextImage(outputFile, ImageFormat.Png);
+
+                imageIndex++;
             }
         }
 
-        Console.WriteLine($"All images extracted to folder: {outputFolder}");
+        Console.WriteLine($"Image extraction completed. Files saved to '{outputFolder}'.");
     }
 }

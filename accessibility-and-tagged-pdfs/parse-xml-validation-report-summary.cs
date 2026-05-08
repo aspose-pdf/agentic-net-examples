@@ -4,99 +4,91 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 
-class ValidationReportParser
+class Program
 {
     // Entry point
-    static void Main(string[] args)
+    static void Main()
     {
-        // Expect the path to the XML validation report as the first argument
-        if (args.Length == 0 || !File.Exists(args[0]))
+        // Path to the XML validation report – adjust as needed
+        const string reportPath = "validation_report.xml";
+
+        if (!File.Exists(reportPath))
         {
-            Console.Error.WriteLine("Usage: ValidationReportParser <validation_report.xml>");
+            Console.Error.WriteLine($"Report file not found: {reportPath}");
             return;
         }
-
-        string xmlPath = args[0];
 
         try
         {
             // Load the XML document
-            XDocument doc = XDocument.Load(xmlPath);
+            XDocument doc = XDocument.Load(reportPath);
 
-            // The structure of Aspose.Pdf validation reports typically contains
-            // <Error> elements with attributes like Code and Message.
-            // Adjust the element/attribute names if your report differs.
+            // Expected structure:
+            // <Report>
+            //   <Error>
+            //     <Code>ERR001</Code>
+            //     <Message>Some description</Message>
+            //   </Error>
+            //   ...
+            // </Report>
+
+            // Extract all error elements
             var errorElements = doc.Descendants("Error");
 
-            // Extract error information into a simple POCO
-            var errors = errorElements
-                .Select(e => new ValidationError
-                {
-                    Code = (string)e.Attribute("Code") ?? "UNKNOWN",
-                    Message = (string)e.Attribute("Message") ?? e.Value.Trim()
-                })
-                .ToList();
+            // Dictionary to count occurrences of each error code
+            var errorCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            // Dictionary to collect distinct messages per code
+            var errorMessages = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
 
-            if (!errors.Any())
+            foreach (var err in errorElements)
             {
-                Console.WriteLine("No errors found in the validation report.");
-                return;
-            }
+                // Use the safe navigation operator to avoid null‑reference warnings (CS8600)
+                string code = err.Element("Code")?.Value ?? "UNKNOWN";
+                string message = err.Element("Message")?.Value ?? string.Empty;
 
-            // Group by error code to get counts
-            var errorsByCode = errors
-                .GroupBy(err => err.Code)
-                .Select(g => new
-                {
-                    Code = g.Key,
-                    Count = g.Count(),
-                    SampleMessages = g
-                        .Select(err => err.Message)
-                        .Distinct()
-                        .Take(3) // show up to 3 distinct messages per code
-                })
-                .OrderByDescending(g => g.Count);
+                // Update count
+                if (errorCounts.ContainsKey(code))
+                    errorCounts[code]++;
+                else
+                    errorCounts[code] = 1;
+
+                // Store distinct messages
+                if (!errorMessages.ContainsKey(code))
+                    errorMessages[code] = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                if (!string.IsNullOrWhiteSpace(message))
+                    errorMessages[code].Add(message.Trim());
+            }
 
             // Output summary
             Console.WriteLine("=== Validation Report Summary ===");
-            Console.WriteLine($"Total errors: {errors.Count}");
+            Console.WriteLine($"Total errors found: {errorCounts.Values.Sum()}");
             Console.WriteLine();
 
-            foreach (var group in errorsByCode)
+            foreach (var kvp in errorCounts.OrderBy(k => k.Key))
             {
-                Console.WriteLine($"Error Code: {group.Code}");
-                Console.WriteLine($"Occurrences: {group.Count}");
-                Console.WriteLine("Sample messages:");
-                foreach (var msg in group.SampleMessages)
+                string code = kvp.Key;
+                int count = kvp.Value;
+                Console.WriteLine($"Error Code: {code}");
+                Console.WriteLine($"  Occurrences: {count}");
+
+                if (errorMessages.TryGetValue(code, out var msgs) && msgs.Count > 0)
                 {
-                    Console.WriteLine($"  - {msg}");
+                    Console.WriteLine("  Sample messages:");
+                    foreach (var msg in msgs.Take(3)) // show up to 3 distinct messages
+                        Console.WriteLine($"    - {msg}");
                 }
+                else
+                {
+                    Console.WriteLine("  No message details available.");
+                }
+
                 Console.WriteLine();
-            }
-
-            // Additionally, list the most common violation messages overall
-            var commonMessages = errors
-                .GroupBy(err => err.Message)
-                .Select(g => new { Message = g.Key, Count = g.Count() })
-                .OrderByDescending(g => g.Count)
-                .Take(5);
-
-            Console.WriteLine("=== Top 5 Common Violation Messages ===");
-            foreach (var item in commonMessages)
-            {
-                Console.WriteLine($"{item.Count}× \"{item.Message}\"");
             }
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Failed to process the validation report: {ex.Message}");
+            Console.Error.WriteLine($"Failed to process report: {ex.Message}");
         }
-    }
-
-    // Simple container for error details
-    private class ValidationError
-    {
-        public string Code { get; set; }
-        public string Message { get; set; }
     }
 }

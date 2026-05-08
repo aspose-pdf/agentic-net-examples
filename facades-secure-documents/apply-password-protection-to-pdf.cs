@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -17,25 +18,15 @@ class Program
             return;
         }
 
-        try
-        {
-            // Load the existing PDF document (no need to recreate it)
-            Document pdfDoc = new Document(inputPath);
+        // Initialize the facade with input and output files
+        PdfFileSecurity fileSecurity = new PdfFileSecurity(inputPath, outputPath);
 
-            // Define the permissions you want to allow (e.g., only printing)
-            Permissions permissions = Permissions.PrintDocument;
+        // Encrypt the PDF with desired privileges and key size
+        bool result = fileSecurity.EncryptFile(userPassword, ownerPassword, DocumentPrivilege.Print, KeySize.x256);
 
-            // Encrypt the document with 256‑bit AES encryption and set both user and owner passwords
-            pdfDoc.Encrypt(userPassword, ownerPassword, permissions, CryptoAlgorithm.AESx256);
-
-            // Save the protected PDF to a new file
-            pdfDoc.Save(outputPath);
-
-            Console.WriteLine($"PDF encrypted and saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        if (result)
+            Console.WriteLine($"PDF encrypted successfully: {outputPath}");
+        else
+            Console.Error.WriteLine("Failed to encrypt PDF.");
     }
 }

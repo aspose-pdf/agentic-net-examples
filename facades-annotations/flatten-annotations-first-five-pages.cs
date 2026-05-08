@@ -1,36 +1,39 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;          // PdfAnnotationEditor
-using Aspose.Pdf.Annotations;      // AnnotationType enum
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "flattened_first5.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "flattened_output.pdf";
 
-        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Initialize the annotation editor and bind the PDF
-        PdfAnnotationEditor editor = new PdfAnnotationEditor();
-        editor.BindPdf(inputPath);
+        // Use PdfAnnotationEditor to flatten annotations on the first five pages
+        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        {
+            // Load the PDF document
+            editor.BindPdf(inputPath);
 
-        // Retrieve all possible annotation types
-        AnnotationType[] allTypes = (AnnotationType[])Enum.GetValues(typeof(AnnotationType));
+            // Page range (Aspose.Pdf uses 1‑based indexing)
+            int startPage = 1;
+            int endPage   = 5;
 
-        // Flatten annotations on pages 1 through 5 (inclusive)
-        editor.FlatteningAnnotations(1, 5, allTypes);
+            // Flatten all annotation types within the specified range.
+            // Passing null for the annotation type array flattens every type.
+            editor.FlatteningAnnotations(startPage, endPage, null);
 
-        // Save the modified PDF
-        editor.Save(outputPath);
-        editor.Close(); // Release resources
+            // Save the result
+            editor.Save(outputPath);
+        }
 
-        Console.WriteLine($"Annotations on the first 5 pages have been flattened and saved to '{outputPath}'.");
+        Console.WriteLine($"Annotations flattened on pages 1‑5. Output saved to '{outputPath}'.");
     }
 }

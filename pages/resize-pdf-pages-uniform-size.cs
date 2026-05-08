@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "uniform_pages.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "uniform.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,21 +15,20 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            double maxWidth  = 0;
+            // Find the maximum width and height among all pages
+            double maxWidth = 0;
             double maxHeight = 0;
 
-            // Determine the largest page dimensions (pages are 1‑based)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
-                // Rectangle coordinates: LLX, LLY, URX, URY
-                double width  = page.Rect.URX - page.Rect.LLX;
-                double height = page.Rect.URY - page.Rect.LLY;
+                double width = page.Rect.Width;
+                double height = page.Rect.Height;
 
-                if (width  > maxWidth)  maxWidth  = width;
+                if (width > maxWidth) maxWidth = width;
                 if (height > maxHeight) maxHeight = height;
             }
 
@@ -37,14 +36,14 @@ class Program
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
-                page.SetPageSize(maxWidth, maxHeight);
-                // Alternatively: page.Resize(new PageSize((float)maxWidth, (float)maxHeight));
+                page.Resize(new PageSize((float)maxWidth, (float)maxHeight));
+                // Alternative: page.SetPageSize(maxWidth, maxHeight);
             }
 
-            // Save the modified document (lifecycle rule: save inside using)
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Pages resized and saved to '{outputPath}'.");
+        Console.WriteLine($"Uniform PDF saved to '{outputPath}'.");
     }
 }

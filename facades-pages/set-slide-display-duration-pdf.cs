@@ -1,44 +1,45 @@
 using System;
+using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF (must exist) and output PDF paths
-        const string inputPdf  = "presentation.pdf";
-        const string outputPdf = "presentation_with_timing.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Desired display duration in seconds for each slide
-        const int slideDurationSeconds = 5; // e.g., 5 seconds per page
-
-        // Ensure the input file exists
-        if (!System.IO.File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Use PdfPageEditor (a SaveableFacade) to edit page‑level properties
-        using (PdfPageEditor editor = new PdfPageEditor())
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Bind the source PDF to the editor
-            editor.BindPdf(inputPdf);
+            // Initialize the PdfPageEditor facade
+            using (PdfPageEditor editor = new PdfPageEditor())
+            {
+                // Bind the document to the editor
+                editor.BindPdf(doc);
 
-            // Set the display duration for pages (in seconds)
-            editor.DisplayDuration = slideDurationSeconds;
+                // Set the display duration (in seconds) for each slide/page
+                editor.DisplayDuration = 5; // e.g., 5 seconds per page
 
-            // Optional: set a transition effect and its duration
-            // editor.TransitionType = PdfPageEditor.BLINDV; // vertical blinds
-            // editor.TransitionDuration = 2;               // 2‑second transition
+                // Optional: set a transition effect and its duration
+                editor.TransitionType = PdfPageEditor.BLINDV; // example transition style
+                editor.TransitionDuration = 2;                // 2 seconds transition
 
-            // Apply the changes to the document
-            editor.ApplyChanges();
+                // Apply the changes to the document
+                editor.ApplyChanges();
 
-            // Save the modified PDF
-            editor.Save(outputPdf);
+                // Save the modified PDF
+                doc.Save(outputPath);
+            }
         }
 
-        Console.WriteLine($"PDF saved with slide timing to '{outputPdf}'.");
+        Console.WriteLine($"Presentation PDF saved to '{outputPath}'.");
     }
 }

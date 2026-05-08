@@ -7,60 +7,84 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath    = "input.pdf";
-        const string configPath = "viewerPrefs.xml";
+        const string inputPdfPath = "input.pdf";          // source PDF
+        const string outputXmlPath = "viewer_prefs.xml"; // configuration file
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF and retrieve its viewer preferences
+        // Create the PdfContentEditor facade and bind the PDF
         PdfContentEditor editor = new PdfContentEditor();
-        editor.BindPdf(pdfPath);
-        int prefValue = editor.GetViewerPreference();
-
-        // Serialize the preferences to an XML configuration file
-        using (XmlWriter writer = XmlWriter.Create(configPath, new XmlWriterSettings { Indent = true }))
+        try
         {
-            writer.WriteStartDocument();
-            writer.WriteStartElement("ViewerPreferences");
+            editor.BindPdf(inputPdfPath);
 
-            // Store the raw integer value
-            writer.WriteElementString("PreferenceValue", prefValue.ToString());
+            // Retrieve the viewer preferences as an integer flag set
+            int prefValue = editor.GetViewerPreference();
 
-            // Store individual flags for readability
-            WriteFlag(writer, "HideMenubar",               Aspose.Pdf.Facades.ViewerPreference.HideMenubar,               prefValue);
-            WriteFlag(writer, "HideToolbar",               Aspose.Pdf.Facades.ViewerPreference.HideToolbar,               prefValue);
-            WriteFlag(writer, "HideWindowUI",              Aspose.Pdf.Facades.ViewerPreference.HideWindowUI,              prefValue);
-            WriteFlag(writer, "FitWindow",                 Aspose.Pdf.Facades.ViewerPreference.FitWindow,                 prefValue);
-            WriteFlag(writer, "CenterWindow",              Aspose.Pdf.Facades.ViewerPreference.CenterWindow,              prefValue);
-            WriteFlag(writer, "DisplayDocTitle",           Aspose.Pdf.Facades.ViewerPreference.DisplayDocTitle,           prefValue);
-            WriteFlag(writer, "PageModeUseNone",           Aspose.Pdf.Facades.ViewerPreference.PageModeUseNone,           prefValue);
-            WriteFlag(writer, "PageModeUseOutlines",       Aspose.Pdf.Facades.ViewerPreference.PageModeUseOutlines,       prefValue);
-            WriteFlag(writer, "PageModeUseThumbs",         Aspose.Pdf.Facades.ViewerPreference.PageModeUseThumbs,         prefValue);
-            WriteFlag(writer, "PageModeFullScreen",        Aspose.Pdf.Facades.ViewerPreference.PageModeFullScreen,        prefValue);
-            WriteFlag(writer, "PageLayoutSinglePage",      Aspose.Pdf.Facades.ViewerPreference.PageLayoutSinglePage,      prefValue);
-            WriteFlag(writer, "PageLayoutOneColumn",       Aspose.Pdf.Facades.ViewerPreference.PageLayoutOneColumn,       prefValue);
-            WriteFlag(writer, "PageLayoutTwoColumnLeft",   Aspose.Pdf.Facades.ViewerPreference.PageLayoutTwoColumnLeft,   prefValue);
-            WriteFlag(writer, "PageLayoutTwoColumnRight",  Aspose.Pdf.Facades.ViewerPreference.PageLayoutTwoColumnRight,  prefValue);
-            // Add additional flags as needed
+            // Serialize the preferences to an XML file
+            using (XmlWriter writer = XmlWriter.Create(outputXmlPath, new XmlWriterSettings { Indent = true }))
+            {
+                writer.WriteStartDocument();
+                writer.WriteStartElement("ViewerPreferences");
 
-            writer.WriteEndElement(); // ViewerPreferences
-            writer.WriteEndDocument();
+                // Store the raw integer value
+                writer.WriteElementString("PreferenceValue", prefValue.ToString());
+
+                // Optionally, store individual flags that are set
+                writer.WriteStartElement("Flags");
+                WriteFlagIfSet(writer, prefValue, ViewerPreference.CenterWindow, "CenterWindow");
+                WriteFlagIfSet(writer, prefValue, ViewerPreference.DirectionL2R, "DirectionL2R");
+                WriteFlagIfSet(writer, prefValue, ViewerPreference.DirectionR2L, "DirectionR2L");
+                WriteFlagIfSet(writer, prefValue, ViewerPreference.DisplayDocTitle, "DisplayDocTitle");
+                WriteFlagIfSet(writer, prefValue, ViewerPreference.DuplexFlipLongEdge, "DuplexFlipLongEdge");
+                WriteFlagIfSet(writer, prefValue, ViewerPreference.DuplexFlipShortEdge, "DuplexFlipShortEdge");
+                WriteFlagIfSet(writer, prefValue, ViewerPreference.FitWindow, "FitWindow");
+                WriteFlagIfSet(writer, prefValue, ViewerPreference.HideMenubar, "HideMenubar");
+                WriteFlagIfSet(writer, prefValue, ViewerPreference.HideToolbar, "HideToolbar");
+                WriteFlagIfSet(writer, prefValue, ViewerPreference.HideWindowUI, "HideWindowUI");
+                WriteFlagIfSet(writer, prefValue, ViewerPreference.NonFullScreenPageModeUseNone, "NonFullScreenPageModeUseNone");
+                WriteFlagIfSet(writer, prefValue, ViewerPreference.NonFullScreenPageModeUseOC, "NonFullScreenPageModeUseOC");
+                WriteFlagIfSet(writer, prefValue, ViewerPreference.NonFullScreenPageModeUseOutlines, "NonFullScreenPageModeUseOutlines");
+                WriteFlagIfSet(writer, prefValue, ViewerPreference.NonFullScreenPageModeUseThumbs, "NonFullScreenPageModeUseThumbs");
+                WriteFlagIfSet(writer, prefValue, ViewerPreference.PageLayoutOneColumn, "PageLayoutOneColumn");
+                WriteFlagIfSet(writer, prefValue, ViewerPreference.PageLayoutSinglePage, "PageLayoutSinglePage");
+                WriteFlagIfSet(writer, prefValue, ViewerPreference.PageLayoutTwoColumnLeft, "PageLayoutTwoColumnLeft");
+                WriteFlagIfSet(writer, prefValue, ViewerPreference.PageLayoutTwoColumnRight, "PageLayoutTwoColumnRight");
+                WriteFlagIfSet(writer, prefValue, ViewerPreference.PageModeFullScreen, "PageModeFullScreen");
+                WriteFlagIfSet(writer, prefValue, ViewerPreference.PageModeUseAttachment, "PageModeUseAttachment");
+                WriteFlagIfSet(writer, prefValue, ViewerPreference.PageModeUseNone, "PageModeUseNone");
+                WriteFlagIfSet(writer, prefValue, ViewerPreference.PageModeUseOC, "PageModeUseOC");
+                WriteFlagIfSet(writer, prefValue, ViewerPreference.PageModeUseOutlines, "PageModeUseOutlines");
+                WriteFlagIfSet(writer, prefValue, ViewerPreference.PageModeUseThumbs, "PageModeUseThumbs");
+                WriteFlagIfSet(writer, prefValue, ViewerPreference.PickTrayByPDFSize, "PickTrayByPDFSize");
+                WriteFlagIfSet(writer, prefValue, ViewerPreference.PrintScalingAppDefault, "PrintScalingAppDefault");
+                WriteFlagIfSet(writer, prefValue, ViewerPreference.PrintScalingNone, "PrintScalingNone");
+                WriteFlagIfSet(writer, prefValue, ViewerPreference.Simplex, "Simplex");
+                writer.WriteEndElement(); // Flags
+
+                writer.WriteEndElement(); // ViewerPreferences
+                writer.WriteEndDocument();
+            }
+
+            Console.WriteLine($"Viewer preferences saved to '{outputXmlPath}'.");
         }
-
-        Console.WriteLine($"Viewer preferences saved to '{configPath}'.");
+        finally
+        {
+            // Ensure resources are released
+            editor.Close();
+        }
     }
 
-    // Helper to write each flag as an XML element
-    static void WriteFlag(XmlWriter writer, string name, int flag, int combinedValue)
+    // Helper to write a flag element only if the corresponding bit is set
+    private static void WriteFlagIfSet(XmlWriter writer, int prefValue, int flag, string name)
     {
-        bool isEnabled = (combinedValue & flag) != 0;
-        writer.WriteStartElement("Preference");
-        writer.WriteAttributeString("Name", name);
-        writer.WriteAttributeString("Enabled", isEnabled.ToString().ToLower());
-        writer.WriteEndElement();
+        if ((prefValue & flag) != 0)
+        {
+            writer.WriteElementString(name, "true");
+        }
     }
 }

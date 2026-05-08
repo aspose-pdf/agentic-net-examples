@@ -3,128 +3,123 @@ using System.IO;
 using System.Text.Json;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades; // for VerticalAlignmentType
 
 namespace PdfPageAdjustment
 {
     // Represents the JSON configuration for page adjustments.
     public class PageAdjustmentConfig
     {
-        // 1‑based page numbers to which the settings will be applied.
-        public int[] Pages { get; set; }
-
-        // Rotation in degrees (0, 90, 180, 270). Optional.
-        public int? Rotation { get; set; }
-
-        // Zoom percentage (e.g., 150 for 150%). Optional.
-        public int? Zoom { get; set; }
-
-        // Desired page width in points. Optional.
-        public float? Width { get; set; }
-
-        // Desired page height in points. Optional.
-        public float? Height { get; set; }
-
-        // Transition effect duration in seconds. Optional.
-        public int? TransitionDuration { get; set; }
-
-        // Transition type constant from Aspose.Pdf.Facades.PdfPageEditor.
-        // Example: Aspose.Pdf.Facades.PdfPageEditor.BLINDH
-        public int? TransitionType { get; set; }
+        public int? Rotation { get; set; }                     // 0, 90, 180, 270
+        public double? Zoom { get; set; }                      // 1.0 = 100%
+        public string? HorizontalAlignment { get; set; }        // "Left", "Center", "Right"
+        public string? VerticalAlignment { get; set; }          // "Bottom", "Middle", "Top"
+        public string? PageSize { get; set; }                   // "A4", "Letter", etc.
+        public int[]? ProcessPages { get; set; }                // pages to edit (1‑based)
+        public int? DisplayDuration { get; set; }              // seconds
+        public int? TransitionDuration { get; set; }           // seconds
+        public int? TransitionType { get; set; }               // use PdfPageEditor constants (e.g., PdfPageEditor.BLINDH)
     }
 
     class Program
     {
-        static void Main()
+        static void Main(string[] args)
         {
-            const string configPath   = "config.json";          // JSON file with adjustment settings
-            const string inputFolder  = "InputPdfs";           // Folder containing source PDFs
-            const string outputFolder = "AdjustedPdfs";        // Folder for processed PDFs
+            // Paths – adjust as needed or obtain from command‑line arguments.
+            const string inputPdfPath = "input.pdf";
+            const string outputPdfPath = "output.pdf";
+            const string configJsonPath = "pageConfig.json";
 
-            if (!File.Exists(configPath))
+            if (!File.Exists(inputPdfPath))
             {
-                Console.Error.WriteLine($"Configuration file not found: {configPath}");
+                Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
                 return;
             }
 
-            // Deserialize the JSON configuration.
-            PageAdjustmentConfig config;
+            if (!File.Exists(configJsonPath))
+            {
+                Console.Error.WriteLine($"Configuration file not found: {configJsonPath}");
+                return;
+            }
+
+            // Load and deserialize the JSON configuration.
+            PageAdjustmentConfig? config = null;
             try
             {
-                string json = File.ReadAllText(configPath);
-                config = JsonSerializer.Deserialize<PageAdjustmentConfig>(json);
-                if (config == null)
+                string json = File.ReadAllText(configJsonPath);
+                config = JsonSerializer.Deserialize<PageAdjustmentConfig>(json, new JsonSerializerOptions
                 {
-                    Console.Error.WriteLine("Failed to parse configuration.");
-                    return;
-                }
+                    PropertyNameCaseInsensitive = true
+                });
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error reading configuration: {ex.Message}");
+                Console.Error.WriteLine($"Failed to read configuration: {ex.Message}");
                 return;
             }
 
-            // Ensure output directory exists.
-            Directory.CreateDirectory(outputFolder);
-
-            // Process each PDF file in the input folder.
-            foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+            if (config == null)
             {
-                string fileName   = Path.GetFileName(pdfPath);
-                string outputPath = Path.Combine(outputFolder, fileName);
+                Console.Error.WriteLine("Configuration could not be deserialized (null result)." );
+                return;
+            }
 
-                try
+            // Apply the configuration using PdfPageEditor (Facade API).
+            try
+            {
+                using (PdfPageEditor editor = new PdfPageEditor())
                 {
-                    // Load the PDF document.
-                    using (Document doc = new Document(pdfPath))
-                    {
-                        // Initialize the page editor facade.
-                        using (PdfPageEditor editor = new PdfPageEditor(doc))
-                        {
-                            // Apply page selection if specified.
-                            if (config.Pages != null && config.Pages.Length > 0)
-                                editor.ProcessPages = config.Pages; // int[] required
+                    // Bind the source PDF.
+                    editor.BindPdf(inputPdfPath);
 
-                            // Apply rotation.
-                            if (config.Rotation.HasValue)
-                                editor.Rotation = config.Rotation.Value; // int degrees
+                    // Set rotation if specified.
+                    if (config.Rotation.HasValue)
+                        editor.Rotation = config.Rotation.Value;
 
-                            // Apply zoom (percentage). Property expects an integer value.
-                            if (config.Zoom.HasValue)
-                                editor.Zoom = config.Zoom.Value; // int (e.g., 150 for 150%)
+                    // Set zoom factor if specified (PdfPageEditor.Zoom expects a float representing percentage).
+                    if (config.Zoom.HasValue)
+                        editor.Zoom = (float)config.Zoom.Value;
 
-                            // Apply custom page size if both dimensions are provided.
-                            if (config.Width.HasValue && config.Height.HasValue)
-                            {
-                                // PageSize constructor expects float values.
-                                Aspose.Pdf.PageSize size = new Aspose.Pdf.PageSize(
-                                    config.Width.Value,
-                                    config.Height.Value);
-                                editor.PageSize = size;
-                            }
+                    // Set horizontal alignment if specified.
+                    if (!string.IsNullOrWhiteSpace(config.HorizontalAlignment))
+                        editor.HorizontalAlignment = (HorizontalAlignment)Enum.Parse(typeof(HorizontalAlignment), config.HorizontalAlignment, true);
 
-                            // Apply transition effect duration.
-                            if (config.TransitionDuration.HasValue)
-                                editor.TransitionDuration = config.TransitionDuration.Value; // int seconds
+                    // Set vertical alignment if specified – use the new VerticalAlignmentType enum.
+                    if (!string.IsNullOrWhiteSpace(config.VerticalAlignment))
+                        editor.VerticalAlignment = (VerticalAlignmentType)Enum.Parse(typeof(VerticalAlignmentType), config.VerticalAlignment, true);
 
-                            // Apply transition type constant.
-                            if (config.TransitionType.HasValue)
-                                editor.TransitionType = config.TransitionType.Value;
+                    // Set page size if specified.
+                    if (!string.IsNullOrWhiteSpace(config.PageSize))
+                        editor.PageSize = (PageSize)Enum.Parse(typeof(PageSize), config.PageSize, true);
 
-                            // Commit the changes to the document.
-                            editor.ApplyChanges();
+                    // Set which pages to process if specified.
+                    if (config.ProcessPages != null && config.ProcessPages.Length > 0)
+                        editor.ProcessPages = config.ProcessPages;
 
-                            // Save the modified PDF.
-                            editor.Save(outputPath);
-                        }
-                    }
+                    // Set display duration if specified.
+                    if (config.DisplayDuration.HasValue)
+                        editor.DisplayDuration = config.DisplayDuration.Value;
 
-                    Console.WriteLine($"Processed: {fileName} → {outputPath}");
+                    // Set transition duration if specified.
+                    if (config.TransitionDuration.HasValue)
+                        editor.TransitionDuration = config.TransitionDuration.Value;
+
+                    // Set transition type if specified (uses the integer constants defined in PdfPageEditor).
+                    if (config.TransitionType.HasValue)
+                        editor.TransitionType = config.TransitionType.Value;
+
+                    // Apply all changes to the document.
+                    editor.ApplyChanges();
+
+                    // Save the modified PDF.
+                    editor.Save(outputPdfPath);
                 }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine($"Error processing '{fileName}': {ex.Message}");
-                }
+
+                Console.WriteLine($"Page adjustments applied successfully. Output saved to '{outputPdfPath}'.");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error during PDF processing: {ex.Message}");
             }
         }
     }

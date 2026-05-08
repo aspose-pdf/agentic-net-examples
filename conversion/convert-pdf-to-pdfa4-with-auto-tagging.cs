@@ -11,29 +11,32 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         // Load the source PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Set up conversion options for PDF/A‑4
+            // Create conversion options for PDF/A‑4 format
             PdfFormatConversionOptions options = new PdfFormatConversionOptions(PdfFormat.PDF_A_4);
 
-            // Enable automatic tagging during conversion
-            options.AutoTaggingSettings = new AutoTaggingSettings
-            {
-                EnableAutoTagging = true
-            };
+            // Enable auto‑tagging using the default settings
+            options.AutoTaggingSettings = AutoTaggingSettings.Default;
+            options.AutoTaggingSettings.EnableAutoTagging = true;
 
-            // Convert the document using the specified options
-            doc.Convert(options);
+            // Perform the conversion
+            bool converted = doc.Convert(options);
+            if (!converted)
+            {
+                Console.Error.WriteLine("Conversion to PDF/A‑4 failed.");
+                return;
+            }
 
             // Save the converted PDF/A‑4 document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF/A‑4 conversion completed: {outputPath}");
+        Console.WriteLine($"PDF/A‑4 file saved to '{outputPath}'.");
     }
 }

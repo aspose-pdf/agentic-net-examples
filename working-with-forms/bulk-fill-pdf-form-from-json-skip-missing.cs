@@ -13,53 +13,42 @@ class Program
 
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF template not found: {pdfPath}");
             return;
         }
+
         if (!File.Exists(jsonPath))
         {
-            Console.Error.WriteLine($"JSON not found: {jsonPath}");
+            Console.Error.WriteLine($"JSON data file not found: {jsonPath}");
             return;
         }
 
-        try
+        // Open the JSON stream once and reuse it for each field import
+        using (FileStream jsonStream = new FileStream(jsonPath, FileMode.Open, FileAccess.Read))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(pdfPath))
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(pdfPath))
+            // Iterate over all form fields in the document
+            foreach (Field field in doc.Form.Fields)
             {
-                // Ignore corrupted objects to prevent exceptions during copy/merge operations
-                doc.IgnoreCorruptedObjects = true;
+                // Reset stream position before each import attempt
+                jsonStream.Position = 0;
 
-                // Open the JSON file once and reuse the stream for each field
-                using (FileStream jsonStream = File.OpenRead(jsonPath))
+                // ImportValueFromJson returns true if the field was found in the JSON,
+                // false otherwise. We use the return value to decide whether to skip.
+                bool imported = field.ImportValueFromJson(jsonStream);
+
+                if (!imported)
                 {
-                    // Iterate over all form fields in the document
-                    foreach (Field field in doc.Form.Fields)
-                    {
-                        // Reset stream position before each import attempt
-                        jsonStream.Position = 0;
-
-                        // Attempt to import the field value from JSON.
-                        // ImportValueFromJson returns false when the field name is not present.
-                        bool imported = field.ImportValueFromJson(jsonStream);
-                        if (!imported)
-                        {
-                            // Gracefully skip missing fields without throwing an exception
-                            Console.WriteLine($"Field '{field.FullName}' not found in JSON – leaving unchanged.");
-                        }
-                    }
+                    // Gracefully skip missing fields without throwing an exception
+                    Console.WriteLine($"Field '{field.FullName}' not present in JSON – skipped.");
                 }
-
-                // Save the filled PDF to the output path
-                doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Bulk fill completed. Output saved to '{outputPath}'.");
+            // Save the filled PDF to the output path
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            // General error handling – logs any unexpected issues
-            Console.Error.WriteLine($"Error during bulk fill: {ex.Message}");
-        }
+
+        Console.WriteLine($"Filled PDF saved to '{outputPath}'.");
     }
 }

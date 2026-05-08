@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Net.Http;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -8,53 +7,51 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";      // source PDF (must exist)
-        const string outputPdf = "output.pdf";     // result PDF
-        const string videoUrl  = "https://example.com/video.mp4"; // online video
+        const string outputPdf = "RichMediaVideo.pdf";
+        const string videoPath = "sample.mp4";      // MP4 video file
+        const string posterPath = "poster.jpg";     // Image shown before playback
 
-        if (!File.Exists(inputPdf))
+        // Ensure source files exist
+        if (!File.Exists(videoPath) || !File.Exists(posterPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine("Video or poster image file not found.");
             return;
         }
 
-        // Load the existing PDF inside a using block (ensures deterministic disposal)
-        using (Document doc = new Document(inputPdf))
+        // Create a new PDF document and add a blank page
+        using (Document doc = new Document())
         {
-            // Choose the page where the annotation will be placed (first page in this example)
-            Page page = doc.Pages[1];
+            Page page = doc.Pages.Add();
 
-            // Define the rectangle for the RichMediaAnnotation (coordinates are in points)
+            // Define annotation rectangle (llx, lly, urx, ury)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 400, 800);
 
-            // Create the RichMediaAnnotation
+            // Create RichMediaAnnotation on the page
             RichMediaAnnotation richMedia = new RichMediaAnnotation(page, rect)
             {
-                // Activate on click
-                ActivateOn = RichMediaAnnotation.ActivationEvent.Click,
-                // Specify that the content is a video
-                Type = RichMediaAnnotation.ContentType.Video,
-                // Prevent user from downloading the media (read‑only annotation)
-                Flags = AnnotationFlags.ReadOnly,
-                // Optional: give the annotation a name
-                Name = "OnlineVideo"
+                // Specify that the embedded content is a video
+                Type = RichMediaAnnotation.ContentType.Video
             };
 
-            // Download the video stream from the URL and attach it to the annotation
-            using (HttpClient http = new HttpClient())
-            using (Stream videoStream = http.GetStreamAsync(videoUrl).Result)
+            // Embed the MP4 video stream
+            using (FileStream videoStream = File.OpenRead(videoPath))
             {
-                // The first parameter is a logical name for the stream; it can be any string
-                richMedia.SetContent("video.mp4", videoStream);
+                richMedia.SetContent(Path.GetFileName(videoPath), videoStream);
+            }
+
+            // Set the poster image that appears before playback
+            using (FileStream posterStream = File.OpenRead(posterPath))
+            {
+                richMedia.SetPoster(posterStream);
             }
 
             // Add the annotation to the page
             page.Annotations.Add(richMedia);
 
-            // Save the modified PDF
+            // Save the resulting PDF
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"RichMediaAnnotation added and saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF with RichMediaAnnotation saved to '{outputPdf}'.");
     }
 }

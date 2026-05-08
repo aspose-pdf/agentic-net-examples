@@ -7,35 +7,37 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        // Input PDF file
+        const string inputPath = "input.pdf";
+        // Output PDF file with applied vertical alignment
         const string outputPath = "aligned_output.pdf";
+
+        // Pages to which the vertical alignment will be applied (1‑based indexing)
+        int[] targetPages = new int[] { 1, 2, 3 }; // adjust as needed
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Use PdfPageEditor to modify page layout.
-        using (PdfPageEditor editor = new PdfPageEditor())
+        // Load the source document and edit its pages using PdfPageEditor
+        using (Document doc = new Document(inputPath))
+        using (PdfPageEditor editor = new PdfPageEditor(doc))
         {
-            // Load the source PDF.
-            editor.BindPdf(inputPath);
+            // Specify the pages to be processed
+            editor.ProcessPages = targetPages;
 
-            // Specify the pages to which the vertical alignment will be applied.
-            // Example: pages 2, 3, and 5 (1‑based indexing).
-            editor.ProcessPages = new int[] { 2, 3, 5 };
-
-            // Align the original content to the top of the result page.
+            // Apply top vertical alignment to the original content on the result pages
             editor.VerticalAlignmentType = VerticalAlignment.Top;
 
-            // Apply the changes to the selected pages.
+            // Apply the changes to the selected pages
             editor.ApplyChanges();
 
-            // Save the modified PDF.
+            // Save the edited document
             editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Vertical alignment applied. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Vertical alignment applied and saved to '{outputPath}'.");
     }
 }

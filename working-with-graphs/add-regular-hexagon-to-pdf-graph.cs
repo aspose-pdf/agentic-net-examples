@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
 
@@ -6,62 +7,90 @@ class Program
 {
     static void Main()
     {
-        // Create a new PDF document and add a page
+        // Create a new PDF document
         using (Document doc = new Document())
         {
+            // Add a blank page
             Page page = doc.Pages.Add();
 
-            // Create a Graph container (width: 400, height: 400)
-            Graph graph = new Graph(400, 400);
+            // Create a Graph container (width: 400, height: 400) using the double constructor
+            Graph graph = new Graph(400.0, 400.0);
 
-            // Define hexagon vertices (regular polygon with 6 sides)
-            // Center at (200,200), radius 100
+            // Define the six vertices of a regular hexagon (center at 200,200, radius 100)
             double centerX = 200;
             double centerY = 200;
             double radius = 100;
             double angleStep = Math.PI / 3; // 60 degrees
 
-            // Create a Path shape to hold the hexagon edges
-            Aspose.Pdf.Drawing.Path hexPath = new Aspose.Pdf.Drawing.Path();
-
+            // Store points in an array for easy line creation
+            Point[] vertices = new Point[6];
             for (int i = 0; i < 6; i++)
             {
-                // Current vertex
-                double x1 = centerX + radius * Math.Cos(i * angleStep);
-                double y1 = centerY + radius * Math.Sin(i * angleStep);
-
-                // Next vertex (wrap around)
-                double x2 = centerX + radius * Math.Cos(((i + 1) % 6) * angleStep);
-                double y2 = centerY + radius * Math.Sin(((i + 1) % 6) * angleStep);
-
-                // Create a line between the two vertices
-                float[] linePoints = {
-                    (float)x1, (float)y1,
-                    (float)x2, (float)y2
-                };
-                Line line = new Line(linePoints);
-
-                // Add the line to the Path
-                hexPath.Shapes.Add(line);
+                double angle = i * angleStep - Math.PI / 2; // start at top
+                double x = centerX + radius * Math.Cos(angle);
+                double y = centerY + radius * Math.Sin(angle);
+                vertices[i] = new Point(x, y);
             }
 
-            // Set border color and thickness for the hexagon
-            hexPath.GraphInfo = new GraphInfo
+            // Add lines between consecutive vertices and close the polygon
+            for (int i = 0; i < 6; i++)
             {
-                Color = Aspose.Pdf.Color.Blue,   // Border color
-                LineWidth = 2                     // Border thickness
-            };
+                Point start = vertices[i];
+                Point end = vertices[(i + 1) % 6]; // wrap around to first vertex
 
-            // Add the Path (hexagon) to the Graph
-            graph.Shapes.Add(hexPath);
+                // Line constructor expects a float array: {x1, y1, x2, y2}
+                float[] linePos = {
+                    (float)start.X, (float)start.Y,
+                    (float)end.X,   (float)end.Y
+                };
+                Line line = new Line(linePos)
+                {
+                    GraphInfo = new GraphInfo
+                    {
+                        Color = Aspose.Pdf.Color.Blue,   // border color
+                        LineWidth = 2.0f                 // border thickness
+                    }
+                };
 
-            // Add the Graph to the page
+                // Add the line to the graph
+                graph.Shapes.Add(line);
+            }
+
+            // Add the graph to the page
             page.Paragraphs.Add(graph);
 
-            // Save the PDF
-            doc.Save("RegularHexagon.pdf");
-        }
+            string outputPath = "RegularHexagon.pdf";
 
-        Console.WriteLine("PDF with a regular hexagon saved as 'RegularHexagon.pdf'.");
+            // Guard Document.Save on platforms that may lack GDI+ (libgdiplus)
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                doc.Save(outputPath);
+                Console.WriteLine($"PDF saved to '{outputPath}'.");
+            }
+            else
+            {
+                try
+                {
+                    doc.Save(outputPath);
+                    Console.WriteLine($"PDF saved to '{outputPath}'. (Non‑Windows platform – ensure libgdiplus is installed if rendering issues appear.)");
+                }
+                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
+                {
+                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. The PDF was saved without rendering the graph.");
+                }
+            }
+        }
+    }
+
+    // Helper to detect a nested DllNotFoundException caused by missing libgdiplus
+    private static bool ContainsDllNotFound(Exception ex)
+    {
+        while (ex != null)
+        {
+            if (ex is DllNotFoundException)
+                return true;
+            ex = ex.InnerException;
+        }
+        return false;
     }
 }

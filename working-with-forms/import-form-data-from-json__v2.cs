@@ -6,38 +6,33 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        // Paths for the source PDF, the JSON data file and the output PDF
+        const string pdfPath = "input.pdf";
         const string jsonPath = "data.json";
-        const string outputPdf = "output.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        // Verify that the required files exist
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
-
         if (!File.Exists(jsonPath))
         {
             Console.Error.WriteLine($"JSON file not found: {jsonPath}");
             return;
         }
 
-        try
+        // Load the PDF document, import form data from JSON, and save the result
+        using (Document doc = new Document(pdfPath))
         {
-            using (Document doc = new Document(inputPdf))
-            {
-                // Bulk import form fields from JSON file
-                doc.Form.ImportFromJson(jsonPath);
+            // Bulk import all form fields from the JSON file
+            doc.Form.ImportFromJson(jsonPath);
 
-                // Save the updated PDF
-                doc.Save(outputPdf);
-            }
+            // Persist the changes to a new PDF file
+            doc.Save(outputPath);
+        }
 
-            Console.WriteLine($"Form data imported and saved to '{outputPdf}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"Form data imported successfully. Output saved to '{outputPath}'.");
     }
 }

@@ -4,52 +4,55 @@ using Aspose.Pdf.Facades;
 
 class Program
 {
-    // Usage:
-    //   AttachAndSetViewer.exe <inputPdf> <attachmentFile> <attachmentDescription> <outputPdf>
     static void Main(string[] args)
     {
-        if (args.Length != 4)
+        // Expected arguments:
+        // 0 - path to the source PDF
+        // 1 - path to the file to attach
+        // 2 - description for the attachment
+        // 3 - path for the output PDF
+        if (args.Length < 4)
         {
-            Console.Error.WriteLine("Usage: <inputPdf> <attachmentFile> <attachmentDescription> <outputPdf>");
+            Console.WriteLine("Usage: <inputPdf> <attachmentFile> <description> <outputPdf>");
             return;
         }
 
-        string inputPdfPath      = args[0];
-        string attachmentPath    = args[1];
-        string attachmentDesc    = args[2];
-        string outputPdfPath     = args[3];
+        string inputPdf = args[0];
+        string attachmentFile = args[1];
+        string description = args[2];
+        string outputPdf = args[3];
 
-        // Validate files
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(attachmentPath))
+
+        if (!File.Exists(attachmentFile))
         {
-            Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
+            Console.Error.WriteLine($"Attachment file not found: {attachmentFile}");
             return;
         }
 
         try
         {
-            // PdfContentEditor is a disposable facade; use using for deterministic cleanup
+            // PdfContentEditor implements IDisposable, so use a using block.
             using (PdfContentEditor editor = new PdfContentEditor())
             {
-                // Bind the source PDF document
-                editor.BindPdf(inputPdfPath);
+                // Load the source PDF.
+                editor.BindPdf(inputPdf);
 
-                // Add the attachment (no visual annotation)
-                editor.AddDocumentAttachment(attachmentPath, attachmentDesc);
+                // Add the attachment without an annotation.
+                editor.AddDocumentAttachment(attachmentFile, description);
 
-                // Set viewer preference to show the attachment panel
+                // Set the viewer preference to show attachments pane.
                 editor.ChangeViewerPreference(ViewerPreference.PageModeUseAttachment);
 
-                // Save the modified PDF
-                editor.Save(outputPdfPath);
+                // Save the modified PDF.
+                editor.Save(outputPdf);
             }
 
-            Console.WriteLine($"Attachment added and viewer preference set. Output saved to '{outputPdfPath}'.");
+            Console.WriteLine($"Attachment added and viewer preference set. Output saved to '{outputPdf}'.");
         }
         catch (Exception ex)
         {

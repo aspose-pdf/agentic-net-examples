@@ -7,9 +7,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string logoPath  = "logo.png";
+        const string inputPdf  = "input.pdf";      // existing PDF
+        const string logoImage = "logo.png";       // company logo image
+        const string outputPdf = "output_with_header.pdf";
 
         if (!File.Exists(inputPdf))
         {
@@ -17,43 +17,38 @@ class Program
             return;
         }
 
-        if (!File.Exists(logoPath))
+        if (!File.Exists(logoImage))
         {
-            Console.Error.WriteLine($"Logo image not found: {logoPath}");
+            Console.Error.WriteLine($"Logo image not found: {logoImage}");
             return;
         }
 
         // Load the existing PDF document
         using (Document doc = new Document(inputPdf))
         {
-            // Create an ImageStamp for the company logo
-            ImageStamp logoStamp = new ImageStamp(logoPath)
-            {
-                // Set desired size of the logo (in points)
-                Width  = 100,
-                Height = 50,
-
-                // Position the logo at the top center of each page
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Top,
-
-                // Add a small margin from the top edge
-                TopMargin = 10,
-
-                // Place the stamp in the foreground (over page content)
-                Background = false
-            };
-
-            // Add the stamp to every page in the document
+            // Iterate over all pages and add the logo as a header stamp
             foreach (Page page in doc.Pages)
             {
-                page.AddStamp(logoStamp);
+                // Create an image stamp from the logo file
+                ImageStamp imgStamp = new ImageStamp(logoImage);
+
+                // Position the stamp at the top center of the page
+                imgStamp.Background = false;                         // draw on top of page content
+                imgStamp.Opacity = 1.0f;                             // fully opaque
+                imgStamp.HorizontalAlignment = HorizontalAlignment.Center;
+                imgStamp.VerticalAlignment   = VerticalAlignment.Top;
+
+                // Optional: add a small top margin so the logo is not flush with the edge
+                imgStamp.TopMargin = 10; // points from the top edge
+
+                // Apply the stamp to the current page
+                page.AddStamp(imgStamp);
             }
 
             // Save the modified PDF
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF with header saved to '{outputPdf}'.");
+        Console.WriteLine($"Header with logo added to all pages. Saved as '{outputPdf}'.");
     }
 }

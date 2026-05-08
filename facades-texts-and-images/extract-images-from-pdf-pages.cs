@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf.Facades;
+using System.Drawing.Imaging;
 
 class Program
 {
@@ -8,37 +9,41 @@ class Program
     {
         const string inputPdf = "input.pdf";
 
-        // Verify that the source PDF exists
         if (!File.Exists(inputPdf))
         {
-            Console.WriteLine($"Error: The file '{inputPdf}' was not found.");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Create a unique temporary folder for the extracted images
-        string tempFolder = Path.Combine(Path.GetTempPath(),
-                                         "ExtractedImages_" + Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(tempFolder);
+        // Create a unique temporary directory for the extracted images
+        string tempDir = Path.Combine(Path.GetTempPath(), "AsposePdfImages_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tempDir);
 
-        // Use PdfExtractor (facade) to extract images from pages 2‑5
+        // Use PdfExtractor (Facade) to extract images from pages 2‑5
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            extractor.BindPdf(inputPdf);          // Load the PDF
-            extractor.StartPage = 2;              // First page to process (1‑based)
-            extractor.EndPage   = 5;              // Last page to process
-            extractor.ExtractImage();             // Prepare image extraction
+            // Bind the source PDF file
+            extractor.BindPdf(inputPdf);
 
-            int imgIndex = 1;
+            // Set the page range (Aspose.Pdf uses 1‑based indexing)
+            extractor.StartPage = 2;
+            extractor.EndPage   = 5;
+
+            // Perform the image extraction
+            extractor.ExtractImage();
+
+            int imageIndex = 1;
             while (extractor.HasNextImage())
             {
-                string outFile = Path.Combine(tempFolder, $"image-{imgIndex}.png");
-                // Save each image using the overload that preserves the original format.
-                // This avoids the Windows‑only ImageFormat.Png warning.
-                extractor.GetNextImage(outFile);
-                imgIndex++;
+                // Build the output file path (PNG format)
+                string outFile = Path.Combine(tempDir, $"image_{imageIndex}.png");
+
+                // Save the next image; GetNextImage returns a bool indicating success
+                extractor.GetNextImage(outFile, ImageFormat.Png);
+                imageIndex++;
             }
         }
 
-        Console.WriteLine($"Images from pages 2‑5 have been saved to: {tempFolder}");
+        Console.WriteLine($"Images extracted to temporary folder: {tempDir}");
     }
 }

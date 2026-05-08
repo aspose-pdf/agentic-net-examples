@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -7,16 +8,21 @@ class Program
     static void Main()
     {
         // Input PDF files to be concatenated
-        string[] inputFiles = { "file1.pdf", "file2.pdf", "file3.pdf" };
+        string[] inputFiles = new string[]
+        {
+            "file1.pdf",
+            "file2.pdf",
+            "file3.pdf"
+        };
 
         // Path for the intermediate concatenated PDF
         const string combinedPath = "combined.pdf";
 
         // Final output PDF with page numbers
-        const string outputPath = "final_with_page_numbers.pdf";
+        const string outputPath = "final_output.pdf";
 
         // Verify that all input files exist
-        foreach (var file in inputFiles)
+        foreach (string file in inputFiles)
         {
             if (!File.Exists(file))
             {
@@ -25,41 +31,44 @@ class Program
             }
         }
 
-        // ---------- Concatenate PDFs ----------
-        // PdfFileEditor implements concatenation without requiring a Document instance
-        PdfFileEditor editor = new PdfFileEditor
+        try
         {
-            // Preserve outlines and logical structure if present
-            CopyOutlines = true,
-            CopyLogicalStructure = true
-        };
+            // ---------- Concatenate PDFs ----------
+            // PdfFileEditor does NOT implement IDisposable, so no using block is required.
+            PdfFileEditor editor = new PdfFileEditor();
 
-        // Concatenate the input files into a single PDF
-        bool concatSuccess = editor.Concatenate(inputFiles, combinedPath);
-        if (!concatSuccess)
-        {
-            Console.Error.WriteLine("Failed to concatenate PDF files.");
-            return;
+            // Concatenate all input files into a single PDF.
+            // This overload takes an array of file names and the destination file name.
+            bool concatSuccess = editor.Concatenate(inputFiles, combinedPath);
+            if (!concatSuccess)
+            {
+                Console.Error.WriteLine("Concatenation failed.");
+                return;
+            }
+
+            // ---------- Add page numbers ----------
+            // PdfFileStamp can be constructed with input and output file paths.
+            // It provides AddPageNumber methods to insert page numbers.
+            PdfFileStamp stamp = new PdfFileStamp(combinedPath, outputPath);
+
+            // Add page numbers using the default format "Page #"
+            // The "#" placeholder will be replaced by the actual page number.
+            stamp.AddPageNumber("Page #");
+
+            // Close the stamp to finalize and write the output file.
+            stamp.Close();
+
+            // Optionally delete the intermediate combined file.
+            if (File.Exists(combinedPath))
+            {
+                File.Delete(combinedPath);
+            }
+
+            Console.WriteLine($"Successfully created '{outputPath}' with page numbers.");
         }
-
-        // ---------- Add page numbers ----------
-        // Initialize PdfFileStamp with the concatenated PDF as source and the final file as destination
-        PdfFileStamp stamp = new PdfFileStamp(combinedPath, outputPath)
+        catch (Exception ex)
         {
-            // Optional: set the starting page number (default is 1)
-            StartingNumber = 1
-        };
-
-        // Add page numbers at the bottom middle of each page.
-        // The format string may contain '#' which will be replaced by the actual page number.
-        stamp.AddPageNumber("Page #", PdfFileStamp.PosBottomMiddle);
-
-        // Close the stamp facade to write the output file
-        stamp.Close();
-
-        // Clean up the intermediate file (optional)
-        try { File.Delete(combinedPath); } catch { }
-
-        Console.WriteLine($"Successfully created '{outputPath}' with concatenated content and page numbers.");
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

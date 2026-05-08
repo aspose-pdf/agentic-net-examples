@@ -1,135 +1,84 @@
 using System;
 using System.Collections.Generic;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Facades;   // PdfXmpMetadata resides here
+using Aspose.Pdf;          // XmpValue type
 
-namespace XmpMetadataHelper
+namespace XmpHelper
 {
-    // Helper class to extract XMP metadata from a PDF and convert it to a dictionary.
-    public static class XmpHelper
+    /// <summary>
+    /// Provides utility methods for extracting XMP metadata from a PDF file.
+    /// </summary>
+    public static class XmpMetadataExtractor
     {
-        // Public method that returns a dictionary with string keys and object values.
-        // Complex XMP values (structures, arrays) are converted to nested dictionaries or lists.
-        public static Dictionary<string, object> GetXmpMetadataDictionary(string pdfPath)
+        /// <summary>
+        /// Reads the XMP metadata of the specified PDF and returns it as a dictionary.
+        /// Each entry contains the metadata key and its string representation.
+        /// </summary>
+        /// <param name="pdfPath">Full path to the PDF file.</param>
+        /// <returns>Dictionary with XMP keys and their corresponding values.</returns>
+        public static Dictionary<string, string> GetMetadataDictionary(string pdfPath)
         {
+            // Ensure the PDF file exists before attempting to bind.
             if (string.IsNullOrWhiteSpace(pdfPath))
-                throw new ArgumentException("PDF path must be provided.", nameof(pdfPath));
+                throw new ArgumentException("PDF path must be a non‑empty string.", nameof(pdfPath));
 
-            // Use PdfXmpMetadata facade to bind the PDF and access its XMP dictionary.
+            // PdfXmpMetadata implements IDisposable via SaveableFacade, so use a using block.
             using (PdfXmpMetadata xmp = new PdfXmpMetadata())
             {
-                xmp.BindPdf(pdfPath); // Bind the PDF file.
+                // Bind the PDF document to the facade.
+                xmp.BindPdf(pdfPath);
 
-                var result = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+                // Prepare the result dictionary.
+                var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-                // PdfXmpMetadata implements IDictionary<string, XmpValue>.
-                foreach (KeyValuePair<string, XmpValue> kvp in xmp)
+                // Iterate over all keys in the XMP dictionary.
+                foreach (string key in xmp.Keys)
                 {
-                    result[kvp.Key] = ConvertXmpValue(kvp.Value);
+                    // Retrieve the XmpValue for the current key.
+                    XmpValue value = xmp[key];
+
+                    // Convert the XmpValue to a readable string.
+                    // For complex structures you could call value.ToDictionary() etc.,
+                    // but for a simple helper we use ToString().
+                    string stringValue = value?.ToString() ?? string.Empty;
+
+                    result[key] = stringValue;
                 }
 
                 return result;
             }
         }
-
-        // Recursive conversion of XmpValue to a plain .NET object.
-        private static object ConvertXmpValue(XmpValue value)
-        {
-            if (value == null)
-                return null;
-
-            if (value.IsArray)
-            {
-                // Convert each element of the array.
-                XmpValue[] array = value.ToArray();
-                var list = new List<object>(array.Length);
-                foreach (XmpValue item in array)
-                {
-                    list.Add(ConvertXmpValue(item));
-                }
-                return list;
-            }
-
-            if (value.IsStructure)
-            {
-                // Convert structure to a dictionary of its named values.
-                var dict = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-                foreach (KeyValuePair<string, XmpValue> innerKvp in value.ToDictionary())
-                {
-                    dict[innerKvp.Key] = ConvertXmpValue(innerKvp.Value);
-                }
-                return dict;
-            }
-
-            if (value.IsDateTime)
-                return value.ToDateTime();
-
-            if (value.IsDouble)
-                return value.ToDouble();
-
-            if (value.IsInteger)
-                return value.ToInteger();
-
-            if (value.IsString)
-                return value.ToStringValue();
-
-            // Fallback to string representation for any other type.
-            return value.ToString();
-        }
     }
 
-    // Example usage.
-    class Program
+    // ---------------------------------------------------------------------
+    // Entry point required for a console‑style project.  The Main method does
+    // not perform any work; it simply exists so the compiler can produce an
+    // executable.  Users of the library can call XmpMetadataExtractor from
+    // their own code or from this stub for quick testing.
+    // ---------------------------------------------------------------------
+    internal class Program
     {
-        static void Main()
+        static void Main(string[] args)
         {
-            const string pdfFile = "sample.pdf";
-
-            try
+            // Optional quick‑test when the project is run directly.
+            if (args.Length > 0)
             {
-                Dictionary<string, object> xmpData = XmpHelper.GetXmpMetadataDictionary(pdfFile);
-
-                Console.WriteLine("XMP Metadata extracted:");
-                PrintDictionary(xmpData, 0);
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error extracting XMP metadata: {ex.Message}");
-            }
-        }
-
-        // Helper method to pretty‑print the dictionary (handles nested structures).
-        private static void PrintDictionary(IDictionary<string, object> dict, int indent)
-        {
-            string indentStr = new string(' ', indent * 2);
-            foreach (var kvp in dict)
-            {
-                if (kvp.Value is IDictionary<string, object> nestedDict)
+                try
                 {
-                    Console.WriteLine($"{indentStr}{kvp.Key}:");
-                    PrintDictionary(nestedDict, indent + 1);
-                }
-                else if (kvp.Value is IEnumerable<object> list && !(kvp.Value is string))
-                {
-                    Console.WriteLine($"{indentStr}{kvp.Key}: [");
-                    foreach (var item in list)
+                    var dict = XmpMetadataExtractor.GetMetadataDictionary(args[0]);
+                    foreach (var kvp in dict)
                     {
-                        if (item is IDictionary<string, object> innerDict)
-                        {
-                            PrintDictionary(innerDict, indent + 2);
-                        }
-                        else
-                        {
-                            Console.WriteLine($"{new string(' ', (indent + 2) * 2)}{item}");
-                        }
+                        Console.WriteLine($"{kvp.Key}: {kvp.Value}");
                     }
-                    Console.WriteLine($"{indentStr}]");
                 }
-                else
+                catch (Exception ex)
                 {
-                    Console.WriteLine($"{indentStr}{kvp.Key}: {kvp.Value}");
+                    Console.Error.WriteLine($"Error: {ex.Message}");
                 }
+            }
+            else
+            {
+                Console.WriteLine("Usage: XmpHelper <pdf-path>");
             }
         }
     }

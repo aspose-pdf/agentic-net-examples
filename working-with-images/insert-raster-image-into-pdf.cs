@@ -1,45 +1,84 @@
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using Aspose.Pdf;
 
-class Program
+class InsertImageExample
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";   // existing PDF
-        const string outputPdf = "output.pdf";  // result PDF
-        const string imagePath = "image.png";   // raster image to insert
+        // Paths to the source PDF, the raster image, and the output PDF
+        const string pdfPath   = "input.pdf";
+        const string imgPath   = "image.jpg";
+        const string outPath   = "output.pdf";
 
-        // Verify files exist
-        if (!File.Exists(inputPdf))
+        // Desired absolute coordinates (points) on the page
+        // lower‑left corner (x1, y1) and upper‑right corner (x2, y2)
+        const float llx = 100f;   // lower‑left X
+        const float lly = 500f;   // lower‑left Y
+        const float urx = 300f;   // upper‑right X
+        const float ury = 700f;   // upper‑right Y
+
+        // Ensure the source files exist
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
-        if (!File.Exists(imagePath))
+        if (!File.Exists(imgPath))
         {
-            Console.Error.WriteLine($"Image file not found: {imagePath}");
+            Console.Error.WriteLine($"Image file not found: {imgPath}");
             return;
         }
 
-        // Load the PDF document (using ensures proper disposal)
-        using (Document doc = new Document(inputPdf))
+        // Open the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(pdfPath))
         {
-            // Select the target page (1‑based indexing)
+            // Aspose.Pdf uses 1‑based page indexing; here we modify the first page
             Page page = doc.Pages[1];
 
-            // Define the rectangle where the image will be placed.
-            // Parameters: llx, lly, urx, ury (lower‑left and upper‑right corners).
-            // Example places the image at (100, 500) with width 200 and height 150.
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 650);
+            // Define the rectangle where the image will be placed
+            // Fully qualified type name avoids ambiguity with System.Drawing.Rectangle
+            Aspose.Pdf.Rectangle imgRect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
 
-            // Insert the raster image using the overload that takes a file path.
-            page.AddImage(imagePath, rect);
+            // Open the image file as a stream and add it to the page
+            using (FileStream imgStream = File.OpenRead(imgPath))
+            {
+                // This overload centers the image within the rectangle while preserving its aspect ratio
+                page.AddImage(imgStream, imgRect);
+            }
 
-            // Save the modified PDF.
-            doc.Save(outputPdf);
+            // Save the modified document.
+            // On non‑Windows platforms Aspose.Pdf may require libgdiplus; guard against that.
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                doc.Save(outPath);
+                Console.WriteLine($"Image inserted and PDF saved to '{outPath}'.");
+            }
+            else
+            {
+                try
+                {
+                    doc.Save(outPath);
+                    Console.WriteLine($"Image inserted and PDF saved to '{outPath}'.");
+                }
+                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
+                {
+                    Console.WriteLine("Saving failed: GDI+ (libgdiplus) is not available on this platform.");
+                }
+            }
         }
+    }
 
-        Console.WriteLine($"Image inserted and saved to '{outputPdf}'.");
+    // Helper to detect a nested DllNotFoundException (libgdiplus missing)
+    private static bool ContainsDllNotFound(Exception ex)
+    {
+        while (ex != null)
+        {
+            if (ex is DllNotFoundException)
+                return true;
+            ex = ex.InnerException;
+        }
+        return false;
     }
 }

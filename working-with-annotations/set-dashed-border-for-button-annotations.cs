@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;   // Border, BorderStyle
+using Aspose.Pdf.Forms;        // ButtonField
 
 class Program
 {
@@ -17,7 +17,7 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (using block ensures proper disposal)
         using (Document doc = new Document(inputPath))
         {
             // Iterate through all pages
@@ -28,23 +28,23 @@ class Program
                 {
                     Annotation ann = page.Annotations[idx];
 
-                    // Process only button annotations
+                    // Process only button fields
                     if (ann is ButtonField button)
                     {
-                        // Assign a new Border with dashed style and 2‑point thickness
+                        // Create a Border linked to this annotation and set style & thickness
                         button.Border = new Border(button)
                         {
-                            Style = BorderStyle.Dashed,
-                            Width = 2
+                            Style = BorderStyle.Dashed, // Dashed border
+                            Width = 2                  // Thickness of two points
                         };
                     }
                 }
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (lifecycle rule: use provided save logic)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
+        Console.WriteLine($"All button annotations updated and saved to '{outputPath}'.");
     }
 }

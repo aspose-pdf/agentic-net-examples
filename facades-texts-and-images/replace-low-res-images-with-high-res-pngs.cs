@@ -1,70 +1,55 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class ReplaceLowResImages
+class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string inputPdfPath   = "input.pdf";
-        const string outputPdfPath  = "output.pdf";
-        const string highResFolder  = "HighResImages"; // folder containing replacement PNGs
+        const string inputPdf   = "input.pdf";
+        const string outputPdf  = "output.pdf";
+        const string highResDir = "HighResImages"; // folder containing high‑resolution PNGs
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        if (!Directory.Exists(highResFolder))
+        // Bind the PDF to the editor (facade) and work within a using block for deterministic disposal
+        using (PdfContentEditor editor = new PdfContentEditor())
         {
-            Console.Error.WriteLine($"High‑resolution image folder not found: {highResFolder}");
-            return;
-        }
+            editor.BindPdf(inputPdf);
 
-        // Load the PDF document (lifecycle rule: wrap in using for deterministic disposal)
-        using (Document pdfDoc = new Document(inputPdfPath))
-        {
-            // Facade for editing page content (required by the task)
-            PdfContentEditor editor = new PdfContentEditor();
-            editor.BindPdf(pdfDoc);
+            // Get total number of pages (1‑based indexing)
+            int pageCount = editor.Document.Pages.Count;
 
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
+            // Loop through each page
+            for (int pageNum = 1; pageNum <= pageCount; pageNum++)
             {
-                // Each page has an XImageCollection (Resources.Images)
-                var imageCollection = pdfDoc.Pages[pageNumber].Resources.Images;
+                // Number of images on the current page (1‑based indexing)
+                int imageCount = editor.Document.Pages[pageNum].Resources.Images.Count;
 
-                // ImageCollection is 1‑based as well
-                int imageCount = imageCollection.Count;
-
-                for (int imageIndex = 1; imageIndex <= imageCount; imageIndex++)
+                // Loop through each image on the page
+                for (int imgIdx = 1; imgIdx <= imageCount; imgIdx++)
                 {
                     // Build the expected high‑resolution PNG file name.
-                    // Example naming convention: "page{page}_img{index}.png"
-                    string highResImagePath = Path.Combine(
-                        highResFolder,
-                        $"page{pageNumber}_img{imageIndex}.png");
+                    // Example naming convention: page1_img1.png, page2_img3.png, etc.
+                    string highResPath = Path.Combine(highResDir, $"page{pageNum}_img{imgIdx}.png");
 
-                    // Replace only if the high‑resolution file exists
-                    if (File.Exists(highResImagePath))
+                    // Replace only if the high‑resolution image exists
+                    if (File.Exists(highResPath))
                     {
-                        // ReplaceImage is a Facade method that swaps the image at the given
-                        // page number and image index with the supplied file.
-                        editor.ReplaceImage(pageNumber, imageIndex, highResImagePath);
+                        // Replace the low‑resolution image with the high‑resolution PNG
+                        editor.ReplaceImage(pageNum, imgIdx, highResPath);
                     }
                 }
             }
 
-            // Save the modified PDF (save rule: direct Save for PDF format)
-            pdfDoc.Save(outputPdfPath);
-
-            // Close the editor (optional, but releases internal resources)
-            editor.Close();
+            // Save the modified PDF
+            editor.Save(outputPdf);
         }
 
-        Console.WriteLine($"Low‑resolution images replaced. Output saved to '{outputPdfPath}'.");
+        Console.WriteLine($"All images replaced. Output saved to '{outputPdf}'.");
     }
 }

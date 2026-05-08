@@ -1,41 +1,35 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_branded.pdf";
-        const string logoUrl = "https://example.com/logo.png";
-        const string brandColor = "#FF5733";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output_branded.pdf";
 
-        if (!File.Exists(inputPath))
+        // Ensure the input file exists
+        if (!System.IO.File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document doc = new Document(inputPath))
-        {
-            // Initialize the XMP metadata facade and bind it to the document
-            PdfXmpMetadata xmp = new PdfXmpMetadata();
-            xmp.BindPdf(doc);
+        // Load the PDF document
+        Document pdf = new Document(inputPdf);
 
-            // Register a custom namespace for corporate branding
-            xmp.RegisterNamespaceURI("corp", "http://example.com/corporate");
+        // Register a custom XMP namespace for corporate branding
+        // Prefix: "corp", URI: "http://example.com/corporate"
+        pdf.Metadata.RegisterNamespaceUri("corp", "http://example.com/corporate");
 
-            // Add corporate logo URL and brand color as custom XMP fields
-            xmp.Add("corp:LogoURL", logoUrl);
-            xmp.Add("corp:BrandColor", brandColor);
+        // Add custom XMP metadata fields: logo URL and brand color (hex code)
+        // Note the "xmp:" prefix before the custom namespace when using the indexer
+        pdf.Metadata["xmp:corp:LogoURL"] = "https://example.com/logo.png";
+        pdf.Metadata["xmp:corp:BrandColor"] = "#FF5733";
 
-            // Save the PDF with the updated XMP metadata
-            xmp.Save(outputPath);
-        }
+        // Save the PDF with the updated XMP metadata
+        pdf.Save(outputPdf);
 
-        Console.WriteLine($"Branded PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Branded PDF saved to '{outputPdf}'.");
     }
 }

@@ -1,96 +1,121 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.Json;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades;   // PdfBookmarkEditor, Bookmark, Bookmarks
 
-namespace BookmarkImportExample
+// JSON structure that represents a bookmark entry.
+// It can contain nested children to form a hierarchy.
+public class JsonBookmark
 {
-    // Represents the JSON structure for a bookmark entry.
-    public class BookmarkNode
+    public string Title { get; set; }
+    public int PageNumber { get; set; }
+    public List<JsonBookmark> Children { get; set; } = new List<JsonBookmark>();
+}
+
+class Program
+{
+    static void Main()
     {
-        public string Title { get; set; }
-        public int PageNumber { get; set; }
-        public List<BookmarkNode> Children { get; set; }
+        const string inputPdfPath   = "input.pdf";      // PDF to which bookmarks will be added
+        const string jsonPath       = "bookmarks.json"; // JSON file containing bookmark definitions
+        const string outputPdfPath  = "output_with_bookmarks.pdf";
+
+        if (!File.Exists(inputPdfPath))
+        {
+            Console.Error.WriteLine($"PDF not found: {inputPdfPath}");
+            return;
+        }
+
+        if (!File.Exists(jsonPath))
+        {
+            Console.Error.WriteLine($"JSON file not found: {jsonPath}");
+            return;
+        }
+
+        // ------------------------------------------------------------
+        // 1. Load and deserialize the JSON file into a list of objects.
+        // ------------------------------------------------------------
+        List<JsonBookmark> jsonBookmarks;
+        try
+        {
+            string jsonContent = File.ReadAllText(jsonPath);
+            jsonBookmarks = JsonSerializer.Deserialize<List<JsonBookmark>>(jsonContent,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to read/parse JSON: {ex.Message}");
+            return;
+        }
+
+        if (jsonBookmarks == null || jsonBookmarks.Count == 0)
+        {
+            Console.WriteLine("No bookmarks found in JSON.");
+            return;
+        }
+
+        // ------------------------------------------------------------
+        // 2. Convert the JSON objects to Aspose.Pdf.Facades.Bookmark objects.
+        // ------------------------------------------------------------
+        List<Bookmark> aspBookmarks = new List<Bookmark>();
+        foreach (var jb in jsonBookmarks)
+        {
+            aspBookmarks.Add(ConvertToAsposeBookmark(jb));
+        }
+
+        // ------------------------------------------------------------
+        // 3. Bind the PDF, add the bookmarks, and save the result.
+        // ------------------------------------------------------------
+        PdfBookmarkEditor editor = new PdfBookmarkEditor();
+        try
+        {
+            // Load the PDF document.
+            editor.BindPdf(inputPdfPath);
+
+            // Add each top‑level bookmark (the method handles nested children).
+            foreach (var bm in aspBookmarks)
+            {
+                editor.CreateBookmarks(bm);
+            }
+
+            // Persist the changes.
+            editor.Save(outputPdfPath);
+            Console.WriteLine($"Bookmarks imported successfully. Output saved to '{outputPdfPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
+        }
+        finally
+        {
+            // Release resources held by the facade.
+            editor.Close();
+        }
     }
 
-    class Program
+    // Recursively maps a JsonBookmark to an Aspose.Pdf.Facades.Bookmark.
+    private static Bookmark ConvertToAsposeBookmark(JsonBookmark jsonBm)
     {
-        // Recursively converts a BookmarkNode (JSON) to an Aspose.Pdf.Facades.Bookmark.
-        static Bookmark ConvertToAsposeBookmark(BookmarkNode node)
+        // Create the bookmark and set required properties.
+        Bookmark bm = new Bookmark
         {
-            Bookmark aspBookmark = new Bookmark {
-                Title = node.Title,
-                PageNumber = node.PageNumber,
-                Action = "GoTo" // standard action for page navigation
-            };
+            Title = jsonBm.Title,
+            PageNumber = jsonBm.PageNumber,
+            Action = "GoTo" // Standard action to navigate to the page.
+        };
 
-            if (node.Children != null && node.Children.Count > 0)
+        // If there are child bookmarks, convert them and attach.
+        if (jsonBm.Children != null && jsonBm.Children.Count > 0)
+        {
+            Bookmarks childCollection = new Bookmarks();
+            foreach (var childJson in jsonBm.Children)
             {
-                Bookmarks childCollection = new Bookmarks();
-                foreach (var childNode in node.Children)
-                {
-                    childCollection.Add(ConvertToAsposeBookmark(childNode));
-                }
-                aspBookmark.ChildItem = childCollection;
+                childCollection.Add(ConvertToAsposeBookmark(childJson));
             }
-
-            return aspBookmark;
+            bm.ChildItem = childCollection;
         }
 
-        static void Main()
-        {
-            const string inputPdfPath = "input.pdf";
-            const string outputPdfPath = "output_with_bookmarks.pdf";
-            const string jsonBookmarksPath = "bookmarks.json";
-
-            if (!File.Exists(inputPdfPath))
-            {
-                Console.Error.WriteLine($"PDF not found: {inputPdfPath}");
-                return;
-            }
-
-            if (!File.Exists(jsonBookmarksPath))
-            {
-                Console.Error.WriteLine($"JSON file not found: {jsonBookmarksPath}");
-                return;
-            }
-
-            // Deserialize JSON into a list of bookmark nodes.
-            List<BookmarkNode> rootNodes;
-            try
-            {
-                string jsonContent = File.ReadAllText(jsonBookmarksPath);
-                rootNodes = JsonSerializer.Deserialize<List<BookmarkNode>>(jsonContent);
-                if (rootNodes == null)
-                {
-                    Console.Error.WriteLine("Failed to parse JSON bookmarks.");
-                    return;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error reading JSON: {ex.Message}");
-                return;
-            }
-
-            // Use PdfBookmarkEditor facade to bind the PDF and import bookmarks.
-            using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
-            {
-                editor.BindPdf(inputPdfPath);
-
-                // Convert each root node and add it to the document.
-                foreach (var node in rootNodes)
-                {
-                    Bookmark aspBookmark = ConvertToAsposeBookmark(node);
-                    editor.CreateBookmarks(aspBookmark);
-                }
-
-                // Save the updated PDF.
-                editor.Save(outputPdfPath);
-            }
-
-            Console.WriteLine($"Bookmarks imported and saved to '{outputPdfPath}'.");
-        }
+        return bm;
     }
 }

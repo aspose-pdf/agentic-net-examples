@@ -7,28 +7,31 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.md";
+        // Input PDF file path
+        const string inputPdf = "input.pdf";
 
-        if (!File.Exists(inputPath))
+        // Output Markdown file path
+        const string outputMd = "output.md";
+
+        // Verify that the input file exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document.
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Process paragraphs to retain layout information such as indents.
-            doc.ProcessParagraphs();
-
-            // Configure markdown save options (default settings preserve indentation).
+            // Create MarkdownSaveOptions to control the conversion.
+            // The default options preserve paragraph indentation and other formatting.
             MarkdownSaveOptions mdOptions = new MarkdownSaveOptions();
 
-            // Save the document as a formatted markdown file.
-            doc.Save(outputPath, mdOptions);
+            // Save the PDF as a formatted Markdown file.
+            // This conversion keeps the original paragraph indentation.
+            pdfDoc.Save(outputMd, mdOptions);
         }
 
-        Console.WriteLine($"Markdown file saved to '{outputPath}'.");
+        Console.WriteLine($"Markdown file created: {outputMd}");
     }
 }

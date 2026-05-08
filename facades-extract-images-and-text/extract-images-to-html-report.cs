@@ -7,56 +7,70 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath   = "input.pdf";      // source PDF
-        const string htmlPath  = "report.html";    // output HTML report
+        const string inputPdfPath  = "input.pdf";
+        const string outputHtmlPath = "report.html";
 
-        if (!File.Exists(pdfPath))
+        // Ensure the input file exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
         // StringBuilder to compose the HTML report
-        StringBuilder html = new StringBuilder();
-        html.AppendLine("<!DOCTYPE html>");
-        html.AppendLine("<html>");
-        html.AppendLine("<head><meta charset=\"UTF-8\"><title>Image Report</title></head>");
-        html.AppendLine("<body>");
-        html.AppendLine("<h1>Extracted Images</h1>");
+        StringBuilder htmlBuilder = new StringBuilder();
 
-        // Use PdfExtractor (Facade) to extract images from the PDF
+        // Basic HTML skeleton
+        htmlBuilder.AppendLine("<!DOCTYPE html>");
+        htmlBuilder.AppendLine("<html>");
+        htmlBuilder.AppendLine("<head>");
+        htmlBuilder.AppendLine("    <meta charset=\"UTF-8\">");
+        htmlBuilder.AppendLine("    <title>Extracted Images Report</title>");
+        htmlBuilder.AppendLine("</head>");
+        htmlBuilder.AppendLine("<body>");
+        htmlBuilder.AppendLine("    <h1>Images extracted from PDF</h1>");
+
+        // Use PdfExtractor (Facade) to extract images
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            extractor.BindPdf(pdfPath);          // load the PDF
-            extractor.ExtractImage();            // start image extraction
+            // Bind the source PDF file
+            extractor.BindPdf(inputPdfPath);
+
+            // Start the image extraction process
+            extractor.ExtractImage();
 
             int imageIndex = 1;
+
+            // Iterate over all extracted images
             while (extractor.HasNextImage())
             {
                 // Retrieve the next image into a memory stream
-                using (MemoryStream imgStream = new MemoryStream())
+                using (MemoryStream imageStream = new MemoryStream())
                 {
-                    extractor.GetNextImage(imgStream);   // default format is JPEG
-                    byte[] imgBytes = imgStream.ToArray();
+                    extractor.GetNextImage(imageStream); // default format is JPEG
+                    byte[] imageBytes = imageStream.ToArray();
 
-                    // Convert image bytes to Base64 string
-                    string base64 = Convert.ToBase64String(imgBytes);
+                    // Convert image bytes to a Base64 string
+                    string base64Image = Convert.ToBase64String(imageBytes);
 
-                    // Embed the image using a data URI
-                    html.AppendLine($"<div><p>Image {imageIndex}</p>");
-                    html.AppendLine($"<img src=\"data:image/jpeg;base64,{base64}\" alt=\"Image {imageIndex}\" />");
-                    html.AppendLine("</div>");
-
-                    imageIndex++;
+                    // Embed the image using a data URI (assumed JPEG)
+                    htmlBuilder.AppendLine("    <div style=\"margin-bottom:20px;\">");
+                    htmlBuilder.AppendLine($"        <p>Image {imageIndex}</p>");
+                    htmlBuilder.AppendLine($"        <img src=\"data:image/jpeg;base64,{base64Image}\" alt=\"Image {imageIndex}\"/>");
+                    htmlBuilder.AppendLine("    </div>");
                 }
+
+                imageIndex++;
             }
         }
 
-        html.AppendLine("</body>");
-        html.AppendLine("</html>");
+        // Close HTML tags
+        htmlBuilder.AppendLine("</body>");
+        htmlBuilder.AppendLine("</html>");
 
         // Write the HTML report to disk
-        File.WriteAllText(htmlPath, html.ToString(), Encoding.UTF8);
-        Console.WriteLine($"HTML report generated at '{htmlPath}'.");
+        File.WriteAllText(outputHtmlPath, htmlBuilder.ToString());
+
+        Console.WriteLine($"HTML report with embedded images saved to '{outputHtmlPath}'.");
     }
 }

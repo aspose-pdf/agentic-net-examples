@@ -7,45 +7,42 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPdf = "input.pdf";
+        const string inputPdfPath = "input.pdf";
+        const string outputDirectory = "VectorGraphics";
 
-        // Directory where individual SVG files will be saved
-        const string outputRoot = "ExtractedSvg";
-
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure the root output directory exists
-        Directory.CreateDirectory(outputRoot);
+        // Ensure the output folder exists
+        Directory.CreateDirectory(outputDirectory);
 
-        // Load the PDF document (lifecycle: using for deterministic disposal)
-        using (Document pdfDoc = new Document(inputPdf))
+        // Load the PDF document (using the recommended lifecycle rule)
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+            // Configure the extractor to create a separate SVG for each sub‑path
+            SvgExtractionOptions extractionOptions = new SvgExtractionOptions
+            {
+                ExtractEverySubPathToSvg = true
+            };
+            SvgExtractor extractor = new SvgExtractor(extractionOptions);
+
+            // Iterate pages (1‑based indexing)
             for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
             {
                 Page page = pdfDoc.Pages[pageIndex];
 
-                // Skip pages that do not contain vector graphics
-                if (!page.HasVectorGraphics())
-                    continue;
+                // Create a sub‑folder for each page to keep files organized
+                string pageFolder = Path.Combine(outputDirectory, $"Page_{pageIndex}");
+                Directory.CreateDirectory(pageFolder);
 
-                // Create a sub‑directory for each page's SVG files
-                string pageOutputDir = Path.Combine(outputRoot, $"Page_{pageIndex}");
-                Directory.CreateDirectory(pageOutputDir);
-
-                // SvgExtractor extracts each vector graphic as an individual SVG file
-                SvgExtractor extractor = new SvgExtractor();
-
-                // Extract all vector graphics from the current page into the directory
-                extractor.Extract(page, pageOutputDir);
+                // Extract all vector graphics on the page to individual SVG files
+                extractor.Extract(page, pageFolder);
             }
         }
 
-        Console.WriteLine($"Vector graphics extraction completed. SVG files are located in '{outputRoot}'.");
+        Console.WriteLine("Vector graphics extraction completed.");
     }
 }

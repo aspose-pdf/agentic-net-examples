@@ -1,27 +1,32 @@
 using System;
+using System.IO;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "form_template.pdf";
+        const string sourcePdfPath = "form.pdf";      // Path to the PDF form
+        const string outputPdfPath = "filled_form.pdf"; // Destination for the result
 
-        if (!System.IO.File.Exists(pdfPath))
+        // Verify that the source file exists
+        if (!File.Exists(sourcePdfPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
             return;
         }
 
-        // Create an AutoFiller instance and bind the source PDF form.
+        // Create an AutoFiller instance, bind the PDF, and save the (potentially unchanged) result
         using (AutoFiller autoFiller = new AutoFiller())
         {
-            autoFiller.BindPdf(pdfPath);
+            // Bind the PDF form to the AutoFiller
+            autoFiller.BindPdf(sourcePdfPath);
 
-            // The AutoFiller is now ready for further operations,
-            // such as importing data and saving the filled PDF.
-            // Example (uncomment when needed):
-            // autoFiller.Save("filled_output.pdf");
+            // Save the bound document (no data imported in this example)
+            autoFiller.Save(outputPdfPath);
         }
+
+        // Use fully‑qualified System.IO.Path to avoid ambiguity with Aspose.Pdf.Drawing.Path
+        Console.WriteLine($"AutoFiller bound PDF saved to '{System.IO.Path.GetFullPath(outputPdfPath)}'.");
     }
 }

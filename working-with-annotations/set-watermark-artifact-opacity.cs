@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace
+using Aspose.Pdf;
 
 class Program
 {
@@ -15,7 +15,7 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
         using (Document doc = new Document(inputPath))
         {
             // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
@@ -23,7 +23,7 @@ class Program
             {
                 Page page = doc.Pages[i];
 
-                // Iterate through the artifacts on the page
+                // Iterate over all artifacts on the page
                 foreach (Artifact artifact in page.Artifacts)
                 {
                     // Identify WatermarkArtifact instances
@@ -35,7 +35,7 @@ class Program
                 }
             }
 
-            // Save the modified PDF (lifecycle rule: save inside using block)
+            // Save the modified document (lifecycle rule: save inside using block)
             doc.Save(outputPath);
         }
 

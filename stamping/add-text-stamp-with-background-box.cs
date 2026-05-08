@@ -8,49 +8,47 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_stamp.pdf";
+        const string stampText  = "CONFIDENTIAL";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a text stamp with the desired label
-            TextStamp stamp = new TextStamp("CONFIDENTIAL");
+            // Create a TextStamp with the desired text
+            TextStamp textStamp = new TextStamp(stampText);
 
             // Place the stamp behind the page content (background box)
-            stamp.Background = true;
-
-            // Make the background semi‑transparent
-            stamp.Opacity = 0.6;
+            textStamp.Background = true;
 
             // Center the stamp on each page
-            stamp.HorizontalAlignment = HorizontalAlignment.Center;
-            stamp.VerticalAlignment   = VerticalAlignment.Center;
+            textStamp.HorizontalAlignment = HorizontalAlignment.Center;
+            textStamp.VerticalAlignment   = VerticalAlignment.Center;
 
-            // Let the stamp automatically adjust its font size to fit the page rectangle
-            stamp.AutoAdjustFontSizeToFitStampRectangle = true;
+            // Optional: make the stamp semi‑transparent
+            textStamp.Opacity = 0.6f;
 
-            // Configure text appearance
-            stamp.TextState.Font           = FontRepository.FindFont("Helvetica");
-            stamp.TextState.FontSize       = 48;
-            stamp.TextState.ForegroundColor = Aspose.Pdf.Color.White;   // text color
-            stamp.TextState.BackgroundColor = Aspose.Pdf.Color.Black;   // background box color
+            // Configure the visual appearance of the text
+            textStamp.TextState.Font = FontRepository.FindFont("Helvetica");
+            textStamp.TextState.FontSize = 24;
+            textStamp.TextState.ForegroundColor = Aspose.Pdf.Color.White;          // Text color
+            textStamp.TextState.BackgroundColor = Aspose.Pdf.Color.Black;          // Box color
 
             // Apply the stamp to every page in the document
             foreach (Page page in doc.Pages)
             {
-                page.AddStamp(stamp);
+                page.AddStamp(textStamp);
             }
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with text stamp: {outputPath}");
     }
 }

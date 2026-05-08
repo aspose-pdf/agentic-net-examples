@@ -13,28 +13,27 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF and work with it inside a using block for proper disposal
+        // Load the PDF and work with its tagged content
         using (Document doc = new Document(inputPath))
         {
             // Access the tagged content API
-            ITaggedContent taggedContent = doc.TaggedContent;
+            ITaggedContent tagged = doc.TaggedContent;
 
-            // Optional: set document language and title (metadata)
-            taggedContent.SetLanguage("en-US");
-            taggedContent.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
-
-            // Get the root structure element (no cast needed)
-            StructureElement root = taggedContent.RootElement;
+            // Get the root element of the structure tree (no cast needed)
+            StructureElement root = tagged.RootElement;
 
             // Create a new figure element
-            FigureElement figure = taggedContent.CreateFigureElement();
+            FigureElement figure = tagged.CreateFigureElement();
 
-            // Set a concise description using the Title property of StructureElement
+            // Set a concise description using the Title property
             figure.Title = "Figure 1: Sales growth chart";
+
+            // Optionally set alternative text for accessibility
+            figure.AlternativeText = "Bar chart showing quarterly sales growth";
 
             // Append the figure to the document's structure tree
             root.AppendChild(figure);

@@ -3,73 +3,67 @@ using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 
-class ReplaceImagesOnPage
+class Program
 {
     static void Main()
     {
-        // Input PDF, output PDF and the page number to modify
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output.pdf";
-        const int targetPageNumber = 2; // 1‑based page index
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const int targetPageNumber = 2; // page to modify (1‑based)
 
-        // Mapping of image index (1‑based) to the new image file path
-        var imageReplacements = new Dictionary<int, string>
+        // Map of image index (1‑based) on the page to the new image file path
+        var replacements = new Dictionary<int, string>
         {
             { 1, "newImage1.jpg" },
             { 3, "newImage3.png" }
         };
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Open the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdfPath))
+        foreach (var path in replacements.Values)
         {
-            // Validate the requested page exists
+            if (!File.Exists(path))
+            {
+                Console.Error.WriteLine($"Replacement image not found: {path}");
+                return;
+            }
+        }
+
+        using (Document doc = new Document(inputPath))
+        {
             if (targetPageNumber < 1 || targetPageNumber > doc.Pages.Count)
             {
-                Console.Error.WriteLine($"Page {targetPageNumber} is out of range. Document has {doc.Pages.Count} pages.");
+                Console.Error.WriteLine("Invalid page number.");
                 return;
             }
 
-            // Get the target page (Aspose.Pdf uses 1‑based indexing)
             Page page = doc.Pages[targetPageNumber];
+            var images = page.Resources.Images; // XImageCollection
 
-            // Access the image collection of the page
-            XImageCollection images = page.Resources.Images;
-
-            // Iterate over the replacement dictionary
-            foreach (KeyValuePair<int, string> kvp in imageReplacements)
+            foreach (var kvp in replacements)
             {
-                int index = kvp.Key;          // Image index in the collection (1‑based)
+                int index = kvp.Key;
                 string newImagePath = kvp.Value;
 
                 if (index < 1 || index > images.Count)
                 {
-                    Console.Error.WriteLine($"Image index {index} is out of range. Page has {images.Count} images.");
-                    continue; // skip invalid index
+                    Console.Error.WriteLine($"Image index {index} out of range on page {targetPageNumber}.");
+                    continue;
                 }
 
-                if (!File.Exists(newImagePath))
+                using (FileStream fs = File.OpenRead(newImagePath))
                 {
-                    Console.Error.WriteLine($"Replacement image not found: {newImagePath}");
-                    continue; // skip missing file
-                }
-
-                // Replace the image at the specified index with the new image stream
-                using (FileStream newImageStream = File.OpenRead(newImagePath))
-                {
-                    images.Replace(index, newImageStream);
+                    images.Replace(index, fs);
                 }
             }
 
-            // Save the modified document
-            doc.Save(outputPdfPath);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Images replaced and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Images replaced and saved to '{outputPath}'.");
     }
 }

@@ -2,53 +2,53 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-namespace AsposePdfUtilities
+public static class PdfUtilities
 {
-    public static class PdfAnnotationFlattener
+    /// <summary>
+    /// Flattens all annotations in a PDF provided as a stream and returns the modified PDF as a new stream.
+    /// No file system access is performed.
+    /// </summary>
+    /// <param name="pdfInput">Stream containing the source PDF. The stream will be read from its current position.</param>
+    /// <returns>A MemoryStream containing the PDF with flattened annotations. Caller is responsible for disposing it.</returns>
+    public static MemoryStream FlattenAnnotations(Stream pdfInput)
     {
-        /// <summary>
-        /// Flattens all annotations in a PDF provided as a stream and returns a new stream containing the modified PDF.
-        /// No file system access is performed.
-        /// </summary>
-        /// <param name="inputPdf">Stream containing the source PDF. The stream must be readable and seekable.</param>
-        /// <returns>A MemoryStream with the flattened PDF. Caller is responsible for disposing the returned stream.</returns>
-        public static Stream FlattenAnnotations(Stream inputPdf)
+        // Ensure the input stream is positioned at the beginning
+        if (pdfInput.CanSeek)
         {
-            if (inputPdf == null) throw new ArgumentNullException(nameof(inputPdf));
-            if (!inputPdf.CanRead) throw new ArgumentException("Input stream must be readable.", nameof(inputPdf));
-            if (!inputPdf.CanSeek) throw new ArgumentException("Input stream must be seekable.", nameof(inputPdf));
-
-            // Ensure the input stream is positioned at the beginning.
-            inputPdf.Position = 0;
-
-            // Output stream that will hold the flattened PDF.
-            var outputPdf = new MemoryStream();
-
-            // PdfAnnotationEditor implements IDisposable, so use a using block for deterministic disposal.
-            using (var editor = new PdfAnnotationEditor())
-            {
-                // Bind the PDF document from the input stream.
-                editor.BindPdf(inputPdf);
-
-                // Flatten all annotations in the document.
-                editor.FlatteningAnnotations();
-
-                // Save the modified document to the output stream.
-                editor.Save(outputPdf);
-            }
-
-            // Reset the position of the output stream so it can be read from the beginning.
-            outputPdf.Position = 0;
-            return outputPdf;
+            pdfInput.Position = 0;
         }
+
+        // Output stream that will hold the flattened PDF
+        MemoryStream outputStream = new MemoryStream();
+
+        // Use PdfAnnotationEditor (Facades API) to bind, flatten, and save the document
+        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        {
+            // Bind the PDF from the input stream
+            editor.BindPdf(pdfInput);
+
+            // Flatten all annotations in the document
+            editor.FlatteningAnnotations();
+
+            // Save the modified PDF into the output stream
+            editor.Save(outputStream);
+        }
+
+        // Reset the output stream position so it can be read from the start
+        if (outputStream.CanSeek)
+        {
+            outputStream.Position = 0;
+        }
+
+        return outputStream;
     }
+}
 
-    // Dummy entry point to satisfy the compiler when the project is built as an executable.
-    internal class Program
+// Dummy entry point to satisfy the compiler when the project is built as an executable.
+public class Program
+{
+    public static void Main()
     {
-        private static void Main(string[] args)
-        {
-            // No operation – the library functionality is accessed via PdfAnnotationFlattener.
-        }
+        // Intentionally left blank – the library functionality is accessed via PdfUtilities.
     }
 }

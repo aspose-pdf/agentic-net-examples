@@ -14,23 +14,25 @@ class Program
             return;
         }
 
-        // Bind the PDF file to the facade for editing
-        using (PdfPageEditor editor = new PdfPageEditor())
+        using (MemoryStream outputStream = new MemoryStream())
         {
+            // Load the PDF with a facade
+            PdfPageEditor editor = new PdfPageEditor();
             editor.BindPdf(inputPath);
 
-            // Example modification: adjust zoom (any other edit can be applied here)
-            editor.Zoom = 0.8f;
+            // Example modification (optional)
+            editor.Zoom = 0.75f;
 
-            // Save the modified PDF into a MemoryStream (no disk I/O)
-            using (MemoryStream memory = new MemoryStream())
-            {
-                editor.Save(memory);
-                memory.Position = 0; // Reset for downstream processing
+            // Save the modified PDF into the memory stream
+            editor.Save(outputStream);
 
-                // The PDF is now available in 'memory' for further use
-                Console.WriteLine($"Modified PDF stored in memory: {memory.Length} bytes");
-            }
+            // Prepare the stream for further use
+            outputStream.Position = 0;
+
+            Console.WriteLine($"Modified PDF size in memory: {outputStream.Length} bytes");
+
+            // Release resources held by the facade
+            editor.Close();
         }
     }
 }

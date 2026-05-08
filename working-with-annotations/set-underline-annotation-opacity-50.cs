@@ -9,7 +9,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const int targetPageNumber = 1; // 1‑based page index
+        const int targetPageNumber = 1; // adjust as needed
 
         if (!File.Exists(inputPath))
         {
@@ -17,32 +17,31 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block (ensures proper disposal)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Validate page number
+            // Validate page number (Aspose.Pdf uses 1‑based indexing)
             if (targetPageNumber < 1 || targetPageNumber > doc.Pages.Count)
             {
-                Console.Error.WriteLine("Target page number is out of range.");
+                Console.Error.WriteLine("Invalid page number.");
                 return;
             }
 
             Page page = doc.Pages[targetPageNumber];
 
-            // Iterate through all annotations on the page (annotation collections are 1‑based)
+            // Iterate through all annotations on the page
             for (int i = 1; i <= page.Annotations.Count; i++)
             {
                 Annotation ann = page.Annotations[i];
-
-                // Identify underline annotations
+                // Check for underline annotation
                 if (ann is UnderlineAnnotation underline)
                 {
-                    // Set opacity to 50% (range 0.0 – 1.0)
+                    // Set opacity to 50%
                     underline.Opacity = 0.5;
                 }
             }
 
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

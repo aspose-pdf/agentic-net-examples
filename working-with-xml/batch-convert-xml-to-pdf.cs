@@ -1,23 +1,23 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Aspose.Pdf namespace contains Document, XmlLoadOptions, etc.
 
 class Program
 {
     static void Main()
     {
         // Folder containing XML files
-        const string inputFolder = "XmlFolder";
+        const string inputFolder = @"C:\InputXmlFolder";
         // Folder where PDFs will be saved
-        const string outputFolder = "PdfOutput";
+        const string outputFolder = @"C:\OutputPdfFolder";
 
+        // Validate folders
         if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Input folder does not exist: {inputFolder}");
             return;
         }
 
-        // Ensure output directory exists
         Directory.CreateDirectory(outputFolder);
 
         // Get all XML files in the input folder (non‑recursive)
@@ -27,26 +27,28 @@ class Program
         {
             try
             {
-                // Load the XML file with default XmlLoadOptions
+                // Prepare load options for XML (no XSL required)
                 XmlLoadOptions loadOptions = new XmlLoadOptions();
 
-                // Use the Document constructor that accepts the XML file path and load options
+                // Load XML and convert to PDF
                 using (Document pdfDoc = new Document(xmlPath, loadOptions))
                 {
-                    // Build the output PDF file name
+                    // Determine output PDF file name (same base name, .pdf extension)
                     string pdfFileName = Path.GetFileNameWithoutExtension(xmlPath) + ".pdf";
                     string pdfPath = Path.Combine(outputFolder, pdfFileName);
 
-                    // Save the document as PDF
+                    // Save as PDF (Document.Save without SaveOptions writes PDF)
                     pdfDoc.Save(pdfPath);
-
-                    Console.WriteLine($"Converted: '{xmlPath}' → '{pdfPath}'");
                 }
+
+                Console.WriteLine($"Converted: {Path.GetFileName(xmlPath)} → {Path.GetFileNameWithoutExtension(xmlPath)}.pdf");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error converting '{xmlPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{xmlPath}': {ex.Message}");
             }
         }
+
+        Console.WriteLine("Batch conversion completed.");
     }
 }

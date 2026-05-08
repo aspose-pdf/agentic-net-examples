@@ -1,95 +1,65 @@
 using System;
 using System.IO;
-using System.Drawing;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
 
-class ReplaceImagesWithQr
+class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdfPath   = "input.pdf";
+        const string outputPdfPath  = "output.pdf";
+        const string placeholderImg = "placeholder.png"; // QR‑code image prepared beforehand
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            return;
+        }
+
+        if (!File.Exists(placeholderImg))
+        {
+            Console.Error.WriteLine($"Placeholder image not found: {placeholderImg}");
             return;
         }
 
         // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
             // Iterate over all pages (1‑based indexing)
-            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
             {
-                // Process only odd pages
-                if (pageNum % 2 == 0) continue;
-
-                Page page = doc.Pages[pageNum];
-
-                // Find all image placements on the current page
-                ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
-                page.Accept(absorber);
-
-                foreach (ImagePlacement imgPlacement in absorber.ImagePlacements)
+                // Process only odd‑numbered pages
+                if (pageIndex % 2 == 1)
                 {
-                    // Build a text that would be encoded in a QR code (placeholder)
-                    string qrText = $"Page {pageNum} Image at [{imgPlacement.Rectangle.LLX:F0},{imgPlacement.Rectangle.LLY:F0}]";
+                    Page page = pdfDoc.Pages[pageIndex];
+                    var imageCollection = page.Resources.Images;
 
-                    // Generate a simple PNG that contains the QR placeholder text.
-                    // In a real scenario you could use Aspose.Pdf.Barcode.QRBarcode when the assembly is referenced.
-                    using (MemoryStream placeholderStream = GenerateQrPlaceholderImage(qrText, (int)imgPlacement.Rectangle.Width, (int)imgPlacement.Rectangle.Height))
+                    // XImageCollection uses 1‑based indexing as well
+                    int imageCount = imageCollection.Count;
+
+                    for (int imgIdx = 1; imgIdx <= imageCount; imgIdx++)
                     {
-                        // Replace the original image with the placeholder image
-                        imgPlacement.Replace(placeholderStream);
+                        // Retrieve the original image (optional – for alt text)
+                        XImage originalImage = imageCollection[imgIdx];
+
+                        // Set alternative text indicating replacement (helps accessibility)
+                        originalImage.TrySetAlternativeText(
+                            $"Image on page {pageIndex} replaced by QR‑code placeholder.", page);
+
+                        // Replace the image with the prepared QR‑code placeholder
+                        using (FileStream placeholderStream = File.OpenRead(placeholderImg))
+                        {
+                            // Replace expects a stream containing JPEG data; ensure the placeholder is JPEG
+                            imageCollection.Replace(imgIdx, placeholderStream);
+                        }
                     }
                 }
             }
 
-            // Save the modified document
-            doc.Save(outputPath);
+            // Save the modified PDF
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
-    }
-
-    /// <summary>
-    /// Generates a PNG image containing the supplied text. The image size matches the original image dimensions.
-    /// This acts as a stand‑in for a QR code when the Aspose.Pdf.Barcode assembly is not referenced.
-    /// </summary>
-    private static MemoryStream GenerateQrPlaceholderImage(string text, int width, int height)
-    {
-        // Ensure a minimum size to keep the image readable.
-        width = Math.Max(width, 100);
-        height = Math.Max(height, 100);
-
-        Bitmap bitmap = new Bitmap(width, height);
-        using (Graphics g = Graphics.FromImage(bitmap))
-        {
-            g.Clear(System.Drawing.Color.White);
-            // Draw a simple border to mimic a QR code appearance.
-            using (Pen pen = new Pen(System.Drawing.Color.Black, 2))
-            {
-                g.DrawRectangle(pen, 1, 1, width - 2, height - 2);
-            }
-            // Draw the placeholder text centered.
-            using (Font font = new Font("Arial", 8))
-            {
-                StringFormat sf = new StringFormat
-                {
-                    Alignment = StringAlignment.Center,
-                    LineAlignment = StringAlignment.Center
-                };
-                RectangleF rect = new RectangleF(0, 0, width, height);
-                g.DrawString(text, font, Brushes.Black, rect, sf);
-            }
-        }
-
-        MemoryStream ms = new MemoryStream();
-        bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
-        ms.Position = 0;
-        bitmap.Dispose();
-        return ms;
+        Console.WriteLine($"PDF saved with placeholders: {outputPdfPath}");
     }
 }

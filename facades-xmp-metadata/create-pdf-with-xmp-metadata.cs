@@ -1,41 +1,33 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string outputPdf = "new_with_xmp.pdf";
+        // Output PDF path
+        const string outputPath = "generated_with_xmp.pdf";
 
-        // Create a new empty PDF document
+        // Create a new PDF document and add a blank page
         using (Document doc = new Document())
         {
-            // Add a blank page so the PDF is not empty
             doc.Pages.Add();
 
-            // Initialize XMP metadata facade and bind it to the document
-            using (PdfXmpMetadata xmp = new PdfXmpMetadata())
-            {
-                xmp.BindPdf(doc);
+            // Register the namespaces that will be used in the XMP keys
+            doc.Metadata.RegisterNamespaceUri("dc", "http://purl.org/dc/elements/1.1/");
+            doc.Metadata.RegisterNamespaceUri("xmp", "http://ns.adobe.com/xap/1.0/");
 
-                // Register a common namespace (Dublin Core) – optional but recommended
-                xmp.RegisterNamespaceURI("dc", "http://purl.org/dc/elements/1.1/");
+            // Add custom XMP entries via the metadata indexer
+            doc.Metadata["dc:title"] = "Sample PDF with XMP Metadata";
+            doc.Metadata["dc:creator"] = "Aspose.Pdf Example";
+            // XMP expects dates in ISO‑8601 format
+            doc.Metadata["xmp:CreateDate"] = DateTime.UtcNow.ToString("o");
 
-                // Add standard XMP properties using string keys
-                xmp.Add("dc:title", "My New PDF Document");
-                xmp.Add("dc:creator", "John Doe");
-                xmp.Add("dc:description", "Sample PDF created with Aspose.Pdf and custom XMP metadata.");
-
-                // Add a custom property (no special namespace required)
-                xmp.Add("xmp:Nickname", "SampleNick");
-
-                // Save the PDF with the newly created XMP metadata block
-                xmp.Save(outputPdf);
-            }
+            // Save the PDF – the XMP block is now embedded in the file
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with XMP metadata saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF created with XMP metadata: {outputPath}");
     }
 }

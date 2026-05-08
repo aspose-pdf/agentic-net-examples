@@ -2,33 +2,33 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-namespace ExportAnnotationsApp
+class Program
 {
-    class Program
+    static void Main()
     {
-        static void Main()
+        const string inputPdf = "input.pdf";
+        const string outputXfdf = "annotations.xfdf";
+
+        if (!File.Exists(inputPdf))
         {
-            // Input PDF file containing annotations
-            const string inputPdfPath = "input.pdf";
+            Console.Error.WriteLine($"File not found: {inputPdf}");
+            return;
+        }
 
-            // Output XFDF file where annotations will be exported
-            const string outputXfdfPath = "annotations.xfdf";
-
-            // Verify that the source PDF exists
-            if (!File.Exists(inputPdfPath))
+        try
+        {
+            // Load the PDF document; the using block ensures proper disposal.
+            using (Document pdfDoc = new Document(inputPdf))
             {
-                Console.Error.WriteLine($"Error: File not found – {inputPdfPath}");
-                return;
+                // Export all annotations in the document to an XFDF file.
+                pdfDoc.ExportAnnotationsToXfdf(outputXfdf);
             }
 
-            // Load the PDF document inside a using block for deterministic disposal
-            using (var pdfDoc = new Document(inputPdfPath))
-            {
-                // Export all annotations to the specified XFDF file
-                pdfDoc.ExportAnnotationsToXfdf(outputXfdfPath);
-            }
-
-            Console.WriteLine($"Annotations exported successfully to '{outputXfdfPath}'.");
+            Console.WriteLine($"Annotations successfully exported to '{outputXfdf}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during export: {ex.Message}");
         }
     }
 }

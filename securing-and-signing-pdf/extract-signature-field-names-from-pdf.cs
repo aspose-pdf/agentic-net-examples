@@ -15,28 +15,28 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document (using block ensures proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document actually contains a form
-            if (doc.Form == null || doc.Form.Count == 0)
+            // Access the form object; it may be empty if the PDF has no form fields
+            Form form = doc.Form;
+            if (form == null || form.Count == 0)
             {
                 Console.WriteLine("No form fields found in the document.");
                 return;
             }
 
             // Iterate over all fields and pick out the signature fields
-            foreach (Field field in doc.Form.Fields)
+            foreach (Field field in form)
             {
-                if (field is SignatureField signature)
+                if (field is SignatureField signatureField)
                 {
-                    // FullName gives the qualified field name
-                    string fieldName = signature.FullName;
+                    // FullName provides the qualified field name
+                    string fieldName = signatureField.FullName;
+                    // PageIndex is 1‑based, matching Aspose.Pdf's page indexing
+                    int pageNumber = signatureField.PageIndex;
 
-                    // PageIndex returns the page number containing the field (1‑based)
-                    int pageNumber = signature.PageIndex;
-
-                    Console.WriteLine($"Signature Field: '{fieldName}' on page {pageNumber}");
+                    Console.WriteLine($"Signature field: '{fieldName}' on page {pageNumber}");
                 }
             }
         }

@@ -1,56 +1,49 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputCsvPath = "form_fields_report.csv";
+        const string inputPdf  = "input.pdf";      // source PDF with form fields
+        const string outputCsv = "fields_report.csv"; // CSV report file
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Load the PDF document
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Bind the document to FormEditor (required by the task)
+            using (FormEditor formEditor = new FormEditor(doc))
             {
-                // Retrieve all form fields from the document
-                var formFields = pdfDoc.Form?.Fields;
-
-                // Prepare CSV writer
-                using (StreamWriter writer = new StreamWriter(outputCsvPath, false))
+                // FormEditor does not expose field information, so use Form facade
+                using (Form form = new Form(doc))
                 {
-                    // Write CSV header
-                    writer.WriteLine("FieldName,FieldType");
+                    string[] fieldNames = form.FieldNames;
 
-                    if (formFields != null)
+                    using (StreamWriter writer = new StreamWriter(outputCsv))
                     {
-                        // Iterate over each field and write its name and type
-                        foreach (var field in formFields)
+                        // CSV header
+                        writer.WriteLine("FieldName,FieldType");
+
+                        // Enumerate each field, obtain its type, and write to CSV
+                        foreach (string name in fieldNames)
                         {
-                            // Most fields expose their name via PartialName; fallback to Name if null
-                            string fieldName = field.PartialName ?? field.Name ?? string.Empty;
-                            // Use the concrete .NET type name as the field type (e.g., TextBoxField, CheckBoxField)
-                            string fieldType = field.GetType().Name;
-                            writer.WriteLine($"{fieldName},{fieldType}");
+                            // GetFieldType returns an enum value describing the field type
+                            var fieldType = form.GetFieldType(name);
+                            writer.WriteLine($"{name},{fieldType}");
                         }
                     }
-                }
 
-                Console.WriteLine($"Form fields report saved to '{outputCsvPath}'.");
+                    Console.WriteLine($"Form fields report saved to '{outputCsv}'.");
+                }
             }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

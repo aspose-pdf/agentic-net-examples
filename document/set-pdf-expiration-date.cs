@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -6,25 +7,43 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "expire.pdf";
+        const string inputPdf  = "input.pdf";      // source PDF
+        const string outputPdf = "expired.pdf";    // PDF with expiry script
+        // Set the desired expiry date (year, month, day)
+        DateTime expiryDate = new DateTime(2025, 12, 31);
 
-        // Define the expiration date (e.g., December 31, 2025)
-        DateTime expirationDate = new DateTime(2025, 12, 31);
-        // Format the date for JavaScript (MM/dd/yyyy)
-        string jsDate = expirationDate.ToString("MM/dd/yyyy");
+        if (!File.Exists(inputPdf))
+        {
+            Console.Error.WriteLine($"File not found: {inputPdf}");
+            return;
+        }
 
-        // JavaScript that closes the document if the current date is past the expiration date
-        string script = $"if (new Date() > new Date('{jsDate}')) {{ this.closeDoc(); }}";
+        // JavaScript that checks the current date against the expiry date.
+        // If the document is opened after the expiry date, an alert is shown and the document is closed.
+        string jsCode = $@"
+var expiry = new Date({expiryDate.Year}, {expiryDate.Month - 1}, {expiryDate.Day});
+if (new Date() > expiry) {{
+    app.alert('This document has expired on {expiryDate:yyyy-MM-dd}.');
+    this.closeDoc();
+}}";
 
-        // Create a new PDF document (no external input file required)
-        Document pdfDoc = new Document();
-        // Add at least one blank page so the document is not empty
-        pdfDoc.Pages.Add();
+        try
+        {
+            // Open the existing PDF inside a using block for deterministic disposal.
+            using (Document doc = new Document(inputPdf))
+            {
+                // Assign the JavaScript as a document‑level open action.
+                doc.OpenAction = new JavascriptAction(jsCode);
 
-        // Embed the JavaScript as an OpenAction
-        pdfDoc.OpenAction = new JavascriptAction(script);
+                // Save the modified PDF.
+                doc.Save(outputPdf);
+            }
 
-        // Save the result
-        pdfDoc.Save(outputPath);
+            Console.WriteLine($"PDF with expiry date saved to '{outputPdf}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

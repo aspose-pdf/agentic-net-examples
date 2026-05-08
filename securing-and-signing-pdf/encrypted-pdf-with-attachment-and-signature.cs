@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -8,66 +10,48 @@ class Program
     static void Main()
     {
         const string outputPath = "encrypted_signed.pdf";
-        const string attachmentPath = "attachment.txt";   // file to embed
-        const string pfxPath = "certificate.pfx";        // signing certificate
-        const string pfxPassword = "pfxPassword";        // certificate password
-        const string userPassword = "user123";           // PDF user password
-        const string ownerPassword = "owner123";         // PDF owner password
+        const string attachmentPath = "sample.txt";
+        const string certPath = "signcert.pfx";
+        const string certPassword = "password";
 
-        // Ensure the source files exist
-        if (!File.Exists(attachmentPath))
+        // Verify required files exist
+        if (!File.Exists(attachmentPath) || !File.Exists(certPath))
         {
-            Console.Error.WriteLine($"Attachment not found: {attachmentPath}");
+            Console.Error.WriteLine("Required files not found.");
             return;
         }
-        if (!File.Exists(pfxPath))
-        {
-            Console.Error.WriteLine($"Certificate not found: {pfxPath}");
-            return;
-        }
+
+        // Load the certificate used for both encryption and signing
+        X509Certificate2 cert = new X509Certificate2(certPath, certPassword);
+        IList<X509Certificate2> certList = new List<X509Certificate2> { cert };
 
         // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a blank page (required for the signature field)
+            // Add a blank page to host the signature field
             Page page = doc.Pages.Add();
 
-            // -------------------------------------------------
-            // 1. Embed an attachment into the PDF (document‑level attachment)
-            // -------------------------------------------------
-            // Use the constructor that accepts the file path and a description.
-            FileSpecification fileSpec = new FileSpecification(attachmentPath, Path.GetFileName(attachmentPath));
+            // Attach a file to the PDF using FileSpecification
+            FileSpecification fileSpec = new FileSpecification(attachmentPath);
             doc.EmbeddedFiles.Add(fileSpec);
 
-            // -------------------------------------------------
-            // 2. Add a signature field to the document
-            // -------------------------------------------------
-            // Define the rectangle where the signature appearance will be placed
+            // Encrypt the document for the recipient certificate using AES‑256
+            doc.Encrypt(Permissions.PrintDocument | Permissions.ExtractContent,
+                        CryptoAlgorithm.AESx256,
+                        certList);
+
+            // Define a rectangle for the signature field (fully qualified to avoid ambiguity)
             Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-            // Create the signature field and add it to the form collection
-            SignatureField signatureField = new SignatureField(page, sigRect);
-            doc.Form.Add(signatureField);
+            SignatureField sigField = new SignatureField(page, sigRect);
+            doc.Form.Add(sigField);
 
-            // -------------------------------------------------
-            // 3. Sign the document using a PKCS#7 detached signature
-            // -------------------------------------------------
-            using (FileStream pfxStream = File.OpenRead(pfxPath))
-            {
-                // PKCS7Detached(Stream pfx, string password) creates a detached signature
-                PKCS7Detached pkcs7Signature = new PKCS7Detached(pfxStream, pfxPassword);
-                // Sign the field
-                signatureField.Sign(pkcs7Signature);
-            }
+            // Create a PKCS#1 signature object using the same certificate
+            PKCS1 pkcs1 = new PKCS1(certPath, certPassword);
 
-            // -------------------------------------------------
-            // 4. Encrypt the entire PDF (including attachments and signature)
-            // -------------------------------------------------
-            Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
-            doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+            // Apply the digital signature to the signature field
+            sigField.Sign(pkcs1);
 
-            // -------------------------------------------------
-            // 5. Save the final PDF
-            // -------------------------------------------------
+            // Save the encrypted and signed PDF
             doc.Save(outputPath);
         }
 

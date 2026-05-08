@@ -1,82 +1,81 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf.Facades;          // PdfPageEditor
-using Aspose.Pdf;                 // Document, PageSize class (fully qualified when needed)
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
-class Program
+class BatchPageSizeProcessor
 {
+    // Map file name patterns to desired page sizes.
+    // Extend this dictionary as needed for your printing requirements.
+    private static readonly Dictionary<string, PageSize> PageSizeMap = new Dictionary<string, PageSize>(StringComparer.OrdinalIgnoreCase)
+    {
+        { "A4", PageSize.A4 },
+        // Letter and Legal are not available in older Aspose.Pdf versions; use explicit dimensions (points).
+        // 1 inch = 72 points. Letter = 8.5" x 11" => 612 x 792 points.
+        // Legal = 8.5" x 14" => 612 x 1008 points.
+        { "Letter", new PageSize(612, 792) },
+        { "Legal", new PageSize(612, 1008) }
+        // Add more mappings here.
+    };
+
     static void Main()
     {
-        // Folder containing source PDFs
-        const string inputFolder = "InputPdfs";
-        // Folder where processed PDFs will be saved
-        const string outputFolder = "OutputPdfs";
+        // Use paths that are safe on any OS. They are built relative to the executable's folder.
+        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        string inputFolder = Path.Combine(baseDir, "PdfInput");   // Folder containing source PDFs.
+        string outputFolder = Path.Combine(baseDir, "PdfOutput"); // Folder where processed PDFs will be saved.
 
+        // Ensure the input and output directories exist.
         if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Input folder does not exist: {inputFolder}");
             return;
         }
-
-        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Process each PDF file in the input folder
-        foreach (string sourcePath in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Process each PDF file in the input folder.
+        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
             try
             {
-                // Determine the required page size for this document
-                PageSize targetSize = GetDesiredPageSize(sourcePath);
+                // Determine the target page size based on the file name.
+                PageSize targetSize = DeterminePageSize(Path.GetFileNameWithoutExtension(inputPath));
 
-                // Build the output file path (overwrite same name in output folder)
-                string fileName = Path.GetFileName(sourcePath);
-                string destinationPath = Path.Combine(outputFolder, fileName);
+                // Build the output file path (same name, different folder).
+                string outputPath = Path.Combine(outputFolder, Path.GetFileName(inputPath));
 
-                // Use PdfPageEditor (Facade) to change the page size
+                // Use PdfPageEditor (a Facade) to change the page size.
+                // BindPdf loads the document; PageSize sets the new size for all pages;
+                // ApplyChanges writes the modifications; Save writes the result.
                 using (PdfPageEditor editor = new PdfPageEditor())
                 {
-                    // Bind the source PDF
-                    editor.BindPdf(sourcePath);
-                    // Set the new page size for all pages
+                    editor.BindPdf(inputPath);
                     editor.PageSize = targetSize;
-                    // Apply the changes to the document
                     editor.ApplyChanges();
-                    // Save the modified PDF
-                    editor.Save(destinationPath);
+                    editor.Save(outputPath);
                 }
 
-                Console.WriteLine($"Processed '{fileName}' with page size {targetSize.Width}x{targetSize.Height}");
+                Console.WriteLine($"Processed '{inputPath}' → '{outputPath}' with page size {targetSize}.");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{sourcePath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
             }
         }
     }
 
-    // Example logic to decide page size per document.
-    // Replace with real business rules as needed.
-    static PageSize GetDesiredPageSize(string pdfPath)
+    // Simple heuristic: look for a known keyword in the file name.
+    // Returns A4 as default if no specific match is found.
+    private static PageSize DeterminePageSize(string fileNameWithoutExtension)
     {
-        string name = Path.GetFileNameWithoutExtension(pdfPath).ToLowerInvariant();
+        foreach (var kvp in PageSizeMap)
+        {
+            if (fileNameWithoutExtension.IndexOf(kvp.Key, StringComparison.OrdinalIgnoreCase) >= 0)
+                return kvp.Value;
+        }
 
-        // Aspose.Pdf.PageSize does not expose Letter/Legal in recent versions.
-        // Use explicit dimensions (points) for those sizes.
-        // 1 point = 1/72 inch.
-        // Letter  = 8.5" x 11"   => 612 x 792 points
-        // Legal   = 8.5" x 14"   => 612 x 1008 points
-        // A5      = 148 x 210 mm => 420 x 595 points (approx)
-        // A4      = 210 x 297 mm => 595 x 842 points (approx)
-
-        if (name.Contains("letter"))
-            return new PageSize(612, 792); // Letter
-        if (name.Contains("legal"))
-            return new PageSize(612, 1008); // Legal
-        if (name.Contains("a5"))
-            return PageSize.A5;
-
-        // Default page size (A4)
+        // Default page size if no match.
         return PageSize.A4;
     }
 }

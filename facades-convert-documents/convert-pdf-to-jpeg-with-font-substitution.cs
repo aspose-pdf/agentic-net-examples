@@ -1,85 +1,57 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging;               // ImageFormat for JPEG output
-using Aspose.Pdf;                           // Core PDF API
-using Aspose.Pdf.Facades;                   // PdfConverter facade
-using Aspose.Pdf.Text;                      // PdfSaveOptions (for font substitution)
+using System.Drawing.Imaging;          // ImageFormat enum
+using Aspose.Pdf;                     // Document, PdfSaveOptions
+using Aspose.Pdf.Facades;             // PdfConverter
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file (will be created if it does not exist)
-        const string inputPdfPath = "input.pdf";
+        const string inputPdfPath   = "input.pdf";          // source PDF
+        const string outputDir      = "Images";            // folder for JPEGs
+        const string fallbackFont   = "Arial";             // font used when original is missing
 
-        // Folder where JPEG images will be saved
-        const string outputFolder = "Images";
-
-        // Font to use when the original PDF references a missing font
-        const string substituteFontName = "Arial";
-
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
-
-        // ---------------------------------------------------------------------
-        // Ensure a source PDF exists – create a minimal one if it is missing.
-        // This makes the sample self‑contained and prevents the FileNotFoundException.
-        // ---------------------------------------------------------------------
         if (!File.Exists(inputPdfPath))
         {
-            using (Document tempDoc = new Document())
-            {
-                // Add a simple page with some text so that the conversion has content.
-                Page page = tempDoc.Pages.Add();
-                page.Paragraphs.Add(new TextFragment("Sample PDF generated because 'input.pdf' was missing."));
-                tempDoc.Save(inputPdfPath);
-            }
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            return;
         }
 
-        // Load the source PDF inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputDir);
+
+        // Load the PDF document
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Configure font substitution: any missing font will be replaced by the specified font
-            PdfSaveOptions saveOptions = new PdfSaveOptions
+            // Apply custom font substitution by saving to a memory stream
+            // with a default font name for any missing fonts.
+            using (MemoryStream tempPdf = new MemoryStream())
             {
-                DefaultFontName = substituteFontName
-            };
+                PdfSaveOptions saveOptions = new PdfSaveOptions();
+                saveOptions.DefaultFontName = fallbackFont;   // rule: set default font for missing fonts
+                doc.Save(tempPdf, saveOptions);
+                tempPdf.Position = 0; // reset stream for reading
 
-            // Save the (potentially font‑substituted) PDF into a memory stream
-            using (MemoryStream pdfStream = new MemoryStream())
-            {
-                pdfDoc.Save(pdfStream, saveOptions);
-                pdfStream.Position = 0; // Reset stream position for reading
+                // Convert each page of the (font‑substituted) PDF to JPEG images
+                PdfConverter converter = new PdfConverter();
+                converter.BindPdf(tempPdf);
+                converter.DoConvert();
 
-                // Convert each page to a JPEG image using PdfConverter
-                using (PdfConverter converter = new PdfConverter())
+                int pageIndex = 1;
+                while (converter.HasNextImage())
                 {
-                    // Bind the in‑memory PDF to the converter
-                    converter.BindPdf(pdfStream);
-
-                    // Prepare the converter (parses the document, calculates page count, etc.)
-                    converter.DoConvert();
-
-                    int pageNumber = 1;
-                    // -----------------------------------------------------------------
-                    // Suppress the platform‑specific CA1416 warning for ImageFormat.Jpeg.
-                    // The Aspose API internally handles the platform differences.
-                    // -----------------------------------------------------------------
-#pragma warning disable CA1416 // Validate platform compatibility
-                    while (converter.HasNextImage())
-                    {
-                        string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.jpg");
-
-                        // Save the current page as JPEG with a quality setting (0‑100)
-                        converter.GetNextImage(outputPath, ImageFormat.Jpeg, 90);
-
-                        pageNumber++;
-                    }
-#pragma warning restore CA1416 // Validate platform compatibility
+                    string outFile = Path.Combine(outputDir, $"page_{pageIndex}.jpg");
+                    // GetNextImage with JPEG format (default quality)
+                    converter.GetNextImage(outFile, ImageFormat.Jpeg);
+                    pageIndex++;
                 }
+
+                // Release resources held by the converter
+                converter.Close();
             }
         }
 
-        Console.WriteLine("PDF conversion to JPEG images completed.");
+        Console.WriteLine("PDF has been converted to JPEG images.");
     }
 }

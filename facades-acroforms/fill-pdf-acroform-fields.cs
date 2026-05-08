@@ -3,103 +3,89 @@ using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-public static class PdfFormFiller
+namespace AsposePdfApi
 {
     /// <summary>
-    /// Fills the form fields of a PDF file using the provided field values and saves the result.
+    /// Provides functionality to fill AcroForm fields in a PDF document using Aspose.Pdf.Facades.Form.
     /// </summary>
-    /// <param name="pdfPath">Path to the source PDF containing form fields.</param>
-    /// <param name="fieldValues">Dictionary where the key is the fully‑qualified field name and the value is the data to fill.</param>
-    /// <param name="outputPath">Path where the filled PDF will be saved.</param>
-    public static void FillPdfForm(string pdfPath, Dictionary<string, object> fieldValues, string outputPath)
+    public static class PdfFormFiller
     {
-        // Ensure the source file exists
-        if (!File.Exists(pdfPath))
-            throw new FileNotFoundException($"Source PDF not found: {pdfPath}");
-
-        // Use the Form facade to work with AcroForm fields
-        using (var form = new Form(pdfPath))
+        /// <summary>
+        /// Fills AcroForm fields in a PDF document using Aspose.Pdf.Facades.Form and saves the result.
+        /// </summary>
+        /// <param name="inputPdfPath">Path to the source PDF containing form fields.</param>
+        /// <param name="fieldValues">Dictionary where key = fully‑qualified field name, value = value to set.</param>
+        /// <param name="outputPdfPath">Path where the filled PDF will be saved.</param>
+        public static void FillPdfForm(string inputPdfPath, IDictionary<string, string> fieldValues, string outputPdfPath)
         {
-            // Iterate over each field/value pair and apply the appropriate FillField overload
-            foreach (KeyValuePair<string, object> kvp in fieldValues)
-            {
-                string fieldName = kvp.Key;
-                object value = kvp.Value;
+            if (string.IsNullOrEmpty(inputPdfPath))
+                throw new ArgumentException("Input PDF path must be provided.", nameof(inputPdfPath));
 
-                if (value is string s)
+            if (string.IsNullOrEmpty(outputPdfPath))
+                throw new ArgumentException("Output PDF path must be provided.", nameof(outputPdfPath));
+
+            if (!File.Exists(inputPdfPath))
+                throw new FileNotFoundException($"Input PDF not found: {inputPdfPath}");
+
+            // The Form class implements SaveableFacade which is IDisposable.
+            // Use a using block to ensure proper resource cleanup.
+            using (Form form = new Form(inputPdfPath))
+            {
+                // Iterate over the supplied field/value pairs and fill each field.
+                foreach (KeyValuePair<string, string> kvp in fieldValues)
                 {
-                    // Text field
-                    form.FillField(fieldName, s);
+                    // FillField(string fieldName, string fieldValue) returns a bool indicating success.
+                    // Ignoring the return value here; in production code you might log failures.
+                    form.FillField(kvp.Key, kvp.Value);
                 }
-                else if (value is bool b)
+
+                // Save the modified document to the specified output path.
+                form.Save(outputPdfPath);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Simple console entry point required for a buildable executable.
+    /// Accepts input PDF, output PDF and optional field=value pairs.
+    /// </summary>
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            // Expected usage: <exe> <inputPdfPath> <outputPdfPath> [field=value ...]
+            if (args.Length < 2)
+            {
+                Console.WriteLine("Usage: AsposePdfApi <inputPdfPath> <outputPdfPath> [field=value ...]");
+                return;
+            }
+
+            string inputPath = args[0];
+            string outputPath = args[1];
+
+            var fieldValues = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            for (int i = 2; i < args.Length; i++)
+            {
+                var parts = args[i].Split(new[] { '=' }, 2);
+                if (parts.Length == 2)
                 {
-                    // Check box field
-                    form.FillField(fieldName, b);
-                }
-                else if (value is int i)
-                {
-                    // Radio button, combo box or list box (by index)
-                    form.FillField(fieldName, i);
-                }
-                else if (value is string[] arr)
-                {
-                    // List box with multiple selections
-                    form.FillField(fieldName, arr);
-                }
-                else if (value != null)
-                {
-                    // Fallback: convert to string and fill as text
-                    form.FillField(fieldName, value.ToString());
+                    fieldValues[parts[0]] = parts[1];
                 }
                 else
                 {
-                    // Null value – treat as empty string
-                    form.FillField(fieldName, string.Empty);
+                    Console.WriteLine($"Ignoring invalid argument '{args[i]}'. Expected format field=value.");
                 }
             }
 
-            // Save the modified document to the desired output location
-            form.Save(outputPath);
-        }
-    }
-}
-
-public class Program
-{
-    /// <summary>
-    /// Minimal entry point required for compilation. Demonstrates how to call PdfFormFiller.
-    /// </summary>
-    public static void Main(string[] args)
-    {
-        // Expected arguments: <pdfPath> <outputPath> <fieldName>=<value> [more pairs...]
-        if (args.Length < 3)
-        {
-            Console.WriteLine("Usage: <pdfPath> <outputPath> <fieldName>=<value> [more pairs...]");
-            return;
-        }
-
-        string pdfPath = args[0];
-        string outputPath = args[1];
-        var fieldValues = new Dictionary<string, object>();
-
-        for (int i = 2; i < args.Length; i++)
-        {
-            var pair = args[i].Split(new[] { '=' }, 2);
-            if (pair.Length == 2)
+            try
             {
-                // Simple parsing – everything after '=' is treated as a string value.
-                fieldValues[pair[0]] = pair[1];
+                PdfFormFiller.FillPdfForm(inputPath, fieldValues, outputPath);
+                Console.WriteLine($"PDF form filled successfully. Saved to '{outputPath}'.");
             }
-        }
-
-        try
-        {
-            PdfFormFiller.FillPdfForm(pdfPath, fieldValues, outputPath);
-            Console.WriteLine($"Form filled successfully. Saved to: {outputPath}");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error filling PDF form: {ex.Message}");
+            }
         }
     }
 }

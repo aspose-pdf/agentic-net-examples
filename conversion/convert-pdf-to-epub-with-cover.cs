@@ -1,62 +1,60 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF, output EPUB and cover image paths
-        const string inputPdfPath  = "input.pdf";
-        const string outputEpubPath = "output.epub";
-        const string coverImagePath = "cover.jpg";
+        // Input PDF, cover image and output EPUB paths
+        const string pdfPath   = "input.pdf";
+        const string coverPath = "cover.jpg";
+        const string epubPath  = "output.epub";
 
-        // Validate input files
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
-        if (!File.Exists(coverImagePath))
+        if (!File.Exists(coverPath))
         {
-            Console.Error.WriteLine($"Cover image not found: {coverImagePath}");
+            Console.Error.WriteLine($"Cover image not found: {coverPath}");
             return;
         }
 
-        // Load the source PDF inside a using block for deterministic disposal
-        using (Document pdfDocument = new Document(inputPdfPath))
+        // Load the PDF inside a using block (ensures proper disposal)
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            // ----- Set PDF metadata (will be carried over to EPUB) -----
-            pdfDocument.Info.Title   = "Custom EPUB Title";
-            pdfDocument.Info.Author  = "Author Name";
-            pdfDocument.Info.Subject = "Subject of the EPUB";
+            // ----- Set PDF metadata (will be transferred to EPUB) -----
+            pdfDoc.Info.Title   = "My EPUB Title";
+            pdfDoc.Info.Author  = "Author Name";
+            pdfDoc.Info.Subject = "Subject of the EPUB";
 
-            // ----- Insert a new page at the beginning to act as cover -----
-            // Insert page at position 1 (Aspose.Pdf uses 1‑based indexing)
-            Page coverPage = pdfDocument.Pages.Insert(1);
-
-            // Create an Image object and point it to the cover file
-            Image coverImg = new Image();
-            coverImg.File = coverImagePath;
-
-            // Optionally, scale the image to fit the page dimensions
-            // (Here we simply add it; Aspose.Pdf will render it respecting page size)
+            // ----- Insert a cover page with the custom image -----
+            // Create a new page at the beginning of the document
+            Page coverPage = pdfDoc.Pages.Insert(1);
+            // Add the image to the page
+            Aspose.Pdf.Image coverImg = new Aspose.Pdf.Image();
+            coverImg.File = coverPath;
+            // Optionally scale the image to fit the page
+            coverImg.FixWidth = coverPage.PageInfo.Width;
+            coverImg.FixHeight = coverPage.PageInfo.Height;
             coverPage.Paragraphs.Add(coverImg);
 
             // ----- Prepare EPUB save options -----
-            EpubSaveOptions epubOptions = new EpubSaveOptions();
-
-            // Set the EPUB title (separate from PDF metadata)
-            epubOptions.Title = "Custom EPUB Title";
-
-            // Choose content recognition mode – Flow gives best reflow for e‑readers
-            epubOptions.ContentRecognitionMode = EpubSaveOptions.RecognitionMode.Flow;
+            EpubSaveOptions epubOptions = new EpubSaveOptions
+            {
+                // Set the EPUB title (metadata)
+                Title = "My EPUB Title",
+                // Choose a content recognition mode (optional, default is Flow)
+                ContentRecognitionMode = EpubSaveOptions.RecognitionMode.Flow
+            };
 
             // Save the document as EPUB using the options
-            pdfDocument.Save(outputEpubPath, epubOptions);
+            pdfDoc.Save(epubPath, epubOptions);
         }
 
-        Console.WriteLine($"PDF successfully converted to EPUB with cover image: '{outputEpubPath}'");
+        Console.WriteLine($"PDF successfully converted to EPUB: {epubPath}");
     }
 }

@@ -16,40 +16,33 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPath))
+            // Locate tables on the first page
+            TableAbsorber tableAbsorber = new TableAbsorber();
+            tableAbsorber.Visit(doc.Pages[1]);
+
+            // Ensure a table, row, cell, and text fragment exist
+            if (tableAbsorber.TableList.Count > 0 &&
+                tableAbsorber.TableList[0].RowList.Count > 0 &&
+                tableAbsorber.TableList[0].RowList[0].CellList.Count > 0)
             {
-                // Locate tables on the first page
-                TableAbsorber tableAbsorber = new TableAbsorber();
-                tableAbsorber.Visit(doc.Pages[1]);
-
-                if (tableAbsorber.TableList.Count == 0)
+                var cell = tableAbsorber.TableList[0].RowList[0].CellList[0];
+                if (cell.TextFragments.Count > 0)
                 {
-                    Console.WriteLine("No tables found on page 1.");
-                }
-                else
-                {
-                    // Access the first cell of the first table (adjust indices as needed)
-                    var cell = tableAbsorber.TableList[0].RowList[0].CellList[0];
+                    // Get the first text fragment in the cell
+                    TextFragment fragment = cell.TextFragments[0];
 
-                    // Rotate each text fragment inside the cell by 60 degrees
-                    foreach (TextFragment fragment in cell.TextFragments)
-                    {
-                        fragment.TextState.Rotation = 60; // Rotation in degrees
-                    }
+                    // Rotate the text by 60 degrees
+                    fragment.TextState.Rotation = 60;
                 }
-
-                // Save the modified PDF
-                doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
     }
 }

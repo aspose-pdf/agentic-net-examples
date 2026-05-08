@@ -1,63 +1,46 @@
 using System;
 using System.IO;
-using System.Drawing;                     // Required for System.Drawing.Color used by FormattedText
-using Aspose.Pdf;                         // Core PDF classes
-using Aspose.Pdf.Facades;                 // PdfFileStamp, Aspose.Pdf.Facades.Stamp, FormattedText
-using Aspose.Pdf.Text;                    // EncodingType enum
+using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Bind the source PDF to the facade
-        PdfFileStamp fileStamp = new PdfFileStamp();
-        fileStamp.BindPdf(inputPath);
+        // Load the source PDF
+        Document doc = new Document(inputPath);
 
-        // Build the date string in the required format
-        string dateString = DateTime.Now.ToString("yyyy-MM-dd");
+        // Retrieve the document creation date and format it as yyyy-MM-dd
+        DateTime creationDate = doc.Info.CreationDate;
+        string dateText = creationDate.ToString("yyyy-MM-dd");
 
-        // Create formatted text for the stamp (color, font, size)
-        // NOTE: Use System.Drawing.Color for the color argument and a float for the font size
-        FormattedText formatted = new FormattedText(
-            dateString,                     // text to display
-            System.Drawing.Color.Black,    // text color (System.Drawing.Color)
-            "Helvetica",                  // font name
-            EncodingType.Winansi,          // encoding
-            false,                         // embed font? (false = use system font)
-            12f);                          // font size (float)
+        // Create a text stamp that will be placed at the top‑left corner
+        TextStamp stamp = new TextStamp(dateText);
+        stamp.TextState.Font = FontRepository.FindFont("Helvetica");
+        stamp.TextState.FontSize = 12;
+        stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black; // fully‑qualified Aspose color
+        stamp.HorizontalAlignment = HorizontalAlignment.Left;
+        stamp.VerticalAlignment = VerticalAlignment.Top;
+        stamp.XIndent = 10f; // margin from the left edge
+        stamp.YIndent = 10f; // margin from the top edge
 
-        // Create the stamp and bind the formatted text
-        Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-        stamp.BindLogo(formatted);
+        // Apply the stamp to every page (or change to a specific page if needed)
+        foreach (Page page in doc.Pages)
+        {
+            page.AddStamp(stamp);
+        }
 
-        // Position the stamp at the top‑left corner.
-        // PdfFileStamp provides PageHeight (height of the first page).
-        // Origin is measured from the lower‑left corner, so Y = PageHeight - offset.
-        const float marginLeft = 10f;                     // left margin in points
-        const float marginTop  = 20f;                     // distance from top edge
-        float originY = fileStamp.PageHeight - marginTop; // Y coordinate from bottom
-        stamp.SetOrigin(marginLeft, originY);
-
-        // Ensure the stamp is drawn over the page content (default is false)
-        stamp.IsBackground = false;
-
-        // Add the stamp to the document
-        fileStamp.AddStamp(stamp);
-
-        // Save the result and release resources
-        fileStamp.Save(outputPath);
-        fileStamp.Close();
-
-        Console.WriteLine($"Aspose.Pdf.Facades.Stamp added. Output saved to '{outputPath}'.");
+        // Save the stamped PDF
+        doc.Save(outputPath);
+        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
     }
 }

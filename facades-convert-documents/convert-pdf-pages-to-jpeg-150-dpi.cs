@@ -1,16 +1,17 @@
 using System;
 using System.IO;
+using System.Drawing.Imaging; // for ImageFormat
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices;   // for Resolution
+using Aspose.Pdf.Devices; // for Resolution
 
 class PdfToJpegConverter
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputFolder  = "JpegPages";
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "output_images";
 
-        // Verify input file exists
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
@@ -20,37 +21,41 @@ class PdfToJpegConverter
         // Ensure output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Use PdfConverter (Facade) to convert pages to JPEG images
+        // Wrap Document in a using block for deterministic disposal
+        using (Document pdfDocument = new Document(inputPdfPath))
+        // Wrap PdfConverter in a using block (it implements IDisposable)
         using (PdfConverter converter = new PdfConverter())
         {
-            // Bind the source PDF file
-            converter.BindPdf(inputPdfPath);
+            // Bind the PDF document to the converter
+            converter.BindPdf(pdfDocument);
 
-            // Set the page range (1‑based indexing)
+            // Convert only pages 1 through 10 (1‑based indexing)
             converter.StartPage = 1;
             converter.EndPage   = 10;
 
-            // No need to set CoordinateType – CropBox is the default in recent Aspose.Pdf versions.
-
-            // Set resolution to 150 DPI (default is 150, set explicitly for clarity)
+            // Set resolution to 150 DPI (explicitly)
             converter.Resolution = new Resolution(150);
+
+            // NOTE: In recent Aspose.Pdf versions the CropBox coordinate type is the default
+            // and the former "PageCropBox" property has been removed. No additional code is
+            // required to use the CropBox when converting pages to images.
 
             // Prepare the converter
             converter.DoConvert();
 
-            int pageIndex = 1;
+            int imageIndex = 1;
             while (converter.HasNextImage())
             {
-                // Build output file name (e.g., page_1.jpg, page_2.jpg, ...)
-                string outputPath = Path.Combine(outputFolder, $"page_{pageIndex}.jpg");
+                // Build output file name (e.g., image1.jpg, image2.jpg, ...)
+                string outputFile = Path.Combine(outputFolder, $"image{imageIndex}.jpg");
 
-                // Save the current page as JPEG (default image format is JPEG)
-                converter.GetNextImage(outputPath);
+                // Save the current page as JPEG
+                converter.GetNextImage(outputFile, ImageFormat.Jpeg);
 
-                pageIndex++;
+                imageIndex++;
             }
         }
 
-        Console.WriteLine($"Pages 1‑10 have been converted to JPEG images in '{outputFolder}'.");
+        Console.WriteLine("Conversion completed.");
     }
 }

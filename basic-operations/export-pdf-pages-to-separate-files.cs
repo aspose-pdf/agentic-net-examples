@@ -6,40 +6,40 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // source PDF
-        const string outputDir = "ExportedPages";      // folder for individual pages
+        const string inputPath = "input.pdf";
+        const string outputDir = "output_pages";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Load the source document inside a using block for deterministic disposal
-        using (Document sourceDoc = new Document(inputPdf))
+        // Load the source PDF
+        using (Document srcDoc = new Document(inputPath))
         {
-            // Aspose.Pdf uses 1‑based page indexing
-            for (int pageNumber = 1; pageNumber <= sourceDoc.Pages.Count; pageNumber++)
+            int pageCount = srcDoc.Pages.Count; // 1‑based page count
+
+            // Iterate through each page
+            for (int i = 1; i <= pageCount; i++)
             {
-                // Create a new empty document for the current page
+                // Create a new document for the single page
                 using (Document singlePageDoc = new Document())
                 {
-                    // Add the specific page from the source document
-                    singlePageDoc.Pages.Add(sourceDoc.Pages[pageNumber]);
+                    // Add the current page to the new document
+                    singlePageDoc.Pages.Add(srcDoc.Pages[i]);
 
-                    // Build the output file name (e.g., Page_1.pdf)
-                    string outputPath = Path.Combine(outputDir, $"Page_{pageNumber}.pdf");
+                    // Build the output file name
+                    string outPath = Path.Combine(outputDir, $"page_{i}.pdf");
 
-                    // Save the single‑page document as PDF
-                    singlePageDoc.Save(outputPath);
-                    Console.WriteLine($"Saved page {pageNumber} → {outputPath}");
+                    // Save the single‑page PDF
+                    singlePageDoc.Save(outPath);
+                    Console.WriteLine($"Saved page {i} → {outPath}");
                 }
             }
         }
-
-        Console.WriteLine("All pages have been exported.");
     }
 }

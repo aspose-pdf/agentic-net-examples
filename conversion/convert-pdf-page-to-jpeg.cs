@@ -10,7 +10,7 @@ class Program
         // Input PDF file path
         const string inputPdfPath = "input.pdf";
         // Output JPEG file path
-        const string outputJpegPath = "page1_output.jpeg";
+        const string outputJpegPath = "page1.jpg";
         // Page number to convert (1‑based indexing)
         const int pageNumber = 1;
 
@@ -23,7 +23,7 @@ class Program
         // Load the PDF document inside a using block for deterministic disposal
         using (Document pdfDocument = new Document(inputPdfPath))
         {
-            // Validate the requested page number
+            // Validate requested page number
             if (pageNumber < 1 || pageNumber > pdfDocument.Pages.Count)
             {
                 Console.Error.WriteLine($"Invalid page number {pageNumber}. Document has {pdfDocument.Pages.Count} pages.");

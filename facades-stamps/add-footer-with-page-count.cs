@@ -2,42 +2,42 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text; // for FormattedText and EncodingType
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        // Paths to the source PDF and the resulting PDF with footer.
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        // Verify that the input file exists.
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Initialize the PdfFileStamp facade and bind the source PDF.
-        PdfFileStamp fileStamp = new PdfFileStamp();
-        fileStamp.BindPdf(inputPath);
+        // Create a PdfFileStamp facade and bind it to the source PDF.
+        // PdfFileStamp implements IDisposable via SaveableFacade, so we use a using block.
+        using (PdfFileStamp stampFacade = new PdfFileStamp())
+        {
+            // Bind the source PDF file.
+            stampFacade.BindPdf(inputPdf);
 
-        // Create formatted text for the footer.
-        // The placeholders {page_number} and {page_count} will be replaced automatically.
-        FormattedText footer = new FormattedText(
-            "Page {page_number} of {page_count}",
-            System.Drawing.Color.Gray,
-            "Helvetica",
-            EncodingType.Winansi,
-            false,
-            10); // font size
+            // Create a FormattedText object that contains the placeholder for total page count.
+            // The placeholder {page_count} is recognized by Aspose.Pdf and will be replaced
+            // with the actual number of pages when the document is saved.
+            FormattedText footerText = new FormattedText("Page {page_count}");
 
-        // Add the footer with a bottom margin of 20 units.
-        fileStamp.AddFooter(footer, 20);
+            // Add the footer to all pages. The second argument is the bottom margin (in points).
+            stampFacade.AddFooter(footerText, 10f);
 
-        // Save the stamped PDF and close the facade.
-        fileStamp.Save(outputPath);
-        fileStamp.Close();
+            // Save the modified PDF to the output path.
+            stampFacade.Save(outputPdf);
+        }
 
-        Console.WriteLine($"Footer stamp added and saved to '{outputPath}'.");
+        Console.WriteLine($"Footer with page count added successfully: {outputPdf}");
     }
 }

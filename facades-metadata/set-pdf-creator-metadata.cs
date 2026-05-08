@@ -16,14 +16,16 @@ class Program
             return;
         }
 
-        // Load the PDF file info, modify the Creator property, and save the changes.
+        // Load the PDF file info facade
         using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
         {
-            pdfInfo.Creator = creator;               // Assign custom Creator value
-            bool saved = pdfInfo.SaveNewInfo(outputPath); // Persist changes to a new file
+            // Assign a custom Creator value
+            pdfInfo.Creator = creator;
 
+            // Persist the changes to a new PDF file
+            bool saved = pdfInfo.SaveNewInfo(outputPath);
             Console.WriteLine(saved
-                ? $"Creator set successfully. Saved to '{outputPath}'."
+                ? $"Creator set and saved to '{outputPath}'."
                 : "Failed to save the updated PDF.");
         }
     }

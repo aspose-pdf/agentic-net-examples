@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.IO;
 using Aspose.Pdf;
 
 class Program
@@ -8,45 +8,34 @@ class Program
     {
         const string inputPath = "input.pdf";
 
-        // Ensure the file exists before processing
-        if (!System.IO.File.Exists(inputPath))
+        if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Open the PDF document inside a using block for deterministic disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // List to hold resolution info for reporting
-            var imageResolutions = new List<string>();
-
             // Iterate over all pages (1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                Page page = doc.Pages[pageIndex];
+                Page page = doc.Pages[i];
 
-                // Use ImagePlacementAbsorber to locate images on the page
+                // Search for image placements on the current page
                 ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
                 page.Accept(absorber);
 
-                // Collect resolution data for each image placement
+                Console.WriteLine($"Page {i}: {absorber.ImagePlacements.Count} image(s) found.");
+
+                // Report resolution (DPI) and visible size for each image
                 foreach (ImagePlacement placement in absorber.ImagePlacements)
                 {
-                    var res = placement.Resolution; // Resolution.X and Resolution.Y
-                    string info = $"Page {pageIndex}: " +
-                                  $"Image at [{placement.Rectangle.LLX}, {placement.Rectangle.LLY}, " +
-                                  $"{placement.Rectangle.Width}, {placement.Rectangle.Height}] " +
-                                  $"Resolution = {res.X} DPI (X), {res.Y} DPI (Y)";
-                    imageResolutions.Add(info);
+                    double dpiX = placement.Resolution.X;
+                    double dpiY = placement.Resolution.Y;
+                    Console.WriteLine($"  Image resolution: {dpiX} DPI (horizontal), {dpiY} DPI (vertical)");
+                    Console.WriteLine($"  Visible size: {placement.Rectangle.Width} x {placement.Rectangle.Height}");
                 }
-            }
-
-            // Output the collected metadata
-            Console.WriteLine("Image Resolution Report:");
-            foreach (string line in imageResolutions)
-            {
-                Console.WriteLine(line);
             }
         }
     }

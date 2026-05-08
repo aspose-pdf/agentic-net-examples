@@ -1,6 +1,7 @@
 using System;
-using System.Drawing.Imaging;
 using System.IO;
+using System.Drawing;
+using System.Drawing.Imaging;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -8,47 +9,53 @@ class ExtractSignatureImage
 {
     static void Main()
     {
-        const string pdfPath = "signed_document.pdf";   // input PDF containing a signature field
-        const string fieldName = "Signature1";          // name of the signature field to extract
-        const string outputPng = "signature_image.png"; // output PNG file
+        const string inputPdfPath = "signed_document.pdf";
+        const string outputPngPath = "signature_image.png";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Open the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(pdfPath))
+        // Load the PDF document
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Retrieve the signature field by name; cast to SignatureField
-            if (doc.Form[fieldName] is SignatureField sigField)
+            // Find the first signature field in the form
+            SignatureField sigField = null;
+            foreach (Field field in doc.Form)
             {
-                // Extract the appearance image as a JPEG encoded stream
-                using (Stream jpegStream = sigField.ExtractImage())
+                if (field is SignatureField sField)
                 {
-                    if (jpegStream == null)
-                    {
-                        Console.Error.WriteLine("No signature image found in the field.");
-                        return;
-                    }
-
-                    // Ensure the stream is positioned at the beginning
-                    jpegStream.Position = 0;
-
-                    // Load the JPEG stream into a System.Drawing.Image (fully qualified to avoid ambiguity)
-                    using (System.Drawing.Image jpegImage = System.Drawing.Image.FromStream(jpegStream))
-                    {
-                        // Save the image as PNG
-                        jpegImage.Save(outputPng, System.Drawing.Imaging.ImageFormat.Png);
-                        Console.WriteLine($"Signature image saved as PNG: {outputPng}");
-                    }
+                    sigField = sField;
+                    break;
                 }
             }
-            else
+
+            if (sigField == null)
             {
-                Console.Error.WriteLine($"Signature field '{fieldName}' not found.");
+                Console.Error.WriteLine("No signature field found in the document.");
+                return;
+            }
+
+            // Extract the signature image as a JPEG encoded stream
+            Stream jpegStream = sigField.ExtractImage();
+            if (jpegStream == null)
+            {
+                Console.Error.WriteLine("Signature image could not be extracted.");
+                return;
+            }
+
+            // Ensure the stream is positioned at the beginning
+            jpegStream.Position = 0;
+
+            // Load the JPEG stream into a System.Drawing.Image and save as PNG
+            using (System.Drawing.Image img = System.Drawing.Image.FromStream(jpegStream))
+            {
+                img.Save(outputPngPath, ImageFormat.Png);
             }
         }
+
+        Console.WriteLine($"Signature image saved as PNG to '{outputPngPath}'.");
     }
 }

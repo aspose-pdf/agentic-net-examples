@@ -1,71 +1,73 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Xml.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations; // Correct namespace for GoToAction
+using Aspose.Pdf.Text;
+using Aspose.Pdf.Annotations; // Added for XYZExplicitDestination
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";   // source PDF
-        const string inputXmlPath  = "sections.xml"; // XML with section titles
-        const string outputPdfPath = "output_with_outline.pdf";
+        const string xmlPath = "sections.xml";      // input XML file with section titles
+        const string outputPdf = "document_with_outline.pdf";
 
-        // Verify files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(inputXmlPath))
-        {
-            Console.Error.WriteLine($"XML not found: {inputXmlPath}");
+            Console.Error.WriteLine($"XML file not found: {xmlPath}");
             return;
         }
 
-        // Load the XML document containing section titles and page numbers
-        XDocument xmlDoc = XDocument.Load(inputXmlPath);
+        // Load XML and extract titles (assumes elements <section title="...">)
+        XDocument xdoc = XDocument.Load(xmlPath);
+        var titles = xdoc.Descendants("section")
+                         .Attributes("title")
+                         .Select(a => a.Value)
+                         .ToList();
 
-        // Open the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        if (titles.Count == 0)
         {
-            // Expected XML format:
-            // <Sections>
-            //   <Section title="Chapter 1" page="1" />
-            //   <Section title="Chapter 2" page="5" />
-            //   ...
-            // </Sections>
-            foreach (XElement section in xmlDoc.Root.Elements("Section"))
+            Console.Error.WriteLine("No section titles found in XML.");
+            return;
+        }
+
+        // Create a new PDF document
+        using (Document doc = new Document())
+        {
+            // Ensure the document has an outline collection
+            OutlineCollection outlines = doc.Outlines;
+
+            // Iterate over titles, create a page per title and a corresponding outline entry
+            for (int i = 0; i < titles.Count; i++)
             {
-                string title = (string)section.Attribute("title");
-                int pageNumber = (int?)section.Attribute("page") ?? 1; // default to first page if missing
+                string title = titles[i];
 
-                // Ensure the page number is within the PDF page range
-                if (pageNumber < 1 || pageNumber > pdfDoc.Pages.Count)
-                {
-                    Console.Error.WriteLine($"Invalid page number {pageNumber} for title \"{title}\". Skipping.");
-                    continue;
-                }
+                // Add a new page
+                Page page = doc.Pages.Add();
 
-                // Retrieve the target page (Aspose.Pdf uses 1‑based indexing)
-                Page targetPage = pdfDoc.Pages[pageNumber];
+                // Add the title as visible text on the page
+                TextFragment tf = new TextFragment(title);
+                tf.TextState.FontSize = 24;
+                tf.TextState.Font = FontRepository.FindFont("Helvetica");
+                tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+                page.Paragraphs.Add(tf);
 
-                // Create a new outline item linked to the target page
-                OutlineItemCollection outlineItem = new OutlineItemCollection(pdfDoc.Outlines)
-                {
-                    Title  = title,
-                    Action = new GoToAction(targetPage) // navigation action
-                };
+                // Create an outline item linked to this page
+                OutlineItemCollection outlineItem = new OutlineItemCollection(outlines);
+                outlineItem.Title = title;
+                // Destination: top‑left of the page, zoom 1.0
+                outlineItem.Destination = new XYZExplicitDestination(page, 0, page.PageInfo.Height, 1);
+                outlineItem.Open = true; // expanded in the outline pane
 
-                // Add the outline item to the document's outline collection
-                pdfDoc.Outlines.Add(outlineItem);
+                // Add the outline item to the document outline hierarchy
+                outlines.Add(outlineItem);
             }
 
-            // Save the modified PDF
-            pdfDoc.Save(outputPdfPath);
+            // Save the PDF
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF with custom outlines saved to '{outputPdfPath}'.");
+        Console.WriteLine($"PDF with custom outlines saved to '{outputPdf}'.");
     }
 }

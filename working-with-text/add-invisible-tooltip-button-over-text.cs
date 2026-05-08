@@ -1,17 +1,18 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_tooltip.pdf";
-        const string tooltip = "This is a tooltip for the highlighted text.";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string targetText = "Hover over this text";
+        const string tooltip    = "This is the tooltip shown on hover";
 
         if (!File.Exists(inputPath))
         {
@@ -19,38 +20,50 @@ class Program
             return;
         }
 
-        // Load the PDF
+        // Load the PDF document (lifecycle rule: use using)
         using (Document doc = new Document(inputPath))
         {
-            // Locate the target text on the first page (adjust as needed)
-            TextFragmentAbsorber absorber = new TextFragmentAbsorber("target text");
+            // Find the target text on the first page (page indexing is 1‑based)
+            TextFragmentAbsorber absorber = new TextFragmentAbsorber();
             doc.Pages[1].Accept(absorber);
-            if (absorber.TextFragments.Count == 0)
+
+            // Locate the fragment that matches the target text
+            TextFragment foundFragment = null;
+            foreach (TextFragment fragment in absorber.TextFragments)
+            {
+                if (fragment.Text != null && fragment.Text.Contains(targetText))
+                {
+                    foundFragment = fragment;
+                    break;
+                }
+            }
+
+            if (foundFragment == null)
             {
                 Console.Error.WriteLine("Target text not found.");
                 return;
             }
-            TextFragment fragment = absorber.TextFragments[0];
 
-            // Determine the rectangle that bounds the found text
-            // Use the Rectangle property of TextFragment (GetRectangle does not exist)
-            Aspose.Pdf.Rectangle textRect = fragment.Rectangle;
+            // Rectangle of the found text (coordinates are in PDF points)
+            Aspose.Pdf.Rectangle textRect = foundFragment.Rectangle;
 
             // Create an invisible button field over the text rectangle
-            ButtonField btn = new ButtonField(doc, textRect);
-            btn.AlternateName = tooltip;                     // Tooltip shown on hover
-            btn.Border = new Border(btn) { Width = 0 };      // No visible border
-            btn.Color = Aspose.Pdf.Color.Transparent;       // No fill color
-            // Make the annotation invisible (optional, tooltip still works)
-            btn.Flags = AnnotationFlags.Invisible;           // Correct enum assignment
+            ButtonField button = new ButtonField(doc, textRect);
+            button.AlternateName = tooltip;                     // tooltip text (shown by PDF viewers)
+            button.Color = Aspose.Pdf.Color.Transparent;       // make button invisible
+            button.Border = new Border(button) { Width = 0 };   // no border
 
-            // Add the button field to the document's form
-            doc.Form.Add(btn);
+            // Optional: add a JavaScript action that shows an alert on mouse enter
+            // (demonstrates use of PDF actions)
+            button.Actions.OnEnter = new JavascriptAction($"app.alert('{tooltip}');");
 
-            // Save the modified PDF
+            // Add the button to the document's form
+            doc.Form.Add(button);
+
+            // Save the modified PDF (lifecycle rule: save inside using)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with tooltip button: {outputPath}");
+        Console.WriteLine($"PDF saved with invisible tooltip button: {outputPath}");
     }
 }

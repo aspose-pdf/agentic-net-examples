@@ -11,21 +11,20 @@ class Program
 
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Initialize the Form facade with the source PDF
+        // Initialize the Form facade with the PDF document
         using (Form form = new Form(pdfPath))
         {
-            // Create the output JSON file stream
+            // Export all form field definitions to a JSON file (indented for readability)
             using (FileStream jsonStream = new FileStream(jsonPath, FileMode.Create, FileAccess.Write))
             {
-                // Export all form field definitions to JSON (indented for readability)
                 form.ExportJson(jsonStream, true);
             }
         }
 
-        Console.WriteLine($"Form fields exported successfully to '{jsonPath}'.");
+        Console.WriteLine($"Form field definitions exported to '{jsonPath}'.");
     }
 }

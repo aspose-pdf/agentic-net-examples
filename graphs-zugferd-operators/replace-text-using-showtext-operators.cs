@@ -18,31 +18,34 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF (lifecycle rule: wrap Document in using)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
-            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            // Iterate over all pages (page indexing is 1‑based)
+            foreach (Page page in doc.Pages)
             {
-                Page page = doc.Pages[pageNum];
-                OperatorCollection ops = page.Contents;
+                // OperatorCollection holds low‑level PDF operators for the page
+                var operators = page.Contents;
 
-                // Scan the operator list for ShowText operators
-                for (int i = 0; i < ops.Count; i++)
+                // Scan the collection for ShowText operators (Tj)
+                for (int i = 0; i < operators.Count; i++)
                 {
-                    if (ops[i] is ShowText show && !string.IsNullOrEmpty(show.Text))
+                    if (operators[i] is ShowText showOp && !string.IsNullOrEmpty(showOp.Text))
                     {
-                        // If the operator contains the target string, replace it
-                        if (show.Text.Contains(searchText))
+                        // If the operator's text contains the target string, replace it
+                        if (showOp.Text.Contains(searchText))
                         {
-                            // Simple string replace; you can adjust logic as needed
-                            show.Text = show.Text.Replace(searchText, replaceText);
+                            // Create a new ShowText operator with the same index but new text
+                            ShowText newOp = new ShowText(showOp.Index, showOp.Text.Replace(searchText, replaceText));
+
+                            // Replace the old operator with the new one (OperatorCollection.Replace can also be used)
+                            operators[i] = newOp;
                         }
                     }
                 }
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (lifecycle rule: Save inside using block)
             doc.Save(outputPath);
         }
 

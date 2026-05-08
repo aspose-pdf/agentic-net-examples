@@ -15,20 +15,20 @@ class Program
             return;
         }
 
-        // Load the PDF document with deterministic disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Process pages in reverse order (last page first)
+            // Pages are 1‑based; iterate from the last page to the first
             for (int i = doc.Pages.Count; i >= 1; i--)
             {
-                // Rotate each page 90 degrees clockwise
+                // Apply a 90° clockwise rotation to each page
                 doc.Pages[i].Rotate = Rotation.on90;
             }
 
-            // Save the rotated PDF
+            // Save the modified document (PDF format is implicit)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Pages rotated and saved to '{outputPath}'.");
     }
 }

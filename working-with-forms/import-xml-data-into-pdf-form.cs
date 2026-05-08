@@ -1,43 +1,43 @@
 using System;
 using System.IO;
 using System.Xml;
-using Aspose.Pdf;               // Core PDF API
-using Aspose.Pdf.Forms;        // For Form.AssignXfa
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";      // Original PDF with form fields
-        const string transformedXml = "data.xml";       // XML containing updated field values
-        const string outputPdfPath  = "output.pdf";     // PDF after repopulating fields
+        // Paths – adjust as needed
+        const string pdfPath      = "input.pdf";      // PDF with form fields
+        const string xmlDataPath  = "data.xml";       // Transformed XML containing field values
+        const string outputPdfPath = "output.pdf";    // Resulting PDF with populated fields
 
         // Verify files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
-        if (!File.Exists(transformedXml))
+        if (!File.Exists(xmlDataPath))
         {
-            Console.Error.WriteLine($"XML not found: {transformedXml}");
+            Console.Error.WriteLine($"XML data not found: {xmlDataPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document (lifecycle: create/load)
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Load the existing PDF document
+            using (Document pdfDoc = new Document(pdfPath))
             {
                 // Load the transformed XML into an XmlDocument
                 XmlDocument xmlDoc = new XmlDocument();
-                xmlDoc.Load(transformedXml);
+                xmlDoc.Load(xmlDataPath);
 
-                // Assign the XML (XFA) data to the PDF form
+                // Assign the XML data to the PDF form (XFA)
                 // This populates the form fields with values from the XML
                 pdfDoc.Form.AssignXfa(xmlDoc);
 
-                // Save the updated PDF (lifecycle: save)
+                // Save the updated PDF
                 pdfDoc.Save(outputPdfPath);
             }
 

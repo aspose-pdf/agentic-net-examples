@@ -7,53 +7,57 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string mediaFile = "sample.mp4";
+        const string inputPdf  = "input.pdf";          // source PDF
+        const string outputPdf = "output_richmedia.pdf"; // result PDF
+        const string mediaFile = "sample.mp4";         // video/audio to embed
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
+
         if (!File.Exists(mediaFile))
         {
             Console.Error.WriteLine($"Media file not found: {mediaFile}");
             return;
         }
 
-        // Load the source PDF (using block ensures proper disposal)
+        // Load the existing PDF document
         using (Document doc = new Document(inputPdf))
         {
-            // Get the first page (Aspose.Pdf uses 1‑based indexing)
+            // Choose the page where the annotation will be placed (first page in this example)
             Page page = doc.Pages[1];
 
-            // Define the annotation rectangle (left, bottom, right, top)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 700);
+            // Define the rectangle for the annotation (coordinates are in points)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 400, 800);
 
-            // Create a RichMediaAnnotation on the page
+            // Create the RichMediaAnnotation
             RichMediaAnnotation richMedia = new RichMediaAnnotation(page, rect)
             {
-                // Play automatically when the page becomes visible
+                // Set the activation event to "PageVisible" so it plays automatically
                 ActivateOn = RichMediaAnnotation.ActivationEvent.PageVisible,
-                // Optional description shown in the annotation panel
-                Contents = "Embedded video"
+                // Optional: give the annotation a name and tooltip
+                Name = "AutoPlayMedia",
+                Contents = "Embedded video that plays when the page becomes visible."
             };
 
-            // Embed the media file (e.g., MP4) into the annotation
+            // Embed the media content (video/audio) into the annotation
             using (FileStream mediaStream = File.OpenRead(mediaFile))
             {
                 // The first argument is the name of the stream inside the PDF
                 richMedia.SetContent(Path.GetFileName(mediaFile), mediaStream);
             }
 
-            // Add the annotation to the page's annotation collection
+            // Optionally set a poster image (preview) – omitted here
+
+            // Add the annotation to the page
             page.Annotations.Add(richMedia);
 
             // Save the modified PDF
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Rich media annotation added and saved to '{outputPdf}'.");
+        Console.WriteLine($"RichMediaAnnotation added and saved to '{outputPdf}'.");
     }
 }

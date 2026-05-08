@@ -1,43 +1,48 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputFdfPath = "checkboxes.fdf";
+        const string inputPdf = "input.pdf";
+        const string outputFdf = "checkboxes.fdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Initialize the Form facade for the source PDF.
-        using (Form form = new Form(inputPdfPath))
+        // Load the source PDF document
+        using (Document doc = new Document(inputPdf))
         {
-            // Export the entire form data to a temporary memory stream.
-            using (MemoryStream tempFdf = new MemoryStream())
+            // Facade to read field information
+            Form form = new Form(doc);
+            // Facade to modify the form fields
+            FormEditor editor = new FormEditor(doc);
+
+            // Remove every field that is not a checkbox
+            foreach (string fieldName in form.FieldNames)
             {
-                form.ExportFdf(tempFdf);
-                tempFdf.Position = 0; // Reset stream position for reading.
-
-                // Read the raw FDF text.
-                string fdfText = new StreamReader(tempFdf).ReadToEnd();
-
-                // NOTE: Proper filtering of only checkbox definitions would require parsing the FDF structure.
-                // For demonstration purposes we write the whole FDF content to the output file.
-                // Replace the following block with actual parsing logic if needed.
-                using (FileStream outStream = new FileStream(outputFdfPath, FileMode.Create, FileAccess.Write))
-                using (StreamWriter writer = new StreamWriter(outStream))
+                // GetFieldType returns a FieldType enum, not a string
+                FieldType fieldType = form.GetFieldType(fieldName);
+                if (fieldType != FieldType.CheckBox)
                 {
-                    writer.Write(fdfText);
+                    editor.RemoveField(fieldName);
                 }
+            }
+
+            // Export the remaining fields (checkboxes only) to an FDF file
+            using (FileStream fdfStream = new FileStream(outputFdf, FileMode.Create, FileAccess.Write))
+            {
+                Form exportForm = new Form(doc);
+                exportForm.ExportFdf(fdfStream);
             }
         }
 
-        Console.WriteLine($"Checkbox field definitions exported to '{outputFdfPath}'.");
+        Console.WriteLine($"Checkbox field definitions exported to '{outputFdf}'.");
     }
 }

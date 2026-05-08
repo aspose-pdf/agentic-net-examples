@@ -3,23 +3,24 @@ using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Facades;
 
 class Program
 {
-    // Simple DTO to describe an annotation to be added
-    private class AnnotationDefinition
+    // Simple definition for an annotation to be added
+    class AnnotationDef
     {
-        public string Type;          // "Text", "Highlight", "Link"
-        public Aspose.Pdf.Rectangle Rect;
-        public string Content;      // Text for Text/Highlight, URL for Link
-        public string Title;        // Optional title for Text annotation
+        public string Type;               // "Text" or "Highlight"
+        public int PageNumber;            // 1‑based page index
+        public double Llx, Lly, Urx, Ury; // rectangle coordinates
+        public string Contents;           // text for TextAnnotation or comment for Highlight
+        public string Title;              // optional title for TextAnnotation
+        public Color Color;               // annotation color
     }
 
     static void Main()
     {
         const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_annotated.pdf";
+        const string outputPdf = "output.pdf";
 
         if (!File.Exists(inputPdf))
         {
@@ -28,86 +29,87 @@ class Program
         }
 
         // Define a batch of annotations
-        var annotations = new List<AnnotationDefinition>
+        var annotations = new List<AnnotationDef>
         {
-            new AnnotationDefinition
+            new AnnotationDef
             {
                 Type = "Text",
-                Rect = new Aspose.Pdf.Rectangle(100, 700, 300, 750),
+                PageNumber = 1,
+                Llx = 100, Lly = 500, Urx = 200, Ury = 550,
+                Contents = "First note",
                 Title = "Note 1",
-                Content = "This is a text annotation."
+                Color = Aspose.Pdf.Color.Yellow
             },
-            new AnnotationDefinition
+            new AnnotationDef
             {
                 Type = "Highlight",
-                Rect = new Aspose.Pdf.Rectangle(50, 600, 400, 620),
-                Content = "Highlighted text."
+                PageNumber = 1,
+                Llx = 150, Lly = 400, Urx = 350, Ury = 420,
+                Contents = "Important text",
+                Color = Aspose.Pdf.Color.LightGreen
             },
-            new AnnotationDefinition
+            new AnnotationDef
             {
-                Type = "Link",
-                Rect = new Aspose.Pdf.Rectangle(200, 500, 350, 530),
-                Content = "https://www.example.com"
+                Type = "Text",
+                PageNumber = 2,
+                Llx = 50, Lly = 600, Urx = 250, Ury = 650,
+                Contents = "Second note",
+                Title = "Note 2",
+                Color = Aspose.Pdf.Color.Pink
             }
         };
 
-        // Use PdfAnnotationEditor to bind, modify, and save the PDF
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        // Load the PDF, add annotations in a batch, and save
+        using (Document doc = new Document(inputPdf))
         {
-            // Bind the source PDF
-            editor.BindPdf(inputPdf);
-
-            // Access the underlying Document to add annotations
-            Document doc = editor.Document;
-
-            // For simplicity, add all annotations to the first page
-            Page page = doc.Pages[1]; // 1‑based indexing
-
             foreach (var def in annotations)
             {
-                Annotation ann = null;
-
-                switch (def.Type)
+                // Ensure the page exists
+                if (def.PageNumber < 1 || def.PageNumber > doc.Pages.Count)
                 {
-                    case "Text":
-                        var textAnn = new TextAnnotation(page, def.Rect)
-                        {
-                            Title    = def.Title ?? string.Empty,
-                            Contents = def.Content ?? string.Empty,
-                            Color    = Aspose.Pdf.Color.Yellow
-                        };
-                        ann = textAnn;
-                        break;
-
-                    case "Highlight":
-                        var highlightAnn = new HighlightAnnotation(page, def.Rect)
-                        {
-                            Color = Aspose.Pdf.Color.Yellow
-                        };
-                        // Optionally set the highlighted text as contents
-                        highlightAnn.Contents = def.Content ?? string.Empty;
-                        ann = highlightAnn;
-                        break;
-
-                    case "Link":
-                        var linkAnn = new LinkAnnotation(page, def.Rect);
-                        // Use GoToURIAction for external URLs
-                        linkAnn.Action = new GoToURIAction(def.Content);
-                        linkAnn.Color = Aspose.Pdf.Color.Blue;
-                        ann = linkAnn;
-                        break;
-
-                    default:
-                        Console.WriteLine($"Unsupported annotation type: {def.Type}");
-                        continue;
+                    Console.Error.WriteLine($"Invalid page number {def.PageNumber} for annotation.");
+                    continue;
                 }
 
-                // Add the created annotation to the page
-                page.Annotations.Add(ann);
+                Page page = doc.Pages[def.PageNumber];
+                // Fully qualified rectangle to avoid ambiguity
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(def.Llx, def.Lly, def.Urx, def.Ury);
+
+                Annotation annotation = null;
+
+                if (def.Type.Equals("Text", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Create a TextAnnotation (a sticky note)
+                    var textAnn = new TextAnnotation(page, rect)
+                    {
+                        Title    = def.Title ?? string.Empty,
+                        Contents = def.Contents ?? string.Empty,
+                        Color    = def.Color
+                    };
+                    annotation = textAnn;
+                }
+                else if (def.Type.Equals("Highlight", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Create a HighlightAnnotation
+                    var highlightAnn = new HighlightAnnotation(page, rect)
+                    {
+                        Contents = def.Contents ?? string.Empty,
+                        Color    = def.Color
+                    };
+                    annotation = highlightAnn;
+                }
+                else
+                {
+                    Console.Error.WriteLine($"Unsupported annotation type: {def.Type}");
+                    continue;
+                }
+
+                // Add the annotation to the page's collection
+                page.Annotations.Add(annotation);
             }
 
-            // Save the modified document
-            editor.Save(outputPdf);
+            // Save the modified PDF
+            doc.Save(outputPdf);
         }
 
         Console.WriteLine($"Annotations added and saved to '{outputPdf}'.");

@@ -7,36 +7,49 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string fieldName = "Header";
+        const string inputPdfPath  = "input.pdf";      // source PDF containing a form field named "Header"
+        const string outputPdfPath = "output.pdf";     // destination PDF
+        const string headerFieldName = "Header";       // exact name of the field to decorate
+        const string backgroundImagePath = "header_bg.jpg"; // image to use as background (illustrative)
 
-        if (!File.Exists(inputPdf))
+        // Verify required files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
+        }
+        if (!File.Exists(backgroundImagePath))
+        {
+            Console.Error.WriteLine($"Background image not found: {backgroundImagePath}");
             return;
         }
 
-        // Initialize FormEditor and bind the source PDF
-        FormEditor editor = new FormEditor();
-        editor.BindPdf(inputPdf);
-
-        // Configure visual appearance for the target field
-        editor.Facade = new FormFieldFacade
+        // Use FormEditor (facade) to modify the appearance of the form field.
+        // The facade must be disposed; wrap it in a using block.
+        using (FormEditor formEditor = new FormEditor())
         {
-            // Example background color; replace with desired color or image handling
-            BackgroundColor = System.Drawing.Color.LightGray,
-            // Center the text within the field
-            Alignment = FormFieldFacade.AlignCenter
-        };
+            // Bind the existing PDF document.
+            formEditor.BindPdf(inputPdfPath);
 
-        // Apply the decoration to the specific field named "Header"
-        editor.DecorateField(fieldName);
+            // Create a FormFieldFacade to specify visual attributes.
+            formEditor.Facade = new FormFieldFacade();
 
-        // Save the modified document
-        editor.Save(outputPdf);
-        editor.Close();
+            // Center the text inside the field.
+            formEditor.Facade.Alignment = FormFieldFacade.AlignCenter;
 
-        Console.WriteLine($"Field '{fieldName}' decorated and saved to '{outputPdf}'.");
+            // NOTE: FormFieldFacade does not expose a direct property for a background image.
+            // As a practical workaround, we set a background color (light gray) to illustrate
+            // that a visual background can be applied. If an actual image background is required,
+            // a different API (e.g., HeaderArtifact) would be needed.
+            formEditor.Facade.BackgroundColor = System.Drawing.Color.LightGray;
+
+            // Apply the visual settings to the specific field named "Header".
+            formEditor.DecorateField(headerFieldName);
+
+            // Save the modified PDF.
+            formEditor.Save(outputPdfPath);
+        }
+
+        Console.WriteLine($"Field '{headerFieldName}' has been decorated and saved to '{outputPdfPath}'.");
     }
 }

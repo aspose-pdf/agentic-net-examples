@@ -2,80 +2,86 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class PdfToHtmlConverter
+class Program
 {
     static void Main()
     {
+        // Input PDF file
         const string inputPdfPath = "input.pdf";
+
+        // Output HTML file (first page). Additional pages will be created automatically.
         const string outputHtmlPath = "output.html";
-        const string imagesRootFolder = "PageImages";
+
+        // Root folder where per‑page image subfolders will be created
+        const string imagesRootFolder = "Images";
 
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure the root folder for images exists
+        // Ensure the root images folder exists
         Directory.CreateDirectory(imagesRootFolder);
 
-        try
+        // Load the PDF document
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Configure HTML conversion options
+            HtmlSaveOptions htmlOptions = new HtmlSaveOptions
             {
-                // Configure HTML save options
-                HtmlSaveOptions htmlOpts = new HtmlSaveOptions
-                {
-                    // Generate one HTML file per PDF page
-                    SplitIntoPages = true,
+                // Generate one HTML file per PDF page
+                SplitIntoPages = true,
 
-                    // Custom strategy to store each page's images in its own subfolder
-                    CustomResourceSavingStrategy = resourceInfo =>
+                // (optional) embed fonts, CSS, etc. as needed
+                // PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
+                // RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsExternalPngFilesReferencedViaSvg
+            };
+
+            // Custom strategy to store each page's images in its own subfolder
+            htmlOptions.CustomResourceSavingStrategy = info =>
+            {
+                // Process only image resources
+                if (info is HtmlSaveOptions.HtmlImageSavingInfo imageInfo)
+                {
+                    // PDF page number that generated this image (1‑based)
+                    int pageNumber = imageInfo.PdfHostPageNumber;
+
+                    // Create a subfolder for this page: Images/Page_1, Images/Page_2, …
+                    string pageFolder = Path.Combine(imagesRootFolder, $"Page_{pageNumber}");
+                    Directory.CreateDirectory(pageFolder);
+
+                    // Determine a file name for the image
+                    string fileName = imageInfo.SupposedFileName;
+                    if (string.IsNullOrEmpty(fileName))
                     {
-                        // Only handle image resources
-                        if (resourceInfo is HtmlSaveOptions.HtmlImageSavingInfo imgInfo)
-                        {
-                            // Determine subfolder for the current HTML page (which corresponds to a PDF page)
-                            string pageFolder = Path.Combine(imagesRootFolder,
-                                $"Page_{imgInfo.HtmlHostPageNumber}");
-                            Directory.CreateDirectory(pageFolder);
-
-                            // Build full file path for the image on disk
-                            string imagePath = Path.Combine(pageFolder, imgInfo.SupposedFileName);
-
-                            // Save the image stream to disk
-                            using (FileStream fs = new FileStream(imagePath, FileMode.Create, FileAccess.Write))
-                            {
-                                imgInfo.ContentStream.CopyTo(fs);
-                            }
-
-                            // Tell Aspose.Pdf that we have already processed the resource
-                            imgInfo.CustomProcessingCancelled = true;
-
-                            // Return the relative path that will be used in the generated HTML
-                            return Path.Combine($"Page_{imgInfo.HtmlHostPageNumber}", imgInfo.SupposedFileName);
-                        }
-
-                        // For all other resources let Aspose.Pdf handle them (return null)
-                        return null;
+                        // Fallback to a GUID‑based name if the converter didn't suggest one
+                        fileName = $"img_{Guid.NewGuid():N}.png";
                     }
-                };
 
-                // Perform the conversion (HTML conversion requires GDI+ on Windows)
-                try
-                {
-                    pdfDoc.Save(outputHtmlPath, htmlOpts);
-                    Console.WriteLine($"HTML conversion completed. Output: {outputHtmlPath}");
+                    // Full path on disk where the image will be written
+                    string fullPath = Path.Combine(pageFolder, fileName);
+
+                    // Write the image stream to the file
+                    using (FileStream fs = new FileStream(fullPath, FileMode.Create, FileAccess.Write))
+                    {
+                        imageInfo.ContentStream.CopyTo(fs);
+                    }
+
+                    // Return a relative URL that will be placed into the generated HTML.
+                    // The path is relative to the location of the HTML files.
+                    return Path.Combine("Images", $"Page_{pageNumber}", fileName)
+                           .Replace('\\', '/');
                 }
-                catch (TypeInitializationException)
-                {
-                    Console.WriteLine("HTML conversion requires Windows GDI+. Skipped on this platform.");
-                }
-            }
+
+                // For non‑image resources let the default converter handling take place
+                return null;
+            };
+
+            // Perform the conversion
+            pdfDocument.Save(outputHtmlPath, htmlOptions);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine("PDF successfully converted to HTML with per‑page image folders.");
     }
 }

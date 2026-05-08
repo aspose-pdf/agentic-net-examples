@@ -1,99 +1,68 @@
 using System;
 using System.IO;
 using System.Text;
-using System.Text.Json;
-using System.Collections.Generic;
-using Aspose.Pdf;                     // PDF core API
-using Aspose.Pdf.Forms;               // Form handling
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
-    // Minimal class that matches the JSON structure produced by Aspose.Pdf
-    private class FormField
-    {
-        public string FullName { get; set; }
-        public string Value    { get; set; }
-    }
-
     static void Main()
     {
-        const string pdfPath  = "input.pdf";      // source PDF with form fields
-        const string jsonPath = "formData.json";  // intermediate JSON file
-        const string csvPath  = "formData.csv";   // final CSV output
+        const string inputPdfPath = "input.pdf";
+        const string outputCsvPath = "form_fields.csv";
 
-        // ------------------------------------------------------------
-        // 1. Export PDF form fields to JSON (Aspose.Pdf lifecycle)
-        // ------------------------------------------------------------
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document (must be inside a using block for proper disposal)
-        using (Document pdfDoc = new Document(pdfPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Export all form fields to a JSON file
-            // ExportFieldsToJsonOptions can be omitted for default behaviour
-            pdfDoc.Form.ExportToJson(jsonPath);
-        }
-
-        // ------------------------------------------------------------
-        // 2. Read the exported JSON and convert it to CSV
-        // ------------------------------------------------------------
-        if (!File.Exists(jsonPath))
-        {
-            Console.Error.WriteLine($"JSON not found: {jsonPath}");
-            return;
-        }
-
-        // The JSON produced by Aspose.Pdf looks like:
-        // [
-        //   { "FullName":"field1", "Value":"value1", ... },
-        //   { "FullName":"field2", "Value":"value2", ... }
-        // ]
-        // We'll deserialize only the needed properties.
-        JsonSerializerOptions jsonOptions = new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        };
-
-        List<FormField> fields;
-        using (FileStream jsonStream = File.OpenRead(jsonPath))
-        {
-            fields = JsonSerializer.Deserialize<List<FormField>>(jsonStream, jsonOptions);
-        }
-
-        if (fields == null)
-        {
-            Console.Error.WriteLine("Failed to parse JSON.");
-            return;
-        }
-
-        // Write CSV: first line is header, then each field as a row
-        using (StreamWriter writer = new StreamWriter(csvPath, false, Encoding.UTF8))
-        {
-            writer.WriteLine("FieldName,Value"); // CSV header
-
-            foreach (var field in fields)
+            // Ensure the document actually contains a form
+            if (doc.Form == null || doc.Form.Count == 0)
             {
-                // Escape commas and quotes in the value
-                string escapedValue = field.Value?.Replace("\"", "\"\"") ?? string.Empty;
-                if (escapedValue.Contains(",") || escapedValue.Contains("\""))
-                {
-                    escapedValue = $"\"{escapedValue}\"";
-                }
-
-                string escapedName = field.FullName?.Replace("\"", "\"\"") ?? string.Empty;
-                if (escapedName.Contains(",") || escapedName.Contains("\""))
-                {
-                    escapedName = $"\"{escapedName}\"";
-                }
-
-                writer.WriteLine($"{escapedName},{escapedValue}");
+                Console.WriteLine("No form fields found in the PDF.");
+                return;
             }
-        }
 
-        Console.WriteLine($"Form data exported to CSV: {csvPath}");
+            // Prepare a StreamWriter for CSV output
+            using (StreamWriter writer = new StreamWriter(outputCsvPath, false, Encoding.UTF8))
+            {
+                // Write CSV header
+                writer.WriteLine("FieldName,Value");
+
+                // Iterate over all form fields in the document
+                foreach (Field field in doc.Form.Fields)
+                {
+                    // FullName provides the fully qualified field name; fall back to Name if FullName is null
+                    string fieldName = field.FullName ?? field.Name ?? string.Empty;
+
+                    // Value may be null; convert to string safely
+                    string fieldValue = field.Value?.ToString() ?? string.Empty;
+
+                    // Escape double quotes by doubling them and wrap fields containing commas or quotes in quotes
+                    fieldName = EscapeCsv(fieldName);
+                    fieldValue = EscapeCsv(fieldValue);
+
+                    writer.WriteLine($"{fieldName},{fieldValue}");
+                }
+            }
+
+            Console.WriteLine($"Form fields exported to CSV: {outputCsvPath}");
+        }
+    }
+
+    // Helper method to escape CSV fields according to RFC 4180
+    private static string EscapeCsv(string input)
+    {
+        if (input.Contains("\""))
+            input = input.Replace("\"", "\"\"");
+
+        if (input.Contains(",") || input.Contains("\"") || input.Contains("\n") || input.Contains("\r"))
+            return $"\"{input}\"";
+
+        return input;
     }
 }

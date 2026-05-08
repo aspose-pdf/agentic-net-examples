@@ -17,32 +17,28 @@ class Program
             return;
         }
 
-        // Load the PDF document.
-        Document doc = new Document(inputPath);
-
-        // Iterate through every page and add a header text stamp.
-        foreach (Page page in doc.Pages)
+        // Load the document.
+        using (Document doc = new Document(inputPath))
         {
-            // Create a TextStamp with the company name.
-            TextStamp headerStamp = new TextStamp(companyName);
+            // Iterate through each page and add a header stamp.
+            foreach (Page page in doc.Pages)
+            {
+                // Create a TextStamp for the header.
+                TextStamp headerStamp = new TextStamp(companyName);
+                headerStamp.TextState.Font = FontRepository.FindFont("Helvetica");
+                headerStamp.TextState.FontSize = 12;
+                headerStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+                headerStamp.HorizontalAlignment = HorizontalAlignment.Center;
+                headerStamp.VerticalAlignment = VerticalAlignment.Top;
+                headerStamp.YIndent = 20f; // offset from the top edge
 
-            // Configure the visual appearance of the stamp.
-            headerStamp.TextState.Font = FontRepository.FindFont("Helvetica");
-            headerStamp.TextState.FontSize = 12;
-            headerStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black; // fully‑qualified Aspose color
+                // Add the stamp to the current page.
+                page.AddStamp(headerStamp);
+            }
 
-            // Position the stamp at the top centre of the page.
-            headerStamp.HorizontalAlignment = HorizontalAlignment.Center;
-            headerStamp.VerticalAlignment = VerticalAlignment.Top;
-            headerStamp.YIndent = 20f; // distance from the top edge
-
-            // Add the stamp to the current page.
-            page.AddStamp(headerStamp);
+            // Save the modified document.
+            doc.Save(outputPath);
         }
-
-        // Save the modified document.
-        doc.Save(outputPath);
-        doc.Dispose();
 
         Console.WriteLine($"Header stamp added to all pages. Output saved to '{outputPath}'.");
     }

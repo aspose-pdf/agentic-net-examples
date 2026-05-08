@@ -1,15 +1,15 @@
 using System;
 using System.IO;
 using System.Xml.Linq;
-using Aspose.Pdf;
+using Aspose.Pdf; // Core PDF API – MarginInfo is in this namespace
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";      // source PDF
-        const string xmlPath = "margins.xml";    // XML with margin definitions
-        const string outputPath = "output.pdf";  // result PDF
+        const string pdfPath   = "input.pdf";      // source PDF
+        const string xmlPath   = "margins.xml";   // XML with per‑section margin definitions
+        const string outputPdf = "output.pdf";    // result PDF
 
         if (!File.Exists(pdfPath))
         {
@@ -24,33 +24,33 @@ class Program
         }
 
         // Load the XML that defines margins per section.
+        // Expected format:
+        // <Sections>
+        //   <Section startPage="1" endPage="3">
+        //     <Margins top="10" left="15" bottom="10" right="15"/>
+        //   </Section>
+        //   ...
+        // </Sections>
         XDocument xmlDoc = XDocument.Load(xmlPath);
 
-        // Open the PDF inside a using block for deterministic disposal.
+        // Load the PDF document.
         using (Document pdfDoc = new Document(pdfPath))
         {
-            // Iterate over each <Section> element.
-            foreach (XElement section in xmlDoc.Root.Elements("Section"))
+            // Iterate over each section defined in the XML.
+            foreach (XElement section in xmlDoc.Root?.Elements("Section") ?? Array.Empty<XElement>())
             {
-                // Parse page range attributes.
-                int startPage = (int?)section.Attribute("StartPage") ?? 1;
-                int endPage   = (int?)section.Attribute("EndPage")   ?? startPage;
+                int startPage = (int)section.Attribute("startPage");
+                int endPage   = (int)section.Attribute("endPage");
 
-                // Ensure the range is within the document.
-                startPage = Math.Max(1, startPage);
-                endPage   = Math.Min(pdfDoc.Pages.Count, endPage);
-                if (startPage > endPage) continue;
+                XElement marginsElem = section.Element("Margins");
+                if (marginsElem == null) continue; // skip if no margin info
 
-                // Read margin values (assumed to be in points).
-                XElement marginElem = section.Element("Margin");
-                if (marginElem == null) continue;
+                double top    = (double)marginsElem.Attribute("top");
+                double left   = (double)marginsElem.Attribute("left");
+                double bottom = (double)marginsElem.Attribute("bottom");
+                double right  = (double)marginsElem.Attribute("right");
 
-                double top    = (double?)marginElem.Attribute("Top")    ?? 0;
-                double bottom = (double?)marginElem.Attribute("Bottom") ?? 0;
-                double left   = (double?)marginElem.Attribute("Left")   ?? 0;
-                double right  = (double?)marginElem.Attribute("Right")  ?? 0;
-
-                // Build a MarginInfo instance with the specified values.
+                // Build a MarginInfo instance with the required values.
                 MarginInfo marginInfo = new MarginInfo
                 {
                     Top    = top,
@@ -59,17 +59,17 @@ class Program
                     Right  = right
                 };
 
-                // Apply the margin to each page in the range.
-                for (int pageNum = startPage; pageNum <= endPage; pageNum++)
+                // Apply the margin to every page in the range (Aspose.Pdf uses 1‑based indexing).
+                for (int pageNum = startPage; pageNum <= endPage && pageNum <= pdfDoc.Pages.Count; pageNum++)
                 {
                     pdfDoc.Pages[pageNum].PageInfo.Margin = marginInfo;
                 }
             }
 
             // Save the modified PDF.
-            pdfDoc.Save(outputPath);
+            pdfDoc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved with custom margins to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with custom margins to '{outputPdf}'.");
     }
 }

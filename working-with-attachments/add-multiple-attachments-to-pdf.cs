@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
 
 class Program
@@ -8,50 +8,50 @@ class Program
     static void Main()
     {
         // Input PDF to which attachments will be added
-        const string inputPdfPath  = "input.pdf";
+        const string inputPdf = "input.pdf";
         // Output PDF containing the attachments
-        const string outputPdfPath = "output_with_attachments.pdf";
+        const string outputPdf = "output_with_attachments.pdf";
 
         // Collection of file paths to attach
         List<string> attachmentPaths = new List<string>
         {
-            "document1.txt",
-            "image1.png",
-            "data1.csv"
+            "file1.txt",
+            "image.png",
+            "document.docx"
         };
 
-        // Validate input PDF existence
-        if (!File.Exists(inputPdfPath))
+        // Verify the source PDF exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Validate each attachment file exists
+        // Verify each attachment file exists
         foreach (string path in attachmentPaths)
         {
             if (!File.Exists(path))
             {
-                Console.Error.WriteLine($"Attachment file not found: {path}");
+                Console.Error.WriteLine($"Attachment not found: {path}");
                 return;
             }
         }
 
         // Load the PDF, add attachments, and save
-        using (Document pdfDoc = new Document(inputPdfPath))
+        using (Document doc = new Document(inputPdf))
         {
             foreach (string path in attachmentPaths)
             {
                 // Create a file specification for the attachment
                 FileSpecification fileSpec = new FileSpecification(path);
                 // Add the specification to the document's embedded files collection
-                pdfDoc.EmbeddedFiles.Add(fileSpec);
+                doc.EmbeddedFiles.Add(fileSpec);
             }
 
             // Save the modified PDF
-            pdfDoc.Save(outputPdfPath);
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved with attachments to '{outputPdfPath}'.");
+        Console.WriteLine($"PDF saved with attachments to '{outputPdf}'.");
     }
 }

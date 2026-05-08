@@ -6,39 +6,36 @@ class Program
 {
     static void Main()
     {
-        // Input and output PDF file paths
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_margin.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Verify that the source file exists
+        // Verify that the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Create an instance of PdfFileEditor (facade class)
+        // Create the facade that will modify the PDF
         PdfFileEditor editor = new PdfFileEditor();
 
-        // Add 20 % margins on all sides (left, right, top, bottom)
-        // The method works with page indexes that start at 1.
-        // Passing null processes all pages in the document.
+        // Add a 20% margin on all four sides for every page (null pages array = all pages)
         bool success = editor.AddMarginsPct(
-            source:      inputPath,
+            source: inputPath,
             destination: outputPath,
-            pages:       null,      // all pages
-            leftMargin:  20,        // 20 % of page width
-            rightMargin: 20,        // 20 % of page width
-            topMargin:   20,        // 20 % of page height
-            bottomMargin:20);       // 20 % of page height
+            pages: null,
+            leftMargin: 20,
+            rightMargin: 20,
+            topMargin: 20,
+            bottomMargin: 20);
 
-        if (success)
+        if (!success)
         {
-            Console.WriteLine($"Successfully created '{outputPath}' with 20 % margins.");
+            Console.Error.WriteLine("Failed to add margins to the PDF.");
         }
         else
         {
-            Console.Error.WriteLine("Failed to add margins to the PDF.");
+            Console.WriteLine($"Margins added successfully. Output saved to '{outputPath}'.");
         }
     }
 }

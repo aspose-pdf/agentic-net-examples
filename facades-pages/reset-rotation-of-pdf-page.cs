@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -8,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_reset_rotation.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,17 +15,17 @@ class Program
             return;
         }
 
-        // Initialize the PDF page editor and bind the source PDF
+        // Initialize the PdfPageEditor facade and bind the source PDF
         PdfPageEditor editor = new PdfPageEditor();
         editor.BindPdf(inputPath);
 
-        // Specify the page to edit (page numbers are 1‑based)
+        // Specify that only page 6 should be processed
         editor.ProcessPages = new int[] { 6 };
-
-        // Reset rotation to 0 degrees (allowed values: 0, 90, 180, 270)
+        // Reset its rotation to 0 degrees
         editor.Rotation = 0;
 
-        // Save the modified PDF
+        // Apply the changes and save the result
+        editor.ApplyChanges();
         editor.Save(outputPath);
         editor.Close();
 

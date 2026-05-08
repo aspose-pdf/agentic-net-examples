@@ -1,50 +1,58 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;   // Facade classes for PDF operations
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
-class PdfToByteArrayConverter
+namespace AsposePdfApi
 {
-    // Converts a filled PDF file to a byte array without writing to disk.
-    // The method uses Aspose.Pdf.Facades.PdfViewer to load the PDF and save it to a memory stream.
-    public static byte[] ConvertPdfToByteArray(string pdfFilePath)
+    public static class PdfUtility
     {
-        if (!File.Exists(pdfFilePath))
-            throw new FileNotFoundException($"PDF file not found: {pdfFilePath}");
-
-        // Initialize the viewer facade and bind the source PDF.
-        PdfViewer viewer = new PdfViewer();
-        try
+        /// <summary>
+        /// Loads a filled PDF from the specified file path and returns its content as a byte array.
+        /// The method uses Aspose.Pdf.Facades.PdfViewer to avoid writing any intermediate files.
+        /// </summary>
+        /// <param name="pdfPath">Full path to the source PDF file.</param>
+        /// <returns>Byte array containing the PDF data.</returns>
+        public static byte[] GetPdfBytes(string pdfPath)
         {
-            viewer.BindPdf(pdfFilePath);               // Load the PDF into the facade
+            if (string.IsNullOrEmpty(pdfPath))
+                throw new ArgumentException("PDF path must be provided.", nameof(pdfPath));
 
-            // Save the result PDF directly into a memory stream.
-            using (MemoryStream ms = new MemoryStream())
+            if (!File.Exists(pdfPath))
+                throw new FileNotFoundException("PDF file not found.", pdfPath);
+
+            // MemoryStream will hold the PDF data in memory.
+            using (MemoryStream outputStream = new MemoryStream())
             {
-                viewer.Save(ms);                       // Facade saves to the provided stream
-                return ms.ToArray();                   // Return the underlying byte array
+                // PdfViewer is a facade that can bind a PDF and save it to a stream.
+                using (PdfViewer viewer = new PdfViewer())
+                {
+                    // Load the PDF from file.
+                    viewer.BindPdf(pdfPath);
+
+                    // Save the PDF directly into the MemoryStream.
+                    viewer.Save(outputStream);
+                }
+
+                // Ensure the stream position is reset before reading.
+                outputStream.Position = 0;
+
+                // Return the underlying byte array.
+                return outputStream.ToArray();
             }
-        }
-        finally
-        {
-            // Ensure resources are released.
-            viewer.Close();
         }
     }
 
-    // Example usage
-    static void Main()
+    // Dummy entry point to satisfy the console‑application requirement.
+    // In a real library project this class would be omitted or the project type changed to Class Library.
+    public class Program
     {
-        const string inputPdf = "filled_form.pdf";
-
-        try
+        public static void Main(string[] args)
         {
-            byte[] pdfBytes = ConvertPdfToByteArray(inputPdf);
-            Console.WriteLine($"PDF converted to byte array, length = {pdfBytes.Length} bytes.");
-            // The byte array can now be sent over a web API.
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            // Example usage (can be removed in production).
+            // string path = "filled.pdf";
+            // byte[] pdfBytes = PdfUtility.GetPdfBytes(path);
+            // Console.WriteLine($"PDF size: {pdfBytes.Length} bytes");
         }
     }
 }

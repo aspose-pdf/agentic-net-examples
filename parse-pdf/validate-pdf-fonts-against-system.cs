@@ -16,40 +16,47 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Ensure system fonts are loaded before checking accessibility
+        FontRepository.LoadFonts();
+
+        // List to hold names of fonts that are not installed on the system
+        List<string> missingFonts = new List<string>();
+
+        // Open the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Collect names of fonts that are not installed on the system
-            List<string> missingFonts = new List<string>();
-
             // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Each page has a Fonts collection in its Resources
+                // Each page has a Resources collection that may contain fonts
                 foreach (Aspose.Pdf.Text.Font font in page.Resources.Fonts)
                 {
-                    // Font.IsAccessible indicates whether the font is present on the system
-                    if (!font.IsAccessible && !missingFonts.Contains(font.FontName))
+                    // Font.IsAccessible indicates whether the font is installed on the system
+                    if (!font.IsAccessible)
                     {
-                        missingFonts.Add(font.FontName);
+                        // Avoid duplicate entries
+                        if (!missingFonts.Contains(font.FontName))
+                        {
+                            missingFonts.Add(font.FontName);
+                        }
                     }
                 }
             }
+        }
 
-            // Report the results
-            if (missingFonts.Count == 0)
+        // Report the result
+        if (missingFonts.Count == 0)
+        {
+            Console.WriteLine("All fonts used in the document are installed on the system.");
+        }
+        else
+        {
+            Console.WriteLine("The following fonts are referenced in the PDF but are NOT installed on the system:");
+            foreach (string fontName in missingFonts)
             {
-                Console.WriteLine("All fonts used in the document are installed on the system.");
-            }
-            else
-            {
-                Console.WriteLine("The following fonts are referenced in the PDF but are NOT installed on the system:");
-                foreach (string fontName in missingFonts)
-                {
-                    Console.WriteLine($"- {fontName}");
-                }
+                Console.WriteLine($"- {fontName}");
             }
         }
     }

@@ -1,38 +1,30 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // PDF handling
 
 class Program
 {
     static void Main()
     {
-        // Input PDF and output PPTX file paths
-        const string pdfPath = "input.pdf";
+        // Input PDF and output PPTX paths
+        const string pdfPath  = "input.pdf";
         const string pptxPath = "output.pptx";
 
-        // ------------------------------------------------------------
-        // Ensure the source PDF exists – create a simple one if missing
-        // ------------------------------------------------------------
+        // Validate the PDF file exists
         if (!File.Exists(pdfPath))
         {
-            using (var doc = new Document())
-            {
-                // Add a blank page (or you can add any content you need)
-                doc.Pages.Add();
-                doc.Save(pdfPath);
-                Console.WriteLine($"Sample PDF created at '{pdfPath}'.");
-            }
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            return;
         }
 
-        // ------------------- Convert PDF to PPTX -------------------
-        using (var pdfDoc = new Document(pdfPath))
+        // ---------- Convert PDF to PPTX ----------
+        // Use a using block to ensure proper disposal of the Document object
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            // Save as PPTX using Aspose.Pdf's built‑in support
+            // Aspose.Pdf can directly save a PDF as a PPTX file – no Aspose.Slides required
             pdfDoc.Save(pptxPath, SaveFormat.Pptx);
         }
-        Console.WriteLine("PDF converted to PPTX successfully.");
 
-        // NOTE: Adding speaker notes requires the Aspose.Slides library, which is a separate product.
-        // Since the current project does not reference Aspose.Slides, the note‑adding step has been omitted.
+        Console.WriteLine($"PDF successfully converted to PPTX: {pptxPath}");
     }
 }

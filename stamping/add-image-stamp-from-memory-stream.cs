@@ -6,52 +6,40 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string imagePath = "logo.png";
+        const string outputPdfPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
+        // A 1x1 pixel PNG image encoded in Base64 (transparent). Replace with your own image if needed.
+        const string base64Png = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+XK6cAAAAASUVORK5CYII=";
+        byte[] imageBytes = Convert.FromBase64String(base64Png);
 
-        if (!File.Exists(imagePath))
+        // Create a PDF document in memory (no external file required)
+        using (Document pdfDoc = new Document())
         {
-            Console.Error.WriteLine($"Image file not found: {imagePath}");
-            return;
-        }
+            // Add a single blank page so we have something to stamp onto
+            pdfDoc.Pages.Add();
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPdf))
-        {
-            // Load the image into a memory stream
-            using (FileStream imgFile = File.OpenRead(imagePath))
-            using (MemoryStream imgStream = new MemoryStream())
+            // Create an ImageStamp directly from the memory stream
+            using (MemoryStream imageStream = new MemoryStream(imageBytes))
             {
-                imgFile.CopyTo(imgStream);
-                imgStream.Position = 0; // reset stream position
-
-                // Create an ImageStamp from the memory stream
-                ImageStamp imgStamp = new ImageStamp(imgStream)
+                ImageStamp stamp = new ImageStamp(imageStream)
                 {
-                    Background = false,
+                    Background = false,               // place on top of page content
+                    Opacity = 0.5,                    // 50% transparent
                     HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Opacity = 0.5f
+                    VerticalAlignment = VerticalAlignment.Center
                 };
 
-                // Apply the stamp to every page in the document
-                foreach (Page page in doc.Pages)
+                // Apply the stamp to each page in the document
+                foreach (Page page in pdfDoc.Pages)
                 {
-                    page.AddStamp(imgStamp);
+                    page.AddStamp(stamp);
                 }
             }
 
-            // Save the modified PDF
-            doc.Save(outputPdf);
+            // Save the stamped PDF to disk
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Stamped PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Image stamp applied and saved to '{outputPdfPath}'.");
     }
 }

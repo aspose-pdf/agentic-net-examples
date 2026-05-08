@@ -2,53 +2,83 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class UpdateZugferdAttachment
+class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "invoice_original.pdf";
-        const string newXmlPath = "invoice_updated.xml";
-        const string outputPdfPath = "invoice_updated.pdf";
-        const string attachmentName = "ZUGFeRD-invoice.xml";
+        const string inputPdfPath  = "invoice.pdf";          // existing PDF with ZUGFeRD attachment
+        const string outputPdfPath = "invoice_updated.pdf";  // PDF after attachment replacement
+        const string newXmlContent = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<Invoice>
+    <ID>2023-001</ID>
+    <IssueDate>2023-04-01</IssueDate>
+    <Seller>
+        <Name>Acme Corp</Name>
+        <TaxID>123456789</TaxID>
+    </Seller>
+    <Buyer>
+        <Name>Globex Ltd</Name>
+        <TaxID>987654321</TaxID>
+    </Buyer>
+    <TotalAmount>1500.00</TotalAmount>
+</Invoice>";
 
-        // Ensure source files exist
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(newXmlPath))
-        {
-            Console.Error.WriteLine($"New ZUGFeRD XML not found: {newXmlPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document (wrapped in using for deterministic disposal)
-        using (Document pdf = new Document(inputPdfPath))
+        try
         {
-            // Remove existing ZUGFeRD attachment if it exists
-            if (pdf.EmbeddedFiles[attachmentName] != null)
+            // Load the PDF document
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                pdf.EmbeddedFiles.Delete(attachmentName);
+                // Prepare the new XML as a memory stream
+                byte[] xmlBytes = System.Text.Encoding.UTF8.GetBytes(newXmlContent);
+                using (MemoryStream xmlStream = new MemoryStream(xmlBytes))
+                {
+                    bool attachmentReplaced = false;
+
+                    // Search for an existing embedded XML file (ZUGFeRD)
+                    foreach (FileSpecification fileSpec in pdfDoc.EmbeddedFiles)
+                    {
+                        // Guard against null Name
+                        if (fileSpec?.Name != null &&
+                            fileSpec.Name.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
+                        {
+                            // Replace the contents with the new XML
+                            // Reset the stream position to the beginning
+                            xmlStream.Position = 0;
+                            fileSpec.Contents = new MemoryStream(xmlBytes);
+                            attachmentReplaced = true;
+                            break;
+                        }
+                    }
+
+                    // If no XML attachment was found, add a new one
+                    if (!attachmentReplaced)
+                    {
+                        // Create a new file specification for the ZUGFeRD XML
+                        // The constructor parameters are (fileName, description)
+                        FileSpecification newSpec = new FileSpecification("ZUGFeRD-invoice.xml",
+                                                                          "ZUGFeRD XML invoice");
+                        // Assign the XML content stream
+                        newSpec.Contents = new MemoryStream(xmlBytes);
+                        // Add the new specification to the document's embedded files collection
+                        pdfDoc.EmbeddedFiles.Add(newSpec);
+                    }
+                }
+
+                // Save the updated PDF (incremental update is performed automatically)
+                pdfDoc.Save(outputPdfPath);
             }
 
-            // Read the updated XML into a memory stream
-            byte[] xmlBytes = File.ReadAllBytes(newXmlPath);
-            using (MemoryStream xmlStream = new MemoryStream(xmlBytes))
-            {
-                // Create a FileSpecification for the embedded file
-                // The constructor that takes a file path is used only for the description;
-                // we then replace the Contents with our stream.
-                var fileSpec = new FileSpecification(attachmentName, "ZUGFeRD invoice XML");
-                fileSpec.Contents = xmlStream;
-                // Add the file specification to the PDF's EmbeddedFiles collection
-                pdf.EmbeddedFiles.Add(fileSpec);
-            }
-
-            // Save the modified PDF
-            pdf.Save(outputPdfPath);
+            Console.WriteLine($"ZUGFeRD attachment updated successfully: {outputPdfPath}");
         }
-
-        Console.WriteLine($"ZUGFeRD attachment updated and saved to '{outputPdfPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error updating attachment: {ex.Message}");
+        }
     }
 }

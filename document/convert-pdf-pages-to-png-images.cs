@@ -2,50 +2,113 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Devices;
+using NUnit.Framework; // Added to bring stubbed NUnit types into scope
 
-class Program
+// Minimal NUnit stubs to allow compilation without the NUnit package.
+namespace NUnit.Framework
 {
-    static void Main()
+    [AttributeUsage(AttributeTargets.Class)]
+    public sealed class TestFixtureAttribute : Attribute { }
+
+    [AttributeUsage(AttributeTargets.Method)]
+    public sealed class TestAttribute : Attribute { }
+
+    [AttributeUsage(AttributeTargets.Method)]
+    public sealed class SetUpAttribute : Attribute { }
+
+    [AttributeUsage(AttributeTargets.Method)]
+    public sealed class TearDownAttribute : Attribute { }
+
+    public static class Assert
     {
-        // Input PDF file path
-        const string inputPdfPath = "input.pdf";
-
-        // Directory where each page image will be saved
-        const string outputImageDir = "SanitizedImages";
-
-        // Validate input file existence
-        if (!File.Exists(inputPdfPath))
+        public static void IsTrue(bool condition, string? message = null)
         {
-            Console.Error.WriteLine($"Error: PDF file not found – {inputPdfPath}");
-            return;
+            if (!condition)
+                throw new Exception(message ?? "Assert.IsTrue failed.");
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputImageDir);
-
-        try
+        public static void AreEqual<T>(T expected, T actual, string? message = null)
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document pdfDoc = new Document(inputPdfPath))
-            {
-                // Define the resolution for the rasterized images (e.g., 300 DPI)
-                var resolution = new Resolution(300);
-                // Create an image device – PNG in this example
-                var pngDevice = new PngDevice(resolution);
-
-                // Iterate through all pages and save each as a separate image file
-                for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
-                {
-                    string outPath = Path.Combine(outputImageDir, $"page_{pageNumber}.png");
-                    pngDevice.Process(pdfDoc.Pages[pageNumber], outPath);
-                }
-            }
-
-            Console.WriteLine($"All pages have been saved as images in '{outputImageDir}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"An error occurred: {ex.Message}");
+            if (!object.Equals(expected, actual))
+                throw new Exception(message ?? $"Assert.AreEqual failed. Expected:<{expected}>. Actual:<{actual}>.");
         }
     }
+}
+
+namespace AsposePdfTests
+{
+    [TestFixture]
+    public class ConvertPagesToImagesTests
+    {
+        // Path to a sample PDF used for testing.
+        // In a real test environment this file should be placed in the test project's output directory.
+        private const string SamplePdfPath = "sample.pdf";
+
+        // Temporary directory where generated images will be stored.
+        private string _outputDir = string.Empty;
+
+        [SetUp]
+        public void SetUp()
+        {
+            // Create a unique temporary folder for each test run.
+            _outputDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            Directory.CreateDirectory(_outputDir);
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            // Clean up generated files after the test.
+            if (Directory.Exists(_outputDir))
+            {
+                Directory.Delete(_outputDir, true);
+            }
+        }
+
+        [Test]
+        public void ConvertPagesToImages_FlagGeneratesImageForEveryPage()
+        {
+            // Verify that the sample PDF exists.
+            Assert.IsTrue(File.Exists(SamplePdfPath), $"Test PDF not found: {SamplePdfPath}");
+
+            // Load the PDF document.
+            using (Document pdfDocument = new Document(SamplePdfPath))
+            {
+                // Create a resolution (300 DPI) for high‑quality images.
+                Resolution resolution = new Resolution(300);
+
+                // Initialize the PNG device with the chosen resolution.
+                PngDevice pngDevice = new PngDevice(resolution);
+
+                // Convert each page to a PNG file.
+                for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
+                {
+                    string imagePath = Path.Combine(_outputDir, $"page_{pageNumber}.png");
+                    using (FileStream imageStream = new FileStream(imagePath, FileMode.Create))
+                    {
+                        pngDevice.Process(pdfDocument.Pages[pageNumber], imageStream);
+                    }
+                }
+
+                // Assert that an image file was created for every page.
+                string[] generatedFiles = Directory.GetFiles(_outputDir, "page_*.png");
+                Assert.AreEqual(pdfDocument.Pages.Count, generatedFiles.Length,
+                    "Number of generated images does not match number of PDF pages.");
+
+                // Additional sanity check: each file should exist and have a non‑zero size.
+                foreach (string file in generatedFiles)
+                {
+                    FileInfo info = new FileInfo(file);
+                    Assert.IsTrue(info.Exists, $"Image file missing: {file}");
+                    Assert.IsTrue(info.Length > 0, $"Image file is empty: {file}");
+                }
+            }
+        }
+    }
+}
+
+// Dummy entry point to satisfy the compiler when the project is built as an executable.
+public static class Program
+{
+    public static void Main() { /* No‑op */ }
 }

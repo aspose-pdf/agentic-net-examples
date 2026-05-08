@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,32 +15,39 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Ensure the document has at least two pages
-            if (doc.Pages.Count < 2)
+            // Load the existing PDF
+            using (Document doc = new Document(inputPath))
             {
-                Console.Error.WriteLine("The document must contain at least two pages.");
-                return;
+                // Verify that page 2 exists
+                if (doc.Pages.Count < 2)
+                {
+                    Console.Error.WriteLine("The document must contain at least two pages.");
+                    return;
+                }
+
+                // Retrieve dimensions from page 2 (1‑based indexing)
+                Page sourcePage = doc.Pages[2];
+                double width = sourcePage.PageInfo.Width;
+                double height = sourcePage.PageInfo.Height;
+
+                // Insert a new empty page at position 5
+                // If the document has fewer than 5 pages, the new page is appended at the end
+                Page newPage = doc.Pages.Insert(5);
+
+                // Apply the same size as page 2
+                newPage.SetPageSize(width, height);
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Get dimensions of page 2 (pages are 1‑based)
-            Page sourcePage = doc.Pages[2];
-            double width  = sourcePage.PageInfo.Width;
-            double height = sourcePage.PageInfo.Height;
-
-            // Insert a new empty page at position 5
-            // Insert returns the newly created page instance
-            Page newPage = doc.Pages.Insert(5);
-
-            // Set the size of the new page to match page 2
-            newPage.SetPageSize(width, height);
-
-            // Save the modified document
-            doc.Save(outputPath);
+            Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"New page inserted at position 5 with size of page 2. Saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

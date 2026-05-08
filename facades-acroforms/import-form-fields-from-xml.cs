@@ -1,20 +1,20 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades; // Form class resides here
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Paths to the source PDF, the XML data file and the output PDF
-        const string sourcePdfPath = "input.pdf";
+        // Paths for the source PDF, the XML data file and the resulting PDF
+        const string inputPdfPath  = "input.pdf";
         const string xmlDataPath   = "data.xml";
         const string outputPdfPath = "output.pdf";
 
         // Ensure the source files exist before proceeding
-        if (!File.Exists(sourcePdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
         if (!File.Exists(xmlDataPath))
@@ -23,20 +23,16 @@ class Program
             return;
         }
 
-        // Use a Form facade to bind the PDF, import XML field values and save the result
-        using (Form form = new Form())
+        // Use the Form facade to bind to the PDF, import XML field values, and save the result
+        using (Form form = new Form(inputPdfPath)) // Binds the facade to the source PDF
         {
-            // Bind the existing PDF document to the Form facade
-            form.BindPdf(sourcePdfPath);
-
-            // Open the XML file as a read‑only stream and import its field values
+            // Open the XML file as a read‑only stream and import its data into the form fields
             using (FileStream xmlStream = new FileStream(xmlDataPath, FileMode.Open, FileAccess.Read))
             {
-                // ImportXml reads the field values from the XML stream and applies them to the bound PDF
-                form.ImportXml(xmlStream);
+                form.ImportXml(xmlStream); // Imports field values from the XML stream
             }
 
-            // Save the modified PDF to the desired output location
+            // Save the updated PDF to a new file
             form.Save(outputPdfPath);
         }
 

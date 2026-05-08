@@ -1,46 +1,44 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace contains Document, Permissions, CryptoAlgorithm
+using Aspose.Pdf; // CryptoAlgorithm, Permissions, Document are in this namespace
 
 class Program
 {
     static void Main()
     {
-        // Input and output file paths
         const string inputPath  = "input.pdf";
         const string outputPath = "encrypted.pdf";
 
-        // Passwords for encryption
+        // Define passwords (user: opens the document, owner: changes permissions)
         const string userPassword  = "user123";
         const string ownerPassword = "owner123";
 
-        // Verify the input file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Error: File not found – {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document (lifecycle rule: use Document constructor)
+            // Load the PDF document inside a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
                 // Set permissions: allow printing and copying (extracting content)
                 Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-                // Encrypt the document using the recommended CryptoAlgorithm (AESx256)
+                // Encrypt using AES-256 (preferred algorithm)
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-                // Save the encrypted PDF (lifecycle rule: use Document.Save)
+                // Save the encrypted PDF
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Encryption successful. Encrypted file saved as '{outputPath}'.");
+            Console.WriteLine($"PDF encrypted and saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during encryption: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

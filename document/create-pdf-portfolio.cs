@@ -6,16 +6,16 @@ class Program
 {
     static void Main()
     {
-        // Input PDF files to be grouped in the portfolio
-        string[] inputFiles = { "file1.pdf", "file2.pdf", "file3.pdf" };
+        // Input PDF files to be bundled into the portfolio
+        string[] inputFiles = { "doc1.pdf", "doc2.pdf", "doc3.pdf" };
         const string outputPortfolio = "portfolio.pdf";
 
-        // Verify that all input files exist before proceeding
-        foreach (string path in inputFiles)
+        // Verify that all source files exist before proceeding
+        foreach (string file in inputFiles)
         {
-            if (!File.Exists(path))
+            if (!File.Exists(file))
             {
-                Console.Error.WriteLine($"Input file not found: {path}");
+                Console.Error.WriteLine($"Source file not found: {file}");
                 return;
             }
         }
@@ -23,28 +23,24 @@ class Program
         // Create an empty PDF document that will become the portfolio
         using (Document portfolioDoc = new Document())
         {
-            // Ensure a collection exists for portfolio attachments
+            // Ensure the Collection object is instantiated
             if (portfolioDoc.Collection == null)
                 portfolioDoc.Collection = new Collection();
 
-            // Add each PDF to the portfolio using FileSpecification
-            foreach (string path in inputFiles)
+            // Add each PDF as an embedded file in the portfolio using FileSpecification
+            foreach (string file in inputFiles)
             {
-                var fileSpec = new FileSpecification(path, Path.GetFileName(path))
+                var fileSpec = new FileSpecification(file, Path.GetFileName(file))
                 {
-                    // Load the file bytes into the Contents stream
-                    Contents = new MemoryStream(File.ReadAllBytes(path))
+                    Contents = new MemoryStream(File.ReadAllBytes(file))
                 };
                 portfolioDoc.Collection.Add(fileSpec);
             }
 
-            // Optional: set document title/description metadata
-            portfolioDoc.Info.Title = "PDF Portfolio";
-
-            // Save the resulting PDF portfolio
+            // Save the resulting portfolio PDF
             portfolioDoc.Save(outputPortfolio);
         }
 
-        Console.WriteLine($"PDF portfolio created successfully: {outputPortfolio}");
+        Console.WriteLine($"PDF portfolio created successfully at '{outputPortfolio}'.");
     }
 }

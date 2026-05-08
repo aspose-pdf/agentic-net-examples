@@ -6,26 +6,32 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_with_department.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        // Verify the source PDF exists
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Bind the existing PDF to the XMP metadata facade
-        PdfXmpMetadata xmp = new PdfXmpMetadata();
-        xmp.BindPdf(inputPdf);
+        // Load the PDF into the XMP metadata facade, add the custom field,
+        // and save the result. The facade implements IDisposable, so we use
+        // a using block to ensure proper resource cleanup.
+        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
+        {
+            // Bind the existing PDF file
+            xmp.BindPdf(inputPath);
 
-        // Add a custom XMP field "Department" with value "Finance"
-        // Using the generic Add(string, object) overload
-        xmp.Add("xmp:Department", "Finance");
+            // Add a custom XMP property. The key follows the XMP namespace
+            // convention (e.g., "xmp:Department").
+            xmp.Add("xmp:Department", "Finance");
 
-        // Save the PDF with the updated XMP metadata
-        xmp.Save(outputPdf);
+            // Save the PDF with the updated XMP metadata.
+            xmp.Save(outputPath);
+        }
 
-        Console.WriteLine($"PDF saved with Department metadata: {outputPdf}");
+        Console.WriteLine($"PDF saved with Department metadata at '{outputPath}'.");
     }
 }

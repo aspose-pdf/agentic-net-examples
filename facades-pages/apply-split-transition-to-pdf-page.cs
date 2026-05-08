@@ -16,24 +16,25 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document (creation rule)
         using (Document doc = new Document(inputPath))
         {
-            // Initialize the PdfPageEditor facade and bind the document
-            PdfPageEditor editor = new PdfPageEditor();
-            editor.BindPdf(doc);
+            // Initialize PdfPageEditor with the loaded document
+            PdfPageEditor editor = new PdfPageEditor(doc);
 
-            // Specify that only page 3 will be edited
+            // Specify that only page 3 should be edited
             editor.ProcessPages = new int[] { 3 };
 
-            // Set the transition effect to a horizontal split (IN) and duration to 2 seconds
-            editor.TransitionType = PdfPageEditor.SPLITHIN; // IN Horizontal Split
-            editor.TransitionDuration = 2; // duration in seconds
+            // Set transition type to a split effect (horizontal in)
+            editor.TransitionType = PdfPageEditor.SPLITHIN;
+
+            // Set transition duration to 2 seconds
+            editor.TransitionDuration = 2;
 
             // Apply the changes to the document
             editor.ApplyChanges();
 
-            // Save the modified PDF
+            // Save the modified PDF (saving rule)
             doc.Save(outputPath);
         }
 

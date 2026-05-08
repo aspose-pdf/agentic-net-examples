@@ -1,64 +1,71 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing; // for Matrix
-using Aspose.Pdf.Vector; // for GraphicsAbsorber and GraphicElement
+using Aspose.Pdf.Vector;
 
 class Program
 {
     static void Main()
     {
-        const string sourcePath = "source.pdf";
-        const string destinationPath = "destination.pdf";
+        const string inputPdf  = "source.pdf";   // PDF containing the vector graphic
+        const string outputPdf = "result.pdf";   // PDF with the graphic transferred
+        const int  sourcePageNumber = 1;         // page to extract from (1‑based)
+        const int  destPageNumber   = 2;         // page to place the graphic onto (1‑based)
 
-        // Page numbers are 1‑based in Aspose.Pdf
-        const int sourcePageNumber = 1;
-        const int destinationPageNumber = 2;
+        // Offsets to move the graphic on the destination page
+        const float offsetX = 100f; // move right by 100 points
+        const float offsetY = 50f;  // move up by 50 points
 
-        // Desired translation of the graphic on the destination page
-        const double offsetX = 100.0; // move right
-        const double offsetY = 50.0;  // move up
-
-        if (!File.Exists(sourcePath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {sourcePath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the source PDF (the same document is used as destination for simplicity)
-        using (Document srcDoc = new Document(sourcePath))
-        using (Document dstDoc = new Document(sourcePath))
+        // Load the PDF document (core API)
+        using (Document doc = new Document(inputPdf))
         {
-            Page srcPage = srcDoc.Pages[sourcePageNumber];
-            Page dstPage = dstDoc.Pages[destinationPageNumber];
+            // Ensure the destination page exists; add a blank page if necessary
+            while (doc.Pages.Count < Math.Max(sourcePageNumber, destPageNumber))
+                doc.Pages.Add();
+
+            Page sourcePage = doc.Pages[sourcePageNumber];
+            Page destPage   = doc.Pages[destPageNumber];
 
             // Extract vector graphics from the source page
-            GraphicsAbsorber absorber = new GraphicsAbsorber();
-            absorber.Visit(srcPage);
-
-            // Translation matrix – moves the graphic by (offsetX, offsetY)
-            Matrix translation = new Matrix(1, 0, 0, 1, offsetX, offsetY);
-
-            // Iterate over each extracted graphic element
-            foreach (GraphicElement element in absorber.Elements)
+            using (GraphicsAbsorber absorber = new GraphicsAbsorber())
             {
-                // Adjust the element's position using the translation matrix.
-                // If the element exposes a Matrix property we could multiply it, but the
-                // safest way across Aspose.Pdf versions is to shift the Position.
-                Point currentPos = element.Position;
-                element.Position = new Point(currentPos.X + offsetX, currentPos.Y + offsetY);
+                // NOTE: GraphicsAbsorber uses Visit(page) – not Page.Accept
+                absorber.Visit(sourcePage);
 
-                // Alternatively, when Matrix is available you could use:
-                // element.Matrix = element.Matrix * translation;
+                // If no vector graphics were found, exit
+                if (absorber.Elements.Count == 0)
+                {
+                    Console.WriteLine("No vector graphics found on the source page.");
+                }
+                else
+                {
+                    // Transfer each extracted graphic to the destination page
+                    foreach (GraphicElement element in absorber.Elements)
+                    {
+                        // Adjust position by setting the Position property.
+                        // This updates the internal transformation matrix.
+                        // Position expects an Aspose.Pdf.Point (X, Y) in user space.
+                        element.Position = new Aspose.Pdf.Point(
+                            element.Position.X + offsetX,
+                            element.Position.Y + offsetY);
 
-                // Place the modified element onto the destination page.
-                element.AddOnPage(dstPage);
+                        // Add the element to the destination page.
+                        // AddOnPage works for a single element; for many elements AddGraphics is faster.
+                        element.AddOnPage(destPage);
+                    }
+                }
             }
 
             // Save the modified document
-            dstDoc.Save(destinationPath);
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Vector graphic transferred and saved to '{destinationPath}'.");
+        Console.WriteLine($"Vector graphic transferred and saved to '{outputPdf}'.");
     }
 }

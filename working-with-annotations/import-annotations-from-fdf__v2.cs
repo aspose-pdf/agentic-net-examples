@@ -1,40 +1,39 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // FdfReader resides here
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string fdfPath = "annotations.fdf";
-        const string outputPath = "output.pdf";
+        const string pdfPath   = "input.pdf";      // source PDF
+        const string fdfPath   = "annotations.fdf"; // FDF containing annotations
+        const string outputPath = "output.pdf";    // result PDF
 
+        // Verify input files exist
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
-
         if (!File.Exists(fdfPath))
         {
-            Console.Error.WriteLine($"FDF not found: {fdfPath}");
+            Console.Error.WriteLine($"FDF file not found: {fdfPath}");
             return;
         }
 
-        // Load the PDF document.
-        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(pdfPath))
+        // Load the PDF document (using ensures proper disposal)
+        using (Document doc = new Document(pdfPath))
         {
-            // Open the FDF file as a stream.
+            // Open the FDF stream
             using (FileStream fdfStream = File.OpenRead(fdfPath))
             {
-                // Import annotations from the FDF into the document.
-                // Annotations are placed on the pages indicated in the FDF data.
+                // Import annotations; page numbers embedded in the FDF are honored
                 Aspose.Pdf.Annotations.FdfReader.ReadAnnotations(fdfStream, doc);
             }
 
-            // Save the PDF with the imported annotations.
+            // Save the PDF with the newly imported annotations
             doc.Save(outputPath);
         }
 

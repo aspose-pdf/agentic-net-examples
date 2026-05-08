@@ -1,96 +1,91 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string firstPdf  = "first.pdf";
-        const string secondPdf = "second.pdf";
-        const string mergedPdf = "merged.pdf";
+        // Input PDF files to concatenate
+        string[] inputFiles = { "file1.pdf", "file2.pdf" };
+        string outputFile = "concatenated.pdf";
 
         // Verify input files exist
-        if (!File.Exists(firstPdf))
+        foreach (string file in inputFiles)
         {
-            Console.Error.WriteLine($"File not found: {firstPdf}");
-            return;
-        }
-        if (!File.Exists(secondPdf))
-        {
-            Console.Error.WriteLine($"File not found: {secondPdf}");
-            return;
-        }
-
-        // Concatenate the two PDFs using PdfFileEditor
-        PdfFileEditor editor = new PdfFileEditor();
-        bool concatResult = editor.Concatenate(firstPdf, secondPdf, mergedPdf);
-        if (!concatResult)
-        {
-            Console.Error.WriteLine("Concatenation failed.");
-            return;
-        }
-
-        // Load source documents to obtain original page counts
-        int firstPageCount, secondPageCount;
-        using (Document doc1 = new Document(firstPdf))
-        {
-            firstPageCount = doc1.Pages.Count; // 1‑based indexing
-        }
-        using (Document doc2 = new Document(secondPdf))
-        {
-            secondPageCount = doc2.Pages.Count;
-        }
-
-        // Load the merged document and verify page order by checking total page count
-        using (Document mergedDoc = new Document(mergedPdf))
-        {
-            int mergedPageCount = mergedDoc.Pages.Count;
-
-            // Expected page count is the sum of the two source documents
-            int expectedPageCount = firstPageCount + secondPageCount;
-
-            if (mergedPageCount != expectedPageCount)
+            if (!File.Exists(file))
             {
-                Console.Error.WriteLine($"Page count mismatch: expected {expectedPageCount}, got {mergedPageCount}");
+                Console.Error.WriteLine($"Input file not found: {file}");
                 return;
             }
-
-            // Optional deeper validation: compare first page of each source with corresponding pages in merged doc
-            // Verify that page 1 of merged equals page 1 of first PDF
-            bool orderValid = true;
-            for (int i = 1; i <= firstPageCount; i++)
-            {
-                // Simple check: compare page dimensions (width/height) as a proxy for order
-                Page srcPage = new Document(firstPdf).Pages[i];
-                Page mergedPage = mergedDoc.Pages[i];
-                if (srcPage.PageInfo.Width != mergedPage.PageInfo.Width ||
-                    srcPage.PageInfo.Height != mergedPage.PageInfo.Height)
-                {
-                    orderValid = false;
-                    break;
-                }
-            }
-            // Verify that pages after first document correspond to second PDF
-            if (orderValid)
-            {
-                for (int i = 1; i <= secondPageCount; i++)
-                {
-                    Page srcPage = new Document(secondPdf).Pages[i];
-                    Page mergedPage = mergedDoc.Pages[firstPageCount + i];
-                    if (srcPage.PageInfo.Width != mergedPage.PageInfo.Width ||
-                        srcPage.PageInfo.Height != mergedPage.PageInfo.Height)
-                    {
-                        orderValid = false;
-                        break;
-                    }
-                }
-            }
-
-            Console.WriteLine(orderValid
-                ? "Concatenation preserved original page order."
-                : "Page order validation failed.");
         }
+
+        // Concatenate PDFs using Document API (avoids PdfFileEditor native process)
+        Document concatenatedDoc = new Document();
+        foreach (string file in inputFiles)
+        {
+            Document src = new Document(file);
+            // Append all pages from the source document
+            concatenatedDoc.Pages.Add(src.Pages);
+        }
+        concatenatedDoc.Save(outputFile);
+
+        // Extract page texts from each original PDF
+        List<string> originalPageTexts = new List<string>();
+        foreach (string file in inputFiles)
+        {
+            originalPageTexts.AddRange(GetPageTexts(file));
+        }
+
+        // Extract page texts from the concatenated PDF
+        List<string> concatenatedPageTexts = GetPageTexts(outputFile);
+
+        // Validate page count
+        if (originalPageTexts.Count != concatenatedPageTexts.Count)
+        {
+            Console.WriteLine("Validation failed: page count mismatch.");
+            Console.WriteLine($"Original total pages: {originalPageTexts.Count}");
+            Console.WriteLine($"Concatenated total pages: {concatenatedPageTexts.Count}");
+            return;
+        }
+
+        // Validate page order by comparing text of each page
+        bool orderPreserved = true;
+        for (int i = 0; i < originalPageTexts.Count; i++)
+        {
+            if (originalPageTexts[i] != concatenatedPageTexts[i])
+            {
+                orderPreserved = false;
+                Console.WriteLine($"Mismatch at page {i + 1}");
+                break;
+            }
+        }
+
+        if (orderPreserved)
+        {
+            Console.WriteLine("Validation succeeded: page order preserved after concatenation.");
+        }
+        else
+        {
+            Console.WriteLine("Validation failed: page order not preserved.");
+        }
+    }
+
+    // Returns a list of text contents for each page of the specified PDF
+    private static List<string> GetPageTexts(string pdfPath)
+    {
+        List<string> pageTexts = new List<string>();
+        using (Document doc = new Document(pdfPath))
+        {
+            for (int i = 1; i <= doc.Pages.Count; i++) // 1‑based indexing
+            {
+                TextAbsorber absorber = new TextAbsorber();
+                doc.Pages[i].Accept(absorber);
+                pageTexts.Add(absorber.Text ?? string.Empty);
+            }
+        }
+        return pageTexts;
     }
 }

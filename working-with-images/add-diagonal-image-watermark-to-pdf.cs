@@ -1,19 +1,18 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // for ImageStamp (inherits from Stamp)
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string watermarkImage = "watermark.png";
-        const string outputPdf = "output_watermarked.pdf";
+        const string inputPdf  = "input.pdf";      // source PDF
+        const string outputPdf = "watermarked.pdf"; // result PDF
+        const string watermarkImage = "logo.png";   // image to use as watermark
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
@@ -23,32 +22,27 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document (using the recommended load pattern)
         using (Document doc = new Document(inputPdf))
         {
-            // Create an ImageStamp with the watermark image
-            ImageStamp stamp = new ImageStamp(watermarkImage);
-
-            // Set the stamp to appear over the page content (false = foreground)
-            stamp.Background = false;
-
-            // Optional: make the watermark semi‑transparent
-            stamp.Opacity = 0.3;
-
-            // Center the stamp on each page
-            stamp.HorizontalAlignment = HorizontalAlignment.Center;
-            stamp.VerticalAlignment   = VerticalAlignment.Center;
-
-            // Rotate the stamp by 45 degrees for diagonal placement
-            stamp.RotateAngle = 45;
-
-            // Apply the stamp to every page in the document
+            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
             foreach (Page page in doc.Pages)
             {
+                // Create an ImageStamp with the watermark image
+                ImageStamp stamp = new ImageStamp(watermarkImage);
+
+                // Set the arbitrary rotation angle (45 degrees) for diagonal placement
+                stamp.RotateAngle = 45;
+
+                // Optional: center the stamp on the page
+                stamp.HorizontalAlignment = HorizontalAlignment.Center;
+                stamp.VerticalAlignment   = VerticalAlignment.Center;
+
+                // Add the stamp to the current page
                 page.AddStamp(stamp);
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (using the standard Save method)
             doc.Save(outputPdf);
         }
 

@@ -7,41 +7,37 @@ class Program
 {
     static void Main()
     {
-        // Directory containing the PDF file (ensure it exists)
-        string dataDir = @"YOUR_DATA_DIRECTORY";
-        Directory.CreateDirectory(dataDir);
+        const string inputPdf = "input.pdf";
+        const string outputDir = "output_images";
 
-        // PDF file name
-        string pdfFile = @"YOUR_PDF_FILE";
-
-        string inputPath = Path.Combine(dataDir, pdfFile);
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDocument = new Document(inputPath))
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDir);
+
+        // Load the PDF document; the using block guarantees proper disposal
+        using (Document pdfDocument = new Document(inputPdf))
         {
-            // BmpDevice with default resolution (no parameters needed)
+            // BmpDevice with default resolution
             BmpDevice bmpDevice = new BmpDevice();
 
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+            // Pages are 1‑based indexed in Aspose.Pdf
             for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
             {
-                // Output BMP file path for the current page
-                string outputPath = Path.Combine(dataDir, $"image{pageNumber}_out.bmp");
+                string bmpPath = Path.Combine(outputDir, $"page_{pageNumber}.bmp");
 
-                // Create a FileStream inside a using block; it will be closed automatically
-                using (FileStream bmpStream = new FileStream(outputPath, FileMode.Create))
+                // Write each page to a BMP file using a FileStream inside a using block
+                using (FileStream bmpStream = new FileStream(bmpPath, FileMode.Create))
                 {
-                    // Convert the page to BMP and write it to the stream
                     bmpDevice.Process(pdfDocument.Pages[pageNumber], bmpStream);
                 }
+
+                Console.WriteLine($"Saved page {pageNumber} as BMP to '{bmpPath}'.");
             }
         }
-
-        Console.WriteLine("PDF has been successfully converted to BMP images.");
     }
 }

@@ -17,36 +17,27 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least one page
-            if (doc.Pages.Count < 1)
+            // Ensure the document has at least two pages
+            if (doc.Pages.Count < 2)
             {
-                Console.Error.WriteLine("Document contains no pages.");
+                Console.Error.WriteLine("Document must contain at least two pages.");
                 return;
             }
 
             // Collect all WatermarkAnnotations from the first page
             Page firstPage = doc.Pages[1];
-            var firstPageWatermarks = new List<WatermarkAnnotation>();
+            List<WatermarkAnnotation> sourceWatermarks = new List<WatermarkAnnotation>();
 
             for (int i = 1; i <= firstPage.Annotations.Count; i++)
             {
                 Annotation ann = firstPage.Annotations[i];
                 if (ann is WatermarkAnnotation wm)
                 {
-                    firstPageWatermarks.Add(wm);
+                    sourceWatermarks.Add(wm);
                 }
-            }
-
-            // No watermarks to duplicate? Exit early.
-            if (firstPageWatermarks.Count == 0)
-            {
-                Console.WriteLine("No WatermarkAnnotations found on the first page.");
-                doc.Save(outputPath);
-                Console.WriteLine($"Document saved to '{outputPath}'.");
-                return;
             }
 
             // Duplicate each collected watermark onto every subsequent page
@@ -54,25 +45,31 @@ class Program
             {
                 Page targetPage = doc.Pages[pageIndex];
 
-                foreach (WatermarkAnnotation srcWm in firstPageWatermarks)
+                foreach (WatermarkAnnotation srcWm in sourceWatermarks)
                 {
-                    // Create a new watermark annotation with the same rectangle
-                    WatermarkAnnotation newWm = new WatermarkAnnotation(targetPage, srcWm.Rect);
+                    // Create a new watermark annotation on the target page with the same rectangle
+                    WatermarkAnnotation dupWm = new WatermarkAnnotation(targetPage, srcWm.Rect);
 
-                    // Copy visual and content properties
-                    newWm.Color   = srcWm.Color;
-                    newWm.Opacity = srcWm.Opacity;
-                    newWm.Border  = srcWm.Border;   // Border can be null; copying reference is acceptable
-                    newWm.Contents = srcWm.Contents;
+                    // Copy relevant visual and metadata properties
+                    dupWm.Color   = srcWm.Color;
+                    dupWm.Opacity = srcWm.Opacity;
+                    dupWm.Contents = srcWm.Contents;
+                    dupWm.Border   = srcWm.Border;
+                    dupWm.Flags    = srcWm.Flags;
+                    dupWm.Name     = srcWm.Name;
+                    dupWm.Height   = srcWm.Height;
+                    dupWm.Width    = srcWm.Width;
+                    dupWm.ZIndex   = srcWm.ZIndex;
 
-                    // Add the new annotation to the target page
-                    targetPage.Annotations.Add(newWm);
+                    // Add the duplicated annotation to the page
+                    targetPage.Annotations.Add(dupWm);
                 }
             }
 
             // Save the modified document
             doc.Save(outputPath);
-            Console.WriteLine($"All WatermarkAnnotations duplicated. Saved to '{outputPath}'.");
         }
+
+        Console.WriteLine($"Watermark annotations duplicated and saved to '{outputPath}'.");
     }
 }

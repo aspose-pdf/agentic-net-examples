@@ -1,7 +1,7 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
-using Aspose.Pdf;
+using System.IO;
+using Aspose.Pdf; // Core API namespace
 
 class Program
 {
@@ -16,30 +16,32 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
         {
             // Ensure the document has at least 6 pages
             if (doc.Pages.Count < 6)
             {
-                Console.Error.WriteLine("Document does not contain enough pages.");
+                Console.Error.WriteLine("Document does not contain pages 3 through 6.");
                 return;
             }
 
             // Collect pages 3 through 6 (1‑based indexing)
-            List<Page> pagesToMove = new List<Page>();
+            List<Aspose.Pdf.Page> pagesToMove = new List<Aspose.Pdf.Page>();
             for (int i = 3; i <= 6; i++)
+            {
                 pagesToMove.Add(doc.Pages[i]);
+            }
 
-            // Insert the collected pages at the end of the document
-            // Insert position is Count+1 because Insert expects a 1‑based index
-            doc.Pages.Insert(doc.Pages.Count + 1, pagesToMove);
+            // Insert the collected pages at the end of the document.
+            // Insert position is Count + 1 because Insert expects a 1‑based index.
+            int insertPosition = doc.Pages.Count + 1;
+            doc.Pages.Insert(insertPosition, pagesToMove);
 
-            // Delete the original pages 3‑6
-            // Delete accepts an array of page numbers (1‑based)
+            // Delete the original pages (3‑6). Insertion at the end does not shift earlier indices.
             doc.Pages.Delete(new int[] { 3, 4, 5, 6 });
 
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

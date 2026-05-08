@@ -6,33 +6,36 @@ class Program
 {
     static void Main()
     {
-        // Paths for the output PDF portfolio and the Word document to embed
-        const string outputPdfPath = "portfolio.pdf";
-        const string wordDocPath   = "document.docx";
+        const string wordPath = "sample.docx";   // input Word document
+        const string outputPdf = "portfolio.pdf"; // output PDF Portfolio
 
-        // Verify the Word document exists before proceeding
-        if (!File.Exists(wordDocPath))
+        if (!File.Exists(wordPath))
         {
-            Console.Error.WriteLine($"Word document not found: {wordDocPath}");
+            Console.Error.WriteLine($"Word file not found: {wordPath}");
             return;
         }
 
-        // Create a new PDF document (empty) and ensure it has at least one page
+        // Create a new PDF document
         using (Document pdfDoc = new Document())
         {
-            // A PDF portfolio requires a page; add a blank one if none exist
-            pdfDoc.Pages.Add();
+            // Ensure the document has a collection (portfolio) initialized
+            if (pdfDoc.Collection == null)
+                pdfDoc.Collection = new Collection();
 
-            // Create a file specification for the Word document
-            FileSpecification wordFileSpec = new FileSpecification(wordDocPath);
+            // Create a FileSpecification for the Word document
+            var fileSpec = new FileSpecification(Path.GetFileName(wordPath), "Embedded Word document")
+            {
+                // Load the file bytes into the specification
+                Contents = new MemoryStream(File.ReadAllBytes(wordPath))
+            };
 
-            // Add the Word document to the PDF portfolio (collection)
-            pdfDoc.Collection.Add(wordFileSpec);
+            // Add the file specification to the PDF portfolio collection
+            pdfDoc.Collection.Add(fileSpec);
 
-            // Save the PDF portfolio to disk
-            pdfDoc.Save(outputPdfPath);
+            // Save the PDF Portfolio
+            pdfDoc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF portfolio created at '{outputPdfPath}' with embedded Word document.");
+        Console.WriteLine($"PDF Portfolio created: {outputPdf}");
     }
 }

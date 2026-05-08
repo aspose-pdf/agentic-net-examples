@@ -4,10 +4,9 @@ using Aspose.Pdf;
 
 class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
-        // Input PDF path – can be passed as a command‑line argument or defaults to "sample.pdf"
-        string inputPath = args.Length > 0 ? args[0] : "sample.pdf";
+        const string inputPath = "input.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,20 +14,18 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            int pageCount = doc.Pages.Count;
-            Console.WriteLine($"Document contains {pageCount} pages.");
-
-            // Pages are 1‑based; iterate from 1 to Count inclusive
-            for (int i = 1; i <= pageCount; i++)
+            // Pages are 1‑based indexed (see page-indexing-one-based rule)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
-                // The Rect property returns the page rectangle (crop box or media box)
-                var rect = page.Rect;
-                double width = rect.Width;
-                double height = rect.Height;
+
+                // The Rect property returns the page rectangle (media box or crop box)
+                // Width = URX - LLX, Height = URY - LLY
+                double width  = page.Rect.URX - page.Rect.LLX;
+                double height = page.Rect.URY - page.Rect.LLY;
 
                 Console.WriteLine($"Page {i}: Width = {width}, Height = {height}");
             }

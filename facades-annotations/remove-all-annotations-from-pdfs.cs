@@ -2,45 +2,60 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-class Program
+namespace AsposePdfAnnotationRemover
 {
-    static void Main()
+    class Program
     {
-        // Folder containing PDF files
-        const string folderPath = @"C:\PdfFolder";
-
-        if (!Directory.Exists(folderPath))
+        static void Main(string[] args)
         {
-            Console.Error.WriteLine($"Folder not found: {folderPath}");
-            return;
-        }
-
-        // Get all PDF files in the folder (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(folderPath, "*.pdf", SearchOption.TopDirectoryOnly);
-
-        foreach (string pdfPath in pdfFiles)
-        {
-            try
+            // ---------------------------------------------------------------
+            // Validate arguments
+            // ---------------------------------------------------------------
+            if (args.Length < 1)
             {
-                // PdfAnnotationEditor implements SaveableFacade (IDisposable)
-                using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-                {
-                    // Bind the PDF file to the editor
-                    editor.BindPdf(pdfPath);
+                Console.WriteLine("Usage: AsposePdfAnnotationRemover <FolderPath> [OutputFolder]");
+                return;
+            }
 
-                    // Delete all annotations in the document
+            string folderPath = args[0];
+            string outputFolder = args.Length > 1 ? args[1] : folderPath;
+
+            if (!Directory.Exists(folderPath))
+            {
+                Console.WriteLine($"Input folder does not exist: {folderPath}");
+                return;
+            }
+
+            // ---------------------------------------------------------------
+            // Ensure the output folder exists (creates it if necessary)
+            // ---------------------------------------------------------------
+            if (!Directory.Exists(outputFolder))
+                Directory.CreateDirectory(outputFolder);
+
+            // ---------------------------------------------------------------
+            // Process each PDF file in the folder
+            // ---------------------------------------------------------------
+            foreach (string pdfFile in Directory.GetFiles(folderPath, "*.pdf"))
+            {
+                string outputFile = Path.Combine(outputFolder, Path.GetFileName(pdfFile));
+
+                // PdfAnnotationEditor implements IDisposable, so we use a using block.
+                using (var editor = new PdfAnnotationEditor())
+                {
+                    // Bind the source PDF.
+                    editor.BindPdf(pdfFile);
+
+                    // Delete **all** annotations in the document.
                     editor.DeleteAnnotations();
 
-                    // Overwrite the original file with the cleaned PDF
-                    editor.Save(pdfPath);
+                    // Save the cleaned PDF. The Save method overwrites the file if it already exists.
+                    editor.Save(outputFile);
                 }
 
-                Console.WriteLine($"Processed: {Path.GetFileName(pdfPath)}");
+                Console.WriteLine($"Processed: {pdfFile} -> {outputFile}");
             }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
-            }
+
+            Console.WriteLine("Annotation removal completed.");
         }
     }
 }

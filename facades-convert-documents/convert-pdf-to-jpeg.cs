@@ -1,47 +1,45 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices;
-using Aspose.Pdf.Text; // Added for TextFragment
+using Aspose.Pdf.Devices; // for JpegDevice and Resolution
 
-class Program
+class PdfToJpegConverter
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputDir = "Images";
-        Directory.CreateDirectory(outputDir);
+        const string inputPdfPath = "input.pdf";   // source PDF
+        const string outputFolder = "Images";      // folder for JPEGs
 
-        // If the source PDF does not exist, create a minimal placeholder so the program can run.
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            using (Document placeholder = new Document())
-            {
-                Page page = placeholder.Pages.Add();
-                page.Paragraphs.Add(new TextFragment("Sample PDF generated because 'input.pdf' was missing."));
-                placeholder.Save(inputPdf);
-                Console.WriteLine($"Created placeholder PDF: {inputPdf}");
-            }
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            return;
         }
 
-        // Load the PDF document.
-        using (Document pdfDocument = new Document(inputPdf))
-        {
-            // 72 DPI keeps the original page size (1 point = 1 pixel at 72 DPI).
-            Resolution resolution = new Resolution(72);
-            // JPEG device – default colour depth is 24‑bit; 100 is the quality (0‑100).
-            JpegDevice jpegDevice = new JpegDevice(resolution, 100);
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-            for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
-            {
-                string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.jpg");
-                using (FileStream imageStream = new FileStream(outputPath, FileMode.Create))
-                {
-                    jpegDevice.Process(pdfDocument.Pages[pageNumber], imageStream);
-                }
-            }
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPdfPath);
+
+        // Set resolution to 72 DPI – 1 point = 1 pixel, preserving original page size.
+        // The Resolution class lives in Aspose.Pdf.Devices namespace.
+        Resolution resolution = new Resolution(72);
+
+        // JpegDevice does NOT implement IDisposable, so do NOT wrap it in a using block.
+        JpegDevice jpegDevice = new JpegDevice(resolution);
+
+        int pageIndex = 1;
+        foreach (Page page in pdfDocument.Pages)
+        {
+            string outputFile = Path.Combine(outputFolder, $"page_{pageIndex}.jpg");
+
+            // Process the page directly to a file path.
+            jpegDevice.Process(page, outputFile);
+
+            pageIndex++;
         }
 
-        Console.WriteLine("PDF conversion to JPEG completed successfully.");
+        Console.WriteLine($"Conversion completed. JPEG images saved to '{outputFolder}'.");
     }
 }

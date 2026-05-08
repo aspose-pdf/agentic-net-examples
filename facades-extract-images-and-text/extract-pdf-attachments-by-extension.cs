@@ -1,7 +1,6 @@
 using System;
-using System.IO;
-using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -23,7 +22,7 @@ class Program
         // Ensure the root output folder exists
         Directory.CreateDirectory(outputRootFolder);
 
-        // Use PdfExtractor (Facade) to work with attachments
+        // Use PdfExtractor facade to work with attachments
         using (PdfExtractor extractor = new PdfExtractor())
         {
             // Bind the source PDF
@@ -35,45 +34,41 @@ class Program
             // Get the list of attachment file names
             IList<string> attachmentNames = extractor.GetAttachNames();
 
-            // Get the attachment data as memory streams (parallel array)
+            // Retrieve all attachment streams
             MemoryStream[] attachmentStreams = extractor.GetAttachment();
 
-            // Safety check: the two collections should have the same count
-            if (attachmentNames.Count != attachmentStreams.Length)
+            // Iterate over each attachment and save it to the appropriate subfolder
+            for (int i = 0; i < attachmentStreams.Length; i++)
             {
-                Console.Error.WriteLine("Mismatch between attachment names and streams.");
-                return;
-            }
+                string name = attachmentNames[i];
+                MemoryStream stream = attachmentStreams[i];
 
-            // Process each attachment
-            for (int i = 0; i < attachmentNames.Count; i++)
-            {
-                string fileName = attachmentNames[i];
-
-                // Determine the original file extension (without the leading dot)
-                string extension = Path.GetExtension(fileName);
+                // Determine the file extension (e.g., "pdf", "png")
+                string extension = Path.GetExtension(name);
                 if (string.IsNullOrEmpty(extension))
                 {
+                    // If no extension, place it in a folder named "no_extension"
                     extension = "no_extension";
                 }
                 else
                 {
-                    extension = extension.TrimStart('.'); // e.g., "pdf", "png"
+                    // Remove the leading dot
+                    extension = extension.TrimStart('.').ToLowerInvariant();
                 }
 
-                // Create a subfolder for this extension
-                string targetFolder = Path.Combine(outputRootFolder, extension);
-                Directory.CreateDirectory(targetFolder);
+                // Create subfolder for this extension
+                string extensionFolder = Path.Combine(outputRootFolder, extension);
+                Directory.CreateDirectory(extensionFolder);
 
                 // Full path for the extracted file
-                string outputPath = Path.Combine(targetFolder, fileName);
+                string outputPath = Path.Combine(extensionFolder, name);
 
-                // Write the memory stream to disk
+                // Write the stream to disk
                 using (FileStream fileStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
                 {
-                    MemoryStream attachmentStream = attachmentStreams[i];
-                    attachmentStream.Position = 0; // reset to start
-                    attachmentStream.CopyTo(fileStream);
+                    // Reset stream position to the beginning
+                    stream.Position = 0;
+                    stream.CopyTo(fileStream);
                 }
 
                 Console.WriteLine($"Extracted: {outputPath}");

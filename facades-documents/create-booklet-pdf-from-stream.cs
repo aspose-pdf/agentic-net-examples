@@ -14,36 +14,33 @@ namespace AsposePdfApi
         /// <returns>MemoryStream with the booklet PDF.</returns>
         public static MemoryStream CreateBookletPdf(Stream inputPdfStream)
         {
-            if (inputPdfStream == null)
-                throw new ArgumentNullException(nameof(inputPdfStream));
+            // Ensure the input stream is positioned at the beginning.
+            if (inputPdfStream.CanSeek)
+                inputPdfStream.Position = 0;
 
             // Output stream that will hold the booklet PDF.
             MemoryStream outputStream = new MemoryStream();
 
-            // PdfFileEditor does NOT implement IDisposable – do NOT wrap in using.
+            // PdfFileEditor does NOT implement IDisposable; instantiate directly.
             PdfFileEditor editor = new PdfFileEditor();
 
-            // Perform the booklet conversion.
-            bool succeeded = editor.MakeBooklet(inputPdfStream, outputStream);
-            if (!succeeded)
-                throw new InvalidOperationException("Failed to create booklet PDF.");
+            // Use the MakeBooklet overload that works with streams.
+            editor.MakeBooklet(inputPdfStream, outputStream);
 
-            // Reset the position so the caller can read from the beginning.
-            outputStream.Position = 0;
+            // Reset the output stream position so callers can read from the start.
+            if (outputStream.CanSeek)
+                outputStream.Position = 0;
+
             return outputStream;
         }
     }
 
-    // Dummy entry point to satisfy the console‑application requirement.
+    // Dummy entry point to satisfy the console‑app requirement of the project.
     internal class Program
     {
         private static void Main(string[] args)
         {
-            // Placeholder – no operation needed for the library functionality.
-            // Example usage (commented out):
-            // using var input = File.OpenRead("input.pdf");
-            // var booklet = BookletCreator.CreateBookletPdf(input);
-            // File.WriteAllBytes("output.pdf", booklet.ToArray());
+            // No operation – placeholder for entry point.
         }
     }
 }

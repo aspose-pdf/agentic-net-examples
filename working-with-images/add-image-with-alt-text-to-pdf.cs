@@ -6,61 +6,48 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";          // Existing PDF
-        const string outputPdfPath = "output.pdf";         // Result PDF
-        const string imagePath     = "picture.jpg";        // Image to add
-        const string altText       = "A scenic mountain view";
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "output.pdf";
+        const string imagePath     = "newImage.png";
+        const string altText       = "Description of the newly added image for assistive technologies";
 
+        // Verify required files exist
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-
         if (!File.Exists(imagePath))
         {
             Console.Error.WriteLine($"Image file not found: {imagePath}");
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the existing PDF
         using (Document doc = new Document(inputPdfPath))
         {
-            // Choose the page where the image will be placed (first page in this example)
+            // Add the image to the first page
             Page page = doc.Pages[1];
-
-            // Open the image file as a stream
-            using (FileStream imgStream = File.OpenRead(imagePath))
+            Aspose.Pdf.Image img = new Aspose.Pdf.Image
             {
-                // 1) Add the image to the page resources.
-                // The Add method returns the internal name of the image resource.
-                string imageResourceName = page.Resources.Images.Add(imgStream);
+                File = imagePath,
+                // Optional: set explicit size (width/height in points)
+                FixWidth  = 200,
+                FixHeight = 150
+            };
+            page.Paragraphs.Add(img);
 
-                // Reset the stream position so it can be read again when creating the Image object.
-                imgStream.Position = 0;
-
-                // 2) Insert the image into the page content.
-                Image pdfImage = new Image
-                {
-                    ImageStream = imgStream   // Use the same stream for the visual appearance
-                };
-                page.Paragraphs.Add(pdfImage);
-
-                // 3) Set alternative text for the image resource.
-                // Retrieve the XImage instance by its resource name.
-                XImage xImg = page.Resources.Images[imageResourceName];
-                bool altSet = xImg.TrySetAlternativeText(altText, page);
-
-                if (!altSet)
-                {
-                    Console.Error.WriteLine("Failed to set alternative text for the image.");
-                }
+            // Set alternative text for the newly added image
+            foreach (XImage xImg in page.Resources.Images)
+            {
+                // TrySetAlternativeText returns true if the alt text was applied
+                xImg.TrySetAlternativeText(altText, page);
             }
 
-            // Save the modified document.
+            // Save the modified PDF
             doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF saved with image and alt text to '{outputPdfPath}'.");
+        Console.WriteLine($"PDF saved with image and alt text: {outputPdfPath}");
     }
 }

@@ -6,41 +6,53 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "sample.pdf";
-        const string reportPath   = "metadata_report.txt";
+        const string inputPath = "sample.pdf";
+        const string reportPath = "report.txt";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdfPath))
+        // Use a using block for deterministic disposal (document-disposal-with-using rule)
+        using (Document doc = new Document(inputPath))
         {
-            // Retrieve standard metadata via DocumentInfo
+            // Access standard metadata via DocumentInfo (doc.Info)
             DocumentInfo info = doc.Info;
+            string title   = info.Title   ?? "N/A";
+            string author  = info.Author  ?? "N/A";
+            string subject = info.Subject ?? "N/A";
+            string keywords = info.Keywords ?? "N/A";
+            string creator = info.Creator ?? "N/A";
+            string producer = info.Producer ?? "N/A";
+            // CreationDate and ModDate are non‑nullable DateTime values in Aspose.Pdf, so we format them directly.
+            string creationDate = info.CreationDate != DateTime.MinValue ? info.CreationDate.ToString("u") : "N/A";
+            string modDate = info.ModDate != DateTime.MinValue ? info.ModDate.ToString("u") : "N/A";
 
-            // Count embedded file attachments (may be null if none)
-            int attachmentCount = doc.EmbeddedFiles?.Count ?? 0;
+            // Get attachment (embedded file) count. The Attachments property does not exist; use EmbeddedFiles.
+            int attachmentCount = (doc.EmbeddedFiles != null) ? doc.EmbeddedFiles.Count : 0;
 
             // Build a simple text report
-            string report = $"Title: {info.Title}{Environment.NewLine}" +
-                            $"Author: {info.Author}{Environment.NewLine}" +
-                            $"Subject: {info.Subject}{Environment.NewLine}" +
-                            $"Keywords: {info.Keywords}{Environment.NewLine}" +
-                            $"Creator: {info.Creator}{Environment.NewLine}" +
-                            $"Producer: {info.Producer}{Environment.NewLine}" +
-                            $"Creation Date: {info.CreationDate}{Environment.NewLine}" +
-                            $"Modification Date: {info.ModDate}{Environment.NewLine}" +
+            string report = $"PDF Metadata Report{Environment.NewLine}" +
+                            $"File: {Path.GetFileName(inputPath)}{Environment.NewLine}" +
+                            $"Title: {title}{Environment.NewLine}" +
+                            $"Author: {author}{Environment.NewLine}" +
+                            $"Subject: {subject}{Environment.NewLine}" +
+                            $"Keywords: {keywords}{Environment.NewLine}" +
+                            $"Creator: {creator}{Environment.NewLine}" +
+                            $"Producer: {producer}{Environment.NewLine}" +
+                            $"Creation Date: {creationDate}{Environment.NewLine}" +
+                            $"Modification Date: {modDate}{Environment.NewLine}" +
                             $"Attachment Count: {attachmentCount}{Environment.NewLine}";
 
             // Output to console
             Console.WriteLine(report);
 
-            // Persist the report to a text file
+            // Save the report to a text file
             File.WriteAllText(reportPath, report);
-            Console.WriteLine($"Report saved to '{reportPath}'.");
         }
+
+        Console.WriteLine($"Report saved to '{reportPath}'.");
     }
 }

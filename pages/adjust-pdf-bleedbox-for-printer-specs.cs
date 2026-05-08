@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_adjusted.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,10 +15,10 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document (using block ensures proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based indexed
+            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
@@ -26,19 +26,19 @@ class Program
                 // Retrieve the current BleedBox; if not set, fall back to MediaBox
                 Aspose.Pdf.Rectangle bleedBox = page.BleedBox ?? page.MediaBox;
 
-                // Example printer specification: expand the bleed area by 5 points on each side
-                double offset = 5.0;
-                Aspose.Pdf.Rectangle adjustedBleed = new Aspose.Pdf.Rectangle(
-                    bleedBox.LLX - offset,
-                    bleedBox.LLY - offset,
-                    bleedBox.URX + offset,
-                    bleedBox.URY + offset);
+                // Example printer specification: expand each side by 5 points
+                const double adjustment = 5.0;
+
+                double llx = bleedBox.LLX - adjustment;
+                double lly = bleedBox.LLY - adjustment;
+                double urx = bleedBox.URX + adjustment;
+                double ury = bleedBox.URY + adjustment;
 
                 // Apply the adjusted BleedBox back to the page
-                page.BleedBox = adjustedBleed;
+                page.BleedBox = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
             }
 
-            // Save the modified PDF (PDF format is the default)
+            // Save the modified PDF (no SaveOptions needed for PDF output)
             doc.Save(outputPath);
         }
 

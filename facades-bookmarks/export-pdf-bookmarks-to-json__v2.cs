@@ -2,17 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 namespace BookmarkExportExample
 {
-    // Simple DTO for JSON serialization
-    public class BookmarkInfo
+    // Simple POCO to hold bookmark information for JSON serialization
+    public class BookmarkNode
     {
         public string Title { get; set; }
         public int Level { get; set; }
         public int PageNumber { get; set; }
+        public List<BookmarkNode> Children { get; set; } = new List<BookmarkNode>();
     }
 
     class Program
@@ -24,50 +24,55 @@ namespace BookmarkExportExample
 
             if (!File.Exists(inputPdfPath))
             {
-                Console.Error.WriteLine($"File not found: {inputPdfPath}");
+                Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
                 return;
             }
 
-            // Load the PDF and work with its bookmarks using PdfBookmarkEditor
+            // Use PdfBookmarkEditor to work with bookmarks (facade API)
             using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
             {
+                // Bind the PDF file to the editor
                 editor.BindPdf(inputPdfPath);
 
-                // Extract all bookmarks (including nested ones)
-                Bookmarks rootBookmarks = editor.ExtractBookmarks();
+                // Extract all bookmarks (hierarchical collection)
+                var topBookmarks = editor.ExtractBookmarks();
 
-                // Flatten the hierarchy while preserving level information
-                List<BookmarkInfo> flatList = new List<BookmarkInfo>();
-                TraverseBookmarks(rootBookmarks, 1, flatList);
+                // Convert the Aspose bookmark hierarchy to our serializable model
+                List<BookmarkNode> jsonBookmarks = new List<BookmarkNode>();
+                foreach (var bm in topBookmarks)
+                {
+                    jsonBookmarks.Add(ConvertToNode(bm, 1));
+                }
 
-                // Serialize to pretty‑printed JSON
-                string json = JsonSerializer.Serialize(
-                    flatList,
-                    new JsonSerializerOptions { WriteIndented = true });
+                // Serialize to JSON with indentation for readability
+                JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+                string json = JsonSerializer.Serialize(jsonBookmarks, jsonOptions);
 
+                // Write JSON to the output file
                 File.WriteAllText(outputJsonPath, json);
                 Console.WriteLine($"Bookmarks exported to '{outputJsonPath}'.");
             }
         }
 
-        // Recursively walk the bookmark tree
-        private static void TraverseBookmarks(Bookmarks bookmarks, int level, List<BookmarkInfo> result)
+        // Recursive conversion from Aspose Bookmark to BookmarkNode
+        private static BookmarkNode ConvertToNode(Aspose.Pdf.Facades.Bookmark aspBookmark, int level)
         {
-            foreach (Bookmark bm in bookmarks)
-            {
-                result.Add(new BookmarkInfo
-                {
-                    Title = bm.Title,
-                    Level = level,
-                    PageNumber = bm.PageNumber
-                });
+            BookmarkNode node = new BookmarkNode {
+                Title = aspBookmark.Title,
+                Level = level,
+                PageNumber = aspBookmark.PageNumber
+            };
 
-                // ChildItem holds the nested bookmarks (if any)
-                if (bm.ChildItem != null && bm.ChildItem.Count > 0)
+            // ChildItem holds nested bookmarks (may be null)
+            if (aspBookmark.ChildItem != null && aspBookmark.ChildItem.Count > 0)
+            {
+                foreach (var child in aspBookmark.ChildItem)
                 {
-                    TraverseBookmarks(bm.ChildItem, level + 1, result);
+                    node.Children.Add(ConvertToNode(child, level + 1));
                 }
             }
+
+            return node;
         }
     }
 }

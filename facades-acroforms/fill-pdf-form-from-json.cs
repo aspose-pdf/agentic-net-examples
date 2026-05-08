@@ -6,12 +6,11 @@ class Program
 {
     static void Main()
     {
-        // Paths for the PDF form template, JSON data and the output PDF
-        const string templatePdfPath = "template.pdf";
-        const string jsonDataPath    = "data.json";
-        const string outputPdfPath   = "filled.pdf";
+        const string templatePdfPath = "template.pdf";   // PDF with form fields
+        const string jsonDataPath    = "data.json";      // JSON where keys match field names
+        const string outputPdfPath   = "filled_form.pdf";
 
-        // Verify that the required files exist
+        // Ensure input files exist
         if (!File.Exists(templatePdfPath))
         {
             Console.Error.WriteLine($"Template PDF not found: {templatePdfPath}");
@@ -23,19 +22,19 @@ class Program
             return;
         }
 
-        // Load the PDF form using the Form facade and import JSON values
+        // Load the PDF form using the Facades Form class and import JSON data
         using (Form form = new Form(templatePdfPath))
         {
-            // Import JSON stream – keys must match the full field names in the PDF
-            using (FileStream jsonStream = File.OpenRead(jsonDataPath))
+            // Import field values from JSON (keys must match full field names)
+            using (FileStream jsonStream = new FileStream(jsonDataPath, FileMode.Open, FileAccess.Read))
             {
                 form.ImportJson(jsonStream);
             }
 
-            // Save the PDF with fields populated from the JSON
+            // Save the filled PDF
             form.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF with pre‑filled form fields saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Filled PDF saved to '{outputPdfPath}'.");
     }
 }

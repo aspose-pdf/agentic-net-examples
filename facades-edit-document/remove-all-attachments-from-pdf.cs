@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -9,25 +10,26 @@ class Program
         const string inputPath  = "input.pdf";
         const string outputPath = "output_no_attachments.pdf";
 
+        // Verify that the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // PdfContentEditor implements IDisposable (via SaveableFacade), so wrap it in a using block.
+        // PdfContentEditor implements IDisposable, so wrap it in a using block
         using (PdfContentEditor editor = new PdfContentEditor())
         {
-            // Load the PDF document.
+            // Load the PDF document into the editor
             editor.BindPdf(inputPath);
 
-            // Remove all embedded attachments.
+            // Remove all embedded attachments from the document
             editor.DeleteAttachments();
 
-            // Save the resulting PDF.
+            // Persist the changes to a new file
             editor.Save(outputPath);
         }
 
-        Console.WriteLine($"All attachments removed. Saved to '{outputPath}'.");
+        Console.WriteLine($"All attachments removed. Output saved to '{outputPath}'.");
     }
 }

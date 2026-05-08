@@ -1,51 +1,59 @@
 using System;
 using System.IO;
-using System.Text.Json;
 using Aspose.Pdf.Facades;
+using System.Text.Json;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string jsonPath = "form_fields.json";
+        const string inputPdf = "input.pdf";
+        const string jsonPath = "formData.json";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF using the Form facade
-        using (Form form = new Form(pdfPath))
+        // Export all form fields to a JSON file (indented for readability)
+        using (Form form = new Form(inputPdf))
         {
-            // Export all form fields to a JSON file (indented for readability)
-            using (FileStream jsonStream = new FileStream(jsonPath, FileMode.Create, FileAccess.Write))
+            using (FileStream fs = new FileStream(jsonPath, FileMode.Create, FileAccess.Write))
             {
-                form.ExportJson(jsonStream, true);
+                form.ExportJson(fs, indented: true);
             }
+        }
 
-            // Verify that the exported file contains valid JSON
-            try
+        // Verify the exported JSON structure by reading it back
+        try
+        {
+            string jsonContent = File.ReadAllText(jsonPath);
+            using (JsonDocument doc = JsonDocument.Parse(jsonContent))
             {
-                string jsonContent = File.ReadAllText(jsonPath);
-                using (JsonDocument doc = JsonDocument.Parse(jsonContent))
+                Console.WriteLine("Exported form fields:");
+                if (doc.RootElement.ValueKind == JsonValueKind.Array)
                 {
-                    // The root element of a form export should be a JSON object
-                    if (doc.RootElement.ValueKind == JsonValueKind.Object)
+                    foreach (JsonElement element in doc.RootElement.EnumerateArray())
                     {
-                        Console.WriteLine("Export succeeded. JSON root is an object.");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Export succeeded but unexpected JSON root type: {doc.RootElement.ValueKind}");
+                        string name = element.GetProperty("Name").GetString();
+                        JsonElement valueElem = element.GetProperty("Value");
+                        string value = valueElem.ValueKind == JsonValueKind.String
+                            ? valueElem.GetString()
+                            : valueElem.ToString();
+
+                        Console.WriteLine($"  {name}: {value}");
                     }
                 }
+                else
+                {
+                    Console.WriteLine("Unexpected JSON format – root element is not an array.");
+                }
             }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Failed to verify JSON: {ex.Message}");
-            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error reading JSON: {ex.Message}");
         }
     }
 }

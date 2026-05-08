@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -7,50 +8,42 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "rotated_output.pdf";
 
-        // Ensure the source file exists
-        if (!System.IO.File.Exists(inputPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Collect per‑page rotation angles. The PdfPageEditor.PageRotations property
+        // expects a Dictionary<int,int> where the key is the 1‑based page number and
+        // the value is the rotation angle in degrees.
+        var pageRotations = new Dictionary<int, int>();
+
+        // First pass – detect landscape pages.
         using (Document doc = new Document(inputPath))
         {
-            // Determine which pages are in landscape orientation.
-            // Landscape is inferred when page width > page height.
-            var pageRotations = new Dictionary<int, int>();
-
             for (int i = 1; i <= doc.Pages.Count; i++) // 1‑based indexing
             {
                 Page page = doc.Pages[i];
-                double width  = page.Rect.URX - page.Rect.LLX;
-                double height = page.Rect.URY - page.Rect.LLY;
-
-                if (width > height)               // Landscape page detected
-                    pageRotations[i] = 90;        // Rotate 90 degrees clockwise
+                // Landscape is defined as width greater than height.
+                if (page.Rect.Width > page.Rect.Height)
+                {
+                    // Rotate landscape pages by 90° to make them portrait.
+                    pageRotations[i] = 90;
+                }
             }
-
-            // If no pages need rotation, simply save the original document
-            if (pageRotations.Count == 0)
-            {
-                doc.Save(outputPath);
-                Console.WriteLine("No landscape pages found. Document saved unchanged.");
-                return;
-            }
-
-            // Use PdfPageEditor (Facade) to apply the rotations
-            PdfPageEditor editor = new PdfPageEditor();
-            editor.BindPdf(doc);                 // Bind the loaded document
-            editor.PageRotations = pageRotations; // Assign the rotation map (Dictionary<int,int>)
-            editor.ApplyChanges();               // Commit changes to the document
-
-            // Save the modified PDF
-            doc.Save(outputPath);
         }
+
+        // Apply the rotations using the PdfPageEditor (facade API).
+        var editor = new PdfPageEditor();
+        editor.BindPdf(inputPath);
+        editor.PageRotations = pageRotations; // Dictionary<int,int> required
+        editor.ApplyChanges();
+        editor.Save(outputPath);
+        editor.Close(); // PdfPageEditor does not implement IDisposable
 
         Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
     }

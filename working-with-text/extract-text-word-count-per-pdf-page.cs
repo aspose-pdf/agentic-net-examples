@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text.RegularExpressions;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -8,7 +9,7 @@ class Program
     static void Main()
     {
         const string inputPdfPath = "input.pdf";
-        const string outputCsvPath = "page_word_counts.csv";
+        const string outputCsvPath = "word_counts.csv";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -16,42 +17,34 @@ class Program
             return;
         }
 
-        try
+        // Open the PDF document (lifecycle: using ensures disposal)
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Load the PDF document
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Prepare CSV output
+            using (StreamWriter csvWriter = new StreamWriter(outputCsvPath, false))
             {
-                // Prepare CSV writer
-                using (StreamWriter csvWriter = new StreamWriter(outputCsvPath, false))
+                // Write CSV header
+                csvWriter.WriteLine("PageNumber,WordCount");
+
+                // Iterate pages (Aspose.Pdf uses 1‑based indexing)
+                for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
                 {
-                    // Write CSV header
-                    csvWriter.WriteLine("PageNumber,WordCount");
+                    Page page = pdfDoc.Pages[pageIndex];
 
-                    // Iterate over all pages (1‑based indexing)
-                    for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
-                    {
-                        // Extract text from the current page
-                        TextAbsorber absorber = new TextAbsorber();
-                        pdfDoc.Pages[pageIndex].Accept(absorber);
-                        string pageText = absorber.Text ?? string.Empty;
+                    // Extract text from the current page
+                    TextAbsorber absorber = new TextAbsorber();
+                    page.Accept(absorber);
+                    string pageText = absorber.Text ?? string.Empty;
 
-                        // Count words (split on whitespace, ignore empty entries)
-                        int wordCount = pageText.Split(
-                            new char[] { ' ', '\t', '\r', '\n' },
-                            StringSplitOptions.RemoveEmptyEntries
-                        ).Length;
+                    // Count words using a simple word regex
+                    int wordCount = Regex.Matches(pageText, @"\b\w+\b").Count;
 
-                        // Write statistics to CSV
-                        csvWriter.WriteLine($"{pageIndex},{wordCount}");
-                    }
+                    // Write statistics to CSV
+                    csvWriter.WriteLine($"{pageIndex},{wordCount}");
                 }
             }
+        }
 
-            Console.WriteLine($"Word count per page saved to '{outputCsvPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"Word count per page saved to '{outputCsvPath}'.");
     }
 }

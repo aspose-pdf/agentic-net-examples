@@ -2,68 +2,51 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Signatures;
-using Aspose.Pdf.Annotations; // Added namespace for AnnotationFlags
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "signed_flattened.pdf";
-        const string pfxPath       = "certificate.pfx";
-        const string pfxPassword   = "pfxPassword";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "signed_flattened.pdf";
+        const string certPath = "certificate.pfx";
+        const string certPassword = "password";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
-
-        if (!File.Exists(pfxPath))
+        if (!File.Exists(certPath))
         {
-            Console.Error.WriteLine($"Certificate file not found: {pfxPath}");
+            Console.Error.WriteLine($"Certificate file not found: {certPath}");
             return;
         }
 
         // Load the PDF document
-        using (Document doc = new Document(inputPdfPath))
+        using (Document doc = new Document(inputPdf))
         {
-            // Define the rectangle where the signature field will be placed (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 300, 150);
-
             // Create a signature field on the first page
-            SignatureField sigField = new SignatureField(doc.Pages[1], sigRect);
-            sigField.Name = "Signature1";
-            sigField.PartialName = "Signature1";
-            sigField.Flags = AnnotationFlags.Print; // optional: make it printable
+            // Fully qualified rectangle to avoid ambiguity with System.Drawing
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            SignatureField signatureField = new SignatureField(doc, rect);
+            doc.Pages[1].Annotations.Add(signatureField);
 
-            // Add the signature field to the page annotations
-            doc.Pages[1].Annotations.Add(sigField);
+            // Create a PKCS#7 signature using the certificate (concrete class, not abstract Signature)
+            PKCS7 signature = new PKCS7(certPath, certPassword);
+            signature.Reason = "Document approved";
+            signature.Location = "Company HQ";
 
-            // Load the certificate (PFX) for signing
-            using (FileStream pfxStream = File.OpenRead(pfxPath))
-            {
-                // Create a PKCS7 signature object
-                PKCS7 pkcs7Signature = new PKCS7(pfxStream, pfxPassword)
-                {
-                    Reason = "Document approved",
-                    Location = "Office",
-                    ContactInfo = "contact@example.com",
-                    Authority = "John Doe"
-                };
+            // Sign the document using the signature field
+            signatureField.Sign(signature);
 
-                // Sign the document using the signature field
-                sigField.Sign(pkcs7Signature);
-            }
-
-            // Flatten all form fields so they become part of the page content
+            // Flatten all form fields to prevent further editing
             doc.Flatten();
 
             // Save the signed and flattened PDF
-            doc.Save(outputPdfPath);
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Signed and flattened PDF saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Signed and flattened PDF saved to '{outputPdf}'.");
     }
 }

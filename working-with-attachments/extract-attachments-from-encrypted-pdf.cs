@@ -1,79 +1,57 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core PDF API
+using Aspose.Pdf;
 
 class ExtractAttachments
 {
     static void Main()
     {
-        const string inputPdf = "encrypted.pdf";   // Encrypted source PDF
-        const string password = "user123";        // Password to open the PDF
-        const string outputDir = "Attachments";   // Folder to store extracted files
+        // Input encrypted PDF path and password
+        const string inputPdfPath = "encrypted.pdf";
+        const string password = "userPassword";
 
-        // Verify input file exists
-        if (!File.Exists(inputPdf))
+        // Directory where extracted attachments will be saved
+        const string outputDir = "ExtractedAttachments";
+
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
         // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        try
+        // Open the encrypted PDF using the password
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPdfPath, password))
         {
-            // Open the encrypted PDF using the password (Document ctor overload)
-            using (Document doc = new Document(inputPdf, password))
+            // The EmbeddedFiles collection holds all file attachments
+            Aspose.Pdf.EmbeddedFileCollection attachments = doc.EmbeddedFiles;
+
+            if (attachments == null || attachments.Count == 0)
             {
-                // Decrypt the document so that all content (including attachments) is accessible
-                doc.Decrypt();
-
-                // The EmbeddedFiles collection holds all file attachments.
-                // Use reflection to avoid a direct compile‑time dependency on the EmbeddedFile type
-                foreach (var attachment in doc.EmbeddedFiles)
-                {
-                    // Retrieve the attachment name via reflection
-                    var nameProp = attachment.GetType().GetProperty("Name");
-                    string safeName = nameProp != null ? Path.GetFileName(nameProp.GetValue(attachment) as string) : "unknown.bin";
-                    string outPath = Path.Combine(outputDir, safeName);
-
-                    // Invoke the Save(string) method via reflection
-                    var saveMethod = attachment.GetType().GetMethod("Save", new[] { typeof(string) });
-                    if (saveMethod != null)
-                    {
-                        saveMethod.Invoke(attachment, new object[] { outPath });
-                        Console.WriteLine($"Extracted: {safeName} → {outPath}");
-                    }
-                    else
-                    {
-                        // Fallback: try to copy the raw stream if Save method is unavailable
-                        var fileSpecProp = attachment.GetType().GetProperty("FileSpecification");
-                        var fileSpec = fileSpecProp?.GetValue(attachment);
-                        var contentsProp = fileSpec?.GetType().GetProperty("Contents");
-                        var contents = contentsProp?.GetValue(fileSpec) as Stream;
-                        if (contents != null)
-                        {
-                            using (var outStream = File.Create(outPath))
-                                contents.CopyTo(outStream);
-                            Console.WriteLine($"Extracted (stream): {safeName} → {outPath}");
-                        }
-                        else
-                        {
-                            Console.Error.WriteLine($"Unable to extract attachment: {safeName}");
-                        }
-                    }
-                }
+                Console.WriteLine("No attachments found in the PDF.");
+                return;
             }
 
-            Console.WriteLine("Attachment extraction completed.");
+            // Iterate over each attachment and save it to the output directory
+            foreach (Aspose.Pdf.FileSpecification fileSpec in attachments)
+            {
+                // Determine a safe file name (use the original name if available)
+                string fileName = string.IsNullOrEmpty(fileSpec.Name) ? "attachment.bin" : fileSpec.Name;
+                string outputPath = Path.Combine(outputDir, fileName);
+
+                // The Contents property provides a stream with the attachment data
+                using (Stream contentStream = fileSpec.Contents)
+                using (FileStream fileStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                {
+                    contentStream.CopyTo(fileStream);
+                }
+
+                Console.WriteLine($"Extracted: {fileName} -> {outputPath}");
+            }
         }
-        catch (InvalidPasswordException ex)
-        {
-            Console.Error.WriteLine($"Incorrect password: {ex.Message}");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine("Attachment extraction completed.");
     }
 }

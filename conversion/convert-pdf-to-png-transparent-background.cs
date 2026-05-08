@@ -3,58 +3,44 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Devices;
 
-namespace AsposePdfApi
+class Program
 {
-    class Program
+    static void Main()
     {
-        static void Main()
+        const string dataDir = @"YOUR_DATA_DIRECTORY";
+        const string pdfFile = @"YOUR_PDF_FILE";
+
+        string pdfPath = Path.Combine(dataDir, pdfFile);
+        if (!File.Exists(pdfPath))
         {
-            // Input PDF file path
-            const string inputPdfPath = "input.pdf";
-            // Output directory for PNG images
-            const string outputDir = "output_images";
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            return;
+        }
 
-            // Ensure output directory exists
-            Directory.CreateDirectory(outputDir);
+        // Load the PDF document
+        using (Document pdfDocument = new Document(pdfPath))
+        {
+            // Define the resolution (e.g., 300 DPI)
+            Resolution resolution = new Resolution(300);
 
-            // If the input PDF does not exist, create a simple one so the example can run self‑contained
-            if (!File.Exists(inputPdfPath))
+            // Initialize the PNG device with the resolution and enable transparent background
+            PngDevice pngDevice = new PngDevice(resolution)
             {
-                using (Document tempDoc = new Document())
-                {
-                    // Add a blank page (or you can add any content you like)
-                    tempDoc.Pages.Add();
-                    tempDoc.Save(inputPdfPath);
-                    Console.WriteLine($"Sample PDF created at '{inputPdfPath}'.");
-                }
-            }
+                TransparentBackground = true
+            };
 
-            // Load the PDF document inside a using block for proper disposal
-            using (Document pdfDocument = new Document(inputPdfPath))
+            // Iterate over all pages (1‑based indexing)
+            for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
             {
-                // Define desired resolution (e.g., 300 DPI)
-                Resolution resolution = new Resolution(300);
+                string outputPath = Path.Combine(dataDir, $"image{pageNumber}_out.png");
 
-                // Create a PngDevice with the specified resolution and enable transparent background
-                PngDevice pngDevice = new PngDevice(resolution)
+                // Convert the current page to PNG and save it
+                using (FileStream pngStream = new FileStream(outputPath, FileMode.Create))
                 {
-                    TransparentBackground = true
-                };
-
-                // Iterate through all pages (1‑based indexing)
-                for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
-                {
-                    // Build output file name for each page
-                    string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
-
-                    // Process the page and write the PNG to a file stream
-                    using (FileStream pngStream = new FileStream(outputPath, FileMode.Create))
-                    {
-                        pngDevice.Process(pdfDocument.Pages[pageNumber], pngStream);
-                    }
-
-                    Console.WriteLine($"Saved page {pageNumber} as PNG to '{outputPath}'.");
+                    pngDevice.Process(pdfDocument.Pages[pageNumber], pngStream);
                 }
+
+                Console.WriteLine($"Saved page {pageNumber} to {outputPath}");
             }
         }
     }

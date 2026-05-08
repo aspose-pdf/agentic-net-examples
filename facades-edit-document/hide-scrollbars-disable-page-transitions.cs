@@ -7,7 +7,6 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string tempPath   = "temp_viewer_pref.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,26 +15,31 @@ class Program
             return;
         }
 
-        // ---------- Step 1: Hide UI elements (scrollbars, toolbars, etc.) ----------
-        PdfContentEditor contentEditor = new PdfContentEditor();
-        contentEditor.BindPdf(inputPath);
-        // HideWindowUI hides scrollbars and other UI controls.
-        contentEditor.ChangeViewerPreference(ViewerPreference.HideWindowUI);
-        contentEditor.Save(tempPath);
-        contentEditor.Close();
+        // Temporary file to hold intermediate changes
+        string tempPath = Path.GetTempFileName();
 
-        // ---------- Step 2: Disable page transition effects ----------
-        PdfPageEditor pageEditor = new PdfPageEditor();
-        pageEditor.BindPdf(tempPath);
-        // Setting duration to 0 removes any transition animation.
-        pageEditor.TransitionDuration = 0;
-        // TransitionType = 0 (no transition). The constants are defined in PdfPageEditor.
-        pageEditor.TransitionType = 0;
-        pageEditor.ApplyChanges();
-        pageEditor.Save(outputPath);
-        pageEditor.Close();
+        // ---------- Disable page transition effects ----------
+        // PdfPageEditor allows setting transition type and duration.
+        // Setting both to zero removes any transition effect.
+        using (PdfPageEditor pageEditor = new PdfPageEditor())
+        {
+            pageEditor.BindPdf(inputPath);
+            pageEditor.TransitionDuration = 0; // No transition duration
+            pageEditor.TransitionType = 0;     // No transition type (default)
+            pageEditor.ApplyChanges();
+            pageEditor.Save(tempPath);         // Save intermediate result
+        }
 
-        // Clean up temporary file.
+        // ---------- Hide UI elements such as scrollbars ----------
+        // PdfContentEditor.ChangeViewerPreference can hide the window UI.
+        using (PdfContentEditor viewerEditor = new PdfContentEditor())
+        {
+            viewerEditor.BindPdf(tempPath);
+            viewerEditor.ChangeViewerPreference(ViewerPreference.HideWindowUI);
+            viewerEditor.Save(outputPath); // Final output
+        }
+
+        // Clean up temporary file
         try { File.Delete(tempPath); } catch { /* ignore cleanup errors */ }
 
         Console.WriteLine($"Processed PDF saved to '{outputPath}'.");

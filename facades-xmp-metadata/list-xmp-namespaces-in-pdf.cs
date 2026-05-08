@@ -1,9 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using Aspose.Pdf.Facades;
 
-class XmpNamespaceLister
+class Program
 {
     static void Main()
     {
@@ -15,44 +16,58 @@ class XmpNamespaceLister
             return;
         }
 
-        // Load XMP metadata using the PdfXmpMetadata facade
+        // Load XMP metadata using the Facade
         using (PdfXmpMetadata xmp = new PdfXmpMetadata())
         {
             xmp.BindPdf(inputPdf);
+            byte[] rawData = xmp.GetXmpMetadata();
 
-            // Retrieve the raw XMP packet as a byte array
-            byte[] xmpData = xmp.GetXmpMetadata();
-
-            // Load the XMP XML into an XmlDocument for parsing
-            XmlDocument xmlDoc = new XmlDocument();
-            using (MemoryStream ms = new MemoryStream(xmpData))
+            if (rawData == null || rawData.Length == 0)
             {
-                xmlDoc.Load(ms);
-            }
-
-            // The root element typically contains the namespace declarations (xmlns:prefix="uri")
-            XmlElement root = xmlDoc.DocumentElement;
-            if (root == null)
-            {
-                Console.WriteLine("No XMP metadata found.");
+                Console.WriteLine("No XMP metadata found in the PDF.");
                 return;
             }
 
-            Console.WriteLine("XMP Namespaces found in the PDF:");
-            foreach (XmlAttribute attr in root.Attributes)
+            // Parse XML
+            XmlDocument doc = new XmlDocument();
+            using (MemoryStream ms = new MemoryStream(rawData))
             {
-                // Namespace declarations are either xmlns="defaultUri" or xmlns:prefix="uri"
+                doc.Load(ms);
+            }
+
+            // Collect unique namespace URIs
+            HashSet<string> namespaces = new HashSet<string>();
+            CollectNamespaces(doc.DocumentElement, namespaces);
+
+            Console.WriteLine("XMP Namespaces present in the PDF:");
+            foreach (string ns in namespaces)
+            {
+                Console.WriteLine(ns);
+            }
+        }
+    }
+
+    // Recursively walk the XML tree and gather xmlns declarations
+    static void CollectNamespaces(XmlNode node, HashSet<string> set)
+    {
+        if (node.Attributes != null)
+        {
+            foreach (XmlAttribute attr in node.Attributes)
+            {
                 if (attr.Prefix == "xmlns")
                 {
-                    // Example: xmlns:dc="http://purl.org/dc/elements/1.1/"
-                    Console.WriteLine($"{attr.LocalName} = {attr.Value}");
+                    set.Add(attr.Value);
                 }
-                else if (attr.Name == "xmlns")
+                else if (attr.Name == "xmlns") // default namespace
                 {
-                    // Default namespace declaration
-                    Console.WriteLine($"default = {attr.Value}");
+                    set.Add(attr.Value);
                 }
             }
+        }
+
+        foreach (XmlNode child in node.ChildNodes)
+        {
+            CollectNamespaces(child, set);
         }
     }
 }

@@ -1,48 +1,37 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text; // Added namespace for TextFragment
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_letter.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "resized_letter.pdf";
 
-        // Ensure the source PDF exists – create a minimal one if it does not.
-        if (!System.IO.File.Exists(inputPath))
+        if (!File.Exists(inputPath))
         {
-            CreateSamplePdf(inputPath);
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // Letter size in points (1 inch = 72 points)
-        const double letterWidth = 8.5 * 72; // 612 points
-        const double letterHeight = 11 * 72; // 792 points
+        // Resize all pages to Letter size (8.5" x 11" = 612 x 792 points)
+        using (PdfPageEditor editor = new PdfPageEditor())
+        {
+            // Load the source PDF
+            editor.BindPdf(inputPath);
 
-        // Facade that provides PDF editing operations
-        PdfFileEditor editor = new PdfFileEditor();
+            // Set the target page size
+            editor.PageSize = new PageSize(612, 792); // width, height in points
 
-        // Resize all pages (pages = null) to the specified width and height.
-        // This overload writes the resized document directly to the destination path.
-        editor.ResizeContents(
-            source: inputPath,
-            destination: outputPath,
-            pages: null,          // null = all pages
-            newWidth: letterWidth,
-            newHeight: letterHeight);
+            // Apply the size change to the document
+            editor.ApplyChanges();
+
+            // Save the resized PDF
+            editor.Save(outputPath);
+        }
 
         Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
-    }
-
-    private static void CreateSamplePdf(string path)
-    {
-        // Create a very simple PDF so the resize operation has something to work on.
-        using (Document doc = new Document())
-        {
-            Page page = doc.Pages.Add();
-            page.Paragraphs.Add(new TextFragment("Sample PDF for resizing."));
-            doc.Save(path);
-        }
     }
 }

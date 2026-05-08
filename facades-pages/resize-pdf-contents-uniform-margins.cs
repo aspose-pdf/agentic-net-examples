@@ -1,50 +1,44 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string sourcePath = "input.pdf";
-        const string destinationPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Ensure the source PDF exists; create a minimal one if it does not.
-        if (!File.Exists(sourcePath))
+        // Verify that the source PDF exists
+        if (!File.Exists(inputPath))
         {
-            CreateSamplePdf(sourcePath);
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
         }
 
-        // PdfFileEditor does NOT implement IDisposable, so do NOT wrap it in a using block.
-        PdfFileEditor fileEditor = new PdfFileEditor();
-        // Define uniform margins of 10% on all sides.
-        var resizeParams = PdfFileEditor.ContentsResizeParameters.MarginsPercent(
-            left:   10,
-            right:  10,
-            top:    10,
-            bottom: 10);
+        // Create an instance of PdfFileEditor (no IDisposable implementation required)
+        PdfFileEditor editor = new PdfFileEditor();
 
-        // Resize the contents of all pages (pages = null) using the defined margins.
-        bool success = fileEditor.ResizeContents(
-            source:      sourcePath,
-            destination: destinationPath,
-            pages:       null,          // null = all pages
-            parameters:  resizeParams);
+        // Define uniform margins of 10% on all sides using the static MarginsPercent factory method
+        PdfFileEditor.ContentsResizeParameters parameters =
+            PdfFileEditor.ContentsResizeParameters.MarginsPercent(
+                left: 10,   // left margin (10% of page width)
+                right: 10,  // right margin (10% of page width)
+                top: 10,    // top margin (10% of page height)
+                bottom: 10  // bottom margin (10% of page height)
+            );
 
-        Console.WriteLine(success
-            ? $"Contents resized successfully. Output saved to '{destinationPath}'."
-            : "Failed to resize contents.");
-    }
+        // Resize contents of all pages (null pages array means all pages)
+        bool success = editor.ResizeContents(inputPath, outputPath, null, parameters);
 
-    // Helper that creates a very simple PDF file so the example can run without external files.
-    private static void CreateSamplePdf(string path)
-    {
-        using (Document doc = new Document())
+        // Report the result
+        if (success)
         {
-            Page page = doc.Pages.Add();
-            page.Paragraphs.Add(new Aspose.Pdf.Text.TextFragment("Sample PDF for resizing."));
-            doc.Save(path);
+            Console.WriteLine($"Contents resized and saved to '{outputPath}'.");
+        }
+        else
+        {
+            Console.Error.WriteLine("Resize operation failed.");
         }
     }
 }

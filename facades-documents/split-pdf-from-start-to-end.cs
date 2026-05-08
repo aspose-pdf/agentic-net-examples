@@ -2,53 +2,52 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-public static class PdfSplitter
+namespace PdfSplitDemo
 {
-    /// <summary>
-    /// Splits the input PDF stream from the specified start page to the end of the document.
-    /// The resulting PDF is returned as a MemoryStream.
-    /// </summary>
-    /// <param name="inputPdf">Stream containing the source PDF. Must be readable.</param>
-    /// <param name="startPage">1‑based page number where the split should begin.</param>
-    /// <returns>MemoryStream holding the split PDF (pages startPage … last page).</returns>
-    public static MemoryStream SplitFromStartToEnd(Stream inputPdf, int startPage)
+    public static class PdfSplitter
     {
-        if (inputPdf == null) throw new ArgumentNullException(nameof(inputPdf));
-        if (startPage < 1) throw new ArgumentOutOfRangeException(nameof(startPage), "Page numbers are 1‑based.");
+        /// <summary>
+        /// Splits the input PDF stream from the specified start page to the end
+        /// and returns the resulting PDF as a MemoryStream.
+        /// </summary>
+        /// <param name="inputPdf">Stream containing the source PDF. Must be readable.</param>
+        /// <param name="startPage">
+        /// 1‑based page number where the split should begin.
+        /// Pages before this number are discarded.
+        /// </param>
+        /// <returns>
+        /// MemoryStream holding the split PDF. The stream position is set to 0.
+        /// </returns>
+        public static MemoryStream SplitFromStartToEnd(Stream inputPdf, int startPage)
+        {
+            if (inputPdf == null) throw new ArgumentNullException(nameof(inputPdf));
+            if (startPage < 1) throw new ArgumentOutOfRangeException(nameof(startPage), "Page numbers are 1‑based.");
 
-        // Output stream that will receive the rear part of the document.
-        MemoryStream outputStream = new MemoryStream();
+            // PdfFileEditor does NOT implement IDisposable, so we do not wrap it in a using block.
+            PdfFileEditor editor = new PdfFileEditor();
 
-        // PdfFileEditor does NOT implement IDisposable; instantiate directly.
-        PdfFileEditor editor = new PdfFileEditor();
+            // Output will be written to a MemoryStream which we return to the caller.
+            MemoryStream outputStream = new MemoryStream();
 
-        // SplitToEnd extracts pages from 'startPage' to the last page.
-        // The method does NOT close the streams, so we keep them open for the caller.
-        editor.SplitToEnd(inputPdf, startPage, outputStream);
+            // SplitToEnd extracts the rear part of the document starting at startPage.
+            // The method does NOT close the streams, so we keep outputStream alive.
+            editor.SplitToEnd(inputPdf, startPage, outputStream);
 
-        // Reset the position so the caller can read from the beginning.
-        outputStream.Position = 0;
-
-        return outputStream;
+            // Reset the position so the caller can read from the beginning.
+            outputStream.Position = 0;
+            return outputStream;
+        }
     }
 
-    // Entry point required for compilation when the project is built as an executable.
-    // It simply demonstrates a basic call; in real usage the method can be invoked from elsewhere.
-    public static void Main(string[] args)
+    // Minimal entry point required for a console‑application project.
+    internal class Program
     {
-        // Example usage – this block is optional and can be removed in production.
-        // It is kept minimal to avoid dependencies on external files during a simple build.
-        // If you have an input PDF, uncomment and adjust the paths accordingly.
-        //
-        // using (FileStream source = new FileStream("input.pdf", FileMode.Open, FileAccess.Read))
-        // {
-        //     MemoryStream result = SplitFromStartToEnd(source, 1);
-        //     using (FileStream dest = new FileStream("output.pdf", FileMode.Create, FileAccess.Write))
-        //     {
-        //         result.CopyTo(dest);
-        //     }
-        // }
-        
-        // No operation – the presence of Main satisfies the compiler.
+        private static void Main(string[] args)
+        {
+            // Optional demonstration (can be removed for pure library usage).
+            // using var input = File.OpenRead("sample.pdf");
+            // using var result = PdfSplitter.SplitFromStartToEnd(input, 3);
+            // File.WriteAllBytes("output.pdf", result.ToArray());
+        }
     }
 }

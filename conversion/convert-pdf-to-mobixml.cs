@@ -1,13 +1,3 @@
-// AsposePdfApi.GlobalUsings.g.cs
-// This file satisfies the compiler‑generated global usings reference.
-// It can be empty or contain the required global using directives.
-// Adding the most common namespaces used in the project.
-
-global using System;
-global using System.IO;
-global using Aspose.Pdf;
-
-// Program.cs
 using System;
 using System.IO;
 using Aspose.Pdf;
@@ -16,27 +6,25 @@ class Program
 {
     static void Main()
     {
-        // Paths for the source PDF and the destination MobiXml file.
-        const string inputPdfPath = "input.pdf";
-        const string outputMobiPath = "output.mobi";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.mobi";
 
-        // Verify that the input file exists before proceeding.
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Error: File not found – {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block to ensure proper disposal.
-        using (Document pdfDocument = new Document(inputPdfPath))
+        // Load the PDF document
+        using (Document pdfDoc = new Document(inputPath))
         {
-            // Initialize the save options for MobiXml format with default settings.
-            MobiXmlSaveOptions mobiOptions = new MobiXmlSaveOptions();
+            // Initialize MobiXmlSaveOptions with default settings
+            var saveOptions = new MobiXmlSaveOptions();
 
-            // Save the document as MobiXml, explicitly providing the save options.
-            pdfDocument.Save(outputMobiPath, mobiOptions);
+            // Save the document as MobiXml using the save options
+            pdfDoc.Save(outputPath, saveOptions);
         }
 
-        Console.WriteLine($"Conversion completed. MobiXml saved to '{outputMobiPath}'.");
+        Console.WriteLine($"PDF successfully converted to MobiXml: {outputPath}");
     }
 }

@@ -16,32 +16,30 @@ class Program
             return;
         }
 
-        // Load the PDF document (using block ensures proper disposal)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve all form fields from the document
-            var allFields = doc.Form;
+            // Retrieve all form fields
+            Field[] allFields = doc.Form.Fields;
 
             // LINQ query to get only TextBoxField instances
-            var textBoxFields = allFields.OfType<TextBoxField>().ToList();
+            var textBoxFields = allFields.OfType<TextBoxField>();
 
-            // Output the full names of the text box fields
-            foreach (var field in textBoxFields)
+            foreach (var tb in textBoxFields)
             {
-                Console.WriteLine($"TextBox field: {field.FullName}");
+                Console.WriteLine($"TextBox Field - Name: {tb.Name}, Value: {tb.Value}");
             }
 
             // Example: LINQ query to get only ListBoxField instances
-            var listBoxFields = allFields.OfType<ListBoxField>().ToList();
+            var listBoxFields = allFields.OfType<ListBoxField>();
 
-            // Output the full names of the list box fields
-            foreach (var field in listBoxFields)
+            foreach (var lb in listBoxFields)
             {
-                Console.WriteLine($"ListBox field: {field.FullName}");
+                Console.WriteLine($"ListBox Field - Name: {lb.Name}");
             }
 
-            // Additional LINQ filters can be applied similarly for other field types,
-            // e.g., ComboBoxField, CheckBoxField, etc.
+            // If modifications were made, you could save the document here
+            // doc.Save("output.pdf");
         }
     }
 }

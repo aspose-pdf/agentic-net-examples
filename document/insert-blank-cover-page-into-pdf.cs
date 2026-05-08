@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_with_cover.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,16 +15,16 @@ class Program
             return;
         }
 
-        // Load the existing PDF document
+        // Load the existing PDF
         using (Document doc = new Document(inputPath))
         {
-            // Insert a blank page at the very beginning (position 1, 1‑based indexing)
+            // Insert an empty page at the very beginning (position 1)
             doc.Pages.Insert(1);
 
-            // Save the updated document
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Blank cover page inserted and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with cover page: '{outputPath}'.");
     }
 }

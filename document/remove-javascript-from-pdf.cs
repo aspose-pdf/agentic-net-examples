@@ -1,26 +1,42 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Security.HiddenDataSanitization;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_stripped.pdf";
+        const string outputPath = "output_sanitized.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Instantiate the JavaScript stripper and remove all scripts from the PDF.
-        PdfJavaScriptStripper stripper = new PdfJavaScriptStripper();
-        bool result = stripper.Strip(inputPath, outputPath);
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
+        {
+            // Configure sanitization options to remove JavaScript and related actions
+            var options = new HiddenDataSanitizationOptions
+            {
+                RemoveJavaScriptsAndActions = true,
+                RemoveSearchIndexAndPrivateInfo = true,
+                RemoveAnnotations = true,
+                FlattenForms = true,
+                FlattenLayers = true
+            };
 
-        Console.WriteLine(result
-            ? $"All JavaScript actions removed. Output saved to '{outputPath}'."
-            : "Failed to strip JavaScript from the document.");
+            // Create the sanitizer and apply it to the document
+            var sanitizer = new HiddenDataSanitizer(options);
+            sanitizer.Sanitize(doc);
+
+            // Save the sanitized PDF
+            doc.Save(outputPath);
+        }
+
+        Console.WriteLine($"Sanitized PDF saved to '{outputPath}'.");
     }
 }

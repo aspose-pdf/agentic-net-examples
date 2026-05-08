@@ -1,47 +1,51 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Security; // required for Permissions and CryptoAlgorithm
+using Aspose.Pdf; // CryptoAlgorithm, Permissions, Document
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string encryptedPath = "encrypted.pdf";
-        const string userPassword = "user123";
-        const string ownerPassword = "owner123";
+        const string inputPath      = "input.pdf";
+        const string encryptedPath  = "encrypted.pdf";
+        const string userPassword   = "user123";
+        const string ownerPassword  = "owner123";
 
-        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the source PDF, apply AES‑256 encryption with no printing permission, and save
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Define permissions – exclude any printing related flags
-            Permissions perms = Permissions.ModifyContent |
-                                 Permissions.ExtractContent |
-                                 Permissions.ModifyTextAnnotations |
-                                 Permissions.FillForm |
-                                 Permissions.AssembleDocument;
+            // Load the source PDF
+            using (Document doc = new Document(inputPath))
+            {
+                // No permissions (disable printing, copying, etc.)
+                Permissions noPermissions = (Permissions)0;
 
-            // Encrypt using AES‑256 (CryptoAlgorithm) as required
-            doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+                // Encrypt with AES‑256 using the specified passwords
+                doc.Encrypt(userPassword, ownerPassword, noPermissions, CryptoAlgorithm.AESx256);
 
-            // Save the encrypted PDF
-            doc.Save(encryptedPath);
+                // Save the encrypted PDF
+                doc.Save(encryptedPath);
+            }
+
+            // Verify encryption status
+            using (Document encryptedDoc = new Document(encryptedPath, userPassword))
+            {
+                bool isEncrypted = encryptedDoc.IsEncrypted;
+                Console.WriteLine($"Document encrypted: {isEncrypted}");
+
+                // Since we set no permissions, printing is not allowed.
+                // Permissions cannot be read directly, but we know we set none.
+                Console.WriteLine("Printing permission: disabled");
+            }
         }
-
-        // Verify that the document is encrypted and that printing is not allowed
-        using (Document encDoc = new Document(encryptedPath, userPassword))
+        catch (Exception ex)
         {
-            Console.WriteLine($"IsEncrypted: {encDoc.IsEncrypted}");
-            // Permissions cannot be read directly; we rely on the settings applied above.
-            Console.WriteLine("Print permission is disabled as intended.");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

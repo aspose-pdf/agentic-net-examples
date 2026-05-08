@@ -22,38 +22,32 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdfPath))
+        // Load the PDF document (wrapped in using for deterministic disposal)
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Get the first page (pages are 1‑based)
-            Page page = doc.Pages[1];
-
-            // Load the image into a memory stream
-            using (FileStream fileStream = new FileStream(imagePath, FileMode.Open, FileAccess.Read))
-            using (MemoryStream imageStream = new MemoryStream())
+            // Load the image into a memory stream (so the stream can be reused safely)
+            byte[] imgBytes = File.ReadAllBytes(imagePath);
+            using (MemoryStream imgStream = new MemoryStream(imgBytes))
             {
-                fileStream.CopyTo(imageStream);
-                imageStream.Position = 0; // reset stream position
-
                 // Create an ImageStamp from the memory stream
-                ImageStamp imgStamp = new ImageStamp(imageStream);
+                ImageStamp imgStamp = new ImageStamp(imgStream);
 
-                // Scale the stamp to 50% (Zoom factor = 0.5)
-                imgStamp.Zoom = 0.5;
+                // Scale the stamp to 50% (both axes)
+                imgStamp.Zoom = 0.5f; // Equivalent to setting ZoomX and ZoomY to 0.5
 
-                // Position the stamp on the page – use XIndent/YIndent instead of SetOrigin
+                // Optional: set the position of the stamp on the page
                 imgStamp.XIndent = 100; // distance from the left edge
                 imgStamp.YIndent = 500; // distance from the bottom edge
 
-                // Optional: control layering (foreground/background)
-                imgStamp.Background = false; // draw over existing content
-
-                // Add the stamp to the page
-                page.AddStamp(imgStamp);
+                // Add the stamp to each page of the document
+                foreach (Page page in pdfDoc.Pages)
+                {
+                    page.AddStamp(imgStamp);
+                }
             }
 
             // Save the modified PDF
-            doc.Save(outputPdfPath);
+            pdfDoc.Save(outputPdfPath);
         }
 
         Console.WriteLine($"Image stamp added and saved to '{outputPdfPath}'.");

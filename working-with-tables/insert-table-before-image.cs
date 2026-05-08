@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -8,87 +7,76 @@ class Program
 {
     static void Main()
     {
-        // Create a sample PDF and add an image
-        using (Document doc = new Document())
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+
+        if (!File.Exists(inputPath))
         {
-            Page page = doc.Pages.Add();
-
-            // Create a tiny PNG file (1x1 pixel) if it does not exist
-            string imagePath = "sample.png";
-            if (!File.Exists(imagePath))
-            {
-                byte[] pngBytes = Convert.FromBase64String(
-                    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+X2V8AAAAASUVORK5CYII=");
-                File.WriteAllBytes(imagePath, pngBytes);
-            }
-
-            // Add the image to the page
-            Image image = new Image();
-            image.File = imagePath;
-            page.Paragraphs.Add(image);
-
-            // Locate the image index inside the page's paragraph collection (zero‑based indexing)
-            int imageIndex = -1;
-            for (int i = 0; i < page.Paragraphs.Count; i++)
-            {
-                if (page.Paragraphs[i] is Image)
-                {
-                    imageIndex = i;
-                    break;
-                }
-            }
-
-            // Build a simple 2‑column table
-            Table table = new Table();
-            table.ColumnWidths = "100 100";
-            Row headerRow = table.Rows.Add();
-            headerRow.Cells.Add("Header 1");
-            headerRow.Cells.Add("Header 2");
-            Row dataRow = table.Rows.Add();
-            dataRow.Cells.Add("Cell 1");
-            dataRow.Cells.Add("Cell 2");
-
-            // Insert the table before the image if the image was found
-            if (imageIndex != -1)
-            {
-                page.Paragraphs.Insert(imageIndex, table);
-            }
-
-            // Save the resulting PDF – guard against missing GDI+ (libgdiplus) on non‑Windows platforms
-            string outputPath = "output.pdf";
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                // Windows has native GDI+ – safe to call Save directly
-                doc.Save(outputPath);
-                Console.WriteLine($"PDF saved to '{outputPath}'.");
-            }
-            else
-            {
-                // On macOS / Linux Aspose.Pdf may require libgdiplus for rendering.
-                // Attempt to save and handle the possible TypeInitializationException gracefully.
-                try
-                {
-                    doc.Save(outputPath);
-                    Console.WriteLine($"PDF saved to '{outputPath}'.");
-                }
-                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
-                {
-                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. " +
-                                      "The PDF was generated in memory but could not be saved to disk.");
-                }
-            }
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
-    }
 
-    // Helper that walks the inner‑exception chain to detect a missing native library.
-    private static bool ContainsDllNotFound(Exception? ex)
-    {
-        while (ex != null)
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            if (ex is DllNotFoundException)
-                return true;
-            ex = ex.InnerException;
+            // Iterate through all pages
+            for (int p = 1; p <= doc.Pages.Count; p++)
+            {
+                Page page = doc.Pages[p];
+
+                // ParagraphCollection is 1‑based. Scan for Image objects.
+                for (int i = 1; i <= page.Paragraphs.Count; i++)
+                {
+                    // The concrete type for an image placed on a page is Aspose.Pdf.Image
+                    if (page.Paragraphs[i] is Image)
+                    {
+                        // Build a simple table to insert before the image
+                        Table table = new Table
+                        {
+                            // Optional visual settings
+                            Border = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Black),
+                            DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Gray),
+                            DefaultCellPadding = new MarginInfo(5, 5, 5, 5)
+                        };
+
+                        // Define two columns (adjust widths as needed)
+                        table.ColumnWidths = "200 200";
+
+                        // Header row
+                        Row header = table.Rows.Add();
+                        header.Cells.Add("Column 1");
+                        header.Cells.Add("Column 2");
+                        // Apply a simple background to header cells
+                        foreach (Cell cell in header.Cells)
+                        {
+                            cell.BackgroundColor = Aspose.Pdf.Color.LightGray;
+                            cell.DefaultCellTextState = new TextState
+                            {
+                                FontSize = 12,
+                                FontStyle = FontStyles.Bold,
+                                Font = FontRepository.FindFont("Helvetica")
+                            };
+                        }
+
+                        // Data row
+                        Row data = table.Rows.Add();
+                        data.Cells.Add("Value A");
+                        data.Cells.Add("Value B");
+
+                        // Insert the table before the image (at the same index)
+                        page.Paragraphs.Insert(i, table);
+
+                        // If there may be multiple images and you only want the first,
+                        // break out of the inner loop after insertion.
+                        // break;
+                    }
+                }
+            }
+
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        return false;
+
+        Console.WriteLine($"Table inserted before images and saved to '{outputPath}'.");
     }
 }

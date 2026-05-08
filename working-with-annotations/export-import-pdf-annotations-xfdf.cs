@@ -7,66 +7,54 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";          // PDF with existing annotations
-        const string xfdfFile   = "annotations.xfdf";   // temporary XFDF file
-        const string outputPdf  = "roundtrip_output.pdf";
+        const string inputPdf = "input.pdf";
+        const string xfdfFile = "annotations.xfdf";
+        const string outputPdf = "roundtrip_output.pdf";
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the original document and count its annotations
-        int originalCount;
-        using (Document srcDoc = new Document(inputPdf))
+        // Load the source PDF and count its annotations
+        using (Document sourceDoc = new Document(inputPdf))
         {
-            originalCount = CountAnnotations(srcDoc);
+            int originalCount = CountAnnotations(sourceDoc);
             Console.WriteLine($"Original annotation count: {originalCount}");
 
-            // Export all annotations to XFDF
-            srcDoc.ExportAnnotationsToXfdf(xfdfFile);
-            Console.WriteLine($"Annotations exported to '{xfdfFile}'.");
-        }
+            // Export all annotations to XFDF file
+            sourceDoc.ExportAnnotationsToXfdf(xfdfFile);
+            Console.WriteLine($"Annotations exported to: {xfdfFile}");
 
-        // Create a fresh copy of the PDF without annotations
-        using (Document cleanDoc = new Document(inputPdf))
-        {
-            // Remove all existing annotations from each page
-            foreach (Page page in cleanDoc.Pages)
+            // Load a fresh copy of the same PDF for round‑trip verification
+            using (Document roundTripDoc = new Document(inputPdf))
             {
-                // AnnotationCollection uses 1‑based indexing
-                while (page.Annotations.Count > 0)
+                // Remove existing annotations to start from a clean state
+                ClearAllAnnotations(roundTripDoc);
+                Console.WriteLine("Existing annotations cleared from round‑trip document.");
+
+                // Import annotations from the XFDF file
+                roundTripDoc.ImportAnnotationsFromXfdf(xfdfFile);
+                Console.WriteLine("Annotations imported from XFDF.");
+
+                // Verify that the imported count matches the original count
+                int importedCount = CountAnnotations(roundTripDoc);
+                Console.WriteLine($"Imported annotation count: {importedCount}");
+
+                if (importedCount == originalCount)
                 {
-                    page.Annotations.Delete(1);
+                    Console.WriteLine("Round‑trip verification succeeded: counts match.");
                 }
+                else
+                {
+                    Console.WriteLine("Round‑trip verification failed: counts do not match.");
+                }
+
+                // Save the round‑trip PDF (optional)
+                roundTripDoc.Save(outputPdf);
+                Console.WriteLine($"Round‑trip PDF saved to: {outputPdf}");
             }
-
-            // Import annotations back from the XFDF file
-            cleanDoc.ImportAnnotationsFromXfdf(xfdfFile);
-            Console.WriteLine("Annotations imported from XFDF.");
-
-            // Verify that the round‑trip preserved the annotation count
-            int roundTripCount = CountAnnotations(cleanDoc);
-            Console.WriteLine($"Round‑trip annotation count: {roundTripCount}");
-
-            // Save the resulting document
-            cleanDoc.Save(outputPdf);
-            Console.WriteLine($"Result saved to '{outputPdf}'.");
-        }
-
-        // Simple integrity check
-        if (originalCount == 0)
-        {
-            Console.WriteLine("No annotations were present in the original document.");
-        }
-        else if (originalCount == CountAnnotations(new Document(outputPdf)))
-        {
-            Console.WriteLine("Round‑trip verification succeeded: annotation counts match.");
-        }
-        else
-        {
-            Console.WriteLine("Round‑trip verification failed: annotation counts differ.");
         }
     }
 
@@ -74,10 +62,25 @@ class Program
     static int CountAnnotations(Document doc)
     {
         int count = 0;
-        foreach (Page page in doc.Pages)
+        for (int i = 1; i <= doc.Pages.Count; i++) // 1‑based indexing
         {
-            count += page.Annotations.Count; // 1‑based collection, Count is accurate
+            Page page = doc.Pages[i];
+            count += page.Annotations.Count;
         }
         return count;
+    }
+
+    // Helper method to delete all annotations from a document
+    static void ClearAllAnnotations(Document doc)
+    {
+        for (int i = 1; i <= doc.Pages.Count; i++) // 1‑based indexing
+        {
+            Page page = doc.Pages[i];
+            // Delete annotations in reverse order to avoid index shifting
+            for (int j = page.Annotations.Count; j >= 1; j--)
+            {
+                page.Annotations.Delete(j);
+            }
+        }
     }
 }

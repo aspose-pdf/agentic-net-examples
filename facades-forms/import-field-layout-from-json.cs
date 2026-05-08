@@ -1,17 +1,18 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using System.Text.Json;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Forms;
 
 class Program
 {
-    // Represents a field definition coming from the JSON layout file
-    private class FieldLayout
+    // Define a simple POCO that matches the expected JSON structure
+    private class FieldDefinition
     {
-        public string Name { get; set; }          // field name
-        public string Type { get; set; }          // e.g., "Text", "CheckBox", "Radio"
+        public string Name { get; set; }
+        public string Type { get; set; }          // e.g., "Text", "CheckBox", "Radio", "ComboBox", "ListBox"
         public int Page { get; set; }             // 1‑based page number
         public float Llx { get; set; }            // lower‑left X
         public float Lly { get; set; }            // lower‑left Y
@@ -21,67 +22,71 @@ class Program
 
     static void Main()
     {
-        const string jsonPath   = "fieldLayout.json";   // input JSON describing fields
-        const string outputPath = "output.pdf";         // resulting PDF with positioned fields
+        const string jsonPath   = "fieldLayout.json";   // JSON file describing fields
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(jsonPath))
         {
-            Console.Error.WriteLine($"JSON layout file not found: {jsonPath}");
+            Console.Error.WriteLine($"JSON file not found: {jsonPath}");
             return;
         }
 
-        // Deserialize JSON into a list of field definitions
-        List<FieldLayout> fields;
+        // Read and deserialize the JSON file
+        List<FieldDefinition> fields;
         using (FileStream fs = File.OpenRead(jsonPath))
         {
-            fields = JsonSerializer.Deserialize<List<FieldLayout>>(fs);
+            fields = JsonSerializer.Deserialize<List<FieldDefinition>>(fs);
         }
 
-        // Create a new blank PDF document and add a page for each distinct page number referenced
+        // Create a new PDF document with a single blank page (add more pages if needed)
         using (Document doc = new Document())
         {
-            // Determine the highest page number required
-            int maxPage = 0;
-            foreach (var f in fields)
-                if (f.Page > maxPage) maxPage = f.Page;
+            // Ensure at least one page exists; additional pages can be added later if JSON references them
+            doc.Pages.Add();
 
-            // Ensure the document has enough pages (Pages are 1‑based)
-            for (int i = 1; i <= maxPage; i++)
-                doc.Pages.Add();
-
-            // Bind the document to a FormEditor facade for field manipulation
+            // Bind the document to FormEditor (Facades API)
             FormEditor formEditor = new FormEditor(doc);
 
-            // Add each field according to its layout definition
+            // Iterate over each field definition and add it to the PDF
             foreach (var f in fields)
             {
-                // Convert the string type to the FieldType enum (case‑insensitive)
-                if (!Enum.TryParse<FieldType>(f.Type, true, out FieldType fieldType))
+                // Ensure the target page exists; add blank pages as necessary
+                while (doc.Pages.Count < f.Page)
                 {
-                    Console.Error.WriteLine($"Unsupported field type '{f.Type}' for field '{f.Name}'. Skipping.");
-                    continue;
+                    doc.Pages.Add();
                 }
 
-                // Add the field; AddField returns true on success
-                bool added = formEditor.AddField(
-                    fieldType,
-                    f.Name,
-                    f.Page,
-                    f.Llx,
-                    f.Lly,
-                    f.Urx,
-                    f.Ury);
+                // Map string type to FieldType enum
+                FieldType fieldType = MapFieldType(f.Type);
 
+                // Add the field using FormEditor
+                bool added = formEditor.AddField(fieldType, f.Name, f.Page, f.Llx, f.Lly, f.Urx, f.Ury);
                 if (!added)
                 {
                     Console.Error.WriteLine($"Failed to add field '{f.Name}' on page {f.Page}.");
                 }
             }
 
-            // Save the populated PDF
+            // Save the resulting PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with imported field layout saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with imported fields saved to '{outputPath}'.");
+    }
+
+    // Helper method to convert a string representation to the corresponding FieldType enum value
+    private static FieldType MapFieldType(string type)
+    {
+        return type?.ToLowerInvariant() switch
+        {
+            "text"      => FieldType.Text,
+            "checkbox"  => FieldType.CheckBox,
+            "radio"     => FieldType.Radio,
+            "combobox"  => FieldType.ComboBox,
+            "listbox"   => FieldType.ListBox,
+            "signature" => FieldType.Signature,
+            "button"    => FieldType.PushButton,
+            _           => FieldType.Text   // default fallback
+        };
     }
 }

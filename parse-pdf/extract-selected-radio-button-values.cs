@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
@@ -18,32 +19,36 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
+            // Dictionary to hold field name -> selected option label
+            var selectedRadioValues = new Dictionary<string, string>();
+
             // Iterate over all form fields
             foreach (Field field in doc.Form)
             {
-                // Process only radio button fields
+                // Check if the field is a radio button group
                 if (field is RadioButtonField radio)
                 {
-                    // Get the export value of the selected option (empty if none selected)
-                    string selectedExportValue = radio.Value ?? string.Empty;
-
-                    // Get the list of option objects (each contains Name and ExportValue)
-                    var options = radio.Options;
-
-                    // Determine the label (display name) of the selected option using the Selected index (1‑based)
-                    string selectedLabel = string.Empty;
-                    if (radio.Selected > 0 && radio.Selected <= options.Count)
+                    // Selected index is 1‑based; 0 means no selection
+                    int selectedIndex = radio.Selected;
+                    if (selectedIndex > 0 && selectedIndex <= radio.Options.Count)
                     {
-                        // Option.Name holds the visible label for the radio button choice
-                        selectedLabel = options[radio.Selected - 1].Name;
+                        // Options collection returns Option objects; use the Name property for the label
+                        string selectedLabel = radio.Options[selectedIndex - 1].Name;
+                        selectedRadioValues[radio.FullName] = selectedLabel;
                     }
-
-                    // Output the mapping
-                    Console.WriteLine($"Radio Button Field: {radio.FullName}");
-                    Console.WriteLine($"  Selected Export Value: \"{selectedExportValue}\"");
-                    Console.WriteLine($"  Selected Label: \"{selectedLabel}\"");
-                    Console.WriteLine();
+                    else
+                    {
+                        // No option selected
+                        selectedRadioValues[radio.FullName] = "(none)";
+                    }
                 }
+            }
+
+            // Output the mapping
+            Console.WriteLine("Selected Radio Button Values:");
+            foreach (var kvp in selectedRadioValues)
+            {
+                Console.WriteLine($"Field: {kvp.Key} => Selected Option: {kvp.Value}");
             }
         }
     }

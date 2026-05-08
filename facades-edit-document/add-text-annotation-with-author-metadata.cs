@@ -1,37 +1,45 @@
 using System;
+using System.Drawing;
 using System.IO;
-using System.Drawing;               // Required for System.Drawing.Rectangle
-using Aspose.Pdf.Facades;          // Facade API for annotation handling
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "annotated_output.pdf";
+        const string author    = "John Doe";               // custom author metadata
+        const string noteText = "Review this section later.";
 
-        // Custom author metadata for the annotation
-        const string author   = "John Doe";
-        const string contents = "This note was added by John Doe.";
-
-        // Define the annotation rectangle (x, y, width, height)
-        Rectangle rect = new Rectangle(100, 500, 200, 100);
-
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Add a text annotation using the Facade API.
-        // The 'title' parameter stores the author information.
+        // Use PdfContentEditor (facade) to add a text annotation with the author as the Title.
         using (PdfContentEditor editor = new PdfContentEditor())
         {
-            editor.BindPdf(inputPath);
-            editor.CreateText(rect, author, contents, true, "Note", 1);
-            editor.Save(outputPath);
+            // Bind the existing PDF document.
+            editor.BindPdf(inputPdf);
+
+            // Define the annotation rectangle (x, y, width, height) in points.
+            Rectangle rect = new Rectangle(100, 500, 200, 100);
+
+            // Create the text annotation:
+            //   rect   – location on the page
+            //   author – Title property (author of the note)
+            //   noteText – Contents of the annotation
+            //   true   – annotation initially open
+            //   "Note" – icon type (standard sticky‑note icon)
+            //   1      – page number (1‑based indexing)
+            editor.CreateText(rect, author, noteText, true, "Note", 1);
+
+            // Save the modified PDF.
+            editor.Save(outputPdf);
         }
 
-        Console.WriteLine($"Annotation with author '{author}' saved to '{outputPath}'.");
+        Console.WriteLine($"Annotation added with author \"{author}\" and saved to '{outputPdf}'.");
     }
 }

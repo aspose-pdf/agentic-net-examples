@@ -2,15 +2,15 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // for AnnotationFlags
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";          // source PDF
-        const string outputPath = "output_with_hidden.pdf"; // result PDF
-        const string sessionId  = "ABC123-SESSION-ID"; // value to store
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string sessionId = "ABC123XYZ";
 
         if (!File.Exists(inputPath))
         {
@@ -18,27 +18,25 @@ class Program
             return;
         }
 
-        // Load the existing PDF
+        // Load the existing PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Create a hidden text box field to hold the session identifier.
-            // Rectangle with zero size makes the field invisible on the page.
-            TextBoxField hiddenField = new TextBoxField(
-                doc,
-                new Aspose.Pdf.Rectangle(0, 0, 0, 0)   // zero‑size rectangle
-            );
+            // Define a zero‑size rectangle (field will not be visible)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(0, 0, 0, 0);
 
-            hiddenField.PartialName = "SessionId";      // field name
-            hiddenField.Value      = sessionId;        // store the session identifier
-            hiddenField.ReadOnly   = true;            // prevent user editing
+            // Create a hidden text box field to store the session identifier
+            TextBoxField hiddenField = new TextBoxField(doc, rect)
+            {
+                PartialName = "SessionId",   // field name
+                Value = sessionId,           // store the session identifier
+                ReadOnly = true,             // prevent editing
+                Flags = AnnotationFlags.Hidden // hide the field in the UI (enum, not int)
+            };
 
-            // Mark the field as hidden so it does not appear in the UI.
-            hiddenField.Flags = AnnotationFlags.Hidden;
+            // Add the field to the form on the first page (page indexing is 1‑based)
+            doc.Form.Add(hiddenField, "SessionId", 1);
 
-            // Add the field to the document's form.
-            doc.Form.Add(hiddenField);
-
-            // Save the modified PDF.
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

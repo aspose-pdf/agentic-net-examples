@@ -16,47 +16,39 @@ class Program
             return;
         }
 
-        // Load the existing PDF document (lifecycle rule: use Document constructor with file path)
+        // Load the PDF document (using rule: load)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (page indexing is 1‑based)
+            // Iterate through all pages (1‑based indexing per rule)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Get the page rectangle (media box or crop box)
-                Aspose.Pdf.Rectangle pageRect = page.Rect;
+                // Create a Graph container sized to the page (double constructor)
+                Graph graph = new Graph((double)page.Rect.Width, (double)page.Rect.Height);
 
-                // Create a Graph container sized to the page (Graph expects double values)
-                Graph graph = new Graph(pageRect.Width, pageRect.Height);
+                // Define a rectangle shape that matches the page size using Aspose.Pdf.Drawing.Rectangle
+                var border = new Aspose.Pdf.Drawing.Rectangle(
+                    (float)page.Rect.LLX,               // left (float)
+                    (float)page.Rect.LLY,               // bottom (float)
+                    (float)page.Rect.Width,             // width (float)
+                    (float)page.Rect.Height);           // height (float)
 
-                // Define a drawing rectangle that matches the page size
-                // Constructor: (left, bottom, width, height) – all as float
-                var borderRect = new Aspose.Pdf.Drawing.Rectangle(
-                    0f,
-                    0f,
-                    (float)pageRect.Width,
-                    (float)pageRect.Height);
-
-                // Set visual properties via GraphInfo (stroke only, no fill)
-                borderRect.GraphInfo = new GraphInfo
+                // Set visual properties via GraphInfo (stroke color & line width)
+                border.GraphInfo = new GraphInfo
                 {
-                    Color = Aspose.Pdf.Color.Black, // stroke color
-                    LineWidth = 2f                    // border thickness
+                    Color = Color.Black,   // border color
+                    LineWidth = 2f          // thickness (float)
                 };
 
                 // Add the rectangle shape to the graph
-                graph.Shapes.Add(borderRect);
-
-                // Position the graph at the page origin – default position is (0,0),
-                // so no explicit Bottom property is required (Graph has no Bottom member).
-                graph.Left = (float)pageRect.LLX;
+                graph.Shapes.Add(border);
 
                 // Add the graph to the page's paragraph collection
                 page.Paragraphs.Add(graph);
             }
 
-            // Save the modified PDF (lifecycle rule: use Document.Save with file path)
+            // Save the modified PDF (using rule: save)
             doc.Save(outputPath);
         }
 

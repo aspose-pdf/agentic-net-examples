@@ -2,8 +2,6 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices;
-using Aspose.Pdf.Text;
 
 class Program
 {
@@ -14,25 +12,26 @@ class Program
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Map missing font "Courier" to "LiberationMono" for proper rendering
-        FontRepository.Substitutions.Add(new SimpleFontSubstitution("Courier", "LiberationMono"));
-
+        // Convert PDF to TIFF with Symbol‑to‑Arial Unicode MS substitution
         using (PdfConverter converter = new PdfConverter())
         {
-            // Load the PDF document
+            // Bind the source PDF
             converter.BindPdf(inputPdf);
 
-            // Set conversion resolution (Resolution object, not an int)
-            converter.Resolution = new Resolution(300);
+            // Enable font conversion to Unicode TrueType (Arial Unicode MS compatible)
+            converter.RenderingOptions = new RenderingOptions
+            {
+                ConvertFontsToUnicodeTTF = true
+            };
 
-            // Perform the conversion
+            // Prepare the converter
             converter.DoConvert();
 
-            // Save all pages as a single multi‑page TIFF file
+            // Save all pages as a single TIFF file
             converter.SaveAsTIFF(outputTiff);
         }
 

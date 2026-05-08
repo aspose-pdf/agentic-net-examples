@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -11,28 +11,20 @@ class Program
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        try
+        // Bind the PDF file and extract its XMP metadata as a byte array
+        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
         {
-            // Load the PDF document (lifecycle: create, load, dispose via using)
-            using (Document doc = new Document(inputPdf))
-            {
-                // Create the output file stream for the XMP side‑car
-                using (FileStream outStream = new FileStream(outputXmp, FileMode.Create, FileAccess.Write))
-                {
-                    // Export XMP metadata directly to the stream
-                    doc.GetXmpMetadata(outStream);
-                }
-            }
+            xmp.BindPdf(inputPdf);
+            byte[] data = xmp.GetXmpMetadata();
 
-            Console.WriteLine($"XMP metadata exported to '{outputXmp}'.");
+            // Write the metadata bytes to a side‑car .xmp file
+            File.WriteAllBytes(outputXmp, data);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"XMP metadata exported to '{outputXmp}'.");
     }
 }

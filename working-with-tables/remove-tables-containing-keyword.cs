@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;   // TableAbsorber, AbsorbedTable, AbsorbedCell, TextFragment
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -10,7 +10,7 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string keyword    = "CONFIDENTIAL";   // keyword to search for (case‑insensitive)
+        const string keyword    = "CONFIDENTIAL";
 
         if (!File.Exists(inputPath))
         {
@@ -18,27 +18,28 @@ class Program
             return;
         }
 
-        // Load the PDF document (using statement ensures proper disposal)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Create a TableAbsorber and extract all tables from the document
+            // Create a TableAbsorber to locate tables in the document
             TableAbsorber absorber = new TableAbsorber();
-            absorber.Visit(doc);   // populates absorber.TableList
 
-            // Work on a copy of the TableList because Remove() modifies the collection
-            var tables = absorber.TableList.ToList();
+            // Extract tables from all pages
+            absorber.Visit(doc);
 
-            foreach (AbsorbedTable table in tables)
+            // Work on a copy of the TableList because Remove() changes the collection
+            var tables = absorber.TableList.ToArray();
+
+            foreach (var table in tables)
             {
                 bool containsKeyword = false;
 
-                // Iterate over rows and cells of the absorbed table
+                // Examine each cell's text fragments for the keyword
                 foreach (var row in table.RowList)
                 {
-                    foreach (AbsorbedCell cell in row.CellList)
+                    foreach (var cell in row.CellList)
                     {
-                        // Each cell may contain multiple text fragments
-                        foreach (TextFragment fragment in cell.TextFragments)
+                        foreach (var fragment in cell.TextFragments)
                         {
                             if (fragment.Text != null &&
                                 fragment.Text.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
@@ -52,7 +53,7 @@ class Program
                     if (containsKeyword) break;
                 }
 
-                // If the keyword was found in any cell, remove the whole table from its page
+                // Remove the table if the keyword was found in any cell
                 if (containsKeyword)
                 {
                     absorber.Remove(table);
@@ -63,6 +64,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Processing complete. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

@@ -1,66 +1,68 @@
 using System;
-using System.IO;
-using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
 class Program
 {
-    // Async entry point
-    static async Task Main(string[] args)
+    static void Main()
     {
-        // List of PDF files to process
-        string[] pdfFiles = { "file1.pdf", "file2.pdf", "file3.pdf" };
+        // Determine the directory that contains PDF files.
+        // Use a path relative to the executable so the code works on any OS.
+        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        string inputDirectory = Path.Combine(baseDir, "PdfFiles");
 
-        // Thread‑safe collection for results
-        var extractedTexts = new ConcurrentDictionary<string, string>();
-
-        // Create a task for each PDF file
-        var tasks = new List<Task>();
-        foreach (var pdfPath in pdfFiles)
+        if (!Directory.Exists(inputDirectory))
         {
-            if (!File.Exists(pdfPath))
+            Console.WriteLine($"PDF directory not found: {inputDirectory}");
+            return;
+        }
+
+        // Collect all PDF file paths
+        string[] pdfFiles = Directory.GetFiles(inputDirectory, "*.pdf", SearchOption.TopDirectoryOnly);
+        if (pdfFiles.Length == 0)
+        {
+            Console.WriteLine("No PDF files found.");
+            return;
+        }
+
+        // Thread‑safe dictionary to hold extraction results: file path -> extracted text
+        var results = new ConcurrentDictionary<string, string>();
+
+        // Parallelize the extraction using TPL
+        Parallel.ForEach(pdfFiles, pdfPath =>
+        {
+            try
             {
-                Console.Error.WriteLine($"File not found: {pdfPath}");
-                continue;
+                // Load the PDF document (wrapped in using for deterministic disposal)
+                using (Document doc = new Document(pdfPath))
+                {
+                    // Create a TextAbsorber to extract text from the whole document
+                    TextAbsorber absorber = new TextAbsorber();
+
+                    // Accept the absorber for all pages
+                    doc.Pages.Accept(absorber);
+
+                    // Store the extracted text
+                    results[pdfPath] = absorber.Text;
+                }
             }
-
-            tasks.Add(Task.Run(async () =>
+            catch (Exception ex)
             {
-                string text = await ExtractTextAsync(pdfPath);
-                extractedTexts[pdfPath] = text;
-                Console.WriteLine($"Extracted {text.Length} characters from {Path.GetFileName(pdfPath)}");
-            }));
-        }
-
-        // Wait for all extractions to finish
-        await Task.WhenAll(tasks);
-
-        // Optionally write each extracted text to a .txt file
-        foreach (var kvp in extractedTexts)
-        {
-            string txtPath = Path.ChangeExtension(kvp.Key, ".txt");
-            await File.WriteAllTextAsync(txtPath, kvp.Value);
-        }
-
-        Console.WriteLine("Text extraction completed for all PDFs.");
-    }
-
-    // Extracts text from a single PDF using Aspose.Pdf.TextAbsorber
-    private static Task<string> ExtractTextAsync(string pdfPath)
-    {
-        return Task.Run(() =>
-        {
-            // Load the PDF document (disposed automatically)
-            using (Document doc = new Document(pdfPath))
-            {
-                // Use TextAbsorber to collect text from all pages
-                TextAbsorber absorber = new TextAbsorber();
-                doc.Pages.Accept(absorber);
-                return absorber.Text ?? string.Empty;
+                // In case of errors, store the exception message
+                results[pdfPath] = $"Error: {ex.Message}";
             }
         });
+
+        // Output the extraction results
+        foreach (KeyValuePair<string, string> kvp in results)
+        {
+            Console.WriteLine($"--- {Path.GetFileName(kvp.Key)} ---");
+            Console.WriteLine(kvp.Value);
+            Console.WriteLine();
+        }
     }
 }

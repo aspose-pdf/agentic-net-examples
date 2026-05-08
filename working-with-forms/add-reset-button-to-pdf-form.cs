@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;      // JavascriptAction
-using Aspose.Pdf.Forms;           // ButtonField
+using Aspose.Pdf.Annotations;   // JavascriptAction
+using Aspose.Pdf.Forms;        // ButtonField
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input_form.pdf";
         const string outputPath = "output_with_reset.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,38 +17,31 @@ class Program
             return;
         }
 
-        // Load the existing PDF (lifecycle rule: use Document constructor)
+        // Load the existing PDF that contains a form
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document contains a form
-            Form form = doc.Form;
-            if (form == null)
-            {
-                Console.Error.WriteLine("The PDF does not contain a form.");
-                return;
-            }
+            // Create a push‑button field that will act as the Reset button
+            // Rectangle coordinates: lower‑left (x1, y1), upper‑right (x2, y2)
+            ButtonField resetButton = new ButtonField(
+                doc,
+                new Aspose.Pdf.Rectangle(100, 500, 200, 550));
 
-            // Create a reset button on the first page
-            Page page = doc.Pages[1];
+            // Set a name for the field (used to reference it programmatically)
+            resetButton.PartialName = "ResetFormButton";
 
-            // Define button rectangle (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle btnRect = new Aspose.Pdf.Rectangle(100, 500, 200, 530);
-
-            // Instantiate the button field and set its visual properties
-            ButtonField resetButton = new ButtonField(page, btnRect);
-            resetButton.PartialName = "ResetButton";
+            // Optional visual properties
             resetButton.AlternateCaption = "Reset";
+            resetButton.Color = Aspose.Pdf.Color.LightGray;
             resetButton.Border = new Border(resetButton) { Width = 1 };
-            resetButton.Color = Color.LightGray;
 
-            // Assign a JavaScript action that resets the form to its default values
-            // (ResetFormAction is not available via AnnotationActionCollection, so we use JavaScript)
-            resetButton.Actions.OnReleaseMouseBtn = new JavascriptAction("this.resetForm();");
+            // Assign a JavaScript action that resets the form when the button is clicked.
+            // Use a valid action property – OnPressMouseBtn (or OnReleaseMouseBtn).
+            resetButton.Actions.OnPressMouseBtn = new JavascriptAction("this.resetForm();");
 
-            // Add the button annotation to the page
-            page.Annotations.Add(resetButton);
+            // Add the button to the document's form collection
+            doc.Form.Add(resetButton);
 
-            // Save the modified PDF (lifecycle rule: use Document.Save)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

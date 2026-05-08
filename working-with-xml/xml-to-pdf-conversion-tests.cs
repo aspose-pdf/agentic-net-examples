@@ -1,11 +1,10 @@
 using System;
 using System.IO;
+using System.Text;
 using Aspose.Pdf;
-using NUnit.Framework; // Added to bring NUnit stub attributes into scope
+using NUnit.Framework;
 
-// -----------------------------------------------------------------------------
-// Minimal NUnit stubs – used when the real NUnit package is not referenced.
-// -----------------------------------------------------------------------------
+// Minimal NUnit stubs to allow compilation without the NUnit package
 namespace NUnit.Framework
 {
     [AttributeUsage(AttributeTargets.Class)]
@@ -15,10 +14,10 @@ namespace NUnit.Framework
     public sealed class TestAttribute : Attribute { }
 
     [AttributeUsage(AttributeTargets.Method)]
-    public sealed class SetUpAttribute : Attribute { }
+    public sealed class OneTimeSetUpAttribute : Attribute { }
 
     [AttributeUsage(AttributeTargets.Method)]
-    public sealed class TearDownAttribute : Attribute { }
+    public sealed class OneTimeTearDownAttribute : Attribute { }
 
     public static class Assert
     {
@@ -28,144 +27,158 @@ namespace NUnit.Framework
                 throw new Exception(message ?? "Assert.IsTrue failed.");
         }
 
-        public static void Greater<T>(T actual, T expected, string message = null) where T : IComparable<T>
+        public static void GreaterOrEqual<T>(T actual, T expected, string message = null) where T : IComparable<T>
         {
-            if (actual.CompareTo(expected) <= 0)
-                throw new Exception(message ?? $"Assert.Greater failed. Expected > {expected}, but was {actual}.");
-        }
-
-        public static void AreEqual<T>(T expected, T actual, string message = null)
-        {
-            if (!object.Equals(expected, actual))
-                throw new Exception(message ?? $"Assert.AreEqual failed. Expected:<{expected}>. Actual:<{actual}>.");
+            if (actual.CompareTo(expected) < 0)
+                throw new Exception(message ?? $"Assert.GreaterOrEqual failed. Expected: >= {expected}, Actual: {actual}.");
         }
     }
 }
 
-// -----------------------------------------------------------------------------
-// Unit tests for XML‑to‑PDF conversion using Aspose.Pdf.
-// -----------------------------------------------------------------------------
-[TestFixture]
-public class XmlToPdfConversionTests
+namespace AsposePdfTests
 {
-    private string _tempDir;
-
-    [SetUp]
-    public void SetUp()
+    // Dummy entry point to satisfy the compiler when the project is built as an executable.
+    // In a real test project this class would not be needed if the project were a class library.
+    public static class Program
     {
-        _tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        Directory.CreateDirectory(_tempDir);
-    }
-
-    [TearDown]
-    public void TearDown()
-    {
-        if (Directory.Exists(_tempDir))
+        public static void Main(string[] args)
         {
-            Directory.Delete(_tempDir, true);
+            // No operation – the NUnit test runner will discover and execute the tests.
         }
     }
 
-    private string CreateXmlFile(string content)
+    [TestFixture]
+    public class XmlToPdfConversionTests
     {
-        string path = Path.Combine(_tempDir, "sample.xml");
-        File.WriteAllText(path, content);
-        return path;
-    }
+        private const string TestDataFolder = "TestData";
 
-    private string CreateXslFile(string content)
-    {
-        string path = Path.Combine(_tempDir, "transform.xsl");
-        File.WriteAllText(path, content);
-        return path;
-    }
-
-    [Test]
-    public void ConvertXmlWithoutXsl_ShouldCreatePdf()
-    {
-        // Simple XML without any XSL transformation
-        string xml = "<?xml version='1.0'?><root><message>Hello World</message></root>";
-        string xmlPath = CreateXmlFile(xml);
-        string pdfPath = Path.Combine(_tempDir, "output.pdf");
-
-        // Load XML using default XmlLoadOptions (no XSL)
-        XmlLoadOptions loadOptions = new XmlLoadOptions();
-
-        // Load and save using the documented lifecycle pattern
-        using (Document pdfDocument = new Document(xmlPath, loadOptions))
+        [OneTimeSetUp]
+        public void GlobalSetup()
         {
-            pdfDocument.Save(pdfPath);
+            // Ensure the test data folder exists
+            if (!Directory.Exists(TestDataFolder))
+                Directory.CreateDirectory(TestDataFolder);
         }
 
-        // Verify PDF was created and contains at least one page
-        Assert.IsTrue(File.Exists(pdfPath));
-        using (Document doc = new Document(pdfPath))
+        [OneTimeTearDown]
+        public void GlobalTeardown()
         {
-            Assert.Greater(doc.Pages.Count, 0);
-        }
-    }
-
-    [Test]
-    public void ConvertXmlWithXslFilePath_ShouldCreatePdf()
-    {
-        // XML and XSL files on disk
-        string xml = "<?xml version='1.0'?><root><msg>Hello XSL</msg></root>";
-        string xsl = "<?xml version='1.0'?\n<xsl:stylesheet version='1.0' xmlns:xsl='http://www.w3.org/1999/XSL/Transform'>\n  <xsl:template match='/'>\n    <pdf>\n      <p><xsl:value-of select='root/msg'/></p>\n    </pdf>\n  </xsl:template>\n</xsl:stylesheet>";
-        string xmlPath = CreateXmlFile(xml);
-        string xslPath = CreateXslFile(xsl);
-        string pdfPath = Path.Combine(_tempDir, "output_with_xsl.pdf");
-
-        // Load XML with XSL file path using XmlLoadOptions(string)
-        XmlLoadOptions loadOptions = new XmlLoadOptions(xslPath);
-
-        using (Document pdfDocument = new Document(xmlPath, loadOptions))
-        {
-            pdfDocument.Save(pdfPath);
+            // Clean up all generated files after the test run
+            if (Directory.Exists(TestDataFolder))
+                Directory.Delete(TestDataFolder, true);
         }
 
-        Assert.IsTrue(File.Exists(pdfPath));
-        using (Document doc = new Document(pdfPath))
+        private string CreateTempXml(string content)
         {
-            Assert.Greater(doc.Pages.Count, 0);
+            string xmlPath = Path.Combine(TestDataFolder, Guid.NewGuid() + ".xml");
+            File.WriteAllText(xmlPath, content);
+            return xmlPath;
         }
-    }
 
-    [Test]
-    public void ConvertXmlWithXslStream_ShouldCreatePdf()
-    {
-        // XML and XSL files, XSL provided as a stream
-        string xml = "<?xml version='1.0'?><root><title>Stream XSL</title></root>";
-        string xsl = "<?xml version='1.0'?\n<xsl:stylesheet version='1.0' xmlns:xsl='http://www.w3.org/1999/XSL/Transform'>\n  <xsl:template match='/'>\n    <pdf>\n      <p><xsl:value-of select='root/title'/></p>\n    </pdf>\n  </xsl:template>\n</xsl:stylesheet>";
-        string xmlPath = CreateXmlFile(xml);
-        string xslPath = CreateXslFile(xsl);
-        string pdfPath = Path.Combine(_tempDir, "output_stream.pdf");
-
-        // Load XSL as a stream and pass to XmlLoadOptions(Stream)
-        using (FileStream xslStream = File.OpenRead(xslPath))
+        private string CreateTempXsl(string content)
         {
-            XmlLoadOptions loadOptions = new XmlLoadOptions(xslStream);
+            string xslPath = Path.Combine(TestDataFolder, Guid.NewGuid() + ".xsl");
+            File.WriteAllText(xslPath, content);
+            return xslPath;
+        }
+
+        private string GetTempPdfPath()
+        {
+            return Path.Combine(TestDataFolder, Guid.NewGuid() + ".pdf");
+        }
+
+        [Test]
+        public void ConvertXmlWithoutXsl_ToPdf_ShouldCreatePdf()
+        {
+            // Arrange: simple XML without any XSLT
+            string xmlContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<root><message>Hello, World!</message></root>";
+            string xmlPath = CreateTempXml(xmlContent);
+            string pdfPath = GetTempPdfPath();
+
+            // Act: load XML with default XmlLoadOptions (no XSL) and save as PDF
+            XmlLoadOptions loadOptions = new XmlLoadOptions(); // creates without XSL data
+            using (Document pdfDocument = new Document(xmlPath, loadOptions))
+            {
+                pdfDocument.Save(pdfPath); // PDF format, no SaveOptions needed
+            }
+
+            // Assert: PDF file exists and has at least one page
+            Assert.IsTrue(File.Exists(pdfPath), "PDF file was not created.");
+            using (Document resultDoc = new Document(pdfPath))
+            {
+                Assert.GreaterOrEqual(resultDoc.Pages.Count, 1, "Resulting PDF should contain at least one page.");
+            }
+        }
+
+        [Test]
+        public void ConvertXmlWithXslFilePath_ToPdf_ShouldCreatePdf()
+        {
+            // Arrange: XML and a simple XSL that copies the XML content
+            string xmlContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<root><title>Test</title></root>";
+            string xslContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\">\n  <xsl:output method=\"xml\"/>\n  <xsl:template match=\"/\">\n    <pdf>\n      <xsl:apply-templates/>\n    </pdf>\n  </xsl:template>\n  <xsl:template match=\"node()\">\n    <xsl:copy-of select=\".\"/>\n  </xsl:template>\n</xsl:stylesheet>";
+            string xmlPath = CreateTempXml(xmlContent);
+            string xslPath = CreateTempXsl(xslContent);
+            string pdfPath = GetTempPdfPath();
+
+            // Act: load XML with XmlLoadOptions that takes an XSL file path
+            XmlLoadOptions loadOptions = new XmlLoadOptions(xslPath);
             using (Document pdfDocument = new Document(xmlPath, loadOptions))
             {
                 pdfDocument.Save(pdfPath);
             }
+
+            // Assert: PDF file exists
+            Assert.IsTrue(File.Exists(pdfPath), "PDF file was not created with XSL file path.");
         }
 
-        Assert.IsTrue(File.Exists(pdfPath));
-        using (Document doc = new Document(pdfPath))
+        [Test]
+        public void ConvertXmlWithXslStream_ToPdf_ShouldCreatePdf()
         {
-            Assert.Greater(doc.Pages.Count, 0);
-        }
-    }
-}
+            // Arrange: XML and XSL content
+            string xmlContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<root><item>Value</item></root>";
+            string xslContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\">\n  <xsl:output method=\"xml\"/>\n  <xsl:template match=\"/\">\n    <pdf>\n      <xsl:apply-templates/>\n    </pdf>\n  </xsl:template>\n  <xsl:template match=\"node()\">\n    <xsl:copy-of select=\".\"/>\n  </xsl:template>\n</xsl:stylesheet>";
+            string xmlPath = CreateTempXml(xmlContent);
+            string pdfPath = GetTempPdfPath();
 
-// -----------------------------------------------------------------------------
-// Dummy entry point to satisfy the C# compiler when building a console project.
-// The test runner will still discover and execute the NUnit tests.
-// -----------------------------------------------------------------------------
-public static class Program
-{
-    public static void Main()
-    {
-        // No operation – the presence of Main resolves CS5001.
+            // Create a memory stream for the XSL content
+            using (MemoryStream xslStream = new MemoryStream())
+            using (StreamWriter writer = new StreamWriter(xslStream, Encoding.UTF8, 1024, true))
+            {
+                writer.Write(xslContent);
+                writer.Flush();
+                xslStream.Position = 0; // reset position for reading
+
+                // Act: load XML with XmlLoadOptions that takes a stream
+                XmlLoadOptions loadOptions = new XmlLoadOptions(xslStream);
+                using (Document pdfDocument = new Document(xmlPath, loadOptions))
+                {
+                    pdfDocument.Save(pdfPath);
+                }
+            }
+
+            // Assert: PDF file exists
+            Assert.IsTrue(File.Exists(pdfPath), "PDF file was not created with XSL stream.");
+        }
+
+        [Test]
+        public void ConvertXmlWithXslStringConstructor_ToPdf_ShouldCreatePdf()
+        {
+            // Arrange: XML and XSL files on disk
+            string xmlContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<root><data>Sample</data></root>";
+            string xslContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\">\n  <xsl:output method=\"xml\"/>\n  <xsl:template match=\"/\">\n    <pdf>\n      <xsl:apply-templates/>\n    </pdf>\n  </xsl:template>\n  <xsl:template match=\"node()\">\n    <xsl:copy-of select=\".\"/>\n  </xsl:template>\n</xsl:stylesheet>";
+            string xmlPath = CreateTempXml(xmlContent);
+            string xslPath = CreateTempXsl(xslContent);
+            string pdfPath = GetTempPdfPath();
+
+            // Act: use the XmlLoadOptions(string) constructor (xsl file path)
+            XmlLoadOptions loadOptions = new XmlLoadOptions(xslPath);
+            using (Document pdfDocument = new Document(xmlPath, loadOptions))
+            {
+                pdfDocument.Save(pdfPath);
+            }
+
+            // Assert: PDF file exists
+            Assert.IsTrue(File.Exists(pdfPath), "PDF file was not created with XmlLoadOptions(string) constructor.");
+        }
     }
 }

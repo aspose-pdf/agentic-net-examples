@@ -6,10 +6,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
+        const string inputPdf = "input.pdf";
         const string outputHtml = "output.html";
 
-        // Verify source file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"File not found: {inputPdf}");
@@ -18,27 +17,28 @@ class Program
 
         try
         {
-            // Load the PDF document (using block ensures proper disposal)
+            // Load PDF document (using block ensures proper disposal)
             using (Document pdfDoc = new Document(inputPdf))
             {
-                // Configure HTML conversion options
-                HtmlSaveOptions htmlOpts = new HtmlSaveOptions
-                {
-                    // Render all background images as a single PNG per page
-                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsEmbeddedPartsOfPngPageBackground
-                };
+                // Configure HTML save options
+                HtmlSaveOptions htmlOpts = new HtmlSaveOptions();
 
-                // HTML conversion relies on GDI+ (Windows only). Handle platforms where it is unavailable.
-                try
-                {
-                    pdfDoc.Save(outputHtml, htmlOpts);
-                    Console.WriteLine($"PDF successfully converted to HTML: {outputHtml}");
-                }
-                catch (TypeInitializationException)
-                {
-                    Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
-                }
+                // Render page backgrounds as PNG images by using the appropriate raster image saving mode
+                htmlOpts.RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsEmbeddedPartsOfPngPageBackground;
+
+                // (Optional) Render other raster images as embedded PNG page backgrounds
+                // htmlOpts.RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsEmbeddedPartsOfPngPageBackground;
+
+                // Save as HTML using explicit options (required for non‑PDF output)
+                pdfDoc.Save(outputHtml, htmlOpts);
             }
+
+            Console.WriteLine($"PDF successfully converted to HTML: {outputHtml}");
+        }
+        catch (TypeInitializationException)
+        {
+            // HTML conversion relies on GDI+ and is Windows‑only
+            Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
         }
         catch (Exception ex)
         {

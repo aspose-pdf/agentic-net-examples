@@ -11,32 +11,33 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Initialize the PdfFileEditor facade
-        PdfFileEditor editor = new PdfFileEditor();
-
-        // Pages to resize (2 and 4) – 1‑based indexing
+        // Pages are 1‑based; resize pages 2 and 4
         int[] pagesToResize = new int[] { 2, 4 };
 
-        // Create resize parameters with custom left and right margins.
-        // Left margin = 20 units, Right margin = 30 units.
-        // Top and bottom margins are set to 0 (auto calculation).
-        PdfFileEditor.ContentsResizeParameters resizeParams =
-            PdfFileEditor.ContentsResizeParameters.Margins(20, 30, 0, 0);
+        // Define custom left and right margins (in default space units).
+        // Top and bottom margins are set to 0 (no change).
+        var resizeParams = PdfFileEditor.ContentsResizeParameters.Margins(
+            left: 20,   // left margin
+            right: 30,  // right margin
+            top: 0,     // top margin
+            bottom: 0   // bottom margin
+        );
 
-        // Perform the resize operation
+        // Perform the resize operation using the Facades API.
+        PdfFileEditor editor = new PdfFileEditor();
         bool result = editor.ResizeContents(inputPath, outputPath, pagesToResize, resizeParams);
 
-        if (!result)
+        if (result)
         {
-            Console.Error.WriteLine("Failed to resize the specified pages.");
+            Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
         }
         else
         {
-            Console.WriteLine($"Pages 2 and 4 resized successfully. Output saved to '{outputPath}'.");
+            Console.Error.WriteLine("Failed to resize PDF pages.");
         }
     }
 }

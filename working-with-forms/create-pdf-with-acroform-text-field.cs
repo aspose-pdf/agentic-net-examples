@@ -1,38 +1,36 @@
 using System;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "output.pdf";
+        const string outputPath = "AcroForm.pdf";
 
-        // Create a new PDF document and ensure proper disposal
+        // Create a new PDF document and ensure deterministic disposal
         using (Document doc = new Document())
         {
             // Add the first page (1‑based indexing)
             Page page = doc.Pages.Add();
 
-            // Define the rectangle for the text field (llx, lly, urx, ury)
-            var rect = new Rectangle(100, 600, 300, 630);
+            // Define the rectangle where the text field will appear
+            // (lower‑left X, lower‑left Y, upper‑right X, upper‑right Y)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 300, 630);
 
-            // Create a TextBoxField on the page
-            var textField = new TextBoxField(page, rect)
+            // Create a text box field on the page
+            TextBoxField txtField = new TextBoxField(page, rect)
             {
-                PartialName = "SampleTextField",   // field name
-                Value = "Enter text here",         // default value
-                Color = Aspose.Pdf.Color.LightGray // background color
+                // Set a name for the field (used in form data)
+                PartialName = "SampleTextField",
+                // Optional: set an initial value
+                Value = "Enter text here"
             };
 
-            // Set a visible border – Border requires the parent annotation (the field itself)
-            textField.Border = new Border(textField) { Width = 1 };
+            // Add the field to the document's AcroForm
+            doc.Form.Add(txtField);
 
-            // Add the field to the document's form on page 1
-            doc.Form.Add(textField, 1);
-
-            // Save the PDF (PDF format, no extra SaveOptions needed)
+            // Save the PDF (no SaveOptions needed for PDF output)
             doc.Save(outputPath);
         }
 

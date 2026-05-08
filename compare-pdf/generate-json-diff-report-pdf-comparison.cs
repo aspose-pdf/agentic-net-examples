@@ -8,44 +8,57 @@ class Program
 {
     static void Main()
     {
-        const string firstPdfPath = "first.pdf";
+        // Input PDF files to compare
+        const string firstPdfPath  = "first.pdf";
         const string secondPdfPath = "second.pdf";
-        const string jsonReportPath = "diffReport.json";
 
-        // Verify input files exist
-        if (!File.Exists(firstPdfPath) || !File.Exists(secondPdfPath))
+        // Path where the JSON diff report will be saved
+        const string jsonReportPath = "diff_report.json";
+
+        // Validate input files
+        if (!File.Exists(firstPdfPath))
         {
-            Console.Error.WriteLine("One or both input PDF files were not found.");
+            Console.Error.WriteLine($"File not found: {firstPdfPath}");
+            return;
+        }
+        if (!File.Exists(secondPdfPath))
+        {
+            Console.Error.WriteLine($"File not found: {secondPdfPath}");
             return;
         }
 
-        // Load the two PDF documents inside using blocks for deterministic disposal
-        using (Document doc1 = new Document(firstPdfPath))
-        using (Document doc2 = new Document(secondPdfPath))
+        try
         {
-            // Create default comparison options
-            ComparisonOptions options = new ComparisonOptions();
-
-            // Perform a page‑by‑page text comparison
-            // Returns a list where each element corresponds to a page and contains its DiffOperation list
-            List<List<DiffOperation>> pageDiffs = TextPdfComparer.CompareDocumentsPageByPage(doc1, doc2, options);
-
-            // Optional: iterate over the DiffOperation objects and write a simple console report
-            for (int pageIndex = 0; pageIndex < pageDiffs.Count; pageIndex++)
+            // Load both documents inside using blocks for deterministic disposal
+            using (Document doc1 = new Document(firstPdfPath))
+            using (Document doc2 = new Document(secondPdfPath))
             {
-                Console.WriteLine($"Differences on page {pageIndex + 1}:");
-                foreach (DiffOperation diff in pageDiffs[pageIndex])
+                // Comparison options – defaults are sufficient for text comparison
+                ComparisonOptions options = new ComparisonOptions();
+
+                // Perform a flat (whole‑document) text comparison
+                List<DiffOperation> diffs = TextPdfComparer.CompareFlatDocuments(doc1, doc2, options);
+
+                // Iterate over the diff operations and output them to the console
+                foreach (DiffOperation diff in diffs)
                 {
-                    // DiffOperation.Operation indicates Insert, Delete, Equal, etc.
-                    Console.WriteLine($"  {diff.Operation}: {diff.Text}");
+                    // DiffOperation provides a useful ToString implementation
+                    Console.WriteLine(diff.ToString());
+                    // Alternatively you can access the explicit properties:
+                    // Console.WriteLine($"{diff.Operation} – \"{diff.Text}\"");
                 }
+
+                // Generate a JSON report of the differences
+                JsonDiffOutputGenerator jsonGenerator = new JsonDiffOutputGenerator();
+                // This overload writes the JSON directly to the specified file
+                jsonGenerator.GenerateOutput(diffs, jsonReportPath);
+
+                Console.WriteLine($"JSON diff report saved to '{jsonReportPath}'.");
             }
-
-            // Generate a JSON report of the differences and save it to a file
-            JsonDiffOutputGenerator jsonGenerator = new JsonDiffOutputGenerator();
-            jsonGenerator.GenerateOutput(pageDiffs, jsonReportPath);
         }
-
-        Console.WriteLine($"JSON diff report saved to '{jsonReportPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during comparison: {ex.Message}");
+        }
     }
 }

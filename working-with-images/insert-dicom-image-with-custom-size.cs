@@ -1,16 +1,20 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf   = "template.pdf";   // existing PDF to which the image will be added
-        const string outputPdf  = "result.pdf";
-        const string dicomImage = "image.dcm";      // path to the DICOM image file
-        const double imgWidth   = 200.0;            // desired width in points (1/72 inch)
-        const double imgHeight  = 150.0;            // desired height in points
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string dicomPath = "image.dcm";
+
+        // Desired size of the image on the page (points; 1 point = 1/72 inch)
+        double customWidth  = 200; // e.g., 200 points
+        double customHeight = 300; // e.g., 300 points
 
         if (!File.Exists(inputPdf))
         {
@@ -18,28 +22,33 @@ class Program
             return;
         }
 
-        if (!File.Exists(dicomImage))
+        if (!File.Exists(dicomPath))
         {
-            Console.Error.WriteLine($"DICOM image not found: {dicomImage}");
+            Console.Error.WriteLine($"DICOM image not found: {dicomPath}");
             return;
         }
 
-        // Open the PDF document
+        // Load the PDF document
         using (Document doc = new Document(inputPdf))
         {
-            // Get the first page (or any page you want to place the image on)
-            Page page = doc.Pages[1];
+            // Enable automatic tagging if the document is not already tagged
+            AutoTaggingSettings.Default.EnableAutoTagging = true;
 
-            // Create an Image object for the DICOM file and set custom dimensions (points)
-            Image img = new Image
-            {
-                File = dicomImage,
-                FixWidth = imgWidth,
-                FixHeight = imgHeight
-            };
+            // Access tagged content (creates a tagged structure if none exists)
+            ITaggedContent tagged = doc.TaggedContent;
+            tagged.SetLanguage("en-US");
+            tagged.SetTitle(Path.GetFileNameWithoutExtension(outputPdf));
 
-            // Add the image to the page's paragraph collection
-            page.Paragraphs.Add(img);
+            // Root element of the structure tree
+            StructureElement root = tagged.RootElement;
+
+            // Create a figure element (used for images) and set the DICOM image with custom dimensions
+            FigureElement figure = tagged.CreateFigureElement();
+            figure.SetImage(dicomPath, customWidth, customHeight);
+            figure.AlternativeText = "DICOM image";
+
+            // Attach the figure to the document structure
+            root.AppendChild(figure);
 
             // Save the modified PDF
             doc.Save(outputPdf);

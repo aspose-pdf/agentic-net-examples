@@ -6,8 +6,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "signed_input.pdf";
-        const string outputPath = "unsigned_output.pdf";
+        const string inputPath  = "signed.pdf";          // PDF containing a digital signature
+        const string outputPath = "unsigned.pdf";        // Resulting PDF without the signature
+        const string password   = "";                    // Owner password if the PDF is protected; leave empty otherwise
 
         if (!File.Exists(inputPath))
         {
@@ -15,17 +16,26 @@ class Program
             return;
         }
 
-        // Load the PDF document. The using block ensures deterministic disposal.
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Enable signature sanitization. When true, Aspose.Pdf removes
-            // all signature fields (including the digital signature) from the document.
-            doc.EnableSignatureSanitization = true;
+            // Load the PDF. If a password is required, pass it; otherwise use the overload without password.
+            using (Document doc = string.IsNullOrEmpty(password)
+                                   ? new Document(inputPath)
+                                   : new Document(inputPath, password))
+            {
+                // Enable signature sanitization (default is true). This removes signature fields
+                // when the document is saved, provided the current privileges allow it.
+                doc.EnableSignatureSanitization = true;
 
-            // Save the modified PDF. No SaveOptions are needed for PDF output.
-            doc.Save(outputPath);
+                // Save the modified PDF. The signature fields are stripped from the output.
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Signature removed. Output saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Signature removed. Output saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

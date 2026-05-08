@@ -15,30 +15,29 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        // Load the PDF document (lifecycle rule: using for disposal)
         using (Document doc = new Document(inputPath))
         {
             // Access the form fields collection
             Form form = doc.Form;
 
             // Assume the first field is a checkbox; cast safely
-            CheckboxField checkbox = form.Fields[0] as CheckboxField;
-            if (checkbox == null)
+            if (form.Fields[0] is CheckboxField checkbox)
             {
-                Console.WriteLine("The first field is not a checkbox.");
-                return;
+                // Read the Value property (string) of the checkbox
+                string rawValue = checkbox.Value; // e.g., "On", "Off", or a custom state
+
+                // Convert the string value to a Boolean
+                // Convention: any value other than "Off" (case‑insensitive) is considered checked
+                bool isChecked = !string.Equals(rawValue, "Off", StringComparison.OrdinalIgnoreCase);
+
+                Console.WriteLine($"Checkbox raw Value: \"{rawValue}\"");
+                Console.WriteLine($"Converted to Boolean: {isChecked}");
             }
-
-            // Read the string value of the checkbox
-            string rawValue = checkbox.Value; // e.g., "Off" or an allowed state name
-
-            // Convert the string value to a Boolean.
-            // In Aspose.Pdf a checkbox is considered checked when its value is NOT "Off".
-            bool isChecked = !string.Equals(rawValue, "Off", StringComparison.OrdinalIgnoreCase);
-
-            // Output the result
-            Console.WriteLine($"Checkbox value string: \"{rawValue}\"");
-            Console.WriteLine($"Converted to Boolean: {isChecked}");
+            else
+            {
+                Console.WriteLine("The first form field is not a checkbox.");
+            }
         }
     }
 }

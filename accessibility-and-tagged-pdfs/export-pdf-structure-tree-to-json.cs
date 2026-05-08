@@ -1,76 +1,88 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text.Json;
+using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Tagged;
 using Aspose.Pdf.LogicalStructure;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 class Program
 {
-    // POCO class that represents a node in the structure tree for JSON serialization
-    class JsonStructureNode
+    // Simple POCO that represents a structure element for JSON serialization
+    private class StructureNode
     {
+        [JsonPropertyName("type")]
         public string Type { get; set; }
-        public string AlternativeText { get; set; }
+
+        [JsonPropertyName("actualText")]
         public string ActualText { get; set; }
+
+        [JsonPropertyName("alternativeText")]
+        public string AlternativeText { get; set; }
+
+        [JsonPropertyName("language")]
         public string Language { get; set; }
-        public List<JsonStructureNode> Children { get; set; } = new List<JsonStructureNode>();
+
+        [JsonPropertyName("children")]
+        public List<StructureNode> Children { get; set; } = new List<StructureNode>();
+    }
+
+    // Recursively converts an Aspose.Pdf logical structure Element into a serializable StructureNode
+    private static StructureNode ConvertToNode(Element element)
+    {
+        StructureNode node = new StructureNode {
+            Type = element.GetType().Name
+        };
+
+        // Most elements that carry textual information derive from StructureElement
+        if (element is StructureElement se)
+        {
+            node.ActualText = se.ActualText;
+            node.AlternativeText = se.AlternativeText;
+            node.Language = se.Language;
+        }
+
+        // Process child elements recursively
+        foreach (Element child in element.ChildElements)
+        {
+            node.Children.Add(ConvertToNode(child));
+        }
+
+        return node;
     }
 
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputJsonPath = "structure.json";
+        const string inputPdf = "input.pdf";
+        const string outputJson = "structure.json";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document (using rule‑based lifecycle)
-        using (Document doc = new Document(inputPdfPath))
+        // Load the PDF document (using statement ensures proper disposal)
+        using (Document doc = new Document(inputPdf))
         {
-            // Access the structure tree root element via ITaggedContent
-            ITaggedContent taggedContent = doc.TaggedContent;
-            Aspose.Pdf.LogicalStructure.StructTreeRootElement rootElement = taggedContent.StructTreeRootElement;
+            // Access the tagged content of the document
+            ITaggedContent tagged = doc.TaggedContent;
 
-            // Convert the structure tree to a serializable object graph
-            JsonStructureNode rootNode = ConvertElementToNode(rootElement);
+            // Obtain the root of the structure tree
+            StructTreeRootElement structRoot = tagged.StructTreeRootElement;
 
-            // Serialize to JSON with indentation
+            // Convert the entire structure tree to a serializable object
+            StructureNode rootNode = ConvertToNode(structRoot);
+
+            // Serialize to JSON with indentation for readability
             JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
             string json = JsonSerializer.Serialize(rootNode, jsonOptions);
 
-            // Write JSON to file (non‑PDF output, so use standard I/O)
-            File.WriteAllText(outputJsonPath, json);
+            // Write JSON to the output file
+            File.WriteAllText(outputJson, json);
         }
 
-        Console.WriteLine($"Structure tree exported to '{outputJsonPath}'.");
-    }
-
-    // Recursively converts an Aspose.Pdf logical structure Element into a JsonStructureNode
-    static JsonStructureNode ConvertElementToNode(Element element)
-    {
-        JsonStructureNode node = new JsonStructureNode {
-            Type = element.GetType().Name
-        };
-
-        // Only StructureElement (and its derived types) expose the text‑related properties
-        if (element is StructureElement se)
-        {
-            node.AlternativeText = se.AlternativeText;
-            node.ActualText      = se.ActualText;
-            node.Language        = se.Language;
-        }
-
-        // Iterate over child elements using the correct ChildElements property
-        foreach (Element child in element.ChildElements)
-        {
-            node.Children.Add(ConvertElementToNode(child));
-        }
-
-        return node;
+        Console.WriteLine($"Structure tree exported to '{outputJson}'.");
     }
 }

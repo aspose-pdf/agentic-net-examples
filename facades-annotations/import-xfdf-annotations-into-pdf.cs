@@ -1,36 +1,36 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string xfdfFile = "annotations.xfdf";
-        const string outputPdf = "output.pdf";
+        const string inputPdfPath = "input.pdf";
+        const string xfdfPath = "annotations.xfdf";
+        const string outputPdfPath = "output.pdf";
 
-        // Verify that source files exist
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(xfdfFile))
-        {
-            Console.Error.WriteLine($"XFDF file not found: {xfdfFile}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Use PdfAnnotationEditor (Facade) to bind the PDF, import XFDF annotations, and save
+        if (!File.Exists(xfdfPath))
+        {
+            Console.Error.WriteLine($"XFDF file not found: {xfdfPath}");
+            return;
+        }
+
+        // Bind the PDF, import annotations from XFDF, and save the result
         using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            editor.BindPdf(inputPdf);                     // Load the PDF document
-            editor.ImportAnnotationsFromXfdf(xfdfFile);   // Import all annotations from XFDF
-            editor.Save(outputPdf);                       // Save the updated PDF
+            editor.BindPdf(inputPdfPath);
+            // ImportAnnotations expects a string array of XFDF file paths
+            editor.ImportAnnotations(new string[] { xfdfPath });
+            editor.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Annotations imported and saved to '{outputPdf}'.");
+        Console.WriteLine($"Annotations imported and saved to '{outputPdfPath}'.");
     }
 }

@@ -7,22 +7,23 @@ class Program
     static void Main()
     {
         const string inputPath = "encrypted.pdf";
-        const string password = "user123";
         const string outputPath = "stamped.pdf";
+        const string password = "user123";
         const string stampImagePath = "stamp.png";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
+
         if (!File.Exists(stampImagePath))
         {
             Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
             return;
         }
 
-        // Open the encrypted PDF with the correct password
+        // Open the encrypted PDF using the user password
         using (Document doc = new Document(inputPath, password))
         {
             // Decrypt the document to allow modifications
@@ -31,21 +32,23 @@ class Program
             // Create an image stamp
             ImageStamp imgStamp = new ImageStamp(stampImagePath)
             {
-                XIndent = 50,          // Horizontal position
-                YIndent = 700,         // Vertical position
-                Width = 100,           // Desired width
-                Height = 50,           // Desired height
-                Opacity = 0.5f,        // Semi‑transparent
-                Background = false     // Stamp on top of content
+                Background = false,
+                Opacity = 0.5,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
             };
 
-            // Apply the stamp to each page (or modify as needed)
+            // Apply the stamp to every page
             foreach (Page page in doc.Pages)
             {
                 page.AddStamp(imgStamp);
             }
 
-            // Save the stamped PDF
+            // Re‑encrypt the document (optional, using same password)
+            Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+            doc.Encrypt(password, password, perms, CryptoAlgorithm.AESx256);
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

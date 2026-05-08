@@ -7,33 +7,41 @@ class Program
 {
     static void Main()
     {
-        // Paths to the destination PDF, source PDF, and the resulting merged PDF
-        const string destinationPath = "dest.pdf";
-        const string sourcePath = "source.pdf";
-        const string outputPath = "merged.pdf";
+        // Paths – adjust as needed
+        const string destinationPdf = "destination.pdf"; // PDF that will receive the pages
+        const string sourcePdf      = "source.pdf";      // PDF whose pages will be appended
+        const string outputPdf      = "merged.pdf";      // Resulting PDF
 
-        // Verify that both input files exist
-        if (!File.Exists(destinationPath) || !File.Exists(sourcePath))
+        // Verify files exist
+        if (!File.Exists(destinationPdf))
         {
-            Console.Error.WriteLine("One or both input PDF files were not found.");
+            Console.Error.WriteLine($"Destination file not found: {destinationPdf}");
+            return;
+        }
+        if (!File.Exists(sourcePdf))
+        {
+            Console.Error.WriteLine($"Source file not found: {sourcePdf}");
             return;
         }
 
-        // Determine the page range of the source PDF (append all its pages)
+        // Determine the page range to copy from the source PDF.
+        // Use a Document in a using block to obtain the page count.
         int startPage = 1;
         int endPage;
-        using (Document srcDoc = new Document(sourcePath))
+        using (Document srcDoc = new Document(sourcePdf))
         {
-            endPage = srcDoc.Pages.Count; // total pages in source PDF
+            endPage = srcDoc.Pages.Count; // Append all pages from the source
         }
 
-        // Use PdfFileEditor to append the source pages to the destination PDF
+        // PdfFileEditor does NOT implement IDisposable, so do NOT wrap it in a using block.
         PdfFileEditor editor = new PdfFileEditor();
-        bool result = editor.Append(destinationPath, sourcePath, startPage, endPage, outputPath);
 
-        // Report the outcome
-        Console.WriteLine(result
-            ? $"Successfully appended pages {startPage}-{endPage} from '{sourcePath}' to '{destinationPath}'. Output saved as '{outputPath}'."
-            : "Failed to append pages.");
+        // Append the selected page range from sourcePdf to the end of destinationPdf.
+        // NOTE: The correct parameter order for Append is (sourceFile, destinationFile, startPage, endPage, outputFile).
+        // In recent Aspose.Pdf versions Append returns void; it throws on failure.
+        editor.Append(sourcePdf, destinationPdf, startPage, endPage, outputPdf);
+
+        Console.WriteLine($"Pages from '{sourcePdf}' (pages {startPage}-{endPage}) appended to '{destinationPdf}'.");
+        Console.WriteLine($"Result saved as '{outputPdf}'.");
     }
 }

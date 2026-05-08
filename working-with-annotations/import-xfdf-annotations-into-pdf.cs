@@ -1,48 +1,45 @@
 using System;
 using System.IO;
-using System.Text;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";          // source PDF file
-        const string outputPath = "output.pdf";      // destination PDF file
-        const string xfdfData = @"<?xml version=""1.0"" encoding=""UTF-8""?>
-<xfdf xmlns=""http://ns.adobe.com/xfdf/"" xml:space=""preserve"">
-  <annots>
-    <!-- Example annotation -->
-    <highlight page=""1"" color=""#FF00FF"">
-      <rects>
-        <rect top=""700"" left=""100"" bottom=""720"" right=""300""/>
-      </rects>
-      <contents>Sample highlight</contents>
-    </highlight>
-  </annots>
-</xfdf>";
+        const string pdfPath = "input.pdf";
+        const string xfdfPath = "annotations.xfdf";
+        const string outputPath = "output.pdf";
 
-        // Verify source PDF exists
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using)
-        using (Document doc = new Document(pdfPath))
+        if (!File.Exists(xfdfPath))
         {
-            // Convert the XFDF string to a UTF‑8 memory stream
-            using (MemoryStream xfdfStream = new MemoryStream(Encoding.UTF8.GetBytes(xfdfData)))
-            {
-                // Import annotations from the XFDF stream into the document
-                doc.ImportAnnotationsFromXfdf(xfdfStream);
-            }
-
-            // Save the modified PDF (lifecycle rule: use Save)
-            doc.Save(outputPath);
+            Console.Error.WriteLine($"XFDF not found: {xfdfPath}");
+            return;
         }
 
-        Console.WriteLine($"Annotations imported and saved to '{outputPath}'.");
+        try
+        {
+            // Load the existing PDF document
+            using (Document doc = new Document(pdfPath))
+            {
+                // Import annotations from the XFDF file.
+                // This operation adds the annotations while keeping the original page layout and content intact.
+                doc.ImportAnnotationsFromXfdf(xfdfPath);
+
+                // Save the modified PDF to a new file.
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Annotations imported successfully. Saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

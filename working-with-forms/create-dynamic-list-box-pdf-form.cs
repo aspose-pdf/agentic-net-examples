@@ -1,41 +1,53 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Annotations; // required for Border
 
 class Program
 {
     static void Main()
     {
-        // Create a new PDF document and ensure proper disposal
-        using (Document pdfDoc = new Document())
-        {
-            // Add a blank page (1‑based indexing)
-            Page page = pdfDoc.Pages.Add();
+        const string outputPath = "DynamicListForm.pdf";
 
-            // Define the rectangle where the list box will appear
-            // Parameters: lower‑left‑x, lower‑left‑y, upper‑right‑x, upper‑right‑y
-            Aspose.Pdf.Rectangle listRect = new Aspose.Pdf.Rectangle(100, 600, 300, 500);
+        // Create a new PDF document
+        using (Document doc = new Document())
+        {
+            // Add a page to the document
+            Page page = doc.Pages.Add();
+
+            // Define the rectangle where the list box will appear (llx, lly, urx, ury)
+            Rectangle listRect = new Rectangle(100, 500, 300, 650);
 
             // Create a ListBox field on the page
             ListBoxField listBox = new ListBoxField(page, listRect)
             {
-                // Allow multiple selections (optional for a dynamic list)
-                MultiSelect = true,
-                // Set a unique field name
-                PartialName = "DynamicList"
+                PartialName = "DynamicList",          // field name
+                AlternateName = "Dynamic List",       // tooltip
+                Color = Color.LightGray,               // background color
+                MultiSelect = false                    // single‑selection list
             };
+
+            // Set the border – Border requires the parent annotation in its constructor
+            listBox.Border = new Border(listBox) { Width = 1 };
 
             // Add initial items to the list
             listBox.AddOption("Item 1");
             listBox.AddOption("Item 2");
             listBox.AddOption("Item 3");
 
-            // Add the field to the form on page 1
-            pdfDoc.Form.Add(listBox, 1);
+            // Demonstrate dynamic expansion by adding more items programmatically
+            // (In a real form this could be driven by JavaScript at runtime)
+            listBox.AddOption("Item 4");
+            listBox.AddOption("Item 5");
 
-            // Save the PDF document
-            pdfDoc.Save("DynamicListForm.pdf");
+            // Register the field with the document's form collection (page numbers are 1‑based)
+            doc.Form.Add(listBox, 1);
+
+            // Save the PDF
+            doc.Save(outputPath);
         }
+
+        Console.WriteLine($"PDF with dynamic list field saved to '{outputPath}'.");
     }
 }

@@ -3,31 +3,42 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Comparison;
 
-class Program
+class PdfComparisonExample
 {
     static void Main()
     {
-        const string pdf1Path = "doc1.pdf";
-        const string pdf2Path = "doc2.pdf";
-        const string diffPath = "diff.pdf";
+        // Input PDF file paths
+        const string firstPdfPath  = "first.pdf";
+        const string secondPdfPath = "second.pdf";
 
-        if (!File.Exists(pdf1Path) || !File.Exists(pdf2Path))
+        // Output path for the diff PDF
+        const string diffPdfPath = "diff_result.pdf";
+
+        // Validate input files
+        if (!File.Exists(firstPdfPath))
         {
-            Console.Error.WriteLine("One or both input PDF files were not found.");
+            Console.Error.WriteLine($"File not found: {firstPdfPath}");
+            return;
+        }
+        if (!File.Exists(secondPdfPath))
+        {
+            Console.Error.WriteLine($"File not found: {secondPdfPath}");
             return;
         }
 
-        // Load both PDFs inside using blocks to ensure proper disposal.
-        using (Document doc1 = new Document(pdf1Path))
-        using (Document doc2 = new Document(pdf2Path))
+        // Load the two documents and compare them page by page
+        // Documents are wrapped in using blocks for deterministic disposal
+        using (Document doc1 = new Document(firstPdfPath))
+        using (Document doc2 = new Document(secondPdfPath))
         {
-            // Use default comparison options.
+            // Default comparison options
             ComparisonOptions options = new ComparisonOptions();
 
-            // Compare the documents page by page and save the diff PDF.
-            TextPdfComparer.CompareDocumentsPageByPage(doc1, doc2, options, diffPath);
+            // Perform the comparison and save the diff PDF
+            // This overload writes the visual diff directly to the specified file
+            TextPdfComparer.CompareDocumentsPageByPage(doc1, doc2, options, diffPdfPath);
         }
 
-        Console.WriteLine($"Diff PDF saved to '{diffPath}'.");
+        Console.WriteLine($"Comparison completed. Diff PDF saved to '{diffPdfPath}'.");
     }
 }

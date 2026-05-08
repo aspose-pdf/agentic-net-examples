@@ -7,53 +7,53 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf      = "input.pdf";      // source PDF
-        const string portfolioPdf  = "portfolio.pdf";  // PDF portfolio to embed
-        const string outputPdf     = "output.pdf";     // result PDF
-        const string userPassword  = "";               // empty user password
-        const string ownerPassword = "owner123";       // owner password for encryption
+        const string inputPdfPath      = "input.pdf";          // source PDF
+        const string outputPdfPath     = "output.pdf";         // result PDF
+        const string portfolioPdfPath  = "portfolio.pdf";      // PDF portfolio to embed
 
-        // Verify required files exist
-        if (!File.Exists(inputPdf) || !File.Exists(portfolioPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine("Required input files are missing.");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Load the source document (lifecycle rule: use using for disposal)
-        using (Document doc = new Document(inputPdf))
+        if (!File.Exists(portfolioPdfPath))
         {
-            // Define the annotation rectangle (llx, lly, urx, ury)
+            Console.Error.WriteLine($"Portfolio PDF not found: {portfolioPdfPath}");
+            return;
+        }
+
+        // Open the source document
+        using (Document doc = new Document(inputPdfPath))
+        {
+            // Ensure there is at least one page
+            Page page = doc.Pages.Count > 0 ? doc.Pages[1] : doc.Pages.Add();
+
+            // Define the annotation rectangle (coordinates are in points)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 700);
 
-            // Create a RichMediaAnnotation on the first page
-            RichMediaAnnotation richMedia = new RichMediaAnnotation(doc.Pages[1], rect);
+            // Create the RichMediaAnnotation
+            RichMediaAnnotation richMedia = new RichMediaAnnotation(page, rect);
 
-            // Embed the PDF portfolio as the rich‑media content
-            using (FileStream fs = File.OpenRead(portfolioPdf))
+            // Embed the PDF portfolio as rich media content.
+            // MIME type for PDF is "application/pdf".
+            using (FileStream portfolioStream = File.OpenRead(portfolioPdfPath))
             {
-                // First argument is a name for the embedded file
-                richMedia.SetContent("portfolio.pdf", fs);
+                richMedia.SetContent("application/pdf", portfolioStream);
             }
 
             // Add the annotation to the page
-            doc.Pages[1].Annotations.Add(richMedia);
+            page.Annotations.Add(richMedia);
 
-            // Set permissions that exclude printing
-            Permissions perms = Permissions.ModifyContent |
-                                 Permissions.ExtractContent |
-                                 Permissions.ModifyTextAnnotations |
-                                 Permissions.FillForm |
-                                 Permissions.AssembleDocument |
-                                 Permissions.PrintingQuality; // PrintDocument flag is omitted
+            // Disable printing by setting permissions that do NOT include PrintDocument.
+            // Here we allow content extraction but forbid printing.
+            Permissions perms = Permissions.ExtractContent; // adjust as needed
+            doc.Encrypt(userPassword: "", ownerPassword: "", perms, CryptoAlgorithm.AESx256);
 
-            // Encrypt the document to enforce the permissions (no user password)
-            doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
-
-            // Save the modified PDF (lifecycle rule: save inside using block)
-            doc.Save(outputPdf);
+            // Save the modified document
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Rich media PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"RichMedia annotation added and document saved to '{outputPdfPath}'.");
     }
 }

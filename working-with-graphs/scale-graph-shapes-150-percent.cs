@@ -1,7 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
+using System.Runtime.InteropServices;
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -9,27 +9,20 @@ class Program
     {
         const string outputPath = "scaled_shapes.pdf";
 
-        // Create a new PDF document and ensure proper disposal
-        using (Document doc = new Document())
+        // Create a new PDF document
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document())
         {
-            // Add a single page to the document
-            Page page = doc.Pages.Add();
+            // Add a page to the document
+            Aspose.Pdf.Page page = doc.Pages.Add();
 
-            // Initialize a Graph that covers the whole page
-            double graphWidth = page.PageInfo.Width;
-            double graphHeight = page.PageInfo.Height;
-            Graph graph = new Graph(graphWidth, graphHeight);
+            // Create a Graph with specified width and height
+            Aspose.Pdf.Drawing.Graph graph = new Aspose.Pdf.Drawing.Graph(400.0, 300.0);
 
-            // Apply a 150 % scaling transformation to all shapes in the graph
-            graph.GraphInfo = new GraphInfo
-            {
-                ScalingRateX = 1.5, // 150 % on X axis
-                ScalingRateY = 1.5  // 150 % on Y axis
-            };
+            // ----- Add shapes to the graph -----
 
-            // Example shape: a rectangle (position and size are in points)
-            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(100, 500, 200, 100);
-            rect.GraphInfo = new GraphInfo
+            // Rectangle shape
+            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(0, 0, 200, 100);
+            rect.GraphInfo = new Aspose.Pdf.GraphInfo
             {
                 FillColor = Aspose.Pdf.Color.LightGray,
                 Color = Aspose.Pdf.Color.Black,
@@ -37,13 +30,58 @@ class Program
             };
             graph.Shapes.Add(rect);
 
-            // Add the graph (with its scaled shapes) to the page
+            // Line shape
+            float[] linePoints = { 0, 0, 300, 0 };
+            Aspose.Pdf.Drawing.Line line = new Aspose.Pdf.Drawing.Line(linePoints);
+            line.GraphInfo = new Aspose.Pdf.GraphInfo
+            {
+                Color = Aspose.Pdf.Color.Red,
+                LineWidth = 1
+            };
+            graph.Shapes.Add(line);
+
+            // ----- Scale all shapes by 150% using GraphInfo scaling rates -----
+            // The GraphInfo attached to the Graph controls transformation of its child shapes.
+            graph.GraphInfo = new Aspose.Pdf.GraphInfo
+            {
+                ScalingRateX = 1.5, // 150% horizontal scaling
+                ScalingRateY = 1.5  // 150% vertical scaling
+            };
+
+            // Add the graph to the page's paragraph collection
             page.Paragraphs.Add(graph);
 
-            // Save the resulting PDF
-            doc.Save(outputPath);
+            // Save the document.
+            // On non‑Windows platforms the PDF rendering may require libgdiplus.
+            // Guard the save operation to avoid a TypeInitializationException.
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                doc.Save(outputPath);
+            }
+            else
+            {
+                try
+                {
+                    doc.Save(outputPath);
+                }
+                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
+                {
+                    Console.WriteLine("GDI+ (libgdiplus) is not available on this platform; graph rendering was skipped.");
+                }
+            }
         }
 
         Console.WriteLine($"PDF saved to '{outputPath}'.");
+    }
+
+    // Helper to detect a nested DllNotFoundException (libgdiplus) inside TypeInitializationException
+    static bool ContainsDllNotFound(Exception ex)
+    {
+        while (ex != null)
+        {
+            if (ex is DllNotFoundException) return true;
+            ex = ex.InnerException;
+        }
+        return false;
     }
 }

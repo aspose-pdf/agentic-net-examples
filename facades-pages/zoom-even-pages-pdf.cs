@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -7,52 +8,40 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_even_zoom.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
+        // Create the PdfPageEditor facade, bind the source PDF,
+        // set zoom on even‑numbered pages, apply changes and save.
+        using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // PdfPageEditor implements IDisposable, so use a using block.
-            using (PdfPageEditor editor = new PdfPageEditor())
-            {
-                // Load the source PDF.
-                editor.BindPdf(inputPath);
+            // Load the PDF file.
+            editor.BindPdf(inputPath);
 
-                // Get total number of pages (1‑based indexing).
-                int totalPages = editor.GetPages();
+            // Get total page count (1‑based indexing).
+            int totalPages = editor.GetPages();
 
-                // Build an array containing all even page numbers.
-                int evenCount = totalPages / 2;
-                int[] evenPages = new int[evenCount];
-                int idx = 0;
-                for (int i = 2; i <= totalPages; i += 2)
-                {
-                    evenPages[idx++] = i;
-                }
+            // Build an array of even page numbers.
+            List<int> evenPages = new List<int>();
+            for (int i = 2; i <= totalPages; i += 2)
+                evenPages.Add(i);
+            editor.ProcessPages = evenPages.ToArray();
 
-                // Restrict editing to the even pages.
-                editor.ProcessPages = evenPages;
+            // Apply a zoom factor of 1.2 (120%).
+            editor.Zoom = 1.2f;
 
-                // Apply a zoom factor of 1.2 (120%).
-                editor.Zoom = 1.2f;
+            // Commit the modifications.
+            editor.ApplyChanges();
 
-                // Commit the changes to the document.
-                editor.ApplyChanges();
-
-                // Save the modified PDF.
-                editor.Save(outputPath);
-            }
-
-            Console.WriteLine($"Even pages zoomed to 1.2x and saved as '{outputPath}'.");
+            // Save the edited PDF.
+            editor.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Even pages zoomed to 1.2x and saved as '{outputPath}'.");
     }
 }

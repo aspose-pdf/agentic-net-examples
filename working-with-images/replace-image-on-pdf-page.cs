@@ -1,20 +1,24 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // Core Aspose.Pdf namespace (no Facades)
 
-class ReplaceImageExample
+class Program
 {
     static void Main()
     {
-        // Paths for the source PDF, the new image, and the output PDF
-        const string sourcePdfPath = "input.pdf";
-        const string newImagePath  = "newImage.jpg";
-        const string outputPdfPath = "output.pdf";
+        // Paths – adjust as needed
+        const string inputPdfPath   = "input.pdf";
+        const string outputPdfPath  = "output.pdf";
+        const string newImagePath   = "newImage.jpg";
 
-        // Ensure the source files exist
-        if (!File.Exists(sourcePdfPath))
+        // Page and image indexes are 1‑based in Aspose.Pdf
+        const int pageNumber = 1;   // page where the image will be replaced
+        const int imageIndex = 1;   // index of the image to replace on that page
+
+        // Verify files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
         if (!File.Exists(newImagePath))
@@ -24,35 +28,38 @@ class ReplaceImageExample
         }
 
         // Open the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(sourcePdfPath))
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Select the page that contains the image to replace (first page in this example)
-            Page page = pdfDoc.Pages[1];
+            // Ensure the requested page exists
+            if (pageNumber < 1 || pageNumber > pdfDoc.Pages.Count)
+            {
+                Console.Error.WriteLine($"Page {pageNumber} is out of range. Document has {pdfDoc.Pages.Count} pages.");
+                return;
+            }
 
-            // Access the collection of images (XImage objects) on the page
+            // Access the page's image resources collection
+            Page page = pdfDoc.Pages[pageNumber];
             var images = page.Resources.Images;
 
-            // Verify that the page actually contains at least one image
-            if (images.Count == 0)
+            // Validate the image index
+            if (imageIndex < 1 || imageIndex > images.Count)
             {
-                Console.WriteLine("No images found on the selected page.");
-            }
-            else
-            {
-                // Replace the first image (index is 1‑based) with the new image stream
-                using (FileStream newImgStream = File.OpenRead(newImagePath))
-                {
-                    // Overload Replace(int index, Stream stream) replaces the image at the given index
-                    images.Replace(1, newImgStream);
-                }
-
-                Console.WriteLine("Image replaced successfully.");
+                Console.Error.WriteLine($"Image index {imageIndex} is out of range. Page contains {images.Count} images.");
+                return;
             }
 
-            // Save the modified PDF (PDF format, no SaveOptions needed)
+            // Open the new image as a stream and replace the existing image
+            using (FileStream imgStream = new FileStream(newImagePath, FileMode.Open, FileAccess.Read))
+            {
+                // Replace the image at the specified index with the new image stream
+                images.Replace(imageIndex, imgStream);
+            }
+
+            // Save the modified PDF
             pdfDoc.Save(outputPdfPath);
         }
 
+        Console.WriteLine($"Image on page {pageNumber} (index {imageIndex}) replaced successfully.");
         Console.WriteLine($"Modified PDF saved to '{outputPdfPath}'.");
     }
 }

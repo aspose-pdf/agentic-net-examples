@@ -2,77 +2,78 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using Aspose.Pdf.Facades; // PdfBookmarkEditor and Bookmark classes
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades; // PdfBookmarkEditor resides here
 
-namespace BookmarkJsonExport
+// Model that will be serialized to JSON
+public class BookmarkNode
 {
-    // Simple POCO to represent a bookmark node for JSON serialization
-    public class BookmarkNode
-    {
-        public string Title { get; set; }
-        public int? PageNumber { get; set; } // null if not set
-        public List<BookmarkNode> Children { get; set; } = new List<BookmarkNode>();
-    }
+    public string Title { get; set; }
+    public int? PageNumber { get; set; }          // null when not set
+    public List<BookmarkNode> Children { get; set; } = new List<BookmarkNode>();
+}
 
-    class Program
+class Program
+{
+    static void Main()
     {
-        static void Main()
+        const string inputPdf = "input.pdf";
+        const string outputJson = "bookmarks.json";
+
+        if (!File.Exists(inputPdf))
         {
-            const string inputPdfPath = "input.pdf";
-            const string outputJsonPath = "bookmarks.json";
+            Console.Error.WriteLine($"File not found: {inputPdf}");
+            return;
+        }
 
-            if (!File.Exists(inputPdfPath))
-            {
-                Console.Error.WriteLine($"File not found: {inputPdfPath}");
-                return;
-            }
-
-            // Initialize the bookmark editor and bind the PDF
-            PdfBookmarkEditor editor = new PdfBookmarkEditor();
-            editor.BindPdf(inputPdfPath);
+        // Initialize the bookmark editor and bind the PDF
+        PdfBookmarkEditor editor = new PdfBookmarkEditor();
+        try
+        {
+            editor.BindPdf(inputPdf);
 
             // Extract all bookmarks (recursive)
-            Bookmarks extracted = editor.ExtractBookmarks();
+            Aspose.Pdf.Facades.Bookmarks rawBookmarks = editor.ExtractBookmarks();
 
-            // Convert to a hierarchy of BookmarkNode objects
-            List<BookmarkNode> rootNodes = new List<BookmarkNode>();
-            foreach (Bookmark bm in extracted)
+            // Convert to our serializable structure
+            List<BookmarkNode> jsonTree = new List<BookmarkNode>();
+            foreach (Aspose.Pdf.Facades.Bookmark bm in rawBookmarks)
             {
-                rootNodes.Add(ConvertToNode(bm));
+                jsonTree.Add(ConvertBookmark(bm));
             }
 
-            // Serialize hierarchy to pretty‑printed JSON
-            string json = JsonSerializer.Serialize(rootNodes, new JsonSerializerOptions
-            {
-                WriteIndented = true
-            });
+            // Serialize to pretty‑printed JSON
+            JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+            string json = JsonSerializer.Serialize(jsonTree, jsonOptions);
 
             // Write JSON to file
-            File.WriteAllText(outputJsonPath, json);
-            Console.WriteLine($"Bookmarks exported to '{outputJsonPath}'.");
-
-            // Clean up the editor
+            File.WriteAllText(outputJson, json);
+            Console.WriteLine($"Bookmarks exported to '{outputJson}'.");
+        }
+        finally
+        {
+            // Ensure resources are released
             editor.Close();
         }
+    }
 
-        // Recursive conversion from Aspose.Pdf.Facades.Bookmark to our POCO
-        private static BookmarkNode ConvertToNode(Bookmark bm)
+    // Recursively transforms Aspose.Pdf.Facades.Bookmark into BookmarkNode
+    private static BookmarkNode ConvertBookmark(Aspose.Pdf.Facades.Bookmark bm)
+    {
+        BookmarkNode node = new BookmarkNode {
+            Title = bm.Title,
+            PageNumber = bm.PageNumber > 0 ? (int?)bm.PageNumber : null
+        };
+
+        // ChildItems may be null; guard against it
+        if (bm.ChildItems != null && bm.ChildItems.Count > 0)
         {
-            BookmarkNode node = new BookmarkNode {
-                Title = bm.Title,
-                PageNumber = bm.PageNumber > 0 ? (int?)bm.PageNumber : null
-            };
-
-            // ChildItems holds nested bookmarks; process them recursively
-            if (bm.ChildItems != null && bm.ChildItems.Count > 0)
+            foreach (Aspose.Pdf.Facades.Bookmark child in bm.ChildItems)
             {
-                foreach (Bookmark child in bm.ChildItems)
-                {
-                    node.Children.Add(ConvertToNode(child));
-                }
+                node.Children.Add(ConvertBookmark(child));
             }
-
-            return node;
         }
+
+        return node;
     }
 }

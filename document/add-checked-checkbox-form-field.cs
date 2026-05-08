@@ -1,15 +1,11 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "checkbox_checked.pdf";
-
         // Create a new PDF document
         using (Document doc = new Document())
         {
@@ -17,26 +13,21 @@ class Program
             Page page = doc.Pages.Add();
 
             // Define the rectangle for the checkbox (llx, lly, urx, ury)
-            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 700, 120, 720);
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(50, 750, 70, 770);
 
             // Create the checkbox field on the page
             CheckboxField checkbox = new CheckboxField(page, rect);
 
             // Set the default state to checked
-            checkbox.Checked = true; // or checkbox.Value = "On";
+            checkbox.Checked = true; // alternatively: checkbox.Value = "On";
 
-            // Optionally set a name and export value
-            checkbox.Name = "SampleCheckBox";
-            checkbox.ExportValue = "Checked";
-
-            // Add the checkbox to the document's form collection
+            // Add the checkbox to the document's form
             doc.Form.Add(checkbox);
 
             // Save the PDF
-            doc.Save(outputPath);
+            doc.Save("checkbox_checked.pdf");
         }
 
-        Console.WriteLine($"PDF with checked checkbox saved to '{outputPath}'.");
+        Console.WriteLine("PDF with checked checkbox saved as 'checkbox_checked.pdf'.");
     }
 }

@@ -1,62 +1,77 @@
-// Global usings to satisfy the missing AsposePdfApi.GlobalUsings.g.cs file
-global using System;
-global using System.IO;
-global using Aspose.Pdf;
-global using Aspose.Pdf.Text;
+using System;
+using System.IO;
+using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Paths for the source PDF, the output DOCX and the custom font file
-        const string inputPdfPath   = "input.pdf";
-        const string outputDocxPath = "output.docx";
-        const string customFontPath = "MyCustomFont.ttf";
+        // Input PDF file path
+        const string inputPdfPath = "input.pdf";
 
-        // Validate file existence
+        // Output DOCX file path
+        const string outputDocxPath = "output.docx";
+
+        // Path to a custom TrueType font that should be embedded in the DOCX
+        const string customFontPath = "customfont.ttf";
+
+        // Verify that the input files exist
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Error: PDF file not found – {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
+
         if (!File.Exists(customFontPath))
         {
-            Console.Error.WriteLine($"Error: Custom font file not found – {customFontPath}");
+            Console.Error.WriteLine($"Custom font not found: {customFontPath}");
             return;
         }
 
-        // Register the custom font so that the conversion engine can embed it
-        // In recent Aspose.PDF versions FontRepository.AddFont was removed.
-        // Use FontRepository.Substitutions.Add with SimpleFontSubstitution instead.
-        string fontFamilyName = Path.GetFileNameWithoutExtension(customFontPath);
-        FontRepository.Substitutions.Add(new SimpleFontSubstitution(fontFamilyName, customFontPath));
-
-        // Load the PDF and convert it to DOCX with explicit save options
-        using (Document pdfDocument = new Document(inputPdfPath))
+        try
         {
-            // Configure DOCX conversion options
-            DocSaveOptions saveOptions = new DocSaveOptions
+            // Load the custom font and register it as a substitution for any missing fonts.
+            // This ensures the font is available during conversion and will be embedded.
+            using (FileStream fontStream = File.OpenRead(customFontPath))
             {
-                // Output format – DOCX
-                Format = DocSaveOptions.DocFormat.DocX,
+                // Open the font (TTF format)
+                Font customFont = FontRepository.OpenFont(fontStream, FontTypes.TTF);
 
-                // Use the Flow recognition mode for maximum editability
-                Mode = DocSaveOptions.RecognitionMode.Flow,
+                // Example substitution: replace missing "Helvetica" with the custom font.
+                // Adjust the source font name as needed for your PDF.
+                FontRepository.Substitutions.Add(
+                    new SimpleFontSubstitution("Helvetica", customFont.FontName));
+            }
 
-                // Ensure Type3 fonts are converted to TrueType (text remains selectable)
-                ConvertType3Fonts = true,
+            // Load the source PDF document.
+            using (Document pdfDocument = new Document(inputPdfPath))
+            {
+                // Configure DOCX save options.
+                DocSaveOptions saveOptions = new DocSaveOptions
+                {
+                    // Specify DOCX as the target format.
+                    Format = DocSaveOptions.DocFormat.DocX,
 
-                // Re‑embed fonts in the resulting document
-                ReSaveFonts = true,
+                    // Enable re‑saving of fonts so they are embedded in the output DOCX.
+                    ReSaveFonts = true,
 
-                // Optional: cache glyphs for better performance
-                CacheGlyphs = true
-            };
+                    // Optional: convert Type3 fonts to TrueType to improve text extraction.
+                    ConvertType3Fonts = true,
 
-            // Save the converted document
-            pdfDocument.Save(outputDocxPath, saveOptions);
+                    // Use flow recognition mode for better layout preservation.
+                    Mode = DocSaveOptions.RecognitionMode.Flow
+                };
+
+                // Save the PDF as DOCX with the configured options.
+                pdfDocument.Save(outputDocxPath, saveOptions);
+            }
+
+            Console.WriteLine($"PDF successfully converted to DOCX with embedded fonts: {outputDocxPath}");
         }
-
-        Console.WriteLine($"Conversion completed: '{outputDocxPath}' (fonts embedded).");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+        }
     }
 }

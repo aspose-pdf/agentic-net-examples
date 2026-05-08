@@ -1,13 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "watermarked.pdf";
 
         if (!File.Exists(inputPath))
@@ -19,30 +20,33 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Define the watermark text and its visual style
+            string[] watermarkLines = new string[] { "CONFIDENTIAL" };
+            TextState textState = new TextState
             {
-                Page page = doc.Pages[i];
+                FontSize = 72,                         // large font size
+                ForegroundColor = Color.Gray,          // gray color
+                Font = FontRepository.FindFont("Helvetica") // optional font
+            };
 
-                // Create a text stamp that will act as a semi‑transparent watermark
-                TextStamp stamp = new TextStamp("CONFIDENTIAL")
+            // Apply the watermark to every page
+            foreach (Page page in doc.Pages)
+            {
+                // Use the full page rectangle as the annotation bounds
+                Aspose.Pdf.Rectangle rect = page.Rect;
+
+                // Create the WatermarkAnnotation for the current page
+                WatermarkAnnotation wm = new WatermarkAnnotation(page, rect)
                 {
-                    // Set opacity (0 = fully transparent, 1 = fully opaque)
-                    Opacity = 0.3f,
-                    // Position the stamp in the centre of the page
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    // Rotate the watermark for a classic diagonal look
-                    RotateAngle = 45
+                    Opacity = 0.3, // 30% opacity (semi‑transparent)
+                    // Optional: set alignment or other properties here
                 };
 
-                // Configure the visual appearance via the existing TextState instance
-                stamp.TextState.Font = FontRepository.FindFont("Helvetica");
-                stamp.TextState.FontSize = 72;
-                stamp.TextState.ForegroundColor = Color.Gray; // Aspose.Pdf.Color
+                // Set the watermark text and its TextState
+                wm.SetTextAndState(watermarkLines, textState);
 
-                // Add the stamp (watermark) to the current page
-                page.AddStamp(stamp);
+                // Add the annotation to the page
+                page.Annotations.Add(wm);
             }
 
             // Save the modified PDF

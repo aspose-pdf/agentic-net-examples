@@ -2,65 +2,54 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-class BatchImageExtractor
+class Program
 {
     static void Main()
     {
-        // Input folder containing PDF files
-        const string inputFolder = @"C:\InputPdfs";
-        // Root output folder where subfolders will be created
-        const string outputRoot = @"C:\ExtractedImages";
+        // Directory containing the source PDF files
+        const string inputDirectory = "InputPdfs";
+        // Root directory where extracted images will be saved
+        const string outputRootDirectory = "ExtractedImages";
 
-        if (!Directory.Exists(inputFolder))
+        if (!Directory.Exists(inputDirectory))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Input directory not found: {inputDirectory}");
             return;
         }
 
         // Ensure the root output directory exists
-        Directory.CreateDirectory(outputRoot);
+        Directory.CreateDirectory(outputRootDirectory);
 
-        // Get all PDF files in the input folder (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
-        if (pdfFiles.Length == 0)
+        // Process each PDF file in the input directory
+        foreach (string pdfPath in Directory.GetFiles(inputDirectory, "*.pdf"))
         {
-            Console.WriteLine("No PDF files found.");
-            return;
-        }
+            // Create a subfolder named after the PDF (without extension)
+            string pdfFileName = Path.GetFileNameWithoutExtension(pdfPath);
+            string outputFolder = Path.Combine(outputRootDirectory, pdfFileName);
+            Directory.CreateDirectory(outputFolder);
 
-        foreach (string pdfPath in pdfFiles)
-        {
-            // Create a subfolder named after the PDF file (without extension)
-            string subFolderName = Path.GetFileNameWithoutExtension(pdfPath);
-            string subFolderPath = Path.Combine(outputRoot, subFolderName);
-            Directory.CreateDirectory(subFolderPath);
-
-            try
+            // Use PdfExtractor to extract images from the current PDF
+            using (PdfExtractor extractor = new PdfExtractor())
             {
-                // Use PdfExtractor to extract images from the current PDF
-                using (PdfExtractor extractor = new PdfExtractor())
+                // Bind the PDF file to the extractor
+                extractor.BindPdf(pdfPath);
+                // Prepare the extractor for image extraction
+                extractor.ExtractImage();
+
+                int imageIndex = 1;
+                // Iterate through all extracted images
+                while (extractor.HasNextImage())
                 {
-                    extractor.BindPdf(pdfPath);
-                    extractor.ExtractImage();
-
-                    int imageIndex = 1;
-                    while (extractor.HasNextImage())
-                    {
-                        // Save each image as a separate file (default format is PDF)
-                        // Change the extension if a different image format is desired,
-                        // e.g., ".png" with GetNextImage(string, ImageFormat.Png)
-                        string imageFile = Path.Combine(subFolderPath, $"image-{imageIndex}.pdf");
-                        extractor.GetNextImage(imageFile);
-                        imageIndex++;
-                    }
+                    // Save each image as a JPEG file in the subfolder
+                    string outputImagePath = Path.Combine(outputFolder, $"image-{imageIndex}.jpg");
+                    extractor.GetNextImage(outputImagePath);
+                    imageIndex++;
                 }
+            }
 
-                Console.WriteLine($"Extracted images from '{pdfPath}' to '{subFolderPath}'.");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
-            }
+            Console.WriteLine($"Extracted images from '{pdfPath}' to '{outputFolder}'.");
         }
+
+        Console.WriteLine("Batch image extraction completed.");
     }
 }

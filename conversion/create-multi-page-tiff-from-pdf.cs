@@ -16,7 +16,7 @@ class Program
             return;
         }
 
-        // Load the PDF document (using statement ensures proper disposal)
+        // Load the PDF document inside a using block for proper disposal
         using (Document pdfDoc = new Document(inputPath))
         {
             // Create a TiffDevice with default settings (default compression)

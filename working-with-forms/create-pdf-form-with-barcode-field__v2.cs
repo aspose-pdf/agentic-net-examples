@@ -1,39 +1,47 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
+        // Path for the output PDF
         const string outputPath = "barcode_form.pdf";
+
+        // Numeric identifier to encode in the barcode
         const string numericId = "1234567890";
 
-        // Create a new PDF document and ensure proper disposal
+        // Create a new PDF document and add a blank page
         using (Document doc = new Document())
         {
-            // Add a blank page to host the barcode field
             Page page = doc.Pages.Add();
 
-            // Define the rectangle where the barcode will appear (llx, lly, urx, ury)
-            // Use the fully qualified Aspose.Pdf.Rectangle to avoid ambiguity
+            // Define the rectangle where the barcode field will be placed
+            // (left, bottom, right, top) – fully qualified to avoid ambiguity
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 300, 650);
 
-            // Create a barcode field on the specified page and rectangle
-            BarcodeField barcodeField = new BarcodeField(page, rect);
-            barcodeField.Name = "BarcodeField";      // internal field name
-            barcodeField.PartialName = "Barcode";    // optional display name
-            barcodeField.AddBarcode(numericId);      // generate Code128 barcode from the numeric identifier
-            barcodeField.ReadOnly = true;           // barcode fields become read‑only after AddBarcode
+            // Create a BarcodeField on the document using the rectangle
+            BarcodeField barcodeField = new BarcodeField(doc, rect)
+            {
+                // Set a name for the field (used to reference it later)
+                Name = "BarcodeField",
+                // Optional: tooltip shown in PDF viewers
+                AlternateName = "Product Barcode"
+            };
 
-            // Add the barcode field to the document's form collection
-            doc.Form.Add(barcodeField);
+            // Add the barcode data (Code128) – this also makes the field read‑only
+            barcodeField.AddBarcode(numericId);
 
-            // Save the resulting PDF form
+            // Add the field to the form on page 1
+            // Overload with page number ensures the field appears on the intended page
+            doc.Form.Add(barcodeField, 1);
+
+            // Save the PDF containing the barcode form field
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF form with barcode saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with barcode field saved to '{outputPath}'.");
     }
 }

@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Text;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -15,27 +14,16 @@ class Program
             return;
         }
 
-        try
+        // Bind the PDF and retrieve its XMP metadata as a byte array
+        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
         {
-            // Initialize the XMP metadata facade and bind the PDF file
-            using (PdfXmpMetadata xmp = new PdfXmpMetadata())
-            {
-                xmp.BindPdf(pdfPath);
+            xmp.BindPdf(pdfPath);
+            byte[] data = xmp.GetXmpMetadata();
 
-                // Retrieve the raw XMP metadata as a byte array
-                byte[] rawData = xmp.GetXmpMetadata();
-
-                // Convert the byte array to a UTF‑8 string
-                string xmpXml = Encoding.UTF8.GetString(rawData);
-
-                // Output the XML string
-                Console.WriteLine("XMP Metadata:");
-                Console.WriteLine(xmpXml);
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            // Convert the byte array to a UTF‑8 string and display it
+            string xml = System.Text.Encoding.UTF8.GetString(data);
+            Console.WriteLine("XMP Metadata:");
+            Console.WriteLine(xml);
         }
     }
 }

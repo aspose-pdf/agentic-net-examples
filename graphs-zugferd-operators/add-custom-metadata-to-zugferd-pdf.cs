@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input_zugferd.pdf";
-        const string outputPath = "output_zugferd_with_metadata.pdf";
+        const string outputPath = "output_with_metadata.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,19 +15,24 @@ class Program
             return;
         }
 
-        // Load the existing ZUGFeRD PDF, modify metadata, and save.
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Add custom metadata entries.
-            // The Metadata property implements IDictionary<string, XmpValue> and
-            // provides an Add(string, object) overload for simple values.
-            doc.Metadata.Add("ProjectCode", "PRJ-2023-001");
-            doc.Metadata.Add("Department", "Finance");
+            // Load the ZUGFeRD PDF inside a using block for proper disposal
+            using (Document doc = new Document(inputPath))
+            {
+                // Add custom metadata entries
+                doc.Metadata.Add("ProjectCode", "PRJ-00123");
+                doc.Metadata.Add("Department", "Accounting");
 
-            // Save the updated PDF.
-            doc.Save(outputPath);
+                // Save the PDF with the new metadata
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"PDF saved with custom metadata to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF saved with custom metadata to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

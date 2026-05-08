@@ -1,47 +1,81 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using System.Text;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations;
 
-class Program
+class ExportAnnotationsExample
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        // Path to the source PDF file
+        const string pdfPath = "input.pdf";
 
-        if (!File.Exists(inputPdf))
+        // Ensure the file exists before proceeding
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        // Optional: set the Aspose.Pdf native API folder if the default location is not used.
+        // This prevents the runtime from trying to start a non‑existent process.
+        // Uncomment and adjust the path to the folder that contains the AsposePdfApi_* binaries.
+        // Aspose.Pdf.Facades.PdfAnnotationEditor.ApiPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "net10.0");
+
+        // Create a memory stream that will hold the XFDF data
+        using (MemoryStream xfdfStream = new MemoryStream())
         {
-            // Initialize the annotation editor and bind the loaded document
-            PdfAnnotationEditor editor = new PdfAnnotationEditor();
-            editor.BindPdf(doc);
-
-            // Create a memory stream to receive the XFDF data
-            using (MemoryStream xfdfStream = new MemoryStream())
+            // Initialize the PdfAnnotationEditor facade
+            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
             {
-                // Export annotations from pages 1 to 2 (inclusive) to the stream.
-                // Passing null for the annotation types array exports all annotation types.
-                editor.ExportAnnotationsXfdf(xfdfStream, 1, 2, (string[])null);
+                // Bind the PDF document to the editor
+                editor.BindPdf(pdfPath);
 
-                // Reset the stream position to the beginning for any further processing
-                xfdfStream.Position = 0;
-
-                // Example: read the XFDF content as a string (optional)
-                using (StreamReader reader = new StreamReader(xfdfStream))
+                // Define the annotation types to export.
+                AnnotationType[] annotTypes = new AnnotationType[]
                 {
-                    string xfdfContent = reader.ReadToEnd();
-                    Console.WriteLine("Exported XFDF:");
-                    Console.WriteLine(xfdfContent);
-                }
+                    AnnotationType.Text,
+                    AnnotationType.Highlight,
+                    AnnotationType.Square,
+                    AnnotationType.Circle,
+                    AnnotationType.Line,
+                    AnnotationType.Stamp,
+                    AnnotationType.FreeText,
+                    AnnotationType.Ink,
+                    AnnotationType.Popup,
+                    AnnotationType.Link,
+                    AnnotationType.FileAttachment,
+                    AnnotationType.Sound,
+                    AnnotationType.Movie,
+                    AnnotationType.Screen,
+                    AnnotationType.Widget,
+                    AnnotationType.Watermark,
+                    // AnnotationType.ThreeD,   // Not available in current Aspose.PDF version
+                    AnnotationType.RichMedia,
+                    // AnnotationType.Redact,   // Not available in current Aspose.PDF version
+                    AnnotationType.Caret,
+                    AnnotationType.StrikeOut,
+                    AnnotationType.Underline,
+                    AnnotationType.Squiggly
+                };
+
+                // Export annotations from pages 1 to 2 into the memory stream
+                editor.ExportAnnotationsXfdf(xfdfStream, 1, 2, annotTypes);
             }
 
-            // No need to save the document because we only exported annotations
+            // Reset the stream position to the beginning for further processing
+            xfdfStream.Position = 0;
+
+            // Example: read the XFDF content as a UTF‑8 string (optional)
+            using (StreamReader reader = new StreamReader(xfdfStream, Encoding.UTF8))
+            {
+                string xfdfContent = reader.ReadToEnd();
+                Console.WriteLine("Exported XFDF content:");
+                Console.WriteLine(xfdfContent);
+            }
+
+            // At this point, xfdfStream contains the XFDF data and can be passed to other APIs.
         }
     }
 }

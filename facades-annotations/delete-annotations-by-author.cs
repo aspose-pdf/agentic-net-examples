@@ -10,52 +10,82 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_filtered.pdf";
-        const string authorToDelete = "John Doe";
+        const string outputPath = "output.pdf";
+        const string targetAuthor = "John Doe";
 
+        // ------------------------------------------------------------
+        // Ensure a PDF exists – create a minimal sample if it does not.
+        // ------------------------------------------------------------
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
+            CreateSamplePdf(inputPath, targetAuthor);
+            Console.WriteLine($"Sample PDF created at '{inputPath}'.");
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Use PdfAnnotationEditor (facade) to work with annotations.
+        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            // Collect the names of annotations whose Title (author) matches the target
-            List<string> namesToDelete = new List<string>();
+            // Load the PDF document.
+            editor.BindPdf(inputPath);
 
-            foreach (Page page in doc.Pages)
+            // Access the underlying Document to inspect annotations.
+            Document doc = editor.Document;
+
+            // Collect names of annotations whose Title (author) matches the target.
+            List<string> namesToDelete = new List<string>();
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                foreach (Annotation annot in page.Annotations)
+                Page page = doc.Pages[pageIndex];
+                foreach (Annotation annotation in page.Annotations)
                 {
-                    // Title exists only on markup annotations, so cast first
-                    if (annot is MarkupAnnotation markup &&
-                        !string.IsNullOrEmpty(markup.Title) &&
-                        markup.Title.Equals(authorToDelete, StringComparison.OrdinalIgnoreCase))
+                    // Title is defined only on markup annotations, so cast first.
+                    if (annotation is MarkupAnnotation markup &&
+                        markup.Title == targetAuthor &&
+                        !string.IsNullOrEmpty(annotation.Name))
                     {
-                        // Name property uniquely identifies the annotation
-                        if (!string.IsNullOrEmpty(annot.Name))
-                            namesToDelete.Add(annot.Name);
+                        namesToDelete.Add(annotation.Name);
                     }
                 }
             }
 
-            // Use PdfAnnotationEditor (Facades API) to delete the selected annotations
-            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+            // Delete each matching annotation by its unique name.
+            foreach (string name in namesToDelete)
             {
-                editor.BindPdf(doc); // bind the loaded document
-
-                foreach (string annotName in namesToDelete)
-                {
-                    editor.DeleteAnnotation(annotName);
-                }
-
-                // Save the modified PDF
-                editor.Save(outputPath);
+                editor.DeleteAnnotation(name);
             }
+
+            // Save the modified PDF.
+            editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Filtered PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Annotations authored by '{targetAuthor}' have been removed. Output saved to '{outputPath}'.");
+    }
+
+    /// <summary>
+    /// Creates a very small PDF containing a single markup annotation whose Title is set to <paramref name="author"/>.
+    /// This helper is only used when the expected input file is missing, allowing the sample to run without external resources.
+    /// </summary>
+    private static void CreateSamplePdf(string path, string author)
+    {
+        // Create a new empty document.
+        using (Document doc = new Document())
+        {
+            // Add a page.
+            Page page = doc.Pages.Add();
+
+            // Create a simple text annotation.
+            TextAnnotation txtAnn = new TextAnnotation(page, new Rectangle(100, 600, 200, 650))
+            {
+                Title = author,               // Author name – this is what we will filter on.
+                Name = "SampleAnnotation",   // Unique name required for DeleteAnnotation.
+                Contents = "Sample annotation created for demo purposes."
+            };
+
+            // Add the annotation to the page.
+            page.Annotations.Add(txtAnn);
+
+            // Save the document.
+            doc.Save(path);
+        }
     }
 }

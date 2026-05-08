@@ -1,7 +1,7 @@
 using System;
+using System.Runtime.InteropServices;
 using Aspose.Pdf;
-using Aspose.Pdf.Tagged;
-using Aspose.Pdf.LogicalStructure;
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -12,27 +12,56 @@ class Program
         // Create a new empty PDF document
         using (Document doc = new Document())
         {
-            // Access the tagged content API
-            ITaggedContent tagged = doc.TaggedContent;
+            // Add a page to the document
+            Page page = doc.Pages.Add();
 
-            // Optionally set language and title for the document
-            tagged.SetLanguage("en-US");
-            tagged.SetTitle("Document with Heading");
+            // Create a TextFragment that will act as a Level 1 heading
+            TextFragment heading = new TextFragment("Level 1 Heading");
+            heading.TextState.Font = FontRepository.FindFont("Helvetica");
+            heading.TextState.FontSize = 24; // typical size for a heading
+            heading.TextState.FontStyle = FontStyles.Bold;
+            heading.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
 
-            // Get the root structure element (no cast needed)
-            StructureElement root = tagged.RootElement;
+            // Add the heading to the page
+            page.Paragraphs.Add(heading);
 
-            // Create a Level 1 heading element
-            HeaderElement h1 = tagged.CreateHeaderElement(1);
-            h1.SetText("Level 1 Heading");
-
-            // Attach the heading to the document structure
-            root.AppendChild(h1);
-
-            // Save the PDF
-            doc.Save(outputPath);
+            // Save the PDF with a guard for platforms that lack GDI+ (libgdiplus)
+            SaveDocument(doc, outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine("Program finished.");
+    }
+
+    private static void SaveDocument(Document doc, string path)
+    {
+        // On Windows the native GDI+ library is always present.
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            doc.Save(path);
+            Console.WriteLine($"PDF saved to '{path}'.");
+            return;
+        }
+
+        // On non‑Windows platforms attempt to save and gracefully handle a missing libgdiplus.
+        try
+        {
+            doc.Save(path);
+            Console.WriteLine($"PDF saved to '{path}'.");
+        }
+        catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
+        {
+            Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. PDF could not be saved.");
+        }
+    }
+
+    private static bool ContainsDllNotFound(Exception? ex)
+    {
+        while (ex != null)
+        {
+            if (ex is DllNotFoundException)
+                return true;
+            ex = ex.InnerException;
+        }
+        return false;
     }
 }

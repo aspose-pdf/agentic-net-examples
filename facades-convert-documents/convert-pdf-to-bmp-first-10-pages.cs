@@ -7,42 +7,48 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputDir = "output_images";
+        const string inputPdf  = "input.pdf";
+        const string outputDir = "BmpImages";
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Ensure the output directory exists
+        // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // PdfConverter is a Facade that implements IDisposable, so wrap it in a using block
-        using (PdfConverter converter = new PdfConverter())
+        try
         {
-            // Bind the source PDF file to the converter
-            converter.BindPdf(inputPdf);
-
-            // Limit conversion to the first 10 pages (pages are 1‑based)
-            converter.StartPage = 1;
-            converter.EndPage = 10;
-
-            // Perform any necessary initialization before extracting images
-            converter.DoConvert();
-
-            int pageNumber = 1;
-            // Iterate through the generated images
-            while (converter.HasNextImage())
+            // PdfConverter is a Facade that implements IDisposable
+            using (PdfConverter converter = new PdfConverter())
             {
-                string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.bmp");
-                // Save the current page as a BMP image
-                converter.GetNextImage(outputPath, ImageFormat.Bmp);
-                pageNumber++;
-            }
-        }
+                // Bind the PDF file to the converter
+                converter.BindPdf(inputPdf);
 
-        Console.WriteLine("PDF to BMP conversion completed.");
+                // Limit conversion to pages 1 through 10
+                converter.StartPage = 1;   // minimal value is 1
+                converter.EndPage   = 10;  // end page inclusive
+
+                // Prepare the converter (required before extracting images)
+                converter.DoConvert();
+
+                int imageIndex = 1;
+                // Loop through available images and save each as BMP
+                while (converter.HasNextImage())
+                {
+                    string outputPath = Path.Combine(outputDir, $"page_{imageIndex}.bmp");
+                    converter.GetNextImage(outputPath, ImageFormat.Bmp);
+                    imageIndex++;
+                }
+            }
+
+            Console.WriteLine($"Conversion completed. BMP images saved to '{outputDir}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+        }
     }
 }

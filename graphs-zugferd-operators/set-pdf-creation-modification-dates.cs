@@ -6,23 +6,28 @@ class Program
 {
     static void Main()
     {
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Create a new PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document())
+        // Verify the source file exists
+        if (!File.Exists(inputPath))
         {
-            // Set creation and modification dates to the current processing time
-            DateTime now = DateTime.Now;
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
+
+        // Load the PDF document (lifecycle rule: use using for disposal)
+        using (Document doc = new Document(inputPath))
+        {
+            // Set creation and modification dates to the current timestamp
+            DateTime now = DateTime.Now; // or DateTime.UtcNow for UTC
             doc.Info.CreationDate = now;
-            doc.Info.ModDate = now;
+            doc.Info.ModDate      = now;
 
-            // Add a blank page so the PDF is not empty
-            doc.Pages.Add();
-
-            // Save the PDF (PDF format is the default when no SaveOptions are provided)
+            // Save the updated PDF (lifecycle rule: save inside using block)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with timestamps to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with updated timestamps to '{outputPath}'.");
     }
 }

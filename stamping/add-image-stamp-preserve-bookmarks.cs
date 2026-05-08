@@ -6,51 +6,45 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";      // source PDF with existing bookmarks/outlines
-        const string stampImage = "logo.png";    // image to be used as stamp
-        const string outputPdf = "output_with_stamp.pdf";
+        const string inputPath = "input.pdf";
+        const string stampImagePath = "stamp.png";
+        const string outputPath = "output.pdf";
 
-        // Verify that required files exist
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
-        if (!File.Exists(stampImage))
+        if (!File.Exists(stampImagePath))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampImage}");
+            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
             return;
         }
 
-        // Load the PDF document (using statement ensures proper disposal)
-        using (Document doc = new Document(inputPdf))
+        // Load the existing PDF (preserves bookmarks and outline)
+        using (Document doc = new Document(inputPath))
         {
-            // Create an ImageStamp from the image file
-            ImageStamp imgStamp = new ImageStamp(stampImage)
+            // Create an image stamp
+            ImageStamp imgStamp = new ImageStamp(stampImagePath)
             {
-                // Positioning – center of each page
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Center,
-
-                // Optional visual settings
-                Opacity   = 0.5f,   // semi‑transparent
-                Background = false   // stamp appears on top of page content
-                // Width/Height can be set to scale the image if needed
-                // Width  = 100,
-                // Height = 50
+                // Position the stamp at the bottom‑right of each page
+                HorizontalAlignment = HorizontalAlignment.Right,
+                VerticalAlignment   = VerticalAlignment.Bottom,
+                Opacity = 0.5,               // semi‑transparent
+                RightMargin = 10,
+                BottomMargin = 10
             };
 
-            // Apply the same stamp to every page.
-            // Page.AddStamp does not modify bookmarks or the document outline.
+            // Apply the stamp to every page; bookmarks remain unchanged
             foreach (Page page in doc.Pages)
             {
                 page.AddStamp(imgStamp);
             }
 
-            // Save the modified document. The original bookmarks/outlines are preserved.
-            doc.Save(outputPdf);
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Image stamp added successfully. Output saved to '{outputPdf}'.");
+        Console.WriteLine($"Image stamp added. Output saved to '{outputPath}'.");
     }
 }

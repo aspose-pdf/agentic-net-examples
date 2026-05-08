@@ -7,14 +7,13 @@ class Program
 {
     static void Main()
     {
-        // Input and output file paths
-        const string inputPdf   = "input.pdf";
-        const string outputPdf  = "signed_output.pdf";
-        const string certPath   = "certificate.pfx";
-        const string certPass   = "password";
-        const string appearance = "signature_appearance.jpg"; // optional image for visible signature
+        // Input PDF, output PDF, and certificate details
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "signed_output.pdf";
+        const string certPath  = "certificate.pfx";
+        const string certPassword = "password";
 
-        // Verify that the source PDF and certificate exist
+        // Verify input files exist
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
@@ -26,48 +25,53 @@ class Program
             return;
         }
 
-        // Create the PdfFileSignature facade and bind the source PDF
-        using (PdfFileSignature pdfSign = new PdfFileSignature())
+        // Load the document to obtain the size of the last page
+        using (Document doc = new Document(inputPdf))
         {
-            pdfSign.BindPdf(inputPdf);
+            // Get the last page (Aspose.Pdf uses 1‑based indexing)
+            int lastPageNumber = doc.Pages.Count;
+            Page lastPage = doc.Pages[lastPageNumber];
 
-            // Determine the last page number (Aspose.Pdf uses 1‑based indexing)
-            int lastPageNumber = pdfSign.Document.Pages.Count;
+            // Define signature appearance size and margin (in points)
+            const double sigWidth  = 150; // width of signature rectangle
+            const double sigHeight = 50;  // height of signature rectangle
+            const double margin    = 30;  // distance from page edges
 
-            // Retrieve page dimensions
-            double pageWidth  = pdfSign.Document.Pages[lastPageNumber].PageInfo.Width;
-            double pageHeight = pdfSign.Document.Pages[lastPageNumber].PageInfo.Height;
+            // Calculate rectangle coordinates (origin is lower‑left)
+            double llx = lastPage.PageInfo.Width - sigWidth - margin; // lower‑left X
+            double lly = margin;                                      // lower‑left Y
 
-            // Desired size of the visible signature (in points)
-            const int sigWidth  = 150; // width
-            const int sigHeight = 50;  // height
+            // System.Drawing.Rectangle expects integer values
+            var signatureRect = new System.Drawing.Rectangle(
+                (int)Math.Round(llx),
+                (int)Math.Round(lly),
+                (int)Math.Round(sigWidth),
+                (int)Math.Round(sigHeight));
 
-            // Calculate rectangle positioned at the bottom‑right corner
-            // System.Drawing.Rectangle is used for the signature API; fully qualified to avoid ambiguity
-            System.Drawing.Rectangle sigRect = new System.Drawing.Rectangle(
-                (int)(pageWidth  - sigWidth), // lower‑left X
-                (int)(pageHeight - sigHeight), // lower‑left Y
-                sigWidth,
-                sigHeight);
+            // Create and configure the PdfFileSignature facade
+            using (PdfFileSignature pdfSigner = new PdfFileSignature())
+            {
+                // Bind the source PDF
+                pdfSigner.BindPdf(inputPdf);
 
-            // Optional: set a graphic appearance for the signature
-            if (File.Exists(appearance))
-                pdfSign.SignatureAppearance = appearance;
+                // Optional: set a visual appearance image for the signature
+                // pdfSigner.SignatureAppearance = "signature_image.jpg";
 
-            // Provide the signing certificate
-            pdfSign.SetCertificate(certPath, certPass);
+                // Provide the certificate for signing
+                pdfSigner.SetCertificate(certPath, certPassword);
 
-            // Apply the visible signature on the last page
-            pdfSign.Sign(
-                lastPageNumber,          // page number
-                "Document approved",     // reason
-                "contact@example.com",   // contact
-                "Head Office",           // location
-                true,                    // visible
-                sigRect);                // rectangle
+                // Apply a visible signature on the last page
+                pdfSigner.Sign(
+                    page:          lastPageNumber,
+                    SigReason:     "Document approved",
+                    SigContact:    "john.doe@example.com",
+                    SigLocation:   "New York, USA",
+                    visible:       true,
+                    annotRect:     signatureRect);
 
-            // Save the signed PDF
-            pdfSign.Save(outputPdf);
+                // Save the signed PDF
+                pdfSigner.Save(outputPdf);
+            }
         }
 
         Console.WriteLine($"Signed PDF saved to '{outputPdf}'.");

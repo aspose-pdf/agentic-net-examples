@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -7,67 +8,87 @@ class Program
 {
     static void Main()
     {
-        // Input and output PDF paths
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_table.pdf";
 
-        // Ensure the input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the existing PDF (or create a new one if you prefer)
+        // Load the existing PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Add a new page to host the table (optional if you want to use an existing page)
-            Page page = doc.Pages.Add();
+            // Ensure there is at least one page to add the table to
+            Page page = doc.Pages.Count > 0 ? doc.Pages[1] : doc.Pages.Add();
 
-            // Create a table and set a maximum column width.
-            // The ColumnWidths property accepts a space‑separated list of widths.
-            // Here we limit each of three columns to 120 points (≈1.67 inches).
+            // Create a table and configure column width limits (150 points per column)
             Table table = new Table
             {
-                ColumnWidths = "120 120 120",          // max width for each column
-                DefaultColumnWidth = "120",            // fallback width if ColumnWidths is incomplete
-                RepeatingColumnsCount = 3              // ensure exactly three columns
+                // Set a fixed width for each column; values are space‑separated
+                ColumnWidths = "150 150 150",
+                // Prevent automatic adjustment that could expand columns beyond the specified widths
+                ColumnAdjustment = ColumnAdjustment.Customized,
+                // Optional: set a default column width for any additional columns
+                DefaultColumnWidth = "150",
+                // Add a simple border for visual clarity (order: side, width, color)
+                Border = new BorderInfo(BorderSide.All, 1.0f, Aspose.Pdf.Color.Black)
             };
 
             // Add a header row
             Row header = table.Rows.Add();
+            header.BackgroundColor = Aspose.Pdf.Color.LightGray;
             header.Cells.Add("Header 1");
             header.Cells.Add("Header 2");
             header.Cells.Add("Header 3");
 
-            // Add a data row
-            Row data = table.Rows.Add();
-            data.Cells.Add("Long text that would normally expand the column beyond the limit, but will be wrapped.");
-            data.Cells.Add("Short");
-            data.Cells.Add("Another long piece of text that should be constrained.");
-
-            // Enable word‑wrap for cells so content stays within the max width
-            foreach (Row row in table.Rows)
+            // Add a few data rows
+            for (int i = 1; i <= 5; i++)
             {
-                foreach (Cell cell in row.Cells)
-                {
-                    // Set basic text formatting
-                    cell.DefaultCellTextState = new TextState
-                    {
-                        FontSize = 12
-                    };
-                    // Enable wrapping – the correct property is Cell.IsWordWrapped, not TextState.WordWrap
-                    cell.IsWordWrapped = true;
-                }
+                Row row = table.Rows.Add();
+                row.Cells.Add($"Row {i} Col 1");
+                row.Cells.Add($"Row {i} Col 2");
+                row.Cells.Add($"Row {i} Col 3");
             }
 
-            // Add the table to the page's paragraphs collection
+            // Position the table on the page (optional)
+            table.Margin = new MarginInfo { Top = 20, Left = 20 };
+
+            // Add the table to the page's paragraph collection
             page.Paragraphs.Add(table);
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            // Save the document – guard against missing GDI+ on non‑Windows platforms
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                doc.Save(outputPath);
+                Console.WriteLine($"Document saved to '{outputPath}'.");
+            }
+            else
+            {
+                try
+                {
+                    doc.Save(outputPath);
+                    Console.WriteLine($"Document saved to '{outputPath}'.");
+                }
+                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
+                {
+                    Console.WriteLine("GDI+ (libgdiplus) is not available on this platform; PDF saved without rendering dependent features.");
+                }
+            }
         }
+    }
 
-        Console.WriteLine($"PDF saved with column width limits to '{outputPath}'.");
+    // Helper to detect a nested DllNotFoundException (e.g., missing libgdiplus)
+    private static bool ContainsDllNotFound(Exception ex)
+    {
+        Exception? current = ex;
+        while (current != null)
+        {
+            if (current is DllNotFoundException)
+                return true;
+            current = current.InnerException;
+        }
+        return false;
     }
 }

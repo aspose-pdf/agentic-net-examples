@@ -1,22 +1,29 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Printing;
-using Aspose.Pdf.Devices;
+using Aspose.Pdf; // Core Aspose.Pdf namespace for Document handling
 
 class PrintPdfExample
 {
     static void Main()
     {
-        // Input parameters
-        const string pdfPath = "input.pdf";                 // Path to the PDF file
-        const string printerName = @"\\NetworkPrinter\Printer"; // Network printer name or URI
-        const int fromPage = 2;                             // First page to print (1‑based)
-        const int toPage = 5;                               // Last page to print (inclusive)
-        const Duplex duplexMode = Duplex.Vertical;          // Duplex setting (Vertical = short‑edge flip)
-        const string paperSizeName = "A4";                  // Paper size identifier
-        const int paperWidth = 827;                         // Width in hundredths of an inch (A4)
-        const int paperHeight = 1169;                       // Height in hundredths of an inch (A4)
+        // Path to the PDF file to be printed
+        const string pdfPath = "input.pdf";
+
+        // Network printer name (replace with actual printer name or URI)
+        const string printerName = @"\\NetworkPrinter\Printer";
+
+        // Page range to print (1‑based indexing)
+        const int fromPage = 2;
+        const int toPage   = 5;
+
+        // Desired paper size (width and height in hundredths of an inch)
+        // Example: A4 size = 827 x 1169 (approx 8.27" x 11.69")
+        const int paperWidth  = 827;
+        const int paperHeight = 1169;
+
+        // Duplex mode: Vertical (short‑edge binding) or Horizontal (long‑edge binding)
+        // Use Aspose.Pdf.Printing.Duplex.Vertical for two‑sided short‑edge printing
+        var duplexMode = Aspose.Pdf.Printing.Duplex.Vertical;
 
         if (!File.Exists(pdfPath))
         {
@@ -24,45 +31,47 @@ class PrintPdfExample
             return;
         }
 
-        // Initialize the PDF viewer (facade) without importing the Aspose.Pdf.Facades namespace
-        var viewer = new Aspose.Pdf.Facades.PdfViewer();
-
         try
         {
-            // Bind the PDF document to the viewer
-            viewer.BindPdf(pdfPath);
-
-            // Configure printer settings
-            var printerSettings = new PrinterSettings
+            // Initialize the PDF viewer facade (fully qualified to avoid using the Facades namespace)
+            using (var viewer = new Aspose.Pdf.Facades.PdfViewer())
             {
-                PrinterName = printerName,
-                FromPage = fromPage,
-                ToPage = toPage,
-                PrintRange = PrintRange.SomePages,
-                Duplex = duplexMode,
-                // Optional: number of copies, collate, etc.
-                Copies = 1,
-                Collate = true
-            };
+                // Bind the PDF document
+                viewer.BindPdf(pdfPath);
 
-            // Configure page settings (paper size, margins, etc.)
-            var pageSettings = new PageSettings(printerSettings)
-            {
-                PaperSize = new PaperSize(paperSizeName, paperWidth, paperHeight),
-                Margins = new Margins(0, 0, 0, 0) // No margins
-            };
+                // Optional viewer settings
+                viewer.AutoResize = true;      // Fit content to printable area
+                viewer.AutoRotate = true;      // Auto‑rotate pages if needed
+                viewer.PrintPageDialog = false; // Suppress the page‑range dialog
 
-            // Print the specified page range with the defined settings
-            viewer.PrintDocumentWithSettings(pageSettings, printerSettings);
+                // Configure printer settings (fully qualified)
+                var printerSettings = new Aspose.Pdf.Printing.PrinterSettings
+                {
+                    PrinterName = printerName,
+                    FromPage = fromPage,
+                    ToPage = toPage,
+                    PrintRange = Aspose.Pdf.Printing.PrintRange.SomePages,
+                    Duplex = duplexMode,
+                    Copies = 1,
+                    Collate = true
+                };
+
+                // Configure page settings (paper size and margins)
+                var pageSettings = new Aspose.Pdf.Printing.PageSettings
+                {
+                    PaperSize = new Aspose.Pdf.Printing.PaperSize("CustomA4", paperWidth, paperHeight),
+                    Margins = new Aspose.Pdf.Devices.Margins(0, 0, 0, 0) // zero margins
+                };
+
+                // Send the document to the specified printer with the defined settings
+                viewer.PrintDocumentWithSettings(pageSettings, printerSettings);
+            }
+
+            Console.WriteLine("Print job submitted successfully.");
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine($"Printing failed: {ex.Message}");
-        }
-        finally
-        {
-            // Ensure resources are released
-            viewer.Close();
         }
     }
 }

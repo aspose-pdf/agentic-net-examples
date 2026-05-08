@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "watermarked_output.pdf";
+        const string outputPath = "watermarked.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,34 +16,28 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (using rule‑based load)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing)
+            // Iterate over all pages (1‑based indexing per rule)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
                 // Create a text fragment that will serve as the watermark
-                TextFragment watermark = new TextFragment("CONFIDENTIAL");
-
-                // Position the fragment at the center of the page
-                double centerX = page.PageInfo.Width / 2;
-                double centerY = page.PageInfo.Height / 2;
-                watermark.Position = new Position(centerX, centerY);
-
-                // Set visual appearance
-                watermark.TextState.Font = FontRepository.FindFont("Helvetica");
-                watermark.TextState.FontSize = 72;
-                watermark.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
-                watermark.TextState.Rotation = 45; // Rotate 45 degrees
+                TextFragment tf = new TextFragment("CONFIDENTIAL");
+                tf.Position = new Position(200, 400);               // place near centre
+                tf.TextState.Font = FontRepository.FindFont("Arial");
+                tf.TextState.FontSize = 72;
+                tf.TextState.ForegroundColor = Color.Red;           // use Aspose.Pdf.Color
+                tf.TextState.Rotation = 45;                         // rotate 45 degrees
 
                 // Append the fragment to the current page using TextBuilder
                 TextBuilder builder = new TextBuilder(page);
-                builder.AppendText(watermark);
+                builder.AppendText(tf);
             }
 
-            // Save the modified document as PDF
+            // Save the modified PDF (using rule‑based save)
             doc.Save(outputPath);
         }
 

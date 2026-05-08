@@ -3,7 +3,7 @@ name: aspose-pdf-examples
 description: AI-friendly C# code examples for Aspose.PDF for .NET
 language: csharp
 framework: net10.0
-package: Aspose.PDF 26.3.0
+package: Aspose.PDF 26.4.0
 ---
 
 # Aspose.PDF for .NET Examples
@@ -21,10 +21,10 @@ When working in this repository:
 
 ## Repository Overview
 
-This repository contains **2708** working code examples demonstrating Aspose.PDF for .NET capabilities.
+This repository contains **2631** working code examples demonstrating Aspose.PDF for .NET capabilities.
 
-**Statistics** (as of 2026-04-10):
-- Total Examples: 2708
+**Statistics** (as of 2026-05-08):
+- Total Examples: 2631
 - Categories: 34
 
 ## Category Details
@@ -34,11 +34,11 @@ This repository contains **2708** working code examples demonstrating Aspose.PDF
 - Guide: [agents.md](./accessibility-and-tagged-pdfs/agents.md)
 
 ### basic-operations
-- Examples: 57
+- Examples: 56
 - Guide: [agents.md](./basic-operations/agents.md)
 
 ### compare-pdf
-- Examples: 28
+- Examples: 27
 - Guide: [agents.md](./compare-pdf/agents.md)
 
 ### conversion
@@ -46,15 +46,15 @@ This repository contains **2708** working code examples demonstrating Aspose.PDF
 - Guide: [agents.md](./conversion/agents.md)
 
 ### document
-- Examples: 122
+- Examples: 118
 - Guide: [agents.md](./document/agents.md)
 
 ### facades-acroforms
-- Examples: 41
+- Examples: 40
 - Guide: [agents.md](./facades-acroforms/agents.md)
 
 ### facades-annotations
-- Examples: 107
+- Examples: 106
 - Guide: [agents.md](./facades-annotations/agents.md)
 
 ### facades-bookmarks
@@ -70,19 +70,19 @@ This repository contains **2708** working code examples demonstrating Aspose.PDF
 - Guide: [agents.md](./facades-documents/agents.md)
 
 ### facades-edit-document
-- Examples: 214
+- Examples: 209
 - Guide: [agents.md](./facades-edit-document/agents.md)
 
 ### facades-extract-images-and-text
-- Examples: 83
+- Examples: 82
 - Guide: [agents.md](./facades-extract-images-and-text/agents.md)
 
 ### facades-fill-forms
-- Examples: 35
+- Examples: 28
 - Guide: [agents.md](./facades-fill-forms/agents.md)
 
 ### facades-forms
-- Examples: 88
+- Examples: 90
 - Guide: [agents.md](./facades-forms/agents.md)
 
 ### facades-metadata
@@ -98,23 +98,23 @@ This repository contains **2708** working code examples demonstrating Aspose.PDF
 - Guide: [agents.md](./facades-secure-documents/agents.md)
 
 ### facades-sign-documents
-- Examples: 35
+- Examples: 34
 - Guide: [agents.md](./facades-sign-documents/agents.md)
 
 ### facades-stamps
-- Examples: 50
+- Examples: 45
 - Guide: [agents.md](./facades-stamps/agents.md)
 
 ### facades-texts-and-images
-- Examples: 29
+- Examples: 27
 - Guide: [agents.md](./facades-texts-and-images/agents.md)
 
 ### facades-xmp-metadata
-- Examples: 45
+- Examples: 43
 - Guide: [agents.md](./facades-xmp-metadata/agents.md)
 
 ### graphs-zugferd-operators
-- Examples: 84
+- Examples: 83
 - Guide: [agents.md](./graphs-zugferd-operators/agents.md)
 
 ### pages
@@ -126,7 +126,7 @@ This repository contains **2708** working code examples demonstrating Aspose.PDF
 - Guide: [agents.md](./parse-pdf/agents.md)
 
 ### securing-and-signing-pdf
-- Examples: 87
+- Examples: 83
 - Guide: [agents.md](./securing-and-signing-pdf/agents.md)
 
 ### stamping
@@ -134,7 +134,7 @@ This repository contains **2708** working code examples demonstrating Aspose.PDF
 - Guide: [agents.md](./stamping/agents.md)
 
 ### working-with-annotations
-- Examples: 163
+- Examples: 160
 - Guide: [agents.md](./working-with-annotations/agents.md)
 
 ### working-with-attachments
@@ -142,27 +142,27 @@ This repository contains **2708** working code examples demonstrating Aspose.PDF
 - Guide: [agents.md](./working-with-attachments/agents.md)
 
 ### working-with-forms
-- Examples: 240
+- Examples: 239
 - Guide: [agents.md](./working-with-forms/agents.md)
 
 ### working-with-graphs
-- Examples: 85
+- Examples: 70
 - Guide: [agents.md](./working-with-graphs/agents.md)
 
 ### working-with-images
-- Examples: 72
+- Examples: 70
 - Guide: [agents.md](./working-with-images/agents.md)
 
 ### working-with-tables
-- Examples: 109
+- Examples: 91
 - Guide: [agents.md](./working-with-tables/agents.md)
 
 ### working-with-text
-- Examples: 75
+- Examples: 72
 - Guide: [agents.md](./working-with-text/agents.md)
 
 ### working-with-xml
-- Examples: 75
+- Examples: 74
 - Guide: [agents.md](./working-with-xml/agents.md)
 
 ## Boundaries
@@ -472,7 +472,7 @@ Cross-cutting rules and API-specific gotchas.
 dotnet new console -n ExampleProject --framework net10.0
 
 # Add Aspose.PDF NuGet package
-dotnet add package Aspose.PDF --version 26.3.0
+dotnet add package Aspose.PDF --version 26.4.0
 
 # Build
 dotnet build --configuration Release --verbosity minimal
@@ -489,14 +489,14 @@ dotnet run
     <TargetFramework>net10.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Aspose.PDF" Version="26.3.0" />
+    <PackageReference Include="Aspose.PDF" Version="26.4.0" />
   </ItemGroup>
 </Project>
 ```
 
 ### Environment
 - .NET SDK: 10.0 or higher
-- NuGet: Aspose.PDF 26.3.0
+- NuGet: Aspose.PDF 26.4.0
 - All examples are standalone Console Applications
 - Each `.cs` file can be compiled and run independently
 
@@ -535,7 +535,7 @@ dotnet run
 
 ### Prerequisites
 - .NET SDK (10.0 or higher)
-- Aspose.PDF for .NET (26.3.0 or higher)
+- Aspose.PDF for .NET (26.4.0 or higher)
 - NuGet package restore enabled
 
 ### Running an Example
@@ -548,9 +548,9 @@ dotnet run
    ```
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-04-10 | Run: `20260410_174139_d90957` | Examples: 2708 | Categories: 34
+Updated: 2026-05-08 | Run: `20260508_152858_8cb8c4` | Examples: 2631 | Categories: 34
 <!-- AUTOGENERATED:END -->
 
 ---
 
-*This repository is maintained by automated code generation. Last updated: 2026-04-10 | Total examples: 2708*
+*This repository is maintained by automated code generation. Last updated: 2026-05-08 | Total examples: 2631*

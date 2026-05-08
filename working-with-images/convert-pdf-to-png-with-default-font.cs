@@ -1,55 +1,44 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices;   // PngDevice resides here
+using Aspose.Pdf.Devices;
 
-class Program
+class PdfToImages
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputDir = "Images";
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "Images";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(outputFolder);
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Load the PDF document (lifecycle rule: use Document constructor)
-            using (Document pdfDoc = new Document(inputPdf))
+            // Define the resolution for the output images (e.g., 300 DPI)
+            Resolution resolution = new Resolution(300);
+            // Create a PNG device that will render pages to PNG images
+            PngDevice pngDevice = new PngDevice(resolution);
+
+            // Configure rendering options – set the default font to substitute missing fonts
+            pngDevice.RenderingOptions = new RenderingOptions();
+            pngDevice.RenderingOptions.DefaultFontName = "Times New Roman";
+
+            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
             {
-                // Prepare a PNG device with desired resolution
-                var pngDevice = new PngDevice(new Resolution(300));
-
-                // Set RenderingOptions and specify the default font name
-                pngDevice.RenderingOptions = new RenderingOptions
-                {
-                    DefaultFontName = "Times New Roman"
-                };
-
-                // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-                for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
-                {
-                    string outPath = Path.Combine(outputDir, $"page_{pageNum}.png");
-
-                    // Convert the current page to PNG
-                    pngDevice.Process(pdfDoc.Pages[pageNum], outPath);
-
-                    Console.WriteLine($"Saved page {pageNum} → {outPath}");
-                }
+                string outputPath = Path.Combine(outputFolder, $"Page_{pageNumber}.png");
+                // Render the current page to an image file
+                pngDevice.Process(pdfDoc.Pages[pageNumber], outputPath);
             }
+        }
 
-            Console.WriteLine("All pages have been converted to images.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"All pages have been saved to '{outputFolder}'.");
     }
 }

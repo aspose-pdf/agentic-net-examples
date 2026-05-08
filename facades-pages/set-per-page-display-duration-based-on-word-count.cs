@@ -6,58 +6,55 @@ using Aspose.Pdf.Text;
 
 class Program
 {
-    // Adjust this factor to control how many seconds per word (e.g., 0.01 sec per word)
-    const double SecondsPerWord = 0.01;
-
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_with_durations.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document to read text per page
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Prepare the page editor facade
-            using (PdfPageEditor editor = new PdfPageEditor())
+            // Factor: seconds per word (adjust as needed)
+            const double secondsPerWord = 0.05; // e.g., 0.05 sec ≈ 20 words per second
+
+            // Iterate through all pages (1‑based indexing)
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
-                // Bind the same document instance to the editor
-                editor.BindPdf(doc);
+                // Extract text from the current page
+                TextAbsorber absorber = new TextAbsorber();
+                doc.Pages[pageNum].Accept(absorber);
+                string pageText = absorber.Text ?? string.Empty;
 
-                // Iterate over all pages (1‑based indexing)
-                for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+                // Count words
+                int wordCount = 0;
+                if (!string.IsNullOrWhiteSpace(pageText))
                 {
-                    // Extract text from the current page
-                    TextAbsorber absorber = new TextAbsorber();
-                    absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
-                    doc.Pages[pageNum].Accept(absorber);
-                    string pageText = absorber.Text ?? string.Empty;
-
-                    // Count words (split on whitespace)
-                    int wordCount = pageText.Split(
-                        new char[] { ' ', '\n', '\r', '\t' },
-                        StringSplitOptions.RemoveEmptyEntries).Length;
-
-                    // Compute duration in seconds (rounded to nearest whole number)
-                    int duration = (int)Math.Round(wordCount * SecondsPerWord);
-                    if (duration < 1) duration = 1; // Minimum of 1 second per page
-
-                    // Apply the duration to the current page
-                    editor.ProcessPages = new int[] { pageNum };
-                    editor.DisplayDuration = duration;
-                    editor.ApplyChanges();
+                    char[] delimiters = { ' ', '\t', '\r', '\n' };
+                    wordCount = pageText.Split(delimiters, StringSplitOptions.RemoveEmptyEntries).Length;
                 }
 
-                // Save the modified PDF with per‑page display durations
-                editor.Save(outputPdf);
-            }
-        }
+                // Compute display duration (minimum 1 second)
+                int duration = Math.Max(1, (int)Math.Round(wordCount * secondsPerWord));
 
-        Console.WriteLine($"Processed PDF saved to '{outputPdf}'.");
+                // Apply the duration to the current page using PdfPageEditor (Facade API)
+                using (PdfPageEditor editor = new PdfPageEditor())
+                {
+                    editor.BindPdf(doc);                     // Bind the document
+                    editor.ProcessPages = new int[] { pageNum }; // Target only this page
+                    editor.DisplayDuration = duration;       // Set duration in seconds
+                    editor.ApplyChanges();                   // Commit the change
+                }
+            }
+
+            // Save the modified PDF
+            doc.Save(outputPath);
+            Console.WriteLine($"PDF saved with per‑page display durations: {outputPath}");
+        }
     }
 }

@@ -1,90 +1,81 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Security; // Correct namespace for security interfaces
 
-// Custom security handler that logs every security‑related call.
-class LoggingSecurityHandler : ICustomSecurityHandler
+class LoggingSecurityHandler : Aspose.Pdf.Security.ICustomSecurityHandler
 {
-    // Store parameters for possible future use
-    private EncryptionParameters _parameters;
+    private Aspose.Pdf.Security.EncryptionParameters _parameters;
 
-    // Simple properties required by the interface
-    public string Filter => "CustomLogHandler";
+    // Required properties – simple static values for demonstration
+    public string Filter => "CustomFilter";
     public int KeyLength => 128;
     public int Revision => 4;
-    public string SubFilter => "CustomLogSubFilter";
+    public string SubFilter => "CustomSubFilter";
     public int Version => 2;
 
-    // Called during encryption/decryption initialization
-    public void Initialize(EncryptionParameters parameters)
+    // Called when the PDF engine prepares encryption/decryption
+    public void Initialize(Aspose.Pdf.Security.EncryptionParameters parameters)
     {
         _parameters = parameters;
-        Console.WriteLine("[Log] Initialize called.");
+        Console.WriteLine("CustomSecurityHandler initialized.");
     }
 
-    // Create user key (placeholder implementation)
+    // User‑key generation – log the password and return a placeholder
     public byte[] GetUserKey(string userPassword)
     {
-        Console.WriteLine($"[Log] GetUserKey called with password: '{userPassword}'");
+        Console.WriteLine($"GetUserKey called with password: '{userPassword}'");
         return new byte[0];
     }
 
-    // Create owner key (placeholder implementation)
+    // Owner‑key generation – log both passwords and return a placeholder
     public byte[] GetOwnerKey(string userPassword, string ownerPassword)
     {
-        Console.WriteLine($"[Log] GetOwnerKey called with user: '{userPassword}', owner: '{ownerPassword}'");
+        Console.WriteLine($"GetOwnerKey called with user: '{userPassword}', owner: '{ownerPassword}'");
         return new byte[0];
     }
 
-    // Calculate encryption key (placeholder implementation)
+    // Encryption key calculation – log and return a placeholder
     public byte[] CalculateEncryptionKey(string userPassword)
     {
-        Console.WriteLine($"[Log] CalculateEncryptionKey called with password: '{userPassword}'");
+        Console.WriteLine($"CalculateEncryptionKey called with password: '{userPassword}'");
         return new byte[0];
     }
 
-    // Encrypt data (no actual encryption, just log)
+    // Encryption of data – log and return the (unchanged) data as required by the interface
     public byte[] Encrypt(byte[] data, int offset, int count, byte[] key)
     {
-        Console.WriteLine("[Log] Encrypt called.");
-        // Return the original data slice unchanged
-        byte[] result = new byte[count];
-        Array.Copy(data, offset, result, 0, count);
-        return result;
+        Console.WriteLine("Encrypt called.");
+        // Placeholder implementation – no real encryption performed.
+        // Returning the original data satisfies the interface contract.
+        return data;
     }
 
-    // Decrypt data (no actual decryption, just log)
+    // Decryption of data – log and return the (unchanged) data as required by the interface
     public byte[] Decrypt(byte[] data, int offset, int count, byte[] key)
     {
-        Console.WriteLine("[Log] Decrypt called.");
-        // Return the original data slice unchanged
-        byte[] result = new byte[count];
-        Array.Copy(data, offset, result, 0, count);
-        return result;
+        Console.WriteLine("Decrypt called.");
+        // Placeholder implementation – no real decryption performed.
+        return data;
     }
 
-    // Encrypt permissions field (placeholder)
+    // Permissions encryption – log and return a placeholder
     public byte[] EncryptPermissions(int permissions)
     {
-        Console.WriteLine($"[Log] EncryptPermissions called with permissions: {permissions}");
+        Console.WriteLine($"EncryptPermissions called with permissions: {permissions}");
         return new byte[0];
     }
 
-    // Check if supplied password is the user password
+    // Password checks – log each attempt and validate against known passwords
     public bool IsUserPassword(string password)
     {
-        Console.WriteLine($"[Log] IsUserPassword check for: '{password}'");
-        // For demo purposes, accept any password
-        return true;
+        Console.WriteLine($"IsUserPassword check: '{password}'");
+        return password == "user123";
     }
 
-    // Check if supplied password is the owner password
     public bool IsOwnerPassword(string password)
     {
-        Console.WriteLine($"[Log] IsOwnerPassword check for: '{password}'");
-        // For demo purposes, accept any password
-        return true;
+        Console.WriteLine($"IsOwnerPassword check: '{password}'");
+        return password == "owner123";
     }
 }
 
@@ -93,10 +84,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string encryptedPath = "encrypted.pdf";
-        const string decryptedPath = "decrypted.pdf";
-        const string userPassword = "user123";
-        const string ownerPassword = "owner123";
+        const string encryptedPath = "encrypted_custom.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -104,29 +92,36 @@ class Program
             return;
         }
 
-        // Create the custom handler instance
+        // Instantiate the custom handler (will log all interactions)
         LoggingSecurityHandler customHandler = new LoggingSecurityHandler();
 
-        // ---------- Encrypt the PDF ----------
+        // ---------- Encrypt the PDF using the custom handler ----------
         using (Document doc = new Document(inputPath))
         {
-            // Set desired permissions (example: allow printing and content extraction)
-            Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+            // Example permission set – allow printing only
+            Permissions perms = Permissions.PrintDocument;
 
-            // Encrypt using the custom security handler
-            doc.Encrypt(userPassword, ownerPassword, perms, customHandler);
+            // Encrypt with user/owner passwords and the custom handler
+            doc.Encrypt("user123", "owner123", perms, customHandler);
 
             // Save the encrypted document
             doc.Save(encryptedPath);
-            Console.WriteLine($"Encrypted PDF saved to '{encryptedPath}'.");
         }
 
-        // ---------- Open the encrypted PDF (this will trigger logging) ----------
-        using (Document encryptedDoc = new Document(encryptedPath, userPassword, customHandler))
+        Console.WriteLine("PDF encrypted with custom security handler.");
+
+        // ---------- Open with user password (triggers logging) ----------
+        using (Document userDoc = new Document(encryptedPath, "user123", customHandler))
         {
-            // Save a decrypted copy to verify access
-            encryptedDoc.Save(decryptedPath);
-            Console.WriteLine($"Decrypted PDF saved to '{decryptedPath}'.");
+            Console.WriteLine("Opened encrypted PDF with user password.");
+            userDoc.Save("opened_user.pdf");
+        }
+
+        // ---------- Open with owner password (triggers logging) ----------
+        using (Document ownerDoc = new Document(encryptedPath, "owner123", customHandler))
+        {
+            Console.WriteLine("Opened encrypted PDF with owner password.");
+            ownerDoc.Save("opened_owner.pdf");
         }
     }
 }

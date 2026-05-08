@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 
 class Program
@@ -7,42 +8,46 @@ class Program
     {
         const string inputPath = "input.pdf";
 
-        if (!System.IO.File.Exists(inputPath))
+        if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
         {
-            OutlineCollection outlines = doc.Outlines;
+            // Access the outline (bookmark) hierarchy
+            Aspose.Pdf.OutlineCollection outlines = doc.Outlines;
 
-            if (outlines.Count == 0)
+            if (outlines == null || outlines.Count == 0)
             {
-                Console.WriteLine("The document has no outline entries.");
+                Console.WriteLine("The document contains no outlines.");
                 return;
             }
 
-            // Start traversal from the first top‑level outline item
-            PrintOutline(outlines.First, 0);
+            Console.WriteLine("Outline hierarchy:");
+            // Iterate over top‑level outline items
+            for (int i = 1; i <= outlines.Count; i++) // 1‑based indexing
+            {
+                Aspose.Pdf.OutlineItemCollection item = outlines[i];
+                PrintOutline(item, 0);
+            }
         }
     }
 
-    // Recursively prints an outline item and its children as a tree
-    static void PrintOutline(OutlineItemCollection item, int depth)
+    // Recursively prints an outline item and its children with indentation
+    static void PrintOutline(Aspose.Pdf.OutlineItemCollection item, int level)
     {
-        if (item == null) return;
+        string indent = new string(' ', level * 2);
+        Console.WriteLine($"{indent}- {item.Title}");
 
-        string indent = new string(' ', depth * 2);
-        Console.WriteLine($"{indent}{item.Title}");
-
-        // Process child items (first child of the current item)
-        if (item.First != null)
-            PrintOutline(item.First, depth + 1);
-
-        // Process sibling items (next item at the same level)
-        if (item.Next != null)
-            PrintOutline(item.Next, depth);
+        // Traverse child items using the linked‑list style navigation (First/Next)
+        Aspose.Pdf.OutlineItemCollection child = item.First;
+        while (child != null)
+        {
+            PrintOutline(child, level + 1);
+            child = child.Next;
+        }
     }
 }

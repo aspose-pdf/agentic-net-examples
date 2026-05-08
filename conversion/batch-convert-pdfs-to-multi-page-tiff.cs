@@ -7,43 +7,39 @@ class Program
 {
     static void Main()
     {
-        // Directory containing PDF files
-        string inputDirectory = @"C:\PdfFiles";
-        // Directory where TIFF archives will be saved
-        string outputDirectory = @"C:\TiffArchives";
+        // Directory containing source PDF files
+        const string inputDir = @"C:\PdfInput";
+        // Path for the resulting multi‑page TIFF archive
+        const string outputTiff = @"C:\PdfOutput\Combined.tif";
 
-        if (!Directory.Exists(inputDirectory))
+        // Validate input directory
+        if (!Directory.Exists(inputDir))
         {
-            Console.Error.WriteLine($"Input directory not found: {inputDirectory}");
+            Console.Error.WriteLine($"Input directory not found: {inputDir}");
             return;
         }
 
-        Directory.CreateDirectory(outputDirectory);
-
-        // Process each PDF file in the input directory
-        foreach (string pdfPath in Directory.GetFiles(inputDirectory, "*.pdf"))
+        // Collect all PDF files (1‑based indexing is not relevant here)
+        string[] pdfFiles = Directory.GetFiles(inputDir, "*.pdf");
+        if (pdfFiles.Length == 0)
         {
-            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
-            string tiffPath = Path.Combine(outputDirectory, fileNameWithoutExt + ".tif");
-
-            try
-            {
-                // Load PDF document
-                using (Document pdfDocument = new Document(pdfPath))
-                {
-                    // Create TiffDevice with default settings (default compression)
-                    TiffDevice tiffDevice = new TiffDevice();
-
-                    // Convert entire PDF to a multi‑page TIFF archive
-                    tiffDevice.Process(pdfDocument, tiffPath);
-                }
-
-                Console.WriteLine($"Converted '{pdfPath}' to '{tiffPath}'.");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
-            }
+            Console.Error.WriteLine("No PDF files found to process.");
+            return;
         }
+
+        // Merge all PDFs into a single Document
+        using (Document mergedDoc = new Document())
+        {
+            // Document.Merge(params string[]) merges the specified PDF files
+            mergedDoc.Merge(pdfFiles);
+
+            // Create a TiffDevice with default settings (default compression)
+            TiffDevice tiffDevice = new TiffDevice();
+
+            // Convert the merged PDF to a multi‑page TIFF archive
+            tiffDevice.Process(mergedDoc, outputTiff);
+        }
+
+        Console.WriteLine($"Batch conversion completed. TIFF saved to: {outputTiff}");
     }
 }

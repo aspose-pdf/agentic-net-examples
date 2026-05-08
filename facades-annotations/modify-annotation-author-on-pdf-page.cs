@@ -9,10 +9,8 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-
-        // Existing author to replace and the new author name
-        const string srcAuthor = "Old Author";
-        const string desAuthor = "New Author";
+        const string srcAuthor  = "Old Author";
+        const string newAuthor  = "New Author";
 
         if (!File.Exists(inputPath))
         {
@@ -20,15 +18,14 @@ class Program
             return;
         }
 
-        // Bind the PDF, modify the author on page 3 (start = end = 3),
-        // then save the updated document.
+        // Modify the author of annotations on page 3 (1‑based indexing)
         using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
             editor.BindPdf(inputPath);
-            editor.ModifyAnnotationsAuthor(3, 3, srcAuthor, desAuthor);
+            editor.ModifyAnnotationsAuthor(3, 3, srcAuthor, newAuthor);
             editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Author updated and saved to '{outputPath}'.");
+        Console.WriteLine($"Annotations author updated and saved to '{outputPath}'.");
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -14,33 +15,35 @@ class Program
             return;
         }
 
-        // Use PdfExtractor facade to extract text
-        using (PdfExtractor extractor = new PdfExtractor())
+        // StringWriter will hold the extracted text for logging
+        using (StringWriter logWriter = new StringWriter())
         {
-            extractor.BindPdf(pdfPath);          // Load the PDF
-            extractor.ExtractText();             // Perform extraction (Unicode by default)
-
-            // Capture extracted text into a memory stream
-            using (MemoryStream ms = new MemoryStream())
+            // PdfExtractor implements IDisposable, so wrap it in a using block
+            using (PdfExtractor extractor = new PdfExtractor())
             {
-                extractor.GetText(ms);           // Write text to the stream
-                ms.Position = 0;                 // Reset for reading
+                // Bind the PDF file to the extractor
+                extractor.BindPdf(pdfPath);
 
-                // Read the stream into a string
-                using (StreamReader reader = new StreamReader(ms))
+                // Extract text using Unicode encoding
+                extractor.ExtractText(Encoding.Unicode);
+
+                // Capture the extracted text into a MemoryStream
+                using (MemoryStream ms = new MemoryStream())
                 {
-                    string extractedText = reader.ReadToEnd();
+                    extractor.GetText(ms);
+                    ms.Position = 0; // Reset stream position for reading
 
-                    // Write the text to a StringWriter (suitable for logging frameworks)
-                    using (StringWriter stringWriter = new StringWriter())
+                    // Read the stream as a Unicode string
+                    using (StreamReader reader = new StreamReader(ms, Encoding.Unicode))
                     {
-                        stringWriter.Write(extractedText);
-
-                        // Example output – replace with actual logging as needed
-                        Console.WriteLine(stringWriter.ToString());
+                        string extractedText = reader.ReadToEnd();
+                        logWriter.Write(extractedText);
                     }
                 }
             }
+
+            // Example output: write the captured text to the console (or pass to a logging framework)
+            Console.WriteLine(logWriter.ToString());
         }
     }
 }

@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -12,24 +11,24 @@ class Program
         // Create a new PDF document and ensure proper disposal
         using (Document doc = new Document())
         {
-            // Add a single page to the document
+            // Add a blank page
             Page page = doc.Pages.Add();
 
-            // Define a rectangle positioned near the top of the page
-            // Constructor: Rectangle(llx, lly, urx, ury) – expects float values
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(50f, 730f, 70f, 750f);
+            // Define the checkbox rectangle positioned near the top of the page
+            // Rectangle constructor: (llx, lly, urx, ury)
+            var rect = new Aspose.Pdf.Rectangle(50, 730, 70, 750);
 
-            // Create a checkbox field on the page using the defined rectangle
-            CheckboxField checkbox = new CheckboxField(page, rect)
+            // Create the checkbox field on the page
+            var checkbox = new CheckboxField(page, rect)
             {
-                Name = "TopCheckbox",   // Optional field name
-                Checked = false         // Initial state (unchecked)
+                PartialName = "TopCheckbox", // field name
+                Checked = false               // default unchecked state
             };
 
             // Add the checkbox to the document's AcroForm
             doc.Form.Add(checkbox);
 
-            // Save the PDF to disk
+            // Save the PDF
             doc.Save(outputPath);
         }
 

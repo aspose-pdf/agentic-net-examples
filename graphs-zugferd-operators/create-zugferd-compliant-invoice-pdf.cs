@@ -1,50 +1,47 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace contains Document, PdfFormat, ConvertErrorAction, etc.
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Paths for the readable PDF invoice template, the ZUGFeRD XML data,
-        // and the final ZUGFeRD‑compliant PDF output.
-        const string pdfTemplatePath = "InvoiceTemplate.pdf";
-        const string zugFerdXmlPath   = "InvoiceData.xml";
-        const string outputPdfPath    = "Invoice_ZUGFeRD.pdf";
+        const string templatePdf = "invoice_template.pdf"; // readable invoice layout
+        const string xmlData = "invoice.xml";             // ZUGFeRD XML data
+        const string outputPdf = "invoice_zugferd.pdf";   // final ZUGFeRD PDF
+        const string conversionLog = "conversion_log.xml"; // optional conversion log
 
-        // Verify that the source files exist.
-        if (!File.Exists(pdfTemplatePath))
+        if (!File.Exists(templatePdf))
         {
-            Console.Error.WriteLine($"Template PDF not found: {pdfTemplatePath}");
+            Console.Error.WriteLine($"Template PDF not found: {templatePdf}");
             return;
         }
-        if (!File.Exists(zugFerdXmlPath))
+        if (!File.Exists(xmlData))
         {
-            Console.Error.WriteLine($"ZUGFeRD XML not found: {zugFerdXmlPath}");
+            Console.Error.WriteLine($"XML data not found: {xmlData}");
             return;
         }
 
         try
         {
-            // Load the readable PDF invoice.
-            using (Document pdfDoc = new Document(pdfTemplatePath))
+            // Load the readable PDF invoice template
+            using (Document doc = new Document(templatePdf))
             {
-                // Embed the ZUGFeRD XML data into the PDF.
-                // BindXml attaches the XML as an embedded file and creates the necessary
-                // PDF/A‑3 / ZUGFeRD structure.
-                pdfDoc.BindXml(zugFerdXmlPath);
+                // Embed the ZUGFeRD XML into the PDF
+                doc.BindXml(xmlData);
 
-                // Convert the document to ZUGFeRD format.
-                // The Convert overload writes the result directly to the specified file.
-                // ConvertErrorAction.Delete removes any conversion errors from the output.
-                pdfDoc.Convert(outputPdfPath, PdfFormat.ZUGFeRD, ConvertErrorAction.Delete);
+                // Convert the document to ZUGFeRD (PDF/A‑3) format
+                doc.Convert(conversionLog, PdfFormat.ZUGFeRD, ConvertErrorAction.Delete);
+
+                // Save the ZUGFeRD‑compliant invoice
+                doc.Save(outputPdf);
             }
 
-            Console.WriteLine($"ZUGFeRD‑compliant invoice saved to '{outputPdfPath}'.");
+            Console.WriteLine($"ZUGFeRD invoice saved to '{outputPdf}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during PDF creation: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

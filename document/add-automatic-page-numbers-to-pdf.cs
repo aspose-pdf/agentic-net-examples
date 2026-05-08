@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // needed for FontRepository
+using Aspose.Pdf.Text; // Required for FontRepository
 
 class Program
 {
@@ -16,29 +16,31 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Create a PageNumberStamp with default format ("#")
-            PageNumberStamp pageNumberStamp = new PageNumberStamp();
-            // Position the stamp at the bottom‑center of each page
-            pageNumberStamp.HorizontalAlignment = HorizontalAlignment.Center;
-            pageNumberStamp.VerticalAlignment   = VerticalAlignment.Bottom;
-            pageNumberStamp.BottomMargin       = 20; // distance from bottom edge
-            // Styling must be applied via TextState – FontSize property on the stamp itself is read‑only
-            pageNumberStamp.TextState.FontSize = 12;
-            pageNumberStamp.TextState.Font = FontRepository.FindFont("Helvetica");
-            pageNumberStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
+            // Create a PageNumberStamp – default format is "#"
+            PageNumberStamp pageNumberStamp = new PageNumberStamp
+            {
+                // Position the stamp at the bottom center of each page
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Bottom,
+                // Optional: set margin from the bottom edge
+                BottomMargin = 20,
+                // Optional: make the stamp part of the page background (false = overlay)
+                Background = false,
+                // Optional: set font size (will be adjusted if AutoAdjustFontSizeToFitStampRectangle is true)
+                TextState = { FontSize = 12, Font = FontRepository.FindFont("Helvetica") }
+            };
 
-            // Apply the stamp to all existing pages
+            // Apply the stamp to every existing page
             foreach (Page page in doc.Pages)
             {
                 page.AddStamp(pageNumberStamp);
             }
 
-            // Example: insert a new blank page at position 2 and add the stamp to it
-            Page newPage = doc.Pages.Insert(2);
-            newPage.AddStamp(pageNumberStamp);
+            // Refresh pagination artifacts so they stay correct if pages are added/removed later
+            doc.Pages.UpdatePagination();
 
             // Save the modified PDF
             doc.Save(outputPath);

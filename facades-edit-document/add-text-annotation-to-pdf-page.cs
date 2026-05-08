@@ -1,7 +1,6 @@
 using System;
-using System.IO;
-using System.Drawing;
-using Aspose.Pdf.Facades;
+using System.Drawing;               // Required for System.Drawing.Rectangle
+using Aspose.Pdf.Facades;          // Facade API for editing PDF content
 
 class Program
 {
@@ -9,39 +8,35 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string title      = "Note";
-        const string contents   = "Custom annotation content";
 
-        if (!File.Exists(inputPath))
+        // Custom annotation details
+        const string title    = "Note";
+        const string contents = "Custom annotation content";
+
+        // Verify the source PDF exists
+        if (!System.IO.File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Initialize the PDF content editor (facade)
+        // Initialize the PdfContentEditor facade and bind the source PDF
         PdfContentEditor editor = new PdfContentEditor();
-        try
-        {
-            // Load the existing PDF document
-            editor.BindPdf(inputPath);
+        editor.BindPdf(inputPath);
 
-            // Define the annotation rectangle (x, y, width, height)
-            // Coordinates are in points; (100,200) is the lower‑left corner.
-            Rectangle rect = new Rectangle(100, 200, 200, 100);
+        // Define the annotation rectangle.
+        // System.Drawing.Rectangle(x, y, width, height) where (x,y) is the lower‑left corner.
+        // Adjust width/height as needed for the visual size of the note.
+        Rectangle rect = new Rectangle(100, 200, 150, 100);
 
-            // Create a text (sticky‑note) annotation on page 1
-            // Parameters: rectangle, title, contents, open flag, icon name, page number
-            editor.CreateText(rect, title, contents, true, "Note", 1);
+        // Create a text (sticky‑note) annotation on page 1.
+        // Parameters: rectangle, title, contents, open flag, icon name, page number.
+        editor.CreateText(rect, title, contents, true, "Note", 1);
 
-            // Save the modified PDF
-            editor.Save(outputPath);
-        }
-        finally
-        {
-            // Release resources held by the editor
-            editor.Close();
-        }
+        // Persist the changes to a new file.
+        editor.Save(outputPath);
+        editor.Close();
 
-        Console.WriteLine($"Annotation added and saved to '{outputPath}'.");
+        Console.WriteLine($"Text annotation added and saved to '{outputPath}'.");
     }
 }

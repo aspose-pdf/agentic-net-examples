@@ -7,9 +7,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "processed.pdf";
-        const int expectedFormCount = 3; // adjust as needed
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const int expectedFieldCount = 5; // adjust to the expected number of form fields
 
         if (!File.Exists(inputPath))
         {
@@ -17,42 +17,34 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document (lifecycle rule: use Document constructor inside a using block)
         using (Document doc = new Document(inputPath))
         {
-            // Access the form object
-            Form pdfForm = doc.Form;
-
-            // Verify the number of form fields
-            int actualCount = pdfForm.Count;
+            // Verify the number of form fields using Document.Form.Count
+            int actualCount = doc.Form.Count;
             Console.WriteLine($"Form fields found: {actualCount}");
 
-            if (actualCount != expectedFormCount)
+            if (actualCount != expectedFieldCount)
             {
-                Console.Error.WriteLine($"Unexpected number of form fields. Expected: {expectedFormCount}, Actual: {actualCount}");
-                // Optionally abort processing
-                return;
+                Console.Error.WriteLine($"Unexpected number of form fields. Expected {expectedFieldCount}, but found {actualCount}.");
+                return; // abort processing if the count does not match
             }
 
-            // Example processing: set a value for the first field if it exists
-            if (actualCount > 0)
+            // Example processing: set a value for a field named "Name" if it exists
+            if (doc.Form.HasField("Name"))
             {
-                // The Form collection implements IEnumerable<Field>
-                foreach (Field field in pdfForm)
+                // Retrieve the field and cast to the appropriate type (TextBoxField in this case)
+                var field = doc.Form["Name"] as TextBoxField;
+                if (field != null)
                 {
-                    // Example: set value for a TextBoxField
-                    if (field is TextBoxField textBox)
-                    {
-                        textBox.Value = "Sample value";
-                    }
-                    // Process only the first field for this demo
-                    break;
+                    field.Value = "John Doe";
                 }
             }
 
-            // Save the modified document
+            // Save the modified PDF (lifecycle rule: use Document.Save inside the using block)
             doc.Save(outputPath);
-            Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
         }
+
+        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

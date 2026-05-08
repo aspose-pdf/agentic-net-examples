@@ -1,69 +1,62 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;                     // Core PDF API
+using Aspose.Pdf.Facades;            // For HTML load options (in same namespace)
+using Aspose.Pdf;                    // HtmlLoadOptions is in Aspose.Pdf namespace
 
 class ReplacePdfPageWithHtml
 {
     static void Main()
     {
-        // Input files
-        const string pdfPath   = "source.pdf";   // Existing PDF
-        const string htmlPath  = "newpage.html"; // HTML to convert to PDF page
-        const int    pageIndex = 2;              // 1‑based index of page to replace
-        const string outputPath = "result.pdf";
+        const string sourcePdfPath = "source.pdf";   // Existing PDF
+        const string htmlPath      = "newpage.html"; // HTML to convert
+        const string outputPdfPath = "result.pdf";   // PDF after replacement
+        const int    pageNumber    = 2;              // 1‑based index of page to replace
 
-        // Validate inputs
-        if (!File.Exists(pdfPath))
+        // Validate input files
+        if (!File.Exists(sourcePdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
             return;
         }
         if (!File.Exists(htmlPath))
         {
-            Console.Error.WriteLine($"HTML not found: {htmlPath}");
+            Console.Error.WriteLine($"HTML file not found: {htmlPath}");
             return;
         }
 
         try
         {
             // Load the original PDF
-            using (Document srcDoc = new Document(pdfPath))
+            using (Document sourceDoc = new Document(sourcePdfPath))
             {
-                // Convert HTML to a temporary PDF document
-                Document htmlDoc;
-                try
+                // Convert the HTML file to a temporary PDF document
+                using (Document htmlDoc = new Document(htmlPath, new HtmlLoadOptions()))
                 {
-                    // HTML conversion requires GDI+ (Windows only)
-                    htmlDoc = new Document(htmlPath, new HtmlLoadOptions());
+                    // Ensure the HTML produced at least one page
+                    if (htmlDoc.Pages.Count == 0)
+                    {
+                        Console.Error.WriteLine("HTML conversion resulted in no pages.");
+                        return;
+                    }
+
+                    // Extract the first (and only) page from the HTML‑derived PDF
+                    Page newPage = htmlDoc.Pages[1];
+
+                    // Remove the page to be replaced from the source PDF
+                    // Page collections are 1‑based; Delete throws if index out of range
+                    sourceDoc.Pages.Delete(pageNumber);
+
+                    // Insert the new page at the same position
+                    // Insert expects a 1‑based index where the new page will appear
+                    sourceDoc.Pages.Insert(pageNumber, newPage);
                 }
-                catch (TypeInitializationException)
-                {
-                    Console.Error.WriteLine("HTML conversion requires Windows (GDI+). Operation aborted.");
-                    return;
-                }
 
-                // Ensure the source PDF has enough pages
-                if (pageIndex < 1 || pageIndex > srcDoc.Pages.Count)
-                {
-                    Console.Error.WriteLine($"Page index {pageIndex} is out of range. PDF has {srcDoc.Pages.Count} pages.");
-                    return;
-                }
-
-                // Get the first page from the HTML‑generated PDF
-                // (If the HTML produces multiple pages, you can adjust the index accordingly)
-                Aspose.Pdf.Page newPage = htmlDoc.Pages[1];
-
-                // Remove the page to be replaced from the source PDF
-                srcDoc.Pages.Delete(pageIndex);
-
-                // Insert the new page at the same position
-                srcDoc.Pages.Insert(pageIndex, newPage);
-
-                // Save the modified PDF
-                srcDoc.Save(outputPath);
+                // Save the modified PDF (uses the standard Save method – no extra SaveOptions needed)
+                sourceDoc.Save(outputPdfPath);
             }
 
-            Console.WriteLine($"Page {pageIndex} replaced successfully. Output saved to '{outputPath}'.");
+            Console.WriteLine($"Page {pageNumber} replaced successfully. Output saved to '{outputPdfPath}'.");
         }
         catch (Exception ex)
         {
@@ -71,20 +64,3 @@ class ReplacePdfPageWithHtml
         }
     }
 }
-
-/*
- * NOTE: To resolve the original MSBuild error ("AsposePdfApi.csproj.nuget.g.targets" not found),
- * ensure the project file uses a PackageReference for Aspose.PDF and that NuGet packages are restored.
- * Example .csproj snippet:
- *
- * <Project Sdk="Microsoft.NET.Sdk">
- *   <PropertyGroup>
- *     <TargetFramework>net6.0</TargetFramework>
- *   </PropertyGroup>
- *   <ItemGroup>
- *     <PackageReference Include="Aspose.PDF" Version="23.12.0" />
- *   </ItemGroup>
- * </Project>
- *
- * After adding the reference, run `dotnet restore` before building.
- */

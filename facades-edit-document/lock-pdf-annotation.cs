@@ -8,40 +8,39 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
         const string outputPath = "locked_annotation.pdf";
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document with a single page
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            // Add a blank page (page index starts at 1)
+            Page page = doc.Pages.Add();
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
-        {
-            // Create a text annotation on the first page
+            // Define the rectangle for the annotation (coordinates are in points)
+            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-            TextAnnotation annotation = new TextAnnotation(doc.Pages[1], rect)
+
+            // Create a TextAnnotation (you can choose any annotation type)
+            TextAnnotation annotation = new TextAnnotation(page, rect)
             {
-                Title    = "Note",
-                Contents = "This annotation is locked.",
-                // Set the Locked flag to prevent user modifications
-                Flags    = AnnotationFlags.Locked
+                Title    = "Author",
+                Contents = "This annotation is locked and cannot be edited by end users."
             };
 
-            // Add the annotation to the page
-            doc.Pages[1].Annotations.Add(annotation);
+            // Lock the annotation – set the Locked flag (prevents moving, resizing, deleting)
+            annotation.Flags = AnnotationFlags.Locked;
 
-            // Use PdfAnnotationEditor (Facades API) to bind the modified document and save it
+            // Add the annotation to the page
+            page.Annotations.Add(annotation);
+
+            // Use PdfAnnotationEditor (Facades API) to bind the document and save it
             using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
             {
-                editor.BindPdf(doc);               // Initialize the facade with the document
-                editor.Save(outputPath);           // Save the result
-                editor.Close();                    // Close the facade (optional, using will dispose)
+                editor.BindPdf(doc);               // Load the in‑memory document into the facade
+                editor.Save(outputPath);           // Persist the PDF with the locked annotation
             }
         }
 
-        Console.WriteLine($"PDF saved with locked annotation to '{outputPath}'.");
+        Console.WriteLine($"PDF with locked annotation saved to '{outputPath}'.");
     }
 }

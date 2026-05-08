@@ -15,29 +15,24 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        // Load the PDF document; using ensures deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Verify that the document has at least seven pages (pages are 1‑based)
+            // Verify the document contains at least seven pages (1‑based indexing)
             if (doc.Pages.Count < 7)
             {
-                Console.Error.WriteLine("The document contains fewer than 7 pages.");
+                Console.Error.WriteLine("The document has fewer than 7 pages.");
                 return;
             }
 
-            // Retrieve page 7
-            Page page = doc.Pages[7];
+            // Retrieve page 7 and resize it to Letter format
+            Page page7 = doc.Pages[7];
+            page7.SetPageSize(PageSize.PageLetter.Width, PageSize.PageLetter.Height);
 
-            // Obtain Letter page dimensions from the static PageLetter property
-            var letterSize = Aspose.Pdf.PageSize.PageLetter;
-
-            // Change the page size to Letter using SetPageSize(width, height)
-            page.SetPageSize(letterSize.Width, letterSize.Height);
-
-            // Save the modified PDF (lifecycle rule: save within the using block)
+            // Persist the changes
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Page 7 has been resized to Letter format and saved as '{outputPath}'.");
+        Console.WriteLine($"Page 7 resized to Letter and saved as '{outputPath}'.");
     }
 }

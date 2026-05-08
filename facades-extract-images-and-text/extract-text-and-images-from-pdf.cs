@@ -1,48 +1,60 @@
 using System;
 using System.IO;
 using Aspose.Pdf.Facades;
+using System.Drawing.Imaging;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";          // source PDF file
-        const string textOutput = "extracted.txt";   // text extraction result
-        const string imagePrefix = "image-";          // prefix for extracted images
+        const string inputPdfPath      = "input.pdf";
+        const string outputTextPath    = "extracted_text.txt";
+        const string outputImagesFolder = "ExtractedImages";
 
-        if (!File.Exists(pdfPath))
+        // Verify input file exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Create the extractor facade
-        PdfExtractor extractor = new PdfExtractor();
+        // Ensure the folder for images exists
+        Directory.CreateDirectory(outputImagesFolder);
 
-        // Bind the PDF file to the extractor
-        extractor.BindPdf(pdfPath);
-
-        // Enable text extraction
-        extractor.ExtractText();
-
-        // Enable image extraction
-        extractor.ExtractImage();
-
-        // Save all extracted text to a single file
-        extractor.GetText(textOutput);
-        Console.WriteLine($"Text extracted to '{textOutput}'.");
-
-        // Save each extracted image to a separate file
-        int imgIndex = 1;
-        while (extractor.HasNextImage())
+        // PdfExtractor implements IDisposable, so use a using block
+        using (PdfExtractor extractor = new PdfExtractor())
         {
-            string imgPath = $"{imagePrefix}{imgIndex}.png";
-            extractor.GetNextImage(imgPath);
-            Console.WriteLine($"Image {imgIndex} saved to '{imgPath}'.");
-            imgIndex++;
+            // Bind the PDF document to the extractor
+            extractor.BindPdf(inputPdfPath);
+
+            // Enable text extraction (0 = pure text mode, 1 = raw ordering mode)
+            extractor.ExtractTextMode = 0;
+
+            // Enable image extraction.
+            // Default mode (ExtractImageMode.DefinedInResources) extracts all images.
+            // Uncomment the next line to extract only actually used images.
+            // extractor.ExtractImageMode = ExtractImageMode.ActuallyUsed;
+
+            // Perform the extraction operations
+            extractor.ExtractText();
+            extractor.ExtractImage();
+
+            // Save the extracted text to a single file
+            extractor.GetText(outputTextPath);
+
+            // Save each extracted image as a PNG file
+            int imageIndex = 1;
+            while (extractor.HasNextImage())
+            {
+                string imagePath = Path.Combine(outputImagesFolder, $"image_{imageIndex}.png");
+                extractor.GetNextImage(imagePath, ImageFormat.Png);
+                imageIndex++;
+            }
+
+            // Explicitly close the extractor (optional, as using will dispose)
+            extractor.Close();
         }
 
-        // Release resources
-        extractor.Close();
+        Console.WriteLine("Text and images have been extracted successfully.");
     }
 }

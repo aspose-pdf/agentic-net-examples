@@ -10,14 +10,13 @@ class Program
         const string inputPath  = "input.pdf";
         const string outputPath = "output_no_text_annots.pdf";
 
-        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Create the annotation editor (lifecycle: constructor → BindPdf → DeleteAnnotations → Save → Close)
+        // Initialize the annotation editor facade
         PdfAnnotationEditor editor = new PdfAnnotationEditor();
 
         // Load the PDF document into the editor
@@ -26,7 +25,7 @@ class Program
         // Delete only annotations of type "Text"
         editor.DeleteAnnotations("Text");
 
-        // Save the modified PDF
+        // Save the resulting PDF
         editor.Save(outputPath);
 
         // Release resources held by the editor

@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -6,36 +7,48 @@ class Program
 {
     static void Main()
     {
-        // Output PDF path
-        const string outputPath = "EmbeddedTrueType.pdf";
+        // Paths – adjust as needed
+        const string outputPdfPath = "embedded_font_output.pdf";
+        const string trueTypeFontPath = @"C:\Windows\Fonts\arial.ttf";
+
+        // Ensure the TrueType font file exists
+        if (!File.Exists(trueTypeFontPath))
+        {
+            Console.Error.WriteLine($"TrueType font not found: {trueTypeFontPath}");
+            return;
+        }
 
         // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Ensure standard Type1 fonts are also embedded if used
-            doc.EmbedStandardFonts = true;
-
             // Add a blank page
             Page page = doc.Pages.Add();
 
-            // Load a TrueType font from the system (e.g., Arial)
-            // FontRepository.FindFont returns a Font object that can be embedded
-            Font trueTypeFont = FontRepository.FindFont("Arial");
-            trueTypeFont.IsEmbedded = true; // Mark the font for embedding
+            // Load the TrueType font from file using a Stream (required overload)
+            using (FileStream fontStream = File.OpenRead(trueTypeFontPath))
+            {
+                Font ttfFont = FontRepository.OpenFont(fontStream, FontTypes.TTF);
+                // Mark the font to be embedded (full font, not subset)
+                ttfFont.IsEmbedded = true;
+                ttfFont.IsSubset = false;
 
-            // Create a text fragment with sample content
-            TextFragment fragment = new TextFragment("This PDF uses an embedded TrueType font.");
-            fragment.TextState.Font = trueTypeFont;   // Apply the embedded font
-            fragment.TextState.FontSize = 14;        // Set desired size
-            fragment.TextState.ForegroundColor = Color.Black;
+                // Create a text fragment using the embedded font
+                TextFragment fragment = new TextFragment("Sample text with embedded TrueType font.");
+                fragment.TextState.Font = ttfFont;
+                fragment.TextState.FontSize = 14;
+                fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
 
-            // Add the text fragment to the page
-            page.Paragraphs.Add(fragment);
+                // Add the fragment to the page
+                page.Paragraphs.Add(fragment);
+            }
 
-            // Save the document; the TrueType font will be embedded in the output PDF
-            doc.Save(outputPath);
+            // Optional: embed standard Type1 fonts if they are used elsewhere
+            doc.EmbedStandardFonts = true;
+
+            // Save the PDF – fonts are now embedded in the output file
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}' with embedded TrueType font.");
+        Console.WriteLine($"PDF created with embedded TrueType font: {outputPdfPath}");
     }
 }

@@ -12,36 +12,30 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for proper disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPath))
+            // Create an absorber that searches for the word "Draft"
+            TextFragmentAbsorber absorber = new TextFragmentAbsorber("Draft");
+
+            // Search the entire document (all pages)
+            absorber.Visit(doc);
+
+            // Apply a 15‑degree rotation to each found text fragment
+            foreach (TextFragment fragment in absorber.TextFragments)
             {
-                // Create an absorber to find all occurrences of the word "Draft"
-                TextFragmentAbsorber absorber = new TextFragmentAbsorber("Draft");
-
-                // Search the entire document
-                doc.Pages.Accept(absorber);
-
-                // Apply a 15‑degree rotation to each found text fragment
-                foreach (TextFragment fragment in absorber.TextFragments)
-                {
-                    fragment.TextState.Rotation = 15;
-                }
-
-                // Save the modified PDF
-                doc.Save(outputPath);
+                // Rotation is specified in degrees
+                fragment.TextState.Rotation = 15f;
             }
 
-            Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
     }
 }

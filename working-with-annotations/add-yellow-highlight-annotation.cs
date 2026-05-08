@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "highlighted_output.pdf";
+        const string outputPath = "highlighted.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,24 +16,16 @@ class Program
             return;
         }
 
-        // Load the PDF, modify it, and save – all within using blocks for proper disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Ensure there is at least one page to annotate
-            if (doc.Pages.Count == 0)
-            {
-                Console.Error.WriteLine("The document has no pages.");
-                return;
-            }
-
-            // Choose the first page (1‑based indexing)
-            Page page = doc.Pages[1];
+            // Choose the page to add the highlight (first page in this example)
+            Page page = doc.Pages[1]; // 1‑based indexing
 
             // Define the rectangle area for the highlight annotation
-            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 520);
 
-            // Create the highlight annotation on the selected page
+            // Create the highlight annotation
             HighlightAnnotation highlight = new HighlightAnnotation(page, rect)
             {
                 // Set the highlight color to yellow
@@ -42,7 +34,7 @@ class Program
                 Opacity = 0.8
             };
 
-            // Add the annotation to the page's annotation collection
+            // Add the annotation to the page
             page.Annotations.Add(highlight);
 
             // Save the modified PDF

@@ -1,140 +1,149 @@
 {
   "category": "pages",
-  "nuget_version": "26.3.0",
-  "last_updated": "2026-04-10T07:15:11Z",
+  "nuget_version": "26.4.0",
+  "last_updated": "2026-05-08T09:51:01Z",
   "examples": {
     "append-empty-a4-page-to-pdf": {
-      "title": "Append an Empty A4 Page to a PDF",
+      "title": "Append Empty A4 Page to PDF",
       "filename": "append-empty-a4-page-to-pdf.cs",
-      "description": "Loads an existing PDF, adds a new blank A4‑sized page at the end of the document, and saves the updated file.",
+      "description": "Shows how to load an existing PDF, add a blank page, resize it to A4 dimensions, and save the updated document.",
       "tags": [
         "pdf",
-        "append-page",
+        "add-page",
         "a4",
         "aspose-pdf",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.PageSize"
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages.Add",
+        "Aspose.Pdf.Page.SetPageSize",
+        "Aspose.Pdf.PageSize.A4"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "insert-blank-page-at-specific-position": {
+    "insert-blank-page-at-index-three": {
       "title": "Insert Blank Page at Specific Position in PDF",
-      "filename": "insert-blank-page-at-specific-position.cs",
-      "description": "Shows how to load a PDF with Aspose.Pdf, insert a blank page at a given index (page 3), and save the modified document.",
+      "filename": "insert-blank-page-at-index-three.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, insert a blank page at position 3 using the PageCollection.Insert method, and save the updated document.",
       "tags": [
         "pdf",
-        "insert-page",
         "blank-page",
+        "insert",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.PageCollection.Insert",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T09:51:01Z",
+      "status": "verified"
+    },
+    "copy-page-size-insert-new-page": {
+      "title": "Insert New Page with Same Size as Page 2",
+      "filename": "copy-page-size-insert-new-page.cs",
+      "description": "Demonstrates how to read the dimensions of page 2 in a PDF and insert an empty page at position 5 using the same size. Utilizes Aspose.Pdf to manipulate page collections and save the result.",
+      "tags": [
+        "pdf",
+        "page-size",
+        "insert-page",
         "aspose-pdf",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.PageCollection.Insert"
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.PageInfo",
+        "Aspose.Pdf.PageCollection.Insert",
+        "Aspose.Pdf.Page.SetPageSize"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "copy-page-size-insert-new-page": {
-      "title": "Copy Page Size and Insert New Page at Position 5",
-      "filename": "copy-page-size-insert-new-page.cs",
-      "description": "Shows how to read the dimensions of page 2 in a PDF and insert a new empty page at position 5 with the same size using Aspose.Pdf.",
+    "add-multiple-empty-pages-sequentially": {
+      "title": "Add Multiple Empty Pages Sequentially",
+      "filename": "add-multiple-empty-pages-sequentially.cs",
+      "description": "Demonstrates how to add a series of blank pages to a PDF document using Aspose.Pdf by iterating over a list of page counts and respecting the evaluation mode page limit.",
       "tags": [
         "pdf",
-        "page-size",
-        "insert-page",
-        "aspose",
+        "pages",
+        "aspose.pdf",
+        "evaluation-mode",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.PageCollection.Add",
+        "Aspose.Pdf.PageCollection.Count",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T09:51:01Z",
+      "status": "verified"
+    },
+    "read-pdf-page-dimensions": {
+      "title": "Read PDF Page Dimensions",
+      "filename": "read-pdf-page-dimensions.cs",
+      "description": "Loads a PDF document and logs the width and height of each page to the console.",
+      "tags": [
+        "pdf",
+        "pages",
+        "dimensions",
+        "aspose.pdf",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.PageCollection.Insert",
-        "Aspose.Pdf.Page.SetPageSize",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:15:11Z",
-      "status": "verified"
-    },
-    "add-multiple-empty-pages": {
-      "title": "Add Multiple Empty Pages Sequentially",
-      "filename": "add-multiple-empty-pages.cs",
-      "description": "Demonstrates how to add a series of empty pages to a PDF by iterating over a list of page counts, respecting an evaluation limit.",
-      "tags": [
-        "pages",
-        "add",
-        "iteration",
-        "aspdf",
-        "evaluation-limit"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Pages.Add",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Page.Rect"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
-      "status": "verified"
-    },
-    "read-pdf-page-dimensions": {
-      "title": "Read and Log PDF Page Dimensions",
-      "filename": "read-pdf-page-dimensions.cs",
-      "description": "Loads a PDF using Aspose.Pdf, iterates through each page, obtains its width and height, and writes the dimensions to the console.",
-      "tags": [
-        "pdf",
-        "pages",
-        "dimensions",
-        "aspose",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
     "resize-pdf-page-to-letter-size": {
       "title": "Resize PDF Page to Letter Size",
       "filename": "resize-pdf-page-to-letter-size.cs",
-      "description": "Shows how to change the size of page 7 in a PDF document to the Letter format using Aspose.Pdf's SetPageSize method.",
+      "description": "Loads a PDF, verifies it has at least seven pages, and resizes page 7 to Letter dimensions using Aspose.Pdf.",
       "tags": [
         "pdf",
-        "pages",
+        "page-size",
         "resize",
-        "letter-size",
-        "aspose"
+        "aspose",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.PageSize",
         "Aspose.Pdf.Page.SetPageSize",
-        "Aspose.Pdf.PageSize.PageLetter"
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
     "resize-all-pdf-pages-to-a5": {
-      "title": "Resize All PDF Pages to A5 Size",
+      "title": "Resize All PDF Pages to A5",
       "filename": "resize-all-pdf-pages-to-a5.cs",
-      "description": "Shows how to iterate through a PDF's pages and resize each one to A5 dimensions using Aspose.Pdf.",
+      "description": "Shows how to load a PDF with Aspose.Pdf, loop through its PageCollection, resize each page to A5 dimensions, and save the modified document.",
       "tags": [
         "pdf",
         "resize",
         "pages",
         "a5",
-        "aspose"
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -144,144 +153,152 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "rotate-fourth-page-90-degrees": {
-      "title": "Rotate Fourth Page of PDF by 90 Degrees",
-      "filename": "rotate-fourth-page-90-degrees.cs",
-      "description": "Shows how to load a PDF, access the fourth page, rotate it 90° clockwise using Aspose.Pdf, and save the modified document.",
+    "rotate-fourth-page-90-degrees-clockwise": {
+      "title": "Rotate Fourth Page 90 Degrees Clockwise",
+      "filename": "rotate-fourth-page-90-degrees-clockwise.cs",
+      "description": "Demonstrates how to rotate the fourth page of a PDF document 90 degrees clockwise using Aspose.Pdf's Rotate property and then save the modified file.",
       "tags": [
-        "pdf",
-        "rotation",
+        "rotate",
         "page",
-        "aspose",
+        "pdf",
+        "aspose-pdf",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Page.IntToRotation"
+        "Aspose.Pdf.Rotation",
+        "Aspose.Pdf.PageCollection",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "change-odd-pages-landscape-to-portrait": {
-      "title": "Change Odd‑Numbered Landscape Pages to Portrait",
-      "filename": "change-odd-pages-landscape-to-portrait.cs",
-      "description": "Loads a PDF, iterates through its pages, and for each odd‑numbered page that is in landscape orientation swaps the MediaBox dimensions to convert it to portrait before saving the result.",
+    "convert-odd-pages-landscape-to-portrait": {
+      "title": "Convert Odd Pages from Landscape to Portrait",
+      "filename": "convert-odd-pages-landscape-to-portrait.cs",
+      "description": "Shows how to change the orientation of odd‑numbered PDF pages from landscape to portrait by swapping their MediaBox dimensions using Aspose.Pdf.",
       "tags": [
         "pdf",
         "orientation",
         "mediabox",
         "pages",
-        "aspose"
+        "aspnet"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.PageInfo",
         "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Document.Save"
+        "Document.Save",
+        "Page.MediaBox"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
     "move-page-9-to-first-position": {
       "title": "Move Page 9 to First Position in PDF",
       "filename": "move-page-9-to-first-position.cs",
-      "description": "Shows how to reposition page 9 to the beginning of a PDF by inserting it at index 1 and removing the original page using Aspose.Pdf.",
+      "description": "Shows how to reposition the ninth page of a PDF to the first position by inserting it at the new index and deleting the original using Aspose.Pdf.",
       "tags": [
-        "pdf",
-        "page-reorder",
+        "page-reordering",
+        "pdf-manipulation",
         "aspose-pdf",
         "csharp",
-        "insert-delete"
+        "document-editing"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
         "Aspose.Pdf.PageCollection.Insert",
         "Aspose.Pdf.PageCollection.Delete",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.PageCollection.Count",
+        "Aspose.Pdf.Page"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
     "reorder-pdf-pages-custom-sequence": {
       "title": "Reorder PDF Pages Using a Custom Sequence",
       "filename": "reorder-pdf-pages-custom-sequence.cs",
-      "description": "Demonstrates how to reorder pages of a PDF by copying them into a new document according to a user-defined integer array.",
+      "description": "Shows how to reorder the pages of a PDF by providing a custom integer array that defines the new page order and then saving the reordered document with Aspose.Pdf.",
       "tags": [
         "pdf",
-        "reorder",
-        "pages",
-        "aspose",
-        "csharp"
+        "page-reordering",
+        "aspose-pdf",
+        "csharp",
+        "document-manipulation"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
+        "Aspose.Pdf.Document.Pages",
         "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.PageCollection.Add"
+        "Aspose.Pdf.Document.Pages.Add",
+        "Aspose.Pdf.Document.Pages.CopyTo"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "delete-last-three-pages": {
+    "delete-last-three-pages-from-pdf": {
       "title": "Delete Last Three Pages from PDF",
-      "filename": "delete-last-three-pages.cs",
-      "description": "Demonstrates how to remove the final three pages of a PDF document using Aspose.Pdf by repeatedly deleting the current last page and then saving the result.",
+      "filename": "delete-last-three-pages-from-pdf.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, remove the last three pages, and save the modified document.",
       "tags": [
         "pdf",
-        "pages",
-        "delete",
-        "aspose",
-        "csharp"
+        "delete-pages",
+        "aspose-pdf",
+        "csharp",
+        "document-manipulation"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.PageCollection",
+        "Aspose.Pdf.PageCollection.Count",
         "Aspose.Pdf.PageCollection.Delete",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
     "delete-page-range-from-pdf": {
       "title": "Delete Page Range from PDF",
       "filename": "delete-page-range-from-pdf.cs",
-      "description": "Shows how to remove pages 5 through 10 from a PDF document in a single operation using Aspose.Pdf's Delete method.",
+      "description": "Demonstrates how to remove pages 5 through 10 from a PDF using Aspose.Pdf's Delete method with an integer array.",
       "tags": [
-        "delete",
-        "pages",
         "pdf",
-        "range",
-        "aspose"
+        "delete-pages",
+        "aspose-pdf",
+        "csharp",
+        "page-range"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Pages",
-        "Aspose.Pdf.Pages.Delete"
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.PageCollection",
+        "Aspose.Pdf.PageCollection.Delete",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "insert-empty-custom-size-page-at-beginning": {
-      "title": "Insert Empty Custom-Size Page at Beginning of PDF",
-      "filename": "insert-empty-custom-size-page-at-beginning.cs",
-      "description": "Demonstrates how to insert a blank page with a custom 200 × 300‑point size at the start of an existing PDF using Aspose.Pdf.",
+    "insert-empty-page-custom-size": {
+      "title": "Insert Empty Page with Custom Size at Beginning of PDF",
+      "filename": "insert-empty-page-custom-size.cs",
+      "description": "Demonstrates how to add a blank page with specific dimensions (200 × 300 points) as the first page of an existing PDF using Aspose.Pdf.",
       "tags": [
-        "insert-page",
+        "pages",
+        "insert",
         "custom-size",
         "pdf",
-        "Aspose.Pdf",
-        "beginning"
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -291,115 +308,57 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
     "append-page-to-pdf": {
       "title": "Append a Page from One PDF to Another",
       "filename": "append-page-to-pdf.cs",
-      "description": "Shows how to load two PDF files, take the first page from a source document, append it to the end of a target document without altering its content, and save the merged result.",
+      "description": "Shows how to load two PDF files with Aspose.Pdf, copy the first page from the source document, append it to the end of the target document, and save the combined PDF.",
       "tags": [
         "pdf",
-        "append",
-        "pages",
+        "append-page",
         "aspose",
-        "merge"
+        "document-merge",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page"
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Pages",
+        "Aspose.Pdf.Pages.Add",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "duplicate-page-three-insert-after": {
-      "title": "Duplicate Page Three and Insert After Original",
-      "filename": "duplicate-page-three-insert-after.cs",
+    "duplicate-third-page-pdf": {
+      "title": "Duplicate Third Page in PDF",
+      "filename": "duplicate-third-page-pdf.cs",
       "description": "Demonstrates how to duplicate the third page of a PDF document and insert the copy immediately after the original using Aspose.Pdf.",
       "tags": [
         "pdf",
         "duplicate-page",
         "aspose-pdf",
-        "page-manipulation",
-        "csharp"
+        "csharp",
+        "pages"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Pages.CopyTo",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Document.Pages.Insert",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
     "rotate-all-pdf-pages-180-degrees": {
       "title": "Rotate All PDF Pages 180 Degrees",
       "filename": "rotate-all-pdf-pages-180-degrees.cs",
-      "description": "Demonstrates how to rotate every page of a PDF by 180° using Aspose.Pdf and save the modified document.",
-      "tags": [
-        "rotation",
-        "pdf",
-        "pages",
-        "aspose",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Rotation"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
-      "status": "verified"
-    },
-    "convert-pdf-pages-portrait-to-landscape": {
-      "title": "Convert PDF Pages from Portrait to Landscape",
-      "filename": "convert-pdf-pages-portrait-to-landscape.cs",
-      "description": "Loads a PDF with Aspose.Pdf, iterates over each page, swaps the MediaBox width and height using SetPageSize to turn portrait pages into landscape, and saves the modified document.",
-      "tags": [
-        "pdf",
-        "landscape",
-        "pages",
-        "aspose",
-        "rotation"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Page.SetPageSize"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
-      "status": "verified"
-    },
-    "insert-blank-page-after-each-page": {
-      "title": "Insert Blank Page After Each Page to Double PDF",
-      "filename": "insert-blank-page-after-each-page.cs",
-      "description": "Shows how to load a PDF with Aspose.Pdf, insert a blank page after every existing page, and save the document, resulting in double the original page count.",
-      "tags": [
-        "pdf",
-        "aspose",
-        "blank-page",
-        "page-manipulation",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.PageCollection.Insert",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
-      "status": "verified"
-    },
-    "rotate-pdf-pages-by-parity": {
-      "title": "Rotate PDF Pages Based on Page Number Parity",
-      "filename": "rotate-pdf-pages-by-parity.cs",
-      "description": "Shows how to load a PDF with Aspose.Pdf, iterate through its pages, and set a 90° clockwise rotation for odd‑numbered pages while leaving even pages unchanged.",
+      "description": "Shows how to load a PDF, rotate each page by 180° clockwise, and save the modified document using Aspose.Pdf.",
       "tags": [
         "pdf",
         "rotation",
@@ -411,63 +370,131 @@
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Rotation",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T09:51:01Z",
+      "status": "verified"
+    },
+    "convert-pdf-pages-to-landscape": {
+      "title": "Convert PDF Pages from Portrait to Landscape",
+      "filename": "convert-pdf-pages-to-landscape.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, iterate through each page, swap the MediaBox width and height using SetPageSize, and save the document so all pages become landscape orientation.",
+      "tags": [
+        "pdf",
+        "orientation",
+        "pages",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Page.SetPageSize",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
+      "status": "verified"
+    },
+    "insert-blank-page-after-each-pdf-page": {
+      "title": "Insert Blank Page After Each PDF Page",
+      "filename": "insert-blank-page-after-each-pdf-page.cs",
+      "description": "Demonstrates how to insert a blank page after every existing page in a PDF using Aspose.Pdf, doubling the total page count.",
+      "tags": [
+        "pdf",
+        "blank-page",
+        "insert",
+        "Aspose.Pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PageCollection",
+        "Aspose.Pdf.PageCollection.Insert",
+        "Aspose.Pdf.PageCollection.Count",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T09:51:01Z",
+      "status": "verified"
+    },
+    "rotate-pdf-pages-by-parity": {
+      "title": "Rotate PDF Pages Based on Page Number Parity",
+      "filename": "rotate-pdf-pages-by-parity.cs",
+      "description": "The example loads a PDF, iterates through its pages, rotates odd‑numbered pages 90° while leaving even pages unchanged, and saves the modified document.",
+      "tags": [
+        "pdf",
+        "rotation",
+        "pages",
+        "aspose",
+        "parity"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rotation",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
     "export-pdf-page-dimensions-to-csv": {
       "title": "Export PDF Page Dimensions to CSV",
       "filename": "export-pdf-page-dimensions-to-csv.cs",
-      "description": "The example opens a PDF with Aspose.Pdf, reads each page's width and height, and writes the page number and dimensions to a CSV file for external analysis.",
+      "description": "Loads a PDF with Aspose.Pdf, reads each page's width and height, and writes the page number and dimensions to a CSV file for external analysis.",
       "tags": [
         "pdf",
-        "page-dimensions",
+        "pages",
+        "dimensions",
         "csv",
-        "export",
-        "aspose"
+        "export"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.PageInfo"
+        "Aspose.Pdf.PageInfo",
+        "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "insert-external-pdf-page-at-index": {
-      "title": "Insert External PDF Page at Specific Position",
-      "filename": "insert-external-pdf-page-at-index.cs",
-      "description": "Shows how to insert a page from a source PDF into a target PDF at index two, preserving the page's original size and rotation.",
+    "insert-page-from-another-pdf-at-index-two": {
+      "title": "Insert Page from Another PDF at Specific Index",
+      "filename": "insert-page-from-another-pdf-at-index-two.cs",
+      "description": "Demonstrates how to insert a page from a source PDF into a target PDF at position 2 while preserving the original page size and rotation using Aspose.Pdf.",
       "tags": [
         "pdf",
         "page-insertion",
         "aspose-pdf",
-        "document-manipulation",
-        "rotation"
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Document.Pages.Insert"
+        "Aspose.Pdf.PageCollection",
+        "Aspose.Pdf.PageCollection.Insert",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
     "resize-first-pdf-page-custom-dimensions": {
       "title": "Resize First PDF Page to Custom Dimensions",
       "filename": "resize-first-pdf-page-custom-dimensions.cs",
-      "description": "Shows how to load a PDF with Aspose.Pdf, set the first page size to 500 × 700 points, and save the modified document.",
+      "description": "Shows how to open a PDF with Aspose.Pdf, set the first page size to 500 × 700 points, and save the modified document.",
       "tags": [
         "page-size",
         "pdf",
-        "aspose-pdf",
+        "aspose",
         "csharp",
-        "document"
+        "resize"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -476,76 +503,79 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
     "rotate-pdf-pages-reverse-order": {
       "title": "Rotate PDF Pages in Reverse Order",
       "filename": "rotate-pdf-pages-reverse-order.cs",
-      "description": "Shows how to load a PDF with Aspose.Pdf, rotate each page 90 degrees clockwise starting from the last page, and save the modified document.",
+      "description": "Demonstrates how to rotate each page of a PDF 90 degrees clockwise while iterating from the last page to the first using Aspose.Pdf.",
       "tags": [
         "pdf",
         "rotation",
         "pages",
-        "aspose",
+        "aspose-pdf",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Rotation"
+        "Aspose.Pdf.Rotation",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
     "move-pages-3-6-to-end": {
       "title": "Move Pages 3‑6 to End of PDF",
       "filename": "move-pages-3-6-to-end.cs",
-      "description": "Shows how to relocate pages 3 through 6 to the end of a PDF document using Aspose.Pdf in a single operation.",
+      "description": "Demonstrates how to relocate pages 3 through 6 of a PDF to the document's end using Aspose.Pdf in a single operation.",
       "tags": [
         "pages",
         "reorder",
-        "move",
-        "aspdf",
-        "csharp"
+        "pdf",
+        "aspose",
+        "move"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
+        "Aspose.Pdf.PageCollection",
         "Aspose.Pdf.PageCollection.Insert",
-        "Aspose.Pdf.PageCollection.Delete",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.PageCollection.Delete"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
     "copy-mediabox-page-8-to-12": {
-      "title": "Copy MediaBox from One PDF Page to Another",
+      "title": "Copy MediaBox from Page 8 to Page 12",
       "filename": "copy-mediabox-page-8-to-12.cs",
-      "description": "Shows how to retrieve the MediaBox rectangle from page 8 of a PDF and assign it to page 12 using Aspose.Pdf.",
+      "description": "Demonstrates how to read the MediaBox rectangle from one PDF page and apply it to another page using Aspose.Pdf, ensuring both pages share the same dimensions.",
       "tags": [
         "MediaBox",
         "Aspose.Pdf",
-        "page-size",
         "PDF",
+        "page-dimensions",
         "C#"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Page",
         "Aspose.Pdf.Page.MediaBox",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
     "insert-ten-empty-pages-at-pdf-midpoint": {
       "title": "Insert Ten Empty Pages at PDF Midpoint",
       "filename": "insert-ten-empty-pages-at-pdf-midpoint.cs",
-      "description": "Demonstrates how to calculate the middle of a PDF document and batch‑insert ten blank pages using Aspose.Pdf.",
+      "description": "Shows how to load a PDF with Aspose.Pdf, calculate the midpoint page index, and batch insert ten blank pages before saving the document.",
       "tags": [
         "pdf",
         "pages",
@@ -555,234 +585,250 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.PageCollection",
         "Aspose.Pdf.PageCollection.Insert",
+        "Aspose.Pdf.PageCollection.Count",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
     "resize-wide-pdf-pages-to-a4": {
       "title": "Resize Wide PDF Pages to A4",
       "filename": "resize-wide-pdf-pages-to-a4.cs",
-      "description": "Loads a PDF, checks each page's width, and resizes only pages wider than 600 points to A4 size while leaving narrower pages unchanged.",
+      "description": "Shows how to load a PDF with Aspose.Pdf, iterate through its pages, and resize only pages wider than 600 points to standard A4 size while leaving narrower pages unchanged.",
       "tags": [
         "pdf",
         "page-resize",
+        "aspose-pdf",
         "a4",
-        "conditional",
+        "conditional"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.PageInfo",
+        "Aspose.Pdf.Page.SetPageSize",
+        "Aspose.Pdf.PageSize"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T09:51:01Z",
+      "status": "verified"
+    },
+    "delete-pdf-pages-from-config": {
+      "title": "Delete PDF Pages Based on Config File",
+      "filename": "delete-pdf-pages-from-config.cs",
+      "description": "Demonstrates reading a list of page numbers from an external text file and deleting those pages from a PDF using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "delete-pages",
+        "configuration",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.PageCollection",
+        "Aspose.Pdf.Document.Pages.Delete",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T09:51:01Z",
+      "status": "verified"
+    },
+    "reorder-pdf-pages-descending": {
+      "title": "Reorder PDF Pages in Descending Order",
+      "filename": "reorder-pdf-pages-descending.cs",
+      "description": "Shows how to load a PDF, extract its pages, sort them in descending numeric order, and save the reordered document using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "page-sorting",
+        "descending-order",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.PageCollection",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.PageNodesToBalancedTree",
+        "Aspose.Pdf.PageCollection.Add"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T09:51:01Z",
+      "status": "verified"
+    },
+    "convert-pdf-pages-to-portrait": {
+      "title": "Convert PDF Pages to Portrait Orientation",
+      "filename": "convert-pdf-pages-to-portrait.cs",
+      "description": "Loads a PDF, examines each page's MediaBox, and swaps width and height for landscape pages so that all pages become portrait before saving the document.",
+      "tags": [
+        "pdf",
+        "orientation",
+        "portrait",
+        "pages",
         "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Page.SetPageSize",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T09:51:01Z",
+      "status": "verified"
+    },
+    "rotate-every-third-pdf-page-90-degrees": {
+      "title": "Rotate Every Third PDF Page by 90 Degrees",
+      "filename": "rotate-every-third-pdf-page-90-degrees.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, iterate through its pages, rotate pages whose number is divisible by three, and save the modified document.",
+      "tags": [
+        "pdf",
+        "rotation",
+        "pages",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.PageCollection",
+        "Aspose.Pdf.Rotation",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T09:51:01Z",
+      "status": "verified"
+    },
+    "delete-first-page-from-pdf": {
+      "title": "Delete First Page from PDF Document",
+      "filename": "delete-first-page-from-pdf.cs",
+      "description": "Demonstrates how to load a PDF with Aspose.Pdf, remove the first page, and save the modified document.",
+      "tags": [
+        "pdf",
+        "delete-page",
+        "aspose.pdf",
+        "csharp",
+        "document-manipulation"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.PageCollection",
+        "Aspose.Pdf.PageCollection.Delete",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T09:51:01Z",
+      "status": "verified"
+    },
+    "resize-pdf-pages-uniform-size": {
+      "title": "Resize PDF Pages to Uniform Size",
+      "filename": "resize-pdf-pages-uniform-size.cs",
+      "description": "Shows how to find the largest page dimensions in a PDF and resize all pages to that size using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "page-size",
+        "resize",
+        "uniform",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.PageSize",
+        "Aspose.Pdf.Page.Resize",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T09:51:01Z",
+      "status": "verified"
+    },
+    "reset-page-rotation": {
+      "title": "Reset Page Rotation to Original Orientation",
+      "filename": "reset-page-rotation.cs",
+      "description": "Shows how to load a PDF, reset a page's rotation to its original (non‑rotated) state, and save the updated document using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "rotation",
+        "page",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rotation",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T09:51:01Z",
+      "status": "verified"
+    },
+    "extract-resize-reinsert-pdf-pages": {
+      "title": "Extract Pages, Resize to A4, and Reinsert at New Position",
+      "filename": "extract-resize-reinsert-pdf-pages.cs",
+      "description": "Demonstrates how to extract a range of pages from a PDF, change each page size to A4, remove the original pages, and insert the modified pages at a different position using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "pages",
+        "extract",
+        "resize",
+        "reinsert"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.PageInfo",
         "Aspose.Pdf.PageSize",
-        "Aspose.Pdf.Page.Resize"
+        "Aspose.Pdf.Document.Pages.Delete",
+        "Aspose.Pdf.Document.Pages.Insert",
+        "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "delete-pdf-pages-from-config": {
-      "title": "Delete PDF Pages Using Config File",
-      "filename": "delete-pdf-pages-from-config.cs",
-      "description": "Shows how to read a list of page numbers from an external text file and delete those pages from a PDF using Aspose.Pdf.",
-      "tags": [
-        "pdf",
-        "delete-pages",
-        "aspose",
-        "csharp",
-        "configuration"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.PageCollection.Delete"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
-      "status": "verified"
-    },
-    "reorder-pdf-pages-descending": {
-      "title": "Reorder PDF Pages in Descending Order",
-      "filename": "reorder-pdf-pages-descending.cs",
-      "description": "Shows how to load a PDF, copy its pages into a new document in reverse (descending) order, and save the reordered file using Aspose.Pdf.",
+    "move-even-pages-to-end-of-pdf": {
+      "title": "Move Even Pages to End of PDF",
+      "filename": "move-even-pages-to-end-of-pdf.cs",
+      "description": "Demonstrates how to reorder a PDF by extracting even‑numbered pages and appending them to the end while preserving their original order using Aspose.Pdf.",
       "tags": [
         "pdf",
         "page-reordering",
-        "descending",
-        "aspose",
+        "even-pages",
+        "aspose.pdf",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
         "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.Document.PageNodesToBalancedTree",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
-      "status": "verified"
-    },
-    "convert-pdf-pages-to-portrait": {
-      "title": "Convert All PDF Pages to Portrait Orientation",
-      "filename": "convert-pdf-pages-to-portrait.cs",
-      "description": "Loads a PDF, iterates through each page, and swaps width and height for landscape pages using MediaBox so that all pages become portrait before saving the document.",
-      "tags": [
-        "pdf",
-        "orientation",
-        "portrait",
-        "pages",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Page.SetPageSize",
-        "Aspose.Pdf.Page.MediaBox"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
-      "status": "verified"
-    },
-    "rotate-every-third-pdf-page-90-degrees": {
-      "title": "Rotate Every Third PDF Page by 90 Degrees",
-      "filename": "rotate-every-third-pdf-page-90-degrees.cs",
-      "description": "Demonstrates loading a PDF with Aspose.Pdf, rotating pages whose numbers are divisible by three by 90°, and saving the modified document.",
-      "tags": [
-        "pdf",
-        "rotation",
-        "pages",
-        "conditional",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Rotation",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
-      "status": "verified"
-    },
-    "delete-first-page-from-pdf": {
-      "title": "Delete First Page from PDF",
-      "filename": "delete-first-page-from-pdf.cs",
-      "description": "Shows how to load a PDF with Aspose.Pdf, remove the first page using the Pages collection, and save the updated document.",
-      "tags": [
-        "pdf",
-        "page-deletion",
-        "aspose-pdf",
-        "csharp",
-        "document-manipulation"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.PageCollection.Delete",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
-      "status": "verified"
-    },
-    "resize-pdf-pages-uniform-size": {
-      "title": "Resize PDF Pages to Uniform Size",
-      "filename": "resize-pdf-pages-uniform-size.cs",
-      "description": "Loads a PDF, determines the largest page dimensions, and resizes all pages to match those dimensions for a uniform layout.",
-      "tags": [
-        "pdf",
-        "page-size",
-        "resize",
-        "uniform",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Page.SetPageSize",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
-      "status": "verified"
-    },
-    "rotate-restore-pdf-page-orientation": {
-      "title": "Rotate and Restore PDF Page Orientation",
-      "filename": "rotate-restore-pdf-page-orientation.cs",
-      "description": "Shows how to rotate a PDF page with Aspose.Pdf, save the rotated file, then revert the page to its original orientation and save the restored document.",
-      "tags": [
-        "rotation",
-        "pdf",
-        "page",
-        "aspose",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Rotation"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
-      "status": "verified"
-    },
-    "extract-resize-reinsert-pdf-pages": {
-      "title": "Extract, Resize to A4, and Reinsert PDF Pages",
-      "filename": "extract-resize-reinsert-pdf-pages.cs",
-      "description": "Shows how to extract a range of pages from a PDF, change each page's size to A4, and insert the pages back at a new position using Aspose.Pdf.",
-      "tags": [
-        "pdf",
-        "pages",
-        "resize",
-        "extract",
-        "reinsert"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Pages.Delete",
-        "Aspose.Pdf.Pages.Insert"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:15:11Z",
-      "status": "verified"
-    },
-    "move-even-pages-to-end": {
-      "title": "Move Even Pages to End of PDF",
-      "filename": "move-even-pages-to-end.cs",
-      "description": "Shows how to reorder a PDF by extracting all even‑numbered pages and appending them to the end while preserving their original order.",
-      "tags": [
-        "pdf",
-        "reorder",
-        "pages",
-        "aspose",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
         "Aspose.Pdf.PageCollection.Add",
         "Aspose.Pdf.PageCollection.Delete",
-        "Aspose.Pdf.PageCollection.Count"
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "resize-pdf-pages-to-template-size": {
+    "resize-pdf-pages-to-match-template-size": {
       "title": "Resize PDF Pages to Match Template Size",
-      "filename": "resize-pdf-pages-to-template-size.cs",
-      "description": "Demonstrates how to read a template PDF to obtain page dimensions and then resize every page of another PDF to those dimensions using Aspose.Pdf.",
+      "filename": "resize-pdf-pages-to-match-template-size.cs",
+      "description": "Shows how to resize every page of a PDF to the dimensions of a template PDF using Aspose.Pdf.",
       "tags": [
         "pdf",
         "page-size",
         "resize",
         "template",
-        "aspose-pdf"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -792,13 +838,13 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
     "rotate-pdf-pages-by-configurable-angles": {
       "title": "Rotate PDF Pages by Configurable Angles",
       "filename": "rotate-pdf-pages-by-configurable-angles.cs",
-      "description": "Demonstrates loading a PDF with Aspose.Pdf, rotating individual pages based on a dictionary of page numbers to angles, and saving the modified document.",
+      "description": "Demonstrates loading a PDF with Aspose.Pdf, rotating individual pages using angles defined in a dictionary, and saving the modified document.",
       "tags": [
         "pdf",
         "rotation",
@@ -808,102 +854,109 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rotation",
         "Aspose.Pdf.Page.IntToRotation",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "insert-transparent-separator-page": {
-      "title": "Insert Transparent Separator Page into PDF",
-      "filename": "insert-transparent-separator-page.cs",
-      "description": "Shows how to add an empty PDF page with a transparent background as a separator between sections using Aspose.Pdf.",
+    "add-transparent-separator-page-to-pdf": {
+      "title": "Add Transparent Separator Page to PDF",
+      "filename": "add-transparent-separator-page-to-pdf.cs",
+      "description": "Shows how to append an empty page to a PDF and set its background to transparent using Aspose.Pdf.",
       "tags": [
         "pdf",
         "separator",
         "transparent",
-        "page-insertion",
+        "page",
         "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Color",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Pages.Insert"
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
     "delete-last-page-from-pdfs": {
       "title": "Delete Last Page from PDFs in a Folder",
       "filename": "delete-last-page-from-pdfs.cs",
-      "description": "Loads each PDF file in a given directory, removes its last page, and saves the modified document back to the same location using Aspose.Pdf.",
+      "description": "Shows how to iterate over PDF files in a directory, remove the last page of each document using Aspose.Pdf, and save the modified files back to disk.",
       "tags": [
         "pdf",
         "delete-page",
-        "batch-processing",
-        "aspose-pdf",
+        "batch",
+        "aspose",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.PageCollection.Count",
         "Aspose.Pdf.PageCollection.Delete",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "move-pdf-page-between-documents": {
-      "title": "Move PDF Page Between Documents",
-      "filename": "move-pdf-page-between-documents.cs",
-      "description": "Demonstrates how to transfer a single page from one PDF file to another while preserving its rotation, size, and other page properties, then saves the updated source and target documents.",
+    "move-pdf-page-preserve-size-rotation": {
+      "title": "Move PDF Page While Preserving Size and Rotation",
+      "filename": "move-pdf-page-preserve-size-rotation.cs",
+      "description": "Demonstrates moving a page from one PDF document to another with Aspose.Pdf while keeping its original dimensions and orientation intact.",
       "tags": [
         "pdf",
-        "page",
-        "aspose-pdf",
-        "move",
-        "document"
+        "page-move",
+        "rotation",
+        "size",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.PageCollection.Insert",
-        "Aspose.Pdf.PageCollection.Delete",
+        "Aspose.Pdf.PageInfo",
+        "Aspose.Pdf.Document.Pages.Add",
+        "Aspose.Pdf.Document.Pages.Insert",
+        "Aspose.Pdf.Document.Pages.Delete",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "crop-pdf-page-using-mediabox": {
-      "title": "Crop PDF Page Using MediaBox",
-      "filename": "crop-pdf-page-using-mediabox.cs",
-      "description": "Shows how to set a page's MediaBox (and optionally CropBox) to define a custom cropping region without altering the page content, then save the modified PDF.",
+    "crop-pdf-page-media-box": {
+      "title": "Crop PDF Page by Setting MediaBox",
+      "filename": "crop-pdf-page-media-box.cs",
+      "description": "Shows how to modify a page's MediaBox to define a custom cropping region without altering the page content.",
       "tags": [
         "mediaBox",
-        "crop",
+        "cropping",
         "pdf",
-        "aspose",
-        "page"
+        "pages",
+        "Aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Rectangle"
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Page.MediaBox",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "batch-resize-pdf-pages-fixed-width": {
-      "title": "Batch Resize PDF Pages to Fixed Width",
-      "filename": "batch-resize-pdf-pages-fixed-width.cs",
-      "description": "Shows how to loop through all pages of a PDF and resize each page to a target width of 800 points while preserving the original aspect ratio.",
+    "resize-pdf-pages-fixed-width": {
+      "title": "Resize PDF Pages to Fixed Width While Preserving Aspect Ratio",
+      "filename": "resize-pdf-pages-fixed-width.cs",
+      "description": "Loads a PDF, iterates through each page, and resizes it to a target width of 800 points while maintaining the original aspect ratio, then saves the modified document.",
       "tags": [
         "pdf",
         "resize",
@@ -919,83 +972,84 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "delete-specific-pages-from-pdf": {
-      "title": "Delete Specific Pages from PDF Using Aspose.Pdf",
-      "filename": "delete-specific-pages-from-pdf.cs",
-      "description": "Demonstrates reading page numbers from a text file and deleting those pages from a PDF document with Aspose.Pdf.",
+    "delete-pages-from-pdf-using-text-file": {
+      "title": "Delete Specific Pages from PDF Using a Text File",
+      "filename": "delete-pages-from-pdf-using-text-file.cs",
+      "description": "Loads a PDF, reads a list of page numbers from a text file, validates them, deletes the specified pages, and saves the result.",
       "tags": [
         "pdf",
         "delete-pages",
-        "aspose",
+        "aspose-pdf",
         "csharp",
         "file-io"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Pages.Delete",
+        "Aspose.Pdf.PageCollection",
+        "Aspose.Pdf.PageCollection.Delete",
         "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "reorder-pdf-pages-landscape-portrait": {
-      "title": "Reorder PDF Pages by Orientation (Landscape then Portrait)",
-      "filename": "reorder-pdf-pages-landscape-portrait.cs",
-      "description": "Loads a PDF, separates its pages into landscape and portrait groups, and creates a new PDF with all landscape pages first followed by portrait pages.",
+    "reorder-pdf-pages-by-orientation": {
+      "title": "Reorder PDF Pages by Orientation (Landscape First)",
+      "filename": "reorder-pdf-pages-by-orientation.cs",
+      "description": "Shows how to load a PDF, separate landscape and portrait pages, and create a new PDF with all landscape pages first followed by portrait pages using Aspose.Pdf.",
       "tags": [
         "pdf",
+        "page-reordering",
         "orientation",
-        "reorder",
-        "aspose-pdf"
+        "landscape",
+        "portrait"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.PageInfo.IsLandscape",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Document.Pages.Add"
+        "Aspose.Pdf.PageCollection.Add",
+        "Aspose.Pdf.PageCollection.Count"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
     "add-blank-front-matter-page-with-custom-label": {
-      "title": "Add Blank Front‑Matter Page with Custom Label",
+      "title": "Add Blank Front-Matter Page with Custom Label to PDF",
       "filename": "add-blank-front-matter-page-with-custom-label.cs",
-      "description": "Shows how to insert a blank page at the start of a PDF and assign a custom page label prefix \"i\" for front‑matter numbering using Aspose.Pdf.",
+      "description": "Loads an existing PDF, inserts a blank page at the beginning, and assigns a custom page label \"i\" (without automatic numbering) to serve as front‑matter numbering.",
       "tags": [
+        "pdf",
         "page-label",
-        "front-matter",
         "blank-page",
-        "aspose-pdf",
-        "csharp"
+        "front-matter",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Document.Pages.Insert",
+        "Aspose.Pdf.PageCollection.Insert",
         "Aspose.Pdf.PageLabel",
-        "Aspose.Pdf.NumberingStyle",
-        "Aspose.Pdf.PageLabelCollection.UpdateLabel"
+        "Aspose.Pdf.PageLabelCollection.UpdateLabel",
+        "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "resize-pdf-pages-to-fit-printable-area": {
-      "title": "Resize PDF Pages to Fit Printable Area",
-      "filename": "resize-pdf-pages-to-fit-printable-area.cs",
-      "description": "Demonstrates how to resize each page of a PDF to a target size (595 × 842 points) using Aspose.Pdf, scaling the content proportionally.",
+    "resize-pdf-pages-to-printable-area": {
+      "title": "Resize PDF Pages to Printable Area",
+      "filename": "resize-pdf-pages-to-printable-area.cs",
+      "description": "Demonstrates how to resize all pages of a PDF to a specific printable size (595 × 842 points) while scaling the content proportionally using Aspose.Pdf.",
       "tags": [
         "pdf",
         "page-resize",
-        "aspdf",
-        "scaling",
-        "printable-area"
+        "aspose-pdf",
+        "printable-area",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -1005,34 +1059,34 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "insert-empty-page-custom-size": {
-      "title": "Insert Empty Page with Custom Size",
-      "filename": "insert-empty-page-custom-size.cs",
-      "description": "Shows how to add a blank page to an existing PDF and set its width and height based on user input at runtime.",
+    "insert-empty-page-custom-size__v2": {
+      "title": "Insert Empty Page with Custom Size into PDF",
+      "filename": "insert-empty-page-custom-size__v2.cs",
+      "description": "Shows how to load an existing PDF, add a blank page, set its width and height from user input, and save the modified document using Aspose.Pdf.",
       "tags": [
         "pdf",
         "page",
         "custom-size",
-        "insert",
-        "Aspose.Pdf"
+        "aspose.pdf",
+        "c#"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
+        "Aspose.Pdf.PageCollection.Add",
         "Aspose.Pdf.Page.SetPageSize",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Document.Pages.Insert"
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "resize-pdf-pages-to-template-size__v2": {
-      "title": "Resize PDF Pages to Match Template Size",
-      "filename": "resize-pdf-pages-to-template-size__v2.cs",
+    "resize-pdf-pages-to-match-template": {
+      "title": "Resize PDF Pages to Match a Template",
+      "filename": "resize-pdf-pages-to-match-template.cs",
       "description": "Shows how to resize every page of a PDF to the dimensions of a reference template PDF using Aspose.Pdf.",
       "tags": [
         "pdf",
@@ -1050,13 +1104,13 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "add-header-text-to-first-pdf-page": {
-      "title": "Add Header Text to First PDF Page",
-      "filename": "add-header-text-to-first-pdf-page.cs",
-      "description": "Demonstrates how to add a text header to the first page of a PDF using Aspose.Pdf's HeaderFooter and MarginInfo configuration.",
+    "add-text-header-to-first-pdf-page": {
+      "title": "Add Text Header to First PDF Page",
+      "filename": "add-text-header-to-first-pdf-page.cs",
+      "description": "Demonstrates how to add a text header to the first page of an existing PDF using Aspose.Pdf, configuring the header margin and styling the text.",
       "tags": [
         "header",
         "pdf",
@@ -1066,48 +1120,48 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
         "Aspose.Pdf.HeaderFooter",
         "Aspose.Pdf.MarginInfo",
         "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.FontRepository",
-        "Aspose.Pdf.Color",
-        "Aspose.Pdf.Page"
+        "Aspose.Pdf.FontRepository.FindFont"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
     "add-html-header-to-first-three-pdf-pages": {
       "title": "Add HTML Header with CSS to First Three PDF Pages",
       "filename": "add-html-header-to-first-three-pdf-pages.cs",
-      "description": "Shows how to insert an HTML‑styled header into the first three pages of a PDF document using Aspose.Pdf.",
+      "description": "Demonstrates how to insert an HTML‑styled header, including embedded CSS, on the first three pages of a PDF using Aspose.Pdf.",
       "tags": [
         "header",
         "html",
+        "css",
         "pdf",
-        "aspose",
-        "csharp"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.HeaderFooter",
-        "Aspose.Pdf.HtmlFragment"
+        "Aspose.Pdf.HtmlFragment",
+        "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
     "add-scaled-image-footer-to-pdf-pages": {
       "title": "Add Scaled Image Footer to Each PDF Page",
       "filename": "add-scaled-image-footer-to-pdf-pages.cs",
-      "description": "Shows how to load a PDF with Aspose.Pdf, iterate over all pages, and insert a proportionally scaled footer image at the bottom of each page before saving the document.",
+      "description": "Shows how to insert a footer image on every page of a PDF, scaling it to a fraction of the page width using Aspose.Pdf.",
       "tags": [
+        "pdf",
         "footer",
         "image",
-        "pdf",
-        "aspose",
-        "pages"
+        "scaling",
+        "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -1117,13 +1171,13 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "add-image-footer-30-opacity-pdf": {
-      "title": "Add Image Footer with 30% Opacity to All PDF Pages",
-      "filename": "add-image-footer-30-opacity-pdf.cs",
-      "description": "Demonstrates how to add a semi‑transparent image footer to every page of a PDF using Aspose.Pdf.",
+    "add-image-footer-with-opacity-to-pdf-pages": {
+      "title": "Add Image Footer with Opacity to PDF Pages",
+      "filename": "add-image-footer-with-opacity-to-pdf-pages.cs",
+      "description": "Demonstrates how to add an image footer with 30% opacity to every page of a PDF using Aspose.Pdf.",
       "tags": [
         "footer",
         "image",
@@ -1133,15 +1187,15 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.FooterArtifact",
         "Aspose.Pdf.FooterArtifact.SetImage",
-        "Aspose.Pdf.Drawing.HorizontalAlignment",
-        "Aspose.Pdf.Drawing.VerticalAlignment"
+        "Aspose.Pdf.FooterArtifact.Opacity",
+        "Aspose.Pdf.Page.Artifacts.Add",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
     "add-generation-date-footer-to-pdf-pages": {
@@ -1151,72 +1205,71 @@
       "tags": [
         "footer",
         "pdf",
+        "text",
         "date",
-        "aspose",
-        "csharp"
+        "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.FooterArtifact",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.FontRepository",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.TextBuilder",
+        "Aspose.Pdf.Text.FontRepository",
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "add-diagonal-text-watermark-to-pdf-pages": {
-      "title": "Add Diagonal Text Watermark to PDF Pages",
-      "filename": "add-diagonal-text-watermark-to-pdf-pages.cs",
-      "description": "Demonstrates how to apply a semi‑transparent diagonal text watermark to every page of a PDF using Aspose.Pdf.",
+    "add-diagonal-repeating-text-watermark": {
+      "title": "Add Diagonal Repeating Text Watermark to PDF Pages",
+      "filename": "add-diagonal-repeating-text-watermark.cs",
+      "description": "Shows how to overlay a semi‑transparent, diagonal repeating text watermark on every page of a PDF using Aspose.Pdf.",
       "tags": [
         "watermark",
         "pdf",
         "textstamp",
         "diagonal",
-        "aspose"
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextStamp",
-        "Aspose.Pdf.Text.FontRepository",
-        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Text.FontRepository.FindFont",
         "Aspose.Pdf.Page.AddStamp",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
     "add-rotated-image-watermark-to-pdf-pages": {
       "title": "Add Rotated Image Watermark to PDF Pages",
       "filename": "add-rotated-image-watermark-to-pdf-pages.cs",
-      "description": "Demonstrates how to add a PNG watermark image to each page of a PDF, scaling it to half the page size and rotating it 45 degrees using Aspose.Pdf.",
+      "description": "Shows how to place a semi‑transparent image watermark, rotated 45°, scaled to half the page size and centered on each page of a PDF using Aspose.Pdf.",
       "tags": [
         "watermark",
         "image",
         "pdf",
         "rotation",
-        "aspose-pdf"
+        "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
         "Aspose.Pdf.ImageStamp",
         "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.HorizontalAlignment",
-        "Aspose.Pdf.VerticalAlignment"
+        "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "add-image-watermark-20-opacity-pdf-pages": {
-      "title": "Add Image Watermark with 20% Opacity to PDF Pages",
-      "filename": "add-image-watermark-20-opacity-pdf-pages.cs",
-      "description": "Shows how to apply an image watermark with 20% opacity to every page of a PDF document using Aspose.Pdf.",
+    "add-image-watermark-with-opacity-to-pdf-pages": {
+      "title": "Add Image Watermark with Opacity to PDF Pages",
+      "filename": "add-image-watermark-with-opacity-to-pdf-pages.cs",
+      "description": "Shows how to load a PDF, create an ImageStamp with 20% opacity, center it on each page, apply it as a background watermark, and save the modified document.",
       "tags": [
         "watermark",
         "image",
@@ -1226,570 +1279,563 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.WatermarkArtifact"
+        "Aspose.Pdf.Facades.ImageStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.ImageStamp.Opacity",
+        "Aspose.Pdf.ImageStamp.Background",
+        "Aspose.Pdf.ImageStamp.HorizontalAlignment",
+        "Aspose.Pdf.ImageStamp.VerticalAlignment",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
     "add-repeating-image-watermark-to-pdf-pages": {
       "title": "Add Repeating Image Watermark to PDF Pages",
       "filename": "add-repeating-image-watermark-to-pdf-pages.cs",
-      "description": "Demonstrates how to tile a semi‑transparent image stamp across every page of a PDF, creating a grid‑style watermark using Aspose.Pdf.",
+      "description": "Shows how to load a PDF with Aspose.Pdf, iterate over its pages, and tile a semi‑transparent image stamp in a grid pattern to create a repeated watermark on each page.",
       "tags": [
+        "pdf",
         "watermark",
         "image",
-        "pdf",
         "grid",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.ImageStamp",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.PageInfo",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:15:11Z",
-      "status": "verified"
-    },
-    "add-year-watermark-to-pdf-pages": {
-      "title": "Add Year Watermark to PDF Pages",
-      "filename": "add-year-watermark-to-pdf-pages.cs",
-      "description": "Demonstrates how to add a semi‑transparent text watermark that includes the current year to every page of a PDF using Aspose.Pdf.",
-      "tags": [
-        "pdf",
-        "watermark",
-        "aspnet",
-        "textstamp",
-        "date"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.TextStamp",
-        "Aspose.Pdf.Text.FontRepository",
-        "Aspose.Pdf.Color",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.HorizontalAlignment",
-        "Aspose.Pdf.VerticalAlignment",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Page.AddStamp"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:15:11Z",
-      "status": "verified"
-    },
-    "add-text-watermark-to-pdf-pages": {
-      "title": "Add Text Watermark to PDF Pages",
-      "filename": "add-text-watermark-to-pdf-pages.cs",
-      "description": "Demonstrates how to add a semi‑transparent text watermark to each page of a PDF using Aspose.Pdf's WatermarkArtifact.",
-      "tags": [
-        "watermark",
-        "pdf",
-        "text",
-        "artifact",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.WatermarkArtifact",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.FontRepository.FindFont",
-        "Aspose.Pdf.Color",
-        "Aspose.Pdf.Point",
-        "Aspose.Pdf.Page.Artifacts.Add",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
-      "status": "verified"
-    },
-    "add-semi-transparent-text-watermark": {
-      "title": "Add Semi-Transparent Text Watermark with Outline to PDF Pages",
-      "filename": "add-semi-transparent-text-watermark.cs",
-      "description": "Demonstrates how to add a semi‑transparent text watermark with a colored outline to every page of a PDF using Aspose.Pdf.",
-      "tags": [
-        "watermark",
-        "pdf",
-        "text-stamp",
-        "opacity",
-        "outline"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.Text.TextStamp",
-        "Aspose.Pdf.Color",
-        "Aspose.Pdf.Text.FontRepository",
-        "Aspose.Pdf.Text.HorizontalAlignment",
-        "Aspose.Pdf.Text.VerticalAlignment"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:15:11Z",
-      "status": "verified"
-    },
-    "add-lightgray-background-to-pdf-pages": {
-      "title": "Add LightGray Background to All PDF Pages",
-      "filename": "add-lightgray-background-to-pdf-pages.cs",
-      "description": "Demonstrates loading a PDF with Aspose.Pdf, applying a LightGray background color to each page, and saving the branded document.",
-      "tags": [
-        "background",
-        "color",
-        "branding",
-        "pages",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Color",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
-      "status": "verified"
-    },
-    "set-transparent-background-for-pdf-pages": {
-      "title": "Set Transparent Background for PDF Pages",
-      "filename": "set-transparent-background-for-pdf-pages.cs",
-      "description": "Shows how to apply a transparent background to an entire PDF document and each of its pages using Aspose.Pdf.",
-      "tags": [
-        "background",
-        "transparent",
-        "pdf",
-        "pages",
         "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T09:51:01Z",
+      "status": "verified"
+    },
+    "add-year-text-watermark-to-pdf": {
+      "title": "Add Year-Based Text Watermark to PDF Pages",
+      "filename": "add-year-text-watermark-to-pdf.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, create a TextStamp that includes the current year, and apply it as a semi‑transparent background watermark on each page.",
+      "tags": [
+        "pdf",
+        "watermark",
+        "textstamp",
+        "aspnet",
+        "datetime"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextStamp",
+        "Aspose.Pdf.Text.FontRepository",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T09:51:01Z",
+      "status": "verified"
+    },
+    "add-curved-text-watermark-to-pdf-pages": {
+      "title": "Add Curved Text Watermark to PDF Pages",
+      "filename": "add-curved-text-watermark-to-pdf-pages.cs",
+      "description": "Demonstrates how to place a repeated text watermark that follows a quadratic Bezier curve across each page of a PDF using Aspose.Pdf.",
+      "tags": [
+        "watermark",
+        "curved",
+        "pdf",
+        "aspose",
+        "bezier"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.WatermarkArtifact",
+        "Aspose.Pdf.FontRepository.FindFont",
+        "Aspose.Pdf.Color.FromRgb",
+        "Aspose.Pdf.Point",
+        "Aspose.Pdf.Text.TextState"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T09:51:01Z",
+      "status": "verified"
+    },
+    "add-semi-transparent-text-watermark-to-pdf-pages": {
+      "title": "Add Semi-Transparent Text Watermark to PDF Pages",
+      "filename": "add-semi-transparent-text-watermark-to-pdf-pages.cs",
+      "description": "Demonstrates how to add a semi‑transparent text watermark with an outline to each page of a PDF using Aspose.Pdf.",
+      "tags": [
+        "watermark",
+        "textstamp",
+        "pdf",
+        "aspose-pdf",
+        "pages"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextStamp",
+        "Aspose.Pdf.FontRepository.FindFont",
         "Aspose.Pdf.Color",
+        "Aspose.Pdf.Page.AddStamp",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "set-pdf-page-background-color": {
-      "title": "Set PDF Page Background Color Using RGB",
-      "filename": "set-pdf-page-background-color.cs",
-      "description": "Demonstrates loading a PDF with Aspose.Pdf, applying an RGB brand color as the background for each page, and saving the modified document.",
+    "add-lightgray-background-to-pdf-pages": {
+      "title": "Add LightGray Background to All PDF Pages",
+      "filename": "add-lightgray-background-to-pdf-pages.cs",
+      "description": "Shows how to load a PDF, iterate through each page, set a LightGray background color for branding, and save the modified document.",
       "tags": [
-        "pdf",
         "background",
+        "branding",
+        "pages",
         "color",
-        "aspose.pdf",
-        "csharp"
+        "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Color",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Background"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "set-pdf-page-background-cmyk": {
-      "title": "Set PDF Page Background Color Using CMYK Values",
-      "filename": "set-pdf-page-background-cmyk.cs",
-      "description": "Demonstrates how to apply a CMYK background color to all pages of a PDF document using Aspose.Pdf.",
+    "set-pdf-page-background-transparent": {
+      "title": "Set PDF Page Background to Transparent",
+      "filename": "set-pdf-page-background-transparent.cs",
+      "description": "Demonstrates how to make each page of a PDF have a transparent background using Aspose.Pdf, then saves the modified document.",
       "tags": [
-        "background",
-        "cmyk",
         "pdf",
-        "color",
+        "background",
+        "transparent",
+        "aspose",
         "pages"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Color",
-        "Aspose.Pdf.Color.FromCmyk",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Background"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
+      "status": "verified"
+    },
+    "set-pdf-page-background-color": {
+      "title": "Set PDF Page Background Color Using RGB Values",
+      "filename": "set-pdf-page-background-color.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, create a brand color from RGB components, apply it as the background for each page, and save the modified document.",
+      "tags": [
+        "pdf",
+        "background-color",
+        "rgb",
+        "aspose.pdf",
+        "page"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.Background",
+        "Aspose.Pdf.Color.FromArgb"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T09:51:01Z",
+      "status": "verified"
+    },
+    "set-page-background-cmyk": {
+      "title": "Set Page Background Color Using CMYK Values",
+      "filename": "set-page-background-cmyk.cs",
+      "description": "Shows how to load a PDF, create a CMYK color, apply it as the background for each page, and save the updated document.",
+      "tags": [
+        "cmyk",
+        "background",
+        "pdf",
+        "pages",
+        "color"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Color.FromCmyk",
+        "Aspose.Pdf.Page.Background",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
     "set-pdf-page-background-hsl": {
       "title": "Set PDF Page Background Color Using HSL Values",
       "filename": "set-pdf-page-background-hsl.cs",
-      "description": "Demonstrates converting HSL color values to RGB and applying the resulting color as a page background in a PDF with Aspose.Pdf.",
+      "description": "Demonstrates how to convert HSL color values to an Aspose.Pdf.Color and apply the resulting color as the background for every page in a PDF document.",
       "tags": [
         "background",
-        "color",
         "hsl",
+        "color",
         "pdf",
         "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
+        "Aspose.Pdf.Color",
         "Aspose.Pdf.Color.FromRgb",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "set-pdf-page-background-by-theme": {
-      "title": "Set PDF Page Background Color Based on Theme",
-      "filename": "set-pdf-page-background-by-theme.cs",
-      "description": "Shows how to read a theme from a configuration file and apply the corresponding background color to every page of a PDF using Aspose.Pdf.",
+    "apply-theme-background-to-pdf-pages": {
+      "title": "Apply Theme-Based Background Color to PDF Pages",
+      "filename": "apply-theme-background-to-pdf-pages.cs",
+      "description": "The example reads a theme name from a JSON configuration file, maps it to an Aspose.Pdf.Color, and sets that color as the background for every page in a PDF document.",
       "tags": [
         "pdf",
-        "background-color",
+        "background",
         "theme",
-        "aspose",
-        "csharp"
+        "json",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
         "Aspose.Pdf.Color",
-        "Aspose.Pdf.Page"
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Background"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
     "alternating-page-background-colors": {
       "title": "Set Alternating Page Background Colors in PDF",
       "filename": "alternating-page-background-colors.cs",
-      "description": "Shows how to load a PDF with Aspose.Pdf, iterate through its pages, assign LightGray to odd pages and White to even pages via the Background property, and save the modified document.",
+      "description": "Shows how to load a PDF with Aspose.Pdf, iterate through its pages, assign LightGray to even pages and White to odd pages as background colors, and save the modified document.",
       "tags": [
-        "background",
-        "alternating",
-        "pages",
-        "Aspose.Pdf",
-        "C#"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Color",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
-      "status": "verified"
-    },
-    "add-centered-page-numbers-to-pdf": {
-      "title": "Add Centered Page Numbers to PDF",
-      "filename": "add-centered-page-numbers-to-pdf.cs",
-      "description": "Shows how to insert a centered page number stamp on every page of a PDF document using Aspose.Pdf.",
-      "tags": [
-        "page-number",
-        "stamp",
-        "pdf",
-        "aspose",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.PageNumberStamp",
-        "Page.AddStamp",
-        "Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
-      "status": "verified"
-    },
-    "insert-roman-page-numbers": {
-      "title": "Insert Roman Numeral Page Numbers into PDF",
-      "filename": "insert-roman-page-numbers.cs",
-      "description": "Shows how to add uppercase Roman‑numeral page numbers to the introductory pages of a PDF using Aspose.Pdf.",
-      "tags": [
-        "roman-numerals",
-        "page-numbering",
+        "page-background",
+        "alternating-colors",
         "pdf",
         "aspose-pdf",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.PageNumberStamp",
-        "Aspose.Pdf.NumberingStyle",
-        "Aspose.Pdf.Annotations.HorizontalAlignment",
-        "Aspose.Pdf.Annotations.VerticalAlignment",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
-      "status": "verified"
-    },
-    "add-chapter-page-numbers-to-pdf": {
-      "title": "Add Chapter Page Numbers to PDF",
-      "filename": "add-chapter-page-numbers-to-pdf.cs",
-      "description": "Shows how to iterate through each page of a PDF and add a footer with a custom \"Chapter\" prefix and the page number using Aspose.Pdf.",
-      "tags": [
-        "pdf",
-        "page-number",
-        "footer",
-        "aspose",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.Position",
-        "Aspose.Pdf.Text.FontRepository",
-        "Aspose.Pdf.Text.Color",
-        "Aspose.Pdf.Text.HorizontalAlignment",
-        "Aspose.Pdf.Text.TextState"
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Background"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
-      "status": "verified"
-    },
-    "add-leading-zero-page-numbers": {
-      "title": "Add Leading Zero Page Numbers to PDF",
-      "filename": "add-leading-zero-page-numbers.cs",
-      "description": "Shows how to insert page numbers on every page of a PDF using Aspose.Pdf, formatting single‑digit numbers with a leading zero (01, 02, …).",
-      "tags": [
-        "page-numbering",
-        "pdf",
-        "leading-zero",
-        "Aspose.Pdf",
-        "stamp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.PageNumberStamp",
-        "Aspose.Pdf.Text.FontRepository.FindFont",
-        "Aspose.Pdf.Color"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
     "add-page-numbers-to-pdf": {
-      "title": "Add Page Numbers in \"Page X of Y\" Format to PDF",
+      "title": "Add Page Numbers to PDF Using Aspose.Pdf",
       "filename": "add-page-numbers-to-pdf.cs",
-      "description": "Demonstrates how to insert page numbers with a custom \"Page X of Y\" format on every page of a PDF using Aspose.Pdf.",
+      "description": "Shows how to insert a centered page number stamp starting at 1 on every page of a PDF document with Aspose.Pdf for .NET.",
       "tags": [
-        "page-numbering",
-        "pdf",
-        "aspose-pdf",
+        "page-number",
         "stamp",
+        "pdf",
+        "aspose",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.PageNumberStamp",
-        "Aspose.Pdf.Color",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Page.AddStamp"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
-      "status": "verified"
-    },
-    "insert-page-numbers-current-total": {
-      "title": "Insert Page Numbers with Current/Total Format in PDF",
-      "filename": "insert-page-numbers-current-total.cs",
-      "description": "Shows how to add page numbers in the \"current/total\" format to every page of a PDF using Aspose.Pdf stamps.",
-      "tags": [
-        "page-number",
-        "pdf",
-        "stamp",
-        "custom-format",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.PageNumberStamp",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.FontRepository",
-        "Aspose.Pdf.Color",
         "Aspose.Pdf.HorizontalAlignment",
         "Aspose.Pdf.VerticalAlignment",
-        "Aspose.Pdf.Page.AddStamp"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:15:11Z",
-      "status": "verified"
-    },
-    "add-superscript-page-numbers-to-pdf": {
-      "title": "Add Superscript-Style Page Numbers to PDF",
-      "filename": "add-superscript-page-numbers-to-pdf.cs",
-      "description": "Demonstrates how to insert page numbers at the bottom-center of each PDF page using a PageNumberStamp with a smaller font to simulate superscript formatting.",
-      "tags": [
-        "page-number",
-        "stamp",
-        "superscript",
-        "pdf",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.PageNumberStamp",
-        "Aspose.Pdf.Text.FontRepository",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.Color"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:15:11Z",
-      "status": "verified"
-    },
-    "add-page-numbers-arial-font": {
-      "title": "Add Page Numbers with Arial Font to PDF",
-      "filename": "add-page-numbers-arial-font.cs",
-      "description": "Demonstrates how to insert sequential page numbers on every page of a PDF using Aspose.Pdf, with a custom Arial 14‑pt font and bottom‑center alignment.",
-      "tags": [
-        "page-number",
-        "pdf",
-        "aspose",
-        "font",
-        "stamp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.PageNumberStamp",
-        "Aspose.Pdf.Text.FontRepository.FindFont",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.Color",
-        "Aspose.Pdf.HorizontalAlignment",
-        "Aspose.Pdf.VerticalAlignment",
-        "Aspose.Pdf.Text.PageNumberStamp.Put",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
-      "status": "verified"
-    },
-    "insert-page-numbers-with-custom-embedded-font": {
-      "title": "Insert Page Numbers with Custom Embedded Font",
-      "filename": "insert-page-numbers-with-custom-embedded-font.cs",
-      "description": "Demonstrates adding page numbers to every PDF page using a TrueType font loaded from an external file and embedding that font in the resulting PDF.",
-      "tags": [
-        "page-number",
-        "custom-font",
-        "font-embedding",
-        "Aspose.Pdf",
-        "C#"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.FontRepository.FindFont",
-        "Aspose.Pdf.Text.Font",
-        "Aspose.Pdf.Text.PageNumberStamp",
         "Aspose.Pdf.Page.AddStamp",
         "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "add-page-numbers-to-odd-pdf-pages": {
-      "title": "Add Page Numbers to Odd PDF Pages",
-      "filename": "add-page-numbers-to-odd-pdf-pages.cs",
-      "description": "Shows how to insert page numbers only on odd-numbered pages of a PDF using Aspose.Pdf.",
+    "add-roman-numeral-page-numbers-to-intro-pages": {
+      "title": "Add Roman Numeral Page Numbers to Introductory PDF Pages",
+      "filename": "add-roman-numeral-page-numbers-to-intro-pages.cs",
+      "description": "Demonstrates how to load a PDF with Aspose.Pdf, apply a PageNumberStamp configured for uppercase Roman numerals to a set of introductory pages, and save the updated document.",
       "tags": [
         "pdf",
-        "page-number",
-        "odd-pages",
+        "page-numbering",
+        "roman-numerals",
         "stamp",
         "aspnet"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.PageNumberStamp",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.HorizontalAlignment",
-        "Aspose.Pdf.VerticalAlignment",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Page.AddStamp"
+        "Aspose.Pdf.Text.NumberingStyle",
+        "Aspose.Pdf.FontRepository",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
+      "status": "verified"
+    },
+    "add-chapter-page-numbers-to-pdf": {
+      "title": "Insert Chapter-Numbered Page Stamps in PDF",
+      "filename": "add-chapter-page-numbers-to-pdf.cs",
+      "description": "Demonstrates how to add page numbers with a custom \"Chapter\" prefix to every page of a PDF using Aspose.Pdf's PageNumberStamp.",
+      "tags": [
+        "page-number",
+        "stamp",
+        "pdf",
+        "aspose-pdf",
+        "custom-prefix"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PageNumberStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.TextState",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T09:51:01Z",
+      "status": "verified"
+    },
+    "add-zero-padded-page-numbers-to-pdf": {
+      "title": "Add Zero‑Padded Page Numbers to PDF",
+      "filename": "add-zero-padded-page-numbers-to-pdf.cs",
+      "description": "Loads a PDF, creates a PageNumberStamp with a format that pads single‑digit page numbers with a leading zero, applies the stamp to every page, and saves the modified document.",
+      "tags": [
+        "pdf",
+        "page-number",
+        "stamp",
+        "leading-zero",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PageNumberStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.FontRepository.FindFont",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T09:51:01Z",
+      "status": "verified"
+    },
+    "add-page-numbers-to-pdf__v2": {
+      "title": "Add Page Numbers (Page X of Y) to PDF",
+      "filename": "add-page-numbers-to-pdf__v2.cs",
+      "description": "Demonstrates how to load a PDF, create a PageNumberStamp with a custom \"Page # of #\" format, apply it to every page, and save the result.",
+      "tags": [
+        "pdf",
+        "page-number",
+        "stamp",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PageNumberStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.HorizontalAlignment",
+        "Aspose.Pdf.VerticalAlignment"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T09:51:01Z",
+      "status": "verified"
+    },
+    "add-page-numbers-with-custom-separator": {
+      "title": "Add Page Numbers with '/' Separator to PDF",
+      "filename": "add-page-numbers-with-custom-separator.cs",
+      "description": "Loads a PDF, iterates through each page, and adds a page number stamp formatted as \"current/total\" at the bottom center, then saves the modified document.",
+      "tags": [
+        "page-number",
+        "pdf",
+        "stamp",
+        "custom-format",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.PageNumberStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T09:51:01Z",
+      "status": "verified"
+    },
+    "add-superscript-page-numbers-to-pdf": {
+      "title": "Add Superscript Page Numbers to PDF Pages",
+      "filename": "add-superscript-page-numbers-to-pdf.cs",
+      "description": "Loads a PDF, creates a PageNumberStamp with a smaller font to simulate superscript, places it at the bottom‑right of each page, and saves the modified document.",
+      "tags": [
+        "page-number",
+        "superscript",
+        "stamp",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PageNumberStamp",
+        "Aspose.Pdf.Text.FontRepository.FindFont",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T09:51:01Z",
+      "status": "verified"
+    },
+    "add-page-numbers-arial-font-pdf": {
+      "title": "Add Page Numbers with Arial Font to PDF",
+      "filename": "add-page-numbers-arial-font-pdf.cs",
+      "description": "Demonstrates how to insert sequential page numbers on each PDF page using a custom Arial font at 14 points with Aspose.Pdf.",
+      "tags": [
+        "page-number",
+        "stamp",
+        "font",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PageNumberStamp",
+        "Aspose.Pdf.Text.FontRepository.FindFont",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T09:51:01Z",
+      "status": "verified"
+    },
+    "add-page-numbers-with-custom-ttf-font": {
+      "title": "Add Page Numbers Using Custom TTF Font",
+      "filename": "add-page-numbers-with-custom-ttf-font.cs",
+      "description": "Loads a PDF, embeds an external TrueType font, and adds page numbers to each page using a PageNumberStamp configured with the custom font.",
+      "tags": [
+        "page-number",
+        "custom-font",
+        "embedding",
+        "stamp",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FontRepository.FindFont",
+        "Aspose.Pdf.Font",
+        "Aspose.Pdf.PageNumberStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Text.TextState"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T09:51:01Z",
+      "status": "verified"
+    },
+    "add-page-numbers-to-odd-pdf-pages": {
+      "title": "Add Page Numbers to Odd PDF Pages",
+      "filename": "add-page-numbers-to-odd-pdf-pages.cs",
+      "description": "Shows how to insert page numbers only on odd pages of a PDF using Aspose.Pdf's PageNumberStamp and save the result.",
+      "tags": [
+        "pdf",
+        "page-number",
+        "odd-pages",
+        "stamp",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PageNumberStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.PageCollection"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
     "add-page-numbers-to-even-pdf-pages": {
       "title": "Add Page Numbers to Even PDF Pages",
       "filename": "add-page-numbers-to-even-pdf-pages.cs",
-      "description": "Demonstrates loading a PDF with Aspose.Pdf, iterating over even-numbered pages, and stamping each with a page number at the bottom center.",
+      "description": "Shows how to insert page numbers only on even pages of a PDF using Aspose.Pdf in C#.",
       "tags": [
         "pdf",
         "page-number",
         "even-pages",
-        "stamp",
-        "aspose"
+        "aspose",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
         "Aspose.Pdf.PageNumberStamp",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.Text.FontRepository",
-        "Aspose.Pdf.Color",
-        "Aspose.Pdf.HorizontalAlignment",
-        "Aspose.Pdf.VerticalAlignment",
+        "Aspose.Pdf.Page.AddStamp",
         "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Page.AddStamp"
+        "Aspose.Pdf.HorizontalAlignment",
+        "Aspose.Pdf.VerticalAlignment"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "insert-bates-numbering-into-pdf-pages": {
-      "title": "Insert Bates Numbering Stamp into PDF Pages",
-      "filename": "insert-bates-numbering-into-pdf-pages.cs",
-      "description": "Shows how to add Bates numbering that starts at 1000 with a dash suffix to every page of a PDF using Aspose.Pdf.",
+    "add-bates-numbering-stamp-to-pdf-pages": {
+      "title": "Add Bates Numbering Stamp to PDF Pages",
+      "filename": "add-bates-numbering-stamp-to-pdf-pages.cs",
+      "description": "Shows how to insert a Bates numbering stamp that starts at 1000 and adds a dash suffix on every page of a PDF using Aspose.Pdf.",
       "tags": [
         "bates-numbering",
         "pdf",
-        "aspose",
-        "pages",
-        "c#"
+        "stamp",
+        "aspose-pdf",
+        "pages"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Pages.AddBatesNumbering",
+        "Aspose.Pdf.BatesNumberingArtifact",
+        "Aspose.Pdf.HorizontalAlignment",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T09:51:01Z",
+      "status": "verified"
+    },
+    "add-bates-numbering-with-custom-prefix-suffix": {
+      "title": "Add Bates Numbering with Custom Prefix and Suffix to PDF",
+      "filename": "add-bates-numbering-with-custom-prefix-suffix.cs",
+      "description": "Demonstrates how to apply Bates numbering to every page of a PDF using Aspose.Pdf, with a custom prefix \"DOC\" and suffix \"-2026\" for version tracking.",
+      "tags": [
+        "bates-numbering",
+        "pdf",
+        "prefix",
+        "suffix",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.Pages.AddBatesNumbering",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.BatesNArtifact",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.PageCollection"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "insert-bates-numbering-with-custom-prefix-suffix": {
-      "title": "Insert Bates Numbering with Custom Prefix and Suffix",
-      "filename": "insert-bates-numbering-with-custom-prefix-suffix.cs",
-      "description": "Demonstrates how to add Bates numbering with a custom prefix \"DOC\" and suffix \"-2026\" to every page of a PDF using Aspose.Pdf.",
-      "tags": [
-        "bates-numbering",
-        "pdf",
-        "aspose-pdf",
-        "prefix",
-        "suffix"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.PageCollectionExtensions.AddBatesNumbering",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
-      "status": "verified"
-    },
-    "add-alphanumeric-bates-numbering-to-pdf-pages": {
-      "title": "Add Alphanumeric Bates Numbering to PDF Pages",
-      "filename": "add-alphanumeric-bates-numbering-to-pdf-pages.cs",
-      "description": "Demonstrates how to add Bates numbering with a custom alphanumeric prefix to each page of a PDF using Aspose.Pdf.",
+    "add-bates-numbering-with-alphanumeric-prefix": {
+      "title": "Add Bates Numbering with Alphanumeric Prefix to PDF",
+      "filename": "add-bates-numbering-with-alphanumeric-prefix.cs",
+      "description": "Shows how to load a PDF using Aspose.Pdf, apply Bates numbering that includes an alphanumeric prefix, and save the updated document.",
       "tags": [
         "bates-numbering",
         "pdf",
@@ -1799,108 +1845,111 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.PageCollection.AddBatesNumbering",
-        "Aspose.Pdf.HorizontalAlignment",
-        "Aspose.Pdf.VerticalAlignment"
+        "Aspose.Pdf.PageCollectionExtensions.AddBatesNumbering",
+        "Aspose.Pdf.BatesNumbering",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "add-bates-numbering-to-pdf-pages": {
+    "add-bates-numbering-to-pdf": {
       "title": "Add Bates Numbering to PDF Pages",
-      "filename": "add-bates-numbering-to-pdf-pages.cs",
-      "description": "Shows how to insert year‑based Bates numbers in the format \"2026-####\" on every page of a PDF using Aspose.Pdf.",
+      "filename": "add-bates-numbering-to-pdf.cs",
+      "description": "Demonstrates how to load a PDF, apply year‑based Bates numbering in the format \"2026-####\" to every page, and save the updated document using Aspose.Pdf.",
       "tags": [
         "bates-numbering",
         "pdf",
-        "aspose-pdf",
         "pages",
+        "aspose-pdf",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Pages.AddBatesNumbering"
+        "Aspose.Pdf.Pages",
+        "Aspose.Pdf.Pages.AddBatesNumbering",
+        "Aspose.Pdf.BatesNumberingArtifact"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "batch-bates-numbering-increment-5": {
-      "title": "Batch Bates Numbering with Increment of 5",
-      "filename": "batch-bates-numbering-increment-5.cs",
-      "description": "Shows how to add sequential Bates numbers to every page of PDFs in a folder, increasing the number by 5 per page and saving the modified files to an output directory.",
+    "batch-add-bates-numbering-increment-5": {
+      "title": "Batch Add Bates Numbering to PDFs with Increment of 5",
+      "filename": "batch-add-bates-numbering-increment-5.cs",
+      "description": "Loads each PDF from an input folder, adds Bates numbering to every page where the counter increases by 5 for each subsequent page, and saves the processed files to an output folder.",
       "tags": [
         "bates-numbering",
         "batch-processing",
         "pdf",
-        "aspose",
-        "csharp"
+        "aspose-pdf",
+        "pages"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.Position",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.Text.FontRepository",
-        "Aspose.Pdf.Text.HorizontalAlignment",
-        "Aspose.Pdf.Text.VerticalAlignment"
+        "Aspose.Pdf.Pages.AddBatesNumbering",
+        "Aspose.Pdf.BatesNumberingArtifact",
+        "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "remove-existing-bates-numbering-add-new-sequence": {
-      "title": "Remove Existing Bates Numbering and Add New Sequence to PDF",
-      "filename": "remove-existing-bates-numbering-add-new-sequence.cs",
-      "description": "Shows how to delete any existing Bates numbering artifacts from all pages of a PDF and then apply a new Bates numbering sequence using Aspose.Pdf.",
+    "replace-bates-numbering-in-pdf": {
+      "title": "Replace Bates Numbering in PDF",
+      "filename": "replace-bates-numbering-in-pdf.cs",
+      "description": "Demonstrates how to delete any existing Bates numbering artifacts from all pages of a PDF and then add a new Bates numbering sequence using Aspose.Pdf.",
       "tags": [
         "bates-numbering",
         "pdf",
-        "aspose",
+        "aspnet",
         "pages",
-        "remove-stamps"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.PageCollection.DeleteBatesNumbering",
-        "Aspose.Pdf.PageCollection.AddBatesNumbering"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
-      "status": "verified"
-    },
-    "remove-bates-numbering-from-pdf-pages": {
-      "title": "Remove Bates Numbering from PDF Pages",
-      "filename": "remove-bates-numbering-from-pdf-pages.cs",
-      "description": "Demonstrates how to delete all Bates numbering stamps from a PDF document using Aspose.Pdf and save the cleaned file.",
-      "tags": [
-        "bates-numbering",
-        "pdf",
-        "pages",
-        "remove",
-        "aspose-pdf"
+        "artifact"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Pages.DeleteBatesNumbering",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Pages.AddBatesNumbering",
+        "Aspose.Pdf.BatesNumberingArtifact",
+        "Aspose.Pdf.Point"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "remove-headers-footers-add-new-to-pdf": {
-      "title": "Remove Existing Headers/Footers and Add New Ones to PDF Pages",
-      "filename": "remove-headers-footers-add-new-to-pdf.cs",
-      "description": "Shows how to clear any existing header and footer on each page of a PDF and then assign new header and footer text using Aspose.Pdf.",
+    "remove-bates-numbering-from-selected-pdf-pages": {
+      "title": "Remove Bates Numbering from Selected PDF Pages",
+      "filename": "remove-bates-numbering-from-selected-pdf-pages.cs",
+      "description": "Shows how to delete Bates numbering artifacts from specific pages of a PDF document using Aspose.Pdf, preserving numbering on other pages.",
       "tags": [
+        "bates-numbering",
+        "pdf",
+        "pages",
+        "artifact",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Facades.PageCollection.DeleteBatesNumbering",
+        "Aspose.Pdf.Artifact",
+        "Aspose.Pdf.BatesNArtifact"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T09:51:01Z",
+      "status": "verified"
+    },
+    "replace-pdf-headers-footers": {
+      "title": "Replace PDF Headers and Footers",
+      "filename": "replace-pdf-headers-footers.cs",
+      "description": "Demonstrates how to remove existing headers and footers from each page of a PDF and add new custom header and footer content using Aspose.Pdf.",
+      "tags": [
+        "pdf",
         "header",
         "footer",
-        "pdf",
-        "aspose",
+        "aspose-pdf",
         "csharp"
       ],
       "apis_used": [
@@ -1911,13 +1960,13 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
     "read-pdf-page-count": {
       "title": "Read PDF Page Count with Aspose.Pdf",
       "filename": "read-pdf-page-count.cs",
-      "description": "Shows how to load a PDF using Aspose.Pdf and retrieve the total number of pages without modifying or saving the document.",
+      "description": "Shows how to load a PDF using Aspose.Pdf and obtain the total number of pages without saving the document.",
       "tags": [
         "pdf",
         "page-count",
@@ -1927,57 +1976,61 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.PageCollection"
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.PageCollection.Count"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
     "read-pdf-page-dimensions__v2": {
-      "title": "Read PDF Page Dimensions",
+      "title": "Read PDF Page Width and Height",
       "filename": "read-pdf-page-dimensions__v2.cs",
-      "description": "Loads a PDF file and iterates through each page to output its width and height in points using Aspose.Pdf.",
+      "description": "Loads a PDF file, iterates through each page, and logs the page's width and height in points using Aspose.Pdf.",
       "tags": [
         "pdf",
-        "pages",
+        "page-size",
         "dimensions",
-        "aspose",
+        "aspose-pdf",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Rectangle"
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Page.Rect"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
     "adjust-pdf-bleedbox-for-printer-specs": {
       "title": "Adjust PDF BleedBox for Printer Specifications",
       "filename": "adjust-pdf-bleedbox-for-printer-specs.cs",
-      "description": "Loads a PDF, reads each page's BleedBox (or falls back to MediaBox), expands the box by a fixed offset, and saves the modified document.",
+      "description": "Shows how to read each page's BleedBox (or fall back to MediaBox), expand it by a fixed amount, and save the modified PDF using Aspose.Pdf.",
       "tags": [
         "bleedbox",
         "pdf",
         "pages",
-        "aspose-pdf",
+        "aspose.pdf",
         "printer"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.BleedBox"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "retrieve-trimbox-after-cropping": {
-      "title": "Retrieve TrimBox After Cropping a PDF Page",
-      "filename": "retrieve-trimbox-after-cropping.cs",
-      "description": "Demonstrates setting a CropBox on a PDF page with Aspose.Pdf, reading the resulting TrimBox coordinates, and saving the cropped document.",
+    "retrieve-trimbox-values-after-cropping": {
+      "title": "Retrieve TrimBox Values After Cropping PDF Pages",
+      "filename": "retrieve-trimbox-values-after-cropping.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, optionally set a new CropBox, and read the TrimBox of each page to verify the content area.",
       "tags": [
         "trimbox",
         "cropbox",
@@ -1987,103 +2040,104 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Page.CropBox",
-        "Aspose.Pdf.Page.TrimBox",
-        "Aspose.Pdf.Rectangle"
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Page.TrimBox"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "crop-pdf-pages-remove-margins": {
-      "title": "Crop PDF Pages to Remove Margins",
-      "filename": "crop-pdf-pages-remove-margins.cs",
-      "description": "Shows how to set the CropBox on every page of a PDF with Aspose.Pdf to trim a uniform margin from all sides.",
+    "set-cropbox-trim-margins-pdf-pages": {
+      "title": "Set CropBox to Trim Margins on PDF Pages",
+      "filename": "set-cropbox-trim-margins-pdf-pages.cs",
+      "description": "Shows how to adjust each page's CropBox in a PDF to remove margins by inseting from the MediaBox using Aspose.Pdf.",
       "tags": [
-        "crop",
+        "cropbox",
         "margin",
         "pdf",
         "pages",
-        "aspose"
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Page.MediaBox",
+        "Aspose.Pdf.Rectangle",
         "Aspose.Pdf.Page.CropBox",
-        "Aspose.Pdf.Rectangle"
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "add-bleedbox-extend-cropbox": {
-      "title": "Add BleedBox Extending 5 Points Beyond CropBox",
-      "filename": "add-bleedbox-extend-cropbox.cs",
-      "description": "Loads a PDF, iterates through each page, creates a BleedBox that extends 5 points beyond the existing CropBox (or MediaBox), assigns it to the page, and saves the modified document.",
+    "extend-bleedbox-beyond-cropbox": {
+      "title": "Extend BleedBox Beyond CropBox in PDF",
+      "filename": "extend-bleedbox-beyond-cropbox.cs",
+      "description": "Demonstrates how to load a PDF, read each page's CropBox, create a BleedBox that extends 5 points beyond it on all sides, assign it to the page, and save the modified document.",
       "tags": [
         "bleedbox",
         "cropbox",
         "pdf",
-        "aspose-pdf",
-        "page"
+        "aspose.pdf",
+        "pages"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Page.CropBox",
+        "Aspose.Pdf.Page.BleedBox",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
     "trim-white-space-around-pdf-pages": {
-      "title": "Trim White Space Around PDF Pages Using Content Bounding Box",
+      "title": "Trim White Space Around PDF Pages",
       "filename": "trim-white-space-around-pdf-pages.cs",
-      "description": "Demonstrates how to remove surrounding white space from each PDF page by calculating the content bounding box and setting the TrimBox, with a fallback for completely blank pages.",
+      "description": "Demonstrates how to remove surrounding white space from each PDF page by detecting blank pages and setting the TrimBox to the content bounding box using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "trim",
+        "content-bbox",
+        "aspose-pdf",
+        "blank-page"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.IsBlank",
+        "Aspose.Pdf.Page.CalculateContentBBox",
+        "Aspose.Pdf.Page.TrimBox",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T09:51:01Z",
+      "status": "verified"
+    },
+    "trim-white-space-per-page-tolerance": {
+      "title": "Trim White Space with Per-Page Pixel Tolerance",
+      "filename": "trim-white-space-per-page-tolerance.cs",
+      "description": "Demonstrates how to trim the white margins of each PDF page using a custom pixel tolerance that is converted to PDF points. The example handles per‑page tolerance values and skips blank pages.",
       "tags": [
         "trim",
         "whitespace",
         "pdf",
-        "bounding-box",
-        "aspose"
+        "page",
+        "tolerance"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Page.CalculateContentBBox",
-        "Aspose.Pdf.Page.IsBlank",
-        "Aspose.Pdf.Document.Save"
+        "Page.IsBlank",
+        "Page.TrimBox",
+        "Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:15:11Z",
-      "status": "verified"
-    },
-    "trim-blank-pages-with-tolerance": {
-      "title": "Trim Blank Pages from PDF with Tolerance",
-      "filename": "trim-blank-pages-with-tolerance.cs",
-      "description": "Demonstrates loading a PDF, detecting blank pages using a pixel‑fill tolerance, removing those pages, and saving the trimmed document.",
-      "tags": [
-        "pdf",
-        "blank-page-removal",
-        "tolerance",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Page.IsBlank",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Document.Pages.Delete"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
     "crop-pdf-pages-to-4-3-aspect-ratio": {
@@ -2091,70 +2145,68 @@
       "filename": "crop-pdf-pages-to-4-3-aspect-ratio.cs",
       "description": "Shows how to iterate through all pages of a PDF and adjust each page's CropBox so the content fits a fixed 4:3 aspect ratio using Aspose.Pdf.",
       "tags": [
+        "pdf",
         "crop",
         "aspect-ratio",
-        "pdf",
         "pages",
         "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Page.CropBox",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.Page.MediaBox",
-        "Aspose.Pdf.Rectangle"
+        "Aspose.Pdf.Page.CropBox"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "add-left-aligned-header-logo-to-pdf-pages": {
-      "title": "Add Left-Aligned Header Logo to PDF Pages",
-      "filename": "add-left-aligned-header-logo-to-pdf-pages.cs",
-      "description": "Loads an existing PDF, creates an ImageStamp from a logo image, adds it as a left‑aligned header on every page, and saves the modified document.",
+    "add-header-logo-to-pdf-pages": {
+      "title": "Add Header Logo Image to PDF Pages",
+      "filename": "add-header-logo-to-pdf-pages.cs",
+      "description": "Demonstrates how to load a PDF with Aspose.Pdf, add a company logo as an image stamp aligned to the left header of each page, and save the modified document.",
       "tags": [
+        "pdf",
         "header",
-        "logo",
-        "image-stamp",
-        "Aspose.Pdf",
-        "page-modification"
+        "image",
+        "stamp",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Facades.ImageStamp",
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.HorizontalAlignment",
+        "Aspose.Pdf.VerticalAlignment",
         "Aspose.Pdf.Page.AddStamp",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     },
-    "add-bold-uppercase-header-to-pdf-pages": {
-      "title": "Add Bold Uppercase Header to Each PDF Page",
-      "filename": "add-bold-uppercase-header-to-pdf-pages.cs",
-      "description": "Demonstrates how to add a centered bold uppercase header to every page of an existing PDF using Aspose.Pdf.",
+    "add-bold-section-header-to-pdf-pages": {
+      "title": "Add Bold Section Header to PDF Pages",
+      "filename": "add-bold-section-header-to-pdf-pages.cs",
+      "description": "Shows how to loop through each page of a PDF and insert a centered, bold, uppercase header using Aspose.Pdf.",
       "tags": [
         "header",
         "pdf",
-        "aspose.pdf",
-        "text",
-        "page"
+        "textfragment",
+        "aspose-pdf",
+        "pages"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.HeaderFooter",
         "Aspose.Pdf.Text.TextFragment",
         "Aspose.Pdf.Text.FontRepository",
-        "Aspose.Pdf.Text.FontStyles",
-        "Aspose.Pdf.Color",
-        "Aspose.Pdf.HorizontalAlignment",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Text.Position"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:15:11Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T09:51:01Z",
       "status": "verified"
     }
   }

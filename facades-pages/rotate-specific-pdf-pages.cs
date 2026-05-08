@@ -10,35 +10,36 @@ class Program
         const string inputPath  = "input.pdf";
         const string outputPath = "rotated_output.pdf";
 
-        // Verify that the source file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Use PdfPageEditor (facade) to edit page rotations
+        // Use PdfPageEditor facade to edit page rotations.
         using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // Load the PDF document
+            // Load the source PDF.
             editor.BindPdf(inputPath);
 
-            // Define rotations: pages 3, 5 and 7 -> 180 degrees
+            // Define rotations for specific pages (1‑based indexing).
             var rotations = new Dictionary<int, int>
             {
                 { 3, 180 },
                 { 5, 180 },
                 { 7, 180 }
             };
+
+            // Assign the rotations to the editor.
             editor.PageRotations = rotations;
 
-            // Apply the rotation changes
+            // Apply the changes to the document.
             editor.ApplyChanges();
 
-            // Save the modified PDF
+            // Save the modified PDF.
             editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Pages 3, 5, and 7 rotated 180° and saved to '{outputPath}'.");
     }
 }

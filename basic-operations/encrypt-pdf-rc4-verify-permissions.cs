@@ -1,6 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core API (contains Document, Permissions, CryptoAlgorithm)
+using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -8,52 +9,60 @@ class Program
     {
         const string inputPath      = "input.pdf";
         const string encryptedPath  = "encrypted_rc4.pdf";
-        const string decryptedPath  = "decrypted.pdf";
-
         const string userPassword   = "user123";
         const string ownerPassword  = "owner123";
 
-        // Ensure the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // -----------------------------------------------------------------
-        // 1. Load the original PDF and encrypt it using RC4 (128‑bit) while
-        //    disabling the copy/extract permission.
-        // -----------------------------------------------------------------
+        // ---------- Encrypt ----------
+        // Permissions: allow printing only (no ExtractContent => no copying)
+        Permissions permissions = Permissions.PrintDocument;
+
         using (Document doc = new Document(inputPath))
         {
-            // Allow printing only; do NOT include ExtractContent (copy) permission.
-            Permissions permissions = Permissions.PrintDocument;
-
-            // Encrypt with RC4‑128 algorithm.
+            // Use RC4 128‑bit algorithm
             doc.Encrypt(userPassword, ownerPassword, permissions, CryptoAlgorithm.RC4x128);
-
-            // Save the encrypted document.
             doc.Save(encryptedPath);
         }
-
         Console.WriteLine($"Encrypted PDF saved to '{encryptedPath}'.");
 
-        // -----------------------------------------------------------------
-        // 2. Verify the security settings:
-        //    - Open the encrypted file with the owner password (full access).
-        //    - Decrypt it to ensure the passwords are correct.
-        //    - (Optional) Re‑save the decrypted version.
-        // -----------------------------------------------------------------
-        using (Document encryptedDoc = new Document(encryptedPath, ownerPassword))
+        // ---------- Verify encryption ----------
+        // 1. Opening without a password should fail
+        bool encryptionDetected = false;
+        try
         {
-            // Decrypt the document (no parameters required).
-            encryptedDoc.Decrypt();
-
-            // Save the decrypted copy (optional verification output).
-            encryptedDoc.Save(decryptedPath);
+            using (Document _ = new Document(encryptedPath))
+            {
+                // If we get here, the file was not encrypted (unexpected)
+            }
+        }
+        catch (PdfException)
+        {
+            encryptionDetected = true; // Expected exception for encrypted file
         }
 
-        Console.WriteLine($"Decrypted PDF saved to '{decryptedPath}'.");
-        Console.WriteLine("Encryption and verification completed successfully.");
+        Console.WriteLine(encryptionDetected
+            ? "Encryption verified: file requires a password."
+            : "Encryption verification failed: file opened without a password.");
+
+        // 2. Opening with the user password should succeed
+        try
+        {
+            using (Document doc = new Document(encryptedPath, userPassword))
+            {
+                // Simple operation to prove the document is readable
+                TextAbsorber absorber = new TextAbsorber();
+                doc.Pages.Accept(absorber);
+                Console.WriteLine($"Document opened with user password. Extracted text length: {absorber.Text.Length}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to open encrypted PDF with user password: {ex.Message}");
+        }
     }
 }

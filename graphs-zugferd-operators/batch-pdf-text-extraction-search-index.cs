@@ -1,15 +1,17 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using System.Linq;
+using Aspose.Pdf;                 // Core PDF API
+using Aspose.Pdf.Text;           // TextAbsorber resides here
 
 class Program
 {
-    static void Main()
+    // Entry point: expects optional folder path argument containing PDF files.
+    static void Main(string[] args)
     {
-        // Folder containing PDF files to be indexed
-        const string inputFolder = "pdfs";
+        // Determine the directory to scan; default to "pdfs" subfolder.
+        string inputFolder = args.Length > 0 ? args[0] : "pdfs";
 
         if (!Directory.Exists(inputFolder))
         {
@@ -17,55 +19,63 @@ class Program
             return;
         }
 
-        // In‑memory searchable index: file path -> extracted text
+        // Build an in‑memory searchable index: file path → extracted text.
+        Dictionary<string, string> index = BuildTextIndex(inputFolder);
+
+        Console.WriteLine($"Indexed {index.Count} PDF document(s).");
+        Console.WriteLine("Enter a search term (empty line to exit):");
+
+        while (true)
+        {
+            string query = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(query))
+                break;
+
+            // Perform case‑insensitive search over the indexed texts.
+            IEnumerable<string> results = SearchIndex(index, query);
+
+            Console.WriteLine($"Found in {results.Count()} file(s):");
+            foreach (string filePath in results)
+                Console.WriteLine($"  {filePath}");
+        }
+    }
+
+    // Scans the specified folder, extracts text from each PDF, and stores it.
+    static Dictionary<string, string> BuildTextIndex(string folderPath)
+    {
         var index = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-        // Batch process each PDF in the folder
-        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Enumerate all PDF files (non‑recursive for simplicity).
+        foreach (string pdfFile in Directory.GetFiles(folderPath, "*.pdf"))
         {
-            try
+            // Ensure deterministic disposal of the Document object.
+            using (Document doc = new Document(pdfFile))
             {
-                // Load PDF (lifecycle rule: use Document constructor)
-                using (Document doc = new Document(pdfPath))
-                {
-                    // Extract all text from the document (text extraction rule)
-                    TextAbsorber absorber = new TextAbsorber();
-                    doc.Pages.Accept(absorber);
+                // TextAbsorber extracts all textual content from the document.
+                TextAbsorber absorber = new TextAbsorber();
 
-                    // Store extracted text in the index
-                    index[pdfPath] = absorber.Text;
-                }
+                // Accept the absorber for all pages; this triggers extraction.
+                doc.Pages.Accept(absorber);
 
-                Console.WriteLine($"Indexed: {pdfPath}");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Failed to process '{pdfPath}': {ex.Message}");
+                // Store the extracted text keyed by the file path.
+                index[pdfFile] = absorber.Text ?? string.Empty;
             }
         }
 
-        // Simple interactive search over the in‑memory index
-        Console.WriteLine("Enter search term (empty line to exit):");
-        string term;
-        while (!string.IsNullOrEmpty(term = Console.ReadLine()))
+        return index;
+    }
+
+    // Returns the file paths whose extracted text contains the query string.
+    static IEnumerable<string> SearchIndex(Dictionary<string, string> index, string query)
+    {
+        // Simple linear scan; suitable for modest data sets.
+        foreach (var kvp in index)
         {
-            var matchingFiles = new List<string>();
-
-            foreach (var entry in index)
+            if (kvp.Value != null &&
+                kvp.Value.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)
             {
-                if (entry.Value.IndexOf(term, StringComparison.OrdinalIgnoreCase) >= 0)
-                {
-                    matchingFiles.Add(entry.Key);
-                }
+                yield return kvp.Key;
             }
-
-            Console.WriteLine($"Found in {matchingFiles.Count} document(s):");
-            foreach (string file in matchingFiles)
-            {
-                Console.WriteLine($" - {file}");
-            }
-
-            Console.WriteLine("Enter next search term (empty line to exit):");
         }
     }
 }

@@ -1,49 +1,44 @@
 using System;
 using System.IO;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf;
+using System.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string stampText = "CONFIDENTIAL";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Initialize the PdfFileStamp facade and bind the source PDF
-        PdfFileStamp fileStamp = new PdfFileStamp();
-        fileStamp.BindPdf(inputPdf);
+        // Create formatted text for the stamp – use System.Drawing.Color and a float font size
+        var ft = new FormattedText(
+            "Sample Aspose.Pdf.Facades.Stamp", // text to display
+            Color.Red,                         // System.Drawing.Color (fully qualified via using)
+            "Helvetica",                      // font name
+            EncodingType.Winansi,              // encoding
+            false,                             // embed font flag
+            36f);                              // font size as float
 
-        // Create a stamp that contains formatted text
-        Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-        FormattedText formatted = new FormattedText(
-            stampText,                     // text to display
-            System.Drawing.Color.Red,      // text color (System.Drawing.Color is required here)
-            "Helvetica",                   // font name
-            EncodingType.Winansi,          // encoding
-            false,                         // embed font flag
-            36);                           // font size
+        // Pages that should receive the stamp (1‑based indices)
+        int[] pages = { 1, 5, 10 };
 
-        stamp.BindLogo(formatted);          // bind the formatted text to the stamp
-        stamp.SetOrigin(100, 700);          // position of the stamp on the page
-        stamp.Opacity = 0.5f;               // semi‑transparent
-        stamp.IsBackground = true;          // render behind existing content
+        // Use PdfFileMend to add the text to the selected pages
+        var mend = new PdfFileMend();
+        mend.BindPdf(inputPath);
 
-        // Apply the stamp only to pages 1, 5, and 10
-        stamp.Pages = new int[] { 1, 5, 10 };
+        // Position the stamp – lower‑left (100,500) to upper‑right (300,550)
+        mend.AddText(ft, pages, 100f, 500f, 300f, 550f);
 
-        // Add the stamp to the document and save the result
-        fileStamp.AddStamp(stamp);
-        fileStamp.Save(outputPdf);
-        fileStamp.Close();
+        // Save the modified PDF and release resources
+        mend.Save(outputPath);
+        mend.Close();
 
-        Console.WriteLine($"Stamp applied to pages 1, 5, and 10. Saved as '{outputPdf}'.");
+        Console.WriteLine($"Stamp applied to pages 1, 5, and 10. Saved as '{outputPath}'.");
     }
 }

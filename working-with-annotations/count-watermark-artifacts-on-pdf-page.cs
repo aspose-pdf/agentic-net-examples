@@ -8,19 +8,20 @@ class Program
     {
         const string inputPath = "input.pdf";
 
+        // Verify the input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (using the recommended lifecycle rule)
         using (Document doc = new Document(inputPath))
         {
-            // Access the first page (1‑based indexing)
+            // Select the page to inspect (Aspose.Pdf uses 1‑based indexing)
             Page page = doc.Pages[1];
 
-            // Count artifacts of type WatermarkArtifact
+            // Count artifacts of type WatermarkArtifact on the selected page
             int watermarkCount = 0;
             foreach (Artifact artifact in page.Artifacts)
             {

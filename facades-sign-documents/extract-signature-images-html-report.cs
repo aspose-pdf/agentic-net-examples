@@ -1,77 +1,73 @@
 using System;
 using System.IO;
 using System.Text;
-using System.Collections.Generic;
-using System.Net;
 using Aspose.Pdf.Facades;
 
-class SignatureImageReport
+class Program
 {
     static void Main()
     {
-        // Input PDF that contains digital signatures
-        const string inputPdfPath = "signed.pdf";
-        // Output HTML report file
-        const string outputHtmlPath = "signature_report.html";
+        const string inputPdf  = "signed_document.pdf";
+        const string outputHtml = "signature_report.html";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Initialize the PdfFileSignature facade and bind the PDF
-        PdfFileSignature pdfSignature = new PdfFileSignature();
-        pdfSignature.BindPdf(inputPdfPath);
+        // StringBuilder to compose the HTML report
+        StringBuilder html = new StringBuilder();
+        html.AppendLine("<!DOCTYPE html>");
+        html.AppendLine("<html lang=\"en\">");
+        html.AppendLine("<head><meta charset=\"UTF-8\"><title>Signature Report</title></head>");
+        html.AppendLine("<body>");
+        html.AppendLine("<h1>Signature Images Extracted from PDF</h1>");
 
-        // Retrieve the names of all non‑empty signatures (returns IList<SignatureName>)
-        IList<SignatureName> signatureNames = pdfSignature.GetSignatureNames(true);
-
-        // Build the HTML report
-        StringBuilder htmlBuilder = new StringBuilder();
-        htmlBuilder.AppendLine("<!DOCTYPE html>");
-        htmlBuilder.AppendLine("<html>");
-        htmlBuilder.AppendLine("<head>");
-        htmlBuilder.AppendLine("<meta charset=\"UTF-8\">");
-        htmlBuilder.AppendLine("<title>Signature Images Report</title>");
-        htmlBuilder.AppendLine("</head>");
-        htmlBuilder.AppendLine("<body>");
-        htmlBuilder.AppendLine("<h1>Signature Images</h1>");
-
-        foreach (SignatureName sigObj in signatureNames)
+        // Use PdfFileSignature facade to work with signatures
+        using (PdfFileSignature pdfSignature = new PdfFileSignature())
         {
-            string sigName = sigObj.Name; // string representation for display
+            // Bind the PDF file
+            pdfSignature.BindPdf(inputPdf);
 
-            // Extract the signature image as a JPEG stream
-            Stream imageStream = pdfSignature.ExtractImage(sigObj);
+            // Retrieve all signature names (true = include empty fields if needed)
+            var signatureNames = pdfSignature.GetSignatureNames(true);
 
-            htmlBuilder.AppendLine($"<h2>{WebUtility.HtmlEncode(sigName)}</h2>");
-
-            if (imageStream != null)
+            foreach (var sigName in signatureNames)
             {
-                using (MemoryStream ms = new MemoryStream())
+                // Extract the signature image as a stream (JPEG by default)
+                using (Stream imgStream = pdfSignature.ExtractImage(sigName))
                 {
-                    imageStream.CopyTo(ms);
-                    string base64 = Convert.ToBase64String(ms.ToArray());
-                    // Embed the image using a data URI
-                    htmlBuilder.AppendLine($"<img src=\"data:image/jpeg;base64,{base64}\" alt=\"Signature {WebUtility.HtmlEncode(sigName)}\"/>");
+                    if (imgStream == null)
+                    {
+                        // No image found for this signature
+                        html.AppendLine($"<h3>{sigName}</h3>");
+                        html.AppendLine("<p>No image available.</p>");
+                        continue;
+                    }
+
+                    // Read the image bytes
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        imgStream.CopyTo(ms);
+                        byte[] imgBytes = ms.ToArray();
+
+                        // Convert to Base64 for embedding in HTML
+                        string base64 = Convert.ToBase64String(imgBytes);
+
+                        // Append image to the HTML report
+                        html.AppendLine($"<h3>{sigName}</h3>");
+                        html.AppendLine($"<img src=\"data:image/jpeg;base64,{base64}\" alt=\"Signature {sigName}\" style=\"max-width:600px;\"/>");
+                    }
                 }
-            }
-            else
-            {
-                htmlBuilder.AppendLine("<p>No image available for this signature.</p>");
             }
         }
 
-        htmlBuilder.AppendLine("</body>");
-        htmlBuilder.AppendLine("</html>");
+        html.AppendLine("</body>");
+        html.AppendLine("</html>");
 
         // Write the HTML report to disk
-        File.WriteAllText(outputHtmlPath, htmlBuilder.ToString());
-
-        // Clean up the facade
-        pdfSignature.Close();
-
-        Console.WriteLine($"Signature image report generated: {outputHtmlPath}");
+        File.WriteAllText(outputHtml, html.ToString());
+        Console.WriteLine($"Signature report generated: {outputHtml}");
     }
 }

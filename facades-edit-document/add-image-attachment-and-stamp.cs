@@ -1,83 +1,71 @@
 using System;
 using System.IO;
-using System.Drawing; // needed for Bitmap generation and System.Drawing.Color
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // Facade classes for PDF manipulation
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string inputPdfPath = "input.pdf";                 // source PDF (will be created if missing)
-        const string imageAttachmentPath = "image.jpg";         // image to attach and stamp (will be created if missing)
-        const string tempPdfPath = "temp_with_attachment.pdf"; // intermediate file
-        const string outputPdfPath = "output.pdf";              // final result
+        // Input PDF, image to attach and use as stamp, and output PDF paths
+        const string inputPdfPath   = "input.pdf";
+        const string imagePath      = "logo.png";
+        const string intermediatePdfPath = "temp_stamp.pdf";
+        const string outputPdfPath  = "output.pdf";
 
-        // ------------------------------------------------------------
-        // 1. Ensure prerequisite files exist (create a simple PDF & image)
-        // ------------------------------------------------------------
+        // Verify required files exist
         if (!File.Exists(inputPdfPath))
         {
-            // Create a minimal PDF with a single blank page
-            using (Document doc = new Document())
-            {
-                doc.Pages.Add();
-                doc.Save(inputPdfPath);
-            }
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
         }
-
-        if (!File.Exists(imageAttachmentPath))
+        if (!File.Exists(imagePath))
         {
-            // Generate a simple 100x100 red square JPEG image
-            using (Bitmap bmp = new Bitmap(100, 100))
-            {
-                using (Graphics g = Graphics.FromImage(bmp))
-                {
-                    g.Clear(System.Drawing.Color.Red);
-                }
-                bmp.Save(imageAttachmentPath, System.Drawing.Imaging.ImageFormat.Jpeg);
-            }
+            Console.Error.WriteLine($"Image file not found: {imagePath}");
+            return;
         }
 
         // ------------------------------------------------------------
-        // 2. Add the image as a document attachment (no visual annotation)
+        // 1. Add a stamp that uses the image (via BindImage)
         // ------------------------------------------------------------
-        using (PdfContentEditor contentEditor = new PdfContentEditor())
-        {
-            contentEditor.BindPdf(inputPdfPath); // load the source PDF
-            // Attach the image file; description is optional
-            contentEditor.AddDocumentAttachment(imageAttachmentPath, "Embedded image attachment");
-            // Save the PDF that now contains the attachment
-            contentEditor.Save(tempPdfPath);
-        }
-
-        // ------------------------------------------------------------
-        // 3. Add a stamp annotation that references the same image file
-        // ------------------------------------------------------------
-        // Create a stamp object and bind the image (the same file that was attached)
-        Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-        stamp.BindImage(imageAttachmentPath);          // use the image file as stamp content
-        stamp.SetOrigin(140, 400);                    // position of the stamp on the page
-        stamp.SetImageSize(50, 50);                   // size of the stamp
-        stamp.Opacity = 0.8f;                         // semi‑transparent
-        stamp.IsBackground = true;                    // place behind page content
-
-        // Initialize PdfFileStamp, bind the PDF that already has the attachment,
-        // add the stamp, and save the final document.
+        // PdfFileStamp is a facade for stamping; it implements IDisposable.
         using (PdfFileStamp fileStamp = new PdfFileStamp())
         {
-            fileStamp.BindPdf(tempPdfPath);                // load the intermediate PDF
-            fileStamp.AddStamp(stamp);                     // add the stamp annotation
-            fileStamp.Save(outputPdfPath);                 // write the result
+            // Bind the source PDF
+            fileStamp.BindPdf(inputPdfPath);
+
+            // Create a stamp and bind the image file
+            Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
+            stamp.BindImage(imagePath);                     // Image used as stamp
+            stamp.SetOrigin(100, 500);                     // Position of the stamp (lower‑left corner)
+            stamp.SetImageSize(150, 150);                  // Width and height of the stamp
+            stamp.Opacity = 0.7f;                          // Semi‑transparent
+            stamp.IsBackground = false;                    // Draw over page content
+
+            // Add the stamp to the document
+            fileStamp.AddStamp(stamp);
+
+            // Save to an intermediate file (still without attachment)
+            fileStamp.Save(intermediatePdfPath);
+            fileStamp.Close(); // Required for facades
         }
 
-        // Optional cleanup of the intermediate file
-        if (File.Exists(tempPdfPath))
+        // ------------------------------------------------------------
+        // 2. Attach the same image file to the PDF (no visual annotation)
+        // ------------------------------------------------------------
+        using (PdfContentEditor editor = new PdfContentEditor())
         {
-            File.Delete(tempPdfPath);
+            // Bind the PDF that already contains the stamp
+            editor.BindPdf(intermediatePdfPath);
+
+            // Add the image as a document attachment (no visible annotation)
+            editor.AddDocumentAttachment(imagePath, "Embedded image attachment");
+
+            // Save the final PDF with both stamp and attachment
+            editor.Save(outputPdfPath);
+            editor.Close(); // Required for facades
         }
 
-        Console.WriteLine($"PDF with attachment and stamp saved to '{outputPdfPath}'.");
+        Console.WriteLine($"PDF created with stamp and attachment: {outputPdfPath}");
     }
 }

@@ -1,5 +1,5 @@
 using System;
-using System.IO;
+using System.Runtime.InteropServices;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -9,47 +9,66 @@ class Program
     {
         const string outputPath = "multi_section.pdf";
 
-        // Create a new PDF document and ensure proper disposal
         using (Document doc = new Document())
         {
-            // Section 1: A4 portrait
+            // ---------- Section 1: A4 portrait ----------
             Page page1 = doc.Pages.Add();
-            page1.Resize(PageSize.A4); // A4 size (portrait)
-            AddSectionTitle(page1, "Section 1 - A4 Portrait");
+            page1.SetPageSize(PageSize.A4.Width, PageSize.A4.Height);
+            page1.Paragraphs.Add(new TextFragment("Section 1 - A4 Portrait"));
 
-            // Section 2: Letter landscape
+            // ---------- Section 2: A4 landscape ----------
             Page page2 = doc.Pages.Add();
-            page2.Resize(PageSize.PageLetter); // Letter size (portrait)
-            // Switch to landscape by swapping width and height
-            page2.SetPageSize(PageSize.PageLetter.Height, PageSize.PageLetter.Width);
-            AddSectionTitle(page2, "Section 2 - Letter Landscape");
+            page2.SetPageSize(PageSize.A4.Height, PageSize.A4.Width);
+            page2.Paragraphs.Add(new TextFragment("Section 2 - A4 Landscape"));
 
-            // Section 3: Custom size 400x600 points (portrait)
+            // ---------- Section 3: Letter portrait ----------
             Page page3 = doc.Pages.Add();
-            page3.SetPageSize(400, 600);
-            AddSectionTitle(page3, "Section 3 - Custom 400x600");
+            page3.SetPageSize(PageSize.PageLetter.Width, PageSize.PageLetter.Height);
+            page3.Paragraphs.Add(new TextFragment("Section 3 - Letter Portrait"));
 
-            // Section 4: A5 portrait
+            // ---------- Section 4: Letter landscape ----------
             Page page4 = doc.Pages.Add();
-            page4.Resize(PageSize.A5);
-            AddSectionTitle(page4, "Section 4 - A5 Portrait");
+            page4.SetPageSize(PageSize.PageLetter.Height, PageSize.PageLetter.Width);
+            page4.Paragraphs.Add(new TextFragment("Section 4 - Letter Landscape"));
 
-            // Save the document as PDF
-            doc.Save(outputPath);
+            // Save the document with platform‑aware handling for libgdiplus.
+            SaveDocument(doc, outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF creation finished. Check '{outputPath}' if saved.");
     }
 
-    // Helper method to add a title text to a page
-    static void AddSectionTitle(Page page, string title)
+    private static void SaveDocument(Document doc, string path)
     {
-        // Create a text fragment with desired styling
-        TextFragment tf = new TextFragment(title);
-        tf.TextState.FontSize = 24;
-        tf.TextState.Font = FontRepository.FindFont("Helvetica");
-        // Position near the top-left corner (50 points margin)
-        tf.Position = new Position(50, page.PageInfo.Height - 50);
-        page.Paragraphs.Add(tf);
+        // Windows always has GDI+; save directly.
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            doc.Save(path);
+            Console.WriteLine($"PDF saved to '{path}'.");
+            return;
+        }
+
+        // On non‑Windows platforms attempt to save and gracefully handle missing libgdiplus.
+        try
+        {
+            doc.Save(path);
+            Console.WriteLine($"PDF saved to '{path}'.");
+        }
+        catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
+        {
+            Console.WriteLine("Warning: libgdiplus (GDI+) is not available on this platform. " +
+                              "The PDF could not be saved.");
+        }
+    }
+
+    private static bool ContainsDllNotFound(Exception? ex)
+    {
+        while (ex != null)
+        {
+            if (ex is DllNotFoundException)
+                return true;
+            ex = ex.InnerException;
+        }
+        return false;
     }
 }

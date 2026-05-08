@@ -1,13 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf; // for FieldType enum
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "decorated_output.pdf";
+        const string outputPath = "decorated.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,20 +16,22 @@ class Program
             return;
         }
 
-        // Initialize FormEditor with source and destination PDF files
+        // FormEditor is a facade that implements IDisposable, so wrap it in a using block.
         using (FormEditor editor = new FormEditor(inputPath, outputPath))
         {
-            // Create a facade that defines the visual appearance for fields
+            // Create a FormFieldFacade to define visual attributes.
             editor.Facade = new FormFieldFacade();
-            editor.Facade.BackgroundColor = System.Drawing.Color.LightYellow; // field background
-            editor.Facade.TextColor       = System.Drawing.Color.DarkBlue;   // text color
-            editor.Facade.BorderColor     = System.Drawing.Color.Gray;       // border color
-            editor.Facade.Alignment       = FormFieldFacade.AlignCenter;    // text alignment
 
-            // Apply the facade to all text fields in the document
+            // Set appearance properties. System.Drawing.Color is required by the API.
+            editor.Facade.BackgroundColor = System.Drawing.Color.LightYellow;
+            editor.Facade.TextColor       = System.Drawing.Color.DarkBlue;
+            editor.Facade.BorderColor     = System.Drawing.Color.Gray;
+            editor.Facade.Alignment       = FormFieldFacade.AlignCenter;
+
+            // Apply the defined appearance to all text fields in the PDF.
             editor.DecorateField(FieldType.Text);
 
-            // Persist the changes to the output PDF
+            // Save the modified PDF to the output file specified in the constructor.
             editor.Save();
         }
 

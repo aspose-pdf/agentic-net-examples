@@ -6,23 +6,23 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputJsonPath = "form_fields.json";
+        const string inputPdf = "input.pdf";
+        const string outputJson = "form_fields.json";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document pdfDocument = new Document(inputPdfPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Export all AcroForm field names and values to a JSON file
-            // The ExportToJson method writes the JSON representation of the form fields.
-            pdfDocument.Form.ExportToJson(outputJsonPath);
+            // Export all AcroForm fields (names and values) to a JSON file
+            // ExportToJson writes the JSON representation directly to the specified file
+            doc.Form.ExportToJson(outputJson);
         }
 
-        Console.WriteLine($"AcroForm fields have been exported to '{outputJsonPath}'.");
+        Console.WriteLine($"AcroForm fields have been exported to '{outputJson}'.");
     }
 }

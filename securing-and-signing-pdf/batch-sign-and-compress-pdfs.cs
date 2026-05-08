@@ -2,74 +2,61 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Drawing;
 
-class Program
+class BatchSignAndCompress
 {
     static void Main()
     {
-        // Input folder containing PDFs to be processed
-        const string inputFolder = "InputPdfs";
-        // Output folder for signed and compressed PDFs
-        const string outputFolder = "SignedCompressedPdfs";
-        // Path to the PFX certificate and its password
-        const string pfxPath = "certificate.pfx";
-        const string pfxPassword = "password";
+        // Build platform‑independent input / output folders relative to the executable location
+        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        string inputFolder = System.IO.Path.Combine(baseDir, "Pdf", "Input");
+        string outputFolder = System.IO.Path.Combine(baseDir, "Pdf", "Output");
 
-        // Ensure the output directory exists
+        // Digital certificate (PFX) and its password – also built relative to the executable
+        string pfxPath = System.IO.Path.Combine(baseDir, "Cert", "mycert.pfx");
+        const string pfxPassword = "myPassword";
+
+        // Ensure folders exist (creates them if they are missing)
+        Directory.CreateDirectory(inputFolder);
         Directory.CreateDirectory(outputFolder);
-
-        // Ensure the input directory exists – if it does not, create it and exit gracefully
-        if (!Directory.Exists(inputFolder))
-        {
-            Console.WriteLine($"Input folder '{inputFolder}' does not exist. Creating it now. Place PDFs to be processed in this folder and re‑run the program.");
-            Directory.CreateDirectory(inputFolder);
-            return; // nothing to process yet
-        }
 
         // Process each PDF file in the input folder
         foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            string fileName = Path.GetFileNameWithoutExtension(pdfPath);
-            string outputPath = Path.Combine(outputFolder, $"{fileName}_signed.pdf");
+            // Determine output file path (fully qualify System.IO.Path to avoid ambiguity)
+            string outputPath = System.IO.Path.Combine(outputFolder, System.IO.Path.GetFileName(pdfPath));
 
-            try
+            // Load the PDF document (using the recommended constructor)
+            using (Document doc = new Document(pdfPath))
             {
-                // Load the PDF document (lifecycle rule: use Document constructor)
-                using (Document doc = new Document(pdfPath))
+                // Add a signature field on the first page
+                // Fully qualified Rectangle avoids ambiguity with Aspose.Pdf.Drawing.Rectangle
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+                Page firstPage = doc.Pages[1]; // 1‑based indexing
+                SignatureField sigField = new SignatureField(firstPage, rect)
                 {
-                    // Define the signature field rectangle (fully qualified to avoid ambiguity)
-                    Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 100, 250, 150);
+                    PartialName = "Signature1"
+                };
 
-                    // Create a signature field on the first page
-                    SignatureField sigField = new SignatureField(doc.Pages[1], rect)
-                    {
-                        PartialName = "Signature"
-                    };
+                // Create a concrete Signature object (PKCS7) from the PFX file
+                PKCS7 pkcs7 = new PKCS7(pfxPath, pfxPassword);
+                // Optionally set additional properties
+                // pkcs7.Reason = "Approved";
+                // pkcs7.Location = "Head Office";
+                // pkcs7.ContactInfo = "admin@example.com";
 
-                    // Initialize the concrete PKCS7 signature object from the PFX file
-                    PKCS7 pkcs7 = new PKCS7(pfxPath, pfxPassword)
-                    {
-                        Reason = "Document approved",
-                        Location = "Office",
-                        ContactInfo = "contact@example.com"
-                    };
+                // Apply the signature to the field
+                sigField.Sign(pkcs7);
 
-                    // Apply the digital signature to the field
-                    sigField.Sign(pkcs7);
+                // Optimize resources to compress the signed document
+                doc.OptimizeResources();
 
-                    // Compress the signed document (optimizes resources and reduces size)
-                    doc.OptimizeResources();
-
-                    // Save the signed and compressed PDF (lifecycle rule: use Document.Save)
-                    doc.Save(outputPath);
-                }
-
-                Console.WriteLine($"Processed: {pdfPath} → {outputPath}");
+                // Save the signed and compressed PDF
+                doc.Save(outputPath);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
-            }
+
+            Console.WriteLine($"Processed: {System.IO.Path.GetFileName(pdfPath)} → {outputPath}");
         }
     }
 }

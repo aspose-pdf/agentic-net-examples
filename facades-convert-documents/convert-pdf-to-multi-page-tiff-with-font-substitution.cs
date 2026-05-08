@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Text;
 
@@ -12,21 +13,22 @@ class Program
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Substitute the Symbol font with Arial Unicode MS (or any installed Unicode font)
+        // Register a custom font substitution: replace missing Symbol font with Arial Unicode MS.
+        // This substitution is applied globally for the current AppDomain.
         FontRepository.Substitutions.Add(new SimpleFontSubstitution("Symbol", "Arial Unicode MS"));
 
-        // Convert the PDF pages to a single multi‑page TIFF file
+        // Convert PDF pages to a single multi‑page TIFF file.
         using (PdfConverter converter = new PdfConverter())
         {
             converter.BindPdf(inputPdf);
-            converter.DoConvert();                     // Prepare conversion
-            converter.SaveAsTIFF(outputTiff);          // Save all pages as one TIFF
+            converter.DoConvert();
+            converter.SaveAsTIFF(outputTiff);
         }
 
-        Console.WriteLine($"PDF converted to TIFF: {outputTiff}");
+        Console.WriteLine($"TIFF image saved to '{outputTiff}'.");
     }
 }

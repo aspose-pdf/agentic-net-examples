@@ -1,6 +1,6 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -8,79 +8,71 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "template.pdf";
-        const string csvPath = "data.csv";
+        const string pdfPath   = "template.pdf";   // PDF with form fields
+        const string csvPath   = "data.csv";       // CSV file containing field values
         const string outputPdf = "filled.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
+
         if (!File.Exists(csvPath))
         {
-            Console.Error.WriteLine($"CSV file not found: {csvPath}");
+            Console.Error.WriteLine($"CSV not found: {csvPath}");
             return;
         }
 
-        // Load CSV into a dictionary: column header -> value
-        var fieldValues = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        using (StreamReader reader = new StreamReader(csvPath))
+        // Load CSV into a dictionary: header -> value (assumes a single data row)
+        Dictionary<string, string> fieldValues = LoadCsv(csvPath);
+
+        // Open the PDF document inside a using block (ensures proper disposal)
+        using (Document doc = new Document(pdfPath))
         {
-            // Read header line
-            string headerLine = reader.ReadLine();
-            if (headerLine == null)
-            {
-                Console.Error.WriteLine("CSV file is empty.");
-                return;
-            }
-            string[] headers = SplitCsvLine(headerLine);
-
-            // Read first data line (assumes a single record)
-            string dataLine = reader.ReadLine();
-            if (dataLine == null)
-            {
-                Console.Error.WriteLine("CSV file does not contain data rows.");
-                return;
-            }
-            string[] values = SplitCsvLine(dataLine);
-
-            int count = Math.Min(headers.Length, values.Length);
-            for (int i = 0; i < count; i++)
-            {
-                fieldValues[headers[i].Trim()] = values[i].Trim();
-            }
-        }
-
-        // Open PDF and populate form fields
-        using (Document doc = new Document(inputPdf))
-        {
-            // Turn off auto‑recalculation for performance while filling
-            doc.Form.AutoRecalculate = false;
-
+            // Iterate over all form fields and set their values if a matching entry exists
             foreach (Field field in doc.Form.Fields)
             {
-                // Use the full qualified field name for matching
-                string name = field.FullName;
-                if (fieldValues.TryGetValue(name, out string value))
+                if (fieldValues.TryGetValue(field.FullName, out string value))
                 {
-                    field.Value = value; // Set field value
+                    field.Value = value;
+                }
+                else if (fieldValues.TryGetValue(field.PartialName, out value))
+                {
+                    // Fallback to partial name if full name not found
+                    field.Value = value;
                 }
             }
 
-            // Re‑enable automatic recalculation. No explicit Recalculate method exists.
-            doc.Form.AutoRecalculate = true;
-
-            // Save the filled PDF
+            // Save the populated PDF
             doc.Save(outputPdf);
         }
 
         Console.WriteLine($"PDF saved to '{outputPdf}'.");
     }
 
-    // Simple CSV splitter (does not handle quoted commas)
-    static string[] SplitCsvLine(string line)
+    // Simple CSV loader: expects first line as headers, second line as values
+    private static Dictionary<string, string> LoadCsv(string csvFilePath)
     {
-        return line.Split(',');
+        var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        string[] lines = File.ReadAllLines(csvFilePath);
+
+        if (lines.Length < 2)
+            return dict; // No data
+
+        // Split header and data rows by commas (basic CSV, no quoted commas handling)
+        string[] headers = lines[0].Split(',');
+        string[] values  = lines[1].Split(',');
+
+        int count = Math.Min(headers.Length, values.Length);
+        for (int i = 0; i < count; i++)
+        {
+            string key = headers[i].Trim();
+            string val = values[i].Trim();
+            if (!dict.ContainsKey(key))
+                dict.Add(key, val);
+        }
+
+        return dict;
     }
 }

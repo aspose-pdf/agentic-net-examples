@@ -8,41 +8,48 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        // ---------------------------------------------------------------------
+        // 1. Create a minimal PDF in memory (so we don't depend on an external file)
+        // ---------------------------------------------------------------------
+        using (var sourceStream = new MemoryStream())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            // Create a new PDF document with a single blank page
+            var tempDoc = new Document();
+            tempDoc.Pages.Add();
+            tempDoc.Save(sourceStream);
+            sourceStream.Position = 0; // reset for reading
 
-        // Use PdfAnnotationEditor in a using block for deterministic disposal
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-        {
-            // Load the PDF document
-            editor.BindPdf(inputPath);
-
-            // Get a reference to the first page (required for the TextAnnotation constructor)
-            Page firstPage = editor.Document.Pages[1];
-            // Create a zero‑size rectangle – the rectangle is not used when only modifying properties
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(0, 0, 0, 0);
-
-            // Create a TextAnnotation with the (Page, Rectangle) constructor and set the Modified date.
-            TextAnnotation annot = new TextAnnotation(firstPage, rect)
+            // ---------------------------------------------------------------
+            // 2. Open the PDF with PdfAnnotationEditor and add/modify an annotation
+            // ---------------------------------------------------------------
+            using (var editor = new PdfAnnotationEditor())
             {
-                Modified = DateTime.Now // set the modified date to the current system time
-                // Optional: you can also set Title, Contents, Color, Subject, Open here
-            };
+                // Bind the in‑memory PDF (no file system access required)
+                editor.BindPdf(sourceStream);
 
-            // Apply the modification to all pages (pages are 1‑based)
-            int pageCount = editor.Document.Pages.Count;
-            editor.ModifyAnnotations(1, pageCount, annot);
+                // Access the first page (Aspose.Pdf uses 1‑based indexing)
+                Page page = editor.Document.Pages[1];
 
-            // Save the updated PDF
-            editor.Save(outputPath);
+                // Define the annotation rectangle (left, bottom, right, top)
+                var rect = new Rectangle(100, 500, 200, 550);
+
+                // Create a TextAnnotation and set its Modified date to the current time
+                var annot = new TextAnnotation(page, rect)
+                {
+                    Modified = DateTime.Now,
+                    Title    = "Updated",
+                    Contents = "Modified timestamp refreshed",
+                    Color    = Color.Red
+                };
+
+                // Apply the annotation to page 1 (start = end = 1)
+                editor.ModifyAnnotations(1, 1, annot);
+
+                // Save the updated PDF to disk (or you could save to another stream)
+                editor.Save(outputPath);
+            }
         }
-
-        Console.WriteLine($"Annotation modified date updated and saved to '{outputPath}'.");
     }
 }

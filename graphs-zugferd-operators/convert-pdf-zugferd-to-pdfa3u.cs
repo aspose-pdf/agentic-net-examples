@@ -6,27 +6,31 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // PDF with ZUGFeRD attachment
-        const string outputPdf = "output_pdfa3u.pdf";   // Resulting PDF/A‑3u file
-        const string logFile   = "conversion.log";     // Optional conversion log
+        const string inputPath  = "input.pdf";          // PDF with ZUGFeRD attachment
+        const string outputPath = "output_pdfa3u.pdf";   // Resulting PDF/A‑3U file
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the source PDF (ZUGFeRD attachment is kept in the document object)
-        using (Document doc = new Document(inputPdf))
+        // Load the source PDF
+        using (Document doc = new Document(inputPath))
         {
-            // Convert to PDF/A‑3u. Attachments (including the ZUGFeRD XML) are preserved by default.
-            // ConvertErrorAction.Delete removes objects that cannot be converted.
-            doc.Convert(logFile, PdfFormat.PDF_A_3U, ConvertErrorAction.Delete);
+            // Set up conversion options for PDF/A‑3U
+            PdfFormatConversionOptions convertOptions = new PdfFormatConversionOptions(PdfFormat.PDF_A_3U);
+            // (Optional) handle Private‑Use‑Area symbols if present
+            // convertOptions.PuaSymbolsProcessingStrategy = 
+            //     PdfFormatConversionOptions.PuaSymbolsProcessingStrategies.SurroundPuaTextWithEmptyActualText;
 
-            // Save the converted document.
-            doc.Save(outputPdf);
+            // Perform the conversion; embedded files (ZUGFeRD XML) are preserved by default
+            doc.Convert(convertOptions);
+
+            // Save the converted document as PDF/A‑3U
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF/A‑3u file saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF/A‑3U file saved to '{outputPath}'.");
     }
 }

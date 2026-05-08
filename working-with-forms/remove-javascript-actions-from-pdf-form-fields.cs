@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations; // needed for AnnotationActionCollection
 
 class Program
 {
@@ -13,36 +12,24 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all form fields and clear any attached JavaScript actions
-            foreach (Field field in doc.Form.Fields)
+            // Configure flatten settings to avoid executing any JavaScript actions
+            Form.FlattenSettings flattenSettings = new Form.FlattenSettings
             {
-                // Field.Actions may be null if no actions are defined
-                if (field.Actions != null)
-                {
-                    // Clear all supported JavaScript action properties
-                    field.Actions.OnEnter            = null;
-                    field.Actions.OnExit             = null;
-                    field.Actions.OnPressMouseBtn    = null;
-                    field.Actions.OnReleaseMouseBtn  = null;
-                    field.Actions.OnReceiveFocus     = null;
-                    field.Actions.OnLostFocus        = null;
-                    field.Actions.OnOpenPage         = null;
-                    field.Actions.OnClosePage        = null;
-                    field.Actions.OnShowPage         = null;
-                    field.Actions.OnHidePage         = null;
-                    field.Actions.OnModifyCharacter  = null;
-                    field.Actions.OnValidate         = null;
-                    field.Actions.OnFormat           = null;
-                    field.Actions.OnCalculate        = null;
-                }
-            }
+                CallEvents          = false, // Do not invoke JavaScript events
+                HideButtons         = false,
+                UpdateAppearances   = false,
+                ApplyRedactions     = false
+            };
+
+            // Flatten the document – this removes all form fields (and any attached JavaScript)
+            doc.Flatten(flattenSettings);
 
             // Save the cleaned PDF
             doc.Save(outputPath);

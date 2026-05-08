@@ -1,71 +1,58 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Drawing.Imaging;               // ImageFormat enum
-using Aspose.Pdf;                           // Document
-using Aspose.Pdf.Facades;                   // PdfConverter
+using Aspose.Pdf.Facades;          // Facade APIs (PdfConverter)
+using System.Drawing;
+using System.Drawing.Imaging;      // ImageFormat for PNG
 
-class PdfToPngReverse
+class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";               // source PDF
-        const string outputDir = "PngPages";                // folder for PNGs
-
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
-            return;
-        }
+        const string inputPdf  = "input.pdf";                 // source PDF
+        const string outputDir = "output_images";             // folder for PNGs
 
         // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
-        using (Document doc = new Document(inputPdf))
+        // Verify that the input PDF exists before proceeding
+        if (!File.Exists(inputPdf))
         {
-            int pageCount = doc.Pages.Count; // 1‑based page count
-
-            // Initialize PdfConverter on the loaded document (Facades API)
-            using (PdfConverter converter = new PdfConverter(doc))
-            {
-                // Convert the whole range; order of extraction will be forward
-                converter.StartPage = 1;
-                converter.EndPage   = pageCount;
-                converter.DoConvert();
-
-                // Collect each page image into memory streams
-                List<MemoryStream> pageImages = new List<MemoryStream>();
-                while (converter.HasNextImage())
-                {
-                    MemoryStream imgStream = new MemoryStream();
-                    // Get next image as PNG (explicit format)
-                    converter.GetNextImage(imgStream, ImageFormat.Png);
-                    imgStream.Position = 0;               // reset for later reading
-                    pageImages.Add(imgStream);
-                }
-
-                // Process pages in reverse order
-                for (int i = pageImages.Count - 1; i >= 0; i--)
-                {
-                    int originalPageNumber = i + 1; // because list is 0‑based
-                    string outPath = Path.Combine(outputDir, $"page_{originalPageNumber}_rev.png");
-
-                    // Write the memory stream to a file
-                    using (FileStream file = new FileStream(outPath, FileMode.Create, FileAccess.Write))
-                    {
-                        pageImages[i].CopyTo(file);
-                    }
-
-                    // Dispose the individual memory stream
-                    pageImages[i].Dispose();
-                }
-
-                // Close the converter (optional, using will also dispose)
-                converter.Close();
-            }
+            Console.WriteLine($"Error: The file '{inputPdf}' was not found.");
+            return;
         }
 
-        Console.WriteLine("PDF pages have been saved as PNG images in reverse order.");
+        // PdfConverter is a Facade; wrap in using for deterministic disposal
+        using (PdfConverter converter = new PdfConverter())
+        {
+            // Bind the PDF file to the converter
+            converter.BindPdf(inputPdf);
+
+            // Total number of pages (1‑based indexing)
+            int pageCount = converter.PageCount;
+
+            // Process pages in reverse order: last page to first page
+            for (int pageNum = pageCount; pageNum >= 1; pageNum--)
+            {
+                // Restrict conversion to a single page
+                converter.StartPage = pageNum;
+                converter.EndPage   = pageNum;
+
+                // Prepare the converter for the selected page range
+                converter.DoConvert();
+
+                // Build output file name (e.g., page_5.png)
+                string outputPath = Path.Combine(outputDir, $"page_{pageNum}.png");
+
+                // Suppress the platform‑specific warning for ImageFormat.Png (CA1416)
+#pragma warning disable CA1416 // Validate platform compatibility
+                converter.GetNextImage(outputPath, ImageFormat.Png);
+#pragma warning restore CA1416 // Validate platform compatibility
+            }
+
+            // Release any resources held by the converter
+            converter.Close();
+        }
+
+        Console.WriteLine("PDF pages have been converted to PNG images in reverse order.");
     }
 }

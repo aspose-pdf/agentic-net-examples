@@ -6,26 +6,26 @@ class ExportFormFieldsToFdf
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string fdfPath = "output.fdf";
+        const string inputPdf = "input.pdf";
+        const string outputFdf = "output.fdf";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Initialize the Form facade with the source PDF
-        using (Form form = new Form(pdfPath))
+        // Load the PDF form using the Form facade (handles PDF opening internally)
+        using (Form form = new Form(inputPdf))
         {
-            // Create a file stream for the FDF output
-            using (FileStream fdfStream = new FileStream(fdfPath, FileMode.Create, FileAccess.Write))
+            // Create a writable stream for the FDF output
+            using (FileStream fdfStream = new FileStream(outputFdf, FileMode.Create, FileAccess.Write))
             {
                 // Export all form fields to the FDF stream
                 form.ExportFdf(fdfStream);
             }
         }
 
-        Console.WriteLine($"Form fields exported to FDF: {fdfPath}");
+        Console.WriteLine($"Form fields exported to '{outputFdf}'.");
     }
 }

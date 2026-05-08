@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,24 +16,29 @@ class Program
             return;
         }
 
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Define the rectangle area for the highlight annotation
+            // Get the first page (1‑based indexing)
+            Page page = doc.Pages[1];
+
+            // Define the rectangle area to be highlighted
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 520);
 
-            // Create the highlight annotation on the first page
-            HighlightAnnotation highlight = new HighlightAnnotation(doc.Pages[1], rect)
+            // Create a highlight annotation
+            HighlightAnnotation highlight = new HighlightAnnotation(page, rect)
             {
-                Opacity = 0.7 // 70% opacity for subtle emphasis
+                Color   = Aspose.Pdf.Color.Yellow, // visual highlight color
+                Opacity = 0.7                         // 70% opacity for subtle emphasis
             };
 
             // Add the annotation to the page
-            doc.Pages[1].Annotations.Add(highlight);
+            page.Annotations.Add(highlight);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Highlight annotation added with 70% opacity. Saved to '{outputPath}'.");
+        Console.WriteLine($"Highlight annotation with 70% opacity saved to '{outputPath}'.");
     }
 }

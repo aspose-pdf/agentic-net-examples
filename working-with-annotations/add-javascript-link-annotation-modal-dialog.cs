@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_with_js.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,33 +16,32 @@ class Program
             return;
         }
 
-        // Load the PDF document (using rule: document-disposal-with-using)
+        // Load the PDF inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Get the first page (pages are 1‑based)
+            // Use the first page (1‑based indexing)
             Page page = doc.Pages[1];
 
-            // Define the rectangle area for the link annotation
-            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
+            // Define the clickable area for the link annotation
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Create the link annotation on the specified page and rectangle
-            LinkAnnotation link = new LinkAnnotation(page, rect);
+            // Create the link annotation
+            LinkAnnotation link = new LinkAnnotation(page, rect)
+            {
+                Color = Aspose.Pdf.Color.Blue,   // visual border color
+                Contents = "Show dialog"          // tooltip text
+            };
 
-            // JavaScript action that shows a modal dialog box
-            // The script uses the built‑in app.alert method
+            // JavaScript that shows a modal dialog box
             JavascriptAction jsAction = new JavascriptAction("app.alert('Custom modal dialog');");
 
             // Assign the JavaScript action to the annotation
             link.Action = jsAction;
 
-            // Optional: set a visible border color for the annotation
-            link.Color = Aspose.Pdf.Color.Blue;
-
-            // Add the annotation to the page's annotation collection
+            // Add the annotation to the page
             page.Annotations.Add(link);
 
-            // Save the modified PDF (PDF format, no SaveOptions needed)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

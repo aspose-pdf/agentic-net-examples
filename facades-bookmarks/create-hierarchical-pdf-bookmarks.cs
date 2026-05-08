@@ -1,64 +1,91 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades; // PdfBookmarkEditor, Bookmark, Bookmarks
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input and output PDF paths
         const string inputPdf = "input.pdf";
         const string outputPdf = "output_bookmarked.pdf";
 
-        // Ensure a source PDF exists – create a simple one if missing
         if (!File.Exists(inputPdf))
         {
-            using (Document doc = new Document())
-            {
-                // Add a single blank page
-                doc.Pages.Add();
-                doc.Save(inputPdf);
-            }
+            Console.Error.WriteLine($"File not found: {inputPdf}");
+            return;
         }
 
-        // Example chapter titles and their corresponding page numbers
-        string[] chapterTitles = { "Chapter 1", "Chapter 2", "Chapter 3" };
-        int[]    chapterPages  = { 1, 5, 9 };
-
-        // Initialize the bookmark editor and bind the source PDF
-        PdfBookmarkEditor editor = new PdfBookmarkEditor();
-        editor.BindPdf(inputPdf);
-
-        // Build a root bookmark (optional – can be omitted if not needed)
-        Bookmark rootBookmark = new Bookmark
+        // Initialize the bookmark editor and bind the PDF file
+        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
         {
-            Title      = "Document Outline",
-            Action     = "GoTo",
-            PageNumber = 1 // root can point to the first page
-        };
+            editor.BindPdf(inputPdf);
 
-        // Create a collection for child bookmarks (one per chapter)
-        Bookmarks chapterBookmarks = new Bookmarks();
+            // Build hierarchical bookmarks
+            // Example hierarchy:
+            // Chapter 1 (page 1)
+            //   Section 1.1 (page 2)
+            //   Section 1.2 (page 3)
+            // Chapter 2 (page 5)
+            //   Section 2.1 (page 6)
 
-        for (int i = 0; i < chapterTitles.Length; i++)
-        {
-            Bookmark chapter = new Bookmark
+            // Leaf bookmarks for Chapter 1
+            Bookmark sec11 = new Bookmark
             {
-                Title      = chapterTitles[i],
-                PageNumber = chapterPages[i],
-                Action     = "GoTo"
+                Title = "Section 1.1",
+                PageNumber = 2,
+                Action = "GoTo"
             };
-            chapterBookmarks.Add(chapter);
+            Bookmark sec12 = new Bookmark
+            {
+                Title = "Section 1.2",
+                PageNumber = 3,
+                Action = "GoTo"
+            };
+            // Group sections under Chapter 1
+            Bookmarks chapter1Children = new Bookmarks();
+            chapter1Children.Add(sec11);
+            chapter1Children.Add(sec12);
+            Bookmark chapter1 = new Bookmark
+            {
+                Title = "Chapter 1",
+                PageNumber = 1,
+                Action = "GoTo",
+                ChildItem = chapter1Children
+            };
+
+            // Leaf bookmark for Chapter 2
+            Bookmark sec21 = new Bookmark
+            {
+                Title = "Section 2.1",
+                PageNumber = 6,
+                Action = "GoTo"
+            };
+            // Group under Chapter 2
+            Bookmarks chapter2Children = new Bookmarks();
+            chapter2Children.Add(sec21);
+            Bookmark chapter2 = new Bookmark
+            {
+                Title = "Chapter 2",
+                PageNumber = 5,
+                Action = "GoTo",
+                ChildItem = chapter2Children
+            };
+
+            // Top‑level collection of chapters
+            Bookmarks rootBookmarks = new Bookmarks();
+            rootBookmarks.Add(chapter1);
+            rootBookmarks.Add(chapter2);
+
+            // Add each top‑level bookmark (which includes its children) to the PDF
+            foreach (Bookmark bm in rootBookmarks)
+            {
+                editor.CreateBookmarks(bm);
+            }
+
+            // Save the PDF with the new bookmark hierarchy
+            editor.Save(outputPdf);
         }
 
-        // Attach the child collection to the root bookmark using the non‑obsolete property
-        rootBookmark.ChildItems = chapterBookmarks;
-
-        // Add the hierarchical bookmark structure to the PDF
-        editor.CreateBookmarks(rootBookmark);
-
-        // Save the modified PDF with the new bookmarks
-        editor.Save(outputPdf);
+        Console.WriteLine($"Bookmarks added and saved to '{outputPdf}'.");
     }
 }

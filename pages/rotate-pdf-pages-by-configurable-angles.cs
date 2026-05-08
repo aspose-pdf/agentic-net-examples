@@ -13,11 +13,12 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Configuration: page number (1‑based) -> rotation angle in degrees (must be 0, 90, 180, 270)
+        // Configuration: page number (1‑based) -> rotation angle in degrees
+        // Only multiples of 90 are supported by the Rotation enum.
         var pageRotations = new Dictionary<int, int>
         {
             { 1, 90 },   // Rotate page 1 by 90°
@@ -31,18 +32,22 @@ class Program
         {
             foreach (var kvp in pageRotations)
             {
-                int pageNumber = kvp.Key;   // 1‑based index
-                int angle      = kvp.Value; // degrees
+                int pageNumber = kvp.Key;
+                int angle      = kvp.Value;
 
-                // Ensure the page exists
+                // Ensure the page exists (Aspose.Pdf uses 1‑based indexing)
                 if (pageNumber < 1 || pageNumber > doc.Pages.Count)
                 {
-                    Console.Error.WriteLine($"Page {pageNumber} is out of range. Skipping.");
+                    Console.WriteLine($"Skipping page {pageNumber}: out of range.");
                     continue;
                 }
 
-                // Convert integer angle to the Rotation enum and assign
-                doc.Pages[pageNumber].Rotate = Page.IntToRotation(angle);
+                // Convert the integer angle to the corresponding Rotation enum value
+                // Page.IntToRotation handles 0, 90, 180, 270 degrees.
+                Rotation rotationEnum = Page.IntToRotation(angle);
+
+                // Apply the rotation to the page
+                doc.Pages[pageNumber].Rotate = rotationEnum;
             }
 
             // Save the modified document

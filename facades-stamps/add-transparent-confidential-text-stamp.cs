@@ -1,54 +1,54 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Facades;
+using System.Drawing; // Required for System.Drawing.Color
 
 class Program
 {
     static void Main()
     {
-        // Input PDF, output PDF and the pages on which the stamp should appear
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
-        int[] selectedPages = new int[] { 1, 3, 5 };   // example: pages 1, 3 and 5
+        const string inputPath = "input.pdf";
+        const string outputPath = "confidential_output.pdf";
 
-        if (!File.Exists(inputPdf))
+        // Pages on which the stamp should appear (1‑based indexing)
+        int[] selectedPages = new int[] { 1, 3, 5 };
+
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the source document (use using for deterministic disposal)
-        using (Document doc = new Document(inputPdf))
+        // Create formatted text for the stamp using the Facades overload that expects
+        // System.Drawing.Color and a float font size.
+        Aspose.Pdf.Facades.FormattedText ft = new Aspose.Pdf.Facades.FormattedText(
+            "CONFIDENTIAL",
+            System.Drawing.Color.Red,               // System.Drawing.Color required
+            "Helvetica",
+            Aspose.Pdf.Facades.EncodingType.Winansi,
+            false,
+            48f);                                   // float font size
+
+        // Fully qualify Stamp to avoid ambiguity with other Stamp classes
+        Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
+        stamp.BindLogo(ft);          // Bind the text to the stamp
+        stamp.Opacity = 0.7f;        // 70% opacity (0 = fully transparent, 1 = opaque)
+        stamp.IsBackground = true;  // Place stamp behind page content
+        stamp.Pages = selectedPages; // Apply only to selected pages
+
+        // Optional positioning and size (adjust as needed)
+        stamp.SetOrigin(100, 400);   // X, Y coordinates (from bottom‑left)
+        stamp.SetImageSize(300, 100); // Width, Height of the text bounding box
+
+        // Use PdfFileStamp facade to apply the stamp
+        using (PdfFileStamp fileStamp = new PdfFileStamp())
         {
-            // Create a TextStamp – it supports opacity directly
-            foreach (int pageNumber in selectedPages)
-            {
-                // Guard against out‑of‑range page numbers
-                if (pageNumber < 1 || pageNumber > doc.Pages.Count)
-                    continue;
-
-                TextStamp stamp = new TextStamp("CONFIDENTIAL")
-                {
-                    Opacity = 0.7f,               // 70% opacity
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment   = VerticalAlignment.Center
-                };
-
-                // Configure visual appearance of the stamp (TextState is read‑only, modify its members)
-                stamp.TextState.Font = FontRepository.FindFont("Helvetica");
-                stamp.TextState.FontSize = 48;
-                stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Red; // fully qualified to avoid ambiguity
-                stamp.TextState.FontStyle = FontStyles.Bold;
-
-                // Apply the stamp to the selected page
-                doc.Pages[pageNumber].AddStamp(stamp);
-            }
-
-            // Save the result
-            doc.Save(outputPdf);
+            fileStamp.BindPdf(inputPath); // Load source PDF
+            fileStamp.AddStamp(stamp);    // Add the configured stamp
+            fileStamp.Save(outputPath);   // Save the stamped PDF
         }
 
-        Console.WriteLine($"Transparent text stamp applied. Output saved to '{outputPdf}'.");
+        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
     }
 }

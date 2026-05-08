@@ -7,29 +7,29 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string jsonPath = "form_schema.json";
+        const string inputPdfPath = "input.pdf";
+        const string outputJsonPath = "form_fields.json";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
         // Load the PDF document
-        using (Document doc = new Document(pdfPath))
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Configure JSON export options
-            ExportFieldsToJsonOptions options = new ExportFieldsToJsonOptions
+            // Set JSON export options (indent output for readability, do not export password values)
+            ExportFieldsToJsonOptions jsonOptions = new ExportFieldsToJsonOptions
             {
-                WriteIndented = true,          // make JSON human‑readable
-                ExportPasswordValue = false    // do not include password values
+                WriteIndented = true,
+                ExportPasswordValue = false
             };
 
             // Export all form fields to a JSON file
-            doc.Form.ExportToJson(jsonPath, options);
+            pdfDoc.Form.ExportToJson(outputJsonPath, jsonOptions);
         }
 
-        Console.WriteLine($"Form field schema exported to '{jsonPath}'.");
+        Console.WriteLine($"Form field definitions exported to JSON at: {outputJsonPath}");
     }
 }

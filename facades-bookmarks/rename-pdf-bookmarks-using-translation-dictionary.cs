@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
 using Aspose.Pdf.Facades;
 
@@ -6,40 +7,43 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "renamed_bookmarks.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_translated.pdf";
 
-        if (!System.IO.File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Translation dictionary: key = existing bookmark title, value = new title
-        var translationMap = new Dictionary<string, string>
+        // Dictionary mapping original bookmark titles to their translations
+        var translationDict = new Dictionary<string, string>(StringComparer.Ordinal)
         {
-            { "Chapter 1", "Kapitel 1" },
-            { "Introduction", "Einleitung" },
-            { "Conclusion", "Fazit" }
-            // Add more mappings as needed
+            { "Chapter 1", "Capítulo 1" },
+            { "Introduction", "Introducción" },
+            // Add additional mappings as needed
         };
 
         try
         {
-            // Initialize the bookmark editor and bind the source PDF
-            PdfBookmarkEditor editor = new PdfBookmarkEditor();
-            editor.BindPdf(inputPdf);
-
-            // Rename each bookmark according to the dictionary
-            foreach (var kvp in translationMap)
+            // Use the PdfBookmarkEditor facade to work with bookmarks
+            using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
             {
-                // ModifyBookmarks changes all occurrences of the source title to the destination title
-                editor.ModifyBookmarks(kvp.Key, kvp.Value);
+                // Load the PDF document
+                editor.BindPdf(inputPath);
+
+                // Rename bookmarks according to the translation dictionary
+                foreach (var kvp in translationDict)
+                {
+                    // ModifyBookmarks changes all bookmarks with the source title to the new title
+                    editor.ModifyBookmarks(kvp.Key, kvp.Value);
+                }
+
+                // Save the updated PDF
+                editor.Save(outputPath);
             }
 
-            // Save the modified PDF
-            editor.Save(outputPdf);
-            Console.WriteLine($"Bookmarks renamed and saved to '{outputPdf}'.");
+            Console.WriteLine($"Bookmarks renamed and saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

@@ -8,40 +8,32 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "signed_output.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "signed_output.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using)
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document (using statement ensures proper disposal)
+        using (Document doc = new Document(inputPdf))
         {
-            // Define the signature field rectangle (fully qualified to avoid ambiguity)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 100, 250, 150);
-
-            // Create a signature field on the first page
-            SignatureField signatureField = new SignatureField(doc, rect)
-            {
-                PartialName = "Signature1"
-            };
-            doc.Form.Add(signatureField);
-
-            // Open the personal certificate store and retrieve certificates (smart‑card certificates will trigger PIN entry)
+            // Open the personal (My) certificate store of the current user.
             X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
             store.Open(OpenFlags.ReadOnly);
-            X509Certificate2Collection availableCerts = store.Certificates;
-            store.Close();
+            X509Certificate2Collection allCerts = store.Certificates;
 
-            // Prompt the user to select a certificate
+            // Prompt the user to select a certificate from the smart card / store.
+            // The OS will handle PIN entry when the private key is accessed.
             X509Certificate2Collection selected = X509Certificate2UI.SelectFromCollection(
-                availableCerts,
+                allCerts,
                 "Select Certificate",
-                "Choose a certificate stored on a smart card",
+                "Choose the certificate stored on your smart card",
                 X509SelectionFlag.SingleSelection);
+
+            store.Close();
 
             if (selected == null || selected.Count == 0)
             {
@@ -51,22 +43,27 @@ class Program
 
             X509Certificate2 cert = selected[0];
 
-            // Create an ExternalSignature (detached PKCS#7) using the selected certificate
-            ExternalSignature externalSignature = new ExternalSignature(cert)
-            {
-                Reason = "Document approval",
-                Location = Environment.MachineName,
-                ContactInfo = Environment.UserName,
-                Date = DateTime.UtcNow
-            };
+            // Create an ExternalSignature that works with certificates whose private key
+            // is not exportable (e.g., smart cards). This will trigger the PIN prompt.
+            ExternalSignature externalSignature = new ExternalSignature(cert);
 
-            // Sign the PDF using the signature field
-            signatureField.Sign(externalSignature);
+            // Optional: set signature appearance properties
+            externalSignature.Reason   = "Document approval";
+            externalSignature.Location = Environment.MachineName;
+            externalSignature.Date     = DateTime.Now;
 
-            // Save the signed PDF (lifecycle rule: use Save inside using)
-            doc.Save(outputPath);
+            // Add a signature field to the first page (position can be adjusted as needed)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            SignatureField sigField = new SignatureField(doc.Pages[1], rect);
+            doc.Pages[1].Annotations.Add(sigField);
+
+            // Sign the document using the selected certificate
+            sigField.Sign(externalSignature);
+
+            // Save the signed PDF
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Signed PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Signed PDF saved to '{outputPdf}'.");
     }
 }

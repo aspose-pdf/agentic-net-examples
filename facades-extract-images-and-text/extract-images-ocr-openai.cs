@@ -1,79 +1,92 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging; // ImageFormat for PdfExtractor
-using Aspose.Pdf.Facades;      // PdfExtractor (Facades API)
-using Aspose.Pdf.AI;           // OpenAI OCR copilot
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;          // PdfExtractor
+using Aspose.Pdf.AI;               // OpenAI OCR copilot classes
 
 class Program
 {
-    static void Main()
+    // Async Main entry point (C# 7.1+)
+    static async Task Main(string[] args)
     {
-        const string pdfPath = "input.pdf";               // source PDF
-        const string outputFolder = "OcrResults";         // folder for OCR text files
-        const string openAiApiKey = "YOUR_OPENAI_API_KEY"; // replace with your key
+        // Input PDF path
+        const string pdfPath = "input.pdf";
 
+        // Ensure a PDF exists – create a minimal one if it does not.
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
-            return;
+            // Create a simple PDF with a single blank page.
+            using (Document doc = new Document())
+            {
+                doc.Pages.Add();
+                doc.Save(pdfPath);
+            }
+            Console.WriteLine($"Sample PDF created at '{pdfPath}' because the file was missing.");
         }
 
-        Directory.CreateDirectory(outputFolder);
+        // Directory to store extracted images
+        const string imagesDir = "extracted_images";
+        Directory.CreateDirectory(imagesDir);
 
-        // Prepare the OpenAI OCR copilot once – it can be reused for every image
-        var openAiClient = Aspose.Pdf.AI.OpenAIClient.CreateWithApiKey(openAiApiKey).Build();
+        // Collect paths of extracted images
+        List<string> extractedImagePaths = new List<string>();
 
-        // Initialize PDF extractor (Facades)
+        // ---------- Extract images from PDF ----------
         using (PdfExtractor extractor = new PdfExtractor())
         {
+            // Bind the source PDF
             extractor.BindPdf(pdfPath);
-            extractor.ExtractImage(); // extract all images defined in resources
+
+            // Extract all images defined in resources (default mode)
+            extractor.ExtractImage();
 
             int imageIndex = 1;
             while (extractor.HasNextImage())
             {
-                // Retrieve image into a memory stream (PNG format)
-                using (MemoryStream imgStream = new MemoryStream())
-                {
-                    extractor.GetNextImage(imgStream, ImageFormat.Png);
-                    imgStream.Position = 0; // reset for reading
-
-                    // Save image temporarily – required for OCR copilot
-                    string tempImagePath = Path.Combine(outputFolder, $"page_image_{imageIndex}.png");
-                    using (FileStream file = new FileStream(tempImagePath, FileMode.Create, FileAccess.Write))
-                    {
-                        imgStream.CopyTo(file);
-                    }
-
-                    // Prepare OCR options for the current image
-                    var ocrOptions = Aspose.Pdf.AI.OpenAIOcrCopilotOptions.Create()
-                                         .WithDocument(tempImagePath);
-
-                    // Create the OCR copilot instance
-                    IOcrCopilot ocrCopilot = Aspose.Pdf.AI.AICopilotFactory.CreateOcrCopilot(openAiClient, ocrOptions);
-
-                    // Perform OCR (synchronously for simplicity)
-                    var results = ocrCopilot.GetTextRecognitionResultAsync().GetAwaiter().GetResult();
-
-                    // Extract the recognised text (if any)
-                    string ocrText = string.Empty;
-                    if (results != null && results.Count > 0 && results[0].OcrDetails != null && results[0].OcrDetails.Count > 0)
-                    {
-                        ocrText = results[0].OcrDetails[0].ExtractedText ?? string.Empty;
-                    }
-
-                    // Write OCR text to a file
-                    string textOutputPath = Path.Combine(outputFolder, $"image_{imageIndex}_ocr.txt");
-                    File.WriteAllText(textOutputPath, ocrText);
-
-                    // Clean up temporary image file
-                    File.Delete(tempImagePath);
-                }
-
+                // Save each image as PNG (extension can be any supported format)
+                string imagePath = Path.Combine(imagesDir, $"image_{imageIndex}.png");
+                extractor.GetNextImage(imagePath);
+                extractedImagePaths.Add(imagePath);
                 imageIndex++;
             }
         }
 
-        Console.WriteLine("OCR extraction completed.");
+        // ---------- Perform OCR on each extracted image ----------
+        // Replace with your actual OpenAI API key
+        const string openAiApiKey = "YOUR_API_KEY";
+
+        // Create the OpenAI client (no disposal required)
+        var openAiClient = OpenAIClient
+            .CreateWithApiKey(openAiApiKey)
+            .Build();
+
+        foreach (string imagePath in extractedImagePaths)
+        {
+            // Configure OCR options for the current image
+            var ocrOptions = OpenAIOcrCopilotOptions
+                .Create()
+                .WithDocument(imagePath); // Add the image file to the OCR request
+
+            // Create the OCR copilot instance
+            IOcrCopilot ocrCopilot = AICopilotFactory.CreateOcrCopilot(openAiClient, ocrOptions);
+
+            // Execute OCR asynchronously – the method returns IReadOnlyList<TextRecognitionResult>
+            var ocrResults = await ocrCopilot.GetTextRecognitionResultAsync();
+
+            // Output recognized text (if any)
+            if (ocrResults.Count > 0 && ocrResults[0].OcrDetails.Count > 0)
+            {
+                string extractedText = ocrResults[0].OcrDetails[0].ExtractedText;
+                Console.WriteLine($"OCR result for '{Path.GetFileName(imagePath)}':");
+                Console.WriteLine(extractedText);
+                Console.WriteLine(new string('-', 40));
+            }
+            else
+            {
+                Console.WriteLine($"No OCR text found for '{Path.GetFileName(imagePath)}'.");
+            }
+        }
     }
 }

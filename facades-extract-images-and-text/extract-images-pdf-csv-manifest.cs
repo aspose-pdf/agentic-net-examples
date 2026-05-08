@@ -1,61 +1,58 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // Facade namespace is allowed for other operations if needed
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputFolder = "ExtractedImages";
-        const string csvManifestPath = "image_manifest.csv";
+        const string inputPdfPath   = "input.pdf";                 // source PDF
+        const string imagesDirPath  = "ExtractedImages";           // folder for images
+        const string csvManifestPath = "image_manifest.csv";       // CSV output
 
+        // Verify input file exists
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure the folder for extracted images exists
-        Directory.CreateDirectory(outputFolder);
+        // Ensure the images output directory exists
+        Directory.CreateDirectory(imagesDirPath);
 
-        // Prepare CSV writer
-        using (var csvWriter = new StreamWriter(csvManifestPath, false))
+        // Open the PDF document (1‑based page indexing)
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Write CSV header
-            csvWriter.WriteLine("FileName,PageNumber,Width,Height");
-
-            // Open the PDF document
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Prepare CSV writer
+            using (StreamWriter csvWriter = new StreamWriter(csvManifestPath, false))
             {
-                // Iterate through all pages (1‑based indexing)
-                for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
+                // Write CSV header
+                csvWriter.WriteLine("FileName,PageNumber,Width,Height");
+
+                // Iterate over each page
+                foreach (Page page in doc.Pages)
                 {
-                    // Search for image placements on the current page
-                    var absorber = new ImagePlacementAbsorber();
-                    pdfDoc.Pages[pageNum].Accept(absorber);
+                    int pageNumber = page.Number; // 1‑based page number
 
-                    int imageIndex = 1;
-                    foreach (ImagePlacement placement in absorber.ImagePlacements)
+                    int imageIndex = 1; // counter per page
+
+                    // Iterate over all images on the current page
+                    foreach (XImage img in page.Resources.Images)
                     {
-                        // Build a unique file name for each extracted image
-                        string imageFileName = $"image_page{pageNum}_img{imageIndex}.bin";
-                        string imagePath = Path.Combine(outputFolder, imageFileName);
+                        // Build a unique file name for the extracted image
+                        string fileName = $"page{pageNumber}_img{imageIndex}.png";
+                        string filePath = Path.Combine(imagesDirPath, fileName);
 
-                        // Save the original image bytes (no System.Drawing dependency)
-                        using (FileStream imgStream = new FileStream(imagePath, FileMode.Create, FileAccess.Write))
+                        // Save the image to disk.
+                        // XImage provides a Save method that accepts a Stream.
+                        using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
                         {
-                            placement.Image.Save(imgStream);
+                            img.Save(fs);
                         }
 
-                        // Retrieve displayed dimensions from the placement rectangle
-                        Aspose.Pdf.Rectangle rect = placement.Rectangle;
-                        double width = rect.Width;
-                        double height = rect.Height;
-
                         // Write a line to the CSV manifest
-                        csvWriter.WriteLine($"{imageFileName},{pageNum},{width},{height}");
+                        csvWriter.WriteLine($"{fileName},{pageNumber},{img.Width},{img.Height}");
 
                         imageIndex++;
                     }

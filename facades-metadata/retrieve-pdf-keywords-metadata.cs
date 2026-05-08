@@ -6,22 +6,31 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "sample.pdf";
+        const string inputPath = "input.pdf";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Initialize the PdfFileInfo facade with the PDF file.
-        using (PdfFileInfo fileInfo = new PdfFileInfo(pdfPath))
+        // PdfFileInfo implements IDisposable, so wrap it in a using block
+        using (var pdfInfo = new PdfFileInfo(inputPath))
         {
-            // Retrieve the Keywords metadata.
-            string keywords = fileInfo.Keywords;
+            // Verify the file is a PDF
+            if (!pdfInfo.IsPdfFile)
+            {
+                Console.WriteLine("The specified file is not a valid PDF.");
+                return;
+            }
 
-            // Display the retrieved value.
-            Console.WriteLine($"Keywords: {keywords}");
+            // Retrieve the Keywords metadata (empty string if not set)
+            string keywords = pdfInfo.Keywords ?? string.Empty;
+
+            // Display the value (show a placeholder when it is empty)
+            Console.WriteLine(string.IsNullOrWhiteSpace(keywords)
+                ? "Keywords: <none>"
+                : $"Keywords: {keywords}");
         }
     }
 }

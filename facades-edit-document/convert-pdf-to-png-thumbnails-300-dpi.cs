@@ -1,47 +1,48 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                     // Document
-using Aspose.Pdf.Devices;             // Resolution, PngDevice
+using Aspose.Pdf;
+using Aspose.Pdf.Devices;
 
-class PdfToPngThumbnail
+class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPdf = "input.pdf";
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "thumbnails";
 
-        // Directory where PNG thumbnails will be saved
-        const string outputDir = "Thumbnails";
-
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
-
-        // Verify the input file exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
+        Directory.CreateDirectory(outputFolder);
+
         // Load the PDF document
-        using (Document pdfDocument = new Document(inputPdf))
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
-            int pageCount = pdfDocument.Pages.Count;
-            for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++)
+            // Create a Resolution object with 300 DPI
+            Resolution resolution = new Resolution(300);
+
+            // Initialize PngDevice with the specified resolution
+            PngDevice pngDevice = new PngDevice(resolution);
+
+            // Enable transparent background for the PNG output
+            pngDevice.TransparentBackground = true;
+
+            // Iterate through all pages (1‑based indexing)
+            for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
             {
-                string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
+                string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.png");
 
-                // Create a PNG device with 300 DPI and transparent background
-                PngDevice pngDevice = new PngDevice(new Resolution(300))
+                // Save each page as a PNG image
+                using (FileStream pngStream = new FileStream(outputPath, FileMode.Create))
                 {
-                    TransparentBackground = true
-                };
-
-                // Convert the specific page to PNG
-                pngDevice.Process(pdfDocument.Pages[pageNumber], outputPath);
+                    pngDevice.Process(pdfDocument.Pages[pageNumber], pngStream);
+                }
             }
         }
 
-        Console.WriteLine("PDF to PNG conversion completed.");
+        Console.WriteLine("PDF pages have been converted to PNG thumbnails with 300 DPI and transparent background.");
     }
 }

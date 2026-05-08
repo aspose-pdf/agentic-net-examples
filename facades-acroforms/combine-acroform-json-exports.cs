@@ -9,7 +9,7 @@ class Program
     {
         // Input PDF files whose form data will be exported to JSON
         string[] pdfFiles = { "file1.pdf", "file2.pdf", "file3.pdf" };
-        // Output file that will contain the combined JSON array
+        // Output file that will contain a single JSON array
         const string outputJsonPath = "combined.json";
 
         // Collect individual JSON fragments
@@ -23,27 +23,27 @@ class Program
                 continue;
             }
 
-            // Bind the PDF file to the Facades Form object
+            // Export form fields of the current PDF to a memory stream
             using (Form form = new Form(pdfPath))
+            using (MemoryStream ms = new MemoryStream())
             {
-                // Export the form fields to a memory stream as JSON
-                using (MemoryStream ms = new MemoryStream())
+                // ExportJson writes the JSON representation of the form fields
+                form.ExportJson(ms, true);
+                ms.Position = 0;
+
+                using (StreamReader reader = new StreamReader(ms))
                 {
-                    // ExportJson writes JSON; 'true' makes the output indented
-                    form.ExportJson(ms, true);
-                    ms.Position = 0; // Reset stream position for reading
+                    string json = reader.ReadToEnd().Trim();
 
-                    using (StreamReader reader = new StreamReader(ms))
+                    // If the exported JSON is an array, strip the surrounding brackets
+                    if (json.StartsWith("[") && json.EndsWith("]"))
                     {
-                        string json = reader.ReadToEnd().Trim();
+                        json = json.Substring(1, json.Length - 2).Trim();
+                    }
 
-                        // The ExportJson method may return a JSON array.
-                        // If it does, strip the outer brackets so we can merge them.
-                        if (json.StartsWith("[") && json.EndsWith("]"))
-                        {
-                            json = json.Substring(1, json.Length - 2).Trim();
-                        }
-
+                    // Add the fragment (object or comma‑separated items) to the list
+                    if (!string.IsNullOrEmpty(json))
+                    {
                         jsonFragments.Add(json);
                     }
                 }

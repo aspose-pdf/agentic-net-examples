@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
@@ -8,81 +7,80 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "original.pdf";      // source PDF with existing bookmarks
-        const string outputPdf = "updated.pdf";       // result PDF after inserting pages
-        const int    pagesToInsert = 2;               // number of blank pages to add at the beginning
+        const string inputPdf   = "original.pdf";      // PDF with existing bookmarks
+        const string outputPdf  = "updated.pdf";       // Result after insertion and bookmark adjustment
+        const int    pagesToAdd = 2;                   // Number of new pages to insert at the beginning
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the document inside a using block for deterministic disposal
+        // Load the original document and insert blank pages at the start
         using (Document doc = new Document(inputPdf))
         {
-            // ------------------------------------------------------------
-            // 1. Insert blank pages at the very beginning (position = 1)
-            // ------------------------------------------------------------
-            for (int i = 0; i < pagesToInsert; i++)
+            // Insert the required number of blank pages at position 1 (1‑based indexing)
+            for (int i = 0; i < pagesToAdd; i++)
             {
-                // Insert() adds an empty page; 1‑based indexing is required
+                // Insert an empty page; the size will be taken from the most frequent page size in the document
                 doc.Pages.Insert(1);
             }
 
-            // ------------------------------------------------------------
-            // 2. Extract existing bookmarks, adjust their page numbers,
-            //    delete old bookmarks and recreate them with the new offsets.
-            // ------------------------------------------------------------
+            // Adjust bookmarks: shift each bookmark's destination page by the number of inserted pages
             using (PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor(doc))
             {
-                // Extract the whole bookmark collection (top‑level nodes)
-                Bookmarks topBookmarks = bookmarkEditor.ExtractBookmarks();
+                // Extract existing bookmarks as a Bookmarks collection (not an array)
+                Bookmarks bookmarks = bookmarkEditor.ExtractBookmarks();
 
-                // Flatten the tree into a list while preserving hierarchy order
-                List<Bookmark> flatList = new List<Bookmark>();
-                void Collect(Bookmark bm)
+                if (bookmarks != null && bookmarks.Count > 0)
                 {
-                    if (bm == null) return;
-                    flatList.Add(bm);
-                    if (bm.ChildItems != null)
+                    // Recursively shift page numbers for every bookmark in the hierarchy
+                    foreach (Bookmark topLevel in bookmarks)
                     {
-                        foreach (Bookmark child in bm.ChildItems)
-                        {
-                            Collect(child);
-                        }
+                        ShiftBookmarkPageNumber(topLevel, pagesToAdd);
                     }
                 }
 
-                if (topBookmarks != null)
-                {
-                    foreach (Bookmark bm in topBookmarks)
-                    {
-                        Collect(bm);
-                    }
-                }
-
-                // Remove all existing bookmarks
+                // Remove all old bookmarks
                 bookmarkEditor.DeleteBookmarks();
 
-                // Re‑create each bookmark with the page number shifted by the inserted pages
-                foreach (Bookmark bm in flatList)
+                // Re‑create bookmarks with the updated page numbers.
+                // PdfBookmarkEditor.CreateBookmarks expects a single Bookmark, so we add each top‑level bookmark individually.
+                if (bookmarks != null && bookmarks.Count > 0)
                 {
-                    // Guard against bookmarks without a valid page number
-                    if (bm.PageNumber > 0)
+                    foreach (Bookmark topLevel in bookmarks)
                     {
-                        int newPage = bm.PageNumber + pagesToInsert;
-                        bookmarkEditor.CreateBookmarkOfPage(bm.Title, newPage);
+                        bookmarkEditor.CreateBookmarks(topLevel);
                     }
                 }
-            }
 
-            // ------------------------------------------------------------
-            // 3. Save the modified document
-            // ------------------------------------------------------------
-            doc.Save(outputPdf);
+                // Save the modified document (the editor saves the bound document)
+                bookmarkEditor.Save(outputPdf);
+            }
         }
 
-        Console.WriteLine($"Document saved with updated bookmarks: {outputPdf}");
+        Console.WriteLine($"Document saved with adjusted bookmarks: '{outputPdf}'.");
+    }
+
+    /// <summary>
+    /// Recursively adds an offset to the PageNumber of a bookmark and all its child items.
+    /// </summary>
+    private static void ShiftBookmarkPageNumber(Bookmark bm, int offset)
+    {
+        // PageNumber is 1‑based; only modify if it points to a page (0 means "no destination")
+        if (bm.PageNumber > 0)
+        {
+            bm.PageNumber += offset;
+        }
+
+        // Process child bookmarks, if any
+        if (bm.ChildItems != null && bm.ChildItems.Count > 0)
+        {
+            foreach (Bookmark child in bm.ChildItems)
+            {
+                ShiftBookmarkPageNumber(child, offset);
+            }
+        }
     }
 }

@@ -1,7 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                 // Core PDF API (Document)
-using Aspose.Pdf.Facades;        // Facade API (PdfBookmarkEditor, Bookmark, Bookmarks)
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -16,40 +15,41 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block (document-disposal-with-using rule)
-        using (Document doc = new Document(inputPdf))
+        // Bind the PDF file to the bookmark editor
+        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
         {
-            // Initialize the bookmark editor and bind the loaded document
-            PdfBookmarkEditor editor = new PdfBookmarkEditor();
-            editor.BindPdf(doc);
+            editor.BindPdf(inputPdf);
 
-            // Extract all bookmarks (recursive hierarchy)
-            Bookmarks bookmarks = editor.ExtractBookmarks();
+            // Extract all bookmarks (including nested ones)
+            Aspose.Pdf.Facades.Bookmarks rootBookmarks = editor.ExtractBookmarks();
 
-            // Write the outline to a plain‑text file, preserving hierarchy via indentation
+            // Write the outline to a plain‑text file with indentation
             using (StreamWriter writer = new StreamWriter(outputTxt))
             {
-                WriteBookmarks(bookmarks, writer, 0);
+                WriteBookmarksRecursive(rootBookmarks, writer, 0);
             }
+
+            // Close the editor (optional, Dispose will be called by using)
+            editor.Close();
         }
 
         Console.WriteLine($"Bookmarks exported to '{outputTxt}'.");
     }
 
-    // Recursively writes bookmarks; each level adds two spaces of indentation
-    static void WriteBookmarks(Bookmarks bookmarks, StreamWriter writer, int level)
+    // Recursively writes bookmarks, adding two spaces per hierarchy level
+    static void WriteBookmarksRecursive(Aspose.Pdf.Facades.Bookmarks bookmarks,
+                                        StreamWriter writer,
+                                        int level)
     {
-        if (bookmarks == null) return;
-
-        foreach (Bookmark bm in bookmarks)
+        foreach (Aspose.Pdf.Facades.Bookmark bm in bookmarks)
         {
             string indent = new string(' ', level * 2);
             writer.WriteLine($"{indent}{bm.Title}");
 
-            // If the bookmark has children, recurse with increased level
+            // If the bookmark has child items, process them recursively
             if (bm.ChildItem != null && bm.ChildItem.Count > 0)
             {
-                WriteBookmarks(bm.ChildItem, writer, level + 1);
+                WriteBookmarksRecursive(bm.ChildItem, writer, level + 1);
             }
         }
     }

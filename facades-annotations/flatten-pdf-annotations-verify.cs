@@ -7,54 +7,46 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "flattened.pdf";
 
-        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // -------------------------------------------------
-        // 1. Load PDF into PdfAnnotationEditor (Facades API)
-        // -------------------------------------------------
-        PdfAnnotationEditor editor = new PdfAnnotationEditor();
-        editor.BindPdf(inputPath);
+        // Flatten all annotations using PdfAnnotationEditor
+        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        {
+            editor.BindPdf(inputPath);
+            editor.FlatteningAnnotations(); // removes annotation objects from the PDF
+            editor.Save(outputPath);
+        }
 
-        // -------------------------------------------------
-        // 2. Flatten all annotations in the document
-        // -------------------------------------------------
-        editor.FlatteningAnnotations();
-
-        // -------------------------------------------------
-        // 3. Save the flattened PDF
-        // -------------------------------------------------
-        editor.Save(outputPath);
-        editor.Close(); // Dispose the bound document
-
-        // -------------------------------------------------
-        // 4. Verify that no annotation objects remain
-        // -------------------------------------------------
+        // Verify that no annotation objects remain by scanning each page's annotation collection
         using (Document doc = new Document(outputPath))
         {
             bool anyAnnotations = false;
 
-            foreach (Page page in doc.Pages)
+            for (int i = 1; i <= doc.Pages.Count; i++) // 1‑based indexing
             {
-                // Annotations collection is 1‑based; Count == 0 means none
-                if (page.Annotations.Count > 0)
+                Page page = doc.Pages[i];
+                if (page.Annotations != null && page.Annotations.Count > 0)
                 {
                     anyAnnotations = true;
-                    Console.WriteLine($"Page {page.Number} still contains {page.Annotations.Count} annotation(s).");
+                    Console.WriteLine($"Page {i} still contains {page.Annotations.Count} annotation(s).");
                 }
             }
 
             if (!anyAnnotations)
-                Console.WriteLine("Validation succeeded: No annotations present after flattening.");
+            {
+                Console.WriteLine("Validation passed: no annotation objects remain after flattening.");
+            }
             else
-                Console.WriteLine("Validation failed: Some annotations were not flattened.");
+            {
+                Console.WriteLine("Validation failed: some annotations were not removed.");
+            }
         }
     }
 }

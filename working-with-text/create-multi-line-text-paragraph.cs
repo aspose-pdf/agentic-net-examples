@@ -8,39 +8,37 @@ class Program
     {
         const string outputPath = "output.pdf";
 
-        // Create a new PDF document and ensure proper disposal
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a blank page to the document
-            Page page = doc.Pages.Add();
+            // Add a blank page (Pages collection is 1‑based)
+            doc.Pages.Add();
+            Page page = doc.Pages[1];
 
-            // Create a multi‑line TextParagraph
+            // Create a TextParagraph instance
             TextParagraph paragraph = new TextParagraph();
 
-            // Define the rectangle where the paragraph will be placed
+            // Define the rectangle where the paragraph will be drawn
+            // Fully qualify Rectangle to avoid ambiguity with System.Drawing.Rectangle
             paragraph.Rectangle = new Aspose.Pdf.Rectangle(100, 600, 300, 750);
 
-            // Enable word‑wrap by words
+            // Enable word wrapping by words
             paragraph.FormattingOptions.WrapMode = TextFormattingOptions.WordWrapMode.ByWords;
 
             // Optional visual settings
             paragraph.HorizontalAlignment = HorizontalAlignment.Center;
-            paragraph.VerticalAlignment   = VerticalAlignment.Top;
-            // Use MarginInfo (not the non‑existent Margin class)
-            paragraph.Margin = new MarginInfo(5, 5, 5, 5);
+            paragraph.Margin = new MarginInfo { Top = 5, Bottom = 5, Left = 5, Right = 5 };
 
-            // Populate the paragraph with several lines
-            paragraph.BeginEdit();
+            // Append multiple lines of text
             paragraph.AppendLine("The quick brown fox jumps over the lazy dog.");
-            paragraph.AppendLine("Second line of the paragraph.");
-            paragraph.AppendLine("Third line with more text.");
-            paragraph.EndEdit();
+            paragraph.AppendLine("Line two of the paragraph.");
+            paragraph.AppendLine("Line three of the paragraph.");
 
-            // Append the paragraph to the page using TextBuilder
+            // Use TextBuilder to render the paragraph onto the page
             TextBuilder builder = new TextBuilder(page);
             builder.AppendParagraph(paragraph);
 
-            // Save the PDF
+            // Save the document as PDF
             doc.Save(outputPath);
         }
 

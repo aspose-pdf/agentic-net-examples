@@ -7,47 +7,49 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";   // existing PDF with form fields
-        const string outputPdf = "output.pdf";  // PDF with validation button
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_with_validation.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the source PDF inside a using block (document disposal rule)
-        using (Document doc = new Document(inputPdf))
+        // Load the existing PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Initialize FormEditor facade on the loaded document
-            FormEditor formEditor = new FormEditor(doc);
+            // Initialize FormEditor with the loaded document
+            using (FormEditor formEditor = new FormEditor(doc))
+            {
+                // Add a push button that will trigger validation
+                // Parameters: field type, name, page number, lower-left x, lower-left y, upper-right x, upper-right y
+                formEditor.AddField(FieldType.PushButton, "ValidateBtn", 1, 100, 100, 200, 130);
 
-            // Add a push‑button field that will trigger validation
-            // Parameters: field type, name, page number, llx, lly, urx, ury
-            formEditor.AddField(FieldType.PushButton, "ValidateBtn", 1, 100, 100, 200, 150);
+                // JavaScript code to check required fields and show an alert if any are empty
+                string js = @"
+var missing = [];
+for (var i = 0; i < this.numFields; i++) {
+    var f = this.getField(this.getFieldName(i));
+    if (f.required && (f.value === null || f.value === '')) {
+        missing.push(f.name);
+    }
+}
+if (missing.length > 0) {
+    app.alert('Please fill the required fields: ' + missing.join(', '));
+} else {
+    app.alert('All required fields are filled.');
+}
+";
 
-            // JavaScript that checks all required fields and shows an alert if any are empty
-            string js = @"
-                var missing = '';
-                for (var i = 0; i < this.numFields; i++) {
-                    var f = this.getField(this.getFieldName(i));
-                    if (f.required && (f.value === '' || f.value === null)) {
-                        missing += f.name + '\n';
-                    }
-                }
-                if (missing !== '') {
-                    app.alert('Please fill required fields:\n' + missing);
-                } else {
-                    app.alert('All required fields are filled.');
-                }";
+                // Attach the JavaScript to the button (executed on mouse up)
+                formEditor.SetFieldScript("ValidateBtn", js);
 
-            // Attach the JavaScript to the button (replaces any existing script)
-            formEditor.SetFieldScript("ValidateBtn", js);
-
-            // Save the modified PDF (save rule)
-            formEditor.Save(outputPdf);
+                // Save the modified PDF with the validation button
+                formEditor.Save(outputPath);
+            }
         }
 
-        Console.WriteLine($"PDF with validation button saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF saved with validation button: {outputPath}");
     }
 }

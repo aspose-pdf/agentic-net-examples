@@ -7,54 +7,69 @@ class Program
 {
     static void Main()
     {
-        // Output PDF path
-        const string outputPath = "FileAttachmentForm.pdf";
-
         // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a blank page
+            // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Define the rectangle for the file input box field (llx, lly, urx, ury)
-            var fieldRect = new Aspose.Pdf.Rectangle(100, 600, 300, 630);
-
-            // Create a TextBoxField that will hold the file name/path.
-            // Aspose.Pdf does not expose a public constructor for FileSelectBoxField, so we use a TextBoxField
-            // and add JavaScript validation to restrict the user to PDF files only.
-            TextBoxField fileField = new TextBoxField(page, fieldRect)
+            // -----------------------------------------------------------------
+            // 1. Create a text box that will hold the file name/path.
+            //    We use a TextBoxField because FileSelectBoxField has no public ctor.
+            // -----------------------------------------------------------------
+            var fileFieldRect = new Rectangle(100, 600, 200, 30);
+            TextBoxField fileField = new TextBoxField(page, fileFieldRect)
             {
-                PartialName = "PdfAttachmentField",
-                AlternateName = "Attach PDF File",
-                Required = true
+                PartialName   = "pdfAttachment",
+                AlternateName = "Attach PDF file",
+                MaxLen        = 260 // typical max path length
             };
 
-            // JavaScript that validates the entered value ends with ".pdf" (case‑insensitive).
-            // If the validation fails, the field will reject the input and show an alert.
-            string jsValidate = @"
-                var val = event.value;
-                if (val == null || val.length == 0) {
-                    // Empty value – let the Required flag handle it later.
-                    event.rc = true;
-                } else {
-                    var lower = val.toLowerCase();
-                    if (lower.endsWith('.pdf')) {
-                        event.rc = true; // Accept the value
-                    } else {
-                        app.alert('Only PDF files are allowed.');
-                        event.rc = false; // Reject the value
-                    }
-                }
-            ";
-            fileField.Actions.OnValidate = new JavascriptAction(jsValidate);
+            // -----------------------------------------------------------------
+            // 2. Add JavaScript validation that runs when the user leaves the field.
+            //    The script checks that the entered value ends with ".pdf" (case‑insensitive).
+            //    If not, an alert is shown and the field value is rejected.
+            // -----------------------------------------------------------------
+            string jsValidatePdf = @"if (event.value != null && event.value.length > 0) {
+    var lower = event.value.toLowerCase();
+    if (!lower.endsWith('.pdf')) {
+        app.alert('Only PDF files are allowed.');
+        event.rc = false; // cancel the change
+    }
+}";
+            fileField.Actions.OnExit = new JavascriptAction(jsValidatePdf);
 
-            // Add the field to the document's form collection
-            doc.Form.Add(fileField);
+            // -----------------------------------------------------------------
+            // 3. Add the field to the form (page numbers are 1‑based).
+            // -----------------------------------------------------------------
+            doc.Form.Add(fileField, 1);
 
-            // Save the PDF document
-            doc.Save(outputPath);
+            // -----------------------------------------------------------------
+            // OPTIONAL: Add a button that, when clicked, attaches the selected file
+            //           to the PDF as an embedded file. The button uses JavaScript
+            //           to import the file (the user will be prompted to choose a
+            //           file – the same validation applies because the field already
+            //           restricts the name to *.pdf).
+            // -----------------------------------------------------------------
+            var attachBtnRect = new Rectangle(210, 600, 260, 630);
+            // Use ButtonField (the current class name in Aspose.Pdf) instead of the removed PushButtonField.
+            ButtonField attachBtn = new ButtonField(page, attachBtnRect)
+            {
+                PartialName   = "attachBtn",
+                AlternateName = "Attach"
+            };
+            // JavaScript that imports the file specified in the text box as an attachment.
+            string jsAttach = @"var f = this.getField('pdfAttachment').value;
+if (f == null || f == '') { app.alert('Please specify a PDF file first.'); }
+else { this.importData({cName:f}); }";
+            // Use a valid action property for button clicks.
+            attachBtn.Actions.OnPressMouseBtn = new JavascriptAction(jsAttach);
+            doc.Form.Add(attachBtn, 1);
+
+            // Save the PDF with the form fields
+            doc.Save("fileAttachmentForm.pdf");
         }
 
-        Console.WriteLine($"PDF form with file attachment field saved to '{outputPath}'.");
+        Console.WriteLine("PDF form with PDF‑only file attachment field created successfully.");
     }
 }

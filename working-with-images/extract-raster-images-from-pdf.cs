@@ -1,54 +1,51 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging; // for ImageFormat
-using Aspose.Pdf;
+using Aspose.Pdf;                     // Core Aspose.Pdf namespace
+using System.Drawing.Imaging;        // For ImageFormat (PNG)
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputFolder = "ExtractedImages";
+        const string inputPdf  = "input.pdf";               // Source PDF file
+        const string outputDir = "ExtractedImages";         // Folder for PNG files
 
         // Verify input file exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
+        // Create output directory if it does not exist
+        Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Open the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            int imageIndex = 1;
+            int imageIndex = 1; // Counter for naming output files
 
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing internally,
-            // but foreach abstracts that away)
+            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
             foreach (Page page in pdfDoc.Pages)
             {
-                // Iterate over the image resources of the current page.
-                // XImageCollection is not a dictionary; direct foreach is required.
-                foreach (XImage img in page.Resources.Images)
+                // Iterate over each image resource on the current page
+                foreach (XImage xImg in page.Resources.Images)
                 {
-                    // Build a unique file name for each extracted image.
-                    string outputPath = Path.Combine(outputFolder, $"image_{imageIndex}.png");
+                    // Build a unique file name for each extracted image
+                    string outPath = Path.Combine(outputDir, $"image_{imageIndex}.png");
 
-                    // Save the XImage as PNG using a FileStream because the overload
-                    // XImage.Save expects a Stream, not a file path string.
-                    using (FileStream fs = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                    // Save the XImage to a PNG file
+                    using (FileStream outStream = new FileStream(outPath, FileMode.Create))
                     {
-                        img.Save(fs, ImageFormat.Png);
+                        xImg.Save(outStream, ImageFormat.Png);
                     }
 
-                    Console.WriteLine($"Saved image {imageIndex} → {outputPath}");
+                    Console.WriteLine($"Saved image {imageIndex} → {outPath}");
                     imageIndex++;
                 }
             }
         }
 
-        Console.WriteLine("All raster images have been extracted.");
+        Console.WriteLine("Image extraction completed.");
     }
 }

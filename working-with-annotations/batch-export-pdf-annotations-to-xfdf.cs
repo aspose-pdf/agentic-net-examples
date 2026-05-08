@@ -6,42 +6,46 @@ class Program
 {
     static void Main()
     {
-        // Resolve absolute paths based on the executable location
-        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-        string inputFolder = Path.Combine(baseDir, "InputPdfs");
-        string outputFolder = Path.Combine(baseDir, "XfdfOutput");
+        // Folder containing the source PDF files (relative to the executable directory)
+        const string inputFolder = "InputPdfs";
+        // Folder where the XFDF files will be saved (relative to the executable directory)
+        const string outputFolder = "OutputXfdf";
+
+        // Resolve full paths based on the current working directory to avoid path issues
+        string inputPath = Path.GetFullPath(inputFolder);
+        string outputPath = Path.GetFullPath(outputFolder);
 
         // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
+        Directory.CreateDirectory(outputPath);
 
-        // Verify the input directory exists – if not, create it and inform the user
-        if (!Directory.Exists(inputFolder))
+        // Verify that the input directory exists; if not, inform the user and exit gracefully
+        if (!Directory.Exists(inputPath))
         {
-            Console.WriteLine($"Input folder '{inputFolder}' does not exist. Creating an empty folder. Place PDF files there and re‑run the program.");
-            Directory.CreateDirectory(inputFolder);
-            return; // Nothing to process on first run
+            Console.WriteLine($"Input folder '{inputPath}' does not exist. Please create the folder and place PDF files inside it before running the program.");
+            return;
         }
 
         // Process each PDF file in the input folder
-        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        foreach (string pdfFile in Directory.GetFiles(inputPath, "*.pdf"))
         {
+            // Derive the XFDF file name from the PDF file name
+            string baseName = Path.GetFileNameWithoutExtension(pdfFile);
+            string xfdfFile = Path.Combine(outputPath, baseName + ".xfdf");
+
             try
             {
-                // Determine the output XFDF file path (same name, .xfdf extension)
-                string baseName = Path.GetFileNameWithoutExtension(pdfPath);
-                string xfdfPath = Path.Combine(outputFolder, baseName + ".xfdf");
-
                 // Load the PDF and export its annotations to XFDF
-                using (Document doc = new Document(pdfPath))
+                using (Document doc = new Document(pdfFile))
                 {
-                    doc.ExportAnnotationsToXfdf(xfdfPath);
+                    doc.ExportAnnotationsToXfdf(xfdfFile);
                 }
 
-                Console.WriteLine($"Exported annotations from '{pdfPath}' to '{xfdfPath}'.");
+                Console.WriteLine($"Exported annotations from '{pdfFile}' to '{xfdfFile}'.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Failed to export annotations for '{pdfPath}': {ex.Message}");
+                // Log any unexpected errors but continue processing remaining files
+                Console.WriteLine($"Failed to export annotations from '{pdfFile}': {ex.Message}");
             }
         }
     }

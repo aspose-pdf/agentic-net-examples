@@ -7,45 +7,43 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "watermarked.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string watermarkText = "CONFIDENTIAL";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the source PDF document
-        Document pdfDocument = new Document(inputPath);
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPdf);
 
-        // Create a text stamp (watermark)
-        TextStamp textStamp = new TextStamp("CONFIDENTIAL")
+        // Create a text stamp that will act as a watermark
+        TextStamp stamp = new TextStamp(watermarkText)
         {
-            // Place the stamp behind the page content
-            Background = true,
-            // 50% opacity for a translucent effect
-            Opacity = 0.5f,
-            // Center the stamp on the page (optional)
+            // Center the watermark on each page
             HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Center
+            VerticalAlignment = VerticalAlignment.Center,
+            // Place the stamp behind the page content if the property exists (some versions expose IsBackground)
+            // IsBackground = true,
+            // 50% opacity for a translucent effect
+            Opacity = 0.5f
         };
 
-        // Configure the TextState (read‑only property – modify its members directly)
-        textStamp.TextState.Font = FontRepository.FindFont("Helvetica");
-        textStamp.TextState.FontSize = 48;
-        textStamp.TextState.FontStyle = FontStyles.Bold;
-        textStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
+        // Configure the TextState – the TextState property itself is read‑only, so set its members individually
+        stamp.TextState.Font = FontRepository.FindFont("Helvetica");
+        stamp.TextState.FontSize = 72;
+        stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Red;
 
         // Apply the stamp to every page in the document
         foreach (Page page in pdfDocument.Pages)
         {
-            page.AddStamp(textStamp);
+            page.AddStamp(stamp);
         }
 
-        // Save the watermarked PDF
-        pdfDocument.Save(outputPath);
-
-        Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
+        // Save the modified PDF
+        pdfDocument.Save(outputPdf);
     }
 }

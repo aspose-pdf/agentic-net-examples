@@ -1,55 +1,72 @@
 using System;
 using System.IO;
-using System.Xml.Linq;
+using System.Xml;
 using Aspose.Pdf;
+using Aspose.Pdf.Printing; // for PageSettings if needed
 
 class Program
 {
     static void Main()
     {
-        const string xmlPath   = "layout.xml";   // XML defining page orientations
-        const string outputPdf = "output.pdf";
+        const string xmlPath   = "layout.xml";   // XML describing page layout
+        const string pdfInput  = "input.pdf";    // source PDF
+        const string pdfOutput = "output.pdf";   // result PDF
 
-        if (!File.Exists(xmlPath))
+        if (!File.Exists(xmlPath) || !File.Exists(pdfInput))
         {
-            Console.Error.WriteLine($"XML file not found: {xmlPath}");
+            Console.Error.WriteLine("Required files not found.");
             return;
         }
 
-        // Load the XML layout definition
-        XDocument layoutDoc = XDocument.Load(xmlPath);
-
-        // Create a new empty PDF document
-        using (Document pdfDoc = new Document())
+        // Parse the XML to determine desired orientation.
+        // Expected format: <Document><Page orientation="landscape"/></Document>
+        bool makeLandscape = false;
+        try
         {
-            // Example: add blank pages equal to the number of <Page> elements in the XML
-            foreach (XElement pageElem in layoutDoc.Root.Elements("Page"))
+            XmlDocument doc = new XmlDocument();
+            doc.Load(xmlPath);
+            XmlNode pageNode = doc.SelectSingleNode("//Page[@orientation]");
+            if (pageNode != null)
             {
-                pdfDoc.Pages.Add(); // adds a new blank page
+                string orientation = pageNode.Attributes["orientation"]?.Value?.Trim().ToLowerInvariant();
+                makeLandscape = orientation == "landscape";
             }
-
-            // Apply orientation based on the XML attribute "orientation"
-            foreach (XElement pageElem in layoutDoc.Root.Elements("Page"))
-            {
-                // Expected attributes: number (1‑based) and orientation ("landscape" or "portrait")
-                int pageNumber = (int)pageElem.Attribute("number");
-                string orientation = (string)pageElem.Attribute("orientation");
-
-                if (pageNumber < 1 || pageNumber > pdfDoc.Pages.Count)
-                {
-                    Console.Error.WriteLine($"Invalid page number {pageNumber} in XML.");
-                    continue;
-                }
-
-                // Set the page orientation
-                PageInfo info = pdfDoc.Pages[pageNumber].PageInfo;
-                info.IsLandscape = string.Equals(orientation, "landscape", StringComparison.OrdinalIgnoreCase);
-            }
-
-            // Save the resulting PDF
-            pdfDoc.Save(outputPdf);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"XML parsing error: {ex.Message}");
+            return;
         }
 
-        Console.WriteLine($"PDF saved to '{outputPdf}'.");
+        // Load the PDF, apply orientation, and save.
+        using (Document pdfDoc = new Document(pdfInput))
+        {
+            // Apply orientation to each page (or you could target specific pages).
+            foreach (Page page in pdfDoc.Pages)
+            {
+                // PageInfo.IsLandscape controls the page orientation.
+                page.PageInfo.IsLandscape = makeLandscape;
+
+                // Optionally, adjust the page size to reflect landscape dimensions.
+                // Swapping width/height ensures content fits correctly.
+                if (makeLandscape && !page.PageInfo.IsLandscape)
+                {
+                    // No action needed; setting IsLandscape already swaps dimensions internally.
+                }
+                else if (!makeLandscape && page.PageInfo.IsLandscape)
+                {
+                    // Reset to portrait if needed.
+                    page.PageInfo.IsLandscape = false;
+                }
+
+                // If you need to control printing orientation, you can also set PageSettings.
+                // This is optional and only affects printing, not the PDF itself.
+                // page.PageSettings.Landscape = makeLandscape; // requires Aspose.Pdf.Printing
+            }
+
+            pdfDoc.Save(pdfOutput);
+        }
+
+        Console.WriteLine($"PDF saved to '{pdfOutput}' with {(makeLandscape ? "landscape" : "portrait")} orientation.");
     }
 }

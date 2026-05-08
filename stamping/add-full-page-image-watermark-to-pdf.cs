@@ -1,63 +1,62 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;   // for ImageStamp, HorizontalAlignment, VerticalAlignment
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "watermarked.pdf";
-        const string imagePath  = "watermark.png";   // image to use as background
+        const string inputPdf   = "input.pdf";
+        const string outputPdf  = "watermarked.pdf";
+        const string watermarkImage = "watermark.png";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
-        }
-        if (!File.Exists(imagePath))
-        {
-            Console.Error.WriteLine($"Watermark image not found: {imagePath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block (lifecycle rule)
-        using (Document doc = new Document(inputPath))
+        if (!File.Exists(watermarkImage))
+        {
+            Console.Error.WriteLine($"Watermark image not found: {watermarkImage}");
+            return;
+        }
+
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
             // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Create an ImageStamp that will act as a full‑page background watermark
-                ImageStamp stamp = new ImageStamp(imagePath)
+                // Create an ImageStamp that uses the whole page area
+                ImageStamp stamp = new ImageStamp(watermarkImage)
                 {
                     // Place the stamp behind the page content
                     Background = true,
 
-                    // Make the stamp cover the whole page
-                    Width  = page.Rect.Width,
-                    Height = page.Rect.Height,
-                    XIndent = 0,
-                    YIndent = 0,
+                    // Make the stamp semi‑transparent (0.0 = fully transparent, 1.0 = opaque)
+                    Opacity = 0.3f,
 
-                    // Center alignment (optional, ensures proper placement)
+                    // Align the stamp to cover the entire page
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment   = VerticalAlignment.Center,
 
-                    // Adjust opacity as desired (0.0 = fully transparent, 1.0 = opaque)
-                    Opacity = 0.3f
+                    // Desired size – match the page dimensions
+                    Width  = page.PageInfo.Width,
+                    Height = page.PageInfo.Height
                 };
 
                 // Add the stamp to the current page
                 page.AddStamp(stamp);
             }
 
-            // Save the modified PDF (lifecycle rule)
-            doc.Save(outputPath);
+            // Save the modified PDF
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Watermarked PDF saved to '{outputPdf}'.");
     }
 }

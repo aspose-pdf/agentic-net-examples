@@ -1,6 +1,4 @@
 using System;
-using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -10,25 +8,34 @@ class Program
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        // Ensure the source file exists
+        if (!System.IO.File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Bind the PDF to the PdfPageEditor facade
-        PdfPageEditor editor = new PdfPageEditor();
-        editor.BindPdf(inputPath);
+        // Use PdfPageEditor to modify page transition
+        using (PdfPageEditor editor = new PdfPageEditor())
+        {
+            // Load the PDF document
+            editor.BindPdf(inputPath);
 
-        // Apply the Dissolve transition to page 5 with a 3‑second duration
-        editor.ProcessPages = new int[] { 5 };          // target page(s)
-        editor.TransitionType = PdfPageEditor.DISSOLVE; // dissolve effect
-        editor.TransitionDuration = 3;                  // duration in seconds
+            // Specify that only page 5 will be edited
+            editor.ProcessPages = new int[] { 5 };
 
-        // Commit the changes and save the result
-        editor.ApplyChanges();
-        editor.Save(outputPath);
-        editor.Close();
+            // Apply the Dissolve transition (old page dissolves)
+            editor.TransitionType = PdfPageEditor.DISSOLVE;
+
+            // Set transition duration to 3 seconds
+            editor.TransitionDuration = 3;
+
+            // Apply the changes to the document
+            editor.ApplyChanges();
+
+            // Save the modified PDF
+            editor.Save(outputPath);
+        }
 
         Console.WriteLine($"Transition applied and saved to '{outputPath}'.");
     }

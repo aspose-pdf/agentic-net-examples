@@ -1,54 +1,50 @@
 using System;
 using System.IO;
+using System.Drawing.Imaging;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf;
 using Aspose.Pdf.Devices;
-using System.Drawing.Imaging; // ImageFormat for BMP
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputDir = "output";
+        const string inputPdfPath  = "input.pdf";
+        const string outputFolder  = "BmpImages";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        // PdfConverter is a facade that implements IDisposable
-        using (PdfConverter converter = new PdfConverter())
+        // Initialize the PdfConverter facade
+        using (Aspose.Pdf.Facades.PdfConverter converter = new Aspose.Pdf.Facades.PdfConverter())
         {
             // Bind the source PDF file
-            converter.BindPdf(inputPdf);
+            converter.BindPdf(inputPdfPath);
 
             // Configure resolution (e.g., 300 DPI)
-            converter.Resolution = new Resolution(300);
+            converter.Resolution = new Aspose.Pdf.Devices.Resolution(300);
 
-            // Set the page coordinate type (CropBox is default; MediaBox is also available)
+            // Set the page coordinate type (CropBox is default, can be changed to Media)
             converter.CoordinateType = Aspose.Pdf.PageCoordinateType.CropBox;
 
             // Perform initial conversion setup
             converter.DoConvert();
 
-            int pageNumber = 1;
-            // Retrieve each page as a BMP image
+            int pageIndex = 1;
+            // Extract each page as a BMP image
             while (converter.HasNextImage())
             {
-                string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.bmp");
+                string outputPath = Path.Combine(outputFolder, $"page_{pageIndex}.bmp");
                 converter.GetNextImage(outputPath, ImageFormat.Bmp);
-                pageNumber++;
+                pageIndex++;
             }
-
-            // Explicitly close the converter (optional, as using will dispose)
-            converter.Close();
         }
 
-        Console.WriteLine("PDF has been converted to BMP images successfully.");
+        Console.WriteLine("PDF conversion to BMP images completed.");
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Aspose.Pdf namespace contains Document, Page, Color, etc.
+using Aspose.Pdf;               // Core API
+using Aspose.Pdf.Text;          // For any text-related needs (not used here)
 
 class Program
 {
@@ -15,20 +16,21 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal.
+        // Load the PDF document (using rule: document-disposal-with-using)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing) and set a LightGray background.
+            // Iterate over all pages (1‑based indexing per rule: page-indexing-one-based)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
-                page.Background = Color.LightGray; // LightGray background for branding.
+                // Set a LightGray background for branding
+                page.Background = Color.LightGray;   // Aspose.Pdf.Color
             }
 
-            // Save the modified document.
+            // Save the modified PDF (PDF format, no extra SaveOptions needed)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with LightGray background on all pages: {outputPath}");
+        Console.WriteLine($"Branded PDF saved to '{outputPath}'.");
     }
 }

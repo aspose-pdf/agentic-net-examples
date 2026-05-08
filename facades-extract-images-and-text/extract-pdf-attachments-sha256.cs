@@ -2,68 +2,78 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using System.Text;
 using Aspose.Pdf.Facades;
 
 class Program
 {
-    static void Main()
+    static void Main(string[] args)
     {
-        const string pdfPath = "input.pdf";
-        const string outputDir = "Attachments";
+        // Allow the PDF path to be supplied via command‑line arguments; fall back to the default name.
+        string pdfPath = args.Length > 0 ? args[0] : "input.pdf";
+        const string outputDir = "attachments";
 
+        // Verify that the source PDF exists before attempting to bind it.
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"Error: PDF file not found – '{pdfPath}'. Please provide a valid path.");
             return;
         }
 
-        // Ensure the output directory exists
+        // Ensure the output directory exists.
         Directory.CreateDirectory(outputDir);
 
-        // Bind the PDF and extract all attachments
-        var extractor = new PdfExtractor();
+        // Initialize the extractor and bind the PDF.
+        PdfExtractor extractor = new PdfExtractor();
         extractor.BindPdf(pdfPath);
+
+        // Extract all attachments from the PDF.
         extractor.ExtractAttachment();
 
-        // Retrieve attachment names (generic IList<string>) and their data streams
-        IList<string> attachNames = extractor.GetAttachNames();
-        MemoryStream[] streams = extractor.GetAttachment();
+        // Retrieve attachment names and their data streams.
+        IList<string> attachmentNames = extractor.GetAttachNames();
+        MemoryStream[] attachmentStreams = extractor.GetAttachment();
 
-        if (attachNames == null || streams == null)
+        if (attachmentNames == null || attachmentStreams == null || attachmentNames.Count == 0)
         {
-            Console.WriteLine("No attachments found.");
+            Console.WriteLine("No attachments were found in the PDF.");
             return;
         }
 
-        // Process each attachment – guard against mismatched counts and null names
-        int count = Math.Min(attachNames.Count, streams.Length);
-        for (int i = 0; i < count; i++)
+        // Process each attachment.
+        for (int i = 0; i < attachmentStreams.Length; i++)
         {
-            string? name = attachNames[i];
-            if (string.IsNullOrEmpty(name))
-                continue; // skip null/empty names
+            // Get the name; fall back to a generated name if the entry is null or empty.
+            string name = !string.IsNullOrEmpty(attachmentNames[i])
+                ? attachmentNames[i]
+                : $"attachment_{i}";
 
-            string filePath = Path.Combine(outputDir, name);
+            string outPath = Path.Combine(outputDir, name);
 
-            // Save the attachment to a file
-            using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+            // Save the attachment to disk.
+            using (FileStream fileStream = new FileStream(outPath, FileMode.Create, FileAccess.Write))
             {
-                streams[i].Position = 0;
-                streams[i].CopyTo(fs);
+                attachmentStreams[i].Position = 0;
+                attachmentStreams[i].CopyTo(fileStream);
             }
 
-            // Compute SHA‑256 hash of the saved file
-            byte[] hashBytes;
-            using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
-            using (SHA256 sha256 = SHA256.Create())
-            {
-                hashBytes = sha256.ComputeHash(fs);
-            }
+            // Compute SHA‑256 hash of the saved file.
+            string hash = ComputeSha256(outPath);
+            Console.WriteLine($"{name}: {hash}");
+        }
+    }
 
-            // Convert hash to a hex string
-            string hashHex = BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
-
-            Console.WriteLine($"{name}: {hashHex}");
+    // Helper method to compute SHA‑256 hash of a file and return it as a hex string.
+    private static string ComputeSha256(string filePath)
+    {
+        using (FileStream fileStream = File.OpenRead(filePath))
+        using (SHA256 sha256 = SHA256.Create())
+        {
+            byte[] hashBytes = sha256.ComputeHash(fileStream);
+            StringBuilder sb = new StringBuilder(hashBytes.Length * 2);
+            foreach (byte b in hashBytes)
+                sb.Append(b.ToString("x2"));
+            return sb.ToString();
         }
     }
 }

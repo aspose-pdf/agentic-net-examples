@@ -7,10 +7,10 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";   // source PDF containing the form field
-        const string outputPath = "output.pdf";  // destination PDF after copying the field
-        const string fieldName  = "myTextField"; // name of the existing field to copy
-        const int    targetPage = 2;             // page number (1‑based) where the copy will be placed
+        const string inputPath  = "input.pdf";          // source PDF containing the form field
+        const string outputPath = "output.pdf";         // PDF with the copied field
+        const string fieldName  = "myField";            // name of the field to copy
+        const int    targetPage = 2;                    // page number (1‑based) where the copy will be placed
 
         if (!File.Exists(inputPath))
         {
@@ -18,33 +18,42 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the existing field by its name – the Form indexer returns a WidgetAnnotation,
-            // so we need to cast it to Aspose.Pdf.Forms.Field.
-            Field originalField = doc.Form[fieldName] as Field;
-            if (originalField == null)
+            // Verify that the field exists.
+            if (!doc.Form.HasField(fieldName))
             {
-                Console.Error.WriteLine($"Field '{fieldName}' not found or is not a form field in the document.");
+                Console.Error.WriteLine($"Field \"{fieldName}\" not found in the document.");
                 return;
             }
 
-            // Create a new name for the copied field to avoid name collisions
-            string copyPartialName = fieldName + "_copy";
+            // The Form indexer returns a WidgetAnnotation; cast it to Field.
+            Field originalField = doc.Form[fieldName] as Field;
+            if (originalField == null)
+            {
+                Console.Error.WriteLine($"Field \"{fieldName}\" could not be cast to a form Field.");
+                return;
+            }
 
-            // Add a copy of the field to the target page.
-            // Form.Add(Field, string, int) creates a duplicate of the supplied field on the specified page.
-            Field copiedField = doc.Form.Add(originalField, copyPartialName, targetPage);
+            // Copy the field to the target page.
+            // Provide a new partial name for the copied field to avoid name collisions.
+            string copiedPartialName = fieldName + "_Copy";
+            Field copiedField = doc.Form.Add(originalField, copiedPartialName, targetPage);
 
-            // Optional: adjust the position of the copied field on the new page.
-            // Uncomment and modify the rectangle as needed.
-            // copiedField.Rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            // Optionally, adjust the position of the copied field on the target page.
+            // Here we simply offset it by 50 points to the right and down.
+            Aspose.Pdf.Rectangle originalRect = originalField.Rect;
+            copiedField.Rect = new Aspose.Pdf.Rectangle(
+                originalRect.LLX + 50,
+                originalRect.LLY - 50,
+                originalRect.URX + 50,
+                originalRect.URY - 50);
 
             // Save the modified document.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Field '{fieldName}' copied to page {targetPage} as '{fieldName}_copy'. Saved to '{outputPath}'.");
+        Console.WriteLine($"Field \"{fieldName}\" copied to page {targetPage} and saved as \"{outputPath}\".");
     }
 }

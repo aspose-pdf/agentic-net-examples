@@ -6,60 +6,56 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath   = "encrypted.pdf";   // Path to the encrypted PDF
-        const string userPassword   = "user123";         // User password for decryption
-        const string outputFolder   = "ExtractedImages"; // Folder to store extracted images
+        const string inputPath = "encrypted.pdf";   // path to the encrypted PDF
+        const string userPassword = "user123";      // user password for opening the PDF
+        const string outputDir = "ExtractedImages"; // folder where images will be saved
 
-        // Verify input file exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
+        Directory.CreateDirectory(outputDir);
 
         try
         {
-            // Open the encrypted PDF using the user password
-            using (Document pdfDoc = new Document(inputPdfPath, userPassword))
+            // Open the encrypted PDF with the user password
+            using (Document doc = new Document(inputPath, userPassword))
             {
                 // Decrypt the document (required before saving or further processing)
-                pdfDoc.Decrypt();
-
-                int imageIndex = 1; // Counter for naming extracted images
+                doc.Decrypt();
 
                 // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-                for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
+                for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
                 {
-                    Page page = pdfDoc.Pages[pageNum];
+                    Page page = doc.Pages[pageNum];
+                    int imageCounter = 1;
 
                     // Iterate over all images defined in the page resources
                     foreach (XImage img in page.Resources.Images)
                     {
                         // Build a unique file name for each extracted image
-                        string imageFileName = $"image_{imageIndex}_page{pageNum}.png";
-                        string imagePath = Path.Combine(outputFolder, imageFileName);
+                        string fileName = Path.Combine(
+                            outputDir,
+                            $"page{pageNum}_img{imageCounter}.png");
 
-                        // Save the image to the file system
-                        using (FileStream fs = new FileStream(imagePath, FileMode.Create, FileAccess.Write))
+                        // Save the image to disk using a FileStream (XImage.Save expects a Stream)
+                        using (FileStream fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
                         {
-                            // XImage.Save(Stream) writes the image in its original format.
-                            // If a specific format is required, use the overload with ImageFormat.
                             img.Save(fs);
                         }
 
-                        Console.WriteLine($"Extracted image {imageIndex} from page {pageNum} to '{imagePath}'.");
-                        imageIndex++;
+                        imageCounter++;
                     }
                 }
 
-                // Optionally, save the now‑decrypted PDF for verification
-                string decryptedPdfPath = Path.Combine(outputFolder, "decrypted.pdf");
-                pdfDoc.Save(decryptedPdfPath);
-                Console.WriteLine($"Decrypted PDF saved to '{decryptedPdfPath}'.");
+                // Optionally save the now‑decrypted PDF (overwrites the original file)
+                doc.Save(inputPath);
             }
+
+            Console.WriteLine("All embedded images have been extracted successfully.");
         }
         catch (Exception ex)
         {

@@ -1,35 +1,38 @@
 using System;
 using System.IO;
-using System.Text;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPdfPath = "input.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Export all form fields to JSON using a memory stream
-            using (MemoryStream ms = new MemoryStream())
+            // Export form fields to JSON using a memory stream
+            using (MemoryStream jsonStream = new MemoryStream())
             {
-                // Export form fields; default ExportFieldsToJsonOptions are used
-                doc.Form.ExportToJson(ms);
-                ms.Position = 0; // Reset stream position for reading
+                // Export all form fields to the stream
+                doc.Form.ExportToJson(jsonStream);
 
-                // Convert the JSON bytes to a string
-                string json = new StreamReader(ms, Encoding.UTF8).ReadToEnd();
+                // Reset stream position to the beginning before reading
+                jsonStream.Position = 0;
 
-                // Output the JSON string
-                Console.WriteLine(json);
+                // Read the JSON content as a string
+                using (StreamReader reader = new StreamReader(jsonStream))
+                {
+                    string json = reader.ReadToEnd();
+                    Console.WriteLine("Form fields JSON:");
+                    Console.WriteLine(json);
+                }
             }
         }
     }

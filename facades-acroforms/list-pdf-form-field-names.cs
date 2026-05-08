@@ -1,14 +1,13 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf; // Form class resides here
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf"; // required by FormEditor constructor
+        const string inputPath = "input.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,23 +15,23 @@ class Program
             return;
         }
 
-        // FormEditor loads the PDF and prepares an output file.
-        using (FormEditor editor = new FormEditor(inputPath, outputPath))
+        // Load the PDF using FormEditor
+        using (FormEditor editor = new FormEditor())
         {
-            // Access the underlying Document via the editor.
-            // Use the Form facade to obtain field names.
-            using (Form form = new Form(editor.Document))
-            {
-                string[] fieldNames = form.FieldNames;
-                Console.WriteLine("Form field names:");
-                foreach (string name in fieldNames)
-                {
-                    Console.WriteLine(name);
-                }
-            }
+            editor.BindPdf(inputPath); // initialize the facade with the PDF file
 
-            // No changes made, but Save() fulfills the required lifecycle.
-            editor.Save();
+            // Access the underlying Document object
+            Document doc = editor.Document;
+
+            // Use the Form facade to retrieve field names
+            Form form = new Form(doc);
+            string[] fieldNames = form.FieldNames;
+
+            Console.WriteLine("Form field names:");
+            foreach (string name in fieldNames)
+            {
+                Console.WriteLine(name);
+            }
         }
     }
 }

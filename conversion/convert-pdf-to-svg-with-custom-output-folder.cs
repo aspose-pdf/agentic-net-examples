@@ -6,41 +6,28 @@ class Program
 {
     static void Main()
     {
-        // Path to the source PDF file.
+        // Input PDF file path
         const string inputPdfPath = "input.pdf";
 
-        // Desired folder where SVG files will be written.
-        const string outputFolderPath = "SvgOutput";
+        // Custom output folder where SVG files will be written
+        const string outputFolderPath = "output_svg";
 
-        // Verify that the input file exists.
+        // Verify that the input file exists
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure the output folder exists.
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolderPath);
 
-        // The Save method expects a file name. When TreatTargetFileNameAsDirectory is true,
-        // a folder with the same name as this file (minus extension) will be created and
-        // each page will be saved as a separate SVG file inside it.
-        string dummyOutputFile = Path.Combine(outputFolderPath, "output.svg");
-
-        // Load the PDF document and convert it to SVG.
+        // Load the PDF document (lifecycle: load)
         using (Document pdfDocument = new Document(inputPdfPath))
         {
-            // Initialize SVG save options.
-            SvgSaveOptions svgOptions = new SvgSaveOptions();
-
-            // Create a directory for the SVG pages (named after the dummy file).
-            svgOptions.TreatTargetFileNameAsDirectory = true;
-
-            // Optional: enable multi‑threaded processing for faster conversion.
-            svgOptions.IsMultiThreading = true;
-
-            // Save the PDF as SVG files using the configured options.
-            pdfDocument.Save(dummyOutputFile, svgOptions);
+            // Save each page as an individual SVG file into the output folder.
+            // When a folder path is supplied, Aspose.Pdf creates one SVG per page.
+            pdfDocument.Save(outputFolderPath, SaveFormat.Svg);
         }
 
         Console.WriteLine($"PDF has been converted to SVG files in folder: {outputFolderPath}");

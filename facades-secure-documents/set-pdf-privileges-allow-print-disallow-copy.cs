@@ -6,33 +6,35 @@ class Program
 {
     static void Main()
     {
+        // Input and output PDF file paths
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
+        // Verify the input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Create a privilege that allows printing but disallows copying.
+        // Create a privilege object:
+        // Start with all permissions forbidden, then enable printing only.
         DocumentPrivilege privilege = DocumentPrivilege.ForbidAll;
-        privilege.AllowPrint = true;   // enable printing
-        privilege.AllowCopy = false;   // disable copying
+        privilege.AllowPrint = true;   // allow printing
+        privilege.AllowCopy = false;   // explicitly disallow copying (default for ForbidAll, set for clarity)
 
-        // Initialize the facade with input and output files.
-        using (PdfFileSecurity security = new PdfFileSecurity(inputPath, outputPath))
+        // Apply the privilege using PdfFileSecurity (facade API)
+        // The constructor takes the source and destination file names.
+        using (PdfFileSecurity fileSecurity = new PdfFileSecurity(inputPath, outputPath))
         {
-            // Apply the privilege (no user/owner passwords needed).
-            bool result = security.SetPrivilege(privilege);
+            bool result = fileSecurity.SetPrivilege(privilege);
             if (!result)
             {
                 Console.Error.WriteLine("Failed to set document privileges.");
                 return;
             }
-            // The facade saves the output file automatically.
         }
 
-        Console.WriteLine($"Document saved with updated privileges to '{outputPath}'.");
+        Console.WriteLine($"Document privileges updated and saved to '{outputPath}'.");
     }
 }

@@ -6,29 +6,23 @@ class Program
 {
     static void Main()
     {
-        const string portfolio1Path = "portfolio1.pdf";
-        const string portfolio2Path = "portfolio2.pdf";
-        const string outputPath     = "merged_portfolio.pdf";
+        const string portfolioPath1 = "portfolio1.pdf";
+        const string portfolioPath2 = "portfolio2.pdf";
+        const string outputPath      = "merged_portfolio.pdf";
 
-        // Verify that both source files exist.
-        if (!File.Exists(portfolio1Path) || !File.Exists(portfolio2Path))
+        // Verify that both source files exist
+        if (!File.Exists(portfolioPath1) || !File.Exists(portfolioPath2))
         {
             Console.Error.WriteLine("One or both input PDF portfolios were not found.");
             return;
         }
 
-        // Load the two PDF portfolios.
-        using (Document doc1 = new Document(portfolio1Path))
-        using (Document doc2 = new Document(portfolio2Path))
-        {
-            // Merge the second portfolio into the first.
-            // The core Merge method retains embedded files (portfolio items) and their metadata.
-            doc1.Merge(doc2);
+        // Merge the two PDF portfolios. The static MergeDocuments method
+        // combines the documents while preserving embedded files and their metadata.
+        Document mergedDocument = Document.MergeDocuments(portfolioPath1, portfolioPath2);
 
-            // Save the combined portfolio.
-            doc1.Save(outputPath);
-        }
-
+        // Save the merged result
+        mergedDocument.Save(outputPath);
         Console.WriteLine($"Merged PDF portfolio saved to '{outputPath}'.");
     }
 }

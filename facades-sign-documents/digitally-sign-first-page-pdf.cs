@@ -1,52 +1,60 @@
 using System;
-using System.Drawing;
+using System.IO;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "signed.pdf";
-        const string certPath = "certificate.pfx";
-        const string certPassword = "password";
+        // Paths for the source PDF, output PDF, and the signing certificate
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "signed.pdf";
+        const string certificatePath = "certificate.pfx";
+        const string certificatePassword = "password";
 
-        if (!System.IO.File.Exists(inputPath))
+        // Verify that required files exist
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
+        }
+        if (!File.Exists(certificatePath))
+        {
+            Console.Error.WriteLine($"Certificate file not found: {certificatePath}");
             return;
         }
 
-        // Create a PdfFileSignature facade, bind the PDF, set certificate, sign, and save.
-        using (PdfFileSignature pdfSign = new PdfFileSignature())
-        {
-            // Bind the source PDF file.
-            pdfSign.BindPdf(inputPath);
+        // Create the PdfFileSignature facade
+        PdfFileSignature pdfSigner = new PdfFileSignature();
 
-            // Optional: set an image for the visual appearance of the signature.
-            // pdfSign.SignatureAppearance = "signature_appearance.jpg";
+        // Bind the PDF to be signed
+        pdfSigner.BindPdf(inputPdf);
 
-            // Provide the certificate (PFX file) and its password.
-            pdfSign.SetCertificate(certPath, certPassword);
+        // Optional: set a visual appearance for the signature (e.g., an image)
+        // pdfSigner.SignatureAppearance = "signature_image.jpg";
 
-            // Define the signature rectangle (x, y, width, height) on page 1.
-            Rectangle rect = new Rectangle(100, 100, 200, 100);
+        // Provide the certificate and its password
+        pdfSigner.SetCertificate(certificatePath, certificatePassword);
 
-            // Apply the digital signature to page 1.
-            pdfSign.Sign(
-                page: 1,
-                SigReason: "Document approved",
-                SigContact: "contact@example.com",
-                SigLocation: "New York",
-                visible: true,
-                annotRect: rect
-            );
+        // Define the rectangle (position and size) for the visible signature on page 1
+        // System.Drawing.Rectangle is required by the Sign method overload
+        System.Drawing.Rectangle signatureRect = new System.Drawing.Rectangle(100, 100, 200, 100);
 
-            // Save the signed PDF to the output path.
-            pdfSign.Save(outputPath);
-        }
+        // Apply the digital signature to page 1
+        pdfSigner.Sign(
+            page: 1,
+            SigReason: "Document approved",
+            SigContact: "john.doe@example.com",
+            SigLocation: "New York",
+            visible: true,
+            annotRect: signatureRect);
 
-        Console.WriteLine($"Signed PDF saved to '{outputPath}'.");
+        // Save the signed PDF
+        pdfSigner.Save(outputPdf);
+
+        // Close the facade (good practice, though not strictly required)
+        pdfSigner.Close();
+
+        Console.WriteLine($"Signed PDF saved to '{outputPdf}'.");
     }
 }

@@ -6,11 +6,8 @@ class Program
 {
     static void Main()
     {
-        // Path to the source PDF that contains embedded files (portfolio items)
-        const string pdfPath = "portfolio.pdf";
-
-        // Index of the embedded file to extract (1‑based as per Aspose.Pdf docs)
-        const int embeddedFileIndex = 1;
+        const string pdfPath = "portfolio.pdf";   // input PDF containing embedded files
+        const int index = 1;                     // 1‑based index of the desired embedded file
 
         if (!File.Exists(pdfPath))
         {
@@ -21,40 +18,37 @@ class Program
         // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(pdfPath))
         {
-            // Verify that the document actually contains embedded files
-            if (doc.EmbeddedFiles == null || doc.EmbeddedFiles.Count < embeddedFileIndex)
+            // Verify that the requested index exists (EmbeddedFileCollection is 1‑based)
+            if (doc.EmbeddedFiles == null || doc.EmbeddedFiles.Count < index)
             {
-                Console.Error.WriteLine($"No embedded file found at index {embeddedFileIndex}.");
+                Console.Error.WriteLine($"No embedded file at index {index}.");
                 return;
             }
 
-            // Retrieve the embedded file specification (indexer is 1‑based)
-            FileSpecification fileSpec = doc.EmbeddedFiles[embeddedFileIndex];
+            // Retrieve the embedded file specification
+            FileSpecification fileSpec = doc.EmbeddedFiles[index];
 
-            // The original file name (including extension) is stored in the Name property
-            // If for some reason it is missing, fall back to a generated name.
-            string originalFileName = !string.IsNullOrEmpty(fileSpec.Name)
+            // Preserve the original file name (includes its extension)
+            string outputFileName = !string.IsNullOrEmpty(fileSpec.Name)
                 ? fileSpec.Name
-                : $"embedded_{embeddedFileIndex}";
+                : $"embedded_{index}";
 
-            // Extract the raw bytes of the embedded file using the Contents stream
-            byte[] fileBytes;
-            using (Stream contentStream = fileSpec.Contents)
-            using (MemoryStream ms = new MemoryStream())
+            // Build the full output path (current directory)
+            string outputPath = Path.Combine(Environment.CurrentDirectory, outputFileName);
+
+            // Extract the embedded file using the Contents stream (EmbeddedFile property does not exist)
+            if (fileSpec.Contents != null)
             {
-                contentStream.CopyTo(ms);
-                fileBytes = ms.ToArray();
+                using (FileStream outStream = File.Create(outputPath))
+                {
+                    fileSpec.Contents.CopyTo(outStream);
+                }
+                Console.WriteLine($"Embedded file saved to '{outputPath}'.");
             }
-
-            // Build the output path – saved with its original file name and extension
-            string outputPath = Path.Combine(
-                Path.GetDirectoryName(pdfPath) ?? string.Empty,
-                originalFileName);
-
-            // Write the extracted file to disk
-            File.WriteAllBytes(outputPath, fileBytes);
-
-            Console.WriteLine($"Embedded file extracted and saved to: {outputPath}");
+            else
+            {
+                Console.Error.WriteLine("Embedded file data is missing.");
+            }
         }
     }
 }

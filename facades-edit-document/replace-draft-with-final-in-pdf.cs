@@ -12,27 +12,34 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Create a PdfContentEditor facade to edit the document content
-            using (PdfContentEditor editor = new PdfContentEditor())
+            // Load the PDF document (lifecycle rule: use using for disposal)
+            using (Document doc = new Document(inputPath))
             {
-                // Bind the loaded document to the editor
-                editor.BindPdf(doc);
+                // Create a PdfContentEditor to edit the document content
+                using (PdfContentEditor editor = new PdfContentEditor())
+                {
+                    // Bind the loaded document to the editor
+                    editor.BindPdf(doc);
 
-                // Replace all occurrences of "Draft" with "Final" on all pages
-                editor.ReplaceText("Draft", "Final");
+                    // Replace every occurrence of "Draft" with "Final" in the whole document
+                    editor.ReplaceText("Draft", "Final");
+                }
+
+                // Save the modified document (lifecycle rule: use Save without extra options)
+                doc.Save(outputPath);
             }
 
-            // Save the modified document
-            doc.Save(outputPath);
+            Console.WriteLine($"All occurrences of \"Draft\" replaced with \"Final\". Saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"All occurrences of \"Draft\" have been replaced with \"Final\" and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

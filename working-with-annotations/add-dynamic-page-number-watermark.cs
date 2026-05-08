@@ -2,12 +2,13 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "watermarked_output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,33 +17,41 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block (lifecycle rule)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing rule)
+            // Define a text state for the page number appearance
+            TextState ts = new TextState
+            {
+                Font = FontRepository.FindFont("Helvetica"),
+                FontSize = 12,
+                ForegroundColor = Aspose.Pdf.Color.Gray
+            };
+
+            // Iterate through all pages (1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Define the rectangle where the watermark will appear
-                // Fully qualify to avoid ambiguity with System.Drawing.Rectangle
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+                // Position of the watermark annotation (adjust as needed)
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(50, 750, 150, 770);
 
                 // Create the WatermarkAnnotation for the current page
-                WatermarkAnnotation watermark = new WatermarkAnnotation(page, rect)
+                WatermarkAnnotation wm = new WatermarkAnnotation(page, rect)
                 {
-                    // Visual styling (Color sets the text color for a watermark)
-                    Color = Aspose.Pdf.Color.Black,
-                    Opacity = 0.5,
-                    // Dynamic page number – set per‑page content
-                    Contents = $"Page {i}"
+                    Color = Aspose.Pdf.Color.LightGray,
+                    Opacity = 0.5
                 };
 
+                // Set the page number as the annotation text
+                string pageNumber = i.ToString();
+                wm.SetTextAndState(new[] { pageNumber }, ts);
+
                 // Add the annotation to the page
-                page.Annotations.Add(watermark);
+                page.Annotations.Add(wm);
             }
 
-            // Save the modified PDF (save rule)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

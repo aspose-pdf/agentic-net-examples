@@ -8,13 +8,15 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";   // source PDF
-        const string outputPath = "output.pdf";  // result PDF
-        const string srcString  = "OldText";    // text to find inside annotations
-        const string destString = "NewText";    // replacement text
+        // Input PDF, output PDF and the pages on which annotations should be processed
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+        // Example: process pages 1, 2 and 4
+        int[] pagesToProcess = { 1, 2, 4 };
 
-        // pages on which annotation text should be processed (1‑based indexing)
-        int[] targetPages = { 1, 2, 3 };
+        // Text to find inside annotation contents and its replacement
+        const string srcText  = "Old Annotation Text";
+        const string destText = "New Annotation Text";
 
         if (!File.Exists(inputPath))
         {
@@ -22,38 +24,43 @@ class Program
             return;
         }
 
-        // Load the PDF document – always wrap in a using block (document‑disposal rule)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
+            // Bind the document to the PdfAnnotationEditor facade
+            PdfAnnotationEditor editor = new PdfAnnotationEditor();
+            editor.BindPdf(doc);
+
             // Iterate over the specified pages
-            foreach (int pageNum in targetPages)
+            foreach (int pageNumber in pagesToProcess)
             {
-                if (pageNum < 1 || pageNum > doc.Pages.Count)
-                    continue; // skip invalid page numbers
+                // Ensure the page number is within the document range
+                if (pageNumber < 1 || pageNumber > doc.Pages.Count)
+                    continue;
 
-                Page page = doc.Pages[pageNum];
+                Page page = doc.Pages[pageNumber];
 
-                // Examine each annotation on the current page
-                foreach (Annotation ann in page.Annotations)
+                // Iterate over all annotations on the page (1‑based indexing)
+                for (int i = 1; i <= page.Annotations.Count; i++)
                 {
-                    // Only process annotations that have textual content
-                    if (!string.IsNullOrEmpty(ann.Contents) && ann.Contents.Contains(srcString))
+                    Annotation annot = page.Annotations[i];
+
+                    // Process only TextAnnotation (sticky‑note) types
+                    if (annot is TextAnnotation textAnnot)
                     {
-                        // Replace the target substring inside the annotation's Contents
-                        ann.Contents = ann.Contents.Replace(srcString, destString);
+                        // If the annotation's Contents contain the source text, replace it
+                        if (!string.IsNullOrEmpty(textAnnot.Contents) && textAnnot.Contents.Contains(srcText))
+                        {
+                            textAnnot.Contents = textAnnot.Contents.Replace(srcText, destText);
+                        }
                     }
                 }
             }
 
-            // Use the Facade API (PdfAnnotationEditor) to save the modified document.
-            // Binding the Document to the editor satisfies the “use Aspose.Pdf.Facades” requirement.
-            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-            {
-                editor.BindPdf(doc);          // initialize the facade with the edited document
-                editor.Save(outputPath);      // persist changes
-            }
+            // Save the modified PDF using the facade (ensures annotation changes are persisted)
+            editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Annotation text replacement completed. Saved to '{outputPath}'.");
+        Console.WriteLine($"Annotations updated and saved to '{outputPath}'.");
     }
 }

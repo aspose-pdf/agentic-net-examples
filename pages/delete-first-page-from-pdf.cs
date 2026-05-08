@@ -6,33 +6,25 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Verify the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
+        // Load the PDF document; using ensures proper disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document (using block ensures deterministic disposal)
-            using (Document doc = new Document(inputPath))
-            {
-                // Delete the first page – PageCollection uses 1‑based indexing
-                doc.Pages.Delete(1);
+            // Delete the first page (page numbers are 1‑based)
+            doc.Pages.Delete(1);
 
-                // Save the modified document back to PDF format
-                doc.Save(outputPath);
-            }
+            // Save the updated PDF
+            doc.Save(outputPath);
+        }
 
-            Console.WriteLine($"First page removed. Saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"First page deleted. Output saved to '{outputPath}'.");
     }
 }

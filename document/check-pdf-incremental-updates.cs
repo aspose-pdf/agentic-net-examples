@@ -8,6 +8,7 @@ class Program
     {
         const string inputPath = "input.pdf";
 
+        // Verify the file exists before attempting to load it
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
@@ -17,7 +18,8 @@ class Program
         // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Check whether the PDF has been saved using incremental updates
+            // Check whether the PDF has been saved with incremental updates
+            // HasIncrementalUpdate is a method, so invoke it
             bool hasIncremental = doc.HasIncrementalUpdate();
 
             // Output the result

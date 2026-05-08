@@ -7,8 +7,8 @@ class Program
     static void Main()
     {
         // Input and output PDF file paths
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_resized.pdf";
 
         // Verify that the source file exists
         if (!File.Exists(inputPath))
@@ -17,34 +17,31 @@ class Program
             return;
         }
 
-        // PdfFileEditor does NOT implement IDisposable, so instantiate it directly
-        PdfFileEditor editor = new PdfFileEditor();
-
-        // Define resize parameters:
-        // - Top margin = 20% of page height
-        // - Bottom margin = 10% of page height
-        // - Left, right margins and content size are calculated automatically (null)
-        PdfFileEditor.ContentsResizeParameters parameters =
-            new PdfFileEditor.ContentsResizeParameters(
-                leftMargin:      null,                                            // auto
-                contentsWidth:   null,                                            // auto
-                rightMargin:     null,                                            // auto
-                topMargin:       PdfFileEditor.ContentsResizeValue.Percents(20), // 20% top
-                contentsHeight:  null,                                            // auto
-                bottomMargin:    PdfFileEditor.ContentsResizeValue.Percents(10)  // 10% bottom
-            );
-
-        // Resize contents of all pages (pages = null) using the defined parameters
-        bool success = editor.ResizeContents(
-            source:      inputPath,
-            destination: outputPath,
-            pages:       null,      // null = all pages
-            parameters:  parameters
+        // Create resize parameters:
+        // - Left and right margins: 5% of page width each
+        // - Top margin: 15% of page height
+        // - Bottom margin: 5% of page height
+        // - Contents width and height are set to Auto so they are calculated
+        //   from the remaining space after margins are applied.
+        var resizeParams = new PdfFileEditor.ContentsResizeParameters(
+            PdfFileEditor.ContentsResizeValue.Percents(5),   // left margin
+            PdfFileEditor.ContentsResizeValue.Auto(),       // contents width (auto)
+            PdfFileEditor.ContentsResizeValue.Percents(5),   // right margin
+            PdfFileEditor.ContentsResizeValue.Percents(15),  // top margin
+            PdfFileEditor.ContentsResizeValue.Auto(),       // contents height (auto)
+            PdfFileEditor.ContentsResizeValue.Percents(5)    // bottom margin
         );
 
+        // Instantiate PdfFileEditor (do NOT use a using block; it is not IDisposable)
+        var editor = new PdfFileEditor();
+
+        // Resize contents of all pages (pages = null) using the defined parameters
+        bool success = editor.ResizeContents(inputPath, outputPath, null, resizeParams);
+
+        // Report the result
         if (success)
-            Console.WriteLine($"Pages resized successfully. Output saved to '{outputPath}'.");
+            Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
         else
-            Console.Error.WriteLine("Resize operation failed.");
+            Console.Error.WriteLine("Failed to resize PDF contents.");
     }
 }

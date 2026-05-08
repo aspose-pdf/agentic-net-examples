@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -10,81 +11,96 @@ class Program
         // Output PDF path
         const string outputPath = "RichTextTable.pdf";
 
-        // Ensure any previous file is removed – prevents file‑lock issues during repeated builds
-        if (File.Exists(outputPath))
-        {
-            File.Delete(outputPath);
-        }
-
-        // Create a new PDF document inside a using block (ensures disposal)
+        // Create a new PDF document inside a using block for proper disposal
         using (Document doc = new Document())
         {
-            // Add a page to the document
+            // Add a blank page (pages are 1‑based)
             Page page = doc.Pages.Add();
 
             // Create a table and set its position on the page
             Table table = new Table
             {
-                // Position the table (coordinates are in points)
+                // Position the table (left, top) – coordinates are in points
                 Left = 50,
                 Top = 700,
-                // Optional: set table border
-                Border = new BorderInfo(BorderSide.All, 1, Color.Black)
+                // Optional: set column widths (two columns, each 200 points wide)
+                ColumnWidths = "200 200"
             };
 
-            // -------------------------
-            // Row 1
-            // -------------------------
-            // Create first row
-            Row row1 = table.Rows.Add();
+            // ---------- First Row ----------
+            // Add a new row to the table
+            Aspose.Pdf.Row row1 = table.Rows.Add();
 
-            // Cell 1, Row 1 – bold red text
-            Cell cell11 = row1.Cells.Add();
-            TextFragment tf11 = new TextFragment("Bold Red");
-            tf11.TextState.Font = FontRepository.FindFont("Helvetica");
+            // First cell with bold, blue text
+            Aspose.Pdf.Cell cell11 = row1.Cells.Add();
+            TextFragment tf11 = new TextFragment("Bold Blue");
+            tf11.TextState.Font = FontRepository.FindFont("Helvetica-Bold");
             tf11.TextState.FontSize = 12;
-            tf11.TextState.FontStyle = FontStyles.Bold;
-            tf11.TextState.ForegroundColor = Color.Red;
+            tf11.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
             cell11.Paragraphs.Add(tf11);
 
-            // Cell 2, Row 1 – italic blue text
-            Cell cell12 = row1.Cells.Add();
-            TextFragment tf12 = new TextFragment("Italic Blue");
-            tf12.TextState.Font = FontRepository.FindFont("Helvetica");
+            // Second cell with italic, red text
+            Aspose.Pdf.Cell cell12 = row1.Cells.Add();
+            TextFragment tf12 = new TextFragment("Italic Red");
+            tf12.TextState.Font = FontRepository.FindFont("Helvetica-Oblique");
             tf12.TextState.FontSize = 12;
-            tf12.TextState.FontStyle = FontStyles.Italic;
-            tf12.TextState.ForegroundColor = Color.Blue;
+            tf12.TextState.ForegroundColor = Aspose.Pdf.Color.Red;
             cell12.Paragraphs.Add(tf12);
 
-            // -------------------------
-            // Row 2
-            // -------------------------
-            Row row2 = table.Rows.Add();
+            // ---------- Second Row ----------
+            Aspose.Pdf.Row row2 = table.Rows.Add();
 
-            // Cell 1, Row 2 – underlined green text
-            Cell cell21 = row2.Cells.Add();
-            TextFragment tf21 = new TextFragment("Underline Green");
+            // First cell with underlined, green text
+            Aspose.Pdf.Cell cell21 = row2.Cells.Add();
+            TextFragment tf21 = new TextFragment("Underlined Green");
             tf21.TextState.Font = FontRepository.FindFont("Helvetica");
             tf21.TextState.FontSize = 12;
-            tf21.TextState.Underline = true; // Underline is a bool property, not a FontStyle
-            tf21.TextState.ForegroundColor = Color.Green;
+            tf21.TextState.ForegroundColor = Aspose.Pdf.Color.Green;
+            tf21.TextState.Underline = true;
             cell21.Paragraphs.Add(tf21);
 
-            // Cell 2, Row 2 – regular black text with larger size
-            Cell cell22 = row2.Cells.Add();
-            TextFragment tf22 = new TextFragment("Large Black");
+            // Second cell with larger, orange text
+            Aspose.Pdf.Cell cell22 = row2.Cells.Add();
+            TextFragment tf22 = new TextFragment("Large Orange");
             tf22.TextState.Font = FontRepository.FindFont("Helvetica");
             tf22.TextState.FontSize = 16;
-            tf22.TextState.ForegroundColor = Color.Black;
+            tf22.TextState.ForegroundColor = Aspose.Pdf.Color.Orange;
             cell22.Paragraphs.Add(tf22);
 
             // Add the table to the page's paragraph collection
             page.Paragraphs.Add(table);
 
-            // Save the document as PDF (overwrites if the file already exists)
-            doc.Save(outputPath);
+            // Save the document – guard against missing GDI+ (libgdiplus) on non‑Windows platforms
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                doc.Save(outputPath);
+                Console.WriteLine($"PDF saved to '{outputPath}'.");
+            }
+            else
+            {
+                try
+                {
+                    doc.Save(outputPath);
+                    Console.WriteLine($"PDF saved to '{outputPath}'.");
+                }
+                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
+                {
+                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. " +
+                                      "The PDF could not be saved using Aspose.Pdf's default renderer.");
+                }
+            }
         }
+    }
 
-        Console.WriteLine($"PDF with rich‑text table saved to '{outputPath}'.");
+    // Helper method to detect a nested DllNotFoundException (e.g., missing libgdiplus)
+    private static bool ContainsDllNotFound(Exception? ex)
+    {
+        while (ex != null)
+        {
+            if (ex is DllNotFoundException)
+                return true;
+            ex = ex.InnerException;
+        }
+        return false;
     }
 }

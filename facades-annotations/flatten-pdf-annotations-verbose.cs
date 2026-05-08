@@ -1,7 +1,6 @@
 using System;
 using System.IO;
-using System.Linq;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades; // PdfAnnotationEditor resides here
 
 class Program
 {
@@ -10,13 +9,23 @@ class Program
         // Expect at least input and output file paths
         if (args.Length < 2)
         {
-            Console.Error.WriteLine("Usage: <program> <input.pdf> <output.pdf> [--verbose]");
+            Console.Error.WriteLine("Usage: program <input.pdf> <output.pdf> [--verbose]");
             return;
         }
 
-        string inputPath = args[0];
+        string inputPath  = args[0];
         string outputPath = args[1];
-        bool verbose = args.Any(a => a.Equals("--verbose", StringComparison.OrdinalIgnoreCase));
+        bool verbose = false;
+
+        // Detect the optional verbose flag
+        foreach (string arg in args)
+        {
+            if (arg.Equals("--verbose", StringComparison.OrdinalIgnoreCase))
+            {
+                verbose = true;
+                break;
+            }
+        }
 
         if (!File.Exists(inputPath))
         {
@@ -26,22 +35,22 @@ class Program
 
         try
         {
-            // Load the PDF using PdfAnnotationEditor
+            // Create the annotation editor (creation rule)
             using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
             {
+                // Load the PDF (load rule)
+                if (verbose) Console.WriteLine($"Binding PDF: {inputPath}");
                 editor.BindPdf(inputPath);
-                if (verbose)
-                    Console.WriteLine($"[Verbose] Bound PDF: {inputPath}");
 
                 // Example operation: flatten all annotations
+                if (verbose) Console.WriteLine("Flattening all annotations...");
                 editor.FlatteningAnnotations();
-                if (verbose)
-                    Console.WriteLine("[Verbose] Flattened all annotations.");
 
-                // Save the modified PDF
+                // Save the modified PDF (save rule)
+                if (verbose) Console.WriteLine($"Saving output PDF: {outputPath}");
                 editor.Save(outputPath);
-                if (verbose)
-                    Console.WriteLine($"[Verbose] Saved modified PDF to: {outputPath}");
+
+                if (verbose) Console.WriteLine("Annotation processing completed successfully.");
             }
         }
         catch (Exception ex)

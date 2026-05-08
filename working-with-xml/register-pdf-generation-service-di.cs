@@ -3,27 +3,30 @@ using Aspose.Pdf.Comparison;
 
 namespace AsposePdfApi
 {
+    // Registers the Aspose.Pdf PDF generation service for reuse throughout the application.
+    // The service is registered as a singleton because PdfOutputGenerator is stateless
+    // and can be safely shared across multiple requests.
     public static class ServiceCollectionExtensions
     {
-        /// <summary>
-        /// Registers the Aspose.Pdf comparison PDF generation service for DI.
-        /// </summary>
-        /// <param name="services">The IServiceCollection to add the service to.</param>
-        /// <returns>The same IServiceCollection for chaining.</returns>
         public static IServiceCollection AddPdfGeneration(this IServiceCollection services)
         {
-            // Register PdfOutputGenerator as a singleton so the same instance can be reused.
+            // Register the concrete PdfOutputGenerator.
             services.AddSingleton<PdfOutputGenerator>();
+
+            // Optionally expose it via its interface for more flexible consumption.
+            services.AddSingleton<IFileOutputGenerator>(provider => provider.GetRequiredService<PdfOutputGenerator>());
+
             return services;
         }
     }
 
-    // Dummy entry point to satisfy the compiler when the project is built as an executable.
-    internal class Program
+    // Minimal entry point required for a console‑style project.
+    // The method does not need to perform any work for the purpose of this library.
+    public static class Program
     {
         public static void Main(string[] args)
         {
-            // No runtime logic required for the library; this method exists only to provide an entry point.
+            // Intentionally left blank.
         }
     }
 }

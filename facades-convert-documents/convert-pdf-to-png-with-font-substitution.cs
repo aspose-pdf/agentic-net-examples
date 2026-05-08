@@ -1,17 +1,17 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
-using System.Drawing.Imaging;          // for ImageFormat
+using System.Drawing.Imaging;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text;                 // for SimpleFontSubstitution and FontRepository
+using Aspose.Pdf.Devices;
+using Aspose.Pdf.Text; // Needed for font substitution
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputDir = "PngPages";
+        const string inputPdf = "input.pdf";
+        const string outputDir = "output_images";
 
         if (!File.Exists(inputPdf))
         {
@@ -19,38 +19,41 @@ class Program
             return;
         }
 
-        // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Register a font substitution: replace missing Helvetica with Times New Roman
-        FontRepository.Substitutions.Add(new SimpleFontSubstitution("Helvetica", "Times New Roman"));
-
-        // Load PDF inside a using block for deterministic disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPdf))
-        // PdfConverter also implements IDisposable
-        using (PdfConverter converter = new PdfConverter())
         {
-            // Bind the loaded document to the converter
-            converter.BindPdf(doc);
+            // Enable font substitution for any missing fonts by adding a fallback substitution.
+            // This will replace any font that cannot be found with Arial.
+            FontRepository.Substitutions.Add(new SimpleFontSubstitution("*", "Arial"));
 
-            // (Optional) you can still configure other rendering options here
-            // RenderingOptions renderOpts = new RenderingOptions();
-            // converter.RenderingOptions = renderOpts;
-
-            // Convert all pages
-            converter.StartPage = 1;
-            converter.EndPage   = doc.Pages.Count;
-
-            int pageNumber = 1;
-            while (converter.HasNextImage())
+            // Initialize the PdfConverter with the loaded document
+            using (PdfConverter converter = new PdfConverter(doc))
             {
-                string outPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
-                // Save the current page as PNG
-                converter.GetNextImage(outPath, ImageFormat.Png);
-                pageNumber++;
+                // Set the page range to convert (all pages)
+                converter.StartPage = 1;
+                converter.EndPage   = doc.Pages.Count;
+
+                // Set a higher resolution for better image quality
+                converter.Resolution = new Resolution(300);
+
+                // Prepare the converter for processing
+                converter.DoConvert();
+
+                // Iterate through each page and save it as a PNG image
+                for (int page = converter.StartPage; page <= converter.EndPage; page++)
+                {
+                    string outputPath = Path.Combine(outputDir, $"page_{page}.png");
+                    // Save the current page as PNG
+                    converter.GetNextImage(outputPath, ImageFormat.Png);
+                }
+
+                // Release resources held by the converter
+                converter.Close();
             }
         }
 
-        Console.WriteLine($"PDF pages have been converted to PNG images in '{outputDir}'.");
+        Console.WriteLine("PDF has been successfully converted to PNG images.");
     }
 }

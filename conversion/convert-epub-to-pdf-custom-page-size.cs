@@ -1,32 +1,37 @@
 using System;
+using System.Drawing; // for SizeF
 using System.IO;
-using System.Drawing; // SizeF for custom page dimensions
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string epubPath = "input.epub";
-        const string pdfPath = "output.pdf";
+        // Paths – adjust as needed
+        const string epubPath   = "input.epub";
+        const string pdfPath    = "output.pdf";
 
+        // Verify the source file exists
         if (!File.Exists(epubPath))
         {
-            Console.Error.WriteLine($"File not found: {epubPath}");
+            Console.Error.WriteLine($"EPUB file not found: {epubPath}");
             return;
         }
 
-        // Example custom page size: Letter (8.5 x 11 inches) at 72 DPI => 612 x 792 points
-        SizeF customPageSize = new SizeF(612f, 792f);
-        // EpubLoadOptions accepts a System.Drawing.SizeF for the desired page size.
-        var loadOptions = new EpubLoadOptions(customPageSize);
+        // Define a custom page size (width x height) in points.
+        // Example: 600 x 800 points (≈8.33 x 11.11 inches at 72 DPI)
+        SizeF customPageSize = new SizeF(600f, 800f);
 
-        // Load EPUB with the specified options and convert to PDF
-        using (var pdfDocument = new Document(epubPath, loadOptions))
+        // Create load options with the custom page size
+        EpubLoadOptions loadOptions = new EpubLoadOptions(customPageSize);
+
+        // Load the EPUB and convert it to PDF
+        using (Document pdfDocument = new Document(epubPath, loadOptions))
         {
+            // Save the resulting PDF
             pdfDocument.Save(pdfPath);
         }
 
-        Console.WriteLine($"EPUB successfully converted to PDF: {pdfPath}");
+        Console.WriteLine($"EPUB converted to PDF successfully: {pdfPath}");
     }
 }

@@ -1,60 +1,75 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-public static class PdfViewerPreferenceHelper
+public static class PdfViewerPreferenceToggle
 {
     /// <summary>
-    /// Toggles the FullScreen viewer preference for a PDF file.
-    /// If FullScreen is currently enabled, it will be disabled; otherwise it will be enabled.
+    /// Toggles the FullScreen viewer preference of a PDF.
     /// </summary>
-    /// <param name="inputPdfPath">Path to the source PDF.</param>
-    /// <param name="outputPdfPath">Path where the modified PDF will be saved.</param>
-    public static void ToggleFullScreen(string inputPdfPath, string outputPdfPath)
+    /// <param name="inputPath">Path to the source PDF file.</param>
+    /// <param name="outputPath">Path where the modified PDF will be saved.</param>
+    /// <param name="enableFullScreen">If true, enable FullScreen mode; otherwise disable it.</param>
+    public static void ToggleFullScreen(string inputPath, string outputPath, bool enableFullScreen)
     {
-        if (!File.Exists(inputPdfPath))
-            throw new FileNotFoundException($"Input PDF not found: {inputPdfPath}");
+        // Validate input file
+        if (!File.Exists(inputPath))
+            throw new FileNotFoundException($"Input PDF not found: {inputPath}");
 
-        // Load the PDF using the recommended using pattern (document-disposal-with-using rule)
-        using (Document doc = new Document(inputPdfPath))
-        {
-            // Initialize the PdfContentEditor facade
-            PdfContentEditor editor = new PdfContentEditor();
-            editor.BindPdf(doc);
+        // Initialize the facade and bind the PDF
+        PdfContentEditor editor = new PdfContentEditor();
+        editor.BindPdf(inputPath);
 
-            // Retrieve current viewer preferences
-            int currentPrefs = editor.GetViewerPreference();
+        // Retrieve current viewer preferences
+        int currentPref = editor.GetViewerPreference();
 
-            // FullScreen flag constant (cast enum to int before bitwise operation)
-            const int FullScreenFlag = (int)ViewerPreference.PageModeFullScreen;
+        // Cast the enum value to int before using bitwise operators (Fix: cast-viewerpreference-to-int)
+        int fullScreenFlag = (int)ViewerPreference.PageModeFullScreen;
 
-            // Toggle the flag using bitwise XOR
-            int newPrefs = currentPrefs ^ FullScreenFlag;
+        // Modify the PageModeFullScreen flag according to the desired state
+        if (enableFullScreen)
+            currentPref |= fullScreenFlag;   // set flag
+        else
+            currentPref &= ~fullScreenFlag;  // clear flag
 
-            // Apply the new viewer preference
-            editor.ChangeViewerPreference(newPrefs);
+        // Apply the updated preferences
+        editor.ChangeViewerPreference(currentPref);
 
-            // Save the modified PDF (save rule)
-            editor.Save(outputPdfPath);
-        }
+        // Save the result PDF
+        editor.Save(outputPath);
     }
-}
 
-// Dummy entry point to satisfy the compiler when building as an executable.
-public class Program
-{
+    // Entry point required for a console application (Fix: add Main method)
     public static void Main(string[] args)
     {
-        // Optional: run a quick test if arguments are supplied.
-        if (args.Length == 2)
+        // Expected arguments: <inputPath> <outputPath> <enableFullScreen:true|false>
+        if (args.Length < 3)
         {
-            PdfViewerPreferenceHelper.ToggleFullScreen(args[0], args[1]);
-            Console.WriteLine("Viewer preference toggled successfully.");
+            Console.WriteLine("Usage: <inputPath> <outputPath> <enableFullScreen:true|false>");
+            return;
         }
-        else
+
+        string inputPath = args[0];
+        string outputPath = args[1];
+        bool enableFullScreen;
+        if (!bool.TryParse(args[2], out enableFullScreen))
         {
-            Console.WriteLine("Usage: <exe> <inputPdfPath> <outputPdfPath>");
+            Console.WriteLine("The third argument must be 'true' or 'false'.");
+            return;
+        }
+
+        try
+        {
+            ToggleFullScreen(inputPath, outputPath, enableFullScreen);
+            Console.WriteLine($"FullScreen mode {(enableFullScreen ? "enabled" : "disabled")} and saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
         }
     }
 }
+
+// Example usage from code (uncomment to test programmatically):
+// PdfViewerPreferenceToggle.ToggleFullScreen("input.pdf", "output.pdf", true);   // enable FullScreen
+// PdfViewerPreferenceToggle.ToggleFullScreen("input.pdf", "output.pdf", false);  // disable FullScreen

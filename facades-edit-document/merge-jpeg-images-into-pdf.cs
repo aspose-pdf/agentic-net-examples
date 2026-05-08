@@ -1,59 +1,67 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core PDF API
-using Aspose.Pdf.Facades;      // Facade for adding images
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // List of JPEG files to be merged into the PDF.
-        // Adjust the paths as needed.
+        // Paths to the JPEG images to be merged
         string[] imageFiles = new string[]
         {
             "image1.jpg",
             "image2.jpg",
             "image3.jpg"
+            // add more image paths as needed
         };
 
-        const string outputPdf = "merged_images.pdf";
+        // Output PDF file
+        const string outputPdf = "merged.pdf";
 
-        // Create an empty PDF document.
-        // The using block ensures the document is disposed correctly.
+        // Verify that all image files exist before proceeding
+        foreach (string img in imageFiles)
+        {
+            if (!File.Exists(img))
+            {
+                Console.Error.WriteLine($"Image file not found: {img}");
+                return;
+            }
+        }
+
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document pdfDoc = new Document())
         {
-            // PdfFileMend provides methods to add images to pages.
-            PdfFileMend pdfMend = new PdfFileMend(pdfDoc);
-
-            int pageNumber = 0;
-
-            foreach (string imgPath in imageFiles)
+            // Bind the document to PdfFileMend facade (also disposed via using)
+            using (PdfFileMend pdfMend = new PdfFileMend(pdfDoc))
             {
-                if (!File.Exists(imgPath))
+                // Process each image
+                foreach (string imgPath in imageFiles)
                 {
-                    Console.Error.WriteLine($"Image not found: {imgPath}");
-                    continue; // Skip missing files.
+                    // Add a blank page to the document
+                    Page page = pdfDoc.Pages.Add();
+
+                    // Determine the page number (1‑based indexing)
+                    int pageNumber = pdfDoc.Pages.Count;
+
+                    // Open the image file as a stream
+                    using (FileStream imgStream = File.OpenRead(imgPath))
+                    {
+                        // Add the image to the newly created page.
+                        // Coordinates (0,0) to (page width, page height) make the image fill the page.
+                        pdfMend.AddImage(
+                            imgStream,
+                            pageNumber,
+                            0f,                     // lower left X
+                            0f,                     // lower left Y
+                            (float)page.PageInfo.Width,   // upper right X (cast to float)
+                            (float)page.PageInfo.Height   // upper right Y (cast to float)
+                        );
+                    }
                 }
-
-                // Add a new blank page for the current image.
-                pdfDoc.Pages.Add();
-                pageNumber++;
-
-                // Retrieve the newly added page to obtain its dimensions.
-                Page page = pdfDoc.Pages[pageNumber];
-
-                // Define the rectangle that covers the whole page.
-                // Coordinates are in points (1 point = 1/72 inch).
-                float lowerLeftX = 0f;
-                float lowerLeftY = 0f;
-                float upperRightX = (float)page.PageInfo.Width;   // Cast double to float
-                float upperRightY = (float)page.PageInfo.Height;  // Cast double to float
-
-                // Add the image to the current page, scaling it to fill the page.
-                pdfMend.AddImage(imgPath, pageNumber, lowerLeftX, lowerLeftY, upperRightX, upperRightY);
             }
 
-            // Save the assembled PDF.
+            // Save the assembled PDF to the specified file
             pdfDoc.Save(outputPdf);
         }
 

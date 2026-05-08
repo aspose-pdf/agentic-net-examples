@@ -1,79 +1,62 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Forms;          // For SignatureField, PKCS7, Signature
+using Aspose.Pdf.Drawing;        // For Rectangle (Aspose.Pdf.Rectangle)
 
 class Program
 {
     static void Main()
     {
         // Paths – adjust as needed
-        const string outputPdf = "signed_form.pdf";
-        const string certPath = "certificate.pfx";
-        const string certPassword = "password";
+        const string outputPdfPath = "SignedForm.pdf";
+        const string certificatePath = "certificate.pfx";
+        const string certificatePassword = "password";
 
-        // Ensure the certificate file exists
-        if (!File.Exists(certPath))
+        // Verify that the certificate file exists
+        if (!File.Exists(certificatePath))
         {
-            Console.Error.WriteLine($"Certificate file not found: {certPath}");
+            Console.Error.WriteLine($"Certificate file not found: {certificatePath}");
             return;
         }
 
-        // Create a new PDF document
+        // Create a new PDF document with a single page
         using (Document doc = new Document())
         {
-            // Add a blank page
             Page page = doc.Pages.Add();
 
-            // Define the rectangle for the signature field (llx, lly, urx, ury)
+            // Define the rectangle where the signature field will appear
+            // (llx, lly, urx, ury) – lower‑left and upper‑right coordinates
             Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Create the signature field on the page
-            SignatureField sigField = new SignatureField(page, sigRect)
+            // Create the signature field and add it to the document's form collection
+            SignatureField sigField = new SignatureField(doc, sigRect)
             {
-                PartialName = "Signature1",          // field name
-                AlternateName = "Sign Here",        // tooltip
-                Color = Aspose.Pdf.Color.LightGray // optional visual cue
+                PartialName = "Signature1",   // field name
+                // Optional: tooltip shown in PDF viewers
+                AlternateName = "Please sign here"
             };
+            doc.Form.Add(sigField);
 
-            // Add the field to the page annotations collection
-            page.Annotations.Add(sigField);
-
-            // Create a PKCS#1 signature object using the PFX certificate
-            PKCS1 pkcs1Signature = new PKCS1(certPath, certPassword)
+            // Prepare the digital signature using a PKCS#7 certificate
+            PKCS7 pkcs7Signature = new PKCS7(certificatePath, certificatePassword)
             {
                 Reason = "Document approval",
-                ContactInfo = "contact@example.com",
-                Location = "New York, USA"
+                ContactInfo = "signer@example.com",
+                Location = "New York"
             };
 
-            // Sign the document using the signature field
-            sigField.Sign(pkcs1Signature);
+            // Sign the field
+            sigField.Sign(pkcs7Signature);
 
-            // Verify the signature immediately (optional)
-            bool isValid = pkcs1Signature.Verify();
-            Console.WriteLine($"Signature verification result (in‑memory): {isValid}");
+            // Verify the signature immediately after signing
+            bool isValid = pkcs7Signature.Verify();
+            Console.WriteLine($"Signature verification result: {isValid}");
 
             // Save the signed PDF
-            doc.Save(outputPdf);
+            doc.Save(outputPdfPath);
         }
 
-        // Load the saved PDF to verify the signature from the file
-        using (Document signedDoc = new Document(outputPdf))
-        {
-            // Retrieve the signature field by name from the form
-            // The Form property provides access to AcroForm fields
-            SignatureField loadedField = signedDoc.Form["Signature1"] as SignatureField;
-            if (loadedField != null && loadedField.Signature != null)
-            {
-                // Verify the signature using the embedded certificate
-                bool isValid = loadedField.Signature.Verify();
-                Console.WriteLine($"Signature verification result (saved file): {isValid}");
-            }
-            else
-            {
-                Console.WriteLine("Signature field not found or not signed.");
-            }
-        }
+        Console.WriteLine($"Signed PDF saved to '{outputPdfPath}'.");
     }
 }

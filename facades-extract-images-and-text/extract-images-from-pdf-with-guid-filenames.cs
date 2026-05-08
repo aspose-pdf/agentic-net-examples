@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -10,7 +9,6 @@ class Program
         const string inputPdf = "input.pdf";
         const string outputDir = "ExtractedImages";
 
-        // Verify input file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input file not found: {inputPdf}");
@@ -20,27 +18,29 @@ class Program
         // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Use PdfExtractor to pull images from the PDF
+        // Use PdfExtractor (implements IDisposable) inside a using block
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the PDF document
+            // Bind the source PDF
             extractor.BindPdf(inputPdf);
 
-            // Prepare the extractor for image extraction
+            // Prepare the extractor to pull images
             extractor.ExtractImage();
 
-            // Loop through all images found in the document
+            // Iterate over all images in the document
             while (extractor.HasNextImage())
             {
-                // Create a unique filename using a GUID to avoid collisions
-                string guid = Guid.NewGuid().ToString();
-                string outPath = Path.Combine(outputDir, guid + ".png");
+                // Generate a unique file name using a GUID
+                string guidFileName = Guid.NewGuid().ToString() + ".png"; // extension can be any supported type
 
-                // Save the current image as PNG
-                extractor.GetNextImage(outPath, ImageFormat.Png);
+                // Full path for the extracted image
+                string outputPath = Path.Combine(outputDir, guidFileName);
+
+                // Save the image. The overload without ImageFormat saves the image in its original format.
+                extractor.GetNextImage(outputPath);
             }
         }
 
-        Console.WriteLine($"All images have been extracted to '{outputDir}'.");
+        Console.WriteLine("Image extraction completed.");
     }
 }

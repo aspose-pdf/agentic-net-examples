@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputGzipPath = "extracted_text.gz";
+        const string inputPdfPath = "input.pdf";          // source PDF
+        const string outputGzipPath = "output.txt.gz";    // compressed text file
 
         if (!File.Exists(inputPdfPath))
         {
@@ -16,16 +16,18 @@ class Program
             return;
         }
 
-        // Initialize the PdfExtractor facade and bind the PDF document
+        // PdfExtractor is a Facade; use using for deterministic disposal
         using (PdfExtractor extractor = new PdfExtractor())
         {
+            // Bind the PDF document to the extractor
             extractor.BindPdf(inputPdfPath);
 
             // Extract all text using Unicode encoding (default)
             extractor.ExtractText();
 
-            // Create the output file stream and wrap it with GZipStream for compression
+            // Open the output file stream
             using (FileStream fileStream = new FileStream(outputGzipPath, FileMode.Create, FileAccess.Write))
+            // Wrap the file stream with GZipStream for compression
             using (GZipStream gzipStream = new GZipStream(fileStream, CompressionLevel.Optimal))
             {
                 // Write the extracted text directly into the compressed stream

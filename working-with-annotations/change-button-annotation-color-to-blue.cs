@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -17,7 +17,7 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for proper disposal
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
             // Iterate through all pages (1‑based indexing)
@@ -28,10 +28,10 @@ class Program
                 // Iterate through all annotations on the page (1‑based indexing)
                 for (int annIndex = 1; annIndex <= page.Annotations.Count; annIndex++)
                 {
-                    Annotation annotation = page.Annotations[annIndex];
+                    Annotation ann = page.Annotations[annIndex];
 
-                    // Change color only for button fields
-                    if (annotation is ButtonField button)
+                    // Change color only for button annotations
+                    if (ann is ButtonField button)
                     {
                         button.Color = Aspose.Pdf.Color.Blue;
                     }
@@ -42,6 +42,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

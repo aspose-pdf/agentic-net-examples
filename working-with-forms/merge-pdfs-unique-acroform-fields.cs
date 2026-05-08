@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -7,45 +8,57 @@ class Program
 {
     static void Main()
     {
-        const string pdf1Path = "first.pdf";
-        const string pdf2Path = "second.pdf";
-        const string outputPath = "merged_unique_fields.pdf";
+        const string firstPdf  = "first.pdf";
+        const string secondPdf = "second.pdf";
+        const string outputPdf = "merged.pdf";
 
-        if (!File.Exists(pdf1Path) || !File.Exists(pdf2Path))
+        // Verify input files exist
+        if (!File.Exists(firstPdf) || !File.Exists(secondPdf))
         {
-            Console.Error.WriteLine("One or both input files are missing.");
+            Console.Error.WriteLine("One or both input PDF files were not found.");
             return;
         }
 
         try
         {
-            // Load the first PDF (target) – it will receive pages from the second PDF.
-            using (Document targetDoc = new Document(pdf1Path))
-            // Load the second PDF (source) – its fields will be renamed before merging.
-            using (Document sourceDoc = new Document(pdf2Path))
+            // Load both documents inside using blocks for deterministic disposal
+            using (Document doc1 = new Document(firstPdf))
+            using (Document doc2 = new Document(secondPdf))
             {
-                // Prefix to make field names unique.
-                const string prefix = "Doc2_";
-
-                // Rename every form field in the source document.
-                foreach (Field field in sourceDoc.Form)
+                // Ensure duplicate AcroForm field names are renamed to keep them unique
+                // Aspose.Pdf no longer exposes Form.RenameDuplicateFields, so we rename manually.
+                if (doc2.Form != null && doc2.Form.Fields != null && doc2.Form.Fields.Count() > 0)
                 {
-                    // The FullName property is read‑only; rename via the PartialName property.
-                    field.PartialName = prefix + field.PartialName;
+                    foreach (Field field in doc2.Form.Fields)
+                    {
+                        // If the first document already contains a field with the same name, rename it.
+                        bool duplicate = doc1.Form != null &&
+                                         doc1.Form.Fields != null &&
+                                         doc1.Form.Fields.Any(f => f.PartialName == field.PartialName);
+                        if (duplicate)
+                        {
+                            // Append a GUID suffix to make the name unique.
+                            field.PartialName = $"{field.PartialName}_{Guid.NewGuid():N}";
+                        }
+                    }
                 }
 
-                // Merge pages (including the renamed form fields) into the target document.
-                targetDoc.Pages.Add(sourceDoc.Pages);
+                // Append all pages from the second document to the first one
+                foreach (Page page in doc2.Pages)
+                {
+                    // The Add method clones the page into the target document
+                    doc1.Pages.Add(page);
+                }
 
-                // Save the merged PDF.
-                targetDoc.Save(outputPath);
+                // Save the merged result
+                doc1.Save(outputPdf);
             }
 
-            Console.WriteLine($"Merged PDF saved to '{outputPath}'.");
+            Console.WriteLine($"Merged PDF saved to '{outputPdf}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error during merge: {ex.Message}");
         }
     }
 }

@@ -7,37 +7,41 @@ class Program
 {
     static void Main()
     {
-        const string destinationPdf = "destination.pdf"; // PDF to receive pages
-        const string sourcePdf      = "source.pdf";      // PDF providing pages
-        const string outputPdf      = "merged.pdf";      // Resulting PDF
+        const string destinationPdf = "destination.pdf";
+        const string sourcePdf = "source.pdf";
+        const string outputPdf = "merged.pdf";
 
-        // Verify that both input files exist
         if (!File.Exists(destinationPdf) || !File.Exists(sourcePdf))
         {
             Console.Error.WriteLine("One or both input PDF files were not found.");
             return;
         }
 
-        // Determine the total number of pages in the source PDF
-        int sourcePageCount;
+        // Determine all page numbers from the source PDF (1‑based indexing)
+        int[] sourcePageNumbers;
         using (Document srcDoc = new Document(sourcePdf))
         {
-            sourcePageCount = srcDoc.Pages.Count; // Pages are 1‑based
+            int pageCount = srcDoc.Pages.Count;
+            sourcePageNumbers = new int[pageCount];
+            for (int i = 0; i < pageCount; i++)
+            {
+                sourcePageNumbers[i] = i + 1;
+            }
         }
 
-        // Insert all pages from sourcePdf at the beginning (position 1) of destinationPdf
+        // PdfFileEditor does NOT implement IDisposable; do NOT wrap it in a using block
         PdfFileEditor editor = new PdfFileEditor();
-        bool inserted = editor.Insert(
-            inputFile:      destinationPdf,
-            insertLocation: 1,               // Insert at the start
-            portFile:       sourcePdf,
-            startPage:      1,
-            endPage:        sourcePageCount,
-            outputFile:     outputPdf);
 
-        if (inserted)
-            Console.WriteLine($"Pages inserted successfully. Output saved to '{outputPdf}'.");
-        else
-            Console.Error.WriteLine("Failed to insert pages.");
+        // Insert the source pages at the beginning (position 1) of the destination PDF
+        bool result = editor.Insert(
+            destinationPdf,   // inputFile: the PDF into which pages will be inserted
+            1,                // insertLocation: position in the input file (1 = beginning)
+            sourcePdf,        // portFile: PDF providing pages to insert
+            sourcePageNumbers,// pageNumber: array of pages to insert
+            outputPdf);       // outputFile: resulting PDF
+
+        Console.WriteLine(result
+            ? $"Pages inserted successfully. Output saved to '{outputPdf}'."
+            : "Failed to insert pages.");
     }
 }

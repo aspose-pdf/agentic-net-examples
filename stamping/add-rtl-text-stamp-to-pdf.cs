@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
-using Aspose.Pdf.Tagged;
 
 class Program
 {
@@ -17,28 +16,28 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Set the document language to Arabic (right‑to‑left)
-            ITaggedContent tagged = doc.TaggedContent;
-            tagged.SetLanguage("ar");
+            // Arabic text (right‑to‑left language). Any Hebrew text could be used similarly.
+            const string rtlText = "مرحبا بالعالم"; // "Hello World" in Arabic
 
-            // Arabic text – wrapped with Unicode Right‑to‑Left Embedding marks
-            string arabicText = "\u202Bمثال على طباعة عربية\u202C"; // "Example Arabic stamp"
+            // Create a TextStamp with the RTL text
+            TextStamp stamp = new TextStamp(rtlText);
 
-            // Create a TextStamp with Arabic text
-            TextStamp stamp = new TextStamp(arabicText);
+            // Configure the visual appearance of the stamp
+            // Use a font that supports Arabic/Hebrew characters
+            stamp.TextState.Font = FontRepository.FindFont("Arial Unicode MS");
+            stamp.TextState.FontSize = 24;
+            stamp.TextState.ForegroundColor = Aspose.Pdf.Color.FromRgb(0, 0, 1); // Blue
 
-            // Configure the text appearance (no IsRightToLeft property – direction is handled by Unicode marks)
-            stamp.TextState.Font = FontRepository.FindFont("Arial"); // Font that supports Arabic
-            stamp.TextState.FontSize = 14;
-            stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-
-            // Position the stamp (centered at the bottom of each page)
+            // Position the stamp (example: centered on each page)
             stamp.HorizontalAlignment = HorizontalAlignment.Center;
-            stamp.VerticalAlignment   = VerticalAlignment.Bottom;
-            stamp.BottomMargin        = 20; // distance from bottom edge
+            stamp.VerticalAlignment   = VerticalAlignment.Center;
+
+            // Optional: make the stamp semi‑transparent and place it on top of content
+            stamp.Opacity   = 0.6;
+            stamp.Background = false; // false = draw on top
 
             // Apply the stamp to every page in the document
             foreach (Page page in doc.Pages)

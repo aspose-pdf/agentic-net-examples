@@ -6,53 +6,49 @@ class Program
 {
     static void Main()
     {
-        // Paths to the source (destination) PDF, the PDF providing pages to insert,
-        // and the resulting PDF.
-        const string destinationPdfPath = "destination.pdf";
-        const string sourcePdfPath      = "source.pdf";
-        const string outputPdfPath      = "merged.pdf";
+        // Paths to the PDFs (replace with actual file locations)
+        const string destinationPath = "destination.pdf";   // PDF that will receive the pages
+        const string sourcePath      = "source.pdf";        // PDF containing pages to insert
+        const string outputPath      = "merged.pdf";        // Resulting PDF
 
-        // Page numbers are 1‑based.
-        // Insert after this page in the destination PDF.
-        int insertLocation = 2;   // e.g., after page 2
-        // Range of pages to take from the source PDF.
-        int startPage = 3;        // first page to insert
-        int endPage   = 5;        // last page to insert (inclusive)
+        // Parameters for insertion (1‑based page numbers)
+        int insertLocation = 2;   // Insert after page 2 of the destination PDF
+        int startPage      = 3;   // First page to take from the source PDF
+        int endPage        = 5;   // Last page to take from the source PDF
 
-        // Validate input files exist.
-        if (!File.Exists(destinationPdfPath))
+        // Ensure the input files exist
+        if (!File.Exists(destinationPath))
         {
-            Console.Error.WriteLine($"Destination file not found: {destinationPdfPath}");
+            Console.Error.WriteLine($"File not found: {destinationPath}");
             return;
         }
-        if (!File.Exists(sourcePdfPath))
+        if (!File.Exists(sourcePath))
         {
-            Console.Error.WriteLine($"Source file not found: {sourcePdfPath}");
+            Console.Error.WriteLine($"File not found: {sourcePath}");
             return;
         }
 
-        // Open streams for the three files.
-        // The output stream is created with FileMode.Create to overwrite any existing file.
-        using (FileStream destStream = new FileStream(destinationPdfPath, FileMode.Open, FileAccess.Read))
-        using (FileStream srcStream  = new FileStream(sourcePdfPath, FileMode.Open, FileAccess.Read))
-        using (FileStream outStream  = new FileStream(outputPdfPath, FileMode.Create, FileAccess.Write))
+        // Open streams for the source, destination and output PDFs
+        using (FileStream destStream   = new FileStream(destinationPath, FileMode.Open,  FileAccess.Read))
+        using (FileStream srcStream    = new FileStream(sourcePath,      FileMode.Open,  FileAccess.Read))
+        using (FileStream outStream    = new FileStream(outputPath,      FileMode.Create, FileAccess.Write))
         {
-            // PdfFileEditor provides the Insert operation for streams.
-            PdfFileEditor editor = new PdfFileEditor();
+            // Create the PdfFileEditor facade
+            Aspose.Pdf.Facades.PdfFileEditor editor = new Aspose.Pdf.Facades.PdfFileEditor();
 
-            // Perform the insertion.
+            // Insert the specified page range from srcStream into destStream
             bool success = editor.Insert(
-                destStream,          // input PDF (destination)
-                insertLocation,      // position in destination after which pages are inserted
-                srcStream,           // PDF providing pages to insert
-                startPage,           // first page in source to insert
-                endPage,             // last page in source to insert
-                outStream);          // output PDF containing the merged result
+                destStream,          // input PDF stream (destination)
+                insertLocation,      // position in the destination where pages will be inserted
+                srcStream,           // PDF stream containing pages to insert
+                startPage,           // first page to insert from source
+                endPage,             // last page to insert from source
+                outStream);          // output PDF stream
 
             if (success)
-                Console.WriteLine($"Pages {startPage}-{endPage} inserted into '{destinationPdfPath}' at position {insertLocation}. Result saved as '{outputPdfPath}'.");
+                Console.WriteLine($"Pages {startPage}-{endPage} inserted successfully. Output saved to '{outputPath}'.");
             else
-                Console.Error.WriteLine("Insert operation failed.");
+                Console.Error.WriteLine("Insertion failed.");
         }
     }
 }

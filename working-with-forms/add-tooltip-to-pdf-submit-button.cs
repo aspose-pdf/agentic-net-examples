@@ -2,13 +2,14 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_tooltip.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,32 +17,38 @@ class Program
             return;
         }
 
-        // Load the existing PDF (using rule: load with Document)
         using (Document doc = new Document(inputPath))
         {
-            // Define the button rectangle (coordinates are in points)
-            Aspose.Pdf.Rectangle btnRect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
+            // Define button rectangle (Aspose.Pdf.Rectangle, not System.Drawing.Rectangle)
+            Aspose.Pdf.Rectangle btnRect = new Aspose.Pdf.Rectangle(100, 500, 200, 540);
 
-            // Create a push button field on the document
+            // Create a push‑button field
             ButtonField submitBtn = new ButtonField(doc, btnRect)
             {
-                // Set the field name (used to reference the button)
-                PartialName = "SubmitButton",
-
-                // Tooltip shown in Acrobat – use AlternateName property
-                AlternateName = "Please fill all required fields before submitting.",
-
-                // Optional: visible caption on the button
-                NormalCaption = "Submit"
+                PartialName = "SubmitBtn",
+                // Tooltip property is not available in this API version – use AlternateName as a fallback
+                AlternateName = "All required fields must be filled before submitting.",
+                Contents = "Submit",
+                Required = true
             };
 
-            // Add the button to the form on page 1 (pages are 1‑based)
+            // SubmitFormAction expects a FileSpecification for the URL in this version
+            var urlSpec = new FileSpecification("https://example.com/submit", "Submit URL");
+            SubmitFormAction submitAction = new SubmitFormAction
+            {
+                Url = urlSpec
+            };
+
+            // Attach the action to the button's mouse‑press event
+            submitBtn.Actions.OnPressMouseBtn = submitAction;
+
+            // Add the button to page 1 of the document
             doc.Form.Add(submitBtn, 1);
 
-            // Save the modified PDF (using rule: save with Document)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with tooltip: {outputPath}");
+        Console.WriteLine($"PDF saved with tooltip to '{outputPath}'.");
     }
 }

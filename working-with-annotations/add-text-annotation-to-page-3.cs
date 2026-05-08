@@ -7,43 +7,44 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
+        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (using ensures proper disposal)
+        // Load the PDF document (deterministic disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least three pages
+            // Ensure the document has at least three pages (1‑based indexing)
             if (doc.Pages.Count < 3)
             {
-                Console.Error.WriteLine("The document has fewer than 3 pages.");
+                Console.Error.WriteLine("Document contains fewer than 3 pages.");
                 return;
             }
 
-            // Get page three (1‑based indexing)
+            // Retrieve page 3
             Page page = doc.Pages[3];
 
-            // Define the annotation rectangle (fully qualified to avoid ambiguity)
+            // Define the annotation rectangle (llx, lly, urx, ury)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Create the text annotation on page three
-            TextAnnotation textAnn = new TextAnnotation(page, rect)
+            // Create a TextAnnotation on page 3
+            TextAnnotation txtAnn = new TextAnnotation(page, rect)
             {
-                Title    = "Note",
+                Title = "Note",
                 Contents = "This is a text annotation on page 3.",
-                Color    = Aspose.Pdf.Color.Yellow,
-                Open     = true,               // Show the popup initially
-                Icon     = TextIcon.Note        // Use the standard note icon
+                Icon = TextIcon.Note,
+                Open = true,
+                Color = Aspose.Pdf.Color.Yellow
             };
 
             // Add the annotation to the page's annotation collection
-            page.Annotations.Add(textAnn);
+            page.Annotations.Add(txtAnn);
 
             // Save the modified PDF
             doc.Save(outputPath);

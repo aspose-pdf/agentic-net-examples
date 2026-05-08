@@ -15,67 +15,54 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdf))
+        try
         {
-            // Ensure the document contains embedded files
-            if (pdfDoc.EmbeddedFiles == null || pdfDoc.EmbeddedFiles.Count == 0)
+            // Load the PDF document
+            using (Document doc = new Document(inputPdf))
             {
-                Console.WriteLine("No embedded files found in the PDF.");
-                return;
-            }
-
-            // Locate the ZUGFeRD XML attachment using reflection (avoids direct dependency on EmbeddedFile type)
-            object zugferdEmbedded = null;
-            foreach (var ef in pdfDoc.EmbeddedFiles)
-            {
-                var nameProp = ef.GetType().GetProperty("Name");
-                if (nameProp == null) continue;
-                var name = nameProp.GetValue(ef) as string;
-                if (!string.IsNullOrEmpty(name) &&
-                    name.EndsWith(".xml", StringComparison.OrdinalIgnoreCase) &&
-                    name.IndexOf("ZUGFeRD", StringComparison.OrdinalIgnoreCase) >= 0)
+                // Access embedded files collection
+                EmbeddedFileCollection attachments = doc.EmbeddedFiles;
+                if (attachments == null || attachments.Count == 0)
                 {
-                    zugferdEmbedded = ef;
-                    break;
-                }
-            }
-
-            if (zugferdEmbedded == null)
-            {
-                Console.WriteLine("ZUGFeRD XML attachment not found.");
-                return;
-            }
-
-            // Try to use the Save(string) method if it exists (Aspose.Pdf 23+ provides it)
-            var saveMethod = zugferdEmbedded.GetType().GetMethod("Save", new[] { typeof(string) });
-            if (saveMethod != null)
-            {
-                // Directly save the embedded file to disk
-                saveMethod.Invoke(zugferdEmbedded, new object[] { outputXml });
-            }
-            else
-            {
-                // Fallback: obtain the underlying stream and copy it manually
-                var fileSpecProp = zugferdEmbedded.GetType().GetProperty("FileSpecification");
-                var fileSpec = fileSpecProp?.GetValue(zugferdEmbedded);
-                var contentsProp = fileSpec?.GetType().GetProperty("Contents");
-                var contentsStream = contentsProp?.GetValue(fileSpec) as Stream;
-                if (contentsStream != null)
-                {
-                    using (var outStream = new FileStream(outputXml, FileMode.Create, FileAccess.Write))
-                    {
-                        contentsStream.CopyTo(outStream);
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Unable to extract the ZUGFeRD XML content.");
+                    Console.WriteLine("No embedded files found in the PDF.");
                     return;
                 }
-            }
 
-            Console.WriteLine($"ZUGFeRD XML extracted to '{outputXml}'.");
+                FileSpecification zugferdSpec = null;
+
+                // Search for the ZUGFeRD XML attachment (by name or MIME type)
+                for (int i = 1; i <= attachments.Count; i++) // EmbeddedFileCollection uses 1‑based indexing
+                {
+                    FileSpecification spec = attachments[i];
+                    if (!string.IsNullOrEmpty(spec.Name) &&
+                        spec.Name.EndsWith(".xml", StringComparison.OrdinalIgnoreCase) &&
+                        (spec.Name.IndexOf("zugferd", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                         (spec.MIMEType != null && spec.MIMEType.Contains("xml"))))
+                    {
+                        zugferdSpec = spec;
+                        break;
+                    }
+                }
+
+                if (zugferdSpec == null)
+                {
+                    Console.WriteLine("ZUGFeRD XML attachment not found.");
+                    return;
+                }
+
+                // Extract the XML content and save it to a file
+                using (Stream src = zugferdSpec.Contents)
+                using (FileStream dest = new FileStream(outputXml, FileMode.Create, FileAccess.Write))
+                {
+                    src.CopyTo(dest);
+                }
+
+                Console.WriteLine($"ZUGFeRD XML extracted and saved to '{outputXml}'.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

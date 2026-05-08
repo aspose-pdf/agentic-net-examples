@@ -1,44 +1,38 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string xmlPath = "fields.xml";
-        const string outputPath = "output.pdf";
+        const string sourcePdf = "input.pdf";
+        const string xmlFile   = "fields.xml";
+        const string outputPdf = "output.pdf";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(sourcePdf))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"Source PDF not found: {sourcePdf}");
             return;
         }
-        if (!File.Exists(xmlPath))
+        if (!File.Exists(xmlFile))
         {
-            Console.Error.WriteLine($"XML file not found: {xmlPath}");
+            Console.Error.WriteLine($"XML file not found: {xmlFile}");
             return;
         }
 
-        // Load the source PDF
-        using (Document doc = new Document(pdfPath))
-        {
-            // Create a Form facade bound to the loaded document
-            using (Form form = new Form(doc))
-            {
-                // Import field values from the XML stream; the original field order is retained
-                using (FileStream xmlStream = new FileStream(xmlPath, FileMode.Open, FileAccess.Read))
-                {
-                    form.ImportXml(xmlStream);
-                }
+        // Initialize the Form facade with the source PDF.
+        Form form = new Form(sourcePdf);
 
-                // Save the updated PDF with imported form data
-                form.Save(outputPath);
-            }
+        // Import form field values from the XML stream.
+        using (FileStream xmlStream = new FileStream(xmlFile, FileMode.Open, FileAccess.Read))
+        {
+            form.ImportXml(xmlStream);
         }
 
-        Console.WriteLine($"Form fields imported and saved to '{outputPath}'.");
+        // Save the PDF with imported field values.
+        form.Save(outputPdf);
+
+        Console.WriteLine($"Form fields imported and saved to '{outputPdf}'.");
     }
 }

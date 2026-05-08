@@ -7,44 +7,52 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        // Input and output PDF file paths
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
+        // Verify input file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the existing PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Access the first page (Aspose.Pdf uses 1‑based indexing)
+            // Get the first page (Aspose.Pdf uses 1‑based indexing)
             Page page = doc.Pages[1];
 
             // Create a TextParagraph object
             TextParagraph paragraph = new TextParagraph();
 
             // Define the rectangle where the paragraph will be placed
-            paragraph.Rectangle = new Aspose.Pdf.Rectangle(100, 600, 500, 800);
+            // Fully qualify to avoid ambiguity with System.Drawing.Rectangle
+            paragraph.Rectangle = new Aspose.Pdf.Rectangle(100, 500, 500, 700);
 
-            // Set indentation: first line indent = 20 points, subsequent lines indent = 10 points
-            paragraph.FirstLineIndent = 20;
-            paragraph.SubsequentLinesIndent = 10;
+            // Set indentation values (in points)
+            paragraph.FirstLineIndent      = 20; // indent for the first line
+            paragraph.SubsequentLinesIndent = 10; // indent for subsequent lines
 
-            // Append lines with additional line spacing (5 points after each line)
+            // Optional: enable word wrapping
+            paragraph.FormattingOptions.WrapMode = TextFormattingOptions.WordWrapMode.ByWords;
+
+            // Append lines with custom line spacing (additional spacing after each line)
+            // The second argument is the extra spacing in points
             paragraph.AppendLine("Lorem ipsum dolor sit amet, consectetur adipiscing elit.", 5);
             paragraph.AppendLine("Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", 5);
             paragraph.AppendLine("Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.", 5);
+            paragraph.AppendLine("Nisi ut aliquip ex ea commodo consequat.", 5);
 
-            // Append the paragraph to the page using TextBuilder
+            // Use TextBuilder to add the paragraph to the page
             TextBuilder builder = new TextBuilder(page);
             builder.AppendParagraph(paragraph);
 
-            // Save the modified PDF (lifecycle rule: use Document.Save)
+            // Save the modified PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Paragraph with indentation saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with formatted paragraph: {outputPath}");
     }
 }

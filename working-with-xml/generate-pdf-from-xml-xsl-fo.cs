@@ -6,29 +6,34 @@ class Program
 {
     static void Main()
     {
-        // Paths to the source XML data, the XSL‑FO template, and the resulting PDF.
-        const string xmlPath   = "data.xml";
-        const string xslFoPath = "template.xslfo";
-        const string pdfPath   = "output.pdf";
+        // Paths to the source XML, the XSL‑FO template and the output PDF.
+        const string xmlPath      = "input.xml";
+        const string xslFoPath    = "template.xslfo";
+        const string outputPdfPath = "result.pdf";
 
-        // Verify that the required input files exist.
-        if (!File.Exists(xmlPath) || !File.Exists(xslFoPath))
+        // Verify that the required files exist.
+        if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine("Required input files not found.");
+            Console.Error.WriteLine($"XML file not found: {xmlPath}");
+            return;
+        }
+        if (!File.Exists(xslFoPath))
+        {
+            Console.Error.WriteLine($"XSL‑FO template not found: {xslFoPath}");
             return;
         }
 
-        // Create load options that associate the XSL‑FO stylesheet with the XML data.
-        // The XmlLoadOptions constructor accepting a string sets the XSL‑FO stream internally.
+        // Load the XML file and apply the XSL‑FO template.
+        // XmlLoadOptions(string) constructor sets the XSL‑FO file used for transformation.
         XmlLoadOptions loadOptions = new XmlLoadOptions(xslFoPath);
 
-        // Load the XML document, applying the XSL‑FO template, and generate a PDF.
+        // The Document constructor takes the XML file and the load options.
         using (Document pdfDocument = new Document(xmlPath, loadOptions))
         {
-            // Save the resulting PDF to the specified path.
-            pdfDocument.Save(pdfPath);
+            // Save the resulting PDF.
+            pdfDocument.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF successfully created at '{pdfPath}'.");
+        Console.WriteLine($"PDF generated successfully at '{outputPdfPath}'.");
     }
 }

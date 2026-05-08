@@ -8,72 +8,67 @@ class Program
 {
     static void Main()
     {
-        // Input folder containing PDF files (relative to the executable directory)
-        const string inputFolder = "Input";
-        // Output folder for processed PDFs
-        const string outputFolder = "Output";
+        // Input and output directories (relative to the executable folder)
+        const string inputDir  = "Input";
+        const string outputDir = "Output";
 
-        // Ensure both folders exist – creates them if they are missing.
-        // This prevents DirectoryNotFoundException when the Input folder is absent.
-        Directory.CreateDirectory(inputFolder);
-        Directory.CreateDirectory(outputFolder);
+        // Ensure both directories exist. If the Input folder is missing we create it
+        // so that Directory.GetFiles does not throw a DirectoryNotFoundException.
+        Directory.CreateDirectory(inputDir);
+        Directory.CreateDirectory(outputDir);
 
-        // Get all PDF files in the input folder. If none are found the loop simply does nothing.
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
+        // Get all PDF files in the input folder
+        string[] pdfFiles = Directory.GetFiles(inputDir, "*.pdf", SearchOption.TopDirectoryOnly);
         if (pdfFiles.Length == 0)
         {
-            Console.WriteLine($"No PDF files found in '{Path.GetFullPath(inputFolder)}'." );
+            Console.WriteLine($"No PDF files found in the '{inputDir}' folder.");
             return;
         }
 
-        // Process each PDF file in the input folder
         foreach (string inputPath in pdfFiles)
         {
-            // Determine output file name (e.g., original name + "_annotated.pdf")
-            string fileName = Path.GetFileNameWithoutExtension(inputPath);
-            string outputPath = Path.Combine(outputFolder, $"{fileName}_annotated.pdf");
-
-            // Use PdfAnnotationEditor facade to load and save the document
-            PdfAnnotationEditor editor = new PdfAnnotationEditor();
             try
             {
-                // Bind the PDF file to the facade
-                editor.BindPdf(inputPath);
+                // Determine output file path (same name, different folder)
+                string fileName   = System.IO.Path.GetFileName(inputPath);
+                string outputPath = System.IO.Path.Combine(outputDir, fileName);
 
-                // Access the underlying Document object
-                Document doc = editor.Document;
-
-                // Add a red rectangle annotation to every page
-                for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+                // Use PdfAnnotationEditor (facade) to open the PDF
+                using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
                 {
-                    Page page = doc.Pages[pageIndex];
+                    editor.BindPdf(inputPath);               // Load the PDF
 
-                    // Define rectangle coordinates (llx, lly, urx, ury)
-                    // Here we place a 200x100 rectangle at (100,500)
-                    Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 600);
+                    // Access the underlying Document
+                    Document doc = editor.Document;
 
-                    // Create a square (rectangle) annotation
-                    SquareAnnotation square = new SquareAnnotation(page, rect)
+                    // Loop through all pages (1‑based indexing)
+                    for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
                     {
-                        Color = Aspose.Pdf.Color.Red,   // Border color
-                        Title = "Red Rectangle",
-                        Contents = "Added by batch process"
-                    };
+                        // Define rectangle coordinates (llx, lly, urx, ury)
+                        Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-                    // Add the annotation to the page
-                    page.Annotations.Add(square);
+                        // Create a square (rectangle) annotation with red border
+                        SquareAnnotation square = new SquareAnnotation(doc.Pages[pageNum], rect)
+                        {
+                            Color = Aspose.Pdf.Color.Red   // Border color
+                        };
+
+                        // Add the annotation to the page
+                        doc.Pages[pageNum].Annotations.Add(square);
+                    }
+
+                    // Save the modified PDF
+                    editor.Save(outputPath);
                 }
 
-                // Save the modified PDF to the output path
-                editor.Save(outputPath);
+                Console.WriteLine($"Processed: {fileName} → {outputPath}");
             }
-            finally
+            catch (Exception ex)
             {
-                // Close the facade (releases the bound document)
-                editor.Close();
+                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
             }
-
-            Console.WriteLine($"Processed: {inputPath} -> {outputPath}");
         }
+
+        Console.WriteLine("Batch annotation completed.");
     }
 }

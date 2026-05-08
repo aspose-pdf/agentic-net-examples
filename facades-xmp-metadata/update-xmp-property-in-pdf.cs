@@ -6,10 +6,10 @@ class Program
 {
     static void Main(string[] args)
     {
-        // Expected arguments: inputPdf outputPdf xmpPropertyName newValue
+        // Expected arguments: inputPdf outputPdf xmpKey xmpValue
         if (args.Length != 4)
         {
-            Console.Error.WriteLine("Usage: <exe> <input.pdf> <output.pdf> <xmpProperty> <newValue>");
+            Console.Error.WriteLine("Usage: <inputPdf> <outputPdf> <xmpKey> <xmpValue>");
             return;
         }
 
@@ -20,21 +20,25 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Error: Input file not found – {inputPath}");
             return;
         }
 
-        // Bind the PDF file to the XMP metadata facade
-        PdfXmpMetadata xmp = new PdfXmpMetadata();
-        xmp.BindPdf(inputPath);
+        try
+        {
+            // Bind the PDF and modify its XMP metadata
+            using (PdfXmpMetadata xmp = new PdfXmpMetadata())
+            {
+                xmp.BindPdf(inputPath);               // Load the PDF
+                xmp.Add(xmpKey, xmpValue);            // Set or update the XMP property
+                xmp.Save(outputPath);                 // Save the updated PDF
+            }
 
-        // Update (or add) the specified XMP property
-        // The Add method replaces the value if the key already exists
-        xmp.Add(xmpKey, xmpValue);
-
-        // Save the PDF with the updated XMP metadata
-        xmp.Save(outputPath);
-
-        Console.WriteLine($"XMP property '{xmpKey}' updated and saved to '{outputPath}'.");
+            Console.WriteLine($"XMP property '{xmpKey}' updated and saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text;
 using Aspose.Pdf;
 
 class Program
@@ -7,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_custom.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,32 +16,42 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the existing PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Add custom key‑value pairs to the DocumentInfo dictionary
-            doc.Info.Add("CustomKey1", "CustomValue1");
-            doc.Info.Add("CustomKey2", "CustomValue2");
+            // -----------------------------------------------------------------
+            // 1. Add custom entries to the DocumentInfo dictionary.
+            //    This dictionary stores standard metadata (Title, Author, …) and
+            //    any user‑defined key/value pairs.
+            // -----------------------------------------------------------------
+            string customXml = "<metadata><item key=\"example\">value</item></metadata>";
+            doc.Info.Add("CustomXmlMetadata", customXml);   // or doc.Info["CustomXmlMetadata"] = customXml;
 
-            // Embed custom XML as XMP metadata (optional but useful for downstream processing)
+            // -----------------------------------------------------------------
+            // 2. (Optional) Add custom XMP metadata.
+            //    XMP metadata is stored in a separate XML packet.  Here we
+            //    create a minimal XMP packet that contains a custom namespace
+            //    and a single element.  The packet is written to a memory stream
+            //    and passed to Document.SetXmpMetadata.
+            // -----------------------------------------------------------------
             string xmpXml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
 <x:xmpmeta xmlns:x=""adobe:ns:meta/"" x:xmptk=""Aspose.Pdf"">
   <rdf:RDF xmlns:rdf=""http://www.w3.org/1999/02/22-rdf-syntax-ns#"">
     <rdf:Description rdf:about="""" xmlns:custom=""http://example.com/custom#"">
-      <custom:ProcessingInfo>Downstream data</custom:ProcessingInfo>
+      <custom:Data>Sample custom XML data</custom:Data>
     </rdf:Description>
   </rdf:RDF>
 </x:xmpmeta>";
 
-            using (MemoryStream ms = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(xmpXml)))
+            using (MemoryStream xmpStream = new MemoryStream(Encoding.UTF8.GetBytes(xmpXml)))
             {
-                doc.SetXmpMetadata(ms);
+                doc.SetXmpMetadata(xmpStream);
             }
 
-            // Save the updated PDF
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Document saved with custom metadata to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with custom metadata to '{outputPath}'.");
     }
 }

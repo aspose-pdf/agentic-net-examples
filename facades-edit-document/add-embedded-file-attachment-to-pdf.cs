@@ -7,41 +7,33 @@ class Program
 {
     static void Main()
     {
-        // Paths for the source PDF, the file to attach, and the resulting PDF
-        const string sourcePdfPath      = "input.pdf";
-        const string attachmentFilePath = "attachment_file.pdf";
-        const string outputPdfPath      = "output.pdf";
+        const string inputPdf = "input.pdf";
+        const string attachmentPath = "attachment_file.pdf";
+        const string outputPdf = "output.pdf";
+        const string description = "Sample attachment";
 
-        // Description for the attachment (appears in the attachment list)
-        const string attachmentDescription = "Sample attachment embedded in the PDF";
-
-        // Ensure the source PDF and attachment exist
-        if (!File.Exists(sourcePdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        if (!File.Exists(attachmentFilePath))
+        if (!File.Exists(attachmentPath))
         {
-            Console.Error.WriteLine($"Attachment file not found: {attachmentFilePath}");
+            Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
             return;
         }
 
-        // Use PdfContentEditor (Facades API) to add the attachment.
-        // PdfContentEditor does not implement IDisposable, so a plain instance is sufficient.
+        // Initialize the PdfContentEditor facade and bind the source PDF
         PdfContentEditor editor = new PdfContentEditor();
+        editor.BindPdf(inputPdf);
 
-        // Bind the existing PDF document.
-        editor.BindPdf(sourcePdfPath);
+        // Add the file as an embedded attachment (no visible annotation)
+        editor.AddDocumentAttachment(attachmentPath, description);
 
-        // Add the attachment without creating a visible annotation.
-        // This embeds the file in the PDF's EmbeddedFiles name tree.
-        editor.AddDocumentAttachment(attachmentFilePath, attachmentDescription);
+        // Save the resulting PDF with the embedded file
+        editor.Save(outputPdf);
 
-        // Save the modified PDF.
-        editor.Save(outputPdfPath);
-
-        Console.WriteLine($"Attachment added and PDF saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Attachment added and saved to '{outputPdf}'.");
     }
 }

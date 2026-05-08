@@ -1,20 +1,20 @@
 using System;
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
-using Aspose.Pdf.Security; // for ECDSA‑related types if needed
+using Aspose.Pdf.Forms;          // SignatureField, ExternalSignature
+using Aspose.Pdf.Annotations;   // Rectangle (fully qualified to avoid ambiguity)
 
 class SignPdfWithEcc
 {
     static void Main()
     {
-        // Paths – adjust as necessary
+        // Input PDF, output PDF, and ECC P‑256 certificate (PFX) with password
         const string inputPdfPath  = "input.pdf";
         const string outputPdfPath = "signed_output.pdf";
         const string pfxPath       = "ecc_certificate.pfx";
-        const string pfxPassword   = "yourPfxPassword";
+        const string pfxPassword   = "pfxPassword";
 
-        // Ensure source files exist
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
@@ -26,39 +26,36 @@ class SignPdfWithEcc
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF document
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Create a signature field on the first page.
-            // Fully‑qualified Rectangle avoids ambiguity with System.Drawing.Rectangle.
-            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-            SignatureField sigField = new SignatureField(pdfDoc.Pages[1], sigRect)
-            {
-                // The name used to reference the field later (optional but recommended)
-                PartialName = "Signature1"
-            };
+            // Ensure the document has at least one page
+            Page page = doc.Pages[1];
 
-            // Add the signature field to the document's form collection.
-            // AppendChild is not used here; Form.Add is the correct API for form fields.
-            pdfDoc.Form.Add(sigField, 1);
+            // Define the rectangle where the signature appearance will be placed
+            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 100, 250, 150);
 
-            // Load the ECC certificate (P‑256) from the PFX file.
-            using (FileStream pfxStream = File.OpenRead(pfxPath))
-            {
-                // PKCS7 works with any certificate that contains a private key,
-                // including ECC keys. The digest algorithm is chosen automatically.
-                PKCS7 pkcs7Signature = new PKCS7(pfxStream, pfxPassword);
+            // Create a signature field and add it to the form
+            SignatureField signatureField = new SignatureField(page, rect);
+            doc.Form.Add(signatureField);
 
-                // Optional: set appearance or metadata (e.g., reason, location).
-                pkcs7Signature.Reason   = "Document approved";
-                pkcs7Signature.Location = "New York, USA";
+            // Load the ECC certificate (must contain a private key on curve P‑256)
+            X509Certificate2 cert = new X509Certificate2(pfxPath, pfxPassword, X509KeyStorageFlags.Exportable);
 
-                // Sign the field. The Sign method takes the Signature object.
-                sigField.Sign(pkcs7Signature);
-            }
+            // Create an ExternalSignature that will use the certificate's private key
+            ExternalSignature externalSignature = new ExternalSignature(cert);
 
-            // Save the signed PDF (lifecycle rule: save inside using block).
-            pdfDoc.Save(outputPdfPath);
+            // Optional: set signature properties (reason, location, etc.)
+            externalSignature.Reason   = "Document approved";
+            externalSignature.Location = "New York, USA";
+            externalSignature.ContactInfo = "contact@example.com";
+
+            // Sign the PDF using the ECC key – Aspose.Pdf will select the appropriate ECDSA algorithm
+            signatureField.Sign(externalSignature);
+
+            // Save the signed PDF
+            doc.Save(outputPdfPath);
         }
 
         Console.WriteLine($"PDF signed successfully and saved to '{outputPdfPath}'.");

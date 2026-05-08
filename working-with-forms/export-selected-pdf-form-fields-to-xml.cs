@@ -1,7 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Xml;
+using System.Linq;
+using System.Xml.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -9,67 +9,54 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputXmlPath = "selected_fields.xml";
+        const string inputPdf = "input.pdf";
+        const string outputXml = "selected_fields.xml";
 
-        // List of field names to export (full qualified names)
-        var fieldsToExport = new List<string>
-        {
-            "FirstName",
-            "LastName",
-            "Email"
-        };
+        // Names of the form fields you want to export
+        string[] fieldsToExport = { "FirstName", "LastName", "Email" };
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document
-        using (var document = new Document(inputPdfPath))
+        // Load the PDF document (wrapped in using for deterministic disposal)
+        using (Document doc = new Document(inputPdf))
         {
-            // Ensure the document contains a form
-            if (document.Form == null || document.Form.Count == 0)
+            // Build a collection of the selected fields from the document's Form.Fields collection
+            var selectedFieldElements = doc.Form?.Fields
+                ?.OfType<Field>()
+                ?.Where(f => fieldsToExport.Contains(f.PartialName))
+                ?.Select(f =>
+                {
+                    // The value can be null for empty fields – treat it as an empty string
+                    string value = f?.Value?.ToString() ?? string.Empty;
+                    // Create <field name="..."><value>...</value></field>
+                    return new XElement("field",
+                        new XAttribute("name", f.PartialName),
+                        new XElement("value", value)
+                    );
+                })
+                ?.ToList();
+
+            if (selectedFieldElements == null || selectedFieldElements.Count == 0)
             {
-                Console.WriteLine("No form fields found in the PDF.");
+                Console.Error.WriteLine("No matching form fields were found in the PDF.");
                 return;
             }
 
-            // Create an XML document to hold the exported data
-            var xmlDoc = new XmlDocument();
-            XmlElement root = xmlDoc.CreateElement("FormData");
-            xmlDoc.AppendChild(root);
+            // Build a new XFDF‑like document containing only the selected fields
+            XDocument filteredXfdf = new XDocument(
+                new XElement("xfdf",
+                    new XElement("fields", selectedFieldElements)
+                )
+            );
 
-            // Export only the specified fields
-            foreach (string fieldName in fieldsToExport)
-            {
-                // The Form indexer returns a WidgetAnnotation; cast it to Field safely.
-                Field field = document.Form[fieldName] as Field;
-                if (field == null)
-                {
-                    Console.WriteLine($"Field '{fieldName}' not found or is not a form field; skipping.");
-                    continue;
-                }
-
-                // Get the field value as a string (handles different field types)
-                string value = field.Value?.ToString() ?? string.Empty;
-
-                // Create an XML element for this field
-                XmlElement fieldElement = xmlDoc.CreateElement("Field");
-                fieldElement.SetAttribute("Name", fieldName);
-                fieldElement.InnerText = value;
-                root.AppendChild(fieldElement);
-            }
-
-            // Save the XML to the specified file
-            using (var writer = new XmlTextWriter(outputXmlPath, System.Text.Encoding.UTF8))
-            {
-                writer.Formatting = Formatting.Indented;
-                xmlDoc.WriteContentTo(writer);
-            }
-
-            Console.WriteLine($"Selected form fields exported to '{outputXmlPath}'.");
+            // Save the filtered XML to the requested output file
+            filteredXfdf.Save(outputXml);
         }
+
+        Console.WriteLine($"Selected form fields exported to '{outputXml}'.");
     }
 }

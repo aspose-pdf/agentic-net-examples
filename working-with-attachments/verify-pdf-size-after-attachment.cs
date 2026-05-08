@@ -2,11 +2,9 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using NUnit.Framework; // <-- added
+using NUnit.Framework;
 
-// -----------------------------------------------------------------------------
-// Minimal NUnit stubs – used when the real NUnit package is not referenced.
-// -----------------------------------------------------------------------------
+// Minimal NUnit stubs to allow compilation without the NUnit package
 namespace NUnit.Framework
 {
     [AttributeUsage(AttributeTargets.Class)]
@@ -15,33 +13,13 @@ namespace NUnit.Framework
     [AttributeUsage(AttributeTargets.Method)]
     public sealed class TestAttribute : Attribute { }
 
-    [AttributeUsage(AttributeTargets.Method)]
-    public sealed class OneTimeSetUpAttribute : Attribute { }
-
-    [AttributeUsage(AttributeTargets.Method)]
-    public sealed class OneTimeTearDownAttribute : Attribute { }
-
     public static class Assert
     {
-        // Greater assertion used in the test.
-        public static void Greater<T>(T actual, T expected, string message = null) where T : IComparable<T>
+        public static void Greater<T>(T actual, T expected, string? message = null) where T : IComparable<T>
         {
             if (actual.CompareTo(expected) <= 0)
-                throw new Exception(message ?? $"Assert.Greater failed. Expected a value greater than <{expected}> but got <{actual}>.");
+                throw new Exception(message ?? $"Assert.Greater failed. Expected > {expected}, but got {actual}.");
         }
-
-        // Additional common assertions can be added here if needed.
-    }
-}
-
-// -----------------------------------------------------------------------------
-// Dummy entry point – required because the project is built as a console app.
-// -----------------------------------------------------------------------------
-public class Program
-{
-    public static void Main(string[] args)
-    {
-        // No runtime logic needed; the unit tests are executed by the test runner.
     }
 }
 
@@ -50,87 +28,99 @@ namespace AsposePdfTests
     [TestFixture]
     public class AttachmentSizeTests
     {
-        private const string TempFolder = "TempTestFiles";
+        private const string SampleTextFile = "sample.txt";
 
-        [OneTimeSetUp]
-        public void GlobalSetup()
+        // Helper to create a simple text file used as attachment
+        private void CreateSampleFile()
         {
-            // Ensure a clean temporary directory for test files
-            if (Directory.Exists(TempFolder))
-                Directory.Delete(TempFolder, true);
-            Directory.CreateDirectory(TempFolder);
+            File.WriteAllText(SampleTextFile, "This is a sample attachment file.");
         }
 
-        [OneTimeTearDown]
-        public void GlobalTeardown()
+        // Helper to delete temporary files safely
+        private void DeleteIfExists(string path)
         {
-            // Cleanup after all tests have run
-            if (Directory.Exists(TempFolder))
-                Directory.Delete(TempFolder, true);
+            try
+            {
+                if (File.Exists(path))
+                    File.Delete(path);
+            }
+            catch
+            {
+                // ignore cleanup errors
+            }
         }
 
         [Test]
         public void AddingFileAttachmentIncreasesPdfSize()
         {
-            // Paths for the original and modified PDFs
-            string originalPdfPath = Path.Combine(TempFolder, "original.pdf");
-            string attachedPdfPath = Path.Combine(TempFolder, "withAttachment.pdf");
-            string attachmentFilePath = Path.Combine(TempFolder, "sample.txt");
+            // Arrange: create a simple PDF with one blank page
+            string originalPdfPath = Path.GetTempFileName();
+            string attachedPdfPath = Path.GetTempFileName();
 
-            // Create a simple text file to attach
-            File.WriteAllText(attachmentFilePath, "This is a sample attachment.");
+            CreateSampleFile();
 
-            // -----------------------------------------------------------------
-            // Step 1: Create a minimal PDF (one blank page) and save it
-            // -----------------------------------------------------------------
-            using (Document doc = new Document())
+            try
             {
-                // Add a blank page (Aspose.Pdf creates an empty document with no pages,
-                // so we explicitly add one)
-                doc.Pages.Add();
-
-                // Save the PDF without any annotations
-                doc.Save(originalPdfPath);
-            }
-
-            // Record the file size of the PDF without attachment
-            long sizeWithoutAttachment = new FileInfo(originalPdfPath).Length;
-
-            // -----------------------------------------------------------------
-            // Step 2: Load the PDF, add a FileAttachmentAnnotation, and save
-            // -----------------------------------------------------------------
-            using (Document doc = new Document(originalPdfPath))
-            {
-                // Get the first (and only) page – Aspose.Pdf uses 1‑based indexing
-                Page page = doc.Pages[1];
-
-                // Define the rectangle for the annotation (position on the page)
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 600);
-
-                // Create a FileSpecification that points to the file we want to embed
-                FileSpecification fileSpec = new FileSpecification(attachmentFilePath);
-
-                // Create the FileAttachmentAnnotation and add it to the page
-                FileAttachmentAnnotation attachment = new FileAttachmentAnnotation(page, rect, fileSpec)
+                // Create and save the original PDF
+                using (Document doc = new Document())
                 {
-                    // Optional: set a tooltip (Icon property is omitted because the enum is not available in this version)
-                    Contents = "Sample attachment"
-                };
-                page.Annotations.Add(attachment);
+                    // Add a blank page (Pages.Add() creates a new page)
+                    doc.Pages.Add();
+                    doc.Save(originalPdfPath); // save without any attachments
+                }
 
-                // Save the modified PDF
-                doc.Save(attachedPdfPath);
+                long originalSize = new FileInfo(originalPdfPath).Length;
+
+                // Act: load the PDF, add a FileAttachmentAnnotation, and save to a new file
+                using (Document doc = new Document(originalPdfPath))
+                {
+                    // Get the first page (1‑based indexing)
+                    Page page = doc.Pages[1];
+
+                    // Define the rectangle where the attachment icon will appear
+                    Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 600);
+
+                    // Create a FileSpecification for the attachment file
+                    using (FileStream fs = File.OpenRead(SampleTextFile))
+                    {
+                        FileSpecification fileSpec = new FileSpecification(fs, SampleTextFile);
+
+                        // Create the FileAttachmentAnnotation
+                        FileAttachmentAnnotation attachment = new FileAttachmentAnnotation(page, rect, fileSpec)
+                        {
+                            // Optional: add a description
+                            Contents = "Sample attachment"
+                        };
+
+                        // Add the annotation to the page
+                        page.Annotations.Add(attachment);
+                    }
+
+                    // Save the modified PDF to a new file
+                    doc.Save(attachedPdfPath);
+                }
+
+                long attachedSize = new FileInfo(attachedPdfPath).Length;
+
+                // Assert: the size after adding the attachment should be greater
+                Assert.Greater(attachedSize, originalSize, "PDF size did not increase after adding a file attachment.");
             }
-
-            // Record the file size after adding the attachment
-            long sizeWithAttachment = new FileInfo(attachedPdfPath).Length;
-
-            // -----------------------------------------------------------------
-            // Assertion: the PDF with the attachment should be larger
-            // -----------------------------------------------------------------
-            Assert.Greater(sizeWithAttachment, sizeWithoutAttachment,
-                $"Expected the PDF size to increase after adding an attachment. " +
-                $"Before: {sizeWithoutAttachment} bytes, After: {sizeWithAttachment} bytes.");
+            finally
+            {
+                // Cleanup temporary files
+                DeleteIfExists(originalPdfPath);
+                DeleteIfExists(attachedPdfPath);
+                DeleteIfExists(SampleTextFile);
+            }
         }
+    }
+}
+
+// Provide a minimal entry point to satisfy the compiler when building as an executable.
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        // No operation – tests are executed via the test runner.
     }
 }

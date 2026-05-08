@@ -1,83 +1,99 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Xml.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class InsertFootnotes
 {
     static void Main()
     {
-        // Paths to the input PDF, the XML containing footnote definitions, and the output PDF.
-        const string pdfPath = "input.pdf";
-        const string xmlPath = "footnotes.xml";
-        const string outputPath = "output_with_footnotes.pdf";
+        const string inputPdfPath  = "input.pdf";
+        const string footnotesXmlPath = "footnotes.xml";
+        const string outputPdfPath = "output_with_footnotes.pdf";
 
-        // Verify that the required files exist.
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(xmlPath))
+        if (!File.Exists(footnotesXmlPath))
         {
-            Console.Error.WriteLine($"XML file not found: {xmlPath}");
+            Console.Error.WriteLine($"XML not found: {footnotesXmlPath}");
             return;
         }
 
-        // Load the XML document that defines footnotes.
-        // Expected format (example):
-        // <Footnotes>
-        //   <Footnote>
-        //     <Id>1</Id>
-        //     <Text>This is the first footnote.</Text>
-        //   </Footnote>
-        //   <Footnote>
-        //     <Id>2</Id>
-        //     <Text>Second footnote text.</Text>
-        //   </Footnote>
-        // </Footnotes>
-        XDocument footnotesXml = XDocument.Load(xmlPath);
-
-        // Load the PDF document.
-        using (Document pdfDoc = new Document(pdfPath))
+        // Load footnote definitions from XML.
+        // Expected format:
+        // <footnotes>
+        //   <footnote id="1">First footnote text.</footnote>
+        //   <footnote id="2">Second footnote text.</footnote>
+        // </footnotes>
+        var footnoteMap = new Dictionary<string, string>();
+        try
         {
-            // For demonstration, we will add each footnote to the first page.
-            // In a real scenario you would locate the reference point in the text.
-            Page firstPage = pdfDoc.Pages[1];
-
-            // Iterate over each <Footnote> element in the XML.
-            foreach (XElement fnElement in footnotesXml.Root.Elements("Footnote"))
+            XDocument xmlDoc = XDocument.Load(footnotesXmlPath);
+            foreach (var fn in xmlDoc.Descendants("footnote"))
             {
-                // Extract footnote identifier and text.
-                string footnoteId = (string)fnElement.Element("Id") ?? string.Empty;
-                string footnoteText = (string)fnElement.Element("Text") ?? string.Empty;
-
-                // Create a visible reference marker (e.g., a superscript number).
-                // Position can be adjusted as needed.
-                TextFragment referenceFragment = new TextFragment(footnoteId);
-                referenceFragment.Position = new Position(100, 700); // Example coordinates.
-                referenceFragment.TextState.FontSize = 8;
-                referenceFragment.TextState.Font = FontRepository.FindFont("Helvetica");
-                referenceFragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-
-                // Create the actual footnote content using the Note class.
-                Note footnote = new Note
+                var idAttr = fn.Attribute("id");
+                if (idAttr != null)
                 {
-                    Text = footnoteText
-                };
+                    footnoteMap[idAttr.Value] = fn.Value.Trim();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to load XML: {ex.Message}");
+            return;
+        }
 
-                // Associate the footnote with the reference fragment.
-                referenceFragment.FootNote = footnote;
+        // Open the PDF document.
+        using (Document pdfDoc = new Document(inputPdfPath))
+        {
+            // Optional: ensure the document is tagged (required for proper accessibility handling).
+            ITaggedContent tagged = pdfDoc.TaggedContent;
+            tagged.SetLanguage("en-US");
+            tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPdfPath));
 
-                // Add the fragment (with its footnote) to the page.
-                firstPage.Paragraphs.Add(referenceFragment);
+            // For each page, insert footnotes at the bottom.
+            // This example adds all footnotes to every page; adapt as needed.
+            for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
+            {
+                Page page = pdfDoc.Pages[pageIndex];
+
+                // Starting Y coordinate for footnotes (bottom margin = 50 points).
+                double footnoteY = 50;
+                foreach (var kvp in footnoteMap)
+                {
+                    // Create a TextFragment that will hold the footnote reference.
+                    // The visible text can be the footnote number in brackets.
+                    string footnoteNumber = kvp.Key;
+                    TextFragment tf = new TextFragment($"[{footnoteNumber}]");
+                    tf.Position = new Position(50, footnoteY); // left margin = 50
+                    tf.TextState.Font = FontRepository.FindFont("Helvetica");
+                    tf.TextState.FontSize = 10;
+                    tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+
+                    // Attach the actual footnote content using the FootNote property.
+                    // The Note object holds the explanatory text.
+                    tf.FootNote = new Note(kvp.Value);
+
+                    // Add the fragment to the page.
+                    page.Paragraphs.Add(tf);
+
+                    // Move up for the next footnote.
+                    footnoteY += 12; // line spacing
+                }
             }
 
             // Save the modified PDF.
-            pdfDoc.Save(outputPath);
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Footnotes inserted and saved to '{outputPath}'.");
+        Console.WriteLine($"Footnotes inserted and saved to '{outputPdfPath}'.");
     }
 }

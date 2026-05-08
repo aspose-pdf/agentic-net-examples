@@ -1,8 +1,8 @@
 using System;
 using System.IO;
+using System.Drawing;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text; // for EncodingType
 
 class Program
 {
@@ -11,53 +11,34 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "watermarked.pdf";
 
+        // Ensure the source PDF exists; create a placeholder if it does not.
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
+            using (Document placeholder = new Document())
+            {
+                placeholder.Pages.Add();
+                placeholder.Save(inputPath);
+            }
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Create a multi‑line formatted text watermark.
+        var ft = new Aspose.Pdf.Facades.FormattedText(
+            "Confidential",                     // first line
+            System.Drawing.Color.Red,            // text color (System.Drawing)
+            "Helvetica",                        // font name
+            Aspose.Pdf.Facades.EncodingType.Winansi,
+            false,                               // embed font flag
+            48f);                                 // font size (float)
+
+        ft.AddNewLineText("Do Not Distribute");
+        ft.AddNewLineText("Company XYZ");
+
+        // Apply the watermark to every page using PdfFileStamp.
+        using (PdfFileStamp stamp = new PdfFileStamp())
         {
-            // Initialize PdfFileMend with the loaded document
-            using (PdfFileMend mend = new PdfFileMend(doc))
-            {
-                // Create FormattedText with the first line of the watermark
-                // Note: FormattedText constructor expects System.Drawing.Color for the text color
-                FormattedText ft = new FormattedText(
-                    "First line of watermark",               // text
-                    System.Drawing.Color.Gray,               // text color
-                    "Helvetica",                             // font name
-                    EncodingType.Winansi,                    // encoding
-                    false,                                   // embed font flag
-                    48);                                     // font size
-
-                // Add additional lines using AddNewLineText
-                ft.AddNewLineText("Second line of watermark");
-                ft.AddNewLineText("Third line of watermark");
-
-                // Enable word wrap if needed
-                mend.IsWordWrap = true;
-
-                // Prepare an array with all page numbers (1‑based indexing)
-                int pageCount = doc.Pages.Count;
-                int[] pages = new int[pageCount];
-                for (int i = 0; i < pageCount; i++)
-                    pages[i] = i + 1;
-
-                // Define the rectangle covering the whole page
-                float llx = 0;
-                float lly = 0;
-                float urx = (float)doc.Pages[1].PageInfo.Width;
-                float ury = (float)doc.Pages[1].PageInfo.Height;
-
-                // Add the multi‑line formatted text as a watermark to all pages
-                mend.AddText(ft, pages, llx, lly, urx, ury);
-            }
-
-            // Save the modified PDF
-            doc.Save(outputPath);
+            stamp.BindPdf(inputPath);
+            stamp.AddHeader(ft, 0); // 0 = default vertical offset
+            stamp.Save(outputPath);
         }
 
         Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");

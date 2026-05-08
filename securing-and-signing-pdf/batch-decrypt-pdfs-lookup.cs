@@ -3,68 +3,80 @@ using System.IO;
 using System.Collections.Generic;
 using Aspose.Pdf;
 
-class Program
+class BatchDecrypt
 {
     static void Main()
     {
         // Folder containing encrypted PDFs
         const string inputFolder = "EncryptedPdfs";
-        // Folder where decrypted PDFs will be saved
+        // Folder where decrypted PDFs will be written
         const string outputFolder = "DecryptedPdfs";
+        // CSV file with two columns: filename,password
+        const string lookupPath = "passwords.csv";
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
-
-        // Verify the input directory exists before trying to enumerate files
         if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"[ERROR] Input folder '{inputFolder}' does not exist. Nothing to process.");
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
             return;
         }
 
-        // Lookup table: PDF file name (case‑insensitive) -> password
-        var passwordLookup = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-        {
-            // Add entries as needed, e.g.:
-            // { "report1.pdf", "Secret123" },
-            // { "invoice.pdf", "Passw0rd!" }
-        };
+        // Ensure output folder exists
+        Directory.CreateDirectory(outputFolder);
 
-        // Process each PDF file in the input folder
-        foreach (string filePath in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Load the lookup table into a dictionary for fast access
+        var passwordMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        if (!File.Exists(lookupPath))
+        {
+            Console.Error.WriteLine($"Lookup file not found: {lookupPath}");
+            return;
+        }
+
+        foreach (var line in File.ReadAllLines(lookupPath))
+        {
+            if (string.IsNullOrWhiteSpace(line)) continue; // skip empty lines
+            var parts = line.Split(new[] { ',' }, 2);
+            if (parts.Length == 2)
+            {
+                string fileName = parts[0].Trim();
+                string pwd = parts[1].Trim();
+                passwordMap[fileName] = pwd;
+            }
+        }
+
+        // Process each PDF in the input folder
+        foreach (var filePath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
             string fileName = Path.GetFileName(filePath);
 
-            // Retrieve the password for the current file
-            if (!passwordLookup.TryGetValue(fileName, out string? password) || string.IsNullOrEmpty(password))
+            // Find the password for this file
+            if (!passwordMap.TryGetValue(fileName, out string password))
             {
-                Console.Error.WriteLine($"[SKIP] No password found for '{fileName}'.");
+                Console.WriteLine($"No password entry for {fileName}, skipping.");
                 continue;
             }
 
-            string outputPath = Path.Combine(outputFolder, fileName);
-
             try
             {
-                // Open the encrypted document using the supplied password
+                // Open the encrypted PDF using the password
                 using (Document doc = new Document(filePath, password))
                 {
                     // Decrypt the document (no parameters)
                     doc.Decrypt();
 
-                    // Save the decrypted version (overwrites if same name)
-                    doc.Save(outputPath);
+                    // Save the decrypted version to the output folder
+                    string outPath = Path.Combine(outputFolder, fileName);
+                    doc.Save(outPath);
                 }
 
-                Console.WriteLine($"[OK] Decrypted '{fileName}'.");
+                Console.WriteLine($"Decrypted: {fileName}");
             }
             catch (InvalidPasswordException)
             {
-                Console.Error.WriteLine($"[ERROR] Invalid password for '{fileName}'.");
+                Console.Error.WriteLine($"Invalid password for {fileName}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"[ERROR] Failed to process '{fileName}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing {fileName}: {ex.Message}");
             }
         }
     }

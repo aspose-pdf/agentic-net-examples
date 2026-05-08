@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Aspose.Pdf namespace contains Document, Page, Rectangle
+using Aspose.Pdf;
 
 class Program
 {
@@ -17,7 +17,7 @@ class Program
         // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based; iterate from 1 to Count inclusive
+            // Pages are 1‑based indexed
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
@@ -25,8 +25,8 @@ class Program
                 // Get the page rectangle (crop box or media box)
                 Aspose.Pdf.Rectangle rect = page.Rect;
 
-                // Calculate width and height (in points)
-                double width  = rect.URX - rect.LLX;
+                // Calculate width and height in points
+                double width = rect.URX - rect.LLX;
                 double height = rect.URY - rect.LLY;
 
                 Console.WriteLine($"Page {i}: Width = {width} pt, Height = {height} pt");

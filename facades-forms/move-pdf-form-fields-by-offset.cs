@@ -2,47 +2,49 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Forms; // Correct namespace for form fields
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output_moved_fields.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_moved.pdf";
+        const float offsetX = 10f; // horizontal offset
+        const float offsetY = 15f; // vertical offset
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         // Load the PDF document
-        Document doc = new Document(inputPdf);
+        Document doc = new Document(inputPath);
 
-        // Create FormEditor using the document instance (non‑obsolete constructor)
-        using (FormEditor formEditor = new FormEditor(doc))
+        // Use FormEditor that works with a Document instance (no destination in ctor)
+        using (FormEditor editor = new FormEditor(doc))
         {
-            // Iterate over all form fields in the document
+            // Iterate over all form fields
             foreach (Field field in doc.Form.Fields)
             {
-                // Current rectangle (double values)
+                // Current rectangle of the field (coordinates are double)
                 var rect = field.Rect;
 
-                // Apply the required offset and cast to float as required by MoveField
-                float llx = (float)rect.LLX + 10f;
-                float lly = (float)rect.LLY + 15f;
-                float urx = (float)rect.URX + 10f;
-                float ury = (float)rect.URY + 15f;
+                // Apply the offset – cast to float as required by MoveField
+                float llx = (float)rect.LLX + offsetX;
+                float lly = (float)rect.LLY + offsetY;
+                float urx = (float)rect.URX + offsetX;
+                float ury = (float)rect.URY + offsetY;
 
                 // Move the field to the new position
-                formEditor.MoveField(field.Name, llx, lly, urx, ury);
+                editor.MoveField(field.Name, llx, lly, urx, ury);
             }
 
-            // Save the modified PDF to the output path
-            formEditor.Save(outputPdf);
+            // Save the modified PDF to the desired output file
+            editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Form fields moved and saved to '{outputPdf}'.");
+        Console.WriteLine($"All form fields have been moved and saved to '{outputPath}'.");
     }
 }

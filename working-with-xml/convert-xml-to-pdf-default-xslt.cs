@@ -1,12 +1,12 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core API namespace
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Paths to the source XML and the output PDF.
+        // Paths to the input XML file and the output PDF file.
         const string xmlPath = "input.xml";
         const string pdfPath = "output.pdf";
 

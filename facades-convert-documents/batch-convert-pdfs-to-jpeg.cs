@@ -1,62 +1,62 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices; // Resolution class
+using Aspose.Pdf.Devices;
 
-class PdfToJpegBatchConverter
+class Program
 {
     static void Main()
     {
         // Folder containing source PDF files
-        const string inputFolder = @"C:\InputPdfs";
+        const string inputFolder = "InputPdfs";
         // Folder where JPEG images will be saved
-        const string outputFolder = @"C:\OutputJpegs";
+        const string outputFolder = "OutputImages";
 
-        // Verify that the input folder exists; if not, inform the user and exit gracefully.
         if (!Directory.Exists(inputFolder))
         {
-            Console.WriteLine($"Input folder does not exist: '{inputFolder}'. Please create the folder and place PDF files inside it.");
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
             return;
         }
 
-        // Ensure the output root folder exists
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Process each PDF file in the input folder
-        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Get all PDF files in the input folder
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
+        foreach (string pdfPath in pdfFiles)
         {
-            // Create a subfolder for images of the current PDF
-            string pdfName = Path.GetFileNameWithoutExtension(pdfPath);
-            string pdfOutputDir = Path.Combine(outputFolder, pdfName);
-            Directory.CreateDirectory(pdfOutputDir);
-
-            // Use PdfConverter (a Facade) to convert pages to JPEG images
-            using (PdfConverter converter = new PdfConverter())
+            string baseName = Path.GetFileNameWithoutExtension(pdfPath);
+            try
             {
-                // Bind the PDF file to the converter
-                converter.BindPdf(pdfPath);
+                // Load the PDF document
+                Document pdfDocument = new Document(pdfPath);
+                int pageCount = pdfDocument.Pages.Count;
 
-                // Optional: set a higher resolution for better image quality
-                converter.Resolution = new Resolution(300);
+                // Define the resolution for the JPEG images (you can adjust as needed)
+                var resolution = new Resolution(300);
 
-                // Prepare the converter for image extraction
-                converter.DoConvert();
+                // JpegDevice does NOT implement IDisposable, so instantiate it once and reuse.
+                JpegDevice jpegDevice = new JpegDevice(resolution);
 
-                int pageIndex = 1;
-                // Extract each page as a JPEG image
-                while (converter.HasNextImage())
+                for (int pageIndex = 1; pageIndex <= pageCount; pageIndex++)
                 {
-                    string imagePath = Path.Combine(pdfOutputDir, $"page_{pageIndex}.jpg");
-                    // GetNextImage saves the image in JPEG format by default
-                    converter.GetNextImage(imagePath);
-                    pageIndex++;
+                    // Build output file name: <baseName>_page<index>.jpg
+                    string outputPath = Path.Combine(outputFolder,
+                        $"{baseName}_page{pageIndex}.jpg");
+
+                    // Write the JPEG directly to a file stream.
+                    using (FileStream outStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                    {
+                        jpegDevice.Process(pdfDocument.Pages[pageIndex], outStream);
+                    }
                 }
+
+                Console.WriteLine($"Successfully converted '{pdfPath}' to images.");
             }
-
-            Console.WriteLine($"Converted '{pdfPath}' to JPEG images in '{pdfOutputDir}'.");
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+            }
         }
-
-        Console.WriteLine("Batch conversion completed.");
     }
 }

@@ -1,15 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_hidden_field.pdf";
+        const string outputPath = "hidden_field.pdf";
         const string fieldName = "MyTextField"; // name of the form field to hide
 
         if (!File.Exists(inputPath))
@@ -18,31 +18,37 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the form contains the specified field
-            if (!doc.Form.HasField(fieldName))
-            {
-                Console.Error.WriteLine($"Form field '{fieldName}' does not exist.");
-                return;
-            }
+            // Access the form object
+            Form form = doc.Form;
 
-            // Retrieve the widget annotation that represents the form field
-            WidgetAnnotation widget = doc.Form[fieldName] as WidgetAnnotation;
-            if (widget == null)
+            // Verify that the field exists
+            if (form.HasField(fieldName))
             {
-                Console.Error.WriteLine($"Field '{fieldName}' is not a widget annotation and cannot be hidden.");
-                return;
+                // The visual representation of a form field is a WidgetAnnotation.
+                // Retrieve it via a safe cast.
+                WidgetAnnotation? widget = form[fieldName] as WidgetAnnotation;
+                if (widget != null)
+                {
+                    // Hide the widget (field) on the page.
+                    widget.Flags = AnnotationFlags.Hidden;
+                }
+                else
+                {
+                    Console.WriteLine($"Field '{fieldName}' does not have a widget annotation that can be hidden.");
+                }
             }
-
-            // Combine the Hidden flag with any existing flags (preserve other flags)
-            widget.Flags |= AnnotationFlags.Hidden;
+            else
+            {
+                Console.WriteLine($"Field '{fieldName}' not found in the document.");
+            }
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Field '{fieldName}' hidden and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with hidden field to '{outputPath}'.");
     }
 }

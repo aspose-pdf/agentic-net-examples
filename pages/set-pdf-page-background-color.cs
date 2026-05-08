@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core Aspose.Pdf namespace
+using Aspose.Pdf;
 
 class Program
 {
@@ -18,17 +18,22 @@ class Program
         // Load the PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Define the corporate brand color (example RGB: 30, 144, 255)
-            Color brandColor = Color.FromArgb(30, 144, 255);
+            // Define corporate brand color (RGB values)
+            int r = 30;   // Red component (0‑255)
+            int g = 144;  // Green component (0‑255)
+            int b = 255;  // Blue component (0‑255)
 
-            // Apply the background color to each page (Page indexing is 1‑based)
+            // Create Aspose.Pdf.Color from RGB components
+            Aspose.Pdf.Color brandColor = Aspose.Pdf.Color.FromArgb(r, g, b);
+
+            // Apply the background color to every page (1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
-                page.Background = brandColor;   // Set page background color
+                page.Background = brandColor;
             }
 
-            // Save the modified PDF (saving without options writes PDF)
+            // Save the modified PDF (lifecycle rule: Document.Save)
             doc.Save(outputPath);
         }
 

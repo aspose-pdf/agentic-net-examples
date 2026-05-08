@@ -2,15 +2,16 @@ using System;
 using System.IO;
 using System.Text;
 using System.Drawing.Imaging;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";               // source PDF
-        const string outputDir  = "ExtractedImages";         // folder for images
-        const string keyword    = "YOUR_KEYWORD";            // text to search for (case‑insensitive)
+        const string inputPdf   = "input.pdf";          // source PDF
+        const string outputDir  = "ExtractedImages";    // folder for images
+        const string keyword    = "YOUR_KEYWORD";       // text to search for (case‑sensitive)
 
         if (!File.Exists(inputPdf))
         {
@@ -20,55 +21,56 @@ class Program
 
         Directory.CreateDirectory(outputDir);
 
-        // PdfExtractor implements IDisposable – use a using block for deterministic cleanup
-        using (PdfExtractor extractor = new PdfExtractor())
+        // Load the document once to obtain the total page count.
+        using (Document doc = new Document(inputPdf))
         {
-            // Bind the PDF file to the facade
-            extractor.BindPdf(inputPdf);
+            int pageCount = doc.Pages.Count;
 
-            // Total number of pages (1‑based indexing)
-            int pageCount = extractor.Document.Pages.Count;
-
-            // Iterate through each page, extract its text, and decide whether to extract images
-            for (int pageNum = 1; pageNum <= pageCount; pageNum++)
+            // PdfExtractor is a disposable facade – use a using block.
+            using (PdfExtractor extractor = new PdfExtractor())
             {
-                // Limit operations to the current page
-                extractor.StartPage = pageNum;
-                extractor.EndPage   = pageNum;
+                // Bind the PDF file to the extractor.
+                extractor.BindPdf(inputPdf);
 
-                // ----- TEXT SCAN -------------------------------------------------
-                extractor.ExtractText();                     // extract text of the current page
-
-                // Retrieve the extracted text into a string (Unicode encoding)
-                using (MemoryStream textStream = new MemoryStream())
+                // Iterate through each page.
+                for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++)
                 {
-                    extractor.GetText(textStream);          // writes page text to the stream
-                    string pageText = Encoding.Unicode.GetString(textStream.ToArray());
+                    // Restrict operations to the current page.
+                    extractor.StartPage = pageNumber;
+                    extractor.EndPage   = pageNumber;
 
-                    // Check for the keyword (case‑insensitive)
-                    if (pageText.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
+                    // ----- STEP 1: extract text from the page -----
+                    extractor.ExtractText();
+
+                    // Capture the extracted text into a memory stream.
+                    using (MemoryStream textStream = new MemoryStream())
                     {
-                        // ----- IMAGE EXTRACTION ---------------------------------
-                        // The ExtractImageMode property is not available in the current Aspose.Pdf version.
-                        // Image extraction works by simply calling ExtractImage().
-                        // extractor.ExtractImageMode = ExtractImageMode.ActuallyUsed; // removed for compatibility
+                        extractor.GetText(textStream);
+                        string pageText = Encoding.UTF8.GetString(textStream.ToArray());
 
-                        // Extract images from the same page range (single page)
-                        extractor.ExtractImage();
-
-                        int imageIndex = 1;
-                        while (extractor.HasNextImage())
+                        // Check whether the page contains the target keyword.
+                        if (pageText.Contains(keyword))
                         {
-                            string imagePath = Path.Combine(
-                                outputDir,
-                                $"page{pageNum}_img{imageIndex}.png");
+                            // ----- STEP 2: extract images from the same page -----
+                            extractor.ExtractImage();
 
-                            // Save each image as PNG (other formats are also supported)
-                            extractor.GetNextImage(imagePath, ImageFormat.Png);
-                            imageIndex++;
+                            int imageIndex = 1;
+                            while (extractor.HasNextImage())
+                            {
+                                string imagePath = Path.Combine(
+                                    outputDir,
+                                    $"page_{pageNumber}_img_{imageIndex}.png");
+
+                                // Save the image as PNG (any ImageFormat is acceptable).
+                                extractor.GetNextImage(imagePath, ImageFormat.Png);
+                                imageIndex++;
+                            }
                         }
                     }
                 }
+
+                // Release any resources held by the extractor.
+                extractor.Close();
             }
         }
 

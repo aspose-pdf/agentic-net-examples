@@ -8,7 +8,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -19,32 +19,30 @@ class Program
 
         try
         {
-            // Load the PDF document
+            // Load the PDF inside a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
-                // Iterate over all pages (1‑based indexing)
+                // Pages are 1‑based in Aspose.Pdf
                 for (int i = 1; i <= doc.Pages.Count; i++)
                 {
                     Page page = doc.Pages[i];
 
-                    // Collect all ScreenAnnotation instances on the page
-                    List<ScreenAnnotation> screensToRemove = new List<ScreenAnnotation>();
+                    // Collect all ScreenAnnotation instances on the current page
+                    List<Annotation> toDelete = new List<Annotation>();
                     foreach (Annotation ann in page.Annotations)
                     {
-                        if (ann is ScreenAnnotation screenAnn)
-                        {
-                            screensToRemove.Add(screenAnn);
-                        }
+                        if (ann is ScreenAnnotation)
+                            toDelete.Add(ann);
                     }
 
-                    // Delete each collected ScreenAnnotation
-                    foreach (ScreenAnnotation screenAnn in screensToRemove)
+                    // Remove the collected annotations
+                    foreach (Annotation ann in toDelete)
                     {
-                        page.Annotations.Delete(screenAnn);
+                        page.Annotations.Delete(ann);
                     }
                 }
 
-                // Save the modified PDF
+                // Save the modified document
                 doc.Save(outputPath);
             }
 

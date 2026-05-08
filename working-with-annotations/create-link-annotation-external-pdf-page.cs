@@ -7,32 +7,43 @@ class Program
 {
     static void Main()
     {
-        // Create a new PDF document
-        using (Document doc = new Document())
+        const string inputPath   = "input.pdf";      // source PDF
+        const string outputPath  = "output.pdf";     // result PDF
+        const string externalPdf = "external.pdf";   // PDF to open
+        const int    externalPage = 3;               // page number in external PDF (1‑based)
+
+        if (!File.Exists(inputPath))
         {
-            // Add a page to the document
-            Page page = doc.Pages.Add();
-
-            // Define the annotation rectangle (left, bottom, right, top)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
-
-            // Create the link annotation on the page
-            LinkAnnotation link = new LinkAnnotation(page, rect)
-            {
-                // Optional visual styling
-                Color = Aspose.Pdf.Color.Blue
-            };
-
-            // Set the action to open page 3 of an external PDF file named "external.pdf"
-            link.Action = new GoToRemoteAction("external.pdf", 3);
-
-            // Add the annotation to the page's annotation collection
-            page.Annotations.Add(link);
-
-            // Save the resulting PDF
-            doc.Save("output.pdf");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
         }
 
-        Console.WriteLine("PDF with link annotation created successfully.");
+        // Load the source document (using rule: document-disposal-with-using)
+        using (Document doc = new Document(inputPath))
+        {
+            // Ensure we have a page to place the annotation on
+            Page page = doc.Pages[1];
+
+            // Define the clickable rectangle (llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
+
+            // Create the link annotation
+            LinkAnnotation link = new LinkAnnotation(page, rect)
+            {
+                Color    = Aspose.Pdf.Color.Blue,                     // visual border color
+                Contents = $"Open page {externalPage} of external PDF" // tooltip text
+            };
+
+            // Assign a remote go‑to action that opens the specified page of another PDF
+            link.Action = new GoToRemoteAction(externalPdf, externalPage);
+
+            // Add the annotation to the page
+            page.Annotations.Add(link);
+
+            // Save the modified document (using rule: document-disposal-with-using)
+            doc.Save(outputPath);
+        }
+
+        Console.WriteLine($"PDF saved with link annotation: '{outputPath}'.");
     }
 }

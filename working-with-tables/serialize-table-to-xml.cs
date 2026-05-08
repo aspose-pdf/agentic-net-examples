@@ -2,79 +2,93 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // required for TextFragment if needed
+using Aspose.Pdf.Text;
+using Aspose.Pdf.Drawing; // for BorderInfo and Color
 
 class SerializeTableToXml
 {
     static void Main()
     {
-        // Output XML file path
-        const string xmlOutputPath = "TableExport.xml";
+        // Paths for the output PDF (optional) and XML files
+        const string pdfPath = "table.pdf";
+        const string xmlPath = "table.xml";
 
-        // Create a new empty PDF document
-        using (Document pdfDoc = new Document())
+        // Create a new PDF document
+        using (Document doc = new Document())
         {
             // Add a page to the document
-            Page page = pdfDoc.Pages.Add();
+            Page page = doc.Pages.Add();
 
-            // Create a table with 3 columns
+            // Create a table and set basic properties
             Table table = new Table
             {
-                // Optional: set column widths (in points)
-                ColumnWidths = "100 150 200"
+                // Example: set table border and alignment
+                Border = new BorderInfo(BorderSide.All, 1f, Color.Black), // Aspose.Pdf.Drawing.Color, no System.Drawing dependency
+                Alignment = HorizontalAlignment.Center
             };
+
+            // Define column widths (optional)
+            table.ColumnWidths = "100 150 200";
 
             // Add header row
             Row header = table.Rows.Add();
-            header.Cells.Add("ID");
-            header.Cells.Add("Name");
-            header.Cells.Add("Quantity");
+            header.Cells.Add(new TextFragment("ID"));
+            header.Cells.Add(new TextFragment("Name"));
+            header.Cells.Add(new TextFragment("Quantity"));
 
-            // Add some data rows
-            Row row1 = table.Rows.Add();
-            row1.Cells.Add("1");
-            row1.Cells.Add("Apples");
-            row1.Cells.Add("50");
+            // Add a few data rows
+            for (int i = 1; i <= 3; i++)
+            {
+                Row row = table.Rows.Add();
+                row.Cells.Add(new TextFragment(i.ToString()));
+                row.Cells.Add(new TextFragment($"Item {i}"));
+                row.Cells.Add(new TextFragment((i * 10).ToString()));
+            }
 
-            Row row2 = table.Rows.Add();
-            row2.Cells.Add("2");
-            row2.Cells.Add("Oranges");
-            row2.Cells.Add("30");
-
-            // Add the table to the page's paragraph collection
+            // Add the table to the page's paragraphs collection
             page.Paragraphs.Add(table);
 
-            // Prepare XML save options (default constructor)
+            // OPTIONAL: Save the PDF for visual verification (guarded for non‑Windows platforms)
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                doc.Save(pdfPath);
+            }
+            else
+            {
+                try
+                {
+                    doc.Save(pdfPath);
+                }
+                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
+                {
+                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. PDF save skipped.");
+                }
+            }
+
+            // Save the document structure as XML using XmlSaveOptions (also guarded)
             XmlSaveOptions xmlOptions = new XmlSaveOptions();
-
-            // Save the document as XML – guarded for platforms without GDI+ (libgdiplus)
-            SaveDocument(pdfDoc, xmlOutputPath, xmlOptions);
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                doc.Save(xmlPath, xmlOptions);
+            }
+            else
+            {
+                try
+                {
+                    doc.Save(xmlPath, xmlOptions);
+                }
+                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
+                {
+                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. XML save skipped.");
+                }
+            }
         }
 
-        Console.WriteLine($"Table serialized to XML at '{Path.GetFullPath(xmlOutputPath)}'.");
+        Console.WriteLine($"Table saved as PDF: {pdfPath}");
+        Console.WriteLine($"Document XML representation saved as: {xmlPath}");
     }
 
-    private static void SaveDocument(Document doc, string path, SaveOptions options)
-    {
-        // On Windows the native GDI+ library is always present, so we can save directly.
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            doc.Save(path, options);
-            return;
-        }
-
-        // On non‑Windows platforms (macOS/Linux) Aspose.Pdf may require libgdiplus.
-        // Wrap the call in a try/catch and handle the missing native library gracefully.
-        try
-        {
-            doc.Save(path, options);
-        }
-        catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
-        {
-            Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. XML export was skipped.");
-        }
-    }
-
+    // Helper method to detect a nested DllNotFoundException (e.g., missing libgdiplus)
     private static bool ContainsDllNotFound(Exception? ex)
     {
         while (ex != null)

@@ -8,46 +8,44 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath1 = "document1.pdf";
-        const string pdfPath2 = "document2.pdf";
-        const string auditLogPath = "diff_audit.txt";
+        const string firstPdfPath  = "first.pdf";
+        const string secondPdfPath = "second.pdf";
+        const string auditLogPath  = "audit.txt";
 
-        // Verify input files exist
-        if (!File.Exists(pdfPath1) || !File.Exists(pdfPath2))
+        if (!File.Exists(firstPdfPath) || !File.Exists(secondPdfPath))
         {
-            Console.Error.WriteLine("One or both PDF files were not found.");
+            Console.Error.WriteLine("One or both input PDF files are missing.");
             return;
         }
 
-        // Load the two PDF documents (lifecycle rule: use using for deterministic disposal)
-        using (Document doc1 = new Document(pdfPath1))
-        using (Document doc2 = new Document(pdfPath2))
+        // Load the two documents inside using blocks for deterministic disposal
+        using (Document doc1 = new Document(firstPdfPath))
+        using (Document doc2 = new Document(secondPdfPath))
         {
-            // Create default comparison options
+            // Set up comparison options (default configuration)
             ComparisonOptions options = new ComparisonOptions();
 
-            // Perform a page‑by‑page text comparison
-            // Returns a list where each element corresponds to a page and contains its diff operations
-            List<List<DiffOperation>> diffsByPage = TextPdfComparer.CompareDocumentsPageByPage(doc1, doc2, options);
+            // Perform page‑by‑page text comparison
+            List<List<DiffOperation>> diffByPage = TextPdfComparer.CompareDocumentsPageByPage(doc1, doc2, options);
 
-            // Write the audit log: operation type and page number
-            // Ensure the writer is disposed so the file handle is released before the build process may try to access it again.
+            // Write audit information: operation type and page number
             using (StreamWriter writer = new StreamWriter(auditLogPath, false))
             {
-                for (int i = 0; i < diffsByPage.Count; i++)
+                for (int pageIdx = 0; pageIdx < diffByPage.Count; pageIdx++)
                 {
-                    int pageNumber = i + 1; // Pages are 1‑based for reporting
-                    List<DiffOperation> pageDiffs = diffsByPage[i];
+                    int pageNumber = pageIdx + 1; // pages are 1‑based
+                    List<DiffOperation> diffs = diffByPage[pageIdx];
 
-                    foreach (DiffOperation diff in pageDiffs)
+                    foreach (DiffOperation diff in diffs)
                     {
-                        // DiffOperation.Operation provides the type of change (Insert, Delete, Replace, etc.)
-                        writer.WriteLine($"Page {pageNumber}: {diff.Operation}");
+                        // DiffOperation.Operation is an enum; no need for null‑conditional operator
+                        string operationType = diff.Operation.ToString();
+                        writer.WriteLine($"Operation: {operationType}, Page: {pageNumber}");
                     }
                 }
             }
 
-            Console.WriteLine($"Diff audit log created at '{auditLogPath}'.");
+            Console.WriteLine($"Audit log written to '{auditLogPath}'.");
         }
     }
 }

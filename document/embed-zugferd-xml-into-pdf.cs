@@ -6,10 +6,9 @@ class Program
 {
     static void Main()
     {
-        // Input PDF (the invoice) and ZUGFeRD XML file
-        const string pdfPath = "invoice.pdf";
-        const string xmlPath = "invoice.xml";
-        const string outputPath = "invoice_zugferd.pdf";
+        const string pdfPath      = "input.pdf";          // existing PDF to embed into
+        const string xmlPath      = "invoice.xml";        // ZUGFeRD XML file
+        const string outputPdf    = "output_with_zugferd.pdf";
 
         if (!File.Exists(pdfPath))
         {
@@ -23,57 +22,50 @@ class Program
             return;
         }
 
-        // Load the existing PDF document
-        using (Document pdfDoc = new Document(pdfPath))
+        // Load the PDF, embed the XML as an attachment, and save.
+        using (Document doc = new Document(pdfPath))
         {
-            // Create a FileSpecification for the XML file to embed
-            // The constructor that takes a file path automatically reads the file data.
-            FileSpecification fileSpec = new FileSpecification(xmlPath)
+            // Create a file specification for the XML attachment.
+            // The first argument is the file name as it will appear in the PDF.
+            // The second argument is a description.
+            FileSpecification xmlAttachment = new FileSpecification(Path.GetFileName(xmlPath), "ZUGFeRD Invoice");
+            // Set MIME type for proper identification.
+            xmlAttachment.MIMEType = "application/xml";
+
+            // Add the attachment to the PDF.
+            doc.EmbeddedFiles.Add(xmlAttachment);
+
+            // Save the modified PDF.
+            doc.Save(outputPdf);
+        }
+
+        // Verify that the attachment is present.
+        using (Document verifyDoc = new Document(outputPdf))
+        {
+            if (verifyDoc.EmbeddedFiles.Count == 0)
             {
-                Name = Path.GetFileName(xmlPath),          // File name inside the PDF
-                Description = "ZUGFeRD Invoice XML"       // Optional description
-            };
+                Console.WriteLine("No attachments found in the PDF.");
+                return;
+            }
 
-            // Optionally set the modification date (good practice)
-            fileSpec.Params.ModDate = DateTime.UtcNow;
-
-            // Add the file specification (embedded file) to the PDF
-            pdfDoc.EmbeddedFiles.Add(fileSpec);
-
-            // Verify that the XML was embedded
             bool found = false;
-            foreach (FileSpecification ef in pdfDoc.EmbeddedFiles)
+            foreach (FileSpecification spec in verifyDoc.EmbeddedFiles)
             {
-                if (ef.Name.Equals(fileSpec.Name, StringComparison.OrdinalIgnoreCase))
+                // Compare by file name (case‑insensitive) or MIME type.
+                if (string.Equals(spec.Name, Path.GetFileName(xmlPath), StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(spec.MIMEType, "application/xml", StringComparison.OrdinalIgnoreCase))
                 {
                     found = true;
-                    long dataLength = 0;
-                    // Prefer the size reported in the Params dictionary
-                    if (ef.Params != null && ef.Params.Size > 0)
-                    {
-                        dataLength = ef.Params.Size;
-                    }
-                    else if (ef.Contents != null)
-                    {
-                        // Fallback: read the stream to determine length
-                        using (var ms = new MemoryStream())
-                        {
-                            ef.Contents.CopyTo(ms);
-                            dataLength = ms.Length;
-                        }
-                    }
-                    Console.WriteLine($"Embedded file found: {ef.Name}, size {dataLength} bytes");
+                    Console.WriteLine($"Attachment found: {spec.Name}");
+                    Console.WriteLine($"Description : {spec.Description}");
+                    Console.WriteLine($"MIME Type   : {spec.MIMEType}");
                     break;
                 }
             }
 
-            if (!found)
-                Console.WriteLine("Embedded file not found after insertion.");
-
-            // Save the PDF with the embedded ZUGFeRD XML
-            pdfDoc.Save(outputPath);
+            Console.WriteLine(found
+                ? "ZUGFeRD XML attachment successfully embedded."
+                : "ZUGFeRD XML attachment not found.");
         }
-
-        Console.WriteLine($"PDF with embedded ZUGFeRD saved to '{outputPath}'.");
     }
 }

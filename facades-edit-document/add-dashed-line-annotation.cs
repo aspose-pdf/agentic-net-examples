@@ -1,4 +1,5 @@
 using System;
+using System.Drawing;
 using System.IO;
 using Aspose.Pdf.Facades;
 
@@ -6,50 +7,54 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "diagram.pdf";      // source PDF containing the workflow diagram
-        const string outputPdf = "diagram_with_line.pdf";
+        const string inputPath  = "workflow.pdf";
+        const string outputPath = "workflow_annotated.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // PdfContentEditor is a disposable facade – use a using block for deterministic cleanup
-        using (PdfContentEditor editor = new PdfContentEditor())
-        {
-            // Bind the existing PDF file
-            editor.BindPdf(inputPdf);
+        // Initialize the Facades editor and bind the source PDF.
+        PdfContentEditor editor = new PdfContentEditor();
+        editor.BindPdf(inputPath);
 
-            // Define the annotation rectangle (position and size) – fully qualified to avoid ambiguity
-            System.Drawing.Rectangle annotRect = new System.Drawing.Rectangle(100, 500, 200, 2);
+        // Define the annotation rectangle (position is not used for line drawing,
+        // so a zero‑size rectangle is acceptable).
+        Rectangle annotRect = new Rectangle(0, 0, 0, 0);
 
-            // Custom dash pattern: 4 points dash, 2 points gap
-            int[] dashPattern = new int[] { 4, 2 };
+        // Line coordinates (start and end points) in user space.
+        float x1 = 100f; // start X
+        float y1 = 200f; // start Y
+        float x2 = 300f; // end X
+        float y2 = 200f; // end Y
 
-            // No special line endings (both ends are plain)
-            string[] lineEndings = new string[] { "None", "None" };
+        // Border width (in points) and color.
+        int borderWidth = 1;
+        Color lineColor = Color.Red;
 
-            // Create the line annotation on page 1
-            // Parameters:
-            // rect, contents, x1, y1, x2, y2, page, border width, color, border style, dash array, line ending array
-            editor.CreateLine(
-                annotRect,
-                "Workflow Step Highlight",
-                100f, 500f,   // start point (x1, y1)
-                300f, 500f,   // end point   (x2, y2)
-                1,            // page number (1‑based)
-                1,            // border width in points
-                System.Drawing.Color.Red, // line color
-                "D",          // border style "D" = Dashed
-                dashPattern,  // custom dash pattern
-                lineEndings   // line ending styles
-            );
+        // Use a dashed border style and provide a custom dash pattern.
+        string borderStyle = "D";                     // "D" = Dashed
+        int[] dashPattern = new int[] { 4, 2 };       // 4 units dash, 2 units gap
 
-            // Save the modified PDF
-            editor.Save(outputPdf);
-        }
+        // Optional line ending styles (none in this case).
+        string[] lineEndings = new string[] { "None", "None" };
 
-        Console.WriteLine($"Line annotation added and saved to '{outputPdf}'.");
+        // Create the line annotation on page 1.
+        editor.CreateLine(
+            annotRect,
+            "Workflow Step Highlight", // annotation contents (tooltip)
+            x1, y1, x2, y2,
+            page: 1,
+            border: borderWidth,
+            clr: lineColor,
+            borderStyle: borderStyle,
+            dashArray: dashPattern,
+            LEArray: lineEndings);
+
+        // Save the modified PDF.
+        editor.Save(outputPath);
+        Console.WriteLine($"Annotated PDF saved to '{outputPath}'.");
     }
 }

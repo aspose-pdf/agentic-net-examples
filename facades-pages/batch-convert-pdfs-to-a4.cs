@@ -7,42 +7,35 @@ class Program
 {
     static void Main()
     {
-        // List of PDF files to be converted
+        // List of PDF files to be converted to A4 size
         string[] inputFiles = { "doc1.pdf", "doc2.pdf", "doc3.pdf" };
 
-        // Directory where the A4‑sized PDFs will be saved
-        string outputDir = "ConvertedA4";
-        Directory.CreateDirectory(outputDir);
-
-        foreach (string inputPath in inputFiles)
+        foreach (var inputPath in inputFiles)
         {
+            // Verify the source file exists
             if (!File.Exists(inputPath))
             {
                 Console.Error.WriteLine($"File not found: {inputPath}");
                 continue;
             }
 
-            // Build output file name (original name with _A4 suffix)
-            string fileName = Path.GetFileNameWithoutExtension(inputPath);
-            string outputPath = Path.Combine(outputDir, $"{fileName}_A4.pdf");
+            // Build the output file name (e.g., doc1_A4.pdf)
+            string directory = Path.GetDirectoryName(inputPath);
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(inputPath);
+            string outputPath = Path.Combine(directory, $"{fileNameWithoutExt}_A4.pdf");
 
-            // Use PdfPageEditor (Facade) to change page size to A4
-            using (PdfPageEditor editor = new PdfPageEditor())
-            {
-                // Load the source PDF
-                editor.BindPdf(inputPath);
+            // Retrieve A4 page dimensions (points)
+            double a4Width = PageSize.A4.Width;
+            double a4Height = PageSize.A4.Height;
 
-                // Set the desired page size (A4)
-                editor.PageSize = PageSize.A4;
+            // Use PdfFileEditor to resize all pages to A4
+            PdfFileEditor editor = new PdfFileEditor();
+            bool result = editor.ResizeContents(inputPath, outputPath, null, a4Width, a4Height);
 
-                // Apply changes to all pages (default behavior)
-                editor.ApplyChanges();
-
-                // Save the modified PDF
-                editor.Save(outputPath);
-            }
-
-            Console.WriteLine($"Converted '{inputPath}' to A4 -> '{outputPath}'");
+            if (result)
+                Console.WriteLine($"Successfully converted to A4: {outputPath}");
+            else
+                Console.Error.WriteLine($"Conversion failed for: {inputPath}");
         }
     }
 }

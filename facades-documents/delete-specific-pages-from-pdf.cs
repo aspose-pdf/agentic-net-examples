@@ -6,32 +6,32 @@ class Program
 {
     static void Main()
     {
-        // Paths to the source PDF and the destination PDF
+        // Paths to the source PDF and the resulting PDF
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Pages to delete (1‑based indexing, e.g., delete pages 2 and 4)
-        int[] pagesToDelete = new int[] { 2, 4 };
+        // Pages to delete (1‑based indices)
+        int[] pagesToDelete = new int[] { 2, 3 };
 
-        // Validate input file existence
+        // Verify that the input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Open streams with proper disposal
+        // Open the source and destination streams
         using (FileStream inputStream  = new FileStream(inputPath,  FileMode.Open,  FileAccess.Read))
         using (FileStream outputStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
         {
-            // PdfFileEditor does NOT implement IDisposable; do NOT wrap it in a using block
+            // Create the PdfFileEditor facade
             PdfFileEditor editor = new PdfFileEditor();
 
             // Delete the specified pages and write the result to the output stream
-            bool success = editor.Delete(inputStream, pagesToDelete, outputStream);
+            bool result = editor.Delete(inputStream, pagesToDelete, outputStream);
 
-            if (success)
-                Console.WriteLine($"Pages deleted successfully. Output saved to '{outputPath}'.");
+            if (result)
+                Console.WriteLine($"Pages {string.Join(", ", pagesToDelete)} deleted successfully. Output saved to '{outputPath}'.");
             else
                 Console.Error.WriteLine("Failed to delete pages.");
         }

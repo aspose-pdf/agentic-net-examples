@@ -1,7 +1,7 @@
 using System;
 using System.IO;
+using System.Drawing;
 using Aspose.Pdf.Facades;
-using System.Drawing; // required for Color
 
 class Program
 {
@@ -16,35 +16,28 @@ class Program
             return;
         }
 
-        // Use PdfContentEditor (facade) to add a bookmark that runs JavaScript
+        // Use PdfContentEditor (facade) to edit the PDF
         using (PdfContentEditor editor = new PdfContentEditor())
         {
-            // Bind the source PDF document
+            // Load the PDF document
             editor.BindPdf(inputPath);
 
-            // Create a bookmark with a JavaScript action.
-            // Parameters:
-            //   title        – displayed bookmark title
-            //   color        – colour of the title (System.Drawing.Color)
-            //   boldFlag     – true for bold text
-            //   italicFlag   – false for normal style
-            //   file         – not required for JavaScript (null)
-            //   actionType   – "JavaScript" indicates a JS action
-            //   destination  – the JavaScript code to execute
+            // Create a bookmark that executes JavaScript when clicked
+            // Action type "JavaScript" with the script code as destination
             editor.CreateBookmarksAction(
-                "Show Alert",                                   // title
-                Color.Blue,                                     // title colour
-                true,                                           // bold
-                false,                                          // italic
-                null,                                           // file (unused)
-                "JavaScript",                                   // action type
-                "app.alert('Hello from Aspose.Pdf!');"          // JavaScript code
+                title: "Show Alert",
+                color: Color.Blue,
+                boldFlag: true,
+                italicFlag: false,
+                file: null,                     // not needed for JavaScript action
+                actionType: "JavaScript",       // specifies a JavaScript action
+                destination: "app.alert('Hello from bookmark!');"
             );
 
-            // Save the modified PDF with the new bookmark
+            // Save the modified PDF
             editor.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with JavaScript bookmark saved to '{outputPath}'.");
+        Console.WriteLine($"Bookmarks with JavaScript saved to '{outputPath}'.");
     }
 }

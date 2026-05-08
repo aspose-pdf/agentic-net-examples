@@ -6,44 +6,54 @@ class Program
 {
     static void Main()
     {
-        // Path to the source PDF file
-        const string inputPath = "input.pdf";
+        // Input PDF file path
+        const string inputPdf = "input.pdf";
 
-        // Define the page ranges to split.
-        // Each inner array contains the start page and end page (1‑based indexing).
-        int[][] pageRanges = new int[][]
+        // Ensure the input file exists
+        if (!File.Exists(inputPdf))
         {
-            new int[] { 1, 3 },   // pages 1‑3
-            new int[] { 4, 5 },   // pages 4‑5
-            new int[] { 6, 10 }   // pages 6‑10
-        };
-
-        // Verify that the input file exists
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // PdfFileEditor does NOT implement IDisposable, so do NOT wrap it in a using block
+        // Define the page ranges for each output document.
+        // Each inner array contains two integers: start page and end page (1‑based indexing).
+        // Example: split into three documents – pages 1‑3, pages 4‑6, and pages 7‑10.
+        int[][] pageRanges = new int[][]
+        {
+            new int[] { 1, 3 },
+            new int[] { 4, 6 },
+            new int[] { 7, 10 }
+        };
+
+        // Create an instance of PdfFileEditor (it does NOT implement IDisposable).
         PdfFileEditor editor = new PdfFileEditor();
 
-        // Split the PDF into the defined bulks.
-        // The method returns an array of MemoryStream objects, each containing a PDF document.
-        MemoryStream[] splitStreams = editor.SplitToBulks(inputPath, pageRanges);
+        // Split the source PDF into the defined bulks.
+        // The method returns an array of MemoryStream, each containing a PDF document.
+        MemoryStream[] bulks = editor.SplitToBulks(inputPdf, pageRanges);
 
-        // Save each resulting stream to a separate PDF file
-        for (int i = 0; i < splitStreams.Length; i++)
+        // Output directory for the split PDFs
+        string outputDir = "SplitBulks";
+        Directory.CreateDirectory(outputDir);
+
+        // Save each MemoryStream to a separate file.
+        for (int i = 0; i < bulks.Length; i++)
         {
-            string outputPath = $"output_part_{i + 1}.pdf";
+            // Construct a file name like "part1.pdf", "part2.pdf", etc.
+            string outputPath = Path.Combine(outputDir, $"part{i + 1}.pdf");
 
-            // Ensure the stream is positioned at the beginning before copying
-            splitStreams[i].Position = 0;
+            // Ensure the stream position is at the beginning before writing.
+            bulks[i].Position = 0;
 
+            // Write the stream contents to the file.
             using (FileStream fileStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
             {
-                splitStreams[i].CopyTo(fileStream);
+                bulks[i].CopyTo(fileStream);
             }
+
+            // Dispose the individual MemoryStream after saving.
+            bulks[i].Dispose();
 
             Console.WriteLine($"Saved split part {i + 1} to '{outputPath}'.");
         }

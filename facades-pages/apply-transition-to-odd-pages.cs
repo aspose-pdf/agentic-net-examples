@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
@@ -20,28 +21,30 @@ class Program
         using (Document doc = new Document(inputPath))
         {
             // Create a PdfPageEditor bound to the loaded document
-            using (PdfPageEditor editor = new PdfPageEditor(doc))
+            PdfPageEditor editor = new PdfPageEditor(doc);
+
+            // Build an array of odd‑numbered page indices (1‑based indexing)
+            List<int> oddPages = new List<int>();
+            for (int i = 1; i <= doc.Pages.Count; i += 2)
             {
-                // Determine odd‑numbered pages (1‑based indexing)
-                int pageCount = doc.Pages.Count;
-                int[] oddPages = new int[(pageCount + 1) / 2];
-                int idx = 0;
-                for (int i = 1; i <= pageCount; i += 2)
-                {
-                    oddPages[idx++] = i;
-                }
-
-                // Apply the transition only to the odd pages
-                editor.ProcessPages = oddPages;                     // pages to edit
-                editor.TransitionType = PdfPageEditor.BLINDV;       // example transition style
-                editor.TransitionDuration = 2;                     // duration in seconds (int required)
-
-                // Commit the changes to the document
-                editor.ApplyChanges();
+                oddPages.Add(i);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            // Specify which pages the editor should process
+            editor.ProcessPages = oddPages.ToArray();
+
+            // Choose a transition style (any of the provided constants)
+            // Example: vertical blinds transition
+            editor.TransitionType = PdfPageEditor.BLINDV;
+
+            // Set the duration (in seconds) for the transition effect
+            editor.TransitionDuration = 2; // 2 seconds
+
+            // Apply the changes to the selected pages
+            editor.ApplyChanges();
+
+            // Save the modified PDF to the output file
+            editor.Save(outputPath);
         }
 
         Console.WriteLine($"PDF saved with transitions on odd pages: {outputPath}");

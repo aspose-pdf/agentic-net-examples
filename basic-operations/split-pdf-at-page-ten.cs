@@ -7,46 +7,65 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string part1Path = "output_part1_pages_1_to_10.pdf";
-        const string part2Path = "output_part2_pages_11_onwards.pdf";
+        const string outputDir = "SplitParts";
 
+        // Verify source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the source PDF
-        using (Document source = new Document(inputPath))
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputDir);
+
+        try
         {
-            int totalPages = source.Pages.Count;
-            if (totalPages < 10)
+            // Load the source PDF (using block ensures proper disposal)
+            using (Document src = new Document(inputPath))
             {
-                Console.Error.WriteLine("Source PDF has fewer than 10 pages; cannot split as requested.");
-                return;
-            }
+                int totalPages = src.Pages.Count;
+                int splitPage = 10; // split after this page (1‑based)
 
-            // Create first part (pages 1‑10)
-            using (Document part1 = new Document())
-            {
-                for (int i = 1; i <= 10; i++)
+                // ---------- First part: pages 1 .. splitPage ----------
+                using (Document part1 = new Document())
                 {
-                    part1.Pages.Add(source.Pages[i]);
-                }
-                part1.Save(part1Path); // Save first part
-            }
+                    int lastPagePart1 = Math.Min(splitPage, totalPages);
+                    for (int i = 1; i <= lastPagePart1; i++)
+                    {
+                        // Add each page to the new document
+                        part1.Pages.Add(src.Pages[i]);
+                    }
 
-            // Create second part (pages 11‑end)
-            using (Document part2 = new Document())
-            {
-                for (int i = 11; i <= totalPages; i++)
-                {
-                    part2.Pages.Add(source.Pages[i]);
+                    string part1Path = Path.Combine(outputDir, $"part1_pages_1-{lastPagePart1}.pdf");
+                    part1.Save(part1Path); // Save as PDF
+                    Console.WriteLine($"Saved first part: {part1Path}");
                 }
-                part2.Save(part2Path); // Save second part
+
+                // ---------- Second part: pages splitPage+1 .. end ----------
+                if (totalPages > splitPage)
+                {
+                    using (Document part2 = new Document())
+                    {
+                        for (int i = splitPage + 1; i <= totalPages; i++)
+                        {
+                            part2.Pages.Add(src.Pages[i]);
+                        }
+
+                        string part2Path = Path.Combine(outputDir, $"part2_pages_{splitPage + 1}-end.pdf");
+                        part2.Save(part2Path); // Save as PDF
+                        Console.WriteLine($"Saved second part: {part2Path}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Document has no pages beyond the split point.");
+                }
             }
         }
-
-        Console.WriteLine($"PDF split completed:\n  Part 1 → {part1Path}\n  Part 2 → {part2Path}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

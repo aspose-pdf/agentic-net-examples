@@ -2,25 +2,25 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using System.Drawing;                     // Used only for image resizing
-using Aspose.Pdf;                         // Core PDF API
-using Aspose.Pdf.Devices;                 // For image devices (if needed)
-using Aspose.Pdf.Text;                    // Not required here but kept for completeness
+using System.Drawing.Imaging; // added for ImageFormat
+using Aspose.Pdf;
+using Aspose.Pdf.Devices; // still needed for other device‑related types (e.g., Resolution)
+
+// Configuration model matching the JSON file structure
+public class PageResizeConfig
+{
+    public int Page { get; set; }
+    public double Width { get; set; }   // target width in points
+    public double Height { get; set; }  // target height in points
+}
 
 class Program
 {
-    // Configuration entry for a single page
-    private class PageSizeConfig
-    {
-        public double Width { get; set; }   // Target width in points (1/72 inch)
-        public double Height { get; set; }  // Target height in points
-    }
-
     static void Main()
     {
         const string inputPdfPath   = "input.pdf";
         const string outputPdfPath  = "output_resized.pdf";
-        const string configJsonPath = "page_sizes.json";
+        const string configPath     = "resizeConfig.json";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -28,85 +28,81 @@ class Program
             return;
         }
 
-        if (!File.Exists(configJsonPath))
+        if (!File.Exists(configPath))
         {
-            Console.Error.WriteLine($"Configuration file not found: {configJsonPath}");
+            Console.Error.WriteLine($"Configuration file not found: {configPath}");
             return;
         }
 
-        // Load configuration: {"1":{"Width":200,"Height":300},"3":{"Width":400,"Height":500},...}
-        Dictionary<int, PageSizeConfig> pageSizeMap;
-        try
-        {
-            string json = File.ReadAllText(configJsonPath);
-            pageSizeMap = JsonSerializer.Deserialize<Dictionary<int, PageSizeConfig>>(json);
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Failed to read configuration: {ex.Message}");
-            return;
-        }
+        // Load configuration: map page number -> (width, height)
+        Dictionary<int, (double width, double height)> pageSizeMap = LoadConfiguration(configPath);
 
-        // Open the PDF document
+        // Open the PDF document (lifecycle rule: wrap in using)
         using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Iterate through all pages (1‑based indexing)
+            // Iterate through all pages (1‑based indexing rule)
             for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
             {
-                if (!pageSizeMap.TryGetValue(pageIndex, out PageSizeConfig targetSize))
-                    continue; // No resizing required for this page
+                if (!pageSizeMap.TryGetValue(pageIndex, out var targetSize))
+                    continue; // No resize instruction for this page
 
                 Page page = pdfDoc.Pages[pageIndex];
 
-                // Absorb all image placements on the current page
-                ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
-                page.Accept(absorber);
+                // Absorb image placements on the current page
+                ImagePlacementAbsorber imgAbsorber = new ImagePlacementAbsorber();
+                page.Accept(imgAbsorber);
 
-                // Process each found image
-                foreach (ImagePlacement imgPlacement in absorber.ImagePlacements)
+                // Process each image found on the page
+                foreach (ImagePlacement imgPlacement in imgAbsorber.ImagePlacements)
                 {
-                    // Preserve original position (lower‑left corner)
-                    double llx = imgPlacement.Rectangle.LLX;
-                    double lly = imgPlacement.Rectangle.LLY;
-
-                    // Retrieve the original image bytes
-                    using (MemoryStream originalStream = new MemoryStream())
+                    // Save the original image to a memory stream
+                    using (MemoryStream imgStream = new MemoryStream())
                     {
-                        imgPlacement.Image.Save(originalStream, System.Drawing.Imaging.ImageFormat.Png);
-                        originalStream.Position = 0;
+                        // Use System.Drawing.Imaging.ImageFormat (correct enum)
+                        imgPlacement.Image.Save(imgStream, ImageFormat.Png);
+                        imgStream.Position = 0; // Reset stream for reading
 
-                        // Resize the image using System.Drawing
-                        using (System.Drawing.Image originalImage = System.Drawing.Image.FromStream(originalStream))
-                        using (Bitmap resizedBitmap = new Bitmap((int)targetSize.Width, (int)targetSize.Height))
-                        using (Graphics graphics = Graphics.FromImage(resizedBitmap))
-                        {
-                            graphics.DrawImage(originalImage, 0, 0, (int)targetSize.Width, (int)targetSize.Height);
-                            using (MemoryStream resizedStream = new MemoryStream())
-                            {
-                                resizedBitmap.Save(resizedStream, System.Drawing.Imaging.ImageFormat.Png);
-                                resizedStream.Position = 0;
+                        // Remove the original image from the page
+                        imgPlacement.Hide();
 
-                                // Hide the original image placement
-                                imgPlacement.Hide();
+                        // Determine new rectangle using the same lower‑left corner
+                        double llx = imgPlacement.Rectangle.LLX;
+                        double lly = imgPlacement.Rectangle.LLY;
+                        double urx = llx + targetSize.width;
+                        double ury = lly + targetSize.height;
+                        Aspose.Pdf.Rectangle newRect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
 
-                                // Add the resized image back to the page at the original location
-                                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(
-                                    llx,
-                                    lly,
-                                    llx + targetSize.Width,
-                                    lly + targetSize.Height);
-
-                                page.AddImage(resizedStream, rect);
-                            }
-                        }
+                        // Add the resized image back to the page
+                        page.AddImage(imgStream, newRect);
                     }
                 }
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (save rule: use Document.Save)
             pdfDoc.Save(outputPdfPath);
         }
 
         Console.WriteLine($"Resized PDF saved to '{outputPdfPath}'.");
+    }
+
+    // Helper to read the JSON configuration file
+    private static Dictionary<int, (double width, double height)> LoadConfiguration(string configFilePath)
+    {
+        string json = File.ReadAllText(configFilePath);
+        PageResizeConfig[]? configs = JsonSerializer.Deserialize<PageResizeConfig[]>(json);
+
+        var map = new Dictionary<int, (double width, double height)>();
+        if (configs != null)
+        {
+            foreach (var cfg in configs)
+            {
+                // Ensure positive dimensions before adding
+                if (cfg.Width > 0 && cfg.Height > 0)
+                {
+                    map[cfg.Page] = (cfg.Width, cfg.Height);
+                }
+            }
+        }
+        return map;
     }
 }

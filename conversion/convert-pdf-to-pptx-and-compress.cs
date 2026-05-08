@@ -1,57 +1,81 @@
 using System;
 using System.IO;
 using System.IO.Compression;
-using Aspose.Pdf; // All Aspose.Pdf types (Document, PptxSaveOptions, etc.) are in this namespace
+using Aspose.Pdf;               // Core Aspose.Pdf namespace
+using Aspose.Pdf;               // Document, PptxSaveOptions are here
 
 class Program
 {
     static void Main()
     {
-        // Input PDF and intermediate PPTX paths
-        const string pdfPath = "input.pdf";
-        const string pptxPath = "output.pptx";
-        const string compressedPath = "output_compressed.pptx";
+        // Paths – adjust as needed
+        const string pdfPath      = "input.pdf";
+        const string pptxPath     = "output.pptx";
+        const string compressedPptxPath = "output_compressed.pptx";
 
+        // Verify source PDF exists
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"Source PDF not found: {pdfPath}");
             return;
         }
 
+        // ---------- Convert PDF to PPTX ----------
+        // Load the PDF document (lifecycle: using ensures disposal)
+        using (Document pdfDocument = new Document(pdfPath))
+        {
+            // Initialize PPTX save options (core API, no Facades)
+            PptxSaveOptions pptxOptions = new PptxSaveOptions();
+
+            // Save as PPTX
+            pdfDocument.Save(pptxPath, pptxOptions);
+        }
+
+        // Verify PPTX was created
+        if (!File.Exists(pptxPath))
+        {
+            Console.Error.WriteLine($"Failed to create PPTX: {pptxPath}");
+            return;
+        }
+
+        // ---------- Compress the PPTX (ZIP recompression) ----------
+        // PPTX files are ZIP packages; recompress entries with optimal compression.
+        // Create a temporary file for the recompressed archive.
+        string tempPath = Path.GetTempFileName();
+
         try
         {
-            // ---------- Convert PDF to PPTX ----------
-            using (Document pdfDoc = new Document(pdfPath))
-            {
-                // PptxSaveOptions lives in the Aspose.Pdf namespace
-                PptxSaveOptions pptxOptions = new PptxSaveOptions();
-                pdfDoc.Save(pptxPath, pptxOptions);
-            }
-
-            // ---------- Re‑compress the generated PPTX ----------
-            // PPTX files are ZIP packages; recompress them with optimal settings
+            // Open the original PPTX as a read‑only zip archive
             using (FileStream originalStream = new FileStream(pptxPath, FileMode.Open, FileAccess.Read))
-            using (ZipArchive sourceArchive = new ZipArchive(originalStream, ZipArchiveMode.Read, leaveOpen: true))
-            using (FileStream compressedStream = new FileStream(compressedPath, FileMode.Create, FileAccess.Write))
-            using (ZipArchive targetArchive = new ZipArchive(compressedStream, ZipArchiveMode.Create))
+            using (ZipArchive originalArchive = new ZipArchive(originalStream, ZipArchiveMode.Read, leaveOpen: false))
+            // Create a new zip archive for the compressed output
+            using (FileStream tempStream = new FileStream(tempPath, FileMode.Create, FileAccess.Write))
+            using (ZipArchive compressedArchive = new ZipArchive(tempStream, ZipArchiveMode.Create, leaveOpen: false))
             {
-                foreach (ZipArchiveEntry entry in sourceArchive.Entries)
+                foreach (ZipArchiveEntry entry in originalArchive.Entries)
                 {
                     // Preserve directory structure; copy each entry with optimal compression
-                    ZipArchiveEntry newEntry = targetArchive.CreateEntry(entry.FullName, CompressionLevel.Optimal);
-                    using (Stream sourceEntryStream = entry.Open())
-                    using (Stream targetEntryStream = newEntry.Open())
+                    ZipArchiveEntry newEntry = compressedArchive.CreateEntry(entry.FullName, CompressionLevel.Optimal);
+                    using (Stream source = entry.Open())
+                    using (Stream destination = newEntry.Open())
                     {
-                        sourceEntryStream.CopyTo(targetEntryStream);
+                        source.CopyTo(destination);
                     }
                 }
             }
 
-            Console.WriteLine($"Conversion complete. Compressed PPTX saved to '{compressedPath}'.");
+            // Replace the original PPTX with the compressed version
+            File.Delete(pptxPath);
+            File.Move(tempPath, compressedPptxPath);
+            Console.WriteLine($"Conversion and compression completed. File saved to '{compressedPptxPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"An error occurred: {ex.Message}");
+            // Cleanup temporary file on error
+            if (File.Exists(tempPath))
+                File.Delete(tempPath);
+
+            Console.Error.WriteLine($"Error during compression: {ex.Message}");
         }
     }
 }

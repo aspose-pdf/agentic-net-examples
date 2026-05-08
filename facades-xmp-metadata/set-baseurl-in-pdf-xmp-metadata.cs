@@ -1,30 +1,35 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string baseUrl   = "https://www.example.com";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string baseUrl = "https://www.example.com/";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Bind the PDF, set the BaseURL XMP property, and save.
+        // Create XMP metadata facade and bind the existing PDF
         using (PdfXmpMetadata xmp = new PdfXmpMetadata())
         {
-            xmp.BindPdf(inputPdf);
-            // Add the standard BaseURL property. Using the string-key overload works for simple values.
-            xmp.Add("xmp:BaseURL", baseUrl);
-            xmp.Save(outputPdf);
+            xmp.BindPdf(inputPath);
+
+            // Add the BaseURL property to the XMP metadata
+            XmpValue urlValue = new XmpValue(baseUrl);
+            xmp.Add(DefaultMetadataProperties.BaseURL, urlValue);
+
+            // Save the updated PDF with the new XMP metadata
+            xmp.Save(outputPath);
         }
 
-        Console.WriteLine($"BaseURL set and saved to '{outputPdf}'.");
+        Console.WriteLine($"BaseURL set and saved to '{outputPath}'.");
     }
 }

@@ -1,46 +1,55 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core API (Document, Page, XpsSaveOptions)
-using Aspose.Pdf.Printing;    // PageSize class for custom dimensions
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPdf = "input.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.xps";
 
-        // Output XPS file path
-        const string outputXps = "output.xps";
-
-        // Define custom page size (width, height) in points.
-        // Example: A4 landscape (842 x 595 points).
-        const double customWidth  = 842.0;
-        const double customHeight = 595.0;
-
-        // Ensure the source file exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF, adjust page size, and save as XPS
-        using (Document pdfDoc = new Document(inputPdf))
+        // Define custom page size (example: 8.5 x 11 inches).
+        // 1 inch = 72 points.
+        double widthInches = 8.5;
+        double heightInches = 11;
+        double width = widthInches * 72;
+        double height = heightInches * 72;
+
+        // Set orientation: true for landscape, false for portrait.
+        bool landscape = true;
+        if (landscape)
         {
-            // Apply the custom size to every page (1‑based indexing)
-            foreach (Page page in pdfDoc.Pages)
-            {
-                page.SetPageSize(customWidth, customHeight);
-            }
-
-            // Initialize XPS save options (required for non‑PDF output)
-            XpsSaveOptions xpsOptions = new XpsSaveOptions();
-
-            // Save the document as XPS with the specified options
-            pdfDoc.Save(outputXps, xpsOptions);
+            // Swap dimensions for landscape orientation.
+            double temp = width;
+            width = height;
+            height = temp;
         }
 
-        Console.WriteLine($"PDF successfully converted to XPS: {outputXps}");
+        // Load the PDF, apply custom page size/orientation, and save as XPS.
+        using (Document doc = new Document(inputPath))
+        {
+            // Apply the custom size to every page using PageInfo.
+            foreach (Page page in doc.Pages)
+            {
+                page.PageInfo.Width = width;
+                page.PageInfo.Height = height;
+                page.PageInfo.IsLandscape = landscape;
+            }
+
+            // Initialize XPS save options.
+            XpsSaveOptions saveOptions = new XpsSaveOptions();
+
+            // Save the document as XPS using the specified options.
+            doc.Save(outputPath, saveOptions);
+        }
+
+        Console.WriteLine($"PDF successfully converted to XPS: {outputPath}");
     }
 }

@@ -15,20 +15,23 @@ class Program
             return;
         }
 
-        // Initialize FormEditor with source and destination PDFs
-        using (FormEditor formEditor = new FormEditor(inputPath, outputPath))
+        // Open the PDF with FormEditor (facade API)
+        using (FormEditor formEditor = new FormEditor())
         {
+            // Bind the existing PDF document
+            formEditor.BindPdf(inputPath);
+
             // Make the "TaxRate" field read‑only
             formEditor.SetFieldAttribute("TaxRate", PropertyFlag.ReadOnly);
 
             // Add JavaScript to calculate TaxRate = Subtotal * 0.1
             string js = "event.value = this.getField('Subtotal').value * 0.1;";
-            formEditor.SetFieldScript("TaxRate", js);
+            formEditor.AddFieldScript("TaxRate", js);
 
-            // Persist changes to the output file
-            formEditor.Save();
+            // Save the updated PDF
+            formEditor.Save(outputPath);
         }
 
-        Console.WriteLine($"Form updated and saved to '{outputPath}'.");
+        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }
 }

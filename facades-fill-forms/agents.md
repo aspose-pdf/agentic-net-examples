@@ -21,20 +21,17 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf.Facades;` (32/35 files) ← category-specific
-- `using Aspose.Pdf;` (15/35 files)
-- `using Aspose.Pdf.Text;` (4/35 files)
-- `using Aspose.Pdf.Forms;` (3/35 files)
-- `using System;` (35/35 files)
-- `using System.IO;` (33/35 files)
-- `using System.Data;` (25/35 files) ← category-specific
-- `using System.Collections.Generic;` (6/35 files)
-- `using System.Threading;` (3/35 files)
-- `using System.Linq;` (2/35 files)
-- `using System.Threading.Tasks;` (2/35 files)
-- `using Microsoft.VisualStudio.TestTools.UnitTesting;` (1/35 files)
-- `using System.Runtime.InteropServices;` (1/35 files)
-- `using System.Text.Json;` (1/35 files)
+- `using Aspose.Pdf.Facades;` (27/28 files) ← category-specific
+- `using Aspose.Pdf;` (13/28 files)
+- `using Aspose.Pdf.Forms;` (3/28 files)
+- `using System;` (28/28 files)
+- `using System.IO;` (28/28 files)
+- `using System.Data;` (19/28 files) ← category-specific
+- `using System.Collections.Generic;` (5/28 files)
+- `using System.Threading;` (2/28 files)
+- `using System.Threading.Tasks;` (2/28 files)
+- `using System.Linq;` (1/28 files)
+- `using System.Text.Json;` (1/28 files)
 
 ## Common Code Pattern
 
@@ -52,40 +49,37 @@ using (Document doc = new Document("input.pdf"))
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [add-date-header-to-pdf-pages](./add-date-header-to-pdf-pages.cs) | Add Date Header to PDF Pages | `PageDate`, `FormattedText`, `PdfFileStamp` | Shows how to use Aspose.Pdf's PdfFileStamp to insert a header with the current date on every page... |
-| [add-image-watermark-to-filled-pdf-pages](./add-image-watermark-to-filled-pdf-pages.cs) | Add Image Watermark to Filled PDF Pages | `AutoFiller`, `PdfFileStamp`, `Stamp` | Demonstrates how to fill a PDF form using Aspose.Pdf.Facades.AutoFiller and then apply a semi‑tra... |
-| [async-fill-pdf-from-excel](./async-fill-pdf-from-excel.cs) | Asynchronously Fill PDF Form from Excel Using AutoFiller | `AutoFiller`, `BindPdf`, `ImportDataTable` | Demonstrates loading Excel data asynchronously, binding it to a PDF template with AutoFiller, and... |
-| [autofiller-retry-logic](./autofiller-retry-logic.cs) | AutoFiller PDF Merge with Retry Logic | `AutoFiller`, `BindPdf`, `ImportDataTable` | Demonstrates how to use Aspose.Pdf's AutoFiller to bind a PDF template, import data from a DataTa... |
-| [batch-fill-pdf-template-with-datatables](./batch-fill-pdf-template-with-datatables.cs) | Batch Fill PDF Template with Multiple DataTables | `AutoFiller`, `BindPdf`, `ImportDataTable` | Demonstrates how to fill a single PDF form template repeatedly using a list of DataTable objects,... |
-| [bind-pdf-form-to-autofiller](./bind-pdf-form-to-autofiller.cs) | Bind PDF Form to AutoFiller Instance | `AutoFiller`, `BindPdf` | Shows how to create an AutoFiller object, bind a source PDF form from a file path, and prepare it... |
-| [convert-filled-pdf-to-byte-array](./convert-filled-pdf-to-byte-array.cs) | Convert Filled PDF to Byte Array without Saving to Disk | `PdfViewer`, `BindPdf`, `Save` | Shows how to load a filled PDF using Aspose.Pdf.Facades.PdfViewer and save it directly to a Memor... |
-| [convert-large-pdf-to-excel-with-temp-folder](./convert-large-pdf-to-excel-with-temp-folder.cs) | Convert Large PDF to Excel Using a Temporary Folder | `PdfFileEditor`, `Extract`, `Concatenate` | Demonstrates processing a large PDF by extracting each page to temporary files, concatenating the... |
-| [encrypt-filled-pdf-with-password](./encrypt-filled-pdf-with-password.cs) | Encrypt Filled PDF with Password | `Document`, `Save`, `PdfFileSecurity` | Demonstrates how to protect a previously filled PDF by applying user and owner passwords using As... |
-| [extract-pdf-pages-with-custom-names](./extract-pdf-pages-with-custom-names.cs) | Extract PDF Pages with Custom File Names from DataTable | `Document`, `PdfFileEditor`, `Extract` | Shows how to extract specific pages from a multi‑page PDF and save each page as a separate PDF fi... |
-| [fill-pdf-form-from-csv](./fill-pdf-form-from-csv.cs) | Fill PDF Form from CSV using Aspose.Pdf | `Form`, `FillField`, `Save` | Demonstrates loading data from a CSV file into a DataTable and using Aspose.Pdf.Facades.Form to p... |
-| [fill-pdf-form-from-datatable](./fill-pdf-form-from-datatable.cs) | Fill PDF Form from DataTable (Excel‑derived) | `AutoFiller`, `BindPdf`, `ImportDataTable` | Shows how to create a DataTable (simulating Excel column headers) and use Aspose.Pdf.Facades.Auto... |
-| [fill-pdf-form-from-large-csv](./fill-pdf-form-from-large-csv.cs) | Fill PDF Form from Large CSV Using AutoFiller | `AutoFiller`, `BindPdf`, `ImportDataTable` | Demonstrates loading a large CSV (converted from XLSX) row‑by‑row into a DataTable and using Aspo... |
-| [fill-pdf-form-from-memory-stream](./fill-pdf-form-from-memory-stream.cs) | Fill PDF Form from Memory Stream using AutoFiller | `Document`, `Save`, `Page` | Demonstrates loading a PDF template from a byte array, filling its form fields with data via Aspo... |
-| [fill-pdf-form-from-multiple-csv-worksheets](./fill-pdf-form-from-multiple-csv-worksheets.cs) | Fill PDF Form from Multiple CSV Worksheets | `AutoFiller`, `BindPdf`, `ImportDataTable` | The example reads each CSV file (representing an Excel worksheet) into a DataTable and uses Aspos... |
-| [fill-pdf-form-from-xlsx-using-autofiller](./fill-pdf-form-from-xlsx-using-autofiller.cs) | Fill PDF Form from XLSX Using AutoFiller | `AutoFiller`, `BindPdf`, `ImportDataTable` | Shows how to create a DataTable (simulating XLSX data) and use Aspose.Pdf.Facades.AutoFiller to b... |
-| [fill-pdf-form-using-csv-config-mapping](./fill-pdf-form-using-csv-config-mapping.cs) | Fill PDF Form Using CSV Data with Configurable Column Mappin... | `Form`, `FillField`, `Save` | Demonstrates loading a JSON mapping to translate CSV column names to PDF field names, reading the... |
-| [fill-pdf-form-validate-size](./fill-pdf-form-validate-size.cs) | Fill PDF Form from DataTable and Validate File Size | `AutoFiller`, `BindPdf`, `ImportDataTable` | Demonstrates using Aspose.Pdf AutoFiller to populate a PDF form from a DataTable, creating a temp... |
-| [fill-pdf-form-with-autofiller](./fill-pdf-form-with-autofiller.cs) | Fill PDF Form with AutoFiller and Proper Disposal | `Document`, `Page`, `Rectangle` | Shows how to bind a PDF template, import data from a DataTable, fill form fields using AutoFiller... |
-| [fill-pdf-form-with-datatable-custom-columns](./fill-pdf-form-with-datatable-custom-columns.cs) | Fill PDF Form Using DataTable with Custom Columns | `AutoFiller`, `BindPdf`, `ImportDataTable` | Demonstrates adding custom columns to a DataTable, binding it to a PDF template with Aspose.Pdf.F... |
-| [fill-pdf-form-with-datatable-exception-handling](./fill-pdf-form-with-datatable-exception-handling.cs) | Fill PDF Form with DataTable and Handle Exceptions | `AutoFiller`, `BindPdf`, `ImportDataTable` | Demonstrates using Aspose.Pdf's AutoFiller to bind a template PDF, import a DataTable into form f... |
-| [fill-pdf-form-with-timeout-cancellation](./fill-pdf-form-with-timeout-cancellation.cs) | Fill PDF Form with Timeout Cancellation | `Document`, `Form`, `SaveAsync` | Demonstrates how to fill fields in a PDF form using Aspose.Pdf and abort the operation with a can... |
-| [format-numeric-values-fill-pdf-form](./format-numeric-values-fill-pdf-form.cs) | Format Numeric Values and Fill PDF Form Fields | `AutoFiller`, `BindPdf`, `ImportDataTable` | Shows how to format numeric DataTable values as strings and use Aspose.Pdf.Facades.AutoFiller to ... |
-| [generate-pdf-per-datatable-row](./generate-pdf-per-datatable-row.cs) | Generate PDF with One Page per DataTable Row | `AutoFiller`, `Document` | Shows how to use Aspose.Pdf.Facades.AutoFiller to import a DataTable and create a merged PDF wher... |
-| [generate-subset-pdf-from-filtered-datatable](./generate-subset-pdf-from-filtered-datatable.cs) | Generate Subset PDF from Filtered DataTable | `Document`, `Page`, `Table` | Creates a DataTable (simulating an exported Excel worksheet), filters rows by a column value, and... |
-| [generate-summary-report-pdf-pages-datatable](./generate-summary-report-pdf-pages-datatable.cs) | Generate Summary Report Mapping PDF Pages to DataTable Rows | `Document`, `TableAbsorber`, `Visit` | Iterates through each PDF page, extracts tables with TableAbsorber, and writes a CSV that maps th... |
-| [import-datatable-into-pdf-form](./import-datatable-into-pdf-form.cs) | Import DataTable with ReadOnly and Unique Columns into PDF F... | `AutoFiller`, `BindPdf`, `ImportDataTable` | Shows how to configure DataColumn properties such as ReadOnly and Unique, then import the DataTab... |
-| [import-datatable-into-pdf-form__v2](./import-datatable-into-pdf-form__v2.cs) | Import DataTable into PDF Form using AutoFiller | `AutoFiller`, `BindPdf`, `ImportDataTable` | Shows how to bind a PDF form template, import a DataTable whose column names match AcroForm field... |
-| [log-datatable-row-processing-auto-filler](./log-datatable-row-processing-auto-filler.cs) | Log DataTable Row Processing While Generating PDFs with Auto... | `AutoFiller`, `BindPdf`, `ImportDataTable` | Demonstrates using Aspose.Pdf.Facades.AutoFiller to fill a PDF template from a DataTable, create ... |
-| [map-datatable-columns-to-pdf-fields](./map-datatable-columns-to-pdf-fields.cs) | Map DataTable Columns to PDF Field Names for AutoFiller | `AutoFiller`, `BindPdf`, `ImportDataTable` | Demonstrates how to rename DataTable columns to match PDF form field identifiers and then use Asp... |
-| ... | | | *and 5 more files* |
+| [add-current-date-header-to-pdf](./add-current-date-header-to-pdf.cs) | Add Current Date Header to PDF Using AutoFiller | `BindPdf`, `Save`, `BindPdf` | Shows how to generate a PDF from a template with AutoFiller and then add a header containing the ... |
+| [async-fill-pdf-form-from-xlsx](./async-fill-pdf-form-from-xlsx.cs) | Asynchronously Fill PDF Form from XLSX Data | `Document`, `Form`, `FillField` | The example reads an XLSX file asynchronously, extracts field values, fills a PDF form using Aspo... |
+| [batch-fill-pdf-template-with-multiple-datatables](./batch-fill-pdf-template-with-multiple-datatables.cs) | Batch Fill PDF Template with Multiple DataTables | `AutoFiller`, `BindPdf`, `ImportDataTable` | Shows how to repeatedly fill a single PDF form template using a list of DataTable objects, produc... |
+| [bind-pdf-form-to-autofiller](./bind-pdf-form-to-autofiller.cs) | Bind PDF Form to AutoFiller and Save | `AutoFiller`, `BindPdf`, `Save` | Demonstrates how to bind an existing PDF form to an Aspose.Pdf.Facades.AutoFiller instance and sa... |
+| [configure-datacolumn-properties-fill-pdf-form](./configure-datacolumn-properties-fill-pdf-form.cs) | Configure DataColumn Properties and Fill PDF Form with AutoF... | `Document`, `Page`, `Rectangle` | The example shows how to set DataColumn flags such as ReadOnly and Unique before importing a Data... |
+| [convert-filled-pdf-to-byte-array](./convert-filled-pdf-to-byte-array.cs) | Convert Filled PDF to Byte Array Using PdfViewer | `PdfViewer`, `BindPdf`, `Save` | Shows how to load a filled PDF with Aspose.Pdf.Facades.PdfViewer and return its content as a byte... |
+| [extract-pdf-pages-with-custom-names](./extract-pdf-pages-with-custom-names.cs) | Extract PDF Pages with Custom File Names from DataTable | `PdfFileEditor`, `Extract` | Shows how to split a PDF into individual pages using Aspose.Pdf.Facades.PdfFileEditor and name ea... |
+| [fill-pdf-form-async-timeout](./fill-pdf-form-async-timeout.cs) | Fill PDF Form Asynchronously with Timeout Cancellation | `Form`, `BindPdf`, `FillField` | Demonstrates how to fill a PDF form using Aspose.Pdf.Facades, then save the document asynchronous... |
+| [fill-pdf-form-from-csv](./fill-pdf-form-from-csv.cs) | Fill PDF Form from CSV Data | `Form`, `FillField`, `Save` | Shows how to read a CSV file into a DataTable, map column names to PDF form field names, and use ... |
+| [fill-pdf-form-per-datarow-merge-pages](./fill-pdf-form-per-datarow-merge-pages.cs) | Fill PDF Form per DataTable Row and Merge Pages with Logging | `Document`, `AutoFiller`, `BindPdf` | Demonstrates how to fill a PDF form for each DataTable row using AutoFiller, merge the generated ... |
+| [fill-pdf-form-using-autofiller-datatable](./fill-pdf-form-using-autofiller-datatable.cs) | Fill PDF Form Using AutoFiller and DataTable | `AutoFiller`, `BindPdf`, `ImportDataTable` | Demonstrates how to bind a PDF template, import a DataTable whose column names match AcroForm fie... |
+| [fill-pdf-form-validate-size](./fill-pdf-form-validate-size.cs) | Fill PDF Form and Validate Generated File Size | `AutoFiller`, `BindPdf`, `ImportDataTable` | Demonstrates using Aspose.Pdf.Facades.AutoFiller to merge a DataTable into a PDF form, save the r... |
+| [fill-pdf-form-with-autofiller](./fill-pdf-form-with-autofiller.cs) | Fill PDF Form Using AutoFiller and DataTable | `AutoFiller`, `BindPdf`, `ImportDataTable` | Shows how to bind a PDF template, import data from a DataTable (simulating an XLSX source), and g... |
+| [fill-pdf-form-with-autofiller__v2](./fill-pdf-form-with-autofiller__v2.cs) | Fill PDF Form Using AutoFiller and Dispose Resources | `AutoFiller`, `InputFileName`, `ImportDataTable` | Demonstrates how to populate a PDF form from a DataTable using Aspose.Pdf.Facades.AutoFiller and ... |
+| [fill-pdf-form-with-csv-dynamic-mapping](./fill-pdf-form-with-csv-dynamic-mapping.cs) | Fill PDF Form Using CSV Data with Dynamic Column Mapping | `AutoFiller`, `BindPdf`, `ImportDataTable` | Demonstrates loading CSV data into a DataTable, applying a JSON‑based column‑to‑PDF‑field mapping... |
+| [fill-pdf-form-with-data-table-exception-handling](./fill-pdf-form-with-data-table-exception-handling.cs) | Fill PDF Form with DataTable and Handle Exceptions | `AutoFiller`, `BindPdf`, `ImportDataTable` | The example shows how to use Aspose.Pdf.Facades.AutoFiller to bind a PDF template, import data fr... |
+| [fill-pdf-form-with-datatable-custom-columns](./fill-pdf-form-with-datatable-custom-columns.cs) | Fill PDF Form Using DataTable with Custom Columns | `Document`, `Page`, `TextBoxField` | Shows how to create a PDF form, add matching DataTable columns (including extra custom columns) v... |
+| [generate-pdf-page-summary-report](./generate-pdf-page-summary-report.cs) | Generate PDF Page‑to‑DataTable Summary Report | `Document`, `Save`, `Add` | Creates a PDF (or a blank one if missing), populates a DataTable with identifiers for each page, ... |
+| [generate-pdf-per-datarow](./generate-pdf-per-datarow.cs) | Generate One‑Page PDFs from DataTable Rows | `Document`, `Page`, `Rectangle` | Demonstrates loading a PDF form template, filling its fields with values from each DataTable row,... |
+| [generate-pdfs-from-multiple-csv-worksheets](./generate-pdfs-from-multiple-csv-worksheets.cs) | Generate PDFs from Multiple CSV Worksheets using AutoFiller | `AutoFiller`, `BindPdf`, `ImportDataTable` | The example reads each CSV file in a folder, converts it to a DataTable, and uses Aspose.Pdf.Faca... |
+| [map-datatable-columns-to-pdf-form-fields](./map-datatable-columns-to-pdf-form-fields.cs) | Map DataTable Columns to PDF Form Fields with AutoFiller | `AutoFiller`, `BindPdf`, `ImportDataTable` | Shows how to rename DataTable columns to match PDF form field identifiers and use Aspose.Pdf.Faca... |
+| [merge-filled-pdfs-from-datatables](./merge-filled-pdfs-from-datatables.cs) | Merge Multiple Filled PDFs Generated from DataTables | `BindPdf`, `ImportDataTable`, `Save` | The example fills a PDF form template with data from several DataTables, saves each filled docume... |
+| [password-protect-filled-pdf](./password-protect-filled-pdf.cs) | Password‑Protect a Filled PDF with Aspose.Pdf | `Document`, `Save`, `PdfFileSecurity` | Demonstrates loading an already filled PDF and applying user and owner passwords with specific pr... |
+| [process-pdf-with-temp-folder](./process-pdf-with-temp-folder.cs) | Process PDF with Temporary Folder and Disk Buffer | `Document`, `PdfSaveOptions`, `PdfFileEditor` | Demonstrates how to use a unique temporary folder and disk buffering while processing large PDFs ... |
+| [save-filled-pdf-preserve-layout](./save-filled-pdf-preserve-layout.cs) | Save Filled PDF While Preserving Layout | `Form`, `BindPdf`, `Save` | Shows how to bind a filled PDF using the Form facade and save it to a new file, keeping the origi... |
+| [split-filled-pdf-into-single-page-pdfs](./split-filled-pdf-into-single-page-pdfs.cs) | Split Filled PDF into Single-Page PDFs | `PdfFileEditor`, `SplitToPages` | Demonstrates loading a filled PDF and using Aspose.Pdf.Facades.PdfFileEditor to split it into ind... |
+| [stream-large-csv-fill-pdf-form](./stream-large-csv-fill-pdf-form.cs) | Stream Large CSV Data into PDF Form Using AutoFiller | `AutoFiller`, `BindPdf`, `ImportDataTable` | Demonstrates how to read a large CSV file row‑by‑row into a DataTable and use Aspose.Pdf.Facades.... |
+| [validate-required-pdf-form-fields](./validate-required-pdf-form-fields.cs) | Validate Required PDF Form Fields Against DataTable Columns | `Form`, `FieldNames`, `IsRequiredField` | Shows how to check that every required AcroForm field in a PDF has a matching column in a DataTab... |
 
 ## Category Statistics
-- Total examples: 35
+- Total examples: 28
 
 ## Category-Specific Tips
 
@@ -129,5 +123,5 @@ using (Document doc = new Document("input.pdf"))
 - Review code examples in this folder for facades-fill-forms patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-04-10 | Run: `20260410_113311_e93f13`
+Updated: 2026-05-08 | Run: `20260508_144436_050a95`
 <!-- AUTOGENERATED:END -->

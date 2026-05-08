@@ -1,69 +1,44 @@
 using System;
-using System.Runtime.InteropServices;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // Needed for TextFragment
 
-namespace TableOffsetExample
+class Program
 {
-    class Program
+    static void Main()
     {
-        static void Main(string[] args)
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+
+        if (!File.Exists(inputPath))
         {
-            const string outputPath = "output.pdf";
-
-            // Create a new PDF document
-            using (Document document = new Document())
-            {
-                // Add a page to the document
-                Page page = document.Pages.Add();
-
-                // Create a table and offset it from the left margin
-                Table table = new Table();
-                table.Margin = new MarginInfo();
-                table.Margin.Left = 50.0; // offset 50 points from the left edge
-
-                // Define column widths
-                table.ColumnWidths = "100 100 100";
-
-                // Add a row with three cells
-                Row row = table.Rows.Add();
-                row.Cells.Add("Cell 1");
-                row.Cells.Add("Cell 2");
-                row.Cells.Add("Cell 3");
-
-                // Add the table to the page
-                page.Paragraphs.Add(table);
-
-                // Save the PDF document – guard against missing GDI+ (libgdiplus) on non‑Windows platforms
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    document.Save(outputPath);
-                }
-                else
-                {
-                    try
-                    {
-                        document.Save(outputPath);
-                    }
-                    catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
-                    {
-                        Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. " +
-                                          "The PDF was not saved using GDI+ dependent features.");
-                    }
-                }
-            }
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
         }
 
-        // Helper to detect a nested DllNotFoundException (e.g., missing libgdiplus)
-        private static bool ContainsDllNotFound(Exception? ex)
+        // Load the existing PDF inside a using block (ensures proper disposal)
+        using (Document doc = new Document(inputPath))
         {
-            while (ex != null)
-            {
-                if (ex is DllNotFoundException)
-                    return true;
-                ex = ex.InnerException;
-            }
-            return false;
+            // Create a new table
+            Table table = new Table();
+
+            // Set the left offset by configuring the MarginInfo.Left property (value in points)
+            table.Margin = new MarginInfo();
+            table.Margin.Left = 50; // offset 50 points from the left margin
+
+            // Optional: add a simple row and cell for demonstration
+            Row row = table.Rows.Add();
+            Cell cell = row.Cells.Add();
+            cell.Paragraphs.Add(new TextFragment("Sample cell"));
+
+            // Add the table to the first page
+            Page page = doc.Pages[1];
+            page.Paragraphs.Add(table);
+
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
+
+        Console.WriteLine($"Table offset applied and saved to '{outputPath}'.");
     }
 }

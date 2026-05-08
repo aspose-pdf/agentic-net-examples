@@ -12,29 +12,28 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a PdfContentEditor facade and bind it to the document
-            using (PdfContentEditor editor = new PdfContentEditor())
-            {
-                editor.BindPdf(doc);
+            // Create a PdfContentEditor and bind it to the loaded document
+            PdfContentEditor editor = new PdfContentEditor();
+            editor.BindPdf(doc);
 
-                // Generate a new UUID string
-                string uuid = Guid.NewGuid().ToString();
+            // Generate a new UUID string
+            string uuid = Guid.NewGuid().ToString();
 
-                // Replace the exact text "InvoiceNumber" on page 6 (1‑based indexing)
-                editor.ReplaceText("InvoiceNumber", 6, uuid);
-            }
+            // Replace the exact case‑sensitive text "InvoiceNumber" on page 6
+            // Page numbers are 1‑based, so 6 refers to the sixth page.
+            editor.ReplaceText("InvoiceNumber", 6, uuid);
 
             // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Replaced 'InvoiceNumber' with UUID and saved to '{outputPath}'.");
+        Console.WriteLine($"Text replaced with UUID and saved to '{outputPath}'.");
     }
 }

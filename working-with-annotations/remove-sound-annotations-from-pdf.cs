@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
@@ -8,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_no_sound.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,33 +16,35 @@ class Program
             return;
         }
 
-        // Load the PDF document (using rule for document disposal)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing as per rule)
-            foreach (Page page in doc.Pages)
+            // Iterate through each page (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Collect all SoundAnnotation instances on the current page
-                List<Annotation> soundAnnotations = new List<Annotation>();
+                Page page = doc.Pages[i];
+
+                // Collect all SoundAnnotation objects on this page
+                var soundAnnotations = new System.Collections.Generic.List<SoundAnnotation>();
                 foreach (Annotation ann in page.Annotations)
                 {
-                    if (ann is SoundAnnotation)
+                    if (ann is SoundAnnotation soundAnn)
                     {
-                        soundAnnotations.Add(ann);
+                        soundAnnotations.Add(soundAnn);
                     }
                 }
 
-                // Delete the collected SoundAnnotations from the page's annotation collection
-                foreach (Annotation soundAnn in soundAnnotations)
+                // Delete each collected SoundAnnotation from the page's annotation collection
+                foreach (SoundAnnotation soundAnn in soundAnnotations)
                 {
                     page.Annotations.Delete(soundAnn);
                 }
             }
 
-            // Save the modified PDF (using rule for saving)
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"All SoundAnnotations removed. Saved to '{outputPath}'.");
+        Console.WriteLine($"Sound annotations removed. Saved to '{outputPath}'.");
     }
 }

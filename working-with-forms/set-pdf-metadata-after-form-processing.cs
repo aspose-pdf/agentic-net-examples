@@ -1,55 +1,47 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf  = "filled_form.pdf";
+        const string outputPdf = "filled_form_with_metadata.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        try
+        // Load the PDF that contains the processed form fields
+        using (Document doc = new Document(inputPdf))
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
-            {
-                // ----- Form processing (example) -----
-                // Check if the document contains a form and set a field value
-                if (doc.Form != null && doc.Form.Count > 0)
-                {
-                    // The indexer returns a Field (derived from WidgetAnnotation).
-                    // Cast to Field to access the Value property safely.
-                    Field nameField = doc.Form["Name"] as Field;
-                    if (nameField != null)
-                    {
-                        nameField.Value = "John Doe";
-                    }
-                }
+            // -------------------------------------------------
+            // Form processing placeholder (e.g., fill fields)
+            // -------------------------------------------------
+            // Example: set a text field value
+            // Form form = doc.Form;
+            // if (form != null && form["Name"] != null)
+            // {
+            //     form["Name"].Value = "John Doe";
+            // }
 
-                // ----- Set PDF metadata -----
-                // Standard metadata properties are available via the Info dictionary
-                doc.Info.Author   = "Jane Smith";
-                doc.Info.Title    = "Processed Form Document";
-                doc.Info.Subject  = "Form processing example";
-                doc.Info.Keywords = "Aspose.Pdf, form, metadata";
+            // Set standard document metadata (author and title)
+            doc.Info.Author = "Acme Corp.";
+            doc.Info.Title  = "Customer Information Form";
 
-                // Save the modified PDF (PDF format, no SaveOptions needed)
-                doc.Save(outputPath);
-            }
+            // Optionally, set tagged‑content metadata as well
+            // The TaggedContent property returns a TaggedContent instance; no interface is required.
+            var tagged = doc.TaggedContent;
+            tagged.SetTitle("Customer Information Form");
+            tagged.SetLanguage("en-US");
 
-            Console.WriteLine($"PDF saved with metadata to '{outputPath}'.");
+            // Save the updated PDF
+            doc.Save(outputPdf);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF saved with metadata to '{outputPdf}'.");
     }
 }

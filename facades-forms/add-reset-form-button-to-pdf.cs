@@ -16,20 +16,20 @@ class Program
             return;
         }
 
-        // Load the PDF, add a push button that resets the form, and save the result
-        using (FormEditor formEditor = new FormEditor())
+        // Load the existing PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Load the source PDF
-            formEditor.BindPdf(inputPath);
+            // Initialize FormEditor with the loaded document
+            FormEditor formEditor = new FormEditor(doc);
 
             // Add a push button named "ResetForm" on page 1
-            // Rectangle coordinates: lower‑left (100,100), upper‑right (200,150)
-            formEditor.AddField(FieldType.PushButton, "ResetForm", 1, 100, 100, 200, 150);
+            // (llx, lly) = lower‑left corner, (urx, ury) = upper‑right corner
+            formEditor.AddField(FieldType.PushButton, "ResetForm", 1, 50, 750, 150, 800);
 
-            // Attach JavaScript to clear all form fields when the button is clicked
+            // Attach JavaScript that clears all form fields when the button is clicked
             formEditor.AddFieldScript("ResetForm", "this.resetForm();");
 
-            // Save the modified PDF
+            // Save the modified PDF (using FormEditor’s Save method)
             formEditor.Save(outputPath);
         }
 

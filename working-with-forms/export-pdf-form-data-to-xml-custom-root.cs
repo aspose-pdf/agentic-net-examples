@@ -8,53 +8,39 @@ class ExportFormDataToXml
     static void Main()
     {
         // Input PDF containing form fields
-        const string inputPdfPath = "input_form.pdf";
+        const string inputPdfPath = "form.pdf";
 
         // Desired output XML file
-        const string outputXmlPath = "form_data.xml";
+        const string outputXmlPath = "formData.xml";
 
         // Custom root element name required by the external system
         const string customRootName = "ExternalSystemFormData";
 
-        // Verify the input file exists
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle: load)
-        using (Document pdfDocument = new Document(inputPdfPath))
+        // Load the PDF document (using the standard Document constructor)
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // -----------------------------------------------------------------
-            // NOTE:
-            // The class `FormDataExportOptions` is not available in older versions of
-            // Aspose.Pdf, which leads to a CS0246 compile error. To keep the example
-            // functional across all supported versions we build the XML manually using
-            // the standard .NET `System.Xml.Linq` API.
-            // -----------------------------------------------------------------
+            // Initialize XML save options – no RootElementName property in the current
+            // Aspose.Pdf version, so we will rename the root element after the file is saved.
+            XmlSaveOptions xmlOptions = new XmlSaveOptions();
 
-            // Create the XML document with the required custom root element.
-            XElement root = new XElement(customRootName);
+            // Save the PDF content to a temporary XML file first.
+            string tempXmlPath = Path.GetTempFileName();
+            pdfDoc.Save(tempXmlPath, xmlOptions);
 
-            // Iterate over all form fields and add them to the XML.
-            // Each field is represented as a <field> element with "name" and "value"
-            // attributes. Adjust the structure if a different schema is required.
-            foreach (var field in pdfDocument.Form.Fields)
-            {
-                string fieldName = field?.FullName ?? string.Empty;
-                string fieldValue = field?.Value?.ToString() ?? string.Empty;
+            // Load the generated XML, replace the root element name, and write to the final path.
+            XDocument xDoc = XDocument.Load(tempXmlPath);
+            XElement newRoot = new XElement(customRootName, xDoc.Root.Elements());
+            XDocument finalDoc = new XDocument(newRoot);
+            finalDoc.Save(outputXmlPath);
 
-                XElement fieldElement = new XElement("field",
-                    new XAttribute("name", fieldName),
-                    new XAttribute("value", fieldValue));
-
-                root.Add(fieldElement);
-            }
-
-            // Save the constructed XML to the specified path.
-            XDocument xmlDoc = new XDocument(new XDeclaration("1.0", "utf-8", "yes"), root);
-            xmlDoc.Save(outputXmlPath);
+            // Clean up the temporary file.
+            File.Delete(tempXmlPath);
         }
 
         Console.WriteLine($"Form data exported to XML with root '{customRootName}' at '{outputXmlPath}'.");

@@ -8,7 +8,8 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "table_with_numbers.pdf";
+        // Paths (adjust as needed)
+        const string outputPath = "AutoNumberedTable.pdf";
 
         // Create a new PDF document
         using (Document doc = new Document())
@@ -16,52 +17,71 @@ class Program
             // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Create a table with three columns
+            // Create a table with two columns
             Table table = new Table
             {
-                // Define column widths (first column for numbers)
-                ColumnWidths = "50 150 150",
-                // Optional styling for cells
-                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f),
-                DefaultCellPadding = new MarginInfo(5, 5, 5, 5)
+                // Optional: set table position and width
+                Left = 50,
+                Top = 700,
+                ColumnWidths = "50 200" // first column 50 units, second column 200 units
             };
 
-            // Define how many rows the table will have
-            int rowCount = 10;
+            // Sample data for the second column
+            string[] data = { "Apple", "Banana", "Cherry", "Date", "Elderberry" };
 
-            // Populate the table
-            for (int i = 0; i < rowCount; i++)
+            // Add rows: first column will be filled later with numbers
+            foreach (string item in data)
             {
                 // Add a new row
                 Row row = table.Rows.Add();
 
-                // First cell: sequential number (1‑based)
-                TextFragment numberFragment = new TextFragment((i + 1).ToString());
-                row.Cells.Add(numberFragment);
+                // Add empty cell for the auto‑numbered column
+                row.Cells.Add(new Cell());
 
-                // Additional sample cells
-                row.Cells.Add(new TextFragment($"Data A{i + 1}"));
-                row.Cells.Add(new TextFragment($"Data B{i + 1}"));
+                // Add cell with actual data
+                Cell dataCell = new Cell();
+                dataCell.Paragraphs.Add(new TextFragment(item));
+                row.Cells.Add(dataCell);
             }
 
-            // Add the completed table to the page
+            // Insert sequential numbers into the first cell of each row
+            for (int i = 0; i < table.Rows.Count; i++)
+            {
+                Row row = table.Rows[i];
+                // Ensure the first cell exists
+                if (row.Cells.Count > 0)
+                {
+                    // Clear any existing content (if any) and add the number
+                    row.Cells[0].Paragraphs.Clear();
+                    row.Cells[0].Paragraphs.Add(new TextFragment((i + 1).ToString()));
+                }
+            }
+
+            // Add the table to the page
             page.Paragraphs.Add(table);
 
-            // Save the PDF document – guard against missing GDI+ (libgdiplus) on non‑Windows platforms
-            try
+            // Save the PDF – guard against missing GDI+ (libgdiplus) on non‑Windows platforms
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 doc.Save(outputPath);
-                Console.WriteLine($"Saved PDF with auto‑numbered column to '{outputPath}'.");
+                Console.WriteLine($"PDF saved to '{outputPath}'.");
             }
-            catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
+            else
             {
-                Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. PDF was not saved.");
-                // Optionally, you could implement an alternative saving strategy here.
+                try
+                {
+                    doc.Save(outputPath);
+                    Console.WriteLine($"PDF saved to '{outputPath}'.");
+                }
+                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
+                {
+                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. PDF was not saved.");
+                }
             }
         }
     }
 
-    // Helper that walks the inner‑exception chain looking for a DllNotFoundException (e.g., libgdiplus)
+    // Helper that walks the inner‑exception chain looking for a DllNotFoundException
     private static bool ContainsDllNotFound(Exception? ex)
     {
         while (ex != null)

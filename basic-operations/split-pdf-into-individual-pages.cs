@@ -6,51 +6,48 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "large_document.pdf";          // source PDF
-        const string outputRoot   = "SplitPages";                 // root folder for all pages
+        const string inputPdf = "large_input.pdf";          // Path to the source PDF
+        const string outputRoot = "SplitPages";             // Root folder for all page folders
 
-        // Verify source file exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Create (or clean) the root output directory
-        if (Directory.Exists(outputRoot))
-            Directory.Delete(outputRoot, recursive: true);
+        // Ensure the root output directory exists
         Directory.CreateDirectory(outputRoot);
 
         try
         {
-            // Load the source PDF – using ensures deterministic disposal
-            using (Document sourceDoc = new Document(inputPdfPath))
+            // Load the source PDF (lifecycle: load)
+            using (Document sourceDoc = new Document(inputPdf))
             {
-                int pageCount = sourceDoc.Pages.Count; // 1‑based count
+                int pageCount = sourceDoc.Pages.Count; // 1‑based page count
 
-                // Iterate over each page (Aspose.Pdf uses 1‑based indexing)
+                // Iterate over each page (page indexing is 1‑based)
                 for (int i = 1; i <= pageCount; i++)
                 {
-                    // Create a sub‑folder for the current page
-                    string pageFolder = Path.Combine(outputRoot, $"Page_{i}");
-                    Directory.CreateDirectory(pageFolder);
-
-                    // Create a new PDF containing only the current page
+                    // Create a new empty PDF document (lifecycle: create)
                     using (Document singlePageDoc = new Document())
                     {
-                        // Add the page from the source document
+                        // Add the current page from the source document
                         singlePageDoc.Pages.Add(sourceDoc.Pages[i]);
 
-                        // Save the single‑page PDF inside its folder
-                        string outputPdfPath = Path.Combine(pageFolder, $"Page_{i}.pdf");
-                        singlePageDoc.Save(outputPdfPath);
-                    }
+                        // Prepare a folder for this page
+                        string pageFolder = Path.Combine(outputRoot, $"Page_{i}");
+                        Directory.CreateDirectory(pageFolder);
 
-                    Console.WriteLine($"Saved page {i} to '{pageFolder}'.");
+                        // Save the single‑page PDF into its folder (lifecycle: save)
+                        string outputPath = Path.Combine(pageFolder, $"Page_{i}.pdf");
+                        singlePageDoc.Save(outputPath);
+
+                        Console.WriteLine($"Saved page {i} to '{outputPath}'");
+                    }
                 }
             }
 
-            Console.WriteLine("Batch split completed successfully.");
+            Console.WriteLine("Batch splitting completed successfully.");
         }
         catch (Exception ex)
         {

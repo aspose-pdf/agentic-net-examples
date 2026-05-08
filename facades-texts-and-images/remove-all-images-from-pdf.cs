@@ -2,48 +2,58 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-class Program
+public static class PdfImageRemover
 {
-    // Removes all images from a PDF file and saves the result to a new file.
-    static void RemoveAllImages(string inputPdfPath, string outputPdfPath)
+    /// <summary>
+    /// Removes all images from the specified PDF file and saves the result to a new file.
+    /// </summary>
+    /// <param name="inputPath">Path to the source PDF.</param>
+    /// <param name="outputPath">Path where the image‑free PDF will be saved.</param>
+    public static void RemoveAllImages(string inputPath, string outputPath)
     {
-        // Ensure the source file exists.
-        if (!File.Exists(inputPdfPath))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
-            return;
-        }
+        // Validate input file existence.
+        if (!File.Exists(inputPath))
+            throw new FileNotFoundException($"Input PDF not found: {inputPath}");
 
-        // PdfContentEditor is a Facade class that can edit PDF content.
-        // It implements IDisposable, so we wrap it in a using block.
+        // PdfContentEditor implements IDisposable, so wrap it in a using block.
         using (PdfContentEditor editor = new PdfContentEditor())
         {
-            // Bind the existing PDF document.
-            editor.BindPdf(inputPdfPath);
+            // Bind the source PDF to the editor.
+            editor.BindPdf(inputPath);
 
-            // Delete all images from the document.
+            // Delete every image from the document.
             editor.DeleteImage();
 
-            // Save the modified PDF to the specified output path.
-            editor.Save(outputPdfPath);
+            // Save the modified document to the desired output path.
+            editor.Save(outputPath);
         }
-
-        Console.WriteLine($"All images removed. Saved to '{outputPdfPath}'.");
     }
+}
 
-    static void Main(string[] args)
+public class Program
+{
+    /// <summary>
+    /// Entry point required for a console‑style build. Demonstrates the image‑removal utility.
+    /// </summary>
+    public static void Main(string[] args)
     {
-        // Example usage:
-        // args[0] = input PDF path, args[1] = output PDF path
-        if (args.Length < 2)
+        if (args.Length != 2)
         {
-            Console.WriteLine("Usage: RemoveImages <input.pdf> <output.pdf>");
+            Console.WriteLine("Usage: PdfImageRemover <inputPdfPath> <outputPdfPath>");
             return;
         }
 
         string inputPath = args[0];
         string outputPath = args[1];
 
-        RemoveAllImages(inputPath, outputPath);
+        try
+        {
+            PdfImageRemover.RemoveAllImages(inputPath, outputPath);
+            Console.WriteLine($"All images removed. Output saved to: {outputPath}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

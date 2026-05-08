@@ -8,25 +8,32 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output_pdfa1b.pdf";
-        const string logPath = "conversion_log.xml"; // optional conversion log
+        const string logPath = "conversion_log.txt";
 
+        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the source PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Convert the document to PDF/A‑1b compliance.
-            // ConvertErrorAction.Delete removes objects that prevent successful conversion.
-            doc.Convert(logPath, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
+            // Load the PDF document (using statement ensures proper disposal)
+            using (Document doc = new Document(inputPath))
+            {
+                // Convert to PDF/A‑1b compliance. The conversion is performed in‑place.
+                doc.Convert(logPath, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
 
-            // Save the converted document. No special SaveOptions are required.
-            doc.Save(outputPath);
+                // Save the converted PDF/A‑1b document
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"PDF/A‑1b file saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF/A‑1b file saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

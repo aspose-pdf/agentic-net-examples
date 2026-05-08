@@ -15,16 +15,25 @@ class Program
             return;
         }
 
-        // Adjust zoom of page 3 to 150% using PdfPageEditor facade
+        // Adjust zoom of page 3 to 150% using PdfPageEditor (Facades API)
         using (PdfPageEditor editor = new PdfPageEditor())
         {
-            editor.BindPdf(inputPath);               // Load the PDF
-            editor.ProcessPages = new int[] { 3 };   // Target only page 3
-            editor.Zoom = 1.5f;                      // 1.0 = 100%, so 1.5 = 150%
-            editor.ApplyChanges();                   // Apply the modifications
-            editor.Save(outputPath);                 // Save the result
+            // Load the PDF file
+            editor.BindPdf(inputPath);
+
+            // Process only page 3 (1‑based indexing)
+            editor.ProcessPages = new int[] { 3 };
+
+            // Set zoom factor (1.0 = 100%)
+            editor.Zoom = 1.5f;
+
+            // Apply the changes to the document
+            editor.ApplyChanges();
+
+            // Save the modified PDF
+            editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Page 3 zoom set to 150% and saved as '{outputPath}'.");
+        Console.WriteLine($"Zoom adjusted PDF saved to '{outputPath}'.");
     }
 }

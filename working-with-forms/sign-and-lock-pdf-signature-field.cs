@@ -7,21 +7,28 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "signed_locked.pdf";
-        const string pfxPath = "cert.pfx";
-        const string pfxPassword = "password";
+        const string inputPdfPath  = "input.pdf";          // PDF containing the 'ClientSignature' field
+        const string outputPdfPath = "signed_locked.pdf"; // Resulting PDF
+        const string pfxPath       = "certificate.pfx";   // PKCS#12 certificate file
+        const string pfxPassword   = "password";          // Certificate password
 
-        if (!File.Exists(inputPath) || !File.Exists(pfxPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine("Required input PDF or certificate file not found.");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        if (!File.Exists(pfxPath))
+        {
+            Console.Error.WriteLine($"Certificate file not found: {pfxPath}");
+            return;
+        }
+
+        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        using (Document doc = new Document(inputPdfPath))
         {
             // Retrieve the signature field named 'ClientSignature'
+            // The Form collection returns a generic Field; cast to SignatureField
             SignatureField sigField = doc.Form["ClientSignature"] as SignatureField;
             if (sigField == null)
             {
@@ -29,27 +36,32 @@ class Program
                 return;
             }
 
-            // Create a PKCS#7 signature using the certificate
-            PKCS7 pkcs7 = new PKCS7(pfxPath, pfxPassword)
+            // Create a PKCS#7 signature object using the certificate
+            // Signature(Stream, string) constructor is used to avoid file path issues
+            using (FileStream pfxStream = File.OpenRead(pfxPath))
             {
-                Reason = "Approved",
-                Location = "Company HQ"
-            };
+                PKCS7 pkcs7Signature = new PKCS7(pfxStream, pfxPassword);
 
-            // Sign the field
-            sigField.Sign(pkcs7);
+                // Optional: set signature appearance properties
+                pkcs7Signature.Reason   = "Approved";
+                pkcs7Signature.Location = "Company HQ";
+                pkcs7Signature.ContactInfo = "contact@example.com";
 
-            // Lock the field to prevent further modifications
+                // Sign the field
+                sigField.Sign(pkcs7Signature);
+            }
+
+            // Lock the signature field to prevent further edits
             sigField.ReadOnly = true;
 
-            // Optional: enforce signature integrity on subsequent saves
-            doc.EnableSignatureSanitization = true;
+            // Optional: enforce that any further changes to the document raise an exception
+            // (prevents accidental modifications after signing)
             doc.HandleSignatureChange = true;
 
-            // Save the signed and locked PDF
-            doc.Save(outputPath);
+            // Save the signed and locked PDF (lifecycle rule: save inside using block)
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Signed and locked PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Document signed and field locked. Saved to '{outputPdfPath}'.");
     }
 }

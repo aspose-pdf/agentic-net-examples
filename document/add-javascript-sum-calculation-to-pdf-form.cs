@@ -8,110 +8,55 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "FormWithSum.pdf";
 
-        Document doc;
-        if (File.Exists(inputPath))
+        // Create a new PDF document and add a page.
+        using (Document doc = new Document())
         {
-            // Load existing PDF
-            doc = new Document(inputPath);
-        }
-        else
-        {
-            // Create a new PDF with a single blank page when the source file is missing
-            doc = new Document();
-            doc.Pages.Add();
-        }
+            Page page = doc.Pages.Add();
 
-        // Ensure that calculated fields are updated automatically
-        doc.Form.AutoRecalculate = true;
+            // Define rectangles for the two input fields and the result field.
+            // Rectangle constructor: (llx, lly, urx, ury)
+            Rectangle rectField1 = new Rectangle(50, 700, 200, 730);
+            Rectangle rectField2 = new Rectangle(50, 650, 200, 680);
+            Rectangle rectResult = new Rectangle(50, 600, 200, 630);
 
-        // -----------------------------------------------------------------
-        // Ensure the two source fields exist (named "Field1" and "Field2")
-        // -----------------------------------------------------------------
-        TextBoxField field1;
-        if (!doc.Form.HasField("Field1"))
-        {
-            field1 = new TextBoxField(
-                doc.Pages[1],
-                new Aspose.Pdf.Rectangle(100, 700, 250, 730))
-            {
-                PartialName = "Field1",
-                Name = "Field1"
-            };
+            // Create text box fields using the (Page, Rectangle) constructor.
+            TextBoxField field1 = new TextBoxField(page, rectField1);
+            field1.PartialName = "Field1";
+
+            TextBoxField field2 = new TextBoxField(page, rectField2);
+            field2.PartialName = "Field2";
+
+            TextBoxField resultField = new TextBoxField(page, rectResult);
+            resultField.PartialName = "Result";
+
+            // Add the fields to the document's form.
             doc.Form.Add(field1);
-        }
-        else
-        {
-            // The indexer returns a WidgetAnnotation; cast it to TextBoxField (or Field)
-            field1 = doc.Form["Field1"] as TextBoxField;
-            if (field1 == null)
-                throw new InvalidOperationException("Existing field 'Field1' is not a TextBoxField.");
-        }
-
-        TextBoxField field2;
-        if (!doc.Form.HasField("Field2"))
-        {
-            field2 = new TextBoxField(
-                doc.Pages[1],
-                new Aspose.Pdf.Rectangle(100, 650, 250, 680))
-            {
-                PartialName = "Field2",
-                Name = "Field2"
-            };
             doc.Form.Add(field2);
-        }
-        else
-        {
-            field2 = doc.Form["Field2"] as TextBoxField;
-            if (field2 == null)
-                throw new InvalidOperationException("Existing field 'Field2' is not a TextBoxField.");
-        }
+            doc.Form.Add(resultField);
 
-        // ---------------------------------------------------------------
-        // Create the result field that will display the sum (read‑only)
-        // ---------------------------------------------------------------
-        TextBoxField sumField;
-        if (!doc.Form.HasField("SumField"))
-        {
-            sumField = new TextBoxField(
-                doc.Pages[1],
-                new Aspose.Pdf.Rectangle(100, 600, 250, 630))
-            {
-                PartialName = "SumField",
-                Name = "SumField",
-                ReadOnly = true // make the field non‑editable
-            };
-            doc.Form.Add(sumField);
-        }
-        else
-        {
-            sumField = doc.Form["SumField"] as TextBoxField;
-            if (sumField == null)
-                throw new InvalidOperationException("Existing field 'SumField' is not a TextBoxField.");
+            // JavaScript that calculates the sum of Field1 and Field2.
+            // The script is attached to the result field's OnCalculate action.
+            string jsCode = @"
+                var f1 = this.getField('Field1').value;
+                var f2 = this.getField('Field2').value;
+                // Convert to numbers; empty fields are treated as 0.
+                var n1 = isNaN(parseFloat(f1)) ? 0 : parseFloat(f1);
+                var n2 = isNaN(parseFloat(f2)) ? 0 : parseFloat(f2);
+                event.value = n1 + n2;
+            ";
+
+            // Assign the JavaScript action to the result field.
+            resultField.Actions.OnCalculate = new JavascriptAction(jsCode);
+
+            // Optional: make the result field read‑only so the user cannot edit it.
+            resultField.ReadOnly = true;
+
+            // Save the PDF.
+            doc.Save(outputPath);
         }
 
-        // ---------------------------------------------------------------
-        // JavaScript that reads the two source fields, adds them,
-        // and writes the result into the sum field.
-        // ---------------------------------------------------------------
-        string js = @"
-            var v1 = this.getField('Field1').value;
-            var v2 = this.getField('Field2').value;
-            var sum = (parseFloat(v1) || 0) + (parseFloat(v2) || 0);
-            this.getField('SumField').value = sum;
-        ";
-
-        // Attach the script to the sum field's OnCalculate action
-        sumField.Actions.OnCalculate = new JavascriptAction(js);
-
-        // Optionally trigger the calculation immediately (e.g., for a fresh PDF)
-        sumField.ExecuteFieldJavaScript(new JavascriptAction(js));
-
-        // Save the modified PDF
-        doc.Save(outputPath);
-
-        Console.WriteLine($"PDF with custom JavaScript saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with calculated sum saved to '{outputPath}'.");
     }
 }

@@ -1,45 +1,41 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "signed_input.pdf";   // existing signed PDF
+        const string inputPath = "signed_input.pdf";   // existing signed PDF
         const string outputPath = "privileged_output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Define passwords (can be empty strings if no password is required)
-        const string userPassword  = "user123";
-        const string ownerPassword = "owner123";
-
-        // Permissions: allow printing only; do NOT include ExtractContent or FillForm
-        Permissions perms = Permissions.PrintDocument;
-
-        try
+        // Load the existing PDF (already signed). We only need to apply permission restrictions.
+        using (Document doc = new Document(inputPath))
         {
-            // Load the signed PDF
-            using (Document doc = new Document(inputPath))
-            {
-                // Apply encryption with the desired permissions
-                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+            // ---------------------------------------------------------------
+            // 1. Restrict permissions: allow only printing, disable content
+            //    extraction and form filling.
+            // ---------------------------------------------------------------
+            Permissions allowedPermissions = Permissions.PrintDocument; // only printing allowed
+            doc.Encrypt(
+                userPassword: string.Empty,
+                ownerPassword: string.Empty,
+                permissions: allowedPermissions,
+                cryptoAlgorithm: CryptoAlgorithm.AESx256);
 
-                // Save the result; the document now has privileges that disable
-                // content extraction and form filling
-                doc.Save(outputPath);
-            }
+            // ---------------------------------------------------------------
+            // 2. Save the updated PDF.
+            // ---------------------------------------------------------------
+            doc.Save(outputPath);
+        }
 
-            Console.WriteLine($"Privileged PDF saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"Document saved with restricted privileges to '{outputPath}'.");
     }
 }

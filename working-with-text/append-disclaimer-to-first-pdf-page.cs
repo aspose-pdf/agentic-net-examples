@@ -9,6 +9,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
+        const string disclaimer = "Disclaimer: This document is confidential.";
 
         if (!File.Exists(inputPath))
         {
@@ -19,23 +20,22 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Access the first page (1‑based indexing)
+            // Get the first page (Aspose.Pdf uses 1‑based indexing)
             Page page = doc.Pages[1];
 
-            // Ensure new content is added after existing paragraphs
+            // Ensure new paragraphs are added after the existing ones
             page.IsAddParagraphsAfterLast = true;
 
-            // Create the disclaimer text fragment
-            TextFragment disclaimer = new TextFragment("Disclaimer: This document is confidential.");
-            disclaimer.TextState.FontSize = 10;
-            disclaimer.TextState.Font = FontRepository.FindFont("Helvetica");
-            disclaimer.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
+            // Create a TextFragment containing the disclaimer
+            TextFragment disclaimerFragment = new TextFragment(disclaimer);
+            disclaimerFragment.TextState.FontSize = 10;
+            disclaimerFragment.TextState.Font = FontRepository.FindFont("Helvetica");
+            disclaimerFragment.TextState.ForegroundColor = Color.Gray;
 
-            // Append the fragment to the page using TextBuilder
-            TextBuilder builder = new TextBuilder(page);
-            builder.AppendText(disclaimer);
+            // Append the TextFragment to the end of the page's paragraph collection
+            page.Paragraphs.Add(disclaimerFragment);
 
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,23 +16,21 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Create a page‑number stamp. The default format is "#" which will be
+            // replaced by the actual page number when the stamp is applied.
+            PageNumberStamp pageNumberStamp = new PageNumberStamp();
+
+            // Position the stamp at the bottom center of each page
+            pageNumberStamp.HorizontalAlignment = HorizontalAlignment.Center;
+            pageNumberStamp.VerticalAlignment   = VerticalAlignment.Bottom;
+            pageNumberStamp.BottomMargin        = 20; // adjust margin as needed
+
+            // Apply the stamp to every page in the document
+            foreach (Page page in doc.Pages)
             {
-                Page page = doc.Pages[i];
-
-                // Create a page number stamp; default format is "#"
-                PageNumberStamp pageNumberStamp = new PageNumberStamp();
-
-                // Position the stamp at the bottom center of the page
-                pageNumberStamp.HorizontalAlignment = HorizontalAlignment.Center;
-                pageNumberStamp.VerticalAlignment   = VerticalAlignment.Bottom;
-                pageNumberStamp.BottomMargin        = 20; // distance from bottom edge
-
-                // Add the stamp to the current page
                 page.AddStamp(pageNumberStamp);
             }
 
@@ -40,6 +38,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with footers saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with page‑number footers saved to '{outputPath}'.");
     }
 }

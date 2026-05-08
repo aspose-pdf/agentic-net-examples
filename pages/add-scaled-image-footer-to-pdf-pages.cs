@@ -6,52 +6,55 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_with_footer.pdf";
-        const string footerImg = "footer.png";   // path to the footer image
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string footerImagePath = "footer.png";
+        const double scaleFactor = 0.5; // Scale the image to 50% of page width
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(footerImg))
-        {
-            Console.Error.WriteLine($"Footer image not found: {footerImg}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (using the recommended load pattern)
-        using (Document doc = new Document(inputPdf))
+        if (!File.Exists(footerImagePath))
         {
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            Console.Error.WriteLine($"Footer image not found: {footerImagePath}");
+            return;
+        }
+
+        // Load the PDF document (lifecycle rule: wrap in using)
+        using (Document doc = new Document(inputPath))
+        {
+            // Iterate through all pages (1‑based indexing)
+            foreach (Page page in doc.Pages)
             {
-                Page page = doc.Pages[i];
+                // Get page dimensions
+                double pageWidth  = page.Rect.Width;
+                double pageHeight = page.Rect.Height;
 
-                // Determine a rectangle at the bottom of the page.
-                // Here we use 10 % of the page height for the footer height.
-                double footerHeight = page.Rect.Height * 0.10;
-                double pageWidth    = page.Rect.Width;
+                // Compute desired image width (scaled) and a proportional height.
+                // Since we don't have the original image dimensions without loading it,
+                // we set the image width to the scaled page width and a fixed footer height.
+                double footerHeight = 50; // points; adjust as needed
 
-                // Rectangle coordinates: (llx, lly, urx, ury)
-                // Place the rectangle at the bottom (y = 0) spanning the full width.
+                // Define rectangle positioned at the bottom of the page
+                // (origin is lower‑left corner)
                 Aspose.Pdf.Rectangle footerRect = new Aspose.Pdf.Rectangle(
-                    0,                     // left
-                    0,                     // bottom
-                    pageWidth,             // right
-                    footerHeight           // top
-                );
+                    0,                     // llx
+                    0,                     // lly (bottom of page)
+                    pageWidth,             // urx (full page width)
+                    footerHeight);         // ury
 
                 // Add the image to the page within the rectangle.
-                // The image will be scaled proportionally to fit the rectangle.
-                page.AddImage(footerImg, footerRect);
+                // The AddImage method scales the image to fit the rectangle while preserving aspect ratio.
+                page.AddImage(footerImagePath, footerRect);
             }
 
-            // Save the modified PDF (standard Save without extra options writes PDF)
-            doc.Save(outputPdf);
+            // Save the modified PDF (lifecycle rule: use Save inside using)
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with image footer saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF with image footer saved to '{outputPath}'.");
     }
 }

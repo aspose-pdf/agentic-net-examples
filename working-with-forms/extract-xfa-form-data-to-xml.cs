@@ -1,14 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 using System.Xml;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";      // PDF containing XFA form
-        const string outputXml = "xfa_data.xml";   // Destination XML file
+        const string inputPdf = "input.pdf";
+        const string outputXml = "xfa_data.xml";
 
         if (!File.Exists(inputPdf))
         {
@@ -16,23 +17,23 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdf))
+        // Load the PDF document inside a using block for proper disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Verify that the document actually contains an XFA form
-            if (!pdfDoc.Form.HasXfa)
+            // Verify that the PDF contains an XFA form
+            if (doc.Form.HasXfa)
+            {
+                // Retrieve the XFA data package as an XmlDocument
+                XmlDocument xfaXml = doc.Form.XFA.XDP;
+
+                // Save the XML representation to a file
+                xfaXml.Save(outputXml);
+                Console.WriteLine($"XFA data saved to '{outputXml}'.");
+            }
+            else
             {
                 Console.WriteLine("The PDF does not contain an XFA form.");
-                return;
             }
-
-            // Access the XFA data package (XDP) which is an XmlDocument
-            XmlDocument xfaXml = pdfDoc.Form.XFA.XDP;
-
-            // Save the XML representation to the specified file
-            xfaXml.Save(outputXml);
         }
-
-        Console.WriteLine($"XFA data extracted and saved to '{outputXml}'.");
     }
 }

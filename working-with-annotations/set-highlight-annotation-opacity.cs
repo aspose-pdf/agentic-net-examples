@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_highlights.pdf";
+        const string outputPath = "output_highlight_opacity.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,29 +16,31 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF (document disposal with using)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing)
+            // Pages are 1‑based
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Iterate through all annotations on the page
-                foreach (Annotation ann in page.Annotations)
+                // Annotations collection is also 1‑based
+                for (int j = 1; j <= page.Annotations.Count; j++)
                 {
-                    // Identify HighlightAnnotation instances and set opacity to 60%
+                    Annotation ann = page.Annotations[j];
+
+                    // Change opacity of HighlightAnnotation instances
                     if (ann is HighlightAnnotation highlight)
                     {
-                        highlight.Opacity = 0.6; // Opacity range is 0.0 (transparent) to 1.0 (opaque)
+                        highlight.Opacity = 0.6; // 60 % opacity
                     }
                 }
             }
 
-            // Save the modified document (lifecycle rule: use Save)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"All highlight annotations updated and saved to '{outputPath}'.");
+        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }
 }

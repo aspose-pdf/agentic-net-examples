@@ -1,12 +1,12 @@
 {
   "category": "working-with-xml",
-  "nuget_version": "26.3.0",
-  "last_updated": "2026-04-10T07:26:12Z",
+  "nuget_version": "26.4.0",
+  "last_updated": "2026-05-08T10:00:19Z",
   "examples": {
     "convert-xml-to-pdf-default-xslt": {
-      "title": "Convert XML to PDF Using Default XSLT",
+      "title": "Convert XML to PDF Using Default XSLT Transformation",
       "filename": "convert-xml-to-pdf-default-xslt.cs",
-      "description": "Shows how to load an XML file with Aspose.Pdf's XmlLoadOptions and generate a PDF using the built‑in default XSLT transformation.",
+      "description": "Demonstrates loading an XML file with Aspose.Pdf's XmlLoadOptions and converting it directly to a PDF using the default XSLT transformation.",
       "tags": [
         "xml",
         "pdf",
@@ -20,34 +20,13 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "load-xml-from-memorystream-to-pdf": {
-      "title": "Load XML from MemoryStream and Add to PDF",
-      "filename": "load-xml-from-memorystream-to-pdf.cs",
-      "description": "Shows how to read XML data from a MemoryStream, convert it to a string, and insert it as a TextFragment into a PDF document using Aspose.Pdf.",
-      "tags": [
-        "xml",
-        "memorystream",
-        "pdf",
-        "aspose.pdf",
-        "textfragment"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:26:12Z",
-      "status": "verified"
-    },
-    "convert-xml-xsl-to-pdf": {
-      "title": "Convert XML with XSLT to PDF using Aspose.Pdf",
-      "filename": "convert-xml-xsl-to-pdf.cs",
-      "description": "Demonstrates loading an XML file with a custom XSLT stylesheet via XmlLoadOptions and converting the transformed content to a PDF document using Aspose.Pdf.",
+    "convert-xml-to-pdf-with-xslt": {
+      "title": "Convert XML to PDF with XSLT Transformation using Aspose.Pdf",
+      "filename": "convert-xml-to-pdf-with-xslt.cs",
+      "description": "Demonstrates loading an XML file with a custom XSLT stylesheet via Aspose.Pdf's XmlLoadOptions and saving the transformed result as a PDF document.",
       "tags": [
         "xml",
         "xslt",
@@ -57,56 +36,61 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.XmlLoadOptions"
+        "Aspose.Pdf.XmlLoadOptions",
+        "Aspose.Pdf.LoadOptions",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document..ctor(string, LoadOptions)"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
     "validate-xml-xsd-generate-pdf": {
-      "title": "Validate XML against XSD and Generate PDF",
+      "title": "Validate XML with XSD and Generate PDF using Aspose.Pdf",
       "filename": "validate-xml-xsd-generate-pdf.cs",
-      "description": "The example validates an XML file using an XSD schema and, if valid, loads it into an Aspose.Pdf Document to create a PDF file.",
+      "description": "The example validates an XML file against an XSD schema and, if valid, loads it into an Aspose.Pdf Document via XmlLoadOptions to create a PDF.",
       "tags": [
         "xml",
         "xsd",
-        "validation",
         "pdf",
-        "aspose.pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.XmlLoadOptions",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
-      "status": "verified"
-    },
-    "resize-pdf-pages-using-xml": {
-      "title": "Resize PDF Pages Using XML-Defined Page Size",
-      "filename": "resize-pdf-pages-using-xml.cs",
-      "description": "Reads width and height values from an XML file and applies them to each page of a PDF document using Aspose.Pdf.",
-      "tags": [
-        "pdf",
-        "pagesize",
-        "xml",
-        "aspose.pdf",
+        "aspose-pdf",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page.SetPageSize",
+        "Aspose.Pdf.XmlLoadOptions",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
+      "status": "verified"
+    },
+    "set-pdf-page-size-from-xml": {
+      "title": "Set PDF Page Size from XML",
+      "filename": "set-pdf-page-size-from-xml.cs",
+      "description": "Shows how to read page width and height from an XML file and apply those dimensions to every page of a PDF using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "pagesize",
+        "xml",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.SetPageSize",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.PageCollection"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
     "set-pdf-page-orientation-from-xml": {
       "title": "Set PDF Page Orientation from XML",
       "filename": "set-pdf-page-orientation-from-xml.cs",
-      "description": "Demonstrates loading an XML layout file, creating a PDF with Aspose.Pdf, and setting each page's orientation (landscape or portrait) based on XML attributes.",
+      "description": "Shows how to read an XML layout file to decide whether pages should be landscape and then apply that orientation to all pages of a PDF using Aspose.Pdf.",
       "tags": [
         "pdf",
         "orientation",
@@ -116,17 +100,19 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.PageInfo",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.PageInfo.IsLandscape",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Printing.PageSettings"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
     "set-custom-page-margins-from-xml": {
-      "title": "Set Custom Page Margins from XML",
+      "title": "Set Custom Page Margins from XML per Section",
       "filename": "set-custom-page-margins-from-xml.cs",
-      "description": "Demonstrates loading margin definitions from an XML file and applying them to specific page ranges in a PDF using Aspose.Pdf.",
+      "description": "Shows how to read margin values from an XML file and apply them to specific page ranges in a PDF using Aspose.Pdf.",
       "tags": [
         "pdf",
         "margins",
@@ -137,144 +123,67 @@
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.MarginInfo",
-        "Aspose.Pdf.PageInfo",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
-      "status": "verified"
-    },
-    "insert-automatic-page-numbers-using-xslt": {
-      "title": "Insert Automatic Page Numbers into PDF using XSLT",
-      "filename": "insert-automatic-page-numbers-using-xslt.cs",
-      "description": "Demonstrates loading XML with an XSLT transformation, creating a PDF, and automatically updating pagination placeholders with actual page numbers.",
-      "tags": [
-        "pdf",
-        "xslt",
-        "pagination",
-        "aspose.pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.XmlLoadOptions",
-        "Aspose.Pdf.PageCollection.UpdatePagination",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
-      "status": "verified"
-    },
-    "generate-pdf-table-from-xml-data": {
-      "title": "Generate PDF Table from XML Data",
-      "filename": "generate-pdf-table-from-xml-data.cs",
-      "description": "Shows how to load tabular data from an XML file into a DataSet and render it as a table in a PDF document using Aspose.Pdf.",
-      "tags": [
-        "xml",
-        "pdf",
-        "table",
-        "aspose.pdf",
-        "report"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.XmlLoadOptions",
-        "Aspose.Pdf.Text.Table",
-        "Aspose.Pdf.Text.Table.ImportDataTable",
-        "Aspose.Pdf.Text.BorderInfo",
-        "Aspose.Pdf.Text.MarginInfo",
-        "Aspose.Pdf.Text.BorderSide",
-        "Aspose.Pdf.Page"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
-      "status": "verified"
-    },
-    "preserve-cdata-from-xml-to-pdf": {
-      "title": "Preserve CDATA Sections from XML in PDF",
-      "filename": "preserve-cdata-from-xml-to-pdf.cs",
-      "description": "Demonstrates loading an XML file with CDATA sections, extracting the CDATA text nodes, and rendering them as formatted text in a PDF using Aspose.Pdf.",
-      "tags": [
-        "xml",
-        "cdata",
-        "pdf",
-        "aspose-pdf",
-        "text-fragment"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.XmlLoadOptions",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.FontRepository",
-        "Aspose.Pdf.Color",
-        "Aspose.Pdf.Position",
+        "Aspose.Pdf.PageInfo.Margin",
         "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Page.Paragraphs.Add",
-        "Aspose.Pdf.Document.Pages.Add"
+        "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "apply-custom-font-to-xml-pdf-elements": {
-      "title": "Apply Custom Font to XML‑Derived PDF Elements",
-      "filename": "apply-custom-font-to-xml-pdf-elements.cs",
-      "description": "The example loads an XML file, converts it to a PDF with Aspose.Pdf, and applies a custom TrueType font to specific text fragments such as titles and subtitles within the generated PDF.",
-      "tags": [
-        "custom-font",
-        "xml-to-pdf",
-        "text-fragment",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.XmlLoadOptions",
-        "Aspose.Pdf.Text.FontRepository.OpenFont",
-        "Aspose.Pdf.Text.TextFragmentAbsorber",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.Font",
-        "Aspose.Pdf.Color",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
-      "status": "verified"
-    },
-    "embed-custom-ttf-font-into-pdf-from-xml": {
-      "title": "Embed Custom TrueType Font into PDF from XML",
-      "filename": "embed-custom-ttf-font-into-pdf-from-xml.cs",
-      "description": "Shows how to load XML into a PDF, open a TrueType font, mark it for embedding, replace all text fragments with the custom font, and save the PDF with the font embedded.",
+    "add-automatic-page-numbers-to-pdf": {
+      "title": "Add Automatic Page Numbers to PDF via XSL‑FO",
+      "filename": "add-automatic-page-numbers-to-pdf.cs",
+      "description": "Shows how to load an XML/XSL‑FO document with Aspose.Pdf, update pagination to generate automatic page numbers, and save the result as a PDF.",
       "tags": [
         "pdf",
-        "ttf",
-        "font-embedding",
+        "pagination",
         "xml",
+        "xsl-fo",
         "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.XmlLoadOptions",
-        "Aspose.Pdf.FontRepository",
-        "Aspose.Pdf.FontTypes",
-        "Aspose.Pdf.Text.Font",
-        "Aspose.Pdf.Text.TextFragmentAbsorber",
-        "Aspose.Pdf.Text.TextFragment"
+        "Aspose.Pdf.PageCollection.UpdatePagination",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "xml-to-pdf-with-external-css": {
-      "title": "Convert XML to PDF with External CSS via XSL",
-      "filename": "xml-to-pdf-with-external-css.cs",
-      "description": "Demonstrates loading an XML file with an XSL stylesheet that references external CSS and converting it directly to a styled PDF using Aspose.Pdf.",
+    "generate-pdf-tables-from-xml": {
+      "title": "Generate PDF Tables from XML Data using Aspose.Pdf",
+      "filename": "generate-pdf-tables-from-xml.cs",
+      "description": "Demonstrates loading XML into a DataSet, converting each DataTable into an Aspose.Pdf Table, and saving the result as a PDF report.",
       "tags": [
         "xml",
         "pdf",
-        "css",
-        "xsl",
+        "datatable",
+        "aspose",
+        "report"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.BorderInfo",
+        "Aspose.Pdf.MarginInfo",
+        "Aspose.Pdf.BorderSide"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T10:00:19Z",
+      "status": "verified"
+    },
+    "preserve-cdata-to-pdf": {
+      "title": "Preserve CDATA Sections When Converting XML to PDF",
+      "filename": "preserve-cdata-to-pdf.cs",
+      "description": "Demonstrates loading an XML file with XmlLoadOptions to retain CDATA sections and directly saving it as a PDF using Aspose.Pdf.",
+      "tags": [
+        "xml",
+        "cdata",
+        "pdf",
+        "conversion",
         "aspose"
       ],
       "apis_used": [
@@ -283,538 +192,586 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "generate-pdf-from-xml-using-xsl-styling": {
-      "title": "Generate PDF from XML using XSL Styling",
-      "filename": "generate-pdf-from-xml-using-xsl-styling.cs",
-      "description": "Demonstrates loading an XML file with an XSL stylesheet to apply custom colors and converting it to a PDF using Aspose.Pdf.",
+    "apply-custom-font-to-specific-xml-text": {
+      "title": "Apply Custom Font to Specific XML-Generated Text in PDF",
+      "filename": "apply-custom-font-to-specific-xml-text.cs",
+      "description": "Shows how to load an XML file into a PDF, locate specific text fragments, and apply a custom embedded font and size to those fragments.",
       "tags": [
         "xml",
-        "xsl",
+        "pdf",
+        "custom-font",
+        "text-absorption",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.XmlLoadOptions",
+        "Aspose.Pdf.FontRepository.FindFont",
+        "Aspose.Pdf.Text.TextFragmentAbsorber",
+        "Aspose.Pdf.Page.Accept",
+        "Aspose.Pdf.Text.TextFragment.TextState",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T10:00:19Z",
+      "status": "verified"
+    },
+    "embed-custom-ttf-font-into-pdf": {
+      "title": "Embed Custom TrueType Font into PDF from XML",
+      "filename": "embed-custom-ttf-font-into-pdf.cs",
+      "description": "Demonstrates loading XML into a PDF with Aspose.Pdf, embedding a custom TrueType font, and adding text that uses the embedded font.",
+      "tags": [
+        "pdf",
+        "font-embedding",
+        "xml",
+        "aspose-pdf",
+        "truetype"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.XmlLoadOptions",
+        "Aspose.Pdf.FontRepository.OpenFont",
+        "Aspose.Pdf.Font",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Page"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T10:00:19Z",
+      "status": "verified"
+    },
+    "apply-css-to-xml-pdf": {
+      "title": "Apply External CSS Stylesheet to XML for PDF Generation",
+      "filename": "apply-css-to-xml-pdf.cs",
+      "description": "Shows how to load an XML file and an external CSS file (treated as XSL) and bind them to an Aspose.Pdf Document to produce a styled PDF output.",
+      "tags": [
+        "css",
+        "xml",
         "pdf",
         "aspose.pdf",
         "styling"
       ],
       "apis_used": [
-        "Aspose.Pdf.XmlLoadOptions",
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Document.BindXml",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Text"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "apply-xml-color-pdf-background": {
+    "apply-custom-color-scheme-via-xml": {
+      "title": "Apply Custom Color Scheme to PDF via XML",
+      "filename": "apply-custom-color-scheme-via-xml.cs",
+      "description": "Shows how to export a PDF to XML, replace color values in the XML, and reload it to produce a PDF with a custom color scheme.",
+      "tags": [
+        "pdf",
+        "xml",
+        "color",
+        "styling",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.XmlSaveOptions",
+        "Aspose.Pdf.XmlLoadOptions",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T10:00:19Z",
+      "status": "verified"
+    },
+    "apply-xml-color-pdf-page-background": {
       "title": "Apply XML Color as PDF Page Background",
-      "filename": "apply-xml-color-pdf-background.cs",
-      "description": "Loads a PDF, parses an XML color string, sets it as the background color for each page, and saves the modified document.",
+      "filename": "apply-xml-color-pdf-page-background.cs",
+      "description": "Shows how to load a PDF, parse an XML color string, and set each page's background color using Aspose.Pdf.",
       "tags": [
         "pdf",
         "background",
         "color",
-        "aspose-pdf",
-        "csharp"
+        "xml",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
         "Aspose.Pdf.Color.Parse",
-        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Page.Background",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "add-header-footer-to-pdf-pages": {
-      "title": "Add Header and Footer to PDF Pages",
-      "filename": "add-header-footer-to-pdf-pages.cs",
-      "description": "Demonstrates creating header and footer templates with pagination symbols and applying them to every page of an existing PDF using Aspose.Pdf.",
+    "add-header-footer-to-pdf-using-xml-templates": {
+      "title": "Add Header and Footer to PDF Using XML Templates",
+      "filename": "add-header-footer-to-pdf-using-xml-templates.cs",
+      "description": "Shows how to read header and footer text from XML files and apply them to each page of a PDF using Aspose.Pdf's HeaderFooter and TextFragment objects.",
       "tags": [
+        "pdf",
         "header",
         "footer",
-        "pagination",
-        "Aspose.Pdf",
-        "pdf"
+        "xml",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.HeaderFooter",
         "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.FontRepository",
-        "Aspose.Pdf.Color",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.HorizontalAlignment",
-        "Aspose.Pdf.Pages.UpdatePagination",
+        "Aspose.Pdf.HeaderFooter.Clone",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
     "add-custom-page-borders-to-pdf": {
-      "title": "Add Custom Page Borders to PDF Using Graph",
+      "title": "Add Custom Page Borders to PDF Using Aspose.Pdf",
       "filename": "add-custom-page-borders-to-pdf.cs",
-      "description": "Demonstrates how to draw a rectangular border on each page of an existing PDF by using Aspose.Pdf.Drawing.Graph and related drawing classes.",
+      "description": "Shows how to load a PDF, create a Graph with a rectangle matching each page size, add it as a border, and save the modified document.",
       "tags": [
         "pdf",
         "border",
         "graph",
         "drawing",
-        "aspose-pdf"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Rectangle",
         "Aspose.Pdf.Drawing.Graph",
         "Aspose.Pdf.Drawing.Rectangle",
         "Aspose.Pdf.Drawing.GraphInfo",
-        "Aspose.Pdf.Color",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Drawing.Color"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "apply-background-images-from-xml": {
-      "title": "Apply Background Images to PDF Pages from XML",
-      "filename": "apply-background-images-from-xml.cs",
-      "description": "Shows how to read an XML file that maps page numbers to image files and set each PDF page's background image using Aspose.Pdf.",
+    "add-background-images-to-pdf-from-xml": {
+      "title": "Add Background Images to PDF Pages from XML",
+      "filename": "add-background-images-to-pdf-from-xml.cs",
+      "description": "Shows how to read an XML mapping of page numbers to image files and set each image as the background of the corresponding PDF page using Aspose.Pdf.",
       "tags": [
         "pdf",
         "background",
         "xml",
-        "aspose-pdf",
+        "branding",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Image",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.BackgroundImage",
+        "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "insert-dynamic-headers-xml-pdf": {
-      "title": "Insert Dynamic Headers into PDF Using XML Data",
-      "filename": "insert-dynamic-headers-xml-pdf.cs",
-      "description": "Demonstrates reading per-page header text from an XML file and adding it to each PDF page as a header using Aspose.Pdf event handling.",
+    "insert-dynamic-headers-from-xml": {
+      "title": "Insert Dynamic Headers into PDF from XML per Page",
+      "filename": "insert-dynamic-headers-from-xml.cs",
+      "description": "Demonstrates loading per‑page header text from an XML file, creating a lookup, and assigning a custom HeaderFooter to each PDF page using Aspose.Pdf.",
       "tags": [
         "pdf",
         "header",
         "xml",
-        "aspose.pdf",
-        "event"
+        "aspose-pdf",
+        "dynamic"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.XmlLoadOptions",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Page.OnBeforePageGenerate",
+        "Aspose.Pdf.HeaderFooter",
         "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.Position",
-        "Aspose.Pdf.Text.FontRepository.FindFont",
-        "Aspose.Pdf.Color"
+        "Aspose.Pdf.Document.Pages.UpdatePagination",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
     "insert-footnotes-into-pdf-from-xml": {
       "title": "Insert Footnotes into PDF from XML",
       "filename": "insert-footnotes-into-pdf-from-xml.cs",
-      "description": "Demonstrates loading footnote definitions from an XML file and inserting them as footnote references and content into a PDF using Aspose.Pdf.",
+      "description": "Demonstrates loading footnote definitions from an XML file and adding them as footnote annotations to each page of a PDF using Aspose.Pdf's tagging and text APIs.",
       "tags": [
         "pdf",
-        "footnote",
+        "footnotes",
         "xml",
+        "tagged-content",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.Tagged.TaggedContent.SetLanguage",
+        "Aspose.Pdf.Tagged.TaggedContent.SetTitle",
+        "Aspose.Pdf.Text.Note",
+        "Aspose.Pdf.Text.FontRepository.FindFont"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T10:00:19Z",
+      "status": "verified"
+    },
+    "insert-conditional-page-breaks-based-on-xml": {
+      "title": "Insert Conditional Page Breaks in PDF Based on XML Content Length",
+      "filename": "insert-conditional-page-breaks-based-on-xml.cs",
+      "description": "Shows how to load XML, treat each element as a text block, and insert blank PDF pages when the accumulated character count exceeds a defined threshold.",
+      "tags": [
+        "pdf",
+        "xml",
+        "page-break",
         "aspose",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Page.Paragraphs.Add",
         "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.Position",
-        "Aspose.Pdf.Text.FontRepository.FindFont",
-        "Aspose.Pdf.Text.Color",
-        "Aspose.Pdf.Text.Note"
+        "Aspose.Pdf.PageCollection.Insert",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "insert-conditional-page-breaks-by-xml-length": {
-      "title": "Insert Conditional Page Breaks Based on XML Content Length",
-      "filename": "insert-conditional-page-breaks-by-xml-length.cs",
-      "description": "Shows how to load an XML file into a PDF, calculate cumulative text length per page, and insert blank pages when a specified length threshold is exceeded.",
-      "tags": [
-        "pdf",
-        "xml",
-        "page-break",
-        "text-length",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.XmlLoadOptions",
-        "Aspose.Pdf.Text.TextAbsorber",
-        "Aspose.Pdf.Page.Accept"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
-      "status": "verified"
-    },
-    "generate-pdf-toc-from-xml": {
-      "title": "Generate PDF Table of Contents from XML Headings",
-      "filename": "generate-pdf-toc-from-xml.cs",
-      "description": "Demonstrates how to read a heading hierarchy from an XML file and build a Table of Contents in a PDF using Aspose.Pdf's tagged content features.",
+    "create-pdf-toc-from-xml-headings": {
+      "title": "Create PDF Table of Contents from XML Headings",
+      "filename": "create-pdf-toc-from-xml-headings.cs",
+      "description": "Demonstrates loading a heading hierarchy from an XML file and generating a PDF with a tagged Table of Contents using Aspose.Pdf's logical structure API.",
       "tags": [
         "pdf",
         "toc",
         "xml",
-        "aspose.pdf",
+        "aspose",
         "tagged-content"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Tagged.ITaggedContent",
-        "Aspose.Pdf.Tagged.ITaggedContent.SetLanguage",
-        "Aspose.Pdf.Tagged.ITaggedContent.SetTitle",
-        "Aspose.Pdf.Tagged.ITaggedContent.CreateTOCElement",
-        "Aspose.Pdf.Tagged.ITaggedContent.CreateTOCIElement",
-        "Aspose.Pdf.Tagged.StructureElement",
-        "Aspose.Pdf.Tagged.StructureElement.AppendChild",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.TocInfo",
-        "Aspose.Pdf.Text.TextFragment"
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.Tagged.TOCElement",
+        "Aspose.Pdf.Tagged.TOCIElement",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.FontRepository"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
     "create-hierarchical-pdf-outline-from-xml": {
       "title": "Create Hierarchical PDF Outline from XML",
       "filename": "create-hierarchical-pdf-outline-from-xml.cs",
-      "description": "Loads an XML hierarchy and generates a matching outline (bookmarks) in a PDF, assigning each entry to successive pages using Aspose.Pdf.",
+      "description": "Shows how to build a nested PDF bookmark outline by reading an XML hierarchy and linking each node to a specific page using Aspose.Pdf.",
       "tags": [
         "pdf",
         "outline",
         "xml",
         "bookmarks",
-        "aspose"
+        "aspnet"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.OutlineCollection",
         "Aspose.Pdf.OutlineItemCollection",
-        "Aspose.Pdf.Annotations.GoToAction"
+        "Aspose.Pdf.Annotations.GoToAction",
+        "Aspose.Pdf.Document.Outlines",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
     "create-pdf-outline-from-xml": {
-      "title": "Create PDF Outline from XML Sections",
+      "title": "Create PDF Outline from XML Section Titles",
       "filename": "create-pdf-outline-from-xml.cs",
-      "description": "The example reads an XML file with section titles and page numbers, then adds matching outline (bookmark) entries to a PDF using Aspose.Pdf.",
+      "description": "Shows how to read section titles from an XML file, add each title to a separate PDF page, and generate corresponding outline entries for navigation.",
       "tags": [
-        "pdf",
-        "outline",
-        "bookmark",
+        "pdf-outline",
         "xml",
-        "aspose"
+        "aspose-pdf",
+        "navigation",
+        "text"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.OutlineCollection",
         "Aspose.Pdf.OutlineItemCollection",
-        "Aspose.Pdf.Annotations.GoToAction"
+        "Aspose.Pdf.Annotations.XYZExplicitDestination",
+        "Aspose.Pdf.FontRepository"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "create-hierarchical-pdf-bookmarks-from-xml": {
-      "title": "Create Hierarchical PDF Bookmarks from XML",
-      "filename": "create-hierarchical-pdf-bookmarks-from-xml.cs",
-      "description": "Demonstrates generating PDF outline (bookmarks) that mirror the nesting levels of an XML document by recursively building outline items.",
+    "create-pdf-bookmarks-from-xml": {
+      "title": "Create PDF Bookmarks from XML Hierarchy",
+      "filename": "create-pdf-bookmarks-from-xml.cs",
+      "description": "Shows how to generate a PDF outline (bookmarks) by reading an XML file and mapping its nested elements to bookmark hierarchy using Aspose.Pdf.",
       "tags": [
         "pdf",
+        "outline",
         "bookmarks",
         "xml",
-        "outline",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.Annotations.GoToAction",
+        "Aspose.Pdf.Document.Outlines",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T10:00:19Z",
+      "status": "verified"
+    },
+    "set-page-durations-pdf-presentation-from-xml": {
+      "title": "Set Page Durations for PDF Presentation from XML",
+      "filename": "set-page-durations-pdf-presentation-from-xml.cs",
+      "description": "Demonstrates binding an XML file to an Aspose.Pdf Document, assigning a display duration to each page for presentation mode, and saving the PDF.",
+      "tags": [
+        "pdf",
+        "xml",
+        "presentation",
+        "page-duration",
         "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.OutlineItemCollection",
-        "Aspose.Pdf.Annotations.GoToAction"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
-      "status": "verified"
-    },
-    "apply-page-transitions-to-pdf": {
-      "title": "Apply Page Transition Effects to PDF from XML",
-      "filename": "apply-page-transitions-to-pdf.cs",
-      "description": "Loads an XML file into a PDF, sets full‑screen presentation mode, and adds a fade transition to every page using Aspose.Pdf.Facades.PdfPageEditor.",
-      "tags": [
-        "pdf",
-        "transition",
-        "xml",
-        "presentation",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.XmlLoadOptions",
-        "Aspose.Pdf.PageMode",
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
+        "Aspose.Pdf.Document.BindXml",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.Duration",
         "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "set-pdf-page-durations-from-xml": {
-      "title": "Set PDF Page Transition Durations from XML",
-      "filename": "set-pdf-page-durations-from-xml.cs",
-      "description": "Loads timing values from an XML file and applies them to each PDF page's Duration property using Aspose.Pdf.",
+    "set-pdf-page-duration-from-xml": {
+      "title": "Set PDF Page Transition Duration from XML",
+      "filename": "set-pdf-page-duration-from-xml.cs",
+      "description": "Shows how to read page display durations from an XML file and assign them to each page of a PDF using Aspose.Pdf.",
       "tags": [
         "pdf",
-        "aspose.pdf",
-        "xml",
         "page-duration",
+        "xml",
+        "aspose.pdf",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page"
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.PageCollection",
+        "Aspose.Pdf.Page.Duration",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "generate-pdf-from-xml-fullscreen": {
-      "title": "Generate PDF from XML with Full‑Screen Viewer Mode",
-      "filename": "generate-pdf-from-xml-fullscreen.cs",
-      "description": "Demonstrates loading an XML file into an Aspose.Pdf Document, configuring the viewer to open in full‑screen mode, and saving the result as a PDF.",
+    "enable-full-screen-viewer-mode": {
+      "title": "Enable Full‑Screen Viewer Mode for PDF Generated from XML",
+      "filename": "enable-full-screen-viewer-mode.cs",
+      "description": "Demonstrates how to load an XML file into an Aspose.Pdf Document, set the PDF to open in full‑screen mode, define the behavior after exiting full‑screen, and save the result.",
       "tags": [
         "pdf",
-        "xml",
         "fullscreen",
-        "viewer-mode",
-        "aspose"
+        "aspose",
+        "xml",
+        "viewer-mode"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.XmlLoadOptions",
-        "Aspose.Pdf.PageMode",
+        "Aspose.Pdf.Document.PageMode",
+        "Aspose.Pdf.Document.NonFullScreenPageMode",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
     "set-pdf-viewer-preferences-xml-to-pdf": {
       "title": "Set PDF Viewer Preferences When Converting XML to PDF",
       "filename": "set-pdf-viewer-preferences-xml-to-pdf.cs",
-      "description": "Demonstrates converting an XML file to PDF with Aspose.Pdf and configuring viewer preferences such as FitWindow (fit‑page mode).",
+      "description": "Demonstrates loading an XML file with Aspose.Pdf, converting it to PDF, and configuring viewer preferences such as FitWindow and PageMode before saving.",
       "tags": [
         "pdf",
         "viewer-preferences",
-        "xml-to-pdf",
-        "aspose",
-        "csharp"
+        "xml",
+        "aspose.pdf",
+        "conversion"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.XmlLoadOptions",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Document.FitWindow",
+        "Aspose.Pdf.Document.PageMode",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.PageMode"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "generate-pdf-from-xml-version-1-7": {
+    "generate-pdf-from-xml-pdf-1-7": {
       "title": "Generate PDF from XML with PDF version 1.7",
-      "filename": "generate-pdf-from-xml-version-1-7.cs",
-      "description": "Demonstrates loading an XML file into an Aspose.Pdf Document, converting it to PDF version 1.7, and saving the resulting PDF.",
+      "filename": "generate-pdf-from-xml-pdf-1-7.cs",
+      "description": "Shows how to load an XML file into an Aspose.Pdf Document, convert it to PDF version 1.7, and save the resulting PDF.",
       "tags": [
         "xml",
         "pdf",
-        "aspose",
-        "version",
-        "conversion"
+        "conversion",
+        "aspose-pdf",
+        "pdf-version"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.XmlLoadOptions",
         "Aspose.Pdf.Document.Convert",
         "Aspose.Pdf.PdfFormat",
-        "Aspose.Pdf.ConvertErrorAction",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.ConvertErrorAction"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "set-pdf-permissions-disable-printing-copying": {
-      "title": "Set PDF Permissions to Disable Printing and Copying",
-      "filename": "set-pdf-permissions-disable-printing-copying.cs",
-      "description": "Demonstrates loading an XML file as a PDF, applying AES‑256 encryption with custom permissions that block printing and content extraction, and saving the protected PDF.",
+    "set-pdf-permissions-restrict-printing-copying": {
+      "title": "Set PDF Permissions to Restrict Printing and Copying",
+      "filename": "set-pdf-permissions-restrict-printing-copying.cs",
+      "description": "Shows how to load an XML file into a PDF, apply custom security permissions that block printing and content extraction, and save the encrypted PDF.",
       "tags": [
         "pdf",
         "permissions",
         "encryption",
         "xml",
-        "aspose.pdf"
+        "aspose"
       ],
       "apis_used": [
-        "Document",
-        "XmlLoadOptions",
-        "Permissions",
-        "CryptoAlgorithm"
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.XmlLoadOptions",
+        "Aspose.Pdf.Security.Permissions",
+        "Aspose.Pdf.Security.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "encrypt-pdf-from-xml": {
-      "title": "Encrypt PDF from XML with Password Protection",
-      "filename": "encrypt-pdf-from-xml.cs",
-      "description": "Demonstrates loading an XML file into a PDF using Aspose.Pdf, applying user and owner passwords with specific permissions, and saving the encrypted document.",
+    "convert-xml-to-pdf-with-password-protection": {
+      "title": "Convert XML to PDF and Apply Password Protection",
+      "filename": "convert-xml-to-pdf-with-password-protection.cs",
+      "description": "Demonstrates converting an XML file to a PDF using Aspose.Pdf and then securing the PDF with user and owner passwords and specific permissions.",
+      "tags": [
+        "xml",
+        "pdf",
+        "encryption",
+        "aspose",
+        "conversion"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.XmlLoadOptions",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.CryptoAlgorithm"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T10:00:19Z",
+      "status": "verified"
+    },
+    "digitally-sign-pdf-from-xml": {
+      "title": "Digitally Sign PDF Generated from XML",
+      "filename": "digitally-sign-pdf-from-xml.cs",
+      "description": "Shows how to load an XML file into a PDF, add a signature field, and apply a PKCS#7 digital signature using a PFX certificate.",
+      "tags": [
+        "pdf",
+        "digital-signature",
+        "xml",
+        "aspose.pdf",
+        "pkcs7"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.XmlLoadOptions",
+        "Aspose.Pdf.Forms.SignatureField",
+        "Aspose.Pdf.Forms.PKCS7",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T10:00:19Z",
+      "status": "verified"
+    },
+    "encrypt-pdf-from-xml-drm": {
+      "title": "Encrypt PDF Generated from XML with DRM",
+      "filename": "encrypt-pdf-from-xml-drm.cs",
+      "description": "Demonstrates loading an XML file, converting it to a PDF using Aspose.Pdf, and applying DRM encryption with user/owner passwords and specific permissions before saving.",
       "tags": [
         "pdf",
         "encryption",
         "xml",
-        "aspose",
-        "csharp"
+        "drm",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.XmlLoadOptions",
         "Aspose.Pdf.Permissions",
         "Aspose.Pdf.CryptoAlgorithm",
-        "Aspose.Pdf.Document.Encrypt"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:26:12Z",
-      "status": "verified"
-    },
-    "digitally-sign-pdf-from-xml": {
-      "title": "Digitally Sign PDF Generated from XML",
-      "filename": "digitally-sign-pdf-from-xml.cs",
-      "description": "Shows how to bind an XML file to a PDF, add a visible signature field, and apply a PKCS#7 digital signature using a PFX certificate with Aspose.Pdf.",
-      "tags": [
-        "pdf",
-        "digital-signature",
-        "xml",
-        "aspose-pdf",
-        "pkcs7"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.BindXml",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Forms.SignatureField",
-        "Aspose.Pdf.Forms.SignatureField.Sign",
-        "Aspose.Pdf.Forms.PKCS7",
-        "Aspose.Pdf.Document.Form.Add",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
-      "status": "verified"
-    },
-    "encrypt-pdf-from-xml-with-permissions": {
-      "title": "Encrypt PDF from XML with Permissions and AES-256",
-      "filename": "encrypt-pdf-from-xml-with-permissions.cs",
-      "description": "Demonstrates loading an XML file into an Aspose.Pdf Document, applying AES-256 encryption with user and owner passwords, and setting print and content-extraction permissions before saving the protected PDF.",
-      "tags": [
-        "pdf-encryption",
-        "xml-to-pdf",
-        "drm",
-        "permissions",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.XmlLoadOptions",
-        "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.Encrypt",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Permissions",
-        "Aspose.Pdf.CryptoAlgorithm"
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "compress-pdf-streams-from-xml": {
-      "title": "Compress PDF Streams from XML using Aspose.Pdf",
-      "filename": "compress-pdf-streams-from-xml.cs",
-      "description": "Demonstrates loading a PDF from its XML representation, applying stream compression with OptimizationOptions, and saving the reduced‑size PDF.",
+    "compress-pdf-streams-using-aspose-pdf": {
+      "title": "Compress PDF Streams Using Aspose.Pdf Optimization",
+      "filename": "compress-pdf-streams-using-aspose-pdf.cs",
+      "description": "Shows how to load a PDF generated from XML, enable object compression with OptimizationOptions, optimize the document resources, and save the reduced‑size PDF.",
       "tags": [
-        "pdf",
-        "compression",
-        "xml",
-        "aspose",
-        "optimization"
+        "pdf compression",
+        "optimization",
+        "aspose.pdf",
+        "csharp",
+        "xml"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.BindXml",
+        "Aspose.Pdf.Optimization.OptimizationOptions",
         "Aspose.Pdf.Document.OptimizeResources",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Optimization.OptimizationOptions"
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "compress-pdf-text-streams-flate-xml": {
-      "title": "Compress PDF Text Streams Using Flate via XML Conversion",
-      "filename": "compress-pdf-text-streams-flate-xml.cs",
-      "description": "Shows how to export a PDF to XML, reload it, and apply Flate compression to all objects (including text streams) using Aspose.Pdf optimization features.",
+    "compress-pdf-from-xml-flate": {
+      "title": "Compress PDF from XML using Flate Compression",
+      "filename": "compress-pdf-from-xml-flate.cs",
+      "description": "Shows how to load an XML file into a PDF with Aspose.Pdf, apply Flate compression via OptimizationOptions, and save the reduced-size PDF.",
       "tags": [
+        "xml",
         "pdf",
         "compression",
-        "xml",
-        "flate",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.SaveXml",
-        "Aspose.Pdf.Document.OptimizeResources",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Optimization.OptimizationOptions",
-        "Aspose.Pdf.XmlLoadOptions"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
-      "status": "verified"
-    },
-    "compress-pdf-from-xml": {
-      "title": "Compress PDF Text Objects from XML Using Aspose.Pdf",
-      "filename": "compress-pdf-from-xml.cs",
-      "description": "Demonstrates loading XML into a PDF with XmlLoadOptions, enabling object compression via OptimizationOptions, and saving the reduced-size PDF.",
-      "tags": [
-        "pdf",
-        "compression",
-        "xml",
-        "aspose",
+        "aspose-pdf",
         "optimization"
       ],
       "apis_used": [
@@ -825,58 +782,82 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "downsample-images-from-xml": {
-      "title": "Downsample Images in PDF from XML",
-      "filename": "downsample-images-from-xml.cs",
-      "description": "Shows how to load an XML file into a PDF, configure image downsampling using optimization options, and save the optimized PDF.",
+    "compress-pdf-text-objects-from-xml": {
+      "title": "Compress PDF Text Objects from XML Using Aspose.Pdf Optimization",
+      "filename": "compress-pdf-text-objects-from-xml.cs",
+      "description": "Shows how to load XML content into a PDF with XmlLoadOptions, apply OptimizationOptions to compress PDF objects (including text streams), and save the compressed PDF.",
       "tags": [
         "pdf",
-        "optimization",
-        "images",
+        "compression",
         "xml",
-        "downsampling"
+        "optimization",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.BindXml",
+        "Aspose.Pdf.XmlLoadOptions",
         "Aspose.Pdf.Optimization.OptimizationOptions",
         "Aspose.Pdf.Document.OptimizeResources",
         "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "export-pdf-pages-high-res-png-from-xml": {
-      "title": "Export PDF Pages as High-Resolution PNG Images from XML",
-      "filename": "export-pdf-pages-high-res-png-from-xml.cs",
-      "description": "Demonstrates converting an XML file to PDF using Aspose.Pdf and then exporting each PDF page to a PNG image with a specified DPI resolution.",
+    "downsample-images-in-pdf": {
+      "title": "Downsample Images in PDF to Reduce File Size",
+      "filename": "downsample-images-in-pdf.cs",
+      "description": "Shows how to compress and down‑sample high‑resolution images in a PDF using Aspose.Pdf optimization options, resulting in a smaller PDF with acceptable visual quality.",
       "tags": [
-        "xml",
         "pdf",
-        "image-export",
-        "resolution",
-        "aspose-pdf"
+        "image-downsampling",
+        "optimization",
+        "aspose",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Devices.Resolution",
-        "Aspose.Pdf.Devices.PngDevice",
-        "Aspose.Pdf.Document.BindXml",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Devices.PngDevice.Process"
+        "Aspose.Pdf.Optimization.OptimizationOptions",
+        "Aspose.Pdf.Optimization.OptimizationOptions.All",
+        "Aspose.Pdf.Optimization.ImageCompressionOptions",
+        "Aspose.Pdf.Document.OptimizeResources",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "decode-base64-images-from-xml-to-pdf": {
-      "title": "Decode Base64 Images from XML and Embed into PDF",
-      "filename": "decode-base64-images-from-xml-to-pdf.cs",
-      "description": "Loads an XML file, extracts Base64‑encoded image data, decodes it, and adds each image to a new page in a PDF using Aspose.Pdf.",
+    "set-image-resolution-for-exported-pdf-images": {
+      "title": "Set Image Resolution for Exported PDF Images",
+      "filename": "set-image-resolution-for-exported-pdf-images.cs",
+      "description": "Demonstrates loading an XSL‑FO XML document into an Aspose.Pdf Document, configuring HTML export options to specify image DPI, and saving the PDF as HTML with embedded resources.",
+      "tags": [
+        "image-resolution",
+        "html-export",
+        "xsl-fo",
+        "aspdf",
+        "dpi"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.XslFoLoadOptions",
+        "Aspose.Pdf.HtmlSaveOptions",
+        "Aspose.Pdf.HtmlSaveOptions.ImageResolution",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.HtmlSaveOptions.PartsEmbeddingModes",
+        "Aspose.Pdf.HtmlSaveOptions.RasterImagesSavingModes"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T10:00:19Z",
+      "status": "verified"
+    },
+    "extract-base64-images-from-xml-to-pdf": {
+      "title": "Extract Base64 Images from XML and Embed in PDF",
+      "filename": "extract-base64-images-from-xml-to-pdf.cs",
+      "description": "Demonstrates loading an XML file, decoding Base64‑encoded images, and inserting them into a PDF using Aspose.Pdf.",
       "tags": [
         "xml",
         "base64",
@@ -885,133 +866,133 @@
         "aspose"
       ],
       "apis_used": [
-        "Document",
-        "XmlLoadOptions",
-        "Page",
-        "Image",
-        "Document.Save",
-        "Document.Pages.Add",
-        "Page.Paragraphs.Add"
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Page.AddImage",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "render-svg-from-xml-to-pdf": {
-      "title": "Render SVG Elements from XML into PDF",
-      "filename": "render-svg-from-xml-to-pdf.cs",
-      "description": "Shows how to load an XML file, extract embedded <svg> elements, convert each SVG to a temporary PDF using Aspose.Pdf's SvgLoadOptions, and merge the resulting pages into a single PDF document.",
+    "embed-svg-images-from-xml-into-pdf": {
+      "title": "Embed SVG Images from XML into PDF as Vector Graphics",
+      "filename": "embed-svg-images-from-xml-into-pdf.cs",
+      "description": "Demonstrates loading SVG elements embedded in an XML file, converting each to a vector‑based PDF page using Aspose.Pdf, and appending those pages to an existing PDF document.",
       "tags": [
         "svg",
-        "xml",
         "pdf",
-        "aspose.pdf",
-        "conversion"
+        "xml",
+        "vector-graphics",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.SvgLoadOptions",
+        "Aspose.Pdf.PageCollection.Add",
         "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Document.Pages.Add"
+        "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
     "render-html-cdata-to-pdf": {
-      "title": "Render HTML CDATA Sections to PDF",
+      "title": "Render HTML CDATA Fragments to PDF",
       "filename": "render-html-cdata-to-pdf.cs",
-      "description": "Demonstrates loading an XML file, extracting CDATA sections that contain HTML fragments, and rendering each fragment into a PDF document using Aspose.Pdf.",
+      "description": "Shows how to load an XML file, extract HTML fragments stored in CDATA sections, and render each fragment into a PDF using Aspose.Pdf's HtmlFragment.",
       "tags": [
         "xml",
         "cdata",
         "html",
         "pdf",
-        "aspose-pdf"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.HtmlFragment",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Page.Paragraphs.Add"
+        "Aspose.Pdf.Text.HtmlFragment",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "generate-barcodes-from-xml": {
-      "title": "Generate Barcodes in PDF from XML Data",
-      "filename": "generate-barcodes-from-xml.cs",
-      "description": "Shows how to read barcode values from an XML file and create Code128 barcode fields in a PDF using Aspose.Pdf.",
+    "create-barcodes-from-xml": {
+      "title": "Create Barcodes in PDF from XML Data",
+      "filename": "create-barcodes-from-xml.cs",
+      "description": "Loads barcode values from an XML file and generates a PDF with a barcode field for each entry using Aspose.Pdf.",
       "tags": [
-        "xml",
         "barcode",
         "pdf",
+        "xml",
         "aspose",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Rectangle",
         "Aspose.Pdf.Forms.BarcodeField",
-        "Aspose.Pdf.Forms.BarcodeField.AddBarcode"
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Forms.BarcodeField.AddBarcode",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "embed-video-annotations-from-xml": {
-      "title": "Embed Video Annotations in PDF from XML",
-      "filename": "embed-video-annotations-from-xml.cs",
-      "description": "Demonstrates loading an XML file that describes video files and embedding each video as a MovieAnnotation in a PDF document using Aspose.Pdf. The example validates file existence and page numbers before adding the annotations.",
+    "embed-video-from-xml-to-pdf": {
+      "title": "Embed Video Files from XML into PDF as Rich Media Annotations",
+      "filename": "embed-video-from-xml-to-pdf.cs",
+      "description": "Demonstrates loading video references from an XML file, creating a PDF, and embedding each video as a RichMediaAnnotation on the specified page and position.",
       "tags": [
         "pdf",
         "video",
-        "annotation",
+        "richmedia",
         "xml",
-        "aspose-pdf"
+        "annotation"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.XmlLoadOptions",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Annotations.MovieAnnotation",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Page.Annotations.Add"
+        "Aspose.Pdf.Annotations.RichMediaAnnotation",
+        "Aspose.Pdf.Annotations.RichMediaAnnotation.SetContent",
+        "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "embed-audio-clips-from-xml-into-pdf": {
-      "title": "Embed Audio Clips from XML into PDF as Sound Annotations",
-      "filename": "embed-audio-clips-from-xml-into-pdf.cs",
-      "description": "Shows how to read an XML file that defines audio clip positions and embed each audio file as a SoundAnnotation in a PDF using Aspose.Pdf.",
+    "embed-audio-annotations-from-xml": {
+      "title": "Embed Audio Annotations from XML into PDF",
+      "filename": "embed-audio-annotations-from-xml.cs",
+      "description": "Shows how to parse an XML file that defines audio file references and positions, then embed those audio clips as SoundAnnotation objects into a PDF using Aspose.Pdf.",
       "tags": [
         "audio",
-        "xml",
         "annotation",
+        "xml",
         "pdf",
         "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Annotations.SoundAnnotation"
+        "Aspose.Pdf.Annotations.SoundAnnotation",
+        "Aspose.Pdf.Annotations.AnnotationCollection.Add",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "embed-3d-models-from-xml-into-pdf": {
-      "title": "Embed 3D Models from XML into PDF as Interactive Annotations",
-      "filename": "embed-3d-models-from-xml-into-pdf.cs",
-      "description": "Shows how to read an XML file that references U3D/PRC model files and embed each model as a PDF3DAnnotation on the specified PDF pages using Aspose.Pdf.",
+    "embed-3d-models-from-xml": {
+      "title": "Embed 3D Models from XML as PDF Annotations",
+      "filename": "embed-3d-models-from-xml.cs",
+      "description": "Shows how to read an XML file that lists 3D model files and embed each model as an interactive 3D annotation in a PDF using Aspose.Pdf.",
       "tags": [
         "3d",
         "pdf",
@@ -1021,92 +1002,88 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.PDF3DContent",
-        "Aspose.Pdf.PDF3DContent.LoadAsU3D",
-        "Aspose.Pdf.PDF3DContent.LoadAsPRC",
         "Aspose.Pdf.PDF3DArtwork",
-        "Aspose.Pdf.Annotations.PDF3DAnnotation",
-        "Aspose.Pdf.Annotations.PDF3DActivation",
+        "Aspose.Pdf.PDF3DAnnotation",
         "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Annotations.Border",
-        "Aspose.Pdf.Color"
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "add-javascript-validation-to-pdf-form": {
-      "title": "Add JavaScript Validation to PDF Form from XML",
-      "filename": "add-javascript-validation-to-pdf-form.cs",
-      "description": "Demonstrates binding XML data to a PDF, creating a TextBox form field, attaching field‑level JavaScript validation, and adding a document‑level open‑action script using Aspose.Pdf.",
+    "embed-javascript-actions-in-pdf-from-xml": {
+      "title": "Embed JavaScript Actions in PDF Generated from XML",
+      "filename": "embed-javascript-actions-in-pdf-from-xml.cs",
+      "description": "Demonstrates loading an XML file as a PDF using Aspose.Pdf and embedding document‑level and page‑level JavaScript actions for interactive validation.",
       "tags": [
-        "pdf",
         "javascript",
-        "form",
-        "validation",
-        "aspose"
+        "pdf",
+        "xml",
+        "aspose",
+        "form-validation"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.BindXml",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Forms.TextBoxField",
-        "Aspose.Pdf.Forms.Border",
+        "Aspose.Pdf.XmlLoadOptions",
         "Aspose.Pdf.Annotations.JavascriptAction",
-        "Aspose.Pdf.Document.Form",
-        "Aspose.Pdf.Document.OpenAction"
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.Actions",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
     "create-pdf-form-fields-from-xml": {
       "title": "Create PDF Form Fields from XML and Set Default Values",
       "filename": "create-pdf-form-fields-from-xml.cs",
-      "description": "Demonstrates loading an XFA form definition from an XML file into a PDF, generating the form fields, and assigning default values to specific fields.",
+      "description": "Demonstrates how to read an XML definition of form fields, add them to a PDF using Aspose.Pdf, and assign default values to the created fields.",
       "tags": [
         "pdf",
-        "xfa",
-        "form-fields",
+        "form",
         "xml",
-        "default-values"
+        "aspose",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Forms.Form.AssignXfa",
-        "Aspose.Pdf.Forms.Field"
+        "Aspose.Pdf.Facades.FormEditor",
+        "Aspose.Pdf.Facades.Form",
+        "Aspose.Pdf.FieldType",
+        "FormEditor.AddField",
+        "FormEditor.Save",
+        "Form.FillField"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "populate-pdf-form-from-xml": {
+    "populate-pdf-form-from-xml-records": {
       "title": "Populate PDF Form Fields from XML Records",
-      "filename": "populate-pdf-form-from-xml.cs",
-      "description": "Shows how to read multiple <Record> elements from an XML file, fill an XFA PDF form using Aspose.Pdf's AssignXfa for each record, and save individual filled PDFs.",
+      "filename": "populate-pdf-form-from-xml-records.cs",
+      "description": "Shows how to read multiple <Record> elements from an XML file, assign each as XFA data to a PDF form, and save a separate filled PDF for every record.",
       "tags": [
         "pdf",
         "xml",
         "form-filling",
-        "aspose-pdf",
-        "xfax"
+        "xfa",
+        "batch"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Form.AssignXfa",
+        "Aspose.Pdf.Forms.Form",
+        "Aspose.Pdf.Forms.Form.AssignXfa",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
     "extract-plain-text-from-pdf": {
-      "title": "Extract Plain Text from PDF for Indexing",
+      "title": "Extract Plain Text from PDF using Aspose.Pdf",
       "filename": "extract-plain-text-from-pdf.cs",
-      "description": "Demonstrates loading a PDF generated from XML, extracting its plain text using Aspose.Pdf's TextAbsorber, and saving the result to a file for indexing.",
+      "description": "Demonstrates loading a PDF with Aspose.Pdf, extracting pure text via TextAbsorber and TextExtractionOptions, and saving the result to a file for indexing.",
       "tags": [
         "pdf",
         "text-extraction",
@@ -1117,87 +1094,91 @@
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Text.TextExtractionOptions",
-        "Aspose.Pdf.Text.TextAbsorber"
+        "Aspose.Pdf.Text.TextAbsorber",
+        "Aspose.Pdf.PageCollection.Accept",
+        "Aspose.Pdf.Text.TextAbsorber.Text"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "export-pdf-pages-as-bmp-images-from-xml": {
-      "title": "Export PDF Pages as BMP Images from XML",
-      "filename": "export-pdf-pages-as-bmp-images-from-xml.cs",
-      "description": "Loads an XML file, binds it to a PDF document with Aspose.Pdf, and saves each PDF page as a separate BMP image file.",
+    "export-pdf-pages-from-xml-to-bmp": {
+      "title": "Export PDF Pages from XML to BMP Images",
+      "filename": "export-pdf-pages-from-xml-to-bmp.cs",
+      "description": "Shows how to bind an XML file to an Aspose.Pdf Document, generate a PDF, and save each page as a separate BMP image file.",
       "tags": [
-        "pdf",
         "xml",
+        "pdf",
         "image-export",
-        "bmp",
-        "aspose-pdf"
+        "aspose.pdf",
+        "bmp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.BindXml",
-        "Aspose.Pdf.Document.Info",
-        "Aspose.Pdf.Devices.BmpDevice",
         "Aspose.Pdf.Devices.Resolution",
+        "Aspose.Pdf.Devices.BmpDevice",
         "Aspose.Pdf.Devices.BmpDevice.Process"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "convert-pdf-pages-to-high-res-png-thumbnails": {
+    "convert-pdf-pages-to-png-thumbnails": {
       "title": "Convert PDF Pages to High-Resolution PNG Thumbnails",
-      "filename": "convert-pdf-pages-to-high-res-png-thumbnails.cs",
-      "description": "The example loads a PDF document, iterates through each page, and saves every page as a 300 DPI PNG image for thumbnail creation.",
+      "filename": "convert-pdf-pages-to-png-thumbnails.cs",
+      "description": "Demonstrates how to load a PDF with Aspose.Pdf, iterate through its pages, and render each page as a high‑resolution PNG image for thumbnail creation.",
       "tags": [
         "pdf",
         "png",
         "thumbnail",
-        "aspose.pdf",
-        "resolution"
+        "aspose",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Devices.Resolution",
         "Aspose.Pdf.Devices.PngDevice",
-        "Aspose.Pdf.Devices.PngDevice.Process"
+        "Aspose.Pdf.Devices.PngDevice.Process",
+        "Aspose.Pdf.PageCollection",
+        "Aspose.Pdf.Page"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "create-pdf-thumbnail-from-xml": {
-      "title": "Create PDF Thumbnail from XML-derived PDF",
-      "filename": "create-pdf-thumbnail-from-xml.cs",
-      "description": "Shows how to load an XML file as a PDF with Aspose.Pdf and generate a PNG thumbnail of the first page.",
+    "create-png-thumbnail-from-xml-pdf": {
+      "title": "Create PNG Thumbnail of First PDF Page from XML",
+      "filename": "create-png-thumbnail-from-xml-pdf.cs",
+      "description": "Loads an XML file, converts it to a PDF in memory using Aspose.Pdf, and generates a PNG thumbnail of the first page.",
       "tags": [
         "pdf",
         "thumbnail",
         "xml",
         "aspose",
-        "c#"
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.XmlLoadOptions",
         "Aspose.Pdf.Devices.ThumbnailDevice",
-        "Aspose.Pdf.Devices.ThumbnailDevice.Process"
+        "Aspose.Pdf.Devices.ThumbnailDevice.Process",
+        "Aspose.Pdf.Page"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
     "batch-convert-xml-to-pdf": {
-      "title": "Batch Convert XML Files to PDF using Aspose.Pdf",
+      "title": "Batch Convert XML Files to PDF",
       "filename": "batch-convert-xml-to-pdf.cs",
-      "description": "Shows how to iterate over a folder of XML files, load each with Aspose.Pdf's XmlLoadOptions, and save them as separate PDF documents.",
+      "description": "Shows how to iterate over a directory of XML files and convert each file to a PDF document using Aspose.Pdf's XmlLoadOptions and Document.Save.",
       "tags": [
         "xml",
         "pdf",
-        "batch-processing",
-        "aspose.pdf",
-        "c#"
+        "batch",
+        "conversion",
+        "aspose.pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -1205,451 +1186,460 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
     "merge-pdfs-from-xml-files": {
       "title": "Merge PDFs Created from XML Files",
       "filename": "merge-pdfs-from-xml-files.cs",
-      "description": "Loads multiple XML files, converts each to a PDF using Aspose.Pdf, merges them into a single document, and saves the combined PDF.",
+      "description": "Demonstrates converting multiple XML documents to PDF using Aspose.Pdf and then merging the resulting PDFs into a single document.",
       "tags": [
         "pdf",
         "merge",
         "xml",
         "aspose",
-        "csharp"
+        "document"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.XmlLoadOptions",
         "Aspose.Pdf.Document.Merge",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Dispose"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "split-pdf-into-chapter-files": {
-      "title": "Split PDF into Chapter Files Using Bookmarks",
-      "filename": "split-pdf-into-chapter-files.cs",
-      "description": "Shows how to read a PDF's outline (bookmarks) to determine chapter start pages and split the original document into separate PDF files per chapter.",
+    "split-pdf-from-xml-into-chapters": {
+      "title": "Split PDF Generated from XML into Chapter PDFs",
+      "filename": "split-pdf-from-xml-into-chapters.cs",
+      "description": "Shows how to convert an XML file to a PDF using Aspose.Pdf and then split the resulting document into separate per‑chapter PDF files (one page per chapter).",
       "tags": [
         "pdf",
+        "xml",
         "split",
-        "bookmarks",
-        "aspose",
-        "csharp"
+        "chapter",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.XmlLoadOptions",
         "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.OutlineItemCollection",
-        "Aspose.Pdf.Annotations.GoToAction"
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.PageCollection.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "paginate-large-xml-to-multiple-pdfs": {
-      "title": "Paginate Large XML into Multiple PDFs",
-      "filename": "paginate-large-xml-to-multiple-pdfs.cs",
-      "description": "Demonstrates loading a large XML file with Aspose.Pdf, splitting its pages into fixed-size chunks, and saving each chunk as a sequentially numbered PDF file.",
+    "paginate-xml-to-multiple-pdfs-bates-numbering": {
+      "title": "Paginate Large XML to Multiple PDFs with Sequential Bates Numbering",
+      "filename": "paginate-xml-to-multiple-pdfs-bates-numbering.cs",
+      "description": "Demonstrates loading an XML file as a PDF, splitting it into chunks of a fixed page count, and applying continuous Bates numbering across the generated PDF parts.",
       "tags": [
         "xml",
         "pdf",
         "pagination",
-        "aspose",
-        "split"
+        "bates-numbering",
+        "aspose-pdf"
       ],
       "apis_used": [
-        "Document",
-        "XmlLoadOptions",
-        "Document.Save",
-        "Document.Pages.Add"
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.XmlLoadOptions",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages.Add",
+        "Aspose.Pdf.Document.Pages.AddBatesNumbering"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "repeat-table-header-rows": {
-      "title": "Repeat Table Header Rows on Each PDF Page",
-      "filename": "repeat-table-header-rows.cs",
-      "description": "Shows how to create a multi‑page table in a PDF and configure Aspose.Pdf to repeat the header row on every page.",
+    "repeat-table-header-on-each-pdf-page": {
+      "title": "Repeat Table Header on Each PDF Page",
+      "filename": "repeat-table-header-on-each-pdf-page.cs",
+      "description": "Shows how to create a PDF with a table whose header row repeats on every page when the table spans multiple pages using Aspose.Pdf.",
       "tags": [
         "table",
         "header",
-        "pagination",
-        "aspose-pdf",
-        "csharp"
+        "repeat",
+        "pdf",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Table",
         "Aspose.Pdf.Row",
-        "Aspose.Pdf.Cell",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.FontRepository",
-        "Aspose.Pdf.Color"
+        "Aspose.Pdf.Text.TextState"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
     "validate-pdfa-2b-compliance-xml-to-pdf": {
-      "title": "Validate PDF/A‑2b Compliance After Converting XML to PDF",
+      "title": "Validate PDF/A-2b Compliance After Converting XML to PDF",
       "filename": "validate-pdfa-2b-compliance-xml-to-pdf.cs",
-      "description": "Loads an XML file, converts it to a PDF using Aspose.Pdf, and validates the generated PDF for PDF/A‑2b compliance, outputting a validation log.",
+      "description": "Shows how to load an XML file with Aspose.Pdf, convert it to a PDF, and then validate the resulting document for PDF/A‑2b compliance, outputting a validation log.",
       "tags": [
+        "pdf",
         "pdfa",
-        "validation",
         "xml",
-        "aspose.pdf",
-        "csharp"
+        "validation",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.XmlLoadOptions",
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.Document.Validate",
         "Aspose.Pdf.PdfFormat"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "export-pdf-structure-to-xml": {
-      "title": "Export PDF Structure to XML",
-      "filename": "export-pdf-structure-to-xml.cs",
-      "description": "Shows how to load a PDF using Aspose.Pdf and save its internal structure as an XML file for analysis and validation.",
+    "extract-pdf-xml-representation": {
+      "title": "Extract PDF XML Representation",
+      "filename": "extract-pdf-xml-representation.cs",
+      "description": "Shows how to load a PDF file with Aspose.Pdf and save its internal XML representation to a separate file for analysis or validation.",
       "tags": [
         "pdf",
         "xml",
+        "aspose",
         "export",
-        "aspose-pdf",
-        "csharp"
+        "validation"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.SaveXml"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "convert-xml-to-html-preview": {
-      "title": "Convert XML to HTML preview using Aspose.Pdf",
-      "filename": "convert-xml-to-html-preview.cs",
-      "description": "Shows how to load an XML file into an Aspose.Pdf Document, convert it to PDF in memory, and save the result as HTML for web preview.",
+    "convert-pdf-to-html-preview": {
+      "title": "Convert PDF to HTML for Web Preview",
+      "filename": "convert-pdf-to-html-preview.cs",
+      "description": "Shows how to load a PDF generated from XML and save it as a single‑file HTML document using Aspose.Pdf for web preview.",
       "tags": [
-        "xml",
         "pdf",
         "html",
         "conversion",
+        "preview",
         "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.XmlLoadOptions",
         "Aspose.Pdf.HtmlSaveOptions",
+        "Aspose.Pdf.HtmlSaveOptions.PartsEmbeddingModes",
+        "Aspose.Pdf.HtmlSaveOptions.RasterImagesSavingModes",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "convert-xml-to-pdf-with-logging": {
-      "title": "Convert XML Files to PDF with Aspose.Pdf and Log Processing Steps",
-      "filename": "convert-xml-to-pdf-with-logging.cs",
-      "description": "The example reads XML files from a folder, uses Aspose.Pdf's XmlLoadOptions to load each file into a Document, and saves it as a PDF while logging each step and handling errors.",
+    "convert-xml-to-pdf": {
+      "title": "Convert XML Files to PDF",
+      "filename": "convert-xml-to-pdf.cs",
+      "description": "Shows how to load XML files with Aspose.Pdf.XmlLoadOptions and convert each file to a PDF document using the Document class. Includes batch processing and error handling.",
       "tags": [
         "xml",
         "pdf",
         "conversion",
-        "aspose-pdf",
-        "error-handling"
+        "aspose",
+        "batch"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.XmlLoadOptions",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document..ctor",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.PdfException"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-05-08T10:00:19Z",
+      "status": "verified"
+    },
+    "convert-xml-to-pdf-with-exception-handling": {
+      "title": "Convert XML to PDF with Exception Handling",
+      "filename": "convert-xml-to-pdf-with-exception-handling.cs",
+      "description": "Demonstrates how to load an XML file, convert it to a PDF using Aspose.Pdf, and handle malformed XML warnings and other errors to keep the application stable.",
+      "tags": [
+        "xml",
+        "pdf",
+        "conversion",
+        "exception-handling",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.XmlLoadOptions",
-        "Aspose.Pdf.PdfException",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.IWarningCallback",
+        "Aspose.Pdf.WarningInfo",
+        "Aspose.Pdf.ReturnAction",
+        "Aspose.Pdf.PdfException"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
     "convert-xml-to-pdf-with-error-handling": {
-      "title": "Convert XML to PDF with Malformed XML Handling",
+      "title": "Convert XML to PDF with Graceful Error Handling",
       "filename": "convert-xml-to-pdf-with-error-handling.cs",
-      "description": "Demonstrates loading an XML file into Aspose.Pdf, handling malformed XML via a warning callback, and saving the result as a PDF with proper exception handling.",
+      "description": "Demonstrates converting an XML file to a PDF using Aspose.Pdf while capturing parsing warnings via a custom IWarningCallback and handling errors with user‑friendly messages.",
       "tags": [
         "xml",
         "pdf",
-        "error-handling",
-        "aspose",
-        "conversion"
-      ],
-      "apis_used": [
-        "Document",
-        "XmlLoadOptions",
-        "Document.Save",
-        "IWarningCallback",
-        "WarningInfo",
-        "ReturnAction"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
-      "status": "verified"
-    },
-    "generate-pdf-from-xslfo-with-error-handling": {
-      "title": "Generate PDF from XSL‑FO with Custom Parsing Error Handling",
-      "filename": "generate-pdf-from-xslfo-with-error-handling.cs",
-      "description": "Demonstrates loading an XSL‑FO file into Aspose.Pdf with a custom warning handler to gracefully manage XML parsing errors, then saving the result as a PDF.",
-      "tags": [
-        "xsl-fo",
-        "pdf-generation",
         "error-handling",
         "aspose-pdf",
-        "custom-warning"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.XslFoLoadOptions",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.PdfException",
-        "Aspose.Pdf.IWarningCallback",
-        "Aspose.Pdf.ReturnAction",
-        "Aspose.Pdf.WarningInfo"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
-      "status": "verified"
-    },
-    "thread-safe-xml-to-pdf-conversion": {
-      "title": "Thread‑Safe XML to PDF Conversion Using Parallel Processing",
-      "filename": "thread-safe-xml-to-pdf-conversion.cs",
-      "description": "Demonstrates how to safely convert multiple XML files to PDF in parallel using Aspose.Pdf's XmlLoadOptions and Document classes.",
-      "tags": [
-        "xml",
-        "pdf",
-        "parallel",
-        "aspose",
-        "thread-safe"
+        "warning-callback"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.XmlLoadOptions",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Document.FreeMemory"
+        "Aspose.Pdf.IWarningCallback",
+        "Aspose.Pdf.WarningInfo",
+        "Aspose.Pdf.ReturnAction",
+        "Aspose.Pdf.PdfException"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
+      "status": "verified"
+    },
+    "concurrent-xml-to-pdf-conversion": {
+      "title": "Concurrent XML to PDF Conversion with Aspose.Pdf",
+      "filename": "concurrent-xml-to-pdf-conversion.cs",
+      "description": "Demonstrates thread‑safe conversion of multiple XML files to PDF in parallel by creating a separate Aspose.Pdf Document for each task using XmlLoadOptions.",
+      "tags": [
+        "xml",
+        "pdf",
+        "concurrency",
+        "aspose",
+        "parallel"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.XmlLoadOptions",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
     "register-pdf-generation-service-di": {
       "title": "Register PDF Generation Service with Dependency Injection",
       "filename": "register-pdf-generation-service-di.cs",
-      "description": "Demonstrates adding a PdfOutputGenerator as a singleton to the IServiceCollection so it can be reused across the application.",
+      "description": "Demonstrates how to register a PdfOutputGenerator as a singleton in the IServiceCollection and expose it via an IFileOutputGenerator interface for reuse throughout an application.",
       "tags": [
         "dependency-injection",
-        "aspnet-core",
         "pdf-generation",
         "singleton",
-        "service-registration"
+        "aspnet-core",
+        "aspose-pdf"
       ],
-      "apis_used": [],
+      "apis_used": [
+        "PdfOutputGenerator",
+        "IFileOutputGenerator"
+      ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
     "xml-to-pdf-conversion-tests": {
-      "title": "Unit Tests for XML‑to‑PDF Conversion with XSLT",
+      "title": "XML to PDF Conversion Tests with XSLT",
       "filename": "xml-to-pdf-conversion-tests.cs",
-      "description": "Shows how to convert XML documents to PDF using Aspose.Pdf with optional XSLT transformations and validates the results with NUnit unit tests.",
+      "description": "Demonstrates how to convert XML documents to PDF using Aspose.Pdf with and without XSLT transformations, and provides NUnit unit tests for each scenario.",
       "tags": [
         "xml",
         "pdf",
         "xslt",
-        "aspose",
-        "unit-test"
+        "unit-testing",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages",
         "Aspose.Pdf.XmlLoadOptions",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.XmlLoadOptions(string)"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "batch-xml-to-pdf-performance-profiling": {
-      "title": "Batch XML to PDF Conversion Performance Profiling",
-      "filename": "batch-xml-to-pdf-performance-profiling.cs",
-      "description": "Processes all XML files in a directory, converts each to PDF using Aspose.Pdf, and measures load and save times to help identify performance bottlenecks.",
+    "batch-xml-to-pdf-conversion-performance": {
+      "title": "Batch XML to PDF Conversion with Performance Profiling",
+      "filename": "batch-xml-to-pdf-conversion-performance.cs",
+      "description": "Converts multiple XML files to PDF using Aspose.Pdf while measuring per‑file and total execution time and memory consumption.",
       "tags": [
         "xml",
         "pdf",
+        "conversion",
         "performance",
-        "batch",
-        "profiling"
+        "batch"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.XmlLoadOptions",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Document.OptimizeResources",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.FreeMemory"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
     "generate-pdf-with-retry-logic": {
       "title": "Generate PDF with Retry Logic for Transient I/O Errors",
       "filename": "generate-pdf-with-retry-logic.cs",
-      "description": "Demonstrates loading, modifying, and saving a PDF with Aspose.Pdf while applying retry logic to handle transient I/O errors.",
+      "description": "Demonstrates loading a PDF, adding a text fragment, and saving it while handling transient I/O failures with configurable retry and exponential back‑off.",
       "tags": [
         "pdf",
         "retry",
-        "aspose",
-        "io-errors",
+        "aspose-pdf",
+        "io-error",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextFragment",
         "Aspose.Pdf.Text.Position",
-        "Aspose.Pdf.PdfException"
+        "Aspose.Pdf.PdfException",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
     "generate-pdf-from-xml-using-xslt-config": {
-      "title": "Generate PDF from XML using XSLT Config",
+      "title": "Generate PDF from XML using XSLT Configured via JSON",
       "filename": "generate-pdf-from-xml-using-xslt-config.cs",
-      "description": "This example reads XML, XSLT, and output paths from a JSON configuration file, applies the XSLT transformation while loading the XML with Aspose.Pdf, and saves the resulting PDF.",
+      "description": "Demonstrates loading an XSLT path from a JSON configuration file, applying the transformation to an XML document with Aspose.Pdf, and saving the result as a PDF.",
       "tags": [
-        "pdf-generation",
+        "aspose-pdf",
         "xslt",
-        "configuration",
+        "json",
+        "pdf-generation",
+        "configuration"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.XmlLoadOptions",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Dispose",
+        "Aspose.Pdf.Document (constructor)"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T10:00:19Z",
+      "status": "verified"
+    },
+    "xml-to-pdf-via-xslt-fo": {
+      "title": "Convert XML to PDF via XSLT and XSL‑FO using Aspose.Pdf",
+      "filename": "xml-to-pdf-via-xslt-fo.cs",
+      "description": "The example loads an XML file and an XSLT stylesheet, transforms the XML to XSL‑FO, and then creates a PDF with Aspose.Pdf. It demonstrates handling multiple XML namespaces during the transformation.",
+      "tags": [
+        "xml",
+        "xslt",
+        "pdf",
+        "aspose",
+        "xsl-fo"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.XslFoLoadOptions",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T10:00:19Z",
+      "status": "verified"
+    },
+    "set-pdf-page-size-via-xml-processing-instruction": {
+      "title": "Set PDF Page Size via XML Processing Instruction",
+      "filename": "set-pdf-page-size-via-xml-processing-instruction.cs",
+      "description": "Demonstrates how to read a custom XML processing instruction to specify page dimensions and apply those dimensions to all pages of an Aspose.Pdf document.",
+      "tags": [
+        "xml",
+        "processing-instruction",
+        "page-size",
         "aspose-pdf",
         "csharp"
       ],
       "apis_used": [
-        "Aspose.Pdf.XmlLoadOptions",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
-      "status": "verified"
-    },
-    "xml-to-pdf-with-namespaces": {
-      "title": "Convert XML to PDF with XSL‑FO and Multiple Namespaces",
-      "filename": "xml-to-pdf-with-namespaces.cs",
-      "description": "Shows how to load an XSL‑FO stylesheet, pass XSLT arguments for namespace handling, and generate a PDF from XML using Aspose.Pdf.",
-      "tags": [
-        "xml",
-        "xslt",
-        "pdf",
-        "namespaces",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.XslFoLoadOptions"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
-      "status": "verified"
-    },
-    "generate-pdf-from-xml-with-custom-page-size": {
-      "title": "Generate PDF from XML with Custom Page Size",
-      "filename": "generate-pdf-from-xml-with-custom-page-size.cs",
-      "description": "Demonstrates loading an XML file with Aspose.Pdf, applying custom page‑size settings to the first page, and saving the result as a PDF.",
-      "tags": [
-        "xml",
-        "pdf",
-        "aspose",
-        "page-size",
-        "document-generation"
-      ],
-      "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.XmlLoadOptions",
+        "Aspose.Pdf.Page",
         "Aspose.Pdf.Page.SetPageSize",
         "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
     "generate-pdf-from-xml-xsl-fo": {
-      "title": "Generate PDF from XML using XSL‑FO Template",
+      "title": "Generate PDF from XML using XSL‑FO with Aspose.Pdf",
       "filename": "generate-pdf-from-xml-xsl-fo.cs",
-      "description": "Shows how to load an XML file with an XSL‑FO stylesheet using Aspose.Pdf and save the transformed content as a PDF document.",
+      "description": "Demonstrates loading an XML file, applying an XSL‑FO template, and saving the transformed result as a PDF using Aspose.Pdf.",
       "tags": [
-        "XSL-FO",
-        "PDF",
-        "XML",
-        "Aspose.Pdf",
-        "Document"
+        "pdf",
+        "xml",
+        "xsl-fo",
+        "aspose",
+        "c#"
       ],
       "apis_used": [
-        "Aspose.Pdf.XmlLoadOptions",
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.XmlLoadOptions",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "apply-conditional-page-margins": {
-      "title": "Apply Conditional Page Margins in PDF",
-      "filename": "apply-conditional-page-margins.cs",
-      "description": "Shows how to assign different margin sizes to PDF pages based on their page number using Aspose.PDF's MarginInfo and PageInfo objects.",
+    "apply-section-specific-page-margins-from-xml": {
+      "title": "Apply Section-Specific Page Margins from XML",
+      "filename": "apply-section-specific-page-margins-from-xml.cs",
+      "description": "Demonstrates how to read margin definitions from an XML file and apply different page margins to sections of a PDF using Aspose.Pdf.",
       "tags": [
         "pdf",
-        "margins",
-        "conditional",
+        "margin",
+        "xml",
         "aspose",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.HtmlLoadOptions",
         "Aspose.Pdf.Page",
+        "Aspose.Pdf.PageInfo",
         "Aspose.Pdf.MarginInfo",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     },
-    "encrypt-pdf-from-xml-aes256": {
-      "title": "Encrypt PDF from XML using AES‑256 with Aspose.Pdf",
-      "filename": "encrypt-pdf-from-xml-aes256.cs",
-      "description": "Demonstrates loading an XML file into a PDF document, applying AES‑256 encryption with user and owner passwords and specific permissions, then saving the protected PDF.",
+    "custom-pdf-encryption-xml": {
+      "title": "Custom PDF Encryption with XML Input",
+      "filename": "custom-pdf-encryption-xml.cs",
+      "description": "Shows how to convert an XML file to a PDF and apply a custom encryption handler using Aspose.Pdf to protect the document with user and owner passwords.",
       "tags": [
-        "pdf-encryption",
-        "xml-to-pdf",
-        "aes256",
-        "permissions",
-        "aspose-pdf"
+        "pdf",
+        "encryption",
+        "custom-security",
+        "xml",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.XmlLoadOptions",
         "Aspose.Pdf.Permissions",
-        "Aspose.Pdf.CryptoAlgorithm",
-        "Aspose.Pdf.Document.Encrypt",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Security.ICustomSecurityHandler",
+        "Aspose.Pdf.Document.Encrypt"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-04-10T07:26:12Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-05-08T10:00:19Z",
       "status": "verified"
     }
   }

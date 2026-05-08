@@ -8,39 +8,43 @@ class Program
     static void Main()
     {
         // Input PDF files to be processed concurrently
-        string[] inputFiles = { "doc1.pdf", "doc2.pdf", "doc3.pdf" };
-        string outputDirectory = "Modified";
+        string[] inputFiles = {
+            "doc1.pdf",
+            "doc2.pdf",
+            "doc3.pdf"
+        };
 
         // Ensure the output directory exists
-        Directory.CreateDirectory(outputDirectory);
+        string outputDir = "Processed";
+        Directory.CreateDirectory(outputDir);
 
-        // Process each file in parallel – each thread gets its own PdfFileInfo instance
+        // Process each file in parallel – each thread works with its own PdfFileInfo instance
         Parallel.ForEach(inputFiles, inputPath =>
         {
             if (!File.Exists(inputPath))
-                return; // Skip missing files
-
-            // Build output file path
-            string baseName = Path.GetFileNameWithoutExtension(inputPath);
-            string outputPath = Path.Combine(outputDirectory, $"{baseName}_mod.pdf");
-
-            // PdfFileInfo implements IDisposable, so use a using block for deterministic cleanup
-            using (PdfFileInfo pdfInfo = new PdfFileInfo())
             {
-                // Bind the source PDF to the facade
-                pdfInfo.BindPdf(inputPath);
-
-                // Update meta‑information (each thread works on its own instance)
-                pdfInfo.Title    = $"Processed {baseName}";
-                pdfInfo.Author   = "ThreadSafe Example";
-                pdfInfo.Subject  = "Metadata update";
-                pdfInfo.Keywords = "Aspose.Pdf;ThreadSafe";
-
-                // Save the updated PDF to a new file
-                pdfInfo.SaveNewInfo(outputPath);
+                Console.Error.WriteLine($"File not found: {inputPath}");
+                return;
             }
 
-            Console.WriteLine($"Thread {Task.CurrentId} completed: {inputPath} → {outputPath}");
+            // Derive output file name
+            string outputPath = Path.Combine(outputDir, Path.GetFileNameWithoutExtension(inputPath) + "_updated.pdf");
+
+            // Each thread creates, uses, and disposes its own PdfFileInfo instance
+            using (PdfFileInfo info = new PdfFileInfo())
+            {
+                // Bind the PDF file to the facade
+                info.BindPdf(inputPath);
+
+                // Modify metadata (example: set Title and Author)
+                info.Title = $"Updated {Path.GetFileName(inputPath)}";
+                info.Author = "ThreadSafe Processor";
+
+                // Save the updated PDF to a new file
+                info.SaveNewInfo(outputPath);
+            }
+
+            Console.WriteLine($"Processed: {inputPath} -> {outputPath}");
         });
     }
 }

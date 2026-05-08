@@ -7,8 +7,8 @@ class Program
     static void Main()
     {
         const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string stampImage = "logo.png";
+        const string stampImg  = "logo.png";
+        const string outputPdf = "output_stamped.pdf";
 
         if (!File.Exists(inputPdf))
         {
@@ -16,17 +16,17 @@ class Program
             return;
         }
 
-        if (!File.Exists(stampImage))
+        if (!File.Exists(stampImg))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampImage}");
+            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPdf))
         {
             // Create an ImageStamp from the image file
-            ImageStamp imgStamp = new ImageStamp(stampImage)
+            ImageStamp imgStamp = new ImageStamp(stampImg)
             {
                 // Example positioning – center of each page
                 HorizontalAlignment = HorizontalAlignment.Center,
@@ -45,6 +45,6 @@ class Program
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Image stamp applied to all pages. Saved as '{outputPdf}'.");
+        Console.WriteLine($"Stamped PDF saved to '{outputPdf}'.");
     }
 }

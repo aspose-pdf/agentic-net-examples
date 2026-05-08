@@ -7,67 +7,67 @@ using Aspose.Pdf.Facades;
 
 class Program
 {
-    static async Task Main(string[] args)
+    static async Task Main()
     {
-        // Paths for the source PDF and the output PDF
-        const string sourcePdfPath = "input.pdf";
+        // Paths for the output PDF (the source PDF will be created in‑memory)
         const string outputPdfPath = "output.pdf";
 
-        // URL of the file to download and attach
-        const string attachmentUrl = "https://example.com/file.bin"; // replace with a valid URL
-        const string attachmentName = "file.bin"; // name that will appear in the PDF
+        // URL of the file to be attached (downloaded as a byte array)
+        const string fileUrl = "https://example.com/file.bin";
+
+        // Name and description for the attachment inside the PDF
+        const string attachmentName = "file.bin";
         const string attachmentDescription = "Network downloaded attachment";
 
         // ------------------------------------------------------------
-        // Ensure a source PDF exists – create a minimal one if missing.
+        // 1. Download the file into a byte array – handle possible HTTP errors gracefully
         // ------------------------------------------------------------
-        if (!File.Exists(sourcePdfPath))
-        {
-            var blankDoc = new Document();
-            blankDoc.Pages.Add(); // add a single empty page
-            blankDoc.Save(sourcePdfPath);
-            Console.WriteLine($"Source PDF not found. Created a new blank PDF at '{sourcePdfPath}'.");
-        }
-
-        // ------------------------------------------------------------
-        // Download the attachment into a byte array – handle HTTP errors.
-        // ------------------------------------------------------------
-        byte[]? attachmentBytes = null;
+        byte[] fileBytes;
         using (HttpClient httpClient = new HttpClient())
         {
             try
             {
-                attachmentBytes = await httpClient.GetByteArrayAsync(attachmentUrl);
+                fileBytes = await httpClient.GetByteArrayAsync(fileUrl);
             }
             catch (HttpRequestException ex)
             {
-                Console.WriteLine($"Failed to download attachment from '{attachmentUrl}'. Error: {ex.Message}");
-                Console.WriteLine("The PDF will be saved without the attachment.");
-                // attachmentBytes stays null to indicate no attachment.
+                Console.WriteLine($"Failed to download '{fileUrl}': {ex.Message}");
+                // Fallback: use an empty byte array so the PDF can still be saved
+                fileBytes = Array.Empty<byte>();
             }
         }
 
         // ------------------------------------------------------------
-        // Load the existing PDF and optionally add the attachment.
+        // 2. Create a minimal PDF in memory (so we don't depend on an external file)
         // ------------------------------------------------------------
-        using (PdfContentEditor editor = new PdfContentEditor())
+        using (MemoryStream sourcePdfStream = new MemoryStream())
         {
-            editor.BindPdf(sourcePdfPath);
-
-            if (attachmentBytes != null && attachmentBytes.Length > 0)
+            // Create a one‑page blank PDF
+            using (Document doc = new Document())
             {
-                // Use a MemoryStream overload – no annotation is added.
-                using (MemoryStream attachmentStream = new MemoryStream(attachmentBytes))
-                {
-                    editor.AddDocumentAttachment(attachmentStream, attachmentName, attachmentDescription);
-                }
+                doc.Pages.Add(); // adds a blank page
+                doc.Save(sourcePdfStream);
             }
 
-            // Save the modified PDF.
-            editor.Save(outputPdfPath);
+            // Reset the stream position before reading it again
+            sourcePdfStream.Position = 0;
+
+            // ------------------------------------------------------------
+            // 3. Create a memory stream from the downloaded (or fallback) bytes
+            // ------------------------------------------------------------
+            using (MemoryStream attachmentStream = new MemoryStream(fileBytes))
+            {
+                // ------------------------------------------------------------
+                // 4. Bind the in‑memory PDF, add the attachment, and save the result
+                // ------------------------------------------------------------
+                PdfContentEditor editor = new PdfContentEditor();
+                // Use the overload that accepts a Stream to avoid file‑system dependencies
+                editor.BindPdf(sourcePdfStream);
+                editor.AddDocumentAttachment(attachmentStream, attachmentName, attachmentDescription);
+                editor.Save(outputPdfPath);
+            }
         }
 
-        Console.WriteLine($"PDF saved to '{outputPdfPath}'." +
-                          (attachmentBytes != null ? " Attachment added." : " No attachment added."));
+        Console.WriteLine($"Attachment added and saved to '{outputPdfPath}'.");
     }
 }

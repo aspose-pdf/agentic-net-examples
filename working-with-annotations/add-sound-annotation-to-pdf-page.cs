@@ -7,49 +7,62 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_with_sound.pdf";
-        const string soundFile = "voiceover.wav";
+        // Input PDF, output PDF and the sound file (must be a supported audio format, e.g., .wav)
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "output_with_sound.pdf";
+        const string soundFilePath = "chime.wav";
 
-        if (!File.Exists(inputPdf))
+        // The page number on which the sound should be triggered when it becomes visible.
+        // Aspose.Pdf uses 1‑based page indexing.
+        const int targetPageNumber = 3;
+
+        // Validate files
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
+        }
+        if (!File.Exists(soundFilePath))
+        {
+            Console.Error.WriteLine($"Sound file not found: {soundFilePath}");
             return;
         }
 
-        if (!File.Exists(soundFile))
+        // Load the PDF document (lifecycle rule: wrap Document in a using block)
+        using (Document doc = new Document(inputPdfPath))
         {
-            Console.Error.WriteLine($"Sound file not found: {soundFile}");
-            return;
-        }
-
-        // Load the PDF document inside a using block for proper disposal
-        using (Document doc = new Document(inputPdf))
-        {
-            // Verify that the document has at least five pages (1‑based indexing)
-            if (doc.Pages.Count < 5)
+            // Ensure the requested page exists
+            if (targetPageNumber < 1 || targetPageNumber > doc.Pages.Count)
             {
-                Console.Error.WriteLine("The document contains fewer than 5 pages.");
+                Console.Error.WriteLine($"Page {targetPageNumber} is out of range. Document has {doc.Pages.Count} pages.");
                 return;
             }
 
-            // Define the annotation rectangle (llx, lly, urx, ury)
-            // Fully qualify Aspose.Pdf.Rectangle to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            // Get the target page
+            Page page = doc.Pages[targetPageNumber];
 
-            // Create a SoundAnnotation on page 5 using the constructor that takes page, rectangle, and sound file path
-            SoundAnnotation soundAnn = new SoundAnnotation(doc.Pages[5], rect, soundFile);
+            // Define the rectangle where the annotation will be placed.
+            // Coordinates are in points (1/72 inch). Adjust as needed.
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 120, 520);
 
-            // Optional: set a tooltip or description
-            soundAnn.Contents = "Play voice‑over narration";
+            // Create a SoundAnnotation that references the sound file.
+            // The annotation will play the sound when the user activates it.
+            // (Activation on page visibility is the default behavior for sound annotations in many viewers.)
+            SoundAnnotation soundAnn = new SoundAnnotation(page, rect, soundFilePath)
+            {
+                // Choose an icon to display (Speaker or Mic)
+                Icon = SoundIcon.Speaker,
+                // Optional tooltip text shown on hover
+                Contents = "Page chime"
+            };
 
-            // Add the annotation to the page's annotation collection
-            doc.Pages[5].Annotations.Add(soundAnn);
+            // Add the annotation to the page's annotation collection.
+            page.Annotations.Add(soundAnn);
 
-            // Save the modified PDF
-            doc.Save(outputPdf);
+            // Save the modified PDF (lifecycle rule: use Document.Save inside the using block)
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF with sound annotation saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF saved with sound annotation: {outputPdfPath}");
     }
 }

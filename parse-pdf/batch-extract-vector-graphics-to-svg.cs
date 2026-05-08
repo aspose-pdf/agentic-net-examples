@@ -4,56 +4,61 @@ using Aspose.Pdf;
 
 class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
-        // Input folder containing PDF files
-        string inputFolder = @"C:\InputPdfs";
-        // Output folder for extracted SVG files
-        string outputFolder = @"C:\ExtractedSvgs";
+        // Folder containing source PDF files
+        const string inputFolder = "InputPdfs";
+        // Folder where extracted SVG files will be placed
+        const string outputFolder = "ExtractedSvgs";
 
-        // Verify that the input directory exists; if not, inform the user and exit gracefully.
         if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"Input folder does not exist: '{inputFolder}'. Please create the folder and place PDF files inside it.");
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
             return;
         }
 
         // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Process each PDF file in the input folder
-        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Get all PDF files in the input folder (non‑recursive)
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+
+        foreach (string pdfPath in pdfFiles)
         {
-            // Open the PDF document inside a using block for proper disposal
-            using (Document doc = new Document(pdfPath))
+            try
             {
-                // Iterate through pages (1‑based indexing)
-                for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+                // Load each PDF using the standard Document constructor (lifecycle rule)
+                using (Document doc = new Document(pdfPath))
                 {
-                    Page page = doc.Pages[pageIndex];
-
-                    // Check if the page contains vector graphics
-                    if (page.HasVectorGraphics())
+                    // Iterate pages using 1‑based indexing (global rule)
+                    for (int i = 1; i <= doc.Pages.Count; i++)
                     {
-                        // Build a unique SVG file name per page
-                        string svgFileName = $"{Path.GetFileNameWithoutExtension(pdfPath)}_page{pageIndex}.svg";
-                        string svgPath = Path.Combine(outputFolder, svgFileName);
+                        Page page = doc.Pages[i];
 
-                        // Extract vector graphics to an SVG file
-                        // TrySaveVectorGraphics returns true if extraction succeeded
-                        bool extracted = page.TrySaveVectorGraphics(svgPath);
-
-                        if (!extracted)
+                        // Check if the page contains vector graphics (Page.HasVectorGraphics)
+                        if (page.HasVectorGraphics())
                         {
-                            Console.Error.WriteLine($"Failed to extract SVG from page {pageIndex} of '{pdfPath}'.");
+                            // Build a unique SVG file name per PDF page
+                            string pdfName = Path.GetFileNameWithoutExtension(pdfPath);
+                            string svgPath = Path.Combine(outputFolder, $"{pdfName}_page{i}.svg");
+
+                            // Extract vector graphics to SVG (Page.TrySaveVectorGraphics)
+                            bool saved = page.TrySaveVectorGraphics(svgPath);
+
+                            if (saved)
+                                Console.WriteLine($"Extracted SVG: {svgPath}");
+                            else
+                                Console.WriteLine($"No vector graphics saved for {pdfName} page {i}");
                         }
                     }
                 }
             }
-
-            Console.WriteLine($"Processed '{pdfPath}'.");
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+            }
         }
 
-        Console.WriteLine("Vector graphic extraction completed.");
+        Console.WriteLine("Batch SVG extraction completed.");
     }
 }

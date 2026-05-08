@@ -9,20 +9,20 @@ class ExportFormDataToFdf
         // Path to the source PDF form
         const string pdfPath = "PdfForm.pdf";
 
-        // Path where the exported FDF will be saved
+        // Path for the resulting FDF file
         const string fdfPath = "export.fdf";
 
-        // Ensure the source PDF exists
+        // Ensure the PDF file exists before proceeding
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Source PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"Error: PDF file not found at '{pdfPath}'.");
             return;
         }
 
-        // Use the Form facade to work with the PDF form
+        // Create a Form facade for the PDF document
         using (Form form = new Form(pdfPath))
         {
-            // Create a file stream for the FDF output
+            // Open a file stream for writing the FDF output
             using (FileStream fdfStream = new FileStream(fdfPath, FileMode.Create, FileAccess.Write))
             {
                 // Export the form fields to the FDF stream
@@ -30,6 +30,6 @@ class ExportFormDataToFdf
             }
         }
 
-        Console.WriteLine($"Form data exported to FDF file: {fdfPath}");
+        Console.WriteLine($"Form data exported successfully to '{fdfPath}'.");
     }
 }

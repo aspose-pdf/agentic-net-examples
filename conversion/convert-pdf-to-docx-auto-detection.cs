@@ -1,8 +1,8 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;   // Aspose.Pdf namespace contains Document, DocSaveOptions, etc.
 
-class PdfToDocxConverter
+class Program
 {
     static void Main()
     {
@@ -10,7 +10,7 @@ class PdfToDocxConverter
         const string inputPdfPath  = "input.pdf";
         const string outputDocxPath = "output.docx";
 
-        // Ensure the source file exists.
+        // Verify that the source file exists.
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Source file not found: {inputPdfPath}");
@@ -21,18 +21,18 @@ class PdfToDocxConverter
         using (Document pdfDocument = new Document(inputPdfPath))
         {
             // Configure save options for DOCX conversion.
+            // - Format specifies the output as DOCX.
+            // - Mode set to Flow (automatic content detection) to let the engine decide the best layout.
             DocSaveOptions saveOptions = new DocSaveOptions
             {
-                // Specify the output format as DOCX.
                 Format = DocSaveOptions.DocFormat.DocX,
-                // Set the recognition mode to Flow, which enables automatic content detection.
-                Mode = DocSaveOptions.RecognitionMode.Flow
+                Mode   = DocSaveOptions.RecognitionMode.Flow
             };
 
-            // Save the PDF as a DOCX file using the configured options.
+            // Save the PDF as a DOCX file using the specified options.
             pdfDocument.Save(outputDocxPath, saveOptions);
         }
 
-        Console.WriteLine($"Conversion completed: '{outputDocxPath}'");
+        Console.WriteLine($"PDF successfully converted to DOCX: {outputDocxPath}");
     }
 }
