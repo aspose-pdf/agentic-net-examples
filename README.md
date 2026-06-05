@@ -1,6 +1,6 @@
-# Aspose.PDF for .NET Examples
+# Aspose.PDF for .NET — Agentic Examples
 
-AI-friendly repository containing validated C# examples for Aspose.PDF for .NET API.
+Agentic, build-validated C# code examples for **Aspose.PDF for .NET** covering PDF creation, conversion, editing, annotations, forms, digital signatures, and text extraction. Every example compiles and runs successfully. Includes `agents.md` guides optimized for AI coding agents.
 
 ## Overview
 
@@ -14,45 +14,53 @@ This repository provides working code examples demonstrating Aspose.PDF for .NET
 | Aspose.PDF version | 26.4.0 |
 | Last updated | 2026-05-08 |
 
-## Repository Structure
+## For AI Coding Agents
 
-Examples are organized by feature category:
-- `accessibility-and-tagged-pdfs/` - 45 example(s)
-- `basic-operations/` - 56 example(s)
-- `compare-pdf/` - 27 example(s)
-- `conversion/` - 102 example(s)
-- `document/` - 118 example(s)
-- `facades-acroforms/` - 40 example(s)
-- `facades-annotations/` - 106 example(s)
-- `facades-bookmarks/` - 35 example(s)
-- `facades-convert-documents/` - 40 example(s)
-- `facades-documents/` - 101 example(s)
-- `facades-edit-document/` - 209 example(s)
-- `facades-extract-images-and-text/` - 82 example(s)
-- `facades-fill-forms/` - 28 example(s)
-- `facades-forms/` - 90 example(s)
-- `facades-metadata/` - 40 example(s)
-- `facades-pages/` - 117 example(s)
-- `facades-secure-documents/` - 40 example(s)
-- `facades-sign-documents/` - 34 example(s)
-- `facades-stamps/` - 45 example(s)
-- `facades-texts-and-images/` - 27 example(s)
-- `facades-xmp-metadata/` - 43 example(s)
-- `graphs-zugferd-operators/` - 83 example(s)
-- `pages/` - 99 example(s)
-- `parse-pdf/` - 65 example(s)
-- `securing-and-signing-pdf/` - 83 example(s)
-- `stamping/` - 50 example(s)
-- `working-with-annotations/` - 160 example(s)
-- `working-with-attachments/` - 50 example(s)
-- `working-with-forms/` - 239 example(s)
-- `working-with-graphs/` - 70 example(s)
-- `working-with-images/` - 70 example(s)
-- `working-with-tables/` - 91 example(s)
-- `working-with-text/` - 72 example(s)
-- `working-with-xml/` - 74 example(s)
+This repository is structured for direct use by AI coding agents and LLM-powered tools:
 
-Each category contains standalone `.cs` files that can be compiled and run independently.
+- **[`agents.md`](./agents.md)** — root-level guide covering API surface, anti-patterns, and category tips
+- **Per-category `agents.md`** — targeted guidance inside each category folder
+- **[`index.json`](./index.json)** — machine-readable manifest of all 2,631 examples with metadata
+- **MCP-compatible** — integrate with any MCP client (Claude Desktop, Cursor, Continue.dev) via the [Aspose PDF Examples Generator](https://github.com/aspose-pdf/agentic-net-examples)
+
+## Categories
+
+| Category | Examples | Agent Guide |
+|----------|----------|-------------|
+| `accessibility-and-tagged-pdfs` | 45 | [agents.md](./accessibility-and-tagged-pdfs/agents.md) |
+| `basic-operations` | 56 | [agents.md](./basic-operations/agents.md) |
+| `compare-pdf` | 27 | [agents.md](./compare-pdf/agents.md) |
+| `conversion` | 102 | [agents.md](./conversion/agents.md) |
+| `document` | 118 | [agents.md](./document/agents.md) |
+| `facades-acroforms` | 40 | [agents.md](./facades-acroforms/agents.md) |
+| `facades-annotations` | 106 | [agents.md](./facades-annotations/agents.md) |
+| `facades-bookmarks` | 35 | [agents.md](./facades-bookmarks/agents.md) |
+| `facades-convert-documents` | 40 | [agents.md](./facades-convert-documents/agents.md) |
+| `facades-documents` | 101 | [agents.md](./facades-documents/agents.md) |
+| `facades-edit-document` | 209 | [agents.md](./facades-edit-document/agents.md) |
+| `facades-extract-images-and-text` | 82 | [agents.md](./facades-extract-images-and-text/agents.md) |
+| `facades-fill-forms` | 28 | [agents.md](./facades-fill-forms/agents.md) |
+| `facades-forms` | 90 | [agents.md](./facades-forms/agents.md) |
+| `facades-metadata` | 40 | [agents.md](./facades-metadata/agents.md) |
+| `facades-pages` | 117 | [agents.md](./facades-pages/agents.md) |
+| `facades-secure-documents` | 40 | [agents.md](./facades-secure-documents/agents.md) |
+| `facades-sign-documents` | 34 | [agents.md](./facades-sign-documents/agents.md) |
+| `facades-stamps` | 45 | [agents.md](./facades-stamps/agents.md) |
+| `facades-texts-and-images` | 27 | [agents.md](./facades-texts-and-images/agents.md) |
+| `facades-xmp-metadata` | 43 | [agents.md](./facades-xmp-metadata/agents.md) |
+| `graphs-zugferd-operators` | 83 | [agents.md](./graphs-zugferd-operators/agents.md) |
+| `pages` | 99 | [agents.md](./pages/agents.md) |
+| `parse-pdf` | 65 | [agents.md](./parse-pdf/agents.md) |
+| `securing-and-signing-pdf` | 83 | [agents.md](./securing-and-signing-pdf/agents.md) |
+| `stamping` | 50 | [agents.md](./stamping/agents.md) |
+| `working-with-annotations` | 160 | [agents.md](./working-with-annotations/agents.md) |
+| `working-with-attachments` | 50 | [agents.md](./working-with-attachments/agents.md) |
+| `working-with-forms` | 239 | [agents.md](./working-with-forms/agents.md) |
+| `working-with-graphs` | 70 | [agents.md](./working-with-graphs/agents.md) |
+| `working-with-images` | 70 | [agents.md](./working-with-images/agents.md) |
+| `working-with-tables` | 91 | [agents.md](./working-with-tables/agents.md) |
+| `working-with-text` | 72 | [agents.md](./working-with-text/agents.md) |
+| `working-with-xml` | 74 | [agents.md](./working-with-xml/agents.md) |
 
 ## Getting Started
 
@@ -108,12 +116,18 @@ catch (Exception ex)
 - **Console output**: Success/error messages written to Console.WriteLine/Console.Error
 - **Fully qualified types**: Use `Aspose.Pdf.Drawing.Path` (not bare `Path`) to avoid ambiguity with `System.IO.Path`
 
-## Documentation
+## Agentic .NET Ecosystem
 
-- Each category folder contains an `agents.md` with category-specific guidance
-- Each category folder contains an `index.json` with per-example metadata
-- Root [`agents.md`](./agents.md) provides cumulative guidance across all categories
-- Root [`index.json`](./index.json) provides a machine-readable manifest of all examples
+Other Aspose products with agentic, build-validated example repositories:
+
+| Product | Repository | Focus |
+|---------|-----------|-------|
+| Aspose.Words for .NET | [aspose-words/agentic-net-examples](https://github.com/aspose-words/agentic-net-examples) | Word processing, DOCX, mail merge |
+| Aspose.Cells for .NET | [aspose-cells/agentic-net-examples](https://github.com/aspose-cells/agentic-net-examples) | Spreadsheets, Excel, charts |
+| Aspose.HTML for .NET | [aspose-html/agentic-net-examples](https://github.com/aspose-html/agentic-net-examples) | HTML conversion, DOM editing |
+| Aspose.Imaging for .NET | [aspose-imaging/agentic-net-examples](https://github.com/aspose-imaging/agentic-net-examples) | Image conversion, manipulation |
+| Aspose.Slides for .NET | [aspose-slides/agentic-net-examples](https://github.com/aspose-slides/agentic-net-examples) | Presentations, PowerPoint |
+| Aspose.Email for .NET | [aspose-email/agentic-net-examples](https://github.com/aspose-email/agentic-net-examples) | Email, calendars, messaging |
 
 ## Related Resources
 
