@@ -1,0 +1,232 @@
+name: Validate Examples (PR)
+
+# Runs on every PR targeting release/* or main.
+# Only builds/runs the .cs files changed in the PR — fast per-category checks.
+# dotnet build  → required (blocks merge if any file fails)
+# dotnet run    → informational only (15s timeout; may fail due to missing input files)
+
+on:
+  pull_request:
+    branches:
+      - "release/**"
+      - main
+jobs:
+  validate:
+    name: Build & Run changed examples
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # needed for git diff against base branch
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      # ── Detect NuGet version from index.json, fall back to 26.3.0 ──
+      - name: Detect NuGet version
+        id: version
+        run: |
+          VERSION=""
+          if [ -f "index.json" ]; then
+            VERSION=$(python3 -c "import json,sys; d=json.load(open('index.json')); print(d.get('package_version',''))" 2>/dev/null || true)
+          fi
+          VERSION="${VERSION:-26.3.0}"
+          echo "nuget_version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Using Aspose.PDF $VERSION"
+
+      # ── Create isolated build template (cached per NuGet version) ──
+      - name: Setup build template
+        run: |
+          mkdir -p .build-template
+          cat > .build-template/template.csproj << EOF
+          <Project Sdk="Microsoft.NET.Sdk">
+            <PropertyGroup>
+              <OutputType>Exe</OutputType>
+              <TargetFramework>net10.0</TargetFramework>
+              <Nullable>enable</Nullable>
+              <ImplicitUsings>enable</ImplicitUsings>
+            </PropertyGroup>
+            <ItemGroup>
+              <PackageReference Include="Aspose.PDF" Version="${{ steps.version.outputs.nuget_version }}" />
+            </ItemGroup>
+          </Project>
+          EOF
+          sed -i 's/^[[:space:]]*//' .build-template/template.csproj
+          echo 'class Program { static void Main() {} }' > .build-template/Program.cs
+          dotnet restore .build-template/ --verbosity quiet
+          echo "Template ready with Aspose.PDF ${{ steps.version.outputs.nuget_version }}"
+
+      # ── Find .cs files to validate ──
+      # We apply up to three filters to avoid re-running CI on files that
+      # didn't actually change:
+      #   1. PR-owned filter (merge-base): only files the PR itself added
+      #      or modified vs the base branch — skips files that came in via
+      #      "Update branch" merges from the base.
+      #   2. Incremental filter: if HEAD is a merge commit (i.e. the user
+      #      clicked "Update branch"), only validate files that changed in
+      #      the merge itself (HEAD^1..HEAD). If the merge introduced no
+      #      new changes to PR-owned .cs files, skip the build entirely.
+      #   3. Environment tripwire: if the merge touched csproj, workflow,
+      #      index.json, or global.json, force a full revalidation because
+      #      the build environment may have changed.
+      - name: Get changed .cs files
+        id: changed
+        run: |
+          BASE="${{ github.event.pull_request.base.sha }}"
+          HEAD="${{ github.event.pull_request.head.sha }}"
+          MERGE_BASE=$(git merge-base "$BASE" "$HEAD")
+          echo "PR base:    $BASE"
+          echo "PR head:    $HEAD"
+          echo "Merge base: $MERGE_BASE"
+
+          # ── Filter 1: files the PR itself changed ──
+          PR_FILES=$(git diff --name-only "$MERGE_BASE" "$HEAD" -- '*.cs' | grep '\.cs$' || true)
+
+          # ── Is HEAD a merge commit (i.e. "Update branch" was clicked)? ──
+          IS_MERGE=false
+          if git rev-parse --verify HEAD^2 >/dev/null 2>&1; then
+            IS_MERGE=true
+            echo "HEAD is a merge commit (Update branch was used)"
+          fi
+
+          # ── Filter 3: environment tripwire (forces full revalidate) ──
+          FORCE_FULL=false
+          if [ "$IS_MERGE" = "true" ]; then
+            ENV_DIFF=$(git diff --name-only HEAD^1 HEAD -- \
+              'index.json' \
+              '.github/workflows/validate-pr.yml' \
+              '**/*.csproj' \
+              'global.json' 2>/dev/null || true)
+            if [ -n "$ENV_DIFF" ]; then
+              FORCE_FULL=true
+              echo "Environment changed in merge — forcing full revalidation:"
+              echo "$ENV_DIFF"
+            fi
+          fi
+
+          # ── Filter 2: incremental (only files touched by the merge) ──
+          if [ "$IS_MERGE" = "true" ] && [ "$FORCE_FULL" = "false" ]; then
+            RECENT_FILES=$(git diff --name-only HEAD^1 HEAD -- '*.cs' | grep '\.cs$' || true)
+            if [ -z "$RECENT_FILES" ]; then
+              echo "Merge did not touch any .cs files — skipping validation."
+              echo "has_cs=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            # Intersect PR-owned files with files touched by the merge
+            FILES=$(comm -12 \
+              <(printf '%s\n' "$PR_FILES" | sort -u) \
+              <(printf '%s\n' "$RECENT_FILES" | sort -u))
+            if [ -z "$FILES" ]; then
+              echo "Merge touched .cs files but none were PR-owned — skipping validation."
+              echo "has_cs=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "Incremental mode: validating only files touched by the merge"
+          else
+            FILES="$PR_FILES"
+          fi
+
+          if [ -z "$FILES" ]; then
+            echo "No .cs files changed in this PR"
+            echo "has_cs=false" >> "$GITHUB_OUTPUT"
+          else
+            COUNT=$(echo "$FILES" | wc -l | tr -d ' ')
+            echo "Found $COUNT changed .cs file(s)"
+            echo "$FILES"
+            echo "$FILES" > /tmp/changed_cs.txt
+            echo "has_cs=true" >> "$GITHUB_OUTPUT"
+            echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build & run examples
+        if: steps.changed.outputs.has_cs == 'true'
+        run: |
+          PASS=0; FAIL=0; RUN_PASS=0; RUN_FAIL=0
+          TOTAL="${{ steps.changed.outputs.count }}"
+          FAILED_FILES=""
+
+          while IFS= read -r f; do
+            [ -f "$f" ] || continue   # skip deleted files
+
+            cp "$f" .build-template/Program.cs
+
+            # ── dotnet build (required) ──
+            BUILD_OUT=$(dotnet build .build-template/ --no-restore --nologo 2>&1) || true
+            if echo "$BUILD_OUT" | grep -q "Build succeeded"; then
+              PASS=$((PASS + 1))
+
+              # ── dotnet run (informational, 15s timeout) ──
+              RUN_OUT=$(timeout 15s dotnet run --project .build-template/ --no-build --nologo 2>&1) && RUN_EXIT=0 || RUN_EXIT=$?
+              if [ $RUN_EXIT -eq 124 ]; then
+                RUN_PASS=$((RUN_PASS + 1))
+              elif [ $RUN_EXIT -eq 0 ]; then
+                RUN_PASS=$((RUN_PASS + 1))
+              else
+                RUN_FAIL=$((RUN_FAIL + 1))
+              fi
+
+              echo "✅ $f"
+            else
+              FAIL=$((FAIL + 1))
+              ERRORS=$(echo "$BUILD_OUT" | grep -E "error CS|^.*error :" | sed "s|Program\.cs|$f|g" || true)
+              echo "::error file=$f::Build failed"
+              echo "❌ FAIL: $f"
+              echo "$ERRORS"
+              # Collect failure details for summary (written at end to avoid truncation)
+              FAILED_FILES="$FAILED_FILES
+          FILE:$f
+          $ERRORS
+          ENDFILE"
+            fi
+          done < /tmp/changed_cs.txt
+
+          echo "========================================"
+          echo "Build: ✅ $PASS passed | ❌ $FAIL failed out of $TOTAL"
+          echo "Run:   🚀 $RUN_PASS ok | ⚠️ $RUN_FAIL runtime errors"
+          echo "========================================"
+
+          # ── Write compact summary (failures first to avoid truncation) ──
+          {
+            echo "## Validation Results"
+            echo ""
+            echo "**Aspose.PDF:** ${{ steps.version.outputs.nuget_version }} | **Files:** $TOTAL"
+            echo ""
+            echo "**Build: ✅ $PASS passed | ❌ $FAIL failed**"
+            echo "**Run: 🚀 $RUN_PASS ok | ⚠️ $RUN_FAIL runtime errors (informational)**"
+            echo ""
+
+            # Show failures first (most important info)
+            if [ $FAIL -gt 0 ]; then
+              echo "---"
+              echo "### ❌ Build Failures ($FAIL)"
+              echo ""
+              echo "$FAILED_FILES" | while IFS= read -r line; do
+                case "$line" in
+                  FILE:*)
+                    echo "<details><summary><code>${line#FILE:}</code></summary>"
+                    echo ""
+                    echo '```'
+                    ;;
+                  ENDFILE)
+                    echo '```'
+                    echo "</details>"
+                    echo ""
+                    ;;
+                  *)
+                    [ -n "$line" ] && echo "$line"
+                    ;;
+                esac
+              done
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          # Only build failures block the PR
+          [ "$FAIL" -eq 0 ] || exit 1
+
+      - name: No .cs files changed
+        if: steps.changed.outputs.has_cs == 'false'
+        run: echo "No .cs files in this PR — skipping validation."
