@@ -1,0 +1,895 @@
+{
+  "category": "facades-xmp-metadata",
+  "nuget_version": "26.5.0",
+  "last_updated": "2026-06-15T09:47:48Z",
+  "examples": {
+    "load-pdf-retrieve-xmp-metadata": {
+      "title": "Load PDF and Retrieve XMP Metadata",
+      "filename": "load-pdf-retrieve-xmp-metadata.cs",
+      "description": "Demonstrates how to bind a PDF file to a PdfXmpMetadata facade and extract its XMP metadata as a byte array.",
+      "tags": [
+        "pdf",
+        "xmp",
+        "metadata",
+        "aspose.pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.BindPdf",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.GetXmpMetadata"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "check-xmp-metadata-in-pdf": {
+      "title": "Check for XMP Metadata in a PDF",
+      "filename": "check-xmp-metadata-in-pdf.cs",
+      "description": "Demonstrates how to detect whether a PDF file contains XMP metadata using Aspose.Pdf.Facades before attempting any modifications.",
+      "tags": [
+        "XMP",
+        "metadata",
+        "PDF",
+        "Aspose",
+        "validation"
+      ],
+      "apis_used": [
+        "PdfXmpMetadata",
+        "PdfXmpMetadata.BindPdf",
+        "PdfXmpMetadata.GetXmpMetadata"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "set-baseurl-in-pdf-xmp-metadata": {
+      "title": "Set BaseURL in PDF XMP Metadata",
+      "filename": "set-baseurl-in-pdf-xmp-metadata.cs",
+      "description": "Demonstrates how to bind an XMP metadata facade to a PDF document and set the BaseURL property, then save the updated PDF.",
+      "tags": [
+        "XMP",
+        "metadata",
+        "BaseURL",
+        "Aspose.Pdf",
+        "PDF"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "Aspose.Pdf.Facades.DefaultMetadataProperties",
+        "Aspose.Pdf.Facades.XmpValue",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.Add",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "set-xmp-creatortool-property": {
+      "title": "Set XMP CreatorTool Property in PDF",
+      "filename": "set-xmp-creatortool-property.cs",
+      "description": "Shows how to bind an existing PDF, add or replace the XMP CreatorTool metadata property with the current application version, and save the updated PDF using Aspose.Pdf.Facades.",
+      "tags": [
+        "XMP",
+        "metadata",
+        "CreatorTool",
+        "Aspose.Pdf",
+        "PDF"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.BindPdf",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.Add",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "set-pdf-xmp-nickname": {
+      "title": "Set PDF XMP Nickname Property",
+      "filename": "set-pdf-xmp-nickname.cs",
+      "description": "Shows how to bind a PDF, add a custom Nickname to its XMP metadata, and save the updated file using Aspose.Pdf.Facades.",
+      "tags": [
+        "XMP",
+        "metadata",
+        "nickname",
+        "Aspose.Pdf",
+        "PDF"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.BindPdf",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.Add",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "remove-nickname-from-xmp-metadata": {
+      "title": "Remove Nickname Element from PDF XMP Metadata",
+      "filename": "remove-nickname-from-xmp-metadata.cs",
+      "description": "Shows how to bind a PDF to the XMP metadata facade, delete the Nickname property, and save the modified document using Aspose.Pdf.",
+      "tags": [
+        "xmp",
+        "metadata",
+        "remove",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "PdfXmpMetadata.BindPdf",
+        "PdfXmpMetadata.Remove",
+        "PdfXmpMetadata.Save",
+        "Aspose.Pdf.Facades.DefaultMetadataProperties"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "extract-xmp-metadata-from-pdf": {
+      "title": "Extract XMP Metadata from PDF",
+      "filename": "extract-xmp-metadata-from-pdf.cs",
+      "description": "Shows how to bind a PDF with PdfXmpMetadata, retrieve the raw XMP XML as a UTF‑8 string, and save it to a file.",
+      "tags": [
+        "XMP",
+        "metadata",
+        "PDF",
+        "Aspose.Pdf",
+        "extraction"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.BindPdf",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.GetXmpMetadata"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "read-xmp-metadata-from-pdf": {
+      "title": "Read XMP Metadata from PDF using Aspose.Pdf",
+      "filename": "read-xmp-metadata-from-pdf.cs",
+      "description": "Shows how to bind a PDF with Aspose.Pdf, extract its XMP metadata as XML, and parse specific schema properties such as creator, creation date, and PDF/A part.",
+      "tags": [
+        "xmp",
+        "metadata",
+        "pdf",
+        "aspose",
+        "xml"
+      ],
+      "apis_used": [
+        "PdfXmpMetadata",
+        "PdfXmpMetadata.BindPdf",
+        "PdfXmpMetadata.GetXmpMetadata",
+        "PdfXmpMetadata.Close"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "modify-xmp-metadata-node": {
+      "title": "Modify XMP Metadata Node in PDF",
+      "filename": "modify-xmp-metadata-node.cs",
+      "description": "Shows how to read XMP metadata from a PDF, edit a specific node using XML and XPath, and write the updated metadata back to the document with Aspose.Pdf.",
+      "tags": [
+        "xmp",
+        "metadata",
+        "pdf",
+        "xml",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.BindPdf",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.GetXmpMetadata",
+        "Aspose.Pdf.Document.SetXmpMetadata"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "update-multiple-xmp-properties": {
+      "title": "Update Multiple XMP Properties in a PDF Atomically",
+      "filename": "update-multiple-xmp-properties.cs",
+      "description": "Demonstrates how to bind a PDF to the PdfXmpMetadata facade, add or update several standard and custom XMP metadata properties, and save the changes in a single atomic operation.",
+      "tags": [
+        "XMP",
+        "metadata",
+        "PdfXmpMetadata",
+        "Aspose.Pdf",
+        "C#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.BindPdf",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.Add",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.Save",
+        "Aspose.Pdf.Facades.DefaultMetadataProperties"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "update-pdf-xmp-metadata": {
+      "title": "Update PDF XMP Metadata and Save",
+      "filename": "update-pdf-xmp-metadata.cs",
+      "description": "Demonstrates how to bind an existing PDF, modify its XMP metadata using Aspose.Pdf.Facades, and save the updated document.",
+      "tags": [
+        "pdf",
+        "xmp",
+        "metadata",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "PdfXmpMetadata.BindPdf",
+        "PdfXmpMetadata.Add",
+        "PdfXmpMetadata.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "insert-page-update-xmp-metadata": {
+      "title": "Insert Page and Update XMP Metadata in PDF",
+      "filename": "insert-page-update-xmp-metadata.cs",
+      "description": "Shows how to add a blank page to an existing PDF and modify its XMP metadata, including standard and custom properties, before saving.",
+      "tags": [
+        "pdf",
+        "xmp",
+        "page-insertion",
+        "metadata",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages.Add",
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.Add",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.RegisterNamespaceURI",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "preserve-xmp-metadata-when-splitting-pdf-pages": {
+      "title": "Preserve XMP Metadata When Splitting PDF Pages",
+      "filename": "preserve-xmp-metadata-when-splitting-pdf-pages.cs",
+      "description": "Shows how to extract the original XMP metadata from a multi‑page PDF, split the document into single‑page PDFs, and re‑apply the metadata to each new file using Aspose.Pdf.",
+      "tags": [
+        "xmp",
+        "pdf-split",
+        "metadata",
+        "aspose-pdf",
+        "facades"
+      ],
+      "apis_used": [
+        "PdfXmpMetadata",
+        "PdfXmpMetadata.BindPdf",
+        "PdfXmpMetadata.GetXmpMetadata",
+        "PdfFileEditor.SplitToPages",
+        "Document",
+        "Document.SetXmpMetadata",
+        "Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "copy-xmp-metadata-and-merge-pdfs": {
+      "title": "Copy XMP Metadata Between PDFs and Merge",
+      "filename": "copy-xmp-metadata-and-merge-pdfs.cs",
+      "description": "Shows how to extract XMP metadata from a source PDF, apply it to a target PDF, and then concatenate the PDFs using Aspose.Pdf.",
+      "tags": [
+        "xmp",
+        "metadata",
+        "pdf",
+        "merge",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.BindPdf",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.GetXmpMetadata",
+        "Aspose.Pdf.Document.SetXmpMetadata",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "export-xmp-metadata-from-pdf": {
+      "title": "Export XMP Metadata from PDF to Side‑car File",
+      "filename": "export-xmp-metadata-from-pdf.cs",
+      "description": "Demonstrates how to bind a PDF with the PdfXmpMetadata facade, extract its XMP metadata, and save it as a separate .xmp side‑car file.",
+      "tags": [
+        "xmp",
+        "metadata",
+        "pdf",
+        "export",
+        "facade"
+      ],
+      "apis_used": [
+        "PdfXmpMetadata",
+        "PdfXmpMetadata.BindPdf",
+        "PdfXmpMetadata.GetXmpMetadata"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "replace-pdf-xmp-metadata-from-external-file": {
+      "title": "Replace PDF XMP Metadata from External File",
+      "filename": "replace-pdf-xmp-metadata-from-external-file.cs",
+      "description": "Demonstrates how to import an external .xmp file and replace the existing XMP metadata block in a PDF using Aspose.Pdf and the Facades API.",
+      "tags": [
+        "XMP",
+        "metadata",
+        "PDF",
+        "Aspose.Pdf",
+        "Facades"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.SetXmpMetadata",
+        "Aspose.Pdf.Facades.PdfFileInfo",
+        "Aspose.Pdf.Facades.PdfFileInfo.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileInfo.SaveNewInfoWithXmp"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "validate-pdf-xmp-metadata": {
+      "title": "Validate PDF XMP Metadata Against XSD Schema",
+      "filename": "validate-pdf-xmp-metadata.cs",
+      "description": "Demonstrates how to extract XMP metadata from a PDF using Aspose.Pdf.Facades and validate it against an official XMP XSD schema with an XML schema validator.",
+      "tags": [
+        "xmp",
+        "validation",
+        "pdf",
+        "schema",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.BindPdf",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.GetXmpMetadata"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "update-pdf-xmp-metadata-with-warnings": {
+      "title": "Update PDF XMP Metadata with Warning for Existing Values",
+      "filename": "update-pdf-xmp-metadata-with-warnings.cs",
+      "description": "Demonstrates how to load a PDF, inspect XMP metadata properties, log a warning when a property already contains a non‑empty value, and set new values only when appropriate.",
+      "tags": [
+        "xmp",
+        "metadata",
+        "pdf",
+        "aspose-pdf",
+        "warning"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "Aspose.Pdf.Facades.DefaultMetadataProperties",
+        "Aspose.Pdf.Facades.XmpValue",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.Contains",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "log-modify-xmp-metadata-size": {
+      "title": "Log and Modify XMP Metadata Size in PDF",
+      "filename": "log-modify-xmp-metadata-size.cs",
+      "description": "Demonstrates how to read the XMP metadata from a PDF, log its byte size before and after modification, add a new creator entry, and save the updated document.",
+      "tags": [
+        "xmp",
+        "metadata",
+        "pdf",
+        "size",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.GetXmpMetadata",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.Add",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "extract-audit-original-xmp-metadata": {
+      "title": "Extract and Audit Original XMP Metadata from PDF",
+      "filename": "extract-audit-original-xmp-metadata.cs",
+      "description": "Demonstrates how to load a PDF, retrieve its XMP metadata packet using Aspose.Pdf, and save the original XML to an audit file for traceability.",
+      "tags": [
+        "XMP",
+        "metadata",
+        "audit",
+        "Aspose.Pdf",
+        "PDF"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "PdfXmpMetadata.BindPdf",
+        "PdfXmpMetadata.GetXmpMetadata"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "add-creator-metadata-to-pdf": {
+      "title": "Add Creator Metadata to PDF Document",
+      "filename": "add-creator-metadata-to-pdf.cs",
+      "description": "Shows how to create a reusable extension method that sets the Creator field in a PDF's metadata using Aspose.Pdf's DocumentInfo and saves the document.",
+      "tags": [
+        "creator",
+        "metadata",
+        "pdf",
+        "extension-method",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.DocumentInfo",
+        "Aspose.Pdf.DocumentInfo.Creator",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "clear-xmp-metadata-from-pdf": {
+      "title": "Clear XMP Metadata from PDF while Preserving Header",
+      "filename": "clear-xmp-metadata-from-pdf.cs",
+      "description": "Demonstrates how to remove all XMP metadata from a PDF document using Aspose.Pdf.Facades, leaving only the required PDF schema header, and save the cleaned file.",
+      "tags": [
+        "xmp",
+        "metadata",
+        "pdf",
+        "clear",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.BindPdf",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.Clear",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.Save",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.Dispose"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "remove-xmp-metadata-from-pdf": {
+      "title": "Remove XMP Metadata from PDF",
+      "filename": "remove-xmp-metadata-from-pdf.cs",
+      "description": "Shows how to delete the entire XMP metadata block from a PDF using Aspose.Pdf.Facades and save the cleaned file.",
+      "tags": [
+        "xmp",
+        "metadata",
+        "pdf",
+        "remove",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.BindPdf",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.Clear",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "decrypt-encrypted-pdf-with-error-handling": {
+      "title": "Decrypt Encrypted PDF with Error Handling using PdfFileSecurity",
+      "filename": "decrypt-encrypted-pdf-with-error-handling.cs",
+      "description": "Demonstrates binding an encrypted PDF with PdfFileSecurity, handling InvalidPasswordException by reopening the document with a password, and then decrypting and saving the PDF.",
+      "tags": [
+        "pdf",
+        "encryption",
+        "decryption",
+        "error-handling",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileSecurity",
+        "Aspose.Pdf.Facades.PdfFileSecurity.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileSecurity.DecryptFile",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.InvalidPasswordException"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "decrypt-update-creator-metadata-reencrypt-pdf": {
+      "title": "Decrypt PDF, Update Creator Metadata, and Re‑Encrypt",
+      "filename": "decrypt-update-creator-metadata-reencrypt-pdf.cs",
+      "description": "Demonstrates opening a password‑protected PDF, removing its encryption, modifying the Creator metadata field, and applying new AES‑256 encryption with specific permissions.",
+      "tags": [
+        "pdf",
+        "encryption",
+        "metadata",
+        "creator",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Decrypt",
+        "Aspose.Pdf.Document.Info",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "write-read-custom-pdf-metadata": {
+      "title": "Write and Read Custom PDF Metadata with Aspose.Pdf",
+      "filename": "write-read-custom-pdf-metadata.cs",
+      "description": "Demonstrates how to add custom XMP metadata (BaseUrl, CreatorTool, Nickname) to a PDF using Aspose.Pdf and then read it back to verify the values.",
+      "tags": [
+        "pdf",
+        "metadata",
+        "aspose",
+        "xmp",
+        "unit-test"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfFileInfo",
+        "PdfFileInfo.SetMetaInfo",
+        "PdfFileInfo.GetMetaInfo",
+        "PdfFileInfo.SaveNewInfo"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "verify-htmlloadoptions-basepath-escaping": {
+      "title": "Verify HtmlLoadOptions BasePath Escaping with Special Characters",
+      "filename": "verify-htmlloadoptions-basepath-escaping.cs",
+      "description": "Demonstrates a unit test that ensures the BasePath supplied to HtmlLoadOptions is preserved and correctly escaped when it contains spaces and special characters, and that the resulting PDF can be processed with a Facade.",
+      "tags": [
+        "html",
+        "basepath",
+        "escaping",
+        "pdf",
+        "unit-test"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.HtmlLoadOptions",
+        "Aspose.Pdf.Facades.PdfViewer",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Facades.PdfViewer.BindPdf"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "benchmark-xmp-metadata-extraction": {
+      "title": "Benchmark XMP Metadata Extraction from Large PDF",
+      "filename": "benchmark-xmp-metadata-extraction.cs",
+      "description": "Shows how to read XMP metadata from a large PDF and measure the elapsed time using Aspose.Pdf.Facades.",
+      "tags": [
+        "xmp",
+        "metadata",
+        "benchmark",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.BindPdf",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.GetXmpMetadata",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.Dispose"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "update-pdf-creator-metadata": {
+      "title": "Update PDF Creator Metadata in a Folder",
+      "filename": "update-pdf-creator-metadata.cs",
+      "description": "Demonstrates how to batch‑update the Creator metadata property of all PDF files in a specified directory using Aspose.Pdf.Facades. The utility reads each PDF, sets a new Creator value, and saves the changes.",
+      "tags": [
+        "pdf",
+        "metadata",
+        "creator",
+        "batch",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileInfo",
+        "Aspose.Pdf.Facades.PdfFileInfo.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileInfo.Creator",
+        "Aspose.Pdf.Facades.PdfFileInfo.SaveNewInfo"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "update-xmp-property-in-pdf": {
+      "title": "Update XMP Property in PDF",
+      "filename": "update-xmp-property-in-pdf.cs",
+      "description": "Shows how to bind a PDF, add or update an XMP metadata property, and save the modified file using Aspose.Pdf.Facades.",
+      "tags": [
+        "XMP",
+        "metadata",
+        "PDF",
+        "Aspose.Pdf",
+        "command-line"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.BindPdf",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.Add",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "update-xmp-baseurl-in-pdf": {
+      "title": "Update XMP BaseURL in PDF Using Aspose.Pdf",
+      "filename": "update-xmp-baseurl-in-pdf.cs",
+      "description": "Shows how to set the XMP BaseURL property of a PDF to a supplied host URL and save the updated document.",
+      "tags": [
+        "XMP",
+        "BaseURL",
+        "Aspose.Pdf",
+        "metadata",
+        "PDF"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "Aspose.Pdf.Facades.DefaultMetadataProperties",
+        "Aspose.Pdf.Facades.XmpValue",
+        "Aspose.Pdf.Document.SetXmpMetadata",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "read-xmp-metadata-from-pdf-unc": {
+      "title": "Read XMP Metadata from PDF via UNC Path",
+      "filename": "read-xmp-metadata-from-pdf-unc.cs",
+      "description": "Shows how to open a PDF located on a network share using a UNC path and extract its XMP metadata using Aspose.Pdf.Facades.",
+      "tags": [
+        "xmp",
+        "pdf",
+        "unc",
+        "metadata",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.BindPdf",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.GetXmpMetadata"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "list-xmp-namespaces-in-pdf": {
+      "title": "List XMP Namespaces in a PDF",
+      "filename": "list-xmp-namespaces-in-pdf.cs",
+      "description": "Shows how to load XMP metadata from a PDF, extract unique namespace prefixes from the metadata keys, and retrieve their corresponding namespace URIs using Aspose.Pdf.Facades.",
+      "tags": [
+        "xmp",
+        "metadata",
+        "pdf",
+        "namespace",
+        "aspose"
+      ],
+      "apis_used": [
+        "PdfXmpMetadata",
+        "PdfXmpMetadata.BindPdf",
+        "PdfXmpMetadata.Keys",
+        "PdfXmpMetadata.GetNamespaceURIByPrefix"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "add-minimal-xmp-metadata-to-pdf": {
+      "title": "Add Minimal XMP Metadata to PDF When Missing",
+      "filename": "add-minimal-xmp-metadata-to-pdf.cs",
+      "description": "Shows how to detect the absence of XMP metadata in a PDF and add a minimal set (title and creator) using the PdfXmpMetadata facade, then save the updated document.",
+      "tags": [
+        "xmp",
+        "metadata",
+        "pdf",
+        "aspose",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "PdfXmpMetadata.GetXmpMetadata",
+        "PdfXmpMetadata.Add",
+        "PdfXmpMetadata.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "export-pdf-xmp-metadata-to-json": {
+      "title": "Export PDF XMP Metadata to JSON",
+      "filename": "export-pdf-xmp-metadata-to-json.cs",
+      "description": "Demonstrates how to extract XMP metadata from a PDF using Aspose.Pdf.Facades.PdfXmpMetadata, convert the XML into a JSON-friendly object graph, and save the result as a JSON file.",
+      "tags": [
+        "xmp",
+        "metadata",
+        "json",
+        "pdf",
+        "export"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.BindPdf",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.GetXmpMetadata",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.Dispose"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "compress-pdf-high-compression-read-xmp-metadata": {
+      "title": "Compress PDF with High Settings and Read XMP Metadata",
+      "filename": "compress-pdf-high-compression-read-xmp-metadata.cs",
+      "description": "The example loads a PDF, applies aggressive optimization options to achieve high compression, saves the result, and then reads the XMP metadata from the compressed file using the PdfXmpMetadata facade.",
+      "tags": [
+        "pdf-compression",
+        "xmp-metadata",
+        "optimization",
+        "facade",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Optimization.OptimizationOptions",
+        "Aspose.Pdf.Document.OptimizeResources",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.BindPdf",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.GetXmpMetadata"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "validate-mandatory-xmp-metadata": {
+      "title": "Validate Mandatory XMP Metadata Before Publishing PDF",
+      "filename": "validate-mandatory-xmp-metadata.cs",
+      "description": "Demonstrates how to check for required XMP metadata fields in a PDF using Aspose.Pdf and save the document only when all mandatory fields are present.",
+      "tags": [
+        "xmp",
+        "metadata",
+        "validation",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.BindPdf",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.GetXmpMetadata",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "add-timestamp-to-pdf-xmp-metadata": {
+      "title": "Add Timestamp to PDF XMP Metadata",
+      "filename": "add-timestamp-to-pdf-xmp-metadata.cs",
+      "description": "Demonstrates creating a PDF, inserting text, binding the XMP metadata facade, adding a custom ISO‑8601 timestamp property, and saving the document with platform‑specific handling.",
+      "tags": [
+        "pdf",
+        "xmp",
+        "metadata",
+        "timestamp",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.BindPdf",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "extract-xmp-metadata-to-dictionary": {
+      "title": "Extract XMP Metadata from PDF to Dictionary",
+      "filename": "extract-xmp-metadata-to-dictionary.cs",
+      "description": "Shows how to read XMP metadata from a PDF file using Aspose.Pdf and return it as a case‑insensitive dictionary of string key/value pairs.",
+      "tags": [
+        "xmp",
+        "metadata",
+        "pdf",
+        "dictionary",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.BindPdf",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.GetEnumerator",
+        "Aspose.Pdf.XmpValue",
+        "Aspose.Pdf.XmpValue.ToStringValue"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "set-default-creatortool-metadata-pdf": {
+      "title": "Set Default CreatorTool Metadata in PDF",
+      "filename": "set-default-creatortool-metadata-pdf.cs",
+      "description": "Demonstrates how to check the Creator metadata of a PDF and assign a default value from configuration when it is missing, using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "metadata",
+        "creator",
+        "aspnet",
+        "configuration"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Info",
+        "Aspose.Pdf.DocumentInfo.Creator",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Facades.PdfFileInfo"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    },
+    "disable-baseurl-injection-for-pdf-generation": {
+      "title": "Disable BaseUrl Injection for PDF Generation in Test Environments",
+      "filename": "disable-baseurl-injection-for-pdf-generation.cs",
+      "description": "Demonstrates using an environment variable to toggle BaseUrl injection when converting HTML to PDF with Aspose.Pdf by selecting appropriate HtmlLoadOptions.",
+      "tags": [
+        "html-to-pdf",
+        "baseurl",
+        "configuration",
+        "environment-variable",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.HtmlLoadOptions"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:47:48Z",
+      "status": "verified"
+    }
+  }
+}
