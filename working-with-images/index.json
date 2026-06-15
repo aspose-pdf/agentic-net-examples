@@ -1,0 +1,1586 @@
+{
+  "category": "working-with-images",
+  "nuget_version": "26.5.0",
+  "last_updated": "2026-06-15T10:30:54Z",
+  "examples": {
+    "add-png-logo-to-first-pdf-page": {
+      "title": "Add PNG Logo to First PDF Page",
+      "filename": "add-png-logo-to-first-pdf-page.cs",
+      "description": "Demonstrates loading a PDF with Aspose.Pdf, inserting a PNG image at specific coordinates on the first page, and saving the modified document.",
+      "tags": [
+        "pdf",
+        "image",
+        "logo",
+        "aspose.pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Page.AddImage",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "add-background-image-opacity-to-pdf-pages": {
+      "title": "Add Background Image with Opacity to PDF Pages",
+      "filename": "add-background-image-opacity-to-pdf-pages.cs",
+      "description": "Shows how to place a semi‑transparent background image on each page of an existing PDF using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "background-image",
+        "opacity",
+        "Aspose.Pdf",
+        "page-artifact"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.BackgroundArtifact",
+        "Aspose.Pdf.Page.Artifacts.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "add-transparent-png-overlay-to-pdf-pages": {
+      "title": "Add Transparent PNG Overlay to PDF Pages",
+      "filename": "add-transparent-png-overlay-to-pdf-pages.cs",
+      "description": "Demonstrates how to load a PDF, overlay a transparent PNG on each page using an ImageStamp, and ensure the overlay appears above existing content.",
+      "tags": [
+        "pdf",
+        "overlay",
+        "image",
+        "stamp",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "add-diagonal-image-watermark-to-pdf": {
+      "title": "Add Diagonal Image Watermark to PDF",
+      "filename": "add-diagonal-image-watermark-to-pdf.cs",
+      "description": "Shows how to load a PDF, create an ImageStamp from a PNG, rotate it 45° for diagonal placement, set semi‑transparent opacity, and apply the stamp to every page before saving.",
+      "tags": [
+        "pdf",
+        "watermark",
+        "image",
+        "rotation",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.ImageStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Facades.ImageStamp.RotateAngle",
+        "Aspose.Pdf.Facades.ImageStamp.Opacity",
+        "Aspose.Pdf.Facades.ImageStamp.Background",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "add-company-logo-to-first-page": {
+      "title": "Add Company Logo to First Page of PDF",
+      "filename": "add-company-logo-to-first-page.cs",
+      "description": "Shows how to load a PDF, create an ImageStamp for a logo, center it on the first page, and save the updated document using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "image",
+        "logo",
+        "stamp",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.HorizontalAlignment",
+        "Aspose.Pdf.VerticalAlignment"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "add-header-image-to-pdf-pages": {
+      "title": "Add Header Image to PDF Pages",
+      "filename": "add-header-image-to-pdf-pages.cs",
+      "description": "Shows how to place a decorative header image on every page of an existing PDF and shift the original page content down to prevent overlap using Aspose.Pdf low‑level operators.",
+      "tags": [
+        "header",
+        "image",
+        "pdf",
+        "Aspose.Pdf",
+        "page-manipulation"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Operators.GSave",
+        "Aspose.Pdf.Operators.ConcatenateMatrix",
+        "Aspose.Pdf.Operators.GRestore",
+        "Aspose.Pdf.Page.AddImage",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "add-decorative-footer-image-to-pdf-pages": {
+      "title": "Add Decorative Footer Image to PDF Pages",
+      "filename": "add-decorative-footer-image-to-pdf-pages.cs",
+      "description": "Shows how to insert a footer image on every page of a PDF and scale it proportionally to the page width using Aspose.Pdf.",
+      "tags": [
+        "footer",
+        "image",
+        "pdf",
+        "scaling",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.HeaderFooter",
+        "Aspose.Pdf.Image",
+        "Aspose.Pdf.HorizontalAlignment",
+        "Aspose.Pdf.PageInfo",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "add-background-pattern-image-to-pdf-pages": {
+      "title": "Add Background Pattern Image to PDF Pages",
+      "filename": "add-background-pattern-image-to-pdf-pages.cs",
+      "description": "Shows how to place a semi‑transparent pattern image as a background on every page of a PDF using Aspose.Pdf.",
+      "tags": [
+        "background",
+        "image",
+        "opacity",
+        "pdf",
+        "artifact"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.BackgroundArtifact",
+        "Aspose.Pdf.BackgroundArtifact.SetImage",
+        "Aspose.Pdf.BackgroundArtifact.Opacity",
+        "Aspose.Pdf.BackgroundArtifact.IsBackground",
+        "Aspose.Pdf.Page.Artifacts.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "add-background-pattern-to-pdf-pages": {
+      "title": "Add Background Pattern Image to PDF Pages",
+      "filename": "add-background-pattern-to-pdf-pages.cs",
+      "description": "Shows how to apply a semi‑transparent background pattern image to each page of a PDF document using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "background",
+        "image",
+        "opacity",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.BackgroundArtifact",
+        "Aspose.Pdf.Page.Artifacts",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "add-background-image-to-pdf": {
+      "title": "Add Background Image to PDF with Subtle Multiply Effect",
+      "filename": "add-background-image-to-pdf.cs",
+      "description": "Demonstrates how to load an existing PDF, add a full‑page background image using a BackgroundArtifact, set its opacity for a subtle shading effect, and save the result.",
+      "tags": [
+        "background",
+        "image",
+        "pdf",
+        "Aspose",
+        "blend-mode"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.BackgroundArtifact",
+        "Aspose.Pdf.BackgroundArtifact.SetImage",
+        "Aspose.Pdf.Page.Artifacts.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "add-texture-background-image-to-pdf-pages": {
+      "title": "Add Texture Background Image to PDF Pages",
+      "filename": "add-texture-background-image-to-pdf-pages.cs",
+      "description": "Shows how to place a subtle texture image as a background on every PDF page and adjust its opacity for an overlay effect using Aspose.Pdf.",
+      "tags": [
+        "background",
+        "image",
+        "pdf",
+        "overlay",
+        "texture"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.BackgroundArtifact",
+        "Aspose.Pdf.Page.Artifacts",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "add-semi-transparent-overlay-image-to-pdf": {
+      "title": "Add Semi-Transparent Overlay Image to PDF",
+      "filename": "add-semi-transparent-overlay-image-to-pdf.cs",
+      "description": "Demonstrates applying a semi‑transparent image overlay to every page of a PDF using Aspose.Pdf.",
+      "tags": [
+        "overlay",
+        "image",
+        "pdf",
+        "watermark",
+        "opacity"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.PageInfo",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "add-semi-transparent-overlay-to-pdf-pages": {
+      "title": "Add Semi-Transparent Overlay to PDF Pages",
+      "filename": "add-semi-transparent-overlay-to-pdf-pages.cs",
+      "description": "Demonstrates reading a theme JSON file, converting a hex color with opacity to an Aspose.Pdf.Color, and applying it as a background overlay on every page of a PDF document.",
+      "tags": [
+        "pdf",
+        "overlay",
+        "color",
+        "aspose",
+        "opacity"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Color.FromArgb",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "add-semi-transparent-image-watermark-to-pdf-pages": {
+      "title": "Add Semi-Transparent Image Watermark to PDF Pages",
+      "filename": "add-semi-transparent-image-watermark-to-pdf-pages.cs",
+      "description": "Demonstrates loading a PDF with Aspose.Pdf, creating an ImageStamp, setting its opacity, and applying it as a centered watermark on every page.",
+      "tags": [
+        "pdf",
+        "watermark",
+        "image",
+        "opacity",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.HorizontalAlignment",
+        "Aspose.Pdf.VerticalAlignment"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "replace-image-on-pdf-page-with-png": {
+      "title": "Replace Image on PDF Page with Higher‑Resolution PNG",
+      "filename": "replace-image-on-pdf-page-with-png.cs",
+      "description": "Demonstrates loading a PDF, accessing the image resources of page three, and replacing the first JPEG image with a higher‑resolution PNG using the Resources.Images collection.",
+      "tags": [
+        "pdf",
+        "image-replacement",
+        "resources",
+        "aspose-pdf",
+        "png"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.ImageCollection",
+        "Aspose.Pdf.ImageCollection.Replace",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "replace-jpeg-with-png-in-pdf": {
+      "title": "Replace JPEG Images with PNG in PDF",
+      "filename": "replace-jpeg-with-png-in-pdf.cs",
+      "description": "Shows how to open a PDF, iterate through its pages, and replace each embedded JPEG image with a PNG while keeping the original positions and scaling.",
+      "tags": [
+        "pdf",
+        "image-replacement",
+        "aspose.pdf",
+        "png",
+        "jpeg"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.Resources",
+        "Aspose.Pdf.XImageCollection",
+        "Aspose.Pdf.XImageCollection.Replace"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "replace-raster-with-vector": {
+      "title": "Replace Raster Images with Vector Graphics in PDF",
+      "filename": "replace-raster-with-vector.cs",
+      "description": "Demonstrates how to extract existing vector graphics from each PDF page as SVG files and remove all raster images from the document, resulting in a fully vector‑based PDF.",
+      "tags": [
+        "pdf",
+        "vector-graphics",
+        "raster-images",
+        "aspose-pdf",
+        "image-replacement"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.HasVectorGraphics",
+        "Aspose.Pdf.Page.TrySaveVectorGraphics",
+        "Aspose.Pdf.Page.Resources.Images.Clear",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "replace-images-on-odd-pdf-pages": {
+      "title": "Replace Images on Odd PDF Pages with Placeholder",
+      "filename": "replace-images-on-odd-pdf-pages.cs",
+      "description": "Shows how to iterate through a PDF, detect odd‑numbered pages, and replace each image on those pages with a placeholder graphic while keeping the original image dimensions using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "image-replacement",
+        "odd-pages",
+        "placeholder",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.XImageCollection",
+        "Aspose.Pdf.XImageCollection.Replace",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "replace-images-odd-pages-qr-placeholder": {
+      "title": "Replace Images on Odd Pages with QR Code Placeholder",
+      "filename": "replace-images-odd-pages-qr-placeholder.cs",
+      "description": "Creates a PDF, then replaces each image on odd-numbered pages with a generated QR code that links to the original image source.",
+      "tags": [
+        "pdf",
+        "image",
+        "qr",
+        "replace",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.XImageCollection.Replace",
+        "Aspose.Pdf.Barcode.Barcode",
+        "Aspose.Pdf.Barcode.BarcodeType",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "convert-even-pdf-pages-to-grayscale": {
+      "title": "Convert Even PDF Pages to Grayscale",
+      "filename": "convert-even-pdf-pages-to-grayscale.cs",
+      "description": "Shows how to open a PDF with Aspose.Pdf, iterate through its pages, and apply a grayscale conversion only to even-numbered pages while leaving odd pages unchanged.",
+      "tags": [
+        "pdf",
+        "grayscale",
+        "even-pages",
+        "image-processing",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Page.MakeGrayscale",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "replace-images-with-banner": {
+      "title": "Replace Images on Last PDF Page with Full-Width Banner",
+      "filename": "replace-images-with-banner.cs",
+      "description": "Loads a PDF, removes all images from its last page, and inserts a banner image that spans the entire page width (and height). The modified document is then saved.",
+      "tags": [
+        "pdf",
+        "image",
+        "banner",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Page.AddImage",
+        "Aspose.Pdf.Resources"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "compress-pdf-images": {
+      "title": "Compress PDF Images to Reduce File Size",
+      "filename": "compress-pdf-images.cs",
+      "description": "Shows how to use Aspose.Pdf's OptimizationOptions to compress images in a PDF, lowering the overall document size.",
+      "tags": [
+        "pdf",
+        "image-compression",
+        "optimization",
+        "csharp",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Optimization.OptimizationOptions",
+        "Aspose.Pdf.Optimization.ImageCompressionOptions",
+        "Aspose.Pdf.Document.OptimizeResources",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "replace-images-with-placeholder": {
+      "title": "Replace Images with Placeholder and Add Hyperlink in PDF",
+      "filename": "replace-images-with-placeholder.cs",
+      "description": "Loads a PDF, replaces each embedded image with a small placeholder image, and overlays a hyperlink annotation that points to the original image URL.",
+      "tags": [
+        "pdf",
+        "image-replacement",
+        "hyperlink",
+        "annotation",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.ImagePlacementAbsorber",
+        "Aspose.Pdf.ImagePlacement",
+        "Aspose.Pdf.XImageCollection.Replace",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.GoToURIAction"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "convert-pdf-images-to-grayscale": {
+      "title": "Convert PDF Images to Grayscale for Uniform Look",
+      "filename": "convert-pdf-images-to-grayscale.cs",
+      "description": "Loads a PDF, scans each page for images, converts any matching images to grayscale using System.Drawing, and replaces them to produce a monochrome PDF.",
+      "tags": [
+        "pdf",
+        "image",
+        "grayscale",
+        "aspose",
+        "monochrome"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.XImageCollection",
+        "Aspose.Pdf.XImage",
+        "Aspose.Pdf.XImageCollection.Replace",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "correct-image-orientation-in-pdf": {
+      "title": "Correct Image EXIF Orientation in PDF",
+      "filename": "correct-image-orientation-in-pdf.cs",
+      "description": "Demonstrates how to detect EXIF orientation metadata in images embedded in a PDF, rotate the images accordingly, and replace them in the document using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "image",
+        "exif",
+        "rotation",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.XImage",
+        "Aspose.Pdf.ImageCollection.Replace",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "compress-large-images-in-pdf": {
+      "title": "Compress Large Images in PDF to Reduce Size",
+      "filename": "compress-large-images-in-pdf.cs",
+      "description": "Demonstrates using Aspose.Pdf's OptimizationOptions to recompress images larger than 2 MB into JPEG with a specified quality, thereby reducing the overall PDF file size.",
+      "tags": [
+        "pdf",
+        "image-compression",
+        "optimization",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Optimization.OptimizationOptions",
+        "Aspose.Pdf.Optimization.ImageCompressionOptions",
+        "Aspose.Pdf.Document.OptimizeResources",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "replace-pdf-images-with-qr-code-placeholders": {
+      "title": "Replace PDF Images with QR Code Placeholders",
+      "filename": "replace-pdf-images-with-qr-code-placeholders.cs",
+      "description": "Loads a PDF, iterates through each page's images, generates a QR code that links to the original image location, and replaces the image with the QR code placeholder before saving the document.",
+      "tags": [
+        "pdf",
+        "image",
+        "qr-code",
+        "placeholder",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.XImage",
+        "Aspose.Pdf.XImageCollection",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "replace-images-on-pdf-page": {
+      "title": "Replace Images on a PDF Page Using a Dictionary",
+      "filename": "replace-images-on-pdf-page.cs",
+      "description": "Demonstrates how to replace specific images on a selected PDF page by mapping image indices to new image files with Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "image-replacement",
+        "aspose-pdf",
+        "dictionary",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.XImageCollection",
+        "Aspose.Pdf.XImageCollection.Replace",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "replace-pdf-images-with-icc-embedded-versions": {
+      "title": "Replace PDF Images with ICC‑Embedded Versions",
+      "filename": "replace-pdf-images-with-icc-embedded-versions.cs",
+      "description": "Demonstrates replacing each image on PDF pages with a JPEG that already contains an ICC profile and optionally embedding an ICC profile for the whole PDF using Aspose.Pdf.",
+      "tags": [
+        "image-replacement",
+        "icc-profile",
+        "pdf",
+        "color-management",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.XImage",
+        "Aspose.Pdf.XImageCollection.Replace",
+        "Aspose.Pdf.PdfFormatConversionOptions",
+        "Aspose.Pdf.Document.Convert",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "replace-images-with-logo": {
+      "title": "Replace All PDF Images with a New Logo",
+      "filename": "replace-images-with-logo.cs",
+      "description": "Demonstrates how to locate every image on each PDF page using ImagePlacementAbsorber and replace them with a specified logo image.",
+      "tags": [
+        "pdf",
+        "image-replacement",
+        "aspose-pdf",
+        "image-absorber",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.ImagePlacementAbsorber",
+        "Aspose.Pdf.ImagePlacement",
+        "Aspose.Pdf.ImagePlacement.Replace",
+        "Aspose.Pdf.Page.Accept",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "replace-title-page-image-with-high-res-banner": {
+      "title": "Replace Title Page Image with High-Resolution Banner",
+      "filename": "replace-title-page-image-with-high-res-banner.cs",
+      "description": "Shows how to load a PDF, access the first (title) page, and replace its first image with a high‑resolution banner while keeping the existing text layout intact.",
+      "tags": [
+        "pdf",
+        "image-replacement",
+        "banner",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.ImageCollection",
+        "Aspose.Pdf.ImageCollection.Replace",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "replace-images-with-banner-on-index-page": {
+      "title": "Replace Images on Index Page with Banner Image",
+      "filename": "replace-images-with-banner-on-index-page.cs",
+      "description": "Loads a PDF, accesses the first page's image collection, and replaces every existing image with a single banner JPEG to update branding, then saves the result.",
+      "tags": [
+        "pdf",
+        "image-replacement",
+        "branding",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.XImageCollection",
+        "Aspose.Pdf.XImageCollection.Replace",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "replace-appendix-images-with-placeholder": {
+      "title": "Replace Appendix Images with Placeholder in PDF",
+      "filename": "replace-appendix-images-with-placeholder.cs",
+      "description": "Shows how to locate the appendix section in a PDF and replace every image on those pages with a single placeholder image using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "image-replacement",
+        "appendix",
+        "placeholder",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextAbsorber",
+        "Aspose.Pdf.Text.TextSearchOptions",
+        "Aspose.Pdf.Page.Resources.Images.Replace"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "remove-all-images-from-pdf": {
+      "title": "Remove All Images from a PDF",
+      "filename": "remove-all-images-from-pdf.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, iterate through each page's image resources, delete every image, and save the cleaned document.",
+      "tags": [
+        "pdf",
+        "images",
+        "aspose.pdf",
+        "remove",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Images",
+        "Aspose.Pdf.Images.Delete",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "remove-low-resolution-images-from-pdf": {
+      "title": "Remove Low-Resolution Images from PDF",
+      "filename": "remove-low-resolution-images-from-pdf.cs",
+      "description": "Shows how to iterate through PDF pages, use ImagePlacementAbsorber to find images, hide those with DPI below 72, optimize resources, and save the updated document.",
+      "tags": [
+        "pdf",
+        "image",
+        "dpi",
+        "optimize",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.ImagePlacementAbsorber",
+        "Aspose.Pdf.ImagePlacement",
+        "Aspose.Pdf.Document.OptimizeResources",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "remove-low-resolution-images-from-pdf__v2": {
+      "title": "Remove Low-Resolution Images from PDF",
+      "filename": "remove-low-resolution-images-from-pdf__v2.cs",
+      "description": "Shows how to iterate PDF pages, locate image placements with ImagePlacementAbsorber, and hide images whose horizontal or vertical DPI is below 72.",
+      "tags": [
+        "pdf",
+        "image",
+        "dpi",
+        "filter",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.ImagePlacementAbsorber",
+        "Aspose.Pdf.ImagePlacement",
+        "Aspose.Pdf.Page.Accept",
+        "Aspose.Pdf.ImagePlacement.Hide",
+        "Aspose.Pdf.ImagePlacement.Resolution"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "remove-duplicate-images-from-pdf": {
+      "title": "Remove Duplicate Images from PDF Pages",
+      "filename": "remove-duplicate-images-from-pdf.cs",
+      "description": "Iterates through each page of a PDF, computes a hash for every image, and deletes images that have identical raw byte data, preserving only the first occurrence.",
+      "tags": [
+        "pdf",
+        "duplicate-images",
+        "hash",
+        "csharp",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.XImage",
+        "Aspose.Pdf.Facades.ImageDeleteAction",
+        "Aspose.Pdf.Page.Resources.Images",
+        "Aspose.Pdf.XImage.Save",
+        "Aspose.Pdf.Images.Delete"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "extract-image-resolutions-from-pdf-pages": {
+      "title": "Extract Image Resolutions from PDF Pages",
+      "filename": "extract-image-resolutions-from-pdf-pages.cs",
+      "description": "Iterates through each page of a PDF, extracts all image placements, and reports their DPI resolution along with position and size information.",
+      "tags": [
+        "pdf",
+        "image",
+        "resolution",
+        "metadata",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.ImagePlacementAbsorber",
+        "Aspose.Pdf.ImagePlacement",
+        "Aspose.Pdf.Page.Accept"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "resize-images-on-pdf-pages": {
+      "title": "Resize Images on PDF Pages to Half Size",
+      "filename": "resize-images-on-pdf-pages.cs",
+      "description": "Shows how to loop through each page of a PDF and scale every embedded image to 50 % of its original width and height using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "image",
+        "resize",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Image",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Paragraphs"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "resize-images-in-pdf": {
+      "title": "Resize Images in PDF Using a Configurable Scaling Factor",
+      "filename": "resize-images-in-pdf.cs",
+      "description": "Demonstrates how to read a scaling factor from a configuration file and apply uniform scaling to every image in a PDF by manipulating the content stream operators.",
+      "tags": [
+        "pdf",
+        "image-scaling",
+        "aspose",
+        "configuration",
+        "content-stream"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.OperatorCollection",
+        "Aspose.Pdf.Operators.Do",
+        "Aspose.Pdf.Operators.GSave",
+        "Aspose.Pdf.Operators.ConcatenateMatrix",
+        "Aspose.Pdf.Operators.GRestore"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "resize-pdf-images-using-configurable-scale-factor": {
+      "title": "Resize PDF Images Using Configurable Scale Factor",
+      "filename": "resize-pdf-images-using-configurable-scale-factor.cs",
+      "description": "Demonstrates reading an image scaling factor from appsettings.json and applying it to all images in a PDF using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "image-resize",
+        "configuration",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Image",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Image.ImageScale"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "resize-pdf-images-using-config": {
+      "title": "Resize PDF Images Using Configurable Page Sizes",
+      "filename": "resize-pdf-images-using-config.cs",
+      "description": "Demonstrates how to read a JSON configuration and resize images on specific PDF pages by absorbing existing images, removing them, and adding them back with new dimensions using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "image-resize",
+        "aspose",
+        "configuration",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Devices.ImagePlacementAbsorber",
+        "Aspose.Pdf.ImagePlacement",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Page.AddImage"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "add-raster-image-to-new-pdf-page": {
+      "title": "Add Raster Image to New PDF Page",
+      "filename": "add-raster-image-to-new-pdf-page.cs",
+      "description": "Shows how to create a PDF document, add a blank page, load a raster image, and place it on the page using the Image class and the Paragraphs collection.",
+      "tags": [
+        "image",
+        "pdf",
+        "raster",
+        "Aspose.Pdf",
+        "paragraphs"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Image",
+        "Aspose.Pdf.Paragraphs.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "insert-raster-image-into-pdf-page": {
+      "title": "Insert Raster Image into PDF Page",
+      "filename": "insert-raster-image-into-pdf-page.cs",
+      "description": "Shows how to load an existing PDF, define an absolute rectangle, and insert a raster image onto a specific page using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "image",
+        "insert",
+        "coordinates",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Page.AddImage",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "resize-embedded-raster-image-pdf": {
+      "title": "Resize Embedded Raster Image in PDF",
+      "filename": "resize-embedded-raster-image-pdf.cs",
+      "description": "Demonstrates how to embed a raster image into a PDF and set its displayed width and height using Aspose.Pdf before saving the document.",
+      "tags": [
+        "pdf",
+        "image",
+        "resize",
+        "Aspose.Pdf",
+        "C#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Image",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "replace-image-on-pdf-page": {
+      "title": "Replace Image on PDF Page",
+      "filename": "replace-image-on-pdf-page.cs",
+      "description": "Shows how to locate image placements on a specific PDF page and replace each with a new image loaded from a file stream using Aspose.Pdf.",
+      "tags": [
+        "image-replacement",
+        "pdf",
+        "aspose",
+        "csharp",
+        "page-manipulation"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.ImagePlacementAbsorber",
+        "Aspose.Pdf.ImagePlacement",
+        "Aspose.Pdf.Page.Accept",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "delete-raster-image-from-pdf-page": {
+      "title": "Delete Raster Image from PDF Page",
+      "filename": "delete-raster-image-from-pdf-page.cs",
+      "description": "Shows how to remove a specific raster image from a PDF page by deleting it from the page's image resources using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "image",
+        "delete",
+        "Aspose.Pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.ImageDeleteAction",
+        "Aspose.Pdf.Page.Resources.Images.Delete",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "extract-images-from-pdf-to-png": {
+      "title": "Extract Images from PDF and Save as PNG",
+      "filename": "extract-images-from-pdf-to-png.cs",
+      "description": "Loads a PDF document, iterates through each page's image resources, and saves every raster image as an individual PNG file.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "png",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.XImage",
+        "Aspose.Pdf.Page.Resources",
+        "Aspose.Pdf.XImage.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "extract-raster-images-from-pdf": {
+      "title": "Extract Raster Images from PDF Preserving Original Format",
+      "filename": "extract-raster-images-from-pdf.cs",
+      "description": "Loads a PDF with Aspose.Pdf, iterates through each page's image resources, detects each image's format from its header bytes, and writes the original raster image bytes to disk with the correct file extension.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "raster",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.XImage",
+        "Aspose.Pdf.XImageCollection",
+        "Aspose.Pdf.XImage.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "batch-extract-images-from-pdfs": {
+      "title": "Batch Extract Images from PDFs",
+      "filename": "batch-extract-images-from-pdfs.cs",
+      "description": "Shows how to process multiple PDF files in a folder, iterate through each page, and save all embedded images to a designated output directory using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "batch-processing",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.XImage",
+        "Aspose.Pdf.Page.Resources",
+        "Aspose.Pdf.XImage.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "add-dicom-image-to-pdf-using-filestream": {
+      "title": "Add DICOM Image to PDF Using FileStream",
+      "filename": "add-dicom-image-to-pdf-using-filestream.cs",
+      "description": "Demonstrates loading a DICOM medical image from a FileStream and embedding it into a PDF page using Aspose.Pdf.",
+      "tags": [
+        "dicom",
+        "pdf",
+        "image",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Image",
+        "Aspose.Pdf.PageCollection.Add",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "insert-dicom-image-with-custom-resolution": {
+      "title": "Insert DICOM Image with Custom Resolution into PDF",
+      "filename": "insert-dicom-image-with-custom-resolution.cs",
+      "description": "Shows how to load a DICOM image, set its width and height in points to control resolution, and add it to a PDF page using Aspose.Pdf.",
+      "tags": [
+        "DICOM",
+        "PDF",
+        "Image",
+        "Resolution",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Image",
+        "Aspose.Pdf.Image.FixWidth",
+        "Aspose.Pdf.Image.FixHeight",
+        "Aspose.Pdf.Image.IsApplyResolution",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "render-pdf-page-to-png-with-fallback-font": {
+      "title": "Render PDF Page to PNG with Fallback Font",
+      "filename": "render-pdf-page-to-png-with-fallback-font.cs",
+      "description": "Demonstrates how to render the first page of a PDF document to a high‑resolution PNG image while specifying a fallback font for missing fonts using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "png",
+        "rendering",
+        "fallback-font",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Devices.PngDevice",
+        "Aspose.Pdf.Devices.Resolution",
+        "Aspose.Pdf.Devices.RenderingOptions",
+        "Aspose.Pdf.Devices.PngDevice.Process"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "render-pdf-pages-to-jpeg-with-default-font": {
+      "title": "Render PDF Pages to JPEG with Default Font Substitution",
+      "filename": "render-pdf-pages-to-jpeg-with-default-font.cs",
+      "description": "Demonstrates how to convert each page of a PDF document to a JPEG image using Aspose.Pdf while specifying a fallback font for missing glyphs.",
+      "tags": [
+        "pdf",
+        "jpeg",
+        "rendering",
+        "font-substitution",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.JpegDevice",
+        "Aspose.Pdf.Devices.Resolution",
+        "Aspose.Pdf.Devices.RenderingOptions",
+        "Aspose.Pdf.Devices.JpegDevice.Process"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "generate-png-thumbnails-for-pdf-pages": {
+      "title": "Generate PNG Thumbnails for PDF Pages",
+      "filename": "generate-png-thumbnails-for-pdf-pages.cs",
+      "description": "Creates 150x200 PNG thumbnail images for each page of a PDF document using Aspose.Pdf's ThumbnailDevice.",
+      "tags": [
+        "pdf",
+        "thumbnail",
+        "png",
+        "aspose",
+        "image"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.ThumbnailDevice",
+        "Aspose.Pdf.Devices.ThumbnailDevice.Process",
+        "Aspose.Pdf.PageCollection",
+        "Aspose.Pdf.Page"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "convert-pdf-pages-to-png-with-default-font": {
+      "title": "Convert PDF Pages to PNG with Default Font Setting",
+      "filename": "convert-pdf-pages-to-png-with-default-font.cs",
+      "description": "Demonstrates how to load a PDF, set RenderingOptions.DefaultFontName to \"Arial\", and convert each page to a high‑resolution PNG image using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "png",
+        "conversion",
+        "default-font",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.PngDevice",
+        "Aspose.Pdf.Devices.Resolution",
+        "Aspose.Pdf.Drawing.RenderingOptions",
+        "Aspose.Pdf.Devices.PngDevice.Process"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "render-pdf-to-multi-page-tiff-lzw": {
+      "title": "Render PDF to Multi‑Page TIFF with LZW Compression and Font Fallback",
+      "filename": "render-pdf-to-multi-page-tiff-lzw.cs",
+      "description": "Loads a PDF document, configures a TIFF device with 300 DPI resolution and LZW compression, sets a default font for missing characters, and renders all pages into a single multi‑page TIFF file.",
+      "tags": [
+        "pdf",
+        "tiff",
+        "compression",
+        "font-fallback",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.Resolution",
+        "Aspose.Pdf.Devices.TiffSettings",
+        "Aspose.Pdf.Devices.TiffDevice",
+        "Aspose.Pdf.Devices.TiffDevice.Process"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "export-pdf-pages-to-bmp-300-dpi": {
+      "title": "Export PDF Pages to BMP at 300 DPI",
+      "filename": "export-pdf-pages-to-bmp-300-dpi.cs",
+      "description": "Demonstrates how to convert each page of a PDF into a 300‑DPI BMP image using Aspose.Pdf with custom rendering options.",
+      "tags": [
+        "pdf",
+        "bmp",
+        "export",
+        "300dpi",
+        "rendering"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.Resolution",
+        "Aspose.Pdf.Devices.BmpDevice",
+        "Aspose.Pdf.Devices.RenderingOptions",
+        "Aspose.Pdf.Devices.BmpDevice.Process"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-multi-page-tiff": {
+      "title": "Convert PDF to Multi‑Page TIFF with Default Font",
+      "filename": "convert-pdf-to-multi-page-tiff.cs",
+      "description": "Demonstrates loading a PDF, configuring resolution and TIFF settings, applying a default font for missing glyphs, and converting the entire document to a multi‑page TIFF file.",
+      "tags": [
+        "pdf",
+        "tiff",
+        "conversion",
+        "rendering",
+        "default-font"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.Resolution",
+        "Aspose.Pdf.Devices.TiffSettings",
+        "Aspose.Pdf.Devices.TiffDevice",
+        "Aspose.Pdf.RenderingOptions",
+        "Aspose.Pdf.Devices.TiffDevice.Process"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "extract-vector-graphics-to-svg": {
+      "title": "Extract Vector Graphics from PDF Page to SVG",
+      "filename": "extract-vector-graphics-to-svg.cs",
+      "description": "Shows how to use GraphicsAbsorber to collect vector graphics from a specific PDF page and convert them into an SVG file for further manipulation.",
+      "tags": [
+        "pdf",
+        "vector-graphics",
+        "svg",
+        "extraction",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Vector.GraphicsAbsorber",
+        "Aspose.Pdf.Vector.SvgExtractor",
+        "Aspose.Pdf.Page.HasVectorGraphics",
+        "Aspose.Pdf.Vector.GraphicsAbsorber.Visit",
+        "Aspose.Pdf.Vector.SvgExtractor.Extract"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "remove-specific-vector-graphic-from-pdf-page": {
+      "title": "Remove Specific Vector Graphic from PDF Page",
+      "filename": "remove-specific-vector-graphic-from-pdf-page.cs",
+      "description": "Shows how to locate a vector graphic on a PDF page with GraphicsAbsorber and delete it using Aspose.Pdf.",
+      "tags": [
+        "vector-graphics",
+        "pdf-manipulation",
+        "Aspose.Pdf",
+        "remove-element",
+        "page-content"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.HasVectorGraphics",
+        "Aspose.Pdf.Vector.GraphicsAbsorber",
+        "Aspose.Pdf.Vector.GraphicsAbsorber.Visit",
+        "Aspose.Pdf.Vector.GraphicElement.Remove",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "extract-insert-vector-graphics": {
+      "title": "Extract and Insert Vector Graphics into PDF Page",
+      "filename": "extract-insert-vector-graphics.cs",
+      "description": "Shows how to extract vector graphic (Graph objects) from a source PDF page and add them to another PDF page by inserting the cloned graphs into the target page's Paragraphs collection.",
+      "tags": [
+        "vector-graphics",
+        "pdf-manipulation",
+        "graph",
+        "extract",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Shape",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Drawing.Graph.Shapes.Add"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "add-vector-graphics-collection-to-new-pdf-page": {
+      "title": "Add Vector Graphics Collection to New PDF Page Using AddRange",
+      "filename": "add-vector-graphics-collection-to-new-pdf-page.cs",
+      "description": "The example extracts vector graphics from an existing PDF page with GraphicsAbsorber, creates placeholder shapes, and adds them to a new page via a Graph container, demonstrating the use of List<T>.AddRange to add multiple shapes at once.",
+      "tags": [
+        "vector-graphics",
+        "pdf",
+        "addrange",
+        "graphicsabsorber",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Vector.GraphicsAbsorber",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Drawing.Line",
+        "Aspose.Pdf.Drawing.GraphInfo"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "batch-extract-vector-graphics": {
+      "title": "Batch Extract Vector Graphics from PDFs",
+      "filename": "batch-extract-vector-graphics.cs",
+      "description": "Shows how to iterate over PDF files in a directory, extract each page's vector graphics as SVG files, and save them into separate folders for further analysis.",
+      "tags": [
+        "pdf",
+        "vector-graphics",
+        "svg",
+        "batch-processing",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Page.TrySaveVectorGraphics",
+        "Aspose.Pdf.Document.Dispose"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "set-alternative-text-for-pdf-images": {
+      "title": "Set Alternative Text for Images in PDF",
+      "filename": "set-alternative-text-for-pdf-images.cs",
+      "description": "Demonstrates how to add alternative (alt) text to images in a PDF using Aspose.Pdf to improve accessibility for screen readers.",
+      "tags": [
+        "pdf",
+        "accessibility",
+        "alt-text",
+        "images",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.XImage",
+        "Aspose.Pdf.XImage.TrySetAlternativeText",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "retrieve-image-alt-text": {
+      "title": "Retrieve Alternative Text from PDF Images",
+      "filename": "retrieve-image-alt-text.cs",
+      "description": "Demonstrates loading a PDF with Aspose.Pdf, iterating through its pages and image resources, and extracting any alternative (alt) text associated with each image for auditing purposes.",
+      "tags": [
+        "pdf",
+        "image",
+        "alt-text",
+        "aspose",
+        "audit"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.XImage",
+        "Aspose.Pdf.XImage.GetAlternativeText",
+        "Aspose.Pdf.Page.Resources"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "add-image-with-alt-text-to-pdf": {
+      "title": "Add Image with Alternative Text to PDF",
+      "filename": "add-image-with-alt-text-to-pdf.cs",
+      "description": "Demonstrates embedding an image into a PDF document and assigning alternative (alt) text for accessibility using Aspose.Pdf.",
+      "tags": [
+        "image",
+        "alt-text",
+        "accessibility",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Resources.Images.Add",
+        "Aspose.Pdf.XImage",
+        "Aspose.Pdf.XImage.TrySetAlternativeText",
+        "Aspose.Pdf.Image",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "render-pdf-pages-to-png-300-dpi": {
+      "title": "Render PDF Pages to PNG at 300 DPI",
+      "filename": "render-pdf-pages-to-png-300-dpi.cs",
+      "description": "Demonstrates loading a PDF with Aspose.Pdf, setting a 300‑DPI resolution, and converting each page to a PNG image file.",
+      "tags": [
+        "pdf",
+        "png",
+        "dpi",
+        "render",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Resolution",
+        "Aspose.Pdf.Devices.PngDevice",
+        "Aspose.Pdf.Devices.PngDevice.Process",
+        "Aspose.Pdf.PageCollection"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "convert-pdf-pages-to-png-with-default-font__v2": {
+      "title": "Render PDF Pages to PNG with Default Font Substitution",
+      "filename": "convert-pdf-pages-to-png-with-default-font__v2.cs",
+      "description": "Loads a PDF document and converts each page to a PNG image while setting RenderingOptions.DefaultFontName to \"Times New Roman\" for font substitution.",
+      "tags": [
+        "pdf",
+        "image",
+        "font-substitution",
+        "png",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.PngDevice",
+        "Aspose.Pdf.Devices.PngDevice.Process",
+        "Aspose.Pdf.RenderingOptions",
+        "Aspose.Pdf.RenderingOptions.DefaultFontName"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    },
+    "rasterize-vector-graphics-in-pdf": {
+      "title": "Rasterize Vector Graphics in PDF",
+      "filename": "rasterize-vector-graphics-in-pdf.cs",
+      "description": "Shows how to replace vector graphics on PDF pages with raster images by flattening transparency using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "rasterize",
+        "vector-graphics",
+        "flatten-transparency",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.FlattenTransparency",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T10:30:54Z",
+      "status": "verified"
+    }
+  }
+}
