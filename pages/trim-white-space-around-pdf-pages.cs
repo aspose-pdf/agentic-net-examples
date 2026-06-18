@@ -15,24 +15,23 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
             // Iterate through all pages (1‑based indexing)
-            foreach (Page page in doc.Pages)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Skip completely blank pages using the default fill‑threshold (e.g., 0.01)
-                if (page.IsBlank(0.01))
+                Page page = doc.Pages[i];
+
+                // Optional: skip completely blank pages (default threshold 0.0)
+                if (page.IsBlank(0.0))
                     continue;
 
-                // Calculate the bounding box of the actual content on the page
+                // Calculate the bounding box of the actual content
                 Aspose.Pdf.Rectangle contentBox = page.CalculateContentBBox();
 
-                // If a valid content box is returned, set it as the new TrimBox
-                if (contentBox != null && contentBox.Width > 0 && contentBox.Height > 0)
-                {
-                    page.TrimBox = contentBox;
-                }
+                // Set the TrimBox to the content bounding box to remove surrounding white space
+                page.TrimBox = contentBox;
             }
 
             // Save the modified PDF

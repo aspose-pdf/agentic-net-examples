@@ -8,7 +8,6 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output_pdfa1b.pdf";
-        const string logPath = "conversion_log.xml";
 
         if (!File.Exists(inputPath))
         {
@@ -18,14 +17,13 @@ class Program
 
         try
         {
-            // Load the existing PDF document.
             using (Document doc = new Document(inputPath))
             {
-                // Convert the document to PDF/A‑1b compliance.
-                // Metadata (Info dictionary) is preserved automatically.
-                doc.Convert(logPath, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
-
-                // Save the converted document.
+                // Configure conversion to PDF/A‑1b
+                PdfFormatConversionOptions options = new PdfFormatConversionOptions(PdfFormat.PDF_A_1B);
+                // Perform the conversion
+                doc.Convert(options);
+                // Save the converted document
                 doc.Save(outputPath);
             }
 

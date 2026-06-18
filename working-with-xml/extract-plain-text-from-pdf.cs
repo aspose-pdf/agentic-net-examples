@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string outputTextPath = "extracted.txt";
+        const string pdfPath = "input.pdf";          // PDF generated from XML
+        const string outputTxt = "extracted.txt";    // Destination for plain text
 
         if (!File.Exists(pdfPath))
         {
@@ -16,24 +16,22 @@ class Program
             return;
         }
 
-        // Load the PDF document with deterministic disposal
-        using (Document pdfDoc = new Document(pdfPath))
+        // Load the PDF document (wrapped in using for deterministic disposal)
+        using (Document doc = new Document(pdfPath))
         {
-            // Set extraction options for plain (pure) text formatting
+            // Configure text extraction options – plain text without formatting
             var extractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
 
-            // Create a TextAbsorber using the options
-            TextAbsorber absorber = new TextAbsorber(extractionOptions);
+            // Create a TextAbsorber with the configured options
+            var absorber = new TextAbsorber(extractionOptions);
 
-            // Apply the absorber to all pages (Aspose.Pdf uses 1‑based page indexing)
-            pdfDoc.Pages.Accept(absorber);
-
-            // Retrieve the extracted text
+            // Extract text from all pages of the document
+            doc.Pages.Accept(absorber);
             string extractedText = absorber.Text;
 
-            // Save the extracted text to a file for indexing
-            File.WriteAllText(outputTextPath, extractedText);
-            Console.WriteLine($"Text extracted to '{outputTextPath}'.");
+            // Write the extracted plain text to a file (optional, for indexing)
+            File.WriteAllText(outputTxt, extractedText);
+            Console.WriteLine($"Plain text extracted and saved to '{outputTxt}'.");
         }
     }
 }

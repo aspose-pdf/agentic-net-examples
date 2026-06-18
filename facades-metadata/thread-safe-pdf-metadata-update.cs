@@ -1,50 +1,65 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Aspose.Pdf.Facades;
 
 class Program
 {
+    // Process a single PDF: read meta info, modify it, and save to a new file.
+    static void ProcessPdf(string inputPath, string outputPath, string newTitle)
+    {
+        // Each thread gets its own PdfFileInfo instance – no shared state.
+        using (PdfFileInfo info = new PdfFileInfo())
+        {
+            // Bind the source PDF file.
+            info.BindPdf(inputPath);
+
+            // Modify meta information safely (per‑instance).
+            info.Title = newTitle;
+            info.Author = "ThreadSafeDemo";
+            info.Subject = "Demonstration of thread‑safe PdfFileInfo usage";
+
+            // Save the updated information to a new PDF file.
+            // SaveNewInfo writes only the updated metadata without rewriting the whole document.
+            info.SaveNewInfo(outputPath);
+        }
+    }
+
     static void Main()
     {
-        // Input PDF files to be processed concurrently
-        string[] inputFiles = {
-            "doc1.pdf",
-            "doc2.pdf",
-            "doc3.pdf"
+        // Example list of input PDFs and corresponding output paths.
+        var pdfPairs = new List<(string input, string output, string title)>
+        {
+            ("doc1.pdf", "doc1_updated.pdf", "Document 1 - Updated"),
+            ("doc2.pdf", "doc2_updated.pdf", "Document 2 - Updated"),
+            ("doc3.pdf", "doc3_updated.pdf", "Document 3 - Updated")
         };
 
-        // Ensure the output directory exists
-        string outputDir = "Processed";
-        Directory.CreateDirectory(outputDir);
-
-        // Process each file in parallel – each thread works with its own PdfFileInfo instance
-        Parallel.ForEach(inputFiles, inputPath =>
+        // Ensure all input files exist before processing.
+        foreach (var (input, _, _) in pdfPairs)
         {
-            if (!File.Exists(inputPath))
+            if (!File.Exists(input))
             {
-                Console.Error.WriteLine($"File not found: {inputPath}");
+                Console.Error.WriteLine($"Input file not found: {input}");
                 return;
             }
+        }
 
-            // Derive output file name
-            string outputPath = Path.Combine(outputDir, Path.GetFileNameWithoutExtension(inputPath) + "_updated.pdf");
-
-            // Each thread creates, uses, and disposes its own PdfFileInfo instance
-            using (PdfFileInfo info = new PdfFileInfo())
+        // Process each PDF in parallel – each task works with its own PdfFileInfo instance.
+        Parallel.ForEach(pdfPairs, pair =>
+        {
+            try
             {
-                // Bind the PDF file to the facade
-                info.BindPdf(inputPath);
-
-                // Modify metadata (example: set Title and Author)
-                info.Title = $"Updated {Path.GetFileName(inputPath)}";
-                info.Author = "ThreadSafe Processor";
-
-                // Save the updated PDF to a new file
-                info.SaveNewInfo(outputPath);
+                ProcessPdf(pair.input, pair.output, pair.title);
+                Console.WriteLine($"Processed '{pair.input}' -> '{pair.output}'");
             }
-
-            Console.WriteLine($"Processed: {inputPath} -> {outputPath}");
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{pair.input}': {ex.Message}");
+            }
         });
+
+        Console.WriteLine("All PDFs processed.");
     }
 }

@@ -7,29 +7,30 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
         const string baseUrl = "https://www.example.com/";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Create XMP metadata facade and bind the existing PDF
-        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
+        // Load the PDF document (lifecycle: load)
+        using (Document doc = new Document(inputPdf))
         {
-            xmp.BindPdf(inputPath);
+            // Bind XMP metadata facade to the document (lifecycle: create)
+            using (PdfXmpMetadata xmp = new PdfXmpMetadata(doc))
+            {
+                // Set the BaseURL property in XMP metadata (feature: Add)
+                xmp.Add(DefaultMetadataProperties.BaseURL, new XmpValue(baseUrl));
 
-            // Add the BaseURL property to the XMP metadata
-            XmpValue urlValue = new XmpValue(baseUrl);
-            xmp.Add(DefaultMetadataProperties.BaseURL, urlValue);
-
-            // Save the updated PDF with the new XMP metadata
-            xmp.Save(outputPath);
+                // Save the PDF with updated XMP metadata (lifecycle: save)
+                xmp.Save(outputPdf);
+            }
         }
 
-        Console.WriteLine($"BaseURL set and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with BaseURL set to '{baseUrl}'.");
     }
 }

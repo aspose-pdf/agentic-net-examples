@@ -1,17 +1,17 @@
 using System;
 using System.IO;
+using System.Drawing.Imaging;
 using Aspose.Pdf.Facades;
 
 class Program
 {
-    // NOTE: Include the string[] args parameter so the compiler can locate the entry point.
-    public static void Main(string[] args)
+    static void Main()
     {
-        // UNC path to the source PDF
-        const string inputPdf = @"\\server\share\input\sample.pdf";
+        // Input PDF file (local path)
+        const string inputPdf = @"C:\Docs\sample.pdf";
 
-        // UNC folder where extracted images will be saved
-        const string outputFolder = @"\\server\share\output\images";
+        // UNC output directory (e.g., \\Server\Share\Images)
+        const string uncOutputDir = @"\\Server\Share\Images";
 
         if (!File.Exists(inputPdf))
         {
@@ -19,35 +19,49 @@ class Program
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
-
-        // Use PdfExtractor to extract images
-        // The null‑forgiving operator (!) silences the nullable warning for the disposable instance.
-        using (PdfExtractor extractor = new PdfExtractor()!)
+        // Ensure the UNC directory exists
+        try
         {
-            // Bind the PDF file
-            extractor.BindPdf(inputPdf);
-
-            // Prepare for image extraction
-            extractor.ExtractImage();
-
-            int imageIndex = 1;
-            // Loop through all images in the PDF
-            while (extractor.HasNextImage())
-            {
-                // Build the output file name (e.g., image-1.png, image-2.png, ...)
-                string outputFile = Path.Combine(outputFolder, $"image-{imageIndex}.png");
-
-                // Extract the current image. Use the overload that does not require ImageFormat
-                // (the image will be saved in its original format; if conversion is needed,
-                //  post‑process the file with a separate image library).
-                extractor.GetNextImage(outputFile);
-
-                imageIndex++;
-            }
+            Directory.CreateDirectory(uncOutputDir);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to create output directory '{uncOutputDir}': {ex.Message}");
+            return;
         }
 
-        Console.WriteLine("Image extraction completed.");
+        try
+        {
+            // Use PdfExtractor facade to extract images
+            using (PdfExtractor extractor = new PdfExtractor())
+            {
+                extractor.BindPdf(inputPdf);          // Load the PDF
+                extractor.ExtractImage();             // Prepare image extraction
+
+                int imageIndex = 1;
+                while (extractor.HasNextImage())
+                {
+                    // Build UNC file name for each extracted image
+                    string outputFile = Path.Combine(
+                        uncOutputDir,
+                        $"image-{imageIndex}.png");
+
+                    // Save the image in PNG format
+                    bool success = extractor.GetNextImage(outputFile, ImageFormat.Png);
+                    if (!success)
+                    {
+                        Console.Error.WriteLine($"Failed to extract image #{imageIndex}");
+                    }
+
+                    imageIndex++;
+                }
+            }
+
+            Console.WriteLine("Image extraction completed.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during extraction: {ex.Message}");
+        }
     }
 }

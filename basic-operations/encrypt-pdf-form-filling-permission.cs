@@ -17,26 +17,19 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF, apply encryption allowing only form filling, then save.
+        using (Document doc = new Document(inputPath))
         {
-            // Load the existing PDF
-            using (Document doc = new Document(inputPath))
-            {
-                // Allow only form filling; content extraction is disabled
-                Permissions perms = Permissions.FillForm;
+            // Permissions: only FillForm (no content extraction, no printing, etc.)
+            Permissions perms = Permissions.FillForm;
 
-                // Encrypt with AES-256 algorithm
-                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+            // Encrypt with AES-256 algorithm.
+            doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-                // Save the encrypted PDF
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
+            // Save the encrypted PDF.
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
     }
 }

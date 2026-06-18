@@ -4,61 +4,69 @@ using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
 
-public static class PdfAnnotationHelper
+namespace AsposePdfApi
 {
-    /// <summary>
-    /// Returns a dictionary that maps each annotation type present in the PDF to its occurrence count.
-    /// </summary>
-    /// <param name="pdfPath">Full path to the PDF file.</param>
-    /// <returns>Dictionary where key is AnnotationType and value is the number of occurrences.</returns>
-    public static Dictionary<AnnotationType, int> GetAnnotationCounts(string pdfPath)
+    public static class PdfAnnotationHelper
     {
-        // Ensure the PDF file exists before processing.
-        if (string.IsNullOrEmpty(pdfPath) || !System.IO.File.Exists(pdfPath))
-            throw new ArgumentException("PDF file not found.", nameof(pdfPath));
-
-        // Load the PDF document inside a using block for deterministic disposal.
-        // The null‑forgiving operator (!) tells the compiler that pdfPath is not null here
-        // (we have already validated it above).
-        using (Document doc = new Document(pdfPath!))
+        /// <summary>
+        /// Returns a dictionary where the key is the annotation type name
+        /// and the value is the number of occurrences of that type in the PDF.
+        /// </summary>
+        /// <param name="pdfPath">Path to the PDF file.</param>
+        /// <returns>Dictionary of annotation type names to counts.</returns>
+        public static Dictionary<string, int> GetAnnotationCounts(string pdfPath)
         {
-            // Initialize the PdfAnnotationEditor facade and bind it to the loaded document.
-            PdfAnnotationEditor editor = new PdfAnnotationEditor();
-            editor.BindPdf(doc);
+            // Validate input
+            if (string.IsNullOrEmpty(pdfPath))
+                throw new ArgumentException("PDF path must be provided.", nameof(pdfPath));
 
-            // Retrieve all annotation types defined in the enum.
-            AnnotationType[] allTypes = (AnnotationType[])Enum.GetValues(typeof(AnnotationType));
-
-            // Extract all annotations from the first to the last page.
-            IList<Annotation> annotations = editor.ExtractAnnotations(1, doc.Pages.Count, allTypes);
-
-            // Count occurrences per annotation type.
-            Dictionary<AnnotationType, int> counts = new Dictionary<AnnotationType, int>();
-            foreach (Annotation ann in annotations)
+            // Use PdfAnnotationEditor (facade) to work with annotations.
+            // The facade implements IDisposable, so wrap it in a using block.
+            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
             {
-                AnnotationType type = ann.AnnotationType;
-                if (counts.ContainsKey(type))
-                    counts[type]++;
-                else
-                    counts[type] = 1;
-            }
+                // Bind the PDF file to the editor.
+                editor.BindPdf(pdfPath);
 
-            return counts;
+                // Determine the total number of pages in the document.
+                int pageCount = editor.Document.Pages.Count;
+
+                // Extract all annotations from the whole document.
+                // Passing an empty string array retrieves annotations of all types.
+                IList<Annotation> annotations = editor.ExtractAnnotations(1, pageCount, new string[0]);
+
+                // Prepare the result dictionary.
+                Dictionary<string, int> counts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+                // Iterate through the extracted annotations and count each type.
+                foreach (Annotation annotation in annotations)
+                {
+                    // AnnotationType is an enum; use its name as the dictionary key.
+                    string typeName = annotation.AnnotationType.ToString();
+
+                    if (counts.ContainsKey(typeName))
+                        counts[typeName] += 1;
+                    else
+                        counts[typeName] = 1;
+                }
+
+                return counts;
+            }
         }
     }
-}
 
-// Added entry point to satisfy the executable project requirement.
-public class Program
-{
-    public static void Main(string[] args)
+    // Minimal entry point required for a console application.
+    // It does not perform any work; it simply satisfies the compiler.
+    internal class Program
     {
-        // Optional demonstration (can be removed or left empty).
-        // if (args.Length > 0)
-        // {
-        //     var result = PdfAnnotationHelper.GetAnnotationCounts(args[0]);
-        //     foreach (var kvp in result)
-        //         Console.WriteLine($"{kvp.Key}: {kvp.Value}");
-        // }
+        static void Main(string[] args)
+        {
+            // Example usage (optional). Commented out to avoid runtime errors when no PDF is supplied.
+            // if (args.Length > 0)
+            // {
+            //     var result = PdfAnnotationHelper.GetAnnotationCounts(args[0]);
+            //     foreach (var kvp in result)
+            //         Console.WriteLine($"{kvp.Key}: {kvp.Value}");
+            // }
+        }
     }
 }

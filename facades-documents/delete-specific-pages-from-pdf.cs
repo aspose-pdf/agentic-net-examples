@@ -6,21 +6,21 @@ class Program
 {
     static void Main()
     {
-        // Paths to the source PDF and the resulting PDF
+        // Paths to the source PDF and the result PDF
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Pages to delete (1‑based indices)
-        int[] pagesToDelete = new int[] { 2, 3 };
+        // Pages to delete (1‑based indexing as required by Aspose.Pdf)
+        int[] pagesToDelete = new int[] { 2, 3, 5 };
 
-        // Verify that the input file exists
+        // Validate input file existence
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Open the source and destination streams
+        // Open input and output streams with proper disposal
         using (FileStream inputStream  = new FileStream(inputPath,  FileMode.Open,  FileAccess.Read))
         using (FileStream outputStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
         {
@@ -28,12 +28,11 @@ class Program
             PdfFileEditor editor = new PdfFileEditor();
 
             // Delete the specified pages and write the result to the output stream
-            bool result = editor.Delete(inputStream, pagesToDelete, outputStream);
+            bool success = editor.Delete(inputStream, pagesToDelete, outputStream);
 
-            if (result)
-                Console.WriteLine($"Pages {string.Join(", ", pagesToDelete)} deleted successfully. Output saved to '{outputPath}'.");
-            else
-                Console.Error.WriteLine("Failed to delete pages.");
+            Console.WriteLine(success
+                ? $"Pages {string.Join(", ", pagesToDelete)} deleted successfully. Output saved to '{outputPath}'."
+                : "Failed to delete pages.");
         }
     }
 }

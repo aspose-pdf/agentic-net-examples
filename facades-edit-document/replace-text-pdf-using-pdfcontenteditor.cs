@@ -1,29 +1,33 @@
 using System;
-using System.IO;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "edited.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Verify the input file exists.
-        if (!File.Exists(inputPdf))
+        // Verify the source file exists
+        if (!System.IO.File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // PdfContentEditor implements IDisposable – use a using statement for automatic disposal.
-        using (var editor = new PdfContentEditor())
+        // PdfContentEditor implements IDisposable, so a using block ensures it is closed automatically
+        using (PdfContentEditor editor = new PdfContentEditor())
         {
-            editor.BindPdf(inputPdf);
-            editor.ReplaceText("Foo", "Bar");
-            editor.Save(outputPdf);
+            // Load the PDF document into the editor
+            editor.BindPdf(inputPath);
+
+            // Perform an editing operation – replace all occurrences of "OldText" with "NewText"
+            editor.ReplaceText("OldText", "NewText");
+
+            // Save the modified PDF to a new file
+            editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Edited PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Edited PDF saved to '{outputPath}'.");
     }
 }

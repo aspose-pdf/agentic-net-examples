@@ -8,49 +8,47 @@ class Program
     static void Main()
     {
         // Input and output PDF paths
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "rotated_output.pdf";
+
+        // Configuration: page number (1‑based) -> rotation angle in degrees (0, 90, 180, 270)
+        var pageRotations = new Dictionary<int, int>
+        {
+            { 1, 90 },
+            { 2, 180 },
+            { 3, 0 }   // example entries; adjust as needed
+        };
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Configuration: page number (1‑based) -> rotation angle in degrees
-        // Only multiples of 90 are supported by the Rotation enum.
-        var pageRotations = new Dictionary<int, int>
-        {
-            { 1, 90 },   // Rotate page 1 by 90°
-            { 2, 180 },  // Rotate page 2 by 180°
-            { 3, 270 }   // Rotate page 3 by 270°
-            // Add more entries as needed
-        };
-
-        // Load the PDF, apply rotations, and save
+        // Load the PDF document (using block ensures proper disposal)
         using (Document doc = new Document(inputPath))
         {
+            // Iterate over the configuration dictionary
             foreach (var kvp in pageRotations)
             {
-                int pageNumber = kvp.Key;
-                int angle      = kvp.Value;
+                int pageNumber = kvp.Key;   // 1‑based page index
+                int angle = kvp.Value;      // rotation angle in degrees
 
-                // Ensure the page exists (Aspose.Pdf uses 1‑based indexing)
+                // Validate page number
                 if (pageNumber < 1 || pageNumber > doc.Pages.Count)
                 {
-                    Console.WriteLine($"Skipping page {pageNumber}: out of range.");
+                    Console.Error.WriteLine($"Page {pageNumber} is out of range; skipping.");
                     continue;
                 }
 
-                // Convert the integer angle to the corresponding Rotation enum value
-                // Page.IntToRotation handles 0, 90, 180, 270 degrees.
-                Rotation rotationEnum = Page.IntToRotation(angle);
+                // Convert integer angle to the Rotation enum (Aspose.Pdf.Rotation)
+                Rotation rotation = Page.IntToRotation(angle);
 
-                // Apply the rotation to the page
-                doc.Pages[pageNumber].Rotate = rotationEnum;
+                // Apply rotation to the specific page
+                doc.Pages[pageNumber].Rotate = rotation;
             }
 
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

@@ -8,6 +8,8 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
+        const int    pageNumber = 1;   // 1‑based page index
+        const int    imageIndex = 0;   // index of the image to delete (0‑based in the collection)
 
         if (!File.Exists(inputPath))
         {
@@ -15,21 +17,29 @@ class Program
             return;
         }
 
-        // Load the PDF document (using statement ensures proper disposal)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Choose the page that contains the raster image to delete (1‑based indexing)
-            Page page = doc.Pages[1];
+            // Get the target page (pages are 1‑based)
+            Page page = doc.Pages[pageNumber];
 
-            // Delete the first image from the page's resources.
-            // ImageDeleteAction.None removes the image reference from the page contents
-            // but keeps the image object in the document (file size unchanged).
-            page.Resources.Images.Delete(1, ImageDeleteAction.None);
+            // Verify that the page contains at least one raster image
+            if (page.Resources.Images.Count > imageIndex)
+            {
+                // Delete the image and remove its reference from the page contents.
+                // ImageDeleteAction.None removes the image from the collection and from the page contents,
+                // but keeps the image object in the document (file size unchanged).
+                page.Resources.Images.Delete(imageIndex, ImageDeleteAction.None);
+            }
+            else
+            {
+                Console.WriteLine("No image found at the specified index.");
+            }
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Image removed and PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Image deleted and PDF saved to '{outputPath}'.");
     }
 }

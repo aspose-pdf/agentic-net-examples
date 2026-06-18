@@ -6,30 +6,34 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const int pageNumber = 4;               // Target page (1‑based indexing)
-        int[] imageIndexes = new int[] { 2 };   // Index of the image to remove on page 4 (replace with actual index)
+        // Input PDF containing the image to be removed
+        const string inputPdf  = "input.pdf";
+        // Output PDF after the image has been removed
+        const string outputPdf = "output.pdf";
+        // Object ID (index) of the image to delete on page 4
+        const int imageObjectId = 5; // adjust to the actual image index
 
-        if (!File.Exists(inputPath))
+        // Verify that the source file exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // PdfContentEditor implements IDisposable, so wrap it in a using block
-        using (PdfContentEditor editor = new PdfContentEditor())
-        {
-            // Load the PDF document
-            editor.BindPdf(inputPath);
+        // Use PdfContentEditor (Aspose.Pdf.Facades) to manipulate the PDF
+        PdfContentEditor editor = new PdfContentEditor();
 
-            // Delete the specified image(s) from page 4
-            editor.DeleteImage(pageNumber, imageIndexes);
+        // Load the PDF document
+        editor.BindPdf(inputPdf);
 
-            // Save the modified PDF
-            editor.Save(outputPath);
-        }
+        // Delete the specified image from page 4.
+        // Page numbers are 1‑based; the image index array contains the object IDs to remove.
+        editor.DeleteImage(4, new int[] { imageObjectId });
 
-        Console.WriteLine($"Specified image removed. Output saved to '{outputPath}'.");
+        // Save the modified PDF
+        editor.Save(outputPdf);
+
+        Console.WriteLine($"Image with object ID {imageObjectId} removed from page 4.");
+        Console.WriteLine($"Result saved to '{outputPdf}'.");
     }
 }

@@ -7,63 +7,74 @@ class Program
 {
     static void Main()
     {
+        // Input and output PDF paths
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const int targetPageNumber = 2; // page to modify (1‑based)
 
-        // Map of image index (1‑based) on the page to the new image file path
-        var replacements = new Dictionary<int, string>
+        // Page number to modify (1‑based indexing)
+        const int pageNumber = 1;
+
+        // Dictionary mapping image index (1‑based) to new image file path
+        var imageReplacements = new Dictionary<int, string>
         {
             { 1, "newImage1.jpg" },
-            { 3, "newImage3.png" }
+            { 2, "newImage2.png" }
         };
 
+        // Validate input PDF
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
 
-        foreach (var path in replacements.Values)
+        // Validate replacement image files
+        foreach (var kvp in imageReplacements)
         {
-            if (!File.Exists(path))
+            if (!File.Exists(kvp.Value))
             {
-                Console.Error.WriteLine($"Replacement image not found: {path}");
+                Console.Error.WriteLine($"Replacement image not found: {kvp.Value}");
                 return;
             }
         }
 
+        // Load PDF document (using rule: wrap Document in using)
         using (Document doc = new Document(inputPath))
         {
-            if (targetPageNumber < 1 || targetPageNumber > doc.Pages.Count)
+            // Validate requested page number
+            if (pageNumber < 1 || pageNumber > doc.Pages.Count)
             {
-                Console.Error.WriteLine("Invalid page number.");
+                Console.Error.WriteLine($"Page number {pageNumber} is out of range.");
                 return;
             }
 
-            Page page = doc.Pages[targetPageNumber];
-            var images = page.Resources.Images; // XImageCollection
+            // Get the target page
+            Page page = doc.Pages[pageNumber];
 
-            foreach (var kvp in replacements)
+            // Replace each specified image
+            foreach (var kvp in imageReplacements)
             {
-                int index = kvp.Key;
-                string newImagePath = kvp.Value;
+                int imgIndex = kvp.Key;          // 1‑based index in the XImageCollection
+                string newImgPath = kvp.Value;   // Path to the new image file
 
-                if (index < 1 || index > images.Count)
+                // Ensure the image index exists on this page
+                if (imgIndex < 1 || imgIndex > page.Resources.Images.Count)
                 {
-                    Console.Error.WriteLine($"Image index {index} out of range on page {targetPageNumber}.");
+                    Console.Error.WriteLine($"Image index {imgIndex} is out of range on page {pageNumber}.");
                     continue;
                 }
 
-                using (FileStream fs = File.OpenRead(newImagePath))
+                // Open the new image stream and replace the existing image
+                using (FileStream imgStream = File.OpenRead(newImgPath))
                 {
-                    images.Replace(index, fs);
+                    page.Resources.Images.Replace(imgIndex, imgStream);
                 }
             }
 
+            // Save the modified PDF (PDF format, no extra SaveOptions needed)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Images replaced and saved to '{outputPath}'.");
+        Console.WriteLine($"Images replaced successfully. Output saved to '{outputPath}'.");
     }
 }

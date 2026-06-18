@@ -1,54 +1,58 @@
 using System;
 using System.IO;
-using System.Xml;
+using System.Xml.Linq;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Paths to the XML definition and the PDF files
         const string xmlPath = "pagesize.xml";
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output.pdf";
+        const string outputPdf = "output.pdf";
 
-        // Verify that the required files exist
         if (!File.Exists(xmlPath))
         {
             Console.Error.WriteLine($"XML file not found: {xmlPath}");
             return;
         }
-        if (!File.Exists(inputPdfPath))
-        {
-            Console.Error.WriteLine($"PDF file not found: {inputPdfPath}");
-            return;
-        }
 
-        // Parse the XML to obtain width and height (in points)
-        double width = 0, height = 0;
-        XmlDocument xmlDoc = new XmlDocument();
-        xmlDoc.Load(xmlPath);
-        XmlNode sizeNode = xmlDoc.SelectSingleNode("//PageSize");
-        if (sizeNode == null ||
-            !double.TryParse(sizeNode.Attributes["width"]?.Value, out width) ||
-            !double.TryParse(sizeNode.Attributes["height"]?.Value, out height))
-        {
-            Console.Error.WriteLine("Invalid XML format. Expected <PageSize width=\"...\" height=\"...\"/>");
-            return;
-        }
+        // Load the XML that defines page sizes.
+        // Expected format:
+        // <Pages>
+        //   <Page index="1" width="595" height="842" />
+        //   <Page index="2" width="420" height="595" />
+        //   ...
+        // </Pages>
+        XDocument xdoc = XDocument.Load(xmlPath);
 
-        // Load the PDF, set each page's size, and save the result
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Create a new PDF document. The using block ensures proper disposal.
+        using (Document pdfDoc = new Document())
         {
-            foreach (Page page in pdfDoc.Pages)
+            // Iterate over each <Page> element in the XML.
+            foreach (var pageElem in xdoc.Root.Elements("Page"))
             {
-                // Set the page size using the values from the XML
+                // Read attributes.
+                int index = (int)pageElem.Attribute("index");
+                double width = (double)pageElem.Attribute("width");
+                double height = (double)pageElem.Attribute("height");
+
+                // Ensure the document has enough pages.
+                while (pdfDoc.Pages.Count < index)
+                {
+                    pdfDoc.Pages.Add();
+                }
+
+                // Get the target page (1‑based indexing).
+                Page page = pdfDoc.Pages[index];
+
+                // Set the page size using the SetPageSize method.
                 page.SetPageSize(width, height);
             }
 
-            pdfDoc.Save(outputPdfPath);
+            // Save the resulting PDF.
+            pdfDoc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved with new page size {width}x{height} to '{outputPdfPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPdf}'.");
     }
 }

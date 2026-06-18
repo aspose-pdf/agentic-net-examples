@@ -1,50 +1,50 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // Core API for Document, Page, ImageStamp
+using Aspose.Pdf.Facades;      // For ImageStamp (if needed, otherwise core namespace suffices)
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "output.pdf";
-        const string logoImagePath = "logo.png";
+        const string inputPdf  = "input.pdf";   // source PDF
+        const string outputPdf = "output.pdf";  // result PDF
+        const string logoPath  = "logo.png";    // company logo image
 
-        // Verify that the required files exist
-        if (!File.Exists(inputPdfPath))
+        // Verify files exist
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(logoImagePath))
+        if (!File.Exists(logoPath))
         {
-            Console.Error.WriteLine($"Logo image not found: {logoImagePath}");
+            Console.Error.WriteLine($"Logo image not found: {logoPath}");
             return;
         }
 
-        // Load the PDF document (create‑load‑save lifecycle)
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Aspose.Pdf uses 1‑based page indexing; get the first page
-            Page firstPage = pdfDoc.Pages[1];
+            // Create an ImageStamp for the logo
+            ImageStamp logoStamp = new ImageStamp(logoPath)
+            {
+                // Center the stamp horizontally and vertically on the page
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center,
 
-            // Create an ImageStamp for the logo image
-            ImageStamp logoStamp = new ImageStamp(logoImagePath);
+                // Optional visual settings
+                Background = false,   // place over page content
+                Opacity    = 1.0f     // fully opaque
+            };
 
-            // Center the stamp horizontally and vertically on the page
-            logoStamp.HorizontalAlignment = HorizontalAlignment.Center;
-            logoStamp.VerticalAlignment   = VerticalAlignment.Center;
+            // Add the stamp only to the first page (pages are 1‑based)
+            pdfDoc.Pages[1].AddStamp(logoStamp);
 
-            // Ensure the stamp appears in front of page content
-            logoStamp.Background = false;
-
-            // Add the stamp to the first page only
-            firstPage.AddStamp(logoStamp);
-
-            // Save the modified PDF (save‑rule)
-            pdfDoc.Save(outputPdfPath);
+            // Save the modified PDF (lifecycle rule: save inside using block)
+            pdfDoc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Company logo added to first page and saved as '{outputPdfPath}'.");
+        Console.WriteLine($"Logo added to first page and saved as '{outputPdf}'.");
     }
 }

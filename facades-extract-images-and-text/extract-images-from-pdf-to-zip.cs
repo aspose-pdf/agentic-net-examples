@@ -12,41 +12,52 @@ class Program
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Extract images and add them to a zip archive
-        using (PdfExtractor extractor = new PdfExtractor())
+        try
         {
-            extractor.BindPdf(inputPdf);
-            extractor.ExtractImage();
-
-            using (FileStream zipFile = new FileStream(outputZip, FileMode.Create))
-            using (ZipArchive zip = new ZipArchive(zipFile, ZipArchiveMode.Create))
+            // Initialize the extractor and bind the PDF file
+            using (PdfExtractor extractor = new PdfExtractor())
             {
-                int imageIndex = 1;
-                while (extractor.HasNextImage())
-                {
-                    using (MemoryStream imgStream = new MemoryStream())
-                    {
-                        // Extract next image as JPEG (default format) into the memory stream
-                        extractor.GetNextImage(imgStream);
-                        imgStream.Position = 0;
+                extractor.BindPdf(inputPdf);
+                extractor.ExtractImage(); // Prepare image extraction
 
-                        // Create a zip entry for the image
-                        string entryName = $"image-{imageIndex}.jpg";
-                        ZipArchiveEntry entry = zip.CreateEntry(entryName, CompressionLevel.Optimal);
-                        using (Stream entryStream = entry.Open())
+                // Create the ZIP archive
+                using (FileStream zipFile = new FileStream(outputZip, FileMode.Create))
+                using (ZipArchive zip = new ZipArchive(zipFile, ZipArchiveMode.Create))
+                {
+                    int imageIndex = 1;
+
+                    // Iterate through all extracted images
+                    while (extractor.HasNextImage())
+                    {
+                        // Retrieve the next image into a memory stream
+                        using (MemoryStream imgStream = new MemoryStream())
                         {
-                            imgStream.CopyTo(entryStream);
+                            extractor.GetNextImage(imgStream);
+                            imgStream.Position = 0; // Reset for reading
+
+                            // Add the image to the ZIP archive
+                            string entryName = $"image-{imageIndex}.jpg";
+                            ZipArchiveEntry entry = zip.CreateEntry(entryName);
+                            using (Stream entryStream = entry.Open())
+                            {
+                                imgStream.CopyTo(entryStream);
+                            }
                         }
+
+                        imageIndex++;
                     }
-                    imageIndex++;
                 }
             }
-        }
 
-        Console.WriteLine($"Images extracted to '{outputZip}'.");
+            Console.WriteLine($"All images extracted to '{outputZip}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

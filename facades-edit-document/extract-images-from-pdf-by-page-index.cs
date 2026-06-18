@@ -1,8 +1,7 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging; // Added for ImageFormat
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using System.Drawing.Imaging;
 
 class Program
 {
@@ -13,38 +12,31 @@ class Program
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Ensure the output folder exists
         Directory.CreateDirectory(outputDir);
 
-        // PdfExtractor is a Facade class; it implements IDisposable
+        // PdfExtractor implements IDisposable, so use a using block
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the source PDF file
+            // Bind the source PDF
             extractor.BindPdf(inputPdf);
 
-            // Use a Document only to obtain the total page count
-            int pageCount;
-            using (Document doc = new Document(inputPdf))
-            {
-                pageCount = doc.Pages.Count; // 1‑based indexing
-            }
+            // Get total page count from the underlying Document
+            int pageCount = extractor.Document.Pages.Count;
 
-            // Iterate through each page and extract its images
+            // Iterate through each page to extract images per page
             for (int page = 1; page <= pageCount; page++)
             {
-                // Restrict extraction to the current page
                 extractor.StartPage = page;
                 extractor.EndPage   = page;
 
-                // Perform the image extraction for this page
+                // Extract images from the current page
                 extractor.ExtractImage();
 
                 int imageIndex = 1;
-                // Retrieve all images found on the current page
                 while (extractor.HasNextImage())
                 {
                     // Build the output file name using the required pattern
@@ -52,13 +44,13 @@ class Program
                         outputDir,
                         $"Image_Page{page}_Index{imageIndex}.png");
 
-                    // Save the image in PNG format
+                    // Save the next image as PNG
                     extractor.GetNextImage(outputPath, ImageFormat.Png);
                     imageIndex++;
                 }
             }
         }
 
-        Console.WriteLine("All images have been extracted successfully.");
+        Console.WriteLine($"Image extraction completed. Files saved to '{outputDir}'.");
     }
 }

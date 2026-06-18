@@ -10,6 +10,7 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "watermarked.pdf";
+        const string watermarkText = "CONFIDENTIAL";
 
         if (!File.Exists(inputPath))
         {
@@ -17,36 +18,41 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Define the watermark text and its visual style
-            string[] watermarkLines = new string[] { "CONFIDENTIAL" };
+            // Define a TextState that controls font, size, color, etc.
             TextState textState = new TextState
             {
-                FontSize = 72,                         // large font size
-                ForegroundColor = Color.Gray,          // gray color
-                Font = FontRepository.FindFont("Helvetica") // optional font
+                Font = FontRepository.FindFont("Helvetica"),
+                FontSize = 72,
+                ForegroundColor = Color.Gray,
+                FontStyle = FontStyles.Bold
             };
 
             // Apply the watermark to every page
             foreach (Page page in doc.Pages)
             {
-                // Use the full page rectangle as the annotation bounds
-                Aspose.Pdf.Rectangle rect = page.Rect;
+                // Rectangle covering the whole page
+                Aspose.Pdf.Rectangle pageRect = new Aspose.Pdf.Rectangle(
+                    0,
+                    0,
+                    page.PageInfo.Width,
+                    page.PageInfo.Height);
 
-                // Create the WatermarkAnnotation for the current page
-                WatermarkAnnotation wm = new WatermarkAnnotation(page, rect)
+                // Create the watermark annotation
+                WatermarkAnnotation watermark = new WatermarkAnnotation(page, pageRect)
                 {
-                    Opacity = 0.3, // 30% opacity (semi‑transparent)
-                    // Optional: set alignment or other properties here
+                    Opacity = 0.3, // semi‑transparent (0 = fully transparent, 1 = opaque)
+                    TextHorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
                 };
 
-                // Set the watermark text and its TextState
-                wm.SetTextAndState(watermarkLines, textState);
+                // Set the watermark text and associate the TextState
+                watermark.SetTextAndState(new[] { watermarkText }, textState);
 
                 // Add the annotation to the page
-                page.Annotations.Add(wm);
+                page.Annotations.Add(watermark);
             }
 
             // Save the modified PDF

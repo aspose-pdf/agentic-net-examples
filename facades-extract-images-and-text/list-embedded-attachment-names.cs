@@ -14,13 +14,18 @@ class Program
             return;
         }
 
-        // Create PdfExtractor, bind the PDF, extract attachments, then list their names.
+        // Initialize PdfExtractor and bind the PDF document
         using (PdfExtractor extractor = new PdfExtractor())
         {
             extractor.BindPdf(inputPath);
-            extractor.ExtractAttachment(); // Must be called before GetAttachNames()
+
+            // Must extract attachments before retrieving their names
+            extractor.ExtractAttachment();
+
+            // Get the list of attachment names
             IList<string> attachmentNames = extractor.GetAttachNames();
 
+            // Output each attachment name
             foreach (string name in attachmentNames)
             {
                 Console.WriteLine(name);

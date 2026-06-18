@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using System.Text.Json;
 using Aspose.Pdf;
 using Aspose.Pdf.Tagged;
@@ -8,82 +8,65 @@ using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
-    // POCO representing a node in the tagged structure hierarchy
-    class StructureNode
-    {
-        public string Type { get; set; }
-        public string Text { get; set; }
-        public string AltText { get; set; }
-        public string Language { get; set; }
-        public List<StructureNode> Children { get; set; } = new List<StructureNode>();
-    }
-
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputJson = "tagged_structure.json";
+        const string inputPath = "input.pdf";
+        const string jsonPath  = "structure.json";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
+        // Load PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPdf))
-            {
-                // Access tagged content interface
-                ITaggedContent tagged = doc.TaggedContent;
+            // Access tagged content
+            ITaggedContent tagged = doc.TaggedContent;
 
-                // If the document has no tagged structure, create an empty JSON file
-                if (tagged == null || tagged.RootElement == null)
-                {
-                    File.WriteAllText(outputJson, "{}");
-                    Console.WriteLine("Document is not tagged. Empty JSON created.");
-                    return;
-                }
+            // Root of the logical structure tree
+            StructureElement root = tagged.RootElement;
 
-                // Build a hierarchical model from the root element
-                StructureNode rootNode = BuildNode(tagged.RootElement);
+            // Convert the structure tree to a serializable POCO hierarchy
+            ElementNode jsonRoot = BuildElementNode(root);
 
-                // Serialize the hierarchy to JSON with indentation
-                string json = JsonSerializer.Serialize(rootNode, new JsonSerializerOptions
-                {
-                    WriteIndented = true
-                });
-
-                // Write JSON to the output file
-                File.WriteAllText(outputJson, json);
-                Console.WriteLine($"Tagged structure exported to '{outputJson}'.");
-            }
+            // Serialize hierarchy to formatted JSON
+            JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+            string json = JsonSerializer.Serialize(jsonRoot, jsonOptions);
+            File.WriteAllText(jsonPath, json);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Tagged structure exported to '{jsonPath}'.");
     }
 
-    // Recursively converts a StructureElement into a StructureNode
-    static StructureNode BuildNode(StructureElement element)
+    // Recursively builds a plain object representing a structure element
+    static ElementNode BuildElementNode(Element element)
     {
-        StructureNode node = new StructureNode {
-            Type = element.GetType().Name,
-            Text = element.ActualText,
-            AltText = element.AlternativeText,
-            Language = element.Language
+        ElementNode node = new ElementNode {
+            Type            = element.GetType().Name,
+            Text            = (element as StructureElement)?.ActualText,
+            AlternativeText = (element as StructureElement)?.AlternativeText,
+            Language        = (element as StructureElement)?.Language,
+            Children        = new List<ElementNode>()
         };
 
-        // Iterate over child elements (if any) and process them recursively
+        // Process child elements using the correct ChildElements property
         foreach (Element child in element.ChildElements)
         {
-            if (child is StructureElement childStructure)
-            {
-                node.Children.Add(BuildNode(childStructure));
-            }
+            node.Children.Add(BuildElementNode(child));
         }
 
         return node;
+    }
+
+    // POCO used for JSON serialization
+    class ElementNode
+    {
+        public string Type { get; set; }
+        public string Text { get; set; }
+        public string AlternativeText { get; set; }
+        public string Language { get; set; }
+        public List<ElementNode> Children { get; set; }
     }
 }

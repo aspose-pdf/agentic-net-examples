@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_transitions.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -19,32 +19,32 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Initialize the PdfPageEditor with the loaded document
+            // Bind the editor to the document
             using (PdfPageEditor editor = new PdfPageEditor(doc))
             {
-                // Page 1 – Fade effect (using DISSOLVE constant)
-                editor.ProcessPages = new int[] { 1 };
-                editor.TransitionType = PdfPageEditor.DISSOLVE;
-                editor.TransitionDuration = 2; // duration in seconds
+                // ----- Page 1: Fade effect (DISSOLVE) -----
+                editor.ProcessPages = new int[] { 1 };               // target page (1‑based)
+                editor.TransitionType = PdfPageEditor.DISSOLVE;     // Fade transition
+                editor.TransitionDuration = 2;                       // duration in seconds
                 editor.ApplyChanges();
 
-                // Page 2 – BoxOut effect (using OUTBOX constant)
+                // ----- Page 2: BoxOut effect (OUTBOX) -----
                 editor.ProcessPages = new int[] { 2 };
-                editor.TransitionType = PdfPageEditor.OUTBOX;
-                editor.TransitionDuration = 3;
+                editor.TransitionType = PdfPageEditor.OUTBOX;       // BoxOut transition
+                editor.TransitionDuration = 2;
                 editor.ApplyChanges();
 
-                // Page 3 – Cover effect (using INBOX constant)
+                // ----- Page 3: Cover effect (INBOX) -----
                 editor.ProcessPages = new int[] { 3 };
-                editor.TransitionType = PdfPageEditor.INBOX;
+                editor.TransitionType = PdfPageEditor.INBOX;        // Cover transition
                 editor.TransitionDuration = 2;
                 editor.ApplyChanges();
 
                 // Save the modified PDF
-                doc.Save(outputPath);
+                editor.Save(outputPath);
             }
         }
 
-        Console.WriteLine($"PDF with transitions saved to '{outputPath}'.");
+        Console.WriteLine($"Transitions applied and saved to '{outputPath}'.");
     }
 }

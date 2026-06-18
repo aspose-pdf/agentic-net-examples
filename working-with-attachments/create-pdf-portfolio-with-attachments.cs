@@ -8,31 +8,41 @@ class Program
     {
         const string outputPath = "portfolio.pdf";
 
-        // Create an empty PDF document
         using (Document doc = new Document())
         {
-            // Initialize the collection that holds portfolio files
+            // Ensure the document has a collection for portfolio files
             if (doc.Collection == null)
                 doc.Collection = new Collection();
 
-            // Files to add to the portfolio (ensure the files exist)
-            string[] filesToAdd = { "file1.txt", "image.png" };
-            foreach (string filePath in filesToAdd)
-            {
-                if (File.Exists(filePath))
-                {
-                    // Create a file specification for the attachment
-                    var fileSpec = new FileSpecification(filePath, Path.GetFileName(filePath));
-                    fileSpec.Contents = new MemoryStream(File.ReadAllBytes(filePath));
-                    // Add the specification to the document's collection
-                    doc.Collection.Add(fileSpec);
-                }
-            }
+            // A portfolio needs at least one page; add a blank page
+            doc.Pages.Add();
 
-            // Save the portfolio PDF
+            // Files to attach to the portfolio
+            string txtFile = "sample.txt";
+            string imgFile = "image.png";
+
+            AddFileToPortfolio(doc, txtFile);
+            AddFileToPortfolio(doc, imgFile);
+
+            // Save the document as a PDF Portfolio
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Portfolio PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Portfolio saved to '{outputPath}'.");
+    }
+
+    private static void AddFileToPortfolio(Document doc, string filePath)
+    {
+        if (!File.Exists(filePath))
+            return;
+
+        // Create a FileSpecification for the file and load its contents
+        var fileSpec = new FileSpecification(filePath, Path.GetFileName(filePath))
+        {
+            Contents = new MemoryStream(File.ReadAllBytes(filePath))
+        };
+
+        // Add the specification to the document's collection (portfolio)
+        doc.Collection.Add(fileSpec);
     }
 }

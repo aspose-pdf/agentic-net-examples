@@ -2,8 +2,9 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
+using Aspose.Pdf.Drawing;
 
-class Program
+class AddCreationDateStamp
 {
     static void Main()
     {
@@ -16,31 +17,34 @@ class Program
             return;
         }
 
-        // Load the source PDF
+        // Load the PDF document
         Document doc = new Document(inputPath);
 
-        // Retrieve the document creation date and format it as yyyy-MM-dd
-        DateTime creationDate = doc.Info.CreationDate;
+        // Use the document's creation date if available; otherwise fall back to current date
+        DateTime creationDate = doc.Info.CreationDate != DateTime.MinValue ? doc.Info.CreationDate : DateTime.Now;
         string dateText = creationDate.ToString("yyyy-MM-dd");
 
-        // Create a text stamp that will be placed at the top‑left corner
-        TextStamp stamp = new TextStamp(dateText);
-        stamp.TextState.Font = FontRepository.FindFont("Helvetica");
-        stamp.TextState.FontSize = 12;
-        stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black; // fully‑qualified Aspose color
-        stamp.HorizontalAlignment = HorizontalAlignment.Left;
-        stamp.VerticalAlignment = VerticalAlignment.Top;
-        stamp.XIndent = 10f; // margin from the left edge
-        stamp.YIndent = 10f; // margin from the top edge
+        // Create a TextStamp that will be placed in the top‑left corner
+        TextStamp dateStamp = new TextStamp(dateText)
+        {
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment   = VerticalAlignment.Top,
+            XIndent = 20f,   // left margin
+            YIndent = 20f    // top margin
+        };
+        // TextState is read‑only; modify its members directly
+        dateStamp.TextState.Font = FontRepository.FindFont("Helvetica");
+        dateStamp.TextState.FontSize = 12;
+        dateStamp.TextState.ForegroundColor = Color.Black;
 
-        // Apply the stamp to every page (or change to a specific page if needed)
+        // Add the stamp to every page of the document
         foreach (Page page in doc.Pages)
         {
-            page.AddStamp(stamp);
+            page.AddStamp(dateStamp);
         }
 
-        // Save the stamped PDF
+        // Save the modified PDF
         doc.Save(outputPath);
-        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Creation‑date stamp added. Output saved to '{outputPath}'.");
     }
 }

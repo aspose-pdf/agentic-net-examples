@@ -1,13 +1,12 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations; // ImagePlacementAbsorber and related types are here
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -19,25 +18,25 @@ class Program
         // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create an absorber that will find all image placements in the document
-            ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
-
-            // Perform the search on the whole document
-            absorber.Visit(doc);
-
-            // Iterate over each found image placement
-            foreach (ImagePlacement placement in absorber.ImagePlacements)
+            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                // Image resolution is given in DPI (dots per inch) for X and Y axes
-                // If either axis is lower than 72 DPI, hide (delete) the image from its page
-                if (placement.Resolution.X < 72 || placement.Resolution.Y < 72)
+                // Create an absorber that finds image placements on the current page
+                ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
+
+                // Perform the search on the page
+                doc.Pages[pageIndex].Accept(absorber);
+
+                // Examine each found image placement
+                foreach (ImagePlacement placement in absorber.ImagePlacements)
                 {
-                    placement.Hide();
+                    // If either horizontal or vertical resolution is below 72 DPI, hide the image
+                    if (placement.Resolution.X < 72 || placement.Resolution.Y < 72)
+                    {
+                        placement.Hide();
+                    }
                 }
             }
-
-            // Optional: clean up unused resources after deletions
-            doc.OptimizeResources();
 
             // Save the modified PDF
             doc.Save(outputPath);

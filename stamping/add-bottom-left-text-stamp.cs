@@ -1,44 +1,39 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
-class Program
+namespace AddBottomLeftTextStampExample
 {
-    static void Main()
+    class Program
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-
-        if (!File.Exists(inputPath))
+        static void Main(string[] args)
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // Load the PDF, modify, and save – all within using blocks for proper disposal
-        using (Document doc = new Document(inputPath))
-        {
-            // Create a text stamp with the desired content
-            TextStamp stamp = new TextStamp("Sample Text");
-
-            // Align to bottom‑left corner
-            stamp.HorizontalAlignment = HorizontalAlignment.Left;
-            stamp.VerticalAlignment   = VerticalAlignment.Bottom;
-
-            // Set 10‑point margins from the left and bottom edges
-            stamp.LeftMargin   = 10;
-            stamp.BottomMargin = 10;
-
-            // Apply the stamp to each page (or a specific page)
-            foreach (Page page in doc.Pages)
+            // Create a sample PDF (self‑contained example)
+            using (Document sampleDoc = new Document())
             {
-                stamp.Put(page);
+                sampleDoc.Pages.Add();
+                sampleDoc.Save("input.pdf");
             }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
-        }
+            // Open the sample PDF and add a bottom‑left text stamp with 10‑point margins
+            using (Document doc = new Document("input.pdf"))
+            {
+                // Create the text stamp
+                TextStamp textStamp = new TextStamp("Sample Stamp");
+                textStamp.HorizontalAlignment = HorizontalAlignment.Left;
+                textStamp.VerticalAlignment = VerticalAlignment.Bottom;
+                textStamp.LeftMargin = 10;
+                textStamp.BottomMargin = 10;
 
-        Console.WriteLine($"Text stamp applied and saved to '{outputPath}'.");
+                // Apply the stamp to each page
+                foreach (Page page in doc.Pages)
+                {
+                    page.AddStamp(textStamp);
+                }
+
+                // Save the updated PDF
+                doc.Save("output.pdf");
+            }
+        }
     }
 }

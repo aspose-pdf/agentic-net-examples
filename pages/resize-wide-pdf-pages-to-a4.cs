@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "resized.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,26 +15,31 @@ class Program
             return;
         }
 
-        // Load the PDF document (using the recommended lifecycle pattern)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based indexed in Aspose.Pdf
+            // Pages are 1‑based indexed
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // If the page width is greater than 600 points, resize it to A4
-                if (page.PageInfo.Width > 600)
+                // Get the current page width (in points)
+                double pageWidth = page.PageInfo.Width;
+
+                // If the page is wider than 600 points, resize it to A4
+                if (pageWidth > 600)
                 {
-                    // PageSize.A4 provides the standard A4 dimensions (≈595×842 points)
-                    page.SetPageSize(PageSize.A4.Width, PageSize.A4.Height);
+                    // PageSize.A4 provides the standard A4 dimensions (width × height) in points
+                    page.SetPageSize(
+                        Aspose.Pdf.PageSize.A4.Width,
+                        Aspose.Pdf.PageSize.A4.Height);
                 }
             }
 
-            // Save the modified document (no extra SaveOptions needed for PDF output)
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

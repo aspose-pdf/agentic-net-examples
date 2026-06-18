@@ -6,36 +6,35 @@ class Program
 {
     static void Main()
     {
-        // Paths for the source PDF, the XML data file and the resulting PDF
-        const string inputPdfPath  = "input.pdf";
-        const string xmlDataPath   = "data.xml";
-        const string outputPdfPath = "output.pdf";
+        const string pdfPath = "input_form.pdf";   // PDF with AcroForm fields
+        const string xmlPath = "data.xml";         // XML containing field values
+        const string outputPath = "filled_form.pdf";
 
-        // Ensure the source files exist before proceeding
-        if (!File.Exists(inputPdfPath))
+        // Verify input files exist
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
-        if (!File.Exists(xmlDataPath))
+        if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"XML data file not found: {xmlDataPath}");
+            Console.Error.WriteLine($"XML not found: {xmlPath}");
             return;
         }
 
-        // Use the Form facade to bind to the PDF, import XML field values, and save the result
-        using (Form form = new Form(inputPdfPath)) // Binds the facade to the source PDF
+        // Initialize the Form facade with the source PDF
+        using (Form form = new Form(pdfPath))
         {
-            // Open the XML file as a read‑only stream and import its data into the form fields
-            using (FileStream xmlStream = new FileStream(xmlDataPath, FileMode.Open, FileAccess.Read))
+            // Import field values from the XML stream
+            using (FileStream xmlStream = new FileStream(xmlPath, FileMode.Open, FileAccess.Read))
             {
-                form.ImportXml(xmlStream); // Imports field values from the XML stream
+                form.ImportXml(xmlStream);
             }
 
             // Save the updated PDF to a new file
-            form.Save(outputPdfPath);
+            form.Save(outputPath);
         }
 
-        Console.WriteLine($"Form fields imported from XML and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Form fields imported and saved to '{outputPath}'.");
     }
 }

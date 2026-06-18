@@ -1,39 +1,35 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;   // PdfXmpMetadata facade
-using Aspose.Pdf;           // DefaultMetadataProperties enum
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_no_nickname.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output.pdf";
 
-        // Verify input file exists
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Create the XMP metadata facade
-        PdfXmpMetadata xmp = new PdfXmpMetadata();
+        // Bind the PDF to the XMP metadata facade, remove the Nickname element, and save.
+        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
+        {
+            // Load the PDF document into the facade.
+            xmp.BindPdf(inputPdf);
 
-        // Load (bind) the PDF document into the facade
-        xmp.BindPdf(inputPath);
+            // Remove the Nickname element using the enum key.
+            xmp.Remove(DefaultMetadataProperties.Nickname);
+            // Alternatively, you could use the string key:
+            // xmp.Remove("xmp:Nickname");
 
-        // Remove the Nickname element from the XMP metadata
-        xmp.Remove(DefaultMetadataProperties.Nickname);
-        // Alternative using string key:
-        // xmp.Remove("xmp:Nickname");
+            // Save the modified PDF (the XMP changes are written back to the file).
+            xmp.Save(outputPdf);
+        }
 
-        // Save the modified PDF back to disk
-        xmp.Save(outputPath);
-
-        // Release resources held by the facade
-        xmp.Close();
-
-        Console.WriteLine($"Nickname element removed. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Nickname element removed. Output saved to '{outputPdf}'.");
     }
 }

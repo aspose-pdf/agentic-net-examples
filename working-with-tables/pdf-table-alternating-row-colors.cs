@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // for TextState, FontStyles, BorderInfo, BorderSide
 
 class Program
 {
@@ -10,77 +10,80 @@ class Program
     {
         const string outputPath = "alternating_rows.pdf";
 
-        // Create a new PDF document and ensure proper disposal
+        // Document lifecycle must be wrapped in a using block for proper disposal
         using (Document doc = new Document())
         {
             // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Create a table with 5 columns
+            // Create a table with three columns and a visible border
             Table table = new Table
             {
-                ColumnWidths = "100 100 100 100 100",
-                Border = new BorderInfo(BorderSide.All, 0.5f)
+                ColumnWidths = "100 100 100",
+                Border = new BorderInfo(BorderSide.All, 1f, Aspose.Pdf.Color.Black)
             };
-
-            // Add a header row
-            Row header = table.Rows.Add();
-            for (int c = 0; c < 5; c++)
-            {
-                Cell cell = header.Cells.Add();
-                cell.Paragraphs.Add(new TextFragment($"Header {c + 1}"));
-                cell.BackgroundColor = Aspose.Pdf.Color.LightBlue;
-                cell.DefaultCellTextState = new TextState { FontSize = 12, FontStyle = FontStyles.Bold };
-            }
-
-            // Add data rows
-            for (int r = 0; r < 10; r++)
-            {
-                Row row = table.Rows.Add();
-                for (int c = 0; c < 5; c++)
-                {
-                    Cell cell = row.Cells.Add();
-                    cell.Paragraphs.Add(new TextFragment($"R{r + 1}C{c + 1}"));
-                }
-            }
-
-            // Apply alternating background colors to each row's cells
-            for (int i = 0; i < table.Rows.Count; i++)
-            {
-                Row row = table.Rows[i];
-                // Choose background based on row index parity
-                Aspose.Pdf.Color bg = (i % 2 == 0) ? Aspose.Pdf.Color.LightGray : Aspose.Pdf.Color.White;
-                foreach (Cell cell in row.Cells)
-                {
-                    cell.BackgroundColor = bg;
-                }
-            }
-
-            // Add the table to the page
             page.Paragraphs.Add(table);
 
-            // Save the document – guard against missing GDI+ (libgdiplus) on non‑Windows platforms
+            // Header row (optional styling)
+            Row header = table.Rows.Add();
+            header.BackgroundColor = Aspose.Pdf.Color.LightGray;
+            header.DefaultCellTextState = new TextState
+            {
+                FontSize = 12,
+                FontStyle = FontStyles.Bold
+            };
+            header.Cells.Add("ID");
+            header.Cells.Add("Name");
+            header.Cells.Add("Value");
+
+            // Add data rows and apply alternating background colors
+            for (int i = 1; i <= 10; i++)
+            {
+                Row row = table.Rows.Add();
+                row.Cells.Add(i.ToString());
+                row.Cells.Add($"Item {i}");
+                row.Cells.Add((i * 10).ToString());
+
+                // Choose background color based on row index parity
+                Aspose.Pdf.Color bgColor = (i % 2 == 0)
+                    ? Aspose.Pdf.Color.FromRgb(0.9, 0.9, 0.9) // light gray for even rows
+                    : Aspose.Pdf.Color.White;                // white for odd rows
+
+                // Set the row background (optional, for visual consistency)
+                row.BackgroundColor = bgColor;
+
+                // Apply the same background color to each cell in the row
+                foreach (Cell cell in row.Cells)
+                {
+                    cell.BackgroundColor = bgColor;
+                }
+            }
+
+            // Save the PDF – guard against missing libgdiplus on non‑Windows platforms
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 doc.Save(outputPath);
+                Console.WriteLine($"PDF saved to {outputPath}");
             }
             else
             {
+                // On macOS/Linux the save may fail if libgdiplus is not installed.
+                // Attempt to save and handle the possible GDI+ related exception gracefully.
                 try
                 {
                     doc.Save(outputPath);
+                    Console.WriteLine($"PDF saved to {outputPath} (non‑Windows platform).");
                 }
                 catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
                 {
-                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. PDF was not saved.");
+                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. " +
+                                      "The PDF could not be saved.");
                 }
             }
         }
-
-        Console.WriteLine($"PDF saved to {Path.GetFullPath(outputPath)}");
     }
 
-    // Helper that walks the inner‑exception chain looking for a DllNotFoundException (e.g., libgdiplus)
+    // Helper to detect a nested DllNotFoundException (e.g., missing libgdiplus)
     private static bool ContainsDllNotFound(Exception? ex)
     {
         while (ex != null)

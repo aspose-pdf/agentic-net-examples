@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_transition.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,47 +16,42 @@ class Program
             return;
         }
 
-        // Load the source PDF inside a using block for deterministic disposal
+        // Load the source PDF
         using (Document doc = new Document(inputPath))
         {
-            // Initialize the PdfPageEditor facade with the loaded document
-            using (PdfPageEditor editor = new PdfPageEditor(doc))
+            // Create the page editor facade
+            using (PdfPageEditor editor = new PdfPageEditor())
             {
-                // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+                // Bind the loaded document to the editor
+                editor.BindPdf(doc);
+
+                // Iterate over all pages (1‑based indexing)
                 for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    // Choose a transition style based on the page index.
-                    // This example cycles through three different transitions.
-                    int transition;
-                    switch (i % 3)
+                    // Choose a transition style based on the page index
+                    int transition = (i % 3) switch
                     {
-                        case 0:
-                            transition = PdfPageEditor.BLINDH;      // Vertical blinds
-                            break;
-                        case 1:
-                            transition = PdfPageEditor.DISSOLVE;   // Dissolve effect
-                            break;
-                        default:
-                            transition = PdfPageEditor.SPLITVOUT;  // Out vertical split
-                            break;
-                    }
+                        0 => PdfPageEditor.BLINDH,   // Vertical blinds
+                        1 => PdfPageEditor.DISSOLVE, // Dissolve effect
+                        _ => PdfPageEditor.TBWIPE    // Top‑bottom wipe
+                    };
 
-                    // Specify the page to edit
-                    editor.ProcessPages = new int[] { i };
-                    // Apply the chosen transition type
+                    // Specify that only the current page should be edited
+                    editor.ProcessPages = new int[] { i }; // int[] required by PdfPageEditor
+
+                    // Apply the transition settings
                     editor.TransitionType = transition;
-                    // Set the duration of the transition (seconds)
-                    editor.TransitionDuration = 2;
+                    editor.TransitionDuration = 2; // duration in seconds (integer)
 
-                    // Commit changes for the current page
+                    // Commit changes for this page
                     editor.ApplyChanges();
                 }
 
-                // Save the modified PDF with the applied transitions
+                // Save the modified PDF
                 editor.Save(outputPath);
             }
         }
 
-        Console.WriteLine($"Presentation PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with custom transitions saved to '{outputPath}'.");
     }
 }

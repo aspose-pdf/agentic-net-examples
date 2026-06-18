@@ -2,77 +2,65 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using Aspose.Pdf;               // <-- added core namespace for Bookmark classes
 using Aspose.Pdf.Facades;
 
-namespace BookmarkExportExample
+class Program
 {
-    // Simple POCO to hold bookmark information for JSON serialization
-    public class BookmarkNode
+    // Simple DTO for JSON output
+    private class BookmarkInfo
     {
         public string Title { get; set; }
         public int Level { get; set; }
         public int PageNumber { get; set; }
-        public List<BookmarkNode> Children { get; set; } = new List<BookmarkNode>();
     }
 
-    class Program
+    static void Main()
     {
-        static void Main()
+        const string pdfPath = "input.pdf";
+        const string jsonPath = "bookmarks.json";
+
+        if (!File.Exists(pdfPath))
         {
-            const string inputPdfPath = "input.pdf";
-            const string outputJsonPath = "bookmarks.json";
-
-            if (!File.Exists(inputPdfPath))
-            {
-                Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
-                return;
-            }
-
-            // Use PdfBookmarkEditor to work with bookmarks (facade API)
-            using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
-            {
-                // Bind the PDF file to the editor
-                editor.BindPdf(inputPdfPath);
-
-                // Extract all bookmarks (hierarchical collection)
-                var topBookmarks = editor.ExtractBookmarks();
-
-                // Convert the Aspose bookmark hierarchy to our serializable model
-                List<BookmarkNode> jsonBookmarks = new List<BookmarkNode>();
-                foreach (var bm in topBookmarks)
-                {
-                    jsonBookmarks.Add(ConvertToNode(bm, 1));
-                }
-
-                // Serialize to JSON with indentation for readability
-                JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-                string json = JsonSerializer.Serialize(jsonBookmarks, jsonOptions);
-
-                // Write JSON to the output file
-                File.WriteAllText(outputJsonPath, json);
-                Console.WriteLine($"Bookmarks exported to '{outputJsonPath}'.");
-            }
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            return;
         }
 
-        // Recursive conversion from Aspose Bookmark to BookmarkNode
-        private static BookmarkNode ConvertToNode(Aspose.Pdf.Facades.Bookmark aspBookmark, int level)
+        // Load PDF and work with its bookmarks using PdfBookmarkEditor (facade API)
+        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
         {
-            BookmarkNode node = new BookmarkNode {
-                Title = aspBookmark.Title,
-                Level = level,
-                PageNumber = aspBookmark.PageNumber
-            };
+            editor.BindPdf(pdfPath);                     // load PDF
+            Bookmarks rootBookmarks = editor.ExtractBookmarks(); // get all bookmarks
 
-            // ChildItem holds nested bookmarks (may be null)
-            if (aspBookmark.ChildItem != null && aspBookmark.ChildItem.Count > 0)
+            var list = new List<BookmarkInfo>();
+            TraverseBookmarks(rootBookmarks, 1, list);   // start at level 1
+
+            // Serialize to JSON (indented for readability)
+            JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+            string json = JsonSerializer.Serialize(list, jsonOptions);
+            File.WriteAllText(jsonPath, json);
+        }
+
+        Console.WriteLine($"Bookmarks exported to '{jsonPath}'.");
+    }
+
+    // Recursive traversal of the bookmark tree
+    private static void TraverseBookmarks(Bookmarks bookmarks, int level, List<BookmarkInfo> output)
+    {
+        foreach (Bookmark bm in bookmarks)
+        {
+            output.Add(new BookmarkInfo
             {
-                foreach (var child in aspBookmark.ChildItem)
-                {
-                    node.Children.Add(ConvertToNode(child, level + 1));
-                }
-            }
+                Title = bm.Title,
+                Level = level,
+                PageNumber = bm.PageNumber
+            });
 
-            return node;
+            // If the bookmark has children, recurse with increased level
+            if (bm.ChildItem != null && bm.ChildItem.Count > 0)
+            {
+                TraverseBookmarks(bm.ChildItem, level + 1, output);
+            }
         }
     }
 }

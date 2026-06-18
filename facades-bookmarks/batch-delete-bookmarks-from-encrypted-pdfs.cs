@@ -7,38 +7,39 @@ class Program
 {
     static void Main()
     {
-        // Define the encrypted PDFs, their passwords and the desired output files.
-        var files = new[]
-        {
-            new { Input = "encrypted1.pdf", Output = "clean1.pdf", Password = "userPass1" },
-            new { Input = "encrypted2.pdf", Output = "clean2.pdf", Password = "userPass2" }
-            // Add more entries as needed.
-        };
+        // List of encrypted PDF files to process
+        string[] inputFiles = { "encrypted1.pdf", "encrypted2.pdf" };
+        // Password that unlocks the PDFs (same for all files in this example)
+        const string password = "userPassword";
 
-        foreach (var fileInfo in files)
+        foreach (string inputPath in inputFiles)
         {
-            if (!File.Exists(fileInfo.Input))
+            if (!File.Exists(inputPath))
             {
-                Console.Error.WriteLine($"Input file not found: {fileInfo.Input}");
+                Console.Error.WriteLine($"File not found: {inputPath}");
                 continue;
             }
 
-            // Open the encrypted PDF using the correct password.
-            // Document(string path, string password) decrypts the file for further processing.
-            using (Document doc = new Document(fileInfo.Input, fileInfo.Password))
+            // Output file name – original name with a suffix
+            string outputPath = Path.Combine(
+                Path.GetDirectoryName(inputPath) ?? string.Empty,
+                Path.GetFileNameWithoutExtension(inputPath) + "_nobookmarks.pdf");
+
+            // Open the encrypted PDF using the password
+            using (Document doc = new Document(inputPath, password))
             {
-                // Initialize the bookmark editor with the opened document.
+                // Initialize the bookmark editor with the opened document
                 using (PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor(doc))
                 {
-                    // Delete all bookmarks from the document.
+                    // Delete all bookmarks
                     bookmarkEditor.DeleteBookmarks();
 
-                    // Save the modified PDF to the specified output path.
-                    bookmarkEditor.Save(fileInfo.Output);
+                    // Save the result to a new file
+                    bookmarkEditor.Save(outputPath);
                 }
             }
 
-            Console.WriteLine($"Bookmarks removed and saved to: {fileInfo.Output}");
+            Console.WriteLine($"Bookmarks removed: {inputPath} → {outputPath}");
         }
     }
 }

@@ -6,12 +6,10 @@ class Program
 {
     static void Main()
     {
-        // Paths to the source XML, the XSL‑FO template and the output PDF.
-        const string xmlPath      = "input.xml";
-        const string xslFoPath    = "template.xslfo";
-        const string outputPdfPath = "result.pdf";
+        const string xmlPath = "data.xml";
+        const string xslFoPath = "template.xslfo";
+        const string pdfPath = "output.pdf";
 
-        // Verify that the required files exist.
         if (!File.Exists(xmlPath))
         {
             Console.Error.WriteLine($"XML file not found: {xmlPath}");
@@ -19,21 +17,22 @@ class Program
         }
         if (!File.Exists(xslFoPath))
         {
-            Console.Error.WriteLine($"XSL‑FO template not found: {xslFoPath}");
+            Console.Error.WriteLine($"XSL‑FO file not found: {xslFoPath}");
             return;
         }
 
-        // Load the XML file and apply the XSL‑FO template.
-        // XmlLoadOptions(string) constructor sets the XSL‑FO file used for transformation.
-        XmlLoadOptions loadOptions = new XmlLoadOptions(xslFoPath);
-
-        // The Document constructor takes the XML file and the load options.
-        using (Document pdfDocument = new Document(xmlPath, loadOptions))
+        // Use the XmlLoadOptions constructor that accepts a stream instead of assigning to the read‑only XslStream property.
+        using (FileStream xslStream = File.OpenRead(xslFoPath))
         {
-            // Save the resulting PDF.
-            pdfDocument.Save(outputPdfPath);
+            XmlLoadOptions loadOptions = new XmlLoadOptions(xslStream);
+
+            // Load the XML document and apply the XSL‑FO transformation.
+            using (Document pdfDocument = new Document(xmlPath, loadOptions))
+            {
+                pdfDocument.Save(pdfPath);
+            }
         }
 
-        Console.WriteLine($"PDF generated successfully at '{outputPdfPath}'.");
+        Console.WriteLine($"PDF generated successfully at '{pdfPath}'.");
     }
 }

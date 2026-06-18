@@ -1,37 +1,36 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades; // PdfContentEditor, ViewerPreference
+using Aspose.Pdf.Facades;   // PdfContentEditor and ViewerPreference are defined here
 
 class Program
 {
     static void Main()
     {
-        // Paths for the source PDF and the resulting PDF
         const string inputPath  = "input.pdf";
         const string outputPath = "output_single_page.pdf";
 
-        // Verify that the source file exists
+        // Verify that the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Use PdfContentEditor (a Facades class) to modify viewer preferences.
-        // The class implements IDisposable, so we wrap it in a using block.
-        using (Aspose.Pdf.Facades.PdfContentEditor editor = new Aspose.Pdf.Facades.PdfContentEditor())
-        {
-            // Load the PDF document into the editor
-            editor.BindPdf(inputPath);
+        // Initialize the content editor facade
+        PdfContentEditor editor = new PdfContentEditor();
 
-            // Set the viewer preference to display one page at a time.
-            // Fully‑qualify the enum to avoid ambiguity with other ViewerPreference types.
-            editor.ChangeViewerPreference(Aspose.Pdf.Facades.ViewerPreference.PageLayoutSinglePage);
+        // Load the PDF document
+        editor.BindPdf(inputPath);
 
-            // Save the modified PDF to the output file
-            editor.Save(outputPath);
-        }
+        // Change the viewer preference to single‑page layout
+        editor.ChangeViewerPreference(ViewerPreference.PageLayoutSinglePage);
 
-        Console.WriteLine($"Viewer preference set to single‑page layout. Saved as '{outputPath}'.");
+        // Save the modified PDF
+        editor.Save(outputPath);
+
+        // Release resources held by the facade
+        editor.Close();
+
+        Console.WriteLine($"Viewer preference set to single‑page layout. Saved to '{outputPath}'.");
     }
 }

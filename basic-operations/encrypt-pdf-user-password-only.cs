@@ -6,9 +6,10 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "encrypted.pdf";
-        const string userPassword = "user123";
+        const string userPassword  = "user123";   // password required to open the PDF
+        const string ownerPassword = "";          // no owner password needed
 
         if (!File.Exists(inputPath))
         {
@@ -18,19 +19,16 @@ class Program
 
         try
         {
-            // Load the PDF document
+            // Load the PDF inside a using block for proper disposal
             using (Document doc = new Document(inputPath))
             {
-                // No permissions granted (restrict editing and copying)
-                Permissions perms = (Permissions)0;
+                // Allow only printing; editing and copying are not permitted
+                Permissions perms = Permissions.PrintDocument;
 
-                // Owner password can be empty if not needed
-                string ownerPassword = string.Empty;
-
-                // Encrypt with user password only, using AES-256
+                // Encrypt with user password, empty owner password, and AES-256 algorithm
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-                // Save the encrypted PDF
+                // Save the encrypted document
                 doc.Save(outputPath);
             }
 

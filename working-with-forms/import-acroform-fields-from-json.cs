@@ -1,40 +1,34 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        // Paths for the JSON definition and the output PDF
-        const string jsonPath   = "form_definition.json";
-        const string outputPath = "generated_form.pdf";
+        const string jsonPath = "form_fields.json";
+        const string outputPdf = "generated.pdf";
 
-        // Verify that the JSON file exists
+        // Verify that the JSON schema file exists
         if (!File.Exists(jsonPath))
         {
-            Console.Error.WriteLine($"JSON file not found: {jsonPath}");
+            Console.Error.WriteLine($"JSON schema not found: {jsonPath}");
             return;
         }
 
-        // Create a new empty PDF document
+        // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a blank page – required because form fields need a page context
+            // Ensure the document has at least one page
             doc.Pages.Add();
 
-            // Open the JSON file as a stream and import the form fields
-            using (FileStream jsonStream = new FileStream(jsonPath, FileMode.Open, FileAccess.Read))
-            {
-                // ImportFromJson adds the AcroForm fields defined in the JSON to the document
-                doc.Form.ImportFromJson(jsonStream);
-            }
+            // Import AcroForm fields from the JSON schema
+            doc.Form.ImportFromJson(jsonPath);
 
-            // Save the resulting PDF with the imported form fields
-            doc.Save(outputPath);
+            // Save the PDF with the recreated form fields
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF with imported AcroForm fields saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with imported AcroForm fields saved to '{outputPdf}'.");
     }
 }

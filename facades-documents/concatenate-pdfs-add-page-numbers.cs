@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -16,10 +15,10 @@ class Program
         };
 
         // Path for the intermediate concatenated PDF
-        const string combinedPath = "combined.pdf";
+        const string concatenatedPath = "combined.pdf";
 
-        // Final output PDF with page numbers
-        const string outputPath = "final_output.pdf";
+        // Path for the final PDF with page numbers
+        const string finalOutputPath = "final_with_page_numbers.pdf";
 
         // Verify that all input files exist
         foreach (string file in inputFiles)
@@ -31,44 +30,51 @@ class Program
             }
         }
 
+        // -------------------------------------------------
+        // 1. Concatenate the PDFs using PdfFileEditor
+        // -------------------------------------------------
+        PdfFileEditor fileEditor = new PdfFileEditor();
+
+        // Concatenate all input files into a single PDF
+        bool concatSuccess = fileEditor.Concatenate(inputFiles, concatenatedPath);
+        if (!concatSuccess)
+        {
+            Console.Error.WriteLine("Concatenation failed.");
+            return;
+        }
+
+        // -------------------------------------------------
+        // 2. Add page numbers to the concatenated PDF
+        // -------------------------------------------------
+        // PdfFileStamp works with an input PDF and produces an output PDF.
+        // Use the default constructor, bind the concatenated PDF, add page numbers,
+        // then save to the final output path.
+        using (PdfFileStamp fileStamp = new PdfFileStamp())
+        {
+            // Bind the concatenated PDF as the source document
+            fileStamp.BindPdf(concatenatedPath);
+
+            // Optional: set the starting page number (default is 1)
+            // fileStamp.StartingNumber = 1;
+
+            // Add page numbers. The format string may contain '#' which will be replaced
+            // by the actual page number. This adds numbers at the bottom‑middle position.
+            fileStamp.AddPageNumber("Page #");
+
+            // Save the result to the final output file
+            fileStamp.Save(finalOutputPath);
+        }
+
+        // Clean up the intermediate file if desired
         try
         {
-            // ---------- Concatenate PDFs ----------
-            // PdfFileEditor does NOT implement IDisposable, so no using block is required.
-            PdfFileEditor editor = new PdfFileEditor();
-
-            // Concatenate all input files into a single PDF.
-            // This overload takes an array of file names and the destination file name.
-            bool concatSuccess = editor.Concatenate(inputFiles, combinedPath);
-            if (!concatSuccess)
-            {
-                Console.Error.WriteLine("Concatenation failed.");
-                return;
-            }
-
-            // ---------- Add page numbers ----------
-            // PdfFileStamp can be constructed with input and output file paths.
-            // It provides AddPageNumber methods to insert page numbers.
-            PdfFileStamp stamp = new PdfFileStamp(combinedPath, outputPath);
-
-            // Add page numbers using the default format "Page #"
-            // The "#" placeholder will be replaced by the actual page number.
-            stamp.AddPageNumber("Page #");
-
-            // Close the stamp to finalize and write the output file.
-            stamp.Close();
-
-            // Optionally delete the intermediate combined file.
-            if (File.Exists(combinedPath))
-            {
-                File.Delete(combinedPath);
-            }
-
-            Console.WriteLine($"Successfully created '{outputPath}' with page numbers.");
+            File.Delete(concatenatedPath);
         }
-        catch (Exception ex)
+        catch
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            // Ignored – the file may be in use or deletion may fail
         }
+
+        Console.WriteLine($"PDFs concatenated and numbered successfully: {finalOutputPath}");
     }
 }

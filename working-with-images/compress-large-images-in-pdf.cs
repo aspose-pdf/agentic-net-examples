@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_compressed.pdf";
+        const string outputPath = "compressed_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,35 +16,27 @@ class Program
             return;
         }
 
-        // Load the PDF document (using the lifecycle rule)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Configure optimization options to compress images.
-            // This will replace large images with compressed JPEG versions.
-            OptimizationOptions opt = new OptimizationOptions
-            {
-                // Merge identical objects to reduce size.
-                CompressObjects = true,
+            // Create an OptimizationOptions instance
+            OptimizationOptions optOptions = new OptimizationOptions();
 
-                // Configure image compression.
-                ImageCompressionOptions =
-                {
-                    CompressImages = true,   // Enable image compression.
-                    ImageQuality   = 75,     // JPEG quality (0‑100). Adjust as needed.
-                    // MaxResolution = 150; // Optional: limit image resolution (DPI).
-                }
-            };
+            // Configure the existing ImageCompressionOptions instance (the property is read‑only)
+            optOptions.ImageCompressionOptions.CompressImages = true;
+            optOptions.ImageCompressionOptions.ImageQuality   = 75; // JPEG quality (0‑100)
+            // You can also set the encoding if needed, e.g.:
+            // optOptions.ImageCompressionOptions.Encoding = ImageEncoding.Jpeg;
 
             // Apply the optimization to the document.
-            doc.OptimizeResources(opt);
+            // This will recompress images (including those larger than 2 MB) to JPEG
+            // with the specified quality, reducing overall PDF size.
+            doc.OptimizeResources(optOptions);
 
-            // Optional: enable additional stream merging.
-            doc.OptimizeSize = true;
-
-            // Save the optimized PDF (using the lifecycle rule).
+            // Save the optimized PDF.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Compressed PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Optimized PDF saved to '{outputPath}'.");
     }
 }

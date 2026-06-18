@@ -1,13 +1,14 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // Core API (Document, Page, PdfPageStamp)
+using Aspose.Pdf.Facades;      // Optional, not required for PdfPageStamp but kept for completeness
 
 class Program
 {
     static void Main()
     {
         const string inputPdfPath    = "input.pdf";      // PDF to which the background will be added
-        const string templatePdfPath = "background_template.pdf"; // PDF containing the background image (first page)
+        const string templatePdfPath = "background_template.pdf"; // PDF containing a single page with the desired background image
         const string outputPdfPath   = "output_with_background.pdf";
 
         // Verify files exist
@@ -24,31 +25,36 @@ class Program
 
         try
         {
-            // Load the document that will receive the background
+            // Load the target document and the template (both wrapped in using for deterministic disposal)
             using (Document targetDoc = new Document(inputPdfPath))
-            // Load the template containing the background image (assumed on page 1)
             using (Document templateDoc = new Document(templatePdfPath))
             {
-                // Get the template page that holds the background image
-                Page templatePage = templateDoc.Pages[1]; // 1‑based indexing
+                // Assume the template contains exactly one page that represents the background.
+                // If it has more pages, you can select the appropriate one (e.g., templateDoc.Pages[1]).
+                Page backgroundPage = templateDoc.Pages[1];
 
-                // Iterate over all pages of the target document
+                // Iterate over every page of the target document (1‑based indexing)
                 for (int i = 1; i <= targetDoc.Pages.Count; i++)
                 {
-                    Page page = targetDoc.Pages[i];
+                    Page currentPage = targetDoc.Pages[i];
 
-                    // Create a stamp from the template page
-                    PdfPageStamp stamp = new PdfPageStamp(templatePage)
+                    // Create a stamp that uses the background page as its source.
+                    PdfPageStamp stamp = new PdfPageStamp(backgroundPage)
                     {
-                        // Place the stamp behind existing page content
-                        Background = true
+                        // Place the stamp behind existing page content.
+                        Background = true,
+
+                        // Optional: scale the stamp to fit the page.
+                        // Width and Height default to the original page size; adjust if needed.
+                        // Example: stamp.Width = currentPage.MediaBox.Width;
+                        //          stamp.Height = currentPage.MediaBox.Height;
                     };
 
-                    // Apply the stamp to the current page
-                    page.AddStamp(stamp);
+                    // Apply the stamp to the current page.
+                    currentPage.AddStamp(stamp);
                 }
 
-                // Save the modified document
+                // Save the modified document.
                 targetDoc.Save(outputPdfPath);
             }
 

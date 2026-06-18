@@ -1,7 +1,7 @@
 using System;
 using System.IO;
-using System.Drawing;               // Required for Rectangle and Color (method signature)
-using Aspose.Pdf.Facades;          // Facade API for editing PDF content
+using System.Drawing;               // Required for Rectangle and Color
+using Aspose.Pdf.Facades;          // PdfContentEditor resides here
 
 class Program
 {
@@ -10,29 +10,29 @@ class Program
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Verify source file exists
+        // Verify source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Create the content editor, bind the PDF, add a JavaScript link, and save
+        // PdfContentEditor implements IDisposable via SaveableFacade, so use using for deterministic cleanup
         using (PdfContentEditor editor = new PdfContentEditor())
         {
-            // Load the existing PDF
+            // Load the PDF document to be edited
             editor.BindPdf(inputPath);
 
-            // JavaScript to be executed on click
+            // Define the clickable rectangle (x, y, width, height) in points
+            Rectangle rect = new Rectangle(100, 700, 200, 100);
+
+            // JavaScript code that will be executed on click
             string jsCode = "app.alert('Hello from Aspose.Pdf!');";
 
-            // Define the clickable rectangle (x, y, width, height) in points
-            Rectangle rect = new Rectangle(100, 500, 200, 100);
-
-            // Create the JavaScript link on page 1 with a visible red border
+            // Create a JavaScript link on page 1; the rectangle will be highlighted in red
             editor.CreateJavaScriptLink(jsCode, rect, 1, Color.Red);
 
-            // Save the modified PDF
+            // Persist the changes to a new file
             editor.Save(outputPath);
         }
 

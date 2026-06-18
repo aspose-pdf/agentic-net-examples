@@ -1,41 +1,47 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // Core Aspose.Pdf namespace
+using Aspose.Pdf.Text;          // Required for text handling (if needed)
 
-class Program
+class ExtractVectorGraphics
 {
     static void Main()
     {
-        const string inputPath = "encrypted.pdf";   // Encrypted PDF file
-        const string password  = "user123";        // Password to open the PDF
-        const string outputDir = "VectorGraphics"; // Folder for extracted SVG files
+        // Input encrypted PDF path and password
+        const string encryptedPdfPath = "encrypted_input.pdf";
+        const string password = "userOrOwnerPassword";
 
-        if (!File.Exists(inputPath))
+        // Output SVG file that will contain the vector graphics of the PDF
+        const string outputSvgPath = "extracted_vectors.svg";
+
+        // Verify the input file exists
+        if (!File.Exists(encryptedPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {encryptedPdfPath}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
-
         try
         {
-            // Open the encrypted PDF by providing the password
-            using (Document doc = new Document(inputPath, password))
+            // Open the encrypted PDF by providing the password to the Document constructor
+            // This constructor automatically decrypts the document for further processing.
+            using (Document pdfDoc = new Document(encryptedPdfPath, password))
             {
-                // Decrypt the document so that further operations are allowed
-                doc.Decrypt();
+                // Prepare SVG save options.
+                // SvgSaveOptions is in the Aspose.Pdf namespace (no separate Saving namespace).
+                SvgSaveOptions svgOptions = new SvgSaveOptions
+                {
+                    // Optional: set the page range if you only need specific pages.
+                    // PageIndex = 0;   // first page (zero‑based) – comment out to export all pages
+                    // PageCount = 1;   // number of pages to export
+                };
 
-                // Configure SVG save options (no SplitIntoPages property – default behavior saves a single SVG file)
-                SvgSaveOptions svgOptions = new SvgSaveOptions();
-
-                // Save the document as SVG; Aspose.Pdf will create a single SVG file containing all pages.
-                string outputPath = Path.Combine(outputDir, "page.svg");
-                doc.Save(outputPath, svgOptions);
+                // Save the entire document (or the selected pages) as SVG.
+                // The resulting SVG contains the vector graphics from the PDF.
+                pdfDoc.Save(outputSvgPath, svgOptions);
             }
 
-            Console.WriteLine($"Vector graphics have been extracted to SVG file in the '{outputDir}' folder.");
+            Console.WriteLine($"Vector graphics extracted to SVG: '{outputSvgPath}'");
         }
         catch (InvalidPasswordException ex)
         {
@@ -43,7 +49,7 @@ class Program
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error extracting vector graphics: {ex.Message}");
         }
     }
 }

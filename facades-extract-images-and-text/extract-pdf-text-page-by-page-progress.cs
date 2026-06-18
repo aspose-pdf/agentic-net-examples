@@ -1,58 +1,50 @@
 using System;
 using System.IO;
 using System.Text;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";               // source PDF
-        const string outputDir = "ExtractedPages";          // folder for per‑page text files
+        const string inputPdfPath = "large.pdf";
+        const string outputFolder = "ExtractedPages";
 
-        if (!File.Exists(inputPdf))
+        // Verify input file exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure output folder exists
-        Directory.CreateDirectory(outputDir);
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        // Use PdfExtractor (facade) to extract text page by page
+        // Use PdfExtractor inside a using block for deterministic disposal
         using (PdfExtractor extractor = new PdfExtractor())
         {
             // Bind the PDF file to the extractor
-            extractor.BindPdf(inputPdf);
+            extractor.BindPdf(inputPdfPath);
 
-            // Extract text for the whole document (Unicode encoding)
+            // Extract text using Unicode encoding
             extractor.ExtractText(Encoding.Unicode);
 
-            // Determine total pages to process
-            int totalPages = extractor.Document.Pages.Count;
-            extractor.StartPage = 1;
-            extractor.EndPage   = totalPages;
+            int pageNumber = 1;
 
-            int currentPage = 1;
-
-            // Loop while there is more page text available
+            // Process each page sequentially
             while (extractor.HasNextPageText())
             {
-                // Build output file name for the current page
-                string outPath = Path.Combine(outputDir, $"page_{currentPage}.txt");
+                // Save the text of the current page to a separate .txt file
+                string outputFile = Path.Combine(outputFolder, $"Page_{pageNumber}.txt");
+                extractor.GetNextPageText(outputFile);
 
-                // Save the current page's text to the file
-                extractor.GetNextPageText(outPath);
+                // Report progress to the console
+                Console.WriteLine($"{DateTime.Now:T} - Processed page {pageNumber}");
 
-                // Calculate and display progress percentage
-                double percent = (double)currentPage / totalPages * 100;
-                Console.Write($"\rProcessing page {currentPage}/{totalPages} ({percent:0.0}%)");
-
-                currentPage++;
+                pageNumber++;
             }
-
-            Console.WriteLine("\nExtraction completed.");
         }
+
+        Console.WriteLine("Text extraction completed.");
     }
 }

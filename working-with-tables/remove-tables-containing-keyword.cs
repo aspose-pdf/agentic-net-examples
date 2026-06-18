@@ -1,8 +1,8 @@
 using System;
 using System.IO;
-using System.Linq;
-using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using System.Linq;                     // For ToArray()
+using Aspose.Pdf;                     // Core PDF API
+using Aspose.Pdf.Text;                // TableAbsorber and related types
 
 class Program
 {
@@ -10,7 +10,7 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string keyword    = "CONFIDENTIAL";
+        const string keyword    = "CONFIDENTIAL";   // Table will be removed if any cell contains this text
 
         if (!File.Exists(inputPath))
         {
@@ -18,49 +18,55 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Document lifecycle must be wrapped in a using block (see document‑disposal‑with‑using rule)
         using (Document doc = new Document(inputPath))
         {
-            // Create a TableAbsorber to locate tables in the document
-            TableAbsorber absorber = new TableAbsorber();
-
-            // Extract tables from all pages
-            absorber.Visit(doc);
-
-            // Work on a copy of the TableList because Remove() changes the collection
-            var tables = absorber.TableList.ToArray();
-
-            foreach (var table in tables)
+            // Pages are 1‑based (see page‑indexing‑one‑based rule)
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                bool containsKeyword = false;
+                Page page = doc.Pages[pageIndex];
 
-                // Examine each cell's text fragments for the keyword
-                foreach (var row in table.RowList)
+                // Create a TableAbsorber for the current page
+                TableAbsorber absorber = new TableAbsorber();
+
+                // Extract tables on this page (Visit(Page) method)
+                absorber.Visit(page);
+
+                // TableList is modified by Remove, so work on a copy (see TableAbsorber remarks)
+                var tables = absorber.TableList.ToArray();
+
+                foreach (AbsorbedTable table in tables)
                 {
-                    foreach (var cell in row.CellList)
+                    bool containsKeyword = false;
+
+                    // Scan every cell's text fragments for the keyword
+                    foreach (var row in table.RowList)
                     {
-                        foreach (var fragment in cell.TextFragments)
+                        foreach (var cell in row.CellList)
                         {
-                            if (fragment.Text != null &&
-                                fragment.Text.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
+                            foreach (TextFragment fragment in cell.TextFragments)
                             {
-                                containsKeyword = true;
-                                break;
+                                if (fragment.Text != null &&
+                                    fragment.Text.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
+                                {
+                                    containsKeyword = true;
+                                    break;
+                                }
                             }
+                            if (containsKeyword) break;
                         }
                         if (containsKeyword) break;
                     }
-                    if (containsKeyword) break;
-                }
 
-                // Remove the table if the keyword was found in any cell
-                if (containsKeyword)
-                {
-                    absorber.Remove(table);
+                    // Remove the table if the keyword was found
+                    if (containsKeyword)
+                    {
+                        absorber.Remove(table);
+                    }
                 }
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (PDF format, no special SaveOptions needed)
             doc.Save(outputPath);
         }
 

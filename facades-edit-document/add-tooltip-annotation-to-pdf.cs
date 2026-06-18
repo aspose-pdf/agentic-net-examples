@@ -1,15 +1,14 @@
 using System;
 using System.IO;
-using System.Drawing;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using System.Drawing;               // needed for System.Drawing.Rectangle
+using Aspose.Pdf.Facades;          // PdfContentEditor resides here
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_with_tooltip.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "tooltip_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,35 +16,26 @@ class Program
             return;
         }
 
-        // Use PdfContentEditor (a facade) to add a tooltip annotation.
+        // Use PdfContentEditor (facade) to edit the PDF
         using (PdfContentEditor editor = new PdfContentEditor())
         {
-            // Load the existing PDF.
+            // Load the existing PDF document
             editor.BindPdf(inputPath);
 
-            // Define the annotation rectangle (position and size).
-            // PdfContentEditor.CreateText expects a System.Drawing.Rectangle.
-            System.Drawing.Rectangle rect = new System.Drawing.Rectangle(100, 500, 20, 20);
+            // Define the annotation rectangle (position and size)
+            // Here we place a small square at (100,500) with width=20, height=20
+            Rectangle rect = new Rectangle(100, 500, 20, 20);
 
-            // Title displayed in the popup window (optional).
-            string title = "Info";
+            // Title appears in the annotation window (if opened)
+            // Contents is shown as a tooltip when the mouse hovers over the annotation
+            string title    = "Info";
+            string contents = "This is additional information displayed as a tooltip.";
 
-            // Contents displayed as a tooltip when the mouse hovers over the annotation.
-            string contents = "Additional information displayed on hover.";
+            // open = false so the annotation is not displayed open by default
+            // icon = "Note" (any of the supported icon names can be used)
+            editor.CreateText(rect, title, contents, false, "Note", 1);
 
-            // Open flag: false means the popup is not shown automatically.
-            bool open = false;
-
-            // Icon type for the annotation (e.g., "Note", "Comment", etc.).
-            string icon = "Note";
-
-            // Page number (1‑based indexing).
-            int pageNumber = 1;
-
-            // Create the text annotation which acts as a tooltip.
-            editor.CreateText(rect, title, contents, open, icon, pageNumber);
-
-            // Save the modified PDF.
+            // Save the modified PDF
             editor.Save(outputPath);
         }
 

@@ -1,47 +1,55 @@
 using System;
 using System.IO;
 using Aspose.Pdf.Facades;
-using System.Drawing.Imaging; // for ImageFormat
+using System.Drawing.Imaging;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
+        // Input PDF file path
+        const string inputPdf = "input.pdf";
+
+        // Output folder where extracted images will be saved
         const string outputFolder = "ExtractedImages";
 
-        if (!File.Exists(inputPdfPath))
+        // Validate input file existence
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
         // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Use PdfExtractor facade to extract images
+        // Use PdfExtractor (Facade) to extract images
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the source PDF file
-            extractor.BindPdf(inputPdfPath);
+            // Bind the PDF document to the extractor
+            extractor.BindPdf(inputPdf);
 
-            // Extract images from the bound PDF
+            // Optional: extract only images actually used on pages
+            // extractor.ExtractImageMode = ExtractImageMode.ActuallyUsed;
+
+            // Prepare the extractor for image extraction
             extractor.ExtractImage();
 
             int imageIndex = 1;
+            // Loop through all images in the PDF
             while (extractor.HasNextImage())
             {
                 // Build output file name (e.g., image-1.png, image-2.png, ...)
-                string outputFile = Path.Combine(outputFolder, $"image-{imageIndex}.png");
+                string outputPath = Path.Combine(outputFolder, $"image-{imageIndex}.png");
 
-                // Retrieve the next image and save it as PNG
-                // GetNextImage(string, ImageFormat) returns void; it writes the file directly
-                extractor.GetNextImage(outputFile, ImageFormat.Png);
+                // Save the current image in PNG format
+                extractor.GetNextImage(outputPath, ImageFormat.Png);
 
+                Console.WriteLine($"Extracted image {imageIndex} to: {outputPath}");
                 imageIndex++;
             }
         }
 
-        Console.WriteLine($"Image extraction completed. Files saved to '{outputFolder}'.");
+        Console.WriteLine("Image extraction completed.");
     }
 }

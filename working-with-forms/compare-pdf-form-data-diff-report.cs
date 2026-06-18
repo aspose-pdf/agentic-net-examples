@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Comparison;
 
@@ -8,15 +7,15 @@ class FormDataComparer
 {
     static void Main()
     {
-        // Paths to the source PDF files
+        // Input PDF files containing form fields
         const string pdfPath1 = "form1.pdf";
         const string pdfPath2 = "form2.pdf";
 
-        // Output paths for the diff reports
-        const string jsonReportPath = "diffReport.json";
-        const string pdfReportPath  = "diffReport.pdf";
+        // Output files for the diff report
+        const string jsonReportPath = "form_diff_report.json";
+        const string pdfReportPath  = "form_diff_report.pdf";
 
-        // Verify input files exist
+        // Verify that both input files exist
         if (!File.Exists(pdfPath1))
         {
             Console.Error.WriteLine($"File not found: {pdfPath1}");
@@ -28,26 +27,35 @@ class FormDataComparer
             return;
         }
 
-        // Load the two PDF documents inside using blocks for deterministic disposal
-        using (Document doc1 = new Document(pdfPath1))
-        using (Document doc2 = new Document(pdfPath2))
+        try
         {
-            // Configure comparison options (default options are sufficient for form data)
-            ComparisonOptions options = new ComparisonOptions();
+            // Load the two PDF documents
+            using (Document doc1 = new Document(pdfPath1))
+            using (Document doc2 = new Document(pdfPath2))
+            {
+                // Configure comparison options (default options are sufficient for form data)
+                ComparisonOptions options = new ComparisonOptions();
 
-            // Perform a page‑by‑page text comparison.
-            // The result is a list where each entry corresponds to a page and contains the diff operations.
-            List<List<DiffOperation>> diffByPage = TextPdfComparer.CompareDocumentsPageByPage(doc1, doc2, options);
+                // Perform a page‑by‑page text comparison.
+                // The method returns a list of diff operations for each page.
+                var pageDiffs = TextPdfComparer.CompareDocumentsPageByPage(doc1, doc2, options);
 
-            // Generate a JSON diff report
-            JsonDiffOutputGenerator jsonGenerator = new JsonDiffOutputGenerator();
-            jsonGenerator.GenerateOutput(diffByPage, jsonReportPath);
-            Console.WriteLine($"JSON diff report saved to '{jsonReportPath}'.");
+                // Generate a JSON diff report
+                JsonDiffOutputGenerator jsonGenerator = new JsonDiffOutputGenerator();
+                jsonGenerator.GenerateOutput(pageDiffs, jsonReportPath);
 
-            // Generate a PDF diff report that visually highlights mismatched values
-            PdfOutputGenerator pdfGenerator = new PdfOutputGenerator();
-            pdfGenerator.GenerateOutput(diffByPage, pdfReportPath);
-            Console.WriteLine($"PDF diff report saved to '{pdfReportPath}'.");
+                // Generate a PDF diff report (visual highlighting of mismatched values)
+                PdfOutputGenerator pdfGenerator = new PdfOutputGenerator();
+                pdfGenerator.GenerateOutput(pageDiffs, pdfReportPath);
+            }
+
+            Console.WriteLine($"Diff reports generated:");
+            Console.WriteLine($"  JSON: {jsonReportPath}");
+            Console.WriteLine($"  PDF : {pdfReportPath}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during comparison: {ex.Message}");
         }
     }
 }

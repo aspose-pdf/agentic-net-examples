@@ -3,11 +3,11 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class InsertTableAtPosition
+class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,56 +16,45 @@ class InsertTableAtPosition
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Load the existing PDF document
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
         {
-            // Choose the page where the table will be placed (1‑based index)
-            Page page = doc.Pages[1];
+            // Get the first page (Aspose.Pdf uses 1‑based indexing)
+            Aspose.Pdf.Page page = doc.Pages[1];
 
             // Create a new table
-            Table table = new Table();
+            Aspose.Pdf.Table table = new Aspose.Pdf.Table();
 
-            // Set the absolute position of the table on the page using MarginInfo.
-            // X = 100 points from the left, Y = 500 points from the bottom.
-            // Aspose.Pdf uses a top‑down coordinate system for margins, so we set the left margin
-            // and calculate the top margin as (page height - desired Y coordinate).
-            double desiredX = 100; // points from left
-            double desiredYFromBottom = 500; // points from bottom
-            double topMargin = page.PageInfo.Height - desiredYFromBottom; // convert to top‑based coordinate
-            table.Margin = new MarginInfo { Left = desiredX, Top = topMargin };
+            // Desired absolute position on the page (X, Y)
+            float x = 100f; // horizontal coordinate
+            float y = 500f; // vertical coordinate
 
-            // Define column widths (two columns, 200 points each)
-            table.ColumnWidths = "200 200";
+            // Table does not expose a Position property directly; use Left and Top for absolute placement
+            table.Left = x;
+            table.Top  = y;
+
+            // Define column widths (example: three equal columns)
+            table.ColumnWidths = "100 100 100";
 
             // Add a header row
-            Row header = table.Rows.Add();
-            Cell headerCell1 = header.Cells.Add("Header 1");
-            Cell headerCell2 = header.Cells.Add("Header 2");
-            headerCell1.DefaultCellTextState = new TextState
-            {
-                FontSize = 12,
-                Font = FontRepository.FindFont("Helvetica"),
-                ForegroundColor = Aspose.Pdf.Color.Black // Aspose.Pdf.Color, not System.Drawing.Color
-            };
-            headerCell2.DefaultCellTextState = new TextState
-            {
-                FontSize = 12,
-                Font = FontRepository.FindFont("Helvetica"),
-                ForegroundColor = Aspose.Pdf.Color.Black
-            };
+            Aspose.Pdf.Row headerRow = table.Rows.Add();
+            headerRow.Cells.Add("Header 1");
+            headerRow.Cells.Add("Header 2");
+            headerRow.Cells.Add("Header 3");
 
             // Add a data row
-            Row dataRow = table.Rows.Add();
-            dataRow.Cells.Add("Value A");
-            dataRow.Cells.Add("Value B");
+            Aspose.Pdf.Row dataRow = table.Rows.Add();
+            dataRow.Cells.Add("Cell 1");
+            dataRow.Cells.Add("Cell 2");
+            dataRow.Cells.Add("Cell 3");
 
-            // Add the table to the page's paragraphs collection
+            // Insert the table into the page's paragraph collection
             page.Paragraphs.Add(table);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Table inserted at (100, 500) and saved to '{outputPath}'.");
+        Console.WriteLine($"Table inserted at ({100}, {500}) and saved to '{outputPath}'.");
     }
 }

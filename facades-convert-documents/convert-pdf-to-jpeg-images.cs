@@ -1,50 +1,45 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file path
         const string inputPdfPath = "input.pdf";
+        const string outputFolder = "Images";
 
-        // Folder where JPEG images will be saved
-        const string outputFolder = "output_images";
-
-        // Verify that the source PDF exists
+        // Verify input file exists
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Error: File not found – {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure the output directory exists
+        // Ensure output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Use the PdfConverter facade to extract images page‑by‑page
+        // Use PdfConverter (Facade) to convert each page to JPEG
         using (PdfConverter converter = new PdfConverter())
         {
-            // Bind the PDF file to the converter
+            // Bind the source PDF file
             converter.BindPdf(inputPdfPath);
 
-            // Prepare the converter for image extraction
+            // Prepare the converter (required before extracting images)
             converter.DoConvert();
 
-            int pageNumber = 1;
-
-            // Iterate over all pages; GetNextImage saves each page as a JPEG by default
+            int pageIndex = 1;
+            // Iterate through all pages and save each as a JPEG image
             while (converter.HasNextImage())
             {
-                string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.jpg");
-                converter.GetNextImage(outputPath); // default format is JPEG
-                pageNumber++;
+                string outputFile = Path.Combine(outputFolder, $"page_{pageIndex}.jpg");
+                // GetNextImage saves the current page as JPEG using original page dimensions
+                converter.GetNextImage(outputFile);
+                pageIndex++;
             }
-
-            // Close the converter (optional, Dispose will be called by using)
-            converter.Close();
         }
 
-        Console.WriteLine($"Conversion complete. {outputFolder} contains the JPEG images.");
+        Console.WriteLine("PDF successfully converted to JPEG images.");
     }
 }

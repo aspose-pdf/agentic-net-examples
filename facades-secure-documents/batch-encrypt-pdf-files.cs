@@ -1,18 +1,16 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // DocumentPrivilege, KeySize enums
-using Aspose.Pdf.Facades;      // PdfFileSecurity class
+using Aspose.Pdf.Facades;
 
-class BatchEncryptPdf
+class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
-        // Directory containing PDFs – can be passed as first argument or defaulted.
-        string inputDirectory = args.Length > 0 ? args[0] : @"C:\PdfFolder";
-
-        // User and owner passwords to apply to every file.
-        const string userPassword  = "user123";
-        const string ownerPassword = "owner123";
+        // Directory containing PDFs to encrypt
+        const string inputDirectory = @"C:\PdfFiles";
+        // Passwords to apply to every PDF
+        const string userPassword  = "UserPass123";
+        const string ownerPassword = "OwnerPass123";
 
         if (!Directory.Exists(inputDirectory))
         {
@@ -20,32 +18,44 @@ class BatchEncryptPdf
             return;
         }
 
-        // Process each PDF file in the directory.
-        foreach (string inputPath in Directory.GetFiles(inputDirectory, "*.pdf"))
+        // Enumerate all PDF files (case‑insensitive) in the directory
+        string[] pdfFiles = Directory.GetFiles(inputDirectory, "*.pdf", SearchOption.TopDirectoryOnly);
+        if (pdfFiles.Length == 0)
         {
-            // Build output file name (e.g., MyDoc_encrypted.pdf).
-            string outputPath = Path.Combine(
-                inputDirectory,
-                Path.GetFileNameWithoutExtension(inputPath) + "_encrypted.pdf");
+            Console.WriteLine("No PDF files found to encrypt.");
+            return;
+        }
 
+        foreach (string sourcePath in pdfFiles)
+        {
             try
             {
-                // PdfFileSecurity implements IDisposable – use a using block.
-                using (PdfFileSecurity fileSecurity = new PdfFileSecurity(inputPath, outputPath))
+                // Build output file name – original name with "_encrypted" suffix
+                string fileName   = Path.GetFileNameWithoutExtension(sourcePath);
+                string outputPath = Path.Combine(inputDirectory, $"{fileName}_encrypted.pdf");
+
+                // Initialize the facade with source and destination files
+                using (PdfFileSecurity security = new PdfFileSecurity(sourcePath, outputPath))
                 {
-                    // Encrypt with desired privileges and key size.
-                    // DocumentPrivilege.Print allows printing; adjust as needed.
-                    // KeySize.x256 provides strong AES‑256 encryption.
-                    fileSecurity.EncryptFile(userPassword, ownerPassword,
-                                            DocumentPrivilege.Print, KeySize.x256);
+                    // Encrypt using AES‑256 and allow printing (adjust privileges as needed)
+                    bool success = security.EncryptFile(
+                        userPassword,
+                        ownerPassword,
+                        DocumentPrivilege.Print,
+                        KeySize.x256,
+                        Algorithm.AES);
+
+                    if (!success)
+                    {
+                        Console.Error.WriteLine($"Encryption failed for: {sourcePath}");
+                    }
                 }
 
-                Console.WriteLine($"Encrypted: {inputPath} → {outputPath}");
+                Console.WriteLine($"Encrypted: {sourcePath} → {outputPath}");
             }
             catch (Exception ex)
             {
-                // Log any errors but continue processing remaining files.
-                Console.Error.WriteLine($"Error encrypting '{inputPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{sourcePath}': {ex.Message}");
             }
         }
     }

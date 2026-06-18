@@ -16,23 +16,23 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (lifecycle rule: using block for deterministic disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least 5 pages (Aspose.Pdf uses 1‑based indexing)
+            // Verify that the document has at least five pages (page indexing is 1‑based)
             if (doc.Pages.Count < 5)
             {
-                Console.Error.WriteLine("The document does not contain a page 5.");
+                Console.WriteLine("The document contains fewer than 5 pages.");
                 return;
             }
 
-            // Get page 5
+            // Access page five
             Page pageFive = doc.Pages[5];
 
-            // LINQ query to retrieve the first RichMediaAnnotation on page 5
+            // LINQ query: retrieve the first RichMediaAnnotation on page five
             RichMediaAnnotation richMedia = pageFive.Annotations
-                                                    .OfType<RichMediaAnnotation>()
-                                                    .FirstOrDefault();
+                .OfType<RichMediaAnnotation>()
+                .FirstOrDefault();
 
             if (richMedia == null)
             {
@@ -40,17 +40,14 @@ class Program
                 return;
             }
 
-            // Display selected properties of the RichMediaAnnotation
+            // Display selected properties of the annotation
             Console.WriteLine("RichMediaAnnotation found on page 5:");
-            Console.WriteLine($"  Name               : {richMedia.Name}");
-            Console.WriteLine($"  Contents (text)    : {richMedia.Contents}");
-            Console.WriteLine($"  Type (Audio/Video) : {richMedia.Type}");
-            Console.WriteLine($"  ActivateOn         : {richMedia.ActivateOn}");
-            Console.WriteLine($"  Modified           : {richMedia.Modified}");
-            Console.WriteLine($"  Rect (LLX,LLY,URX,URY): {richMedia.Rect}");
-            Console.WriteLine($"  Width              : {richMedia.Width}");
-            Console.WriteLine($"  Height             : {richMedia.Height}");
-            Console.WriteLine($"  Color              : {richMedia.Color}");
+            Console.WriteLine($"  Name       : {richMedia.Name}");
+            Console.WriteLine($"  Contents   : {richMedia.Contents}");
+            Console.WriteLine($"  Type       : {richMedia.Type}");
+            Console.WriteLine($"  ActivateOn : {richMedia.ActivateOn}");
+            Console.WriteLine($"  Modified   : {richMedia.Modified}");
+            Console.WriteLine($"  Rect       : {richMedia.Rect}");
         }
     }
 }

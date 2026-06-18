@@ -9,28 +9,26 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "booklet.pdf";
 
-        // Verify that the source PDF exists
+        // Verify the input file exists.
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        try
+        // PdfFileEditor does not implement IDisposable, so a simple instance is sufficient.
+        PdfFileEditor editor = new PdfFileEditor();
+
+        // Create a booklet using default settings.
+        bool result = editor.MakeBooklet(inputPath, outputPath);
+
+        if (result)
         {
-            // PdfFileEditor does not implement IDisposable, so no using block is needed
-            PdfFileEditor editor = new PdfFileEditor();
-
-            // Create a booklet using default settings
-            bool result = editor.MakeBooklet(inputPath, outputPath);
-
-            Console.WriteLine(result
-                ? $"Booklet successfully created at '{outputPath}'."
-                : "Failed to create booklet.");
+            Console.WriteLine($"Booklet successfully created at '{outputPath}'.");
         }
-        catch (Exception ex)
+        else
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine("Failed to create booklet.");
         }
     }
 }

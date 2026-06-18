@@ -1,14 +1,15 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Xml.Linq;
 using Aspose.Pdf;
 
-class Program
+class ExportPopupAnnotations
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputXfdf = "popups.xfdf";
+        const string inputPdf = "input.pdf";
+        const string outputXfdf = "popup_annotations.xfdf";
 
         if (!File.Exists(inputPdf))
         {
@@ -17,39 +18,43 @@ class Program
         }
 
         // Load the source PDF
-        using (Document srcDoc = new Document(inputPdf))
+        using (Document doc = new Document(inputPdf))
         {
             // Export all annotations to an in‑memory XFDF stream
-            using (MemoryStream xfdfStream = new MemoryStream())
+            using (MemoryStream allXfdfStream = new MemoryStream())
             {
-                srcDoc.ExportAnnotationsToXfdf(xfdfStream);
-                xfdfStream.Position = 0; // rewind for reading
+                doc.ExportAnnotationsToXfdf(allXfdfStream);
+                allXfdfStream.Position = 0; // rewind for reading
 
                 // Load the XFDF XML
-                XDocument xfdfXml = XDocument.Load(xfdfStream);
+                XDocument xfdfDoc = XDocument.Load(allXfdfStream);
 
-                // The XFDF structure: <xfdf><annots>...</annots></xfdf>
-                // Keep only <popup> elements (and their children)
-                XElement root = xfdfXml.Root;
-                if (root != null)
+                // XFDF stores annotations under the <annots> element.
+                // Keep only those with Subtype="Popup".
+                var popupAnnots = xfdfDoc
+                    .Descendants("annot")
+                    .Where(a => (string)a.Attribute("subtype") == "Popup")
+                    .ToList();
+
+                // Remove all other annotation elements
+                xfdfDoc
+                    .Descendants("annot")
+                    .Where(a => (string)a.Attribute("subtype") != "Popup")
+                    .Remove();
+
+                // If there were no popup annotations, create an empty <annots> element
+                if (!popupAnnots.Any())
                 {
-                    XElement annots = root.Element("annots");
-                    if (annots != null)
+                    // Ensure the <annots> element exists (some viewers expect it)
+                    var annotsElem = xfdfDoc.Root.Element("annots");
+                    if (annotsElem == null)
                     {
-                        // Remove any annotation element that is not a popup
-                        foreach (XElement elem in annots.Elements())
-                        {
-                            // Popup annotations are represented by <popup> elements
-                            if (elem.Name != "popup")
-                            {
-                                elem.Remove();
-                            }
-                        }
+                        xfdfDoc.Root.Add(new XElement("annots"));
                     }
                 }
 
-                // Save the filtered XFDF to the output file
-                xfdfXml.Save(outputXfdf);
+                // Save the filtered XFDF to the target file
+                xfdfDoc.Save(outputXfdf);
                 Console.WriteLine($"Popup annotations exported to '{outputXfdf}'.");
             }
         }

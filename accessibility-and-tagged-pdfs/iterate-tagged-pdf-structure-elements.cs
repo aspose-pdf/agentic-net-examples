@@ -16,13 +16,13 @@ class Program
             return;
         }
 
-        // Load the PDF document (using statement ensures proper disposal)
+        // Load the PDF document (using the lifecycle rule: wrap in using)
         using (Document doc = new Document(inputPath))
         {
-            // Access the tagged content interface
+            // Access tagged content
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Get the root structure element (no cast required)
+            // Get the root structure element (no cast needed)
             StructureElement root = tagged.RootElement;
 
             Console.WriteLine("Structure Elements:");
@@ -30,28 +30,23 @@ class Program
         }
     }
 
-    // Recursive traversal of the structure tree
+    // Recursively walk the structure tree and log Title, Language, and StructureType (tag name)
     static void WalkStructure(StructureElement element, int depth)
     {
         string indent = new string(' ', depth * 2);
+        string title = element.Title ?? "(no title)";
+        string language = element.Language ?? "(no language)";
+        string tagName = element.StructureType?.ToString() ?? "(no tag)";
 
-        // Retrieve properties (Title, Language, custom Tag if available)
-        string title = element.Title ?? string.Empty;
-        string language = element.Language ?? string.Empty;
+        Console.WriteLine($"{indent}Tag: {tagName}, Title: {title}, Language: {language}");
 
-        // Custom tag: some versions expose a Tag property; use null‑conditional access
-        string customTag = (element as dynamic)?.Tag as string ?? string.Empty;
-
-        Console.WriteLine($"{indent}Element: {element.GetType().Name}");
-        Console.WriteLine($"{indent}  Title   : {title}");
-        Console.WriteLine($"{indent}  Language: {language}");
-        Console.WriteLine($"{indent}  Tag     : {customTag}");
-
-        // Recurse into child elements
+        // Iterate over child elements using the correct ChildElements property
         foreach (Element child in element.ChildElements)
         {
             if (child is StructureElement se)
+            {
                 WalkStructure(se, depth + 1);
+            }
         }
     }
 }

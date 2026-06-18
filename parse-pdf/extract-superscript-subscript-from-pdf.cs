@@ -1,100 +1,65 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
 class SuperscriptSubscriptExtractor
 {
-    // Thresholds for detecting superscript/subscript
-    private const double FontSizeRatioThreshold = 0.8;   // smaller than 80% of normal size
-    private const double BaselineOffsetTolerance = 2.0; // points tolerance
-
     static void Main()
     {
         const string inputPdfPath = "input.pdf";
-        const string outputTxtPath = "extracted_with_annotations.txt";
+        const string outputTextPath = "extracted.txt";
 
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use Document constructor)
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF document inside a using block for proper disposal.
+        using (Document doc = new Document(inputPdfPath))
         {
-            System.Text.StringBuilder resultBuilder = new System.Text.StringBuilder();
+            // Prepare an absorber that extracts text fragments with formatting information.
+            TextFragmentAbsorber absorber = new TextFragmentAbsorber();
+            absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
 
-            // Process each page (Aspose.Pdf uses 1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
+            // Apply the absorber to all pages.
+            doc.Pages.Accept(absorber);
+
+            // Open the output file for writing.
+            using (StreamWriter writer = new StreamWriter(outputTextPath, false))
             {
-                Page page = pdfDoc.Pages[pageIndex];
-
-                // Use TextFragmentAbsorber with Raw formatting to get individual fragments
-                TextExtractionOptions extractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Raw);
-                TextFragmentAbsorber absorber = new TextFragmentAbsorber { ExtractionOptions = extractionOptions };
-                page.Accept(absorber);
-
-                var fragments = absorber.TextFragments;
-
-                if (fragments == null || fragments.Count == 0)
-                    continue;
-
-                // Determine the reference (normal) font size and baseline Y
-                // Assume the most common (largest) font size represents normal text
-                double normalFontSize = fragments
-                    .GroupBy(f => f.TextState.FontSize)
-                    .OrderByDescending(g => g.Count())
-                    .First()
-                    .Key;
-
-                // Average baseline Y for fragments with normal font size
-                // Use Rectangle.LLY (lower‑left Y) as the baseline coordinate
-                double normalBaselineY = fragments
-                    .Where(f => Math.Abs(f.TextState.FontSize - normalFontSize) < 0.1)
-                    .Average(f => f.Rectangle.LLY);
-
-                // Build annotated line for the current page
-                foreach (TextFragment fragment in fragments)
+                // Iterate over each extracted text fragment.
+                foreach (TextFragment fragment in absorber.TextFragments)
                 {
                     string text = fragment.Text;
 
-                    // Skip empty fragments
-                    if (string.IsNullOrEmpty(text))
-                        continue;
+                    // Determine if the fragment is marked as superscript or subscript.
+                    bool isSuperscript = fragment.TextState.Superscript;
+                    bool isSubscript = fragment.TextState.Subscript;
 
-                    double sizeRatio = fragment.TextState.FontSize / normalFontSize;
-                    double baselineDiff = fragment.Rectangle.LLY - normalBaselineY;
-
-                    bool isSuperscript = sizeRatio < FontSizeRatioThreshold && baselineDiff > BaselineOffsetTolerance;
-                    bool isSubscript   = sizeRatio < FontSizeRatioThreshold && baselineDiff < -BaselineOffsetTolerance;
-
-                    if (isSuperscript)
+                    // Wrap the text with Unicode markers.
+                    if (isSuperscript && isSubscript)
                     {
-                        // Annotate superscript with ^{...}
-                        resultBuilder.Append($"^{{{text}}}");
+                        // Rare case where both flags are true – treat as superscript.
+                        writer.WriteLine("[SUP]" + text + "[/SUP]");
+                    }
+                    else if (isSuperscript)
+                    {
+                        writer.WriteLine("[SUP]" + text + "[/SUP]");
                     }
                     else if (isSubscript)
                     {
-                        // Annotate subscript with _{...}
-                        resultBuilder.Append($"_{{{text}}}");
+                        writer.WriteLine("[SUB]" + text + "[/SUB]");
                     }
                     else
                     {
-                        // Normal text
-                        resultBuilder.Append(text);
+                        writer.WriteLine(text);
                     }
                 }
-
-                // Add a line break after each page
-                resultBuilder.AppendLine();
             }
 
-            // Write the annotated text to an output file
-            File.WriteAllText(outputTxtPath, resultBuilder.ToString());
-
-            Console.WriteLine($"Extraction completed. Output written to '{outputTxtPath}'.");
+            Console.WriteLine($"Extraction completed. Results saved to '{outputTextPath}'.");
         }
     }
 }

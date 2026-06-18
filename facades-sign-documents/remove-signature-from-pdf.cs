@@ -15,12 +15,16 @@ class Program
             return;
         }
 
-        // Bind the PDF, remove the specified signature, and save the result
+        // Load the PDF with the PdfFileSignature facade
         using (PdfFileSignature pdfSign = new PdfFileSignature())
         {
-            pdfSign.BindPdf(inputPath);                     // Load PDF for editing
-            pdfSign.RemoveSignature("ApprovalSignature"); // Remove the signature by name (field stays)
-            pdfSign.Save(outputPath);                       // Persist changes
+            pdfSign.BindPdf(inputPath);
+
+            // Remove the signature by its name (no SignatureName object needed)
+            pdfSign.RemoveSignature("ApprovalSignature");
+
+            // Save the updated PDF
+            pdfSign.Save(outputPath);
         }
 
         Console.WriteLine($"Signature 'ApprovalSignature' removed. Saved to '{outputPath}'.");

@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,34 +15,33 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Create a fresh absorber for the current page
+                Page page = doc.Pages[i];
+
+                // Create an absorber that will find all image placements on the page
                 ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
 
-                // Perform the search on the page
-                doc.Pages[i].Accept(absorber);
+                // Perform the search on the current page
+                page.Accept(absorber);
 
-                // Examine each found image placement
+                // Examine each found image
                 foreach (ImagePlacement placement in absorber.ImagePlacements)
                 {
-                    // Resolution is expressed in DPI (dots per inch)
-                    double dpiX = placement.Resolution.X;
-                    double dpiY = placement.Resolution.Y;
-
-                    // If either horizontal or vertical DPI is lower than 72, remove the image
-                    if (dpiX < 72 || dpiY < 72)
+                    // ImageResolution is expressed in DPI (X = horizontal, Y = vertical)
+                    if (placement.Resolution.X < 72 || placement.Resolution.Y < 72)
                     {
-                        placement.Hide(); // Deletes the image from the page
+                        // Hide removes the image from the page content
+                        placement.Hide();
                     }
                 }
             }
 
-            // Optional: clean up unused resources after deletions
+            // Remove now‑unused resources (optional but recommended)
             doc.OptimizeResources();
 
             // Save the modified PDF

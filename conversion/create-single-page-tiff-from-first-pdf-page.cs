@@ -16,28 +16,35 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document
         using (Document pdfDoc = new Document(inputPath))
         {
-            // Define the resolution for the output TIFF (e.g., 300 DPI)
+            // Verify that the document has at least one page
+            if (pdfDoc.Pages.Count < 1)
+            {
+                Console.Error.WriteLine("The PDF contains no pages.");
+                return;
+            }
+
+            // Define custom resolution (e.g., 300 DPI)
             Resolution resolution = new Resolution(300);
 
-            // Configure custom TIFF settings
+            // Define custom TIFF settings
             TiffSettings tiffSettings = new TiffSettings
             {
-                Compression = CompressionType.LZW,   // Use LZW compression
-                Depth = ColorDepth.Default,          // Default color depth
-                Shape = ShapeType.Landscape,         // Landscape orientation
-                SkipBlankPages = false               // Do not skip blank pages
+                Compression = CompressionType.LZW,
+                Depth = ColorDepth.Format8bpp,
+                Shape = ShapeType.Portrait,
+                SkipBlankPages = false
             };
 
             // Create a TiffDevice with the specified resolution and settings
             TiffDevice tiffDevice = new TiffDevice(resolution, tiffSettings);
 
-            // Convert only the first page (page 1) to a single‑page TIFF file
+            // Convert only the first page (pages are 1‑based) to a single‑page TIFF file
             tiffDevice.Process(pdfDoc, 1, 1, outputPath);
         }
 
-        Console.WriteLine($"Single‑page TIFF saved to '{outputPath}'.");
+        Console.WriteLine($"Single‑page TIFF created at: {outputPath}");
     }
 }

@@ -1,56 +1,49 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Document, PptxSaveOptions
 
 class Program
 {
     static void Main()
     {
-        // Directory containing source PDF files
-        const string inputDirectory = "InputPdfs";
-        // Directory where converted PPTX files will be placed
-        const string outputDirectory = "OutputPptx";
+        // Folder containing source PDF files
+        const string inputFolder = "InputPdfs";
+        // Folder where converted PPTX files will be saved
+        const string outputFolder = "OutputPpts";
 
-        if (!Directory.Exists(inputDirectory))
+        // Verify input folder exists
+        if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"Input directory not found: {inputDirectory}");
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
             return;
         }
 
-        // Ensure the output folder exists
-        Directory.CreateDirectory(outputDirectory);
+        // Ensure output folder exists
+        Directory.CreateDirectory(outputFolder);
 
-        // Retrieve all PDF files in the input folder
-        string[] pdfFiles = Directory.GetFiles(inputDirectory, "*.pdf");
+        // Get all PDF files in the input folder
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
 
         foreach (string pdfPath in pdfFiles)
         {
-            // Build the output PPTX file name (same base name, .pptx extension)
+            // Build output PPTX file path (same base name)
             string baseName = Path.GetFileNameWithoutExtension(pdfPath);
-            string pptxPath = Path.Combine(outputDirectory, baseName + ".pptx");
+            string pptxPath = Path.Combine(outputFolder, baseName + ".pptx");
 
-            try
+            // Load PDF document inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(pdfPath))
             {
-                // Load the PDF document inside a using block for deterministic disposal
-                using (Document pdfDocument = new Document(pdfPath))
+                // Initialize PPTX save options and enable rasterized slide output
+                PptxSaveOptions saveOptions = new PptxSaveOptions
                 {
-                    // Create PPTX save options and enable rasterized slide output
-                    PptxSaveOptions saveOptions = new PptxSaveOptions
-                    {
-                        SlidesAsImages = true
-                    };
+                    SlidesAsImages = true // each slide will be an image of the PDF page
+                };
 
-                    // Save the document as PPTX using the explicit save options
-                    pdfDocument.Save(pptxPath, saveOptions);
-                }
+                // Save the PDF as PPTX using the configured options
+                pdfDoc.Save(pptxPath, saveOptions);
+            }
 
-                Console.WriteLine($"Converted: '{pdfPath}' → '{pptxPath}'");
-            }
-            catch (Exception ex)
-            {
-                // Report any conversion errors but continue processing remaining files
-                Console.Error.WriteLine($"Error converting '{pdfPath}': {ex.Message}");
-            }
+            Console.WriteLine($"Converted '{pdfPath}' → '{pptxPath}'.");
         }
     }
 }

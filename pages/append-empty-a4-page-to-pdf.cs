@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core API only – no Facades or Plugins namespaces
+using Aspose.Pdf;
 
 class Program
 {
@@ -15,19 +15,19 @@ class Program
             return;
         }
 
-        // Load the existing PDF using the Document constructor (preferred over DocumentFactory)
+        // Load the existing PDF
         using (Document doc = new Document(inputPath))
         {
             // Append an empty page at the end of the document
             Page newPage = doc.Pages.Add();
 
-            // Resize the newly added page to A4 dimensions (width & height are in points)
-            newPage.SetPageSize(PageSize.A4.Width, PageSize.A4.Height);
+            // Resize the newly added page to A4 dimensions
+            newPage.Resize(PageSize.A4);
 
-            // Save the modified document
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"A4 page appended and saved to '{outputPath}'.");
+        Console.WriteLine($"Appended A4 page saved to '{outputPath}'.");
     }
 }

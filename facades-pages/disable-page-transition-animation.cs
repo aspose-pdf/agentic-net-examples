@@ -16,23 +16,23 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Initialize the PdfPageEditor facade with the loaded document
-            using (PdfPageEditor editor = new PdfPageEditor(doc))
-            {
-                // Specify that only page 6 should be edited (1‑based indexing)
-                editor.ProcessPages = new int[] { 6 };
+            // Create a PdfPageEditor facade and bind it to the document
+            PdfPageEditor editor = new PdfPageEditor();
+            editor.BindPdf(doc);
 
-                // Set the transition duration to zero seconds to disable animation
-                editor.TransitionDuration = 0;
+            // Specify that only page 6 should be edited
+            editor.ProcessPages = new int[] { 6 };
 
-                // Apply the changes to the document
-                editor.ApplyChanges();
-            }
+            // Set transition duration to zero seconds (disable animation)
+            editor.TransitionDuration = 0;
 
-            // Save the modified document
+            // Apply the changes to the document
+            editor.ApplyChanges();
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

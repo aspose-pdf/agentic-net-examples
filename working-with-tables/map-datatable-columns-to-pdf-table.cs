@@ -1,128 +1,111 @@
 using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Globalization;
-using System.IO;
-using System.Linq;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
-using Aspose.Pdf.Drawing; // for Color, BorderInfo, etc.
 
 class Program
 {
     static void Main()
     {
-        // Input PDF (existing or new) and output PDF paths
-        const string inputPdf  = "template.pdf";   // can be an empty PDF or a template page
-        const string outputPdf = "mapped_table.pdf";
+        // Prepare a sample DataTable
+        DataTable dataTable = new DataTable("Sample");
+        dataTable.Columns.Add("Name", typeof(string));
+        dataTable.Columns.Add("Age", typeof(int));
+        dataTable.Columns.Add("Country", typeof(string));
 
-        // Sample DataTable with some data
-        DataTable dt = new DataTable();
-        dt.Columns.Add("ID",   typeof(int));
-        dt.Columns.Add("Name", typeof(string));
-        dt.Columns.Add("Age",  typeof(int));
-        dt.Columns.Add("City", typeof(string));
+        dataTable.Rows.Add("Alice", 30, "USA");
+        dataTable.Rows.Add("Bob", 25, "Canada");
+        dataTable.Rows.Add("Charlie", 35, "UK");
 
-        dt.Rows.Add(1, "Alice", 30, "London");
-        dt.Rows.Add(2, "Bob",   25, "Paris");
-        dt.Rows.Add(3, "Carol", 28, "Berlin");
-
-        // Mapping: DataTable column name -> target Table column index (zero‑based)
-        // Example: map "Name" to column 0, "Age" to column 2, "City" to column 4
-        var columnMap = new Dictionary<string, int>
+        // Define a mapping: DataTable column name -> target table column index (0‑based)
+        // Example: target column 0 <- Name, column 1 <- Country, column 2 <- Age
+        var columnMapping = new Dictionary<string, int>
         {
             { "Name", 0 },
-            { "Age",  2 },
-            { "City", 4 }
+            { "Country", 1 },
+            { "Age", 2 }
         };
 
-        // Ensure the target table has enough columns.
-        // Here we create 5 columns (indices 0‑4) with equal widths.
-        int totalTargetColumns = columnMap.Values.Max() + 1;
-        var columnWidths = Enumerable.Repeat(100f, totalTargetColumns).ToArray();
-        // Aspose.Pdf.Table.ColumnWidths expects a space‑separated string, not a float array.
-        string columnWidthsString = string.Join(" ", columnWidths.Select(w => w.ToString(CultureInfo.InvariantCulture)));
+        // Determine the number of columns in the target table (maximum mapped index + 1)
+        int targetColumnCount = 0;
+        foreach (int idx in columnMapping.Values)
+            if (idx + 1 > targetColumnCount) targetColumnCount = idx + 1;
 
-        // Load the template PDF if it exists; otherwise create a new empty document.
-        Document doc;
-        if (File.Exists(inputPdf))
+        // Build sourceColumnList ordered by target column index
+        int[] sourceColumnList = new int[targetColumnCount];
+        foreach (var kvp in columnMapping)
         {
-            doc = new Document(inputPdf);
-        }
-        else
-        {
-            doc = new Document();
-            // Ensure at least one page exists.
-            doc.Pages.Add();
+            // Guard against a missing column name – this removes the CS8602 warning.
+            if (!dataTable.Columns.Contains(kvp.Key))
+                throw new ArgumentException($"Column '{kvp.Key}' does not exist in the source DataTable.");
+
+            int sourceOrdinal = dataTable.Columns[kvp.Key]!.Ordinal; // safe after the Contains check
+            sourceColumnList[kvp.Value] = sourceOrdinal;
         }
 
-        // Create a table and set its column widths
-        Table table = new Table
+        // Build sourceRowList to import all rows
+        int[] sourceRowList = new int[dataTable.Rows.Count];
+        for (int i = 0; i < sourceRowList.Length; i++)
+            sourceRowList[i] = i;
+
+        // Create a new PDF document
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document())
         {
-            ColumnWidths = columnWidthsString,
-            DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Color.Black) // Aspose.Pdf.Drawing.Color
-        };
+            // Add a page
+            Aspose.Pdf.Page page = doc.Pages.Add();
 
-        // Prepare a list of all source row indices (zero‑based)
-        int[] sourceRows = Enumerable.Range(0, dt.Rows.Count).ToArray();
+            // Create a table and set basic layout
+            Aspose.Pdf.Table table = new Aspose.Pdf.Table
+            {
+                // Example: three equal width columns
+                ColumnWidths = "150 150 150",
+                // Optional visual styling
+                Border = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Black),
+                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Gray),
+                DefaultCellPadding = new MarginInfo { Top = 5, Bottom = 5, Left = 5, Right = 5 },
+                DefaultCellTextState = new TextState { FontSize = 12, Font = FontRepository.FindFont("Helvetica") }
+            };
 
-        // Import each mapped column individually
-        foreach (var kvp in columnMap)
-        {
-            string sourceColumnName = kvp.Key;
-            int targetColumnIndex   = kvp.Value;
-
-            // Guard against missing columns in the DataTable
-            if (!dt.Columns.Contains(sourceColumnName))
-                continue; // or throw, depending on requirements
-
-            // Get the zero‑based index of the source column in the DataTable
-            int sourceColumnIndex = dt.Columns[sourceColumnName].Ordinal;
-
-            // Import only this column (sourceColumnList contains a single index)
-            int[] sourceColumns = new int[] { sourceColumnIndex };
-
-            // Import the column data into the table.
+            // Import the DataTable using the column mapping
+            // showColumnNamesAsFirstRow = true (include column headers)
+            // isHtmlSupported = false (plain text)
             table.ImportDataTable(
-                dt,
-                sourceRows,
-                sourceColumns,
+                dataTable,
+                sourceRowList,
+                sourceColumnList,
                 firstFilledRow: 0,
-                firstFilledColumn: targetColumnIndex,
-                showColumnNamesAsFirstRow: false,
+                firstFilledColumn: 0,
+                showColumnNamesAsFirstRow: true,
                 isHtmlSupported: false);
-        }
 
-        // Ensure the document has at least one page; if not, add a blank page.
-        if (doc.Pages.Count == 0)
-            doc.Pages.Add();
+            // Add the table to the page
+            page.Paragraphs.Add(table);
 
-        // Add the table to the first page (index 1 in Aspose – pages are 1‑based).
-        // Use the null‑forgiving operator because Aspose guarantees a Page object when Count > 0.
-        doc.Pages[1]!.Paragraphs.Add(table);
-
-        // Save the resulting PDF – guard against missing libgdiplus on non‑Windows platforms.
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            doc.Save(outputPdf);
-        }
-        else
-        {
-            try
+            // Save the PDF – guard against missing libgdiplus on macOS/Linux
+            string outputPath = "MappedTable.pdf";
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                doc.Save(outputPdf);
+                doc.Save(outputPath);
             }
-            catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
+            else
             {
-                Console.WriteLine("Warning: libgdiplus (GDI+) is not available on this platform. PDF was not saved.");
+                try
+                {
+                    doc.Save(outputPath);
+                }
+                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
+                {
+                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. PDF was not saved.");
+                }
             }
         }
 
-        Console.WriteLine($"PDF with mapped table processing completed. Output path: '{outputPdf}'.");
+        Console.WriteLine("PDF generation completed.");
     }
 
-    // Helper to detect a nested DllNotFoundException (e.g., missing libgdiplus).
+    // Helper to detect a nested DllNotFoundException (e.g., missing libgdiplus)
     private static bool ContainsDllNotFound(Exception? ex)
     {
         while (ex != null)

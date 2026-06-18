@@ -1,13 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf.Facades;
+using System.Drawing.Imaging; // ImageFormat enum for specifying output format
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "sample.pdf";
-        const string outputFolder = "ExtractedImages";
+        const string inputPdf = "input.pdf";
+        const string outputDir = "ExtractedImages";
 
         // Verify input file exists
         if (!File.Exists(inputPdf))
@@ -17,28 +18,28 @@ class Program
         }
 
         // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
+        Directory.CreateDirectory(outputDir);
 
-        // PdfExtractor is a Facade that implements IDisposable
+        // Use PdfExtractor (implements IDisposable) within a using block
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Load the PDF document
+            // Bind the source PDF
             extractor.BindPdf(inputPdf);
 
-            // Set page range: 1 to 0 means all pages
+            // Set page range: StartPage = 1, EndPage = 0 (means all pages)
             extractor.StartPage = 1;
-            extractor.EndPage   = 0;
+            extractor.EndPage = 0;
 
-            // Perform image extraction for the specified range
+            // Perform image extraction for the defined range
             extractor.ExtractImage();
 
             int imageIndex = 1;
             // Iterate through all extracted images
             while (extractor.HasNextImage())
             {
-                string outPath = Path.Combine(outputFolder, $"image-{imageIndex}.png");
-                // Save each image; default format is used (can specify ImageFormat if needed)
-                extractor.GetNextImage(outPath);
+                string outputPath = Path.Combine(outputDir, $"image-{imageIndex}.png");
+                // Save each image as PNG (any ImageFormat can be used)
+                extractor.GetNextImage(outputPath, ImageFormat.Png);
                 imageIndex++;
             }
         }

@@ -1,8 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Annotations;
+using System.Drawing; // PdfContentEditor methods use System.Drawing types
 
 class Program
 {
@@ -10,7 +9,6 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const int    pageNumber = 1; // 1‑based page index
 
         if (!File.Exists(inputPath))
         {
@@ -18,33 +16,26 @@ class Program
             return;
         }
 
-        // Bind the PDF using the Facades API
-        PdfAnnotationEditor editor = new PdfAnnotationEditor();
-        editor.BindPdf(inputPath);
-
-        // Access the underlying Document object
-        Document doc = editor.Document;
-        Page page = doc.Pages[pageNumber];
-
-        // Define the rectangle area for the annotation (left, bottom, right, top)
-        Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 600);
-
-        // Create a square (rectangle) annotation
-        SquareAnnotation square = new SquareAnnotation(page, rect)
+        // Use PdfContentEditor (facade) to add a rectangle (square) annotation
+        using (PdfContentEditor editor = new PdfContentEditor())
         {
-            // Fill color (light gray)
-            InteriorColor = Aspose.Pdf.Color.LightGray
-        };
+            // Load the existing PDF
+            editor.BindPdf(inputPath);
 
-        // Set border width to 1 pt
-        square.Border = new Border(square) { Width = 1 };
+            // Define the annotation rectangle (x, y, width, height) in points
+            Rectangle rect = new Rectangle(100, 500, 200, 100); // left=100, top=500, width=200, height=100
 
-        // Add the annotation to the page
-        page.Annotations.Add(square);
+            // Create a square (rectangle) annotation:
+            // - contents: text shown when the annotation is selected
+            // - clr: fill color (light gray)
+            // - square: true (square/rectangle shape)
+            // - page: 1 (first page, 1‑based indexing)
+            // - borderWidth: 1 point
+            editor.CreateSquareCircle(rect, "Rectangle annotation", Color.LightGray, true, 1, 1);
 
-        // Save the modified PDF via the Facades editor
-        editor.Save(outputPath);
-        editor.Close();
+            // Save the modified PDF
+            editor.Save(outputPath);
+        }
 
         Console.WriteLine($"Rectangle annotation added and saved to '{outputPath}'.");
     }

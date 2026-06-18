@@ -3,48 +3,54 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Devices;
 
-class ExportPdfToBmp
+class Program
 {
     static void Main()
     {
-        // Resolve a concrete folder where the PDF resides and BMPs will be written.
-        // Here we use a "Data" sub‑folder of the current working directory.
-        string dataDir = Path.Combine(Environment.CurrentDirectory, "Data");
-        Directory.CreateDirectory(dataDir); // ensure the folder exists
+        // Input PDF file path
+        const string inputPdf = "input.pdf";
 
-        // Name of the source PDF – replace "sample.pdf" with your actual file name.
-        string pdfFileName = "sample.pdf";
-        string pdfPath = Path.Combine(dataDir, pdfFileName);
+        // Folder where BMP images will be saved
+        const string outputFolder = "output";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.WriteLine($"PDF file not found: {pdfPath}");
-            Console.WriteLine("Place the PDF in the above folder or change the file name/path in the code.");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document (using ensures proper disposal)
-        using (Document pdfDocument = new Document(pdfPath))
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
+
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDocument = new Document(inputPdf))
         {
-            // Desired resolution – 300 DPI for high‑quality rasterisation
+            // Create a Resolution object with 300 DPI
             Resolution resolution = new Resolution(300);
 
-            // Create a BMP device with the specified resolution.
-            // The BmpDevice constructor that accepts a Resolution uses that DPI for rendering.
+            // Initialize the BMP device with the specified resolution
             BmpDevice bmpDevice = new BmpDevice(resolution);
 
-            // Process each page (Aspose.Pdf uses 1‑based page indexing)
-            for (int pageNum = 1; pageNum <= pdfDocument.Pages.Count; pageNum++)
+            // OPTIONAL: set custom rendering options for higher quality output
+            // (properties may vary depending on the Aspose.Pdf version)
+            bmpDevice.RenderingOptions = new RenderingOptions
             {
-                string outBmpPath = Path.Combine(dataDir, $"image{pageNum}_out.bmp");
+                // Example: enable anti‑aliasing for smoother graphics
+                // AntiAliasing = true
+            };
 
-                // Write the BMP image to a file stream
-                using (FileStream bmpStream = new FileStream(outBmpPath, FileMode.Create))
+            // Iterate over all pages (Aspose.Pdf uses 1‑based page indexing)
+            for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
+            {
+                string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.bmp");
+
+                // Convert each page to BMP and write it to a file stream
+                using (FileStream bmpStream = new FileStream(outputPath, FileMode.Create))
                 {
-                    bmpDevice.Process(pdfDocument.Pages[pageNum], bmpStream);
+                    bmpDevice.Process(pdfDocument.Pages[pageNumber], bmpStream);
                 }
 
-                Console.WriteLine($"Page {pageNum} saved as BMP: {outBmpPath}");
+                Console.WriteLine($"Page {pageNumber} saved as BMP to '{outputPath}'.");
             }
         }
     }

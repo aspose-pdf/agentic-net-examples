@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
@@ -9,62 +8,67 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "signed_output.pdf";
-        const string thumbprint = "YOUR_CERTIFICATE_THUMBPRINT"; // replace with actual thumbprint (no spaces, case‑insensitive)
+        const string inputPath = "input.pdf";
+        const string outputPath = "signed.pdf";
+        const string thumbprint = "YOUR_CERTIFICATE_THUMBPRINT"; // replace with actual thumbprint
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the certificate from the CurrentUser\My store by thumbprint
-        X509Certificate2 signingCert = null;
-        using (X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser))
+        // Load the certificate from the Windows certificate store
+        X509Certificate2 certificate = GetCertificateFromStore(thumbprint);
+        if (certificate == null)
         {
-            store.Open(OpenFlags.ReadOnly);
-            var certs = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false);
-            signingCert = certs.OfType<X509Certificate2>().FirstOrDefault();
-        }
-
-        if (signingCert == null)
-        {
-            Console.Error.WriteLine($"Certificate with thumbprint '{thumbprint}' not found in the store.");
+            Console.Error.WriteLine($"Certificate with thumbprint '{thumbprint}' not found.");
             return;
         }
 
-        // Open the PDF, add a signature field, and sign it
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF, add a signature field, sign it, and save
+        using (Document doc = new Document(inputPath))
         {
-            // Define the rectangle where the visible signature will appear (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 300, 150);
+            // Define the rectangle for the signature appearance (left, bottom, right, top)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 600);
 
             // Create a signature field on the first page
-            SignatureField sigField = new SignatureField(doc.Pages[1], sigRect)
-            {
-                // Optional: give the field a name
-                Name = "Signature1"
-            };
+            SignatureField sigField = new SignatureField(doc.Pages[1], rect);
+            // Assign a name to the field (the Form.Add overload expects only the field)
+            sigField.PartialName = "Signature1";
+            doc.Form.Add(sigField);
 
-            // Add the signature field to the page's annotations collection
-            doc.Pages[1].Annotations.Add(sigField);
+            // Create an ExternalSignature using the X509Certificate2 (detached PKCS#7)
+            ExternalSignature externalSig = new ExternalSignature(certificate);
 
-            // Create an ExternalSignature that uses the X509Certificate2 from the store
-            ExternalSignature externalSig = new ExternalSignature(signingCert)
-            {
-                Reason   = "Document approved",
-                Location = "Office",
-                ContactInfo = "contact@example.com"
-            };
-
-            // Sign the field with the external signature
+            // Sign the field
             sigField.Sign(externalSig);
 
             // Save the signed PDF
-            doc.Save(outputPdf);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF signed successfully and saved to '{outputPdf}'.");
+        Console.WriteLine($"Signed PDF saved to '{outputPath}'.");
+    }
+
+    // Helper method to retrieve a certificate by thumbprint from the current user or local machine store
+    static X509Certificate2 GetCertificateFromStore(string thumbprint)
+    {
+        StoreLocation[] locations = { StoreLocation.CurrentUser, StoreLocation.LocalMachine };
+        foreach (StoreLocation location in locations)
+        {
+            using (X509Store store = new X509Store(StoreName.My, location))
+            {
+                store.Open(OpenFlags.ReadOnly);
+                foreach (X509Certificate2 cert in store.Certificates)
+                {
+                    if (string.Equals(cert.Thumbprint, thumbprint, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return cert;
+                    }
+                }
+            }
+        }
+        return null; // No matching certificate found
     }
 }

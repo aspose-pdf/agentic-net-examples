@@ -6,33 +6,36 @@ class Program
 {
     static void Main()
     {
-        // Input PDF containing a form.
-        const string inputPdfPath  = "input.pdf";
+        // Paths for the source PDF and the destination XML file.
+        const string pdfPath  = "input.pdf";
+        const string xmlPath  = "form_data.xml";
 
-        // Destination XML file that will hold the exported form data.
-        const string outputXmlPath = "form_data.xml";
-
-        if (!File.Exists(inputPdfPath))
+        // Verify that the source PDF exists.
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Source PDF not found: {pdfPath}");
             return;
         }
 
-        try
+        // Load the PDF document.
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            // Load the PDF document.
-            using (Document pdfDoc = new Document(inputPdfPath))
-            {
-                // Export the entire PDF document model (including form fields and their values)
-                // to an XML representation.
-                pdfDoc.SaveXml(outputXmlPath);
-            }
+            // OPTIONAL: Fill some form fields programmatically.
+            // Example: set a text field named "Name" to "John Doe".
+            // The core Form API works with WidgetAnnotation objects.
+            // Uncomment and adjust field names as needed.
+            /*
+            var field = pdfDoc.Form["Name"] as TextBoxField;
+            if (field != null)
+                field.Value = "John Doe";
+            */
 
-            Console.WriteLine($"Form data exported to XML file: {outputXmlPath}");
+            // Export the entire document model (including form data) to an XML file.
+            // SaveXml writes the PDF structure as XML; this can be used for offline
+            // data collection or further processing.
+            pdfDoc.SaveXml(xmlPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during export: {ex.Message}");
-        }
+
+        Console.WriteLine($"Form data exported to XML file: {xmlPath}");
     }
 }

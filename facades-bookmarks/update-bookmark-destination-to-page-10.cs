@@ -1,16 +1,14 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades; // PdfBookmarkEditor, Bookmark, Bookmarks
 
 class Program
 {
     static void Main()
     {
-        // Input PDF, output PDF and the bookmark ID to be updated.
-        const string inputPdf  = "input.pdf";
+        const string inputPdf = "input.pdf";
         const string outputPdf = "output.pdf";
-        const string bookmarkId = "12 0 R";   // Example object ID of the bookmark.
+        const string bookmarkId = "MyBookmark"; // identifier of the bookmark to modify
 
         if (!File.Exists(inputPdf))
         {
@@ -18,32 +16,47 @@ class Program
             return;
         }
 
-        // Load the PDF document.
-        using (Document doc = new Document(inputPdf))
+        // Use PdfBookmarkEditor (facade) to work with bookmarks.
+        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
         {
-            // Retrieve the PDF object by its ID.
-            // The returned object can be cast to Aspose.Pdf.Bookmark if the ID refers to a bookmark.
-            var pdfObject = doc.GetObjectById(bookmarkId);
+            // Load the PDF document.
+            editor.BindPdf(inputPdf);
 
-            if (pdfObject is Bookmark bookmark)
+            // Extract all existing bookmarks as a Bookmarks collection.
+            Bookmarks bookmarks = editor.ExtractBookmarks();
+
+            if (bookmarks != null && bookmarks.Count > 0)
             {
-                // Update the destination page number to page 10 (1‑based indexing).
-                bookmark.PageNumber = 10;
+                // Locate the bookmark with the specified identifier (here we treat Title as the ID).
+                foreach (Bookmark bm in bookmarks)
+                {
+                    if (bm.Title == bookmarkId)
+                    {
+                        // Update the destination to page 10.
+                        // The Destination property expects a string; a plain page number works.
+                        bm.Destination = "10";
+                        break;
+                    }
+                }
 
-                // If the bookmark uses an explicit destination string, clear it so the
-                // PageNumber takes effect. This is optional depending on the PDF.
-                bookmark.Destination = string.Empty;
-                Console.WriteLine($"Bookmark '{bookmark.Title}' now points to page {bookmark.PageNumber}.");
+                // Remove all current bookmarks from the document.
+                editor.DeleteBookmarks();
+
+                // Re‑add the (now modified) bookmarks.
+                foreach (Bookmark bm in bookmarks)
+                {
+                    editor.CreateBookmarks(bm);
+                }
             }
             else
             {
-                Console.Error.WriteLine($"No bookmark found with ID '{bookmarkId}'.");
+                Console.WriteLine("No bookmarks found in the source PDF.");
             }
 
-            // Save the modified PDF.
-            doc.Save(outputPdf);
+            // Save the updated PDF.
+            editor.Save(outputPdf);
         }
 
-        Console.WriteLine($"Updated PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Bookmark '{bookmarkId}' updated to point to page 10. Saved as '{outputPdf}'.");
     }
 }

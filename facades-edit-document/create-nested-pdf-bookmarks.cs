@@ -1,56 +1,62 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;   // PdfBookmarkEditor, Bookmark, Bookmarks
+using Aspose.Pdf.Facades;   // Facade classes for bookmark manipulation
+using Aspose.Pdf;           // Core PDF classes (if needed)
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_bookmarks.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Initialize the bookmark editor and bind the source PDF
-        PdfBookmarkEditor editor = new PdfBookmarkEditor();
-        editor.BindPdf(inputPdf);
-
-        // ----- Build the bookmark hierarchy (3 levels) -----
-        // Sub‑subsection (level 3)
-        Bookmark subSub = new Bookmark
+        // Use PdfBookmarkEditor to bind the existing PDF and create nested bookmarks
+        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
         {
-            Title      = "Sub‑subsection 1.1.1",
-            PageNumber = 3
-        };
+            // Bind the source PDF file
+            editor.BindPdf(inputPath);
 
-        // Subsection (level 2) – add the sub‑subsection as a child
-        Bookmark sub = new Bookmark
-        {
-            Title      = "Subsection 1.1",
-            PageNumber = 2,
-            ChildItems = new Bookmarks()
-        };
-        sub.ChildItems.Add(subSub);
+            // ----- Create the deepest bookmark (sub‑subsection) -----
+            Bookmark subSubSection = new Bookmark
+            {
+                Title      = "Sub‑subsection 1.1.1",
+                PageNumber = 3               // Destination page for this bookmark
+            };
 
-        // Section (level 1) – add the subsection as a child
-        Bookmark parent = new Bookmark
-        {
-            Title      = "Section 1",
-            PageNumber = 1,
-            ChildItems = new Bookmarks()
-        };
-        parent.ChildItems.Add(sub);
+            // ----- Create the middle bookmark (subsection) and attach the child -----
+            Bookmark subSection = new Bookmark
+            {
+                Title      = "Subsection 1.1",
+                PageNumber = 2
+            };
+            // ChildItems expects a Bookmarks collection
+            Bookmarks subSubList = new Bookmarks();
+            subSubList.Add(subSubSection);
+            subSection.ChildItems = subSubList;
 
-        // Create the nested bookmarks in the document
-        editor.CreateBookmarks(parent);
+            // ----- Create the top‑level bookmark (section) and attach the child -----
+            Bookmark section = new Bookmark
+            {
+                Title      = "Section 1",
+                PageNumber = 1
+            };
+            Bookmarks subSectionList = new Bookmarks();
+            subSectionList.Add(subSection);
+            section.ChildItems = subSectionList;
 
-        // Save the modified PDF
-        editor.Save(outputPdf);
+            // Add the hierarchical bookmark structure to the document
+            editor.CreateBookmarks(section);
 
-        Console.WriteLine($"Nested bookmarks created and saved to '{outputPdf}'.");
+            // Save the modified PDF with the new bookmarks
+            editor.Save(outputPath);
+        }
+
+        Console.WriteLine($"Nested bookmarks created and saved to '{outputPath}'.");
     }
 }

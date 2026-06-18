@@ -1,69 +1,59 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;                     // Core PDF API
+using Aspose.Pdf.Annotations;        // Annotation types
 
-namespace PdfAnnotationReporting
+class AnnotationReport
 {
     /// <summary>
-    /// Provides functionality to report the number of annotations on each page of a PDF document.
+    /// Retrieves the number of annotations on each page of the specified PDF.
     /// </summary>
-    public static class AnnotationReporter
+    /// <param name="pdfPath">Path to the input PDF file.</param>
+    /// <returns>
+    /// A dictionary where the key is the 1‑based page number and the value is the count of annotations on that page.
+    /// </returns>
+    public static Dictionary<int, int> GetAnnotationsCountPerPage(string pdfPath)
     {
-        /// <summary>
-        /// Retrieves a dictionary where the key is the 1‑based page number and the value is the count of annotations on that page.
-        /// </summary>
-        /// <param name="pdfPath">Full path to the PDF file.</param>
-        /// <returns>Dictionary mapping page numbers to annotation counts.</returns>
-        public static Dictionary<int, int> GetAnnotationsCountPerPage(string pdfPath)
+        if (!File.Exists(pdfPath))
+            throw new FileNotFoundException($"PDF file not found: {pdfPath}");
+
+        // Always wrap Document in a using block for deterministic disposal.
+        using (Document doc = new Document(pdfPath))
         {
-            if (string.IsNullOrWhiteSpace(pdfPath))
-                throw new ArgumentException("PDF path must be a non‑empty string.", nameof(pdfPath));
+            var result = new Dictionary<int, int>();
 
-            if (!File.Exists(pdfPath))
-                throw new FileNotFoundException("PDF file not found.", pdfPath);
-
-            // Use PdfAnnotationEditor (Facade) to bind the PDF.
-            // The editor implements IDisposable, so wrap it in a using block.
-            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+            // Pages collection is 1‑based.
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                editor.BindPdf(pdfPath);               // Load the document.
-                Document doc = editor.Document;        // Access the underlying Document.
+                Page page = doc.Pages[i];
+                // AnnotationCollection.Count gives the number of annotations on the page.
+                int count = page.Annotations.Count;
+                result[i] = count;
+            }
 
-                var pageAnnotationCounts = new Dictionary<int, int>();
+            return result;
+        }
+    }
 
-                // Pages collection is 1‑based.
-                for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
-                {
-                    Page page = doc.Pages[pageIndex];
-                    int annotationCount = page.Annotations.Count; // AnnotationCollection.Count
-                    pageAnnotationCounts[pageIndex] = annotationCount;
-                }
+    // Example usage
+    static void Main()
+    {
+        const string inputPdf = "sample.pdf";
 
-                return pageAnnotationCounts;
+        try
+        {
+            Dictionary<int, int> counts = GetAnnotationsCountPerPage(inputPdf);
+
+            Console.WriteLine($"Annotation counts for '{inputPdf}':");
+            foreach (var kvp in counts)
+            {
+                Console.WriteLine($"Page {kvp.Key}: {kvp.Value} annotation(s)");
             }
         }
-
-        // Example usage.
-        public static void Main()
+        catch (Exception ex)
         {
-            const string inputPdf = "sample.pdf";
-
-            try
-            {
-                Dictionary<int, int> counts = GetAnnotationsCountPerPage(inputPdf);
-
-                Console.WriteLine($"Annotation counts for '{inputPdf}':");
-                foreach (var kvp in counts)
-                {
-                    Console.WriteLine($"Page {kvp.Key}: {kvp.Value} annotation(s)");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error: {ex.Message}");
-            }
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

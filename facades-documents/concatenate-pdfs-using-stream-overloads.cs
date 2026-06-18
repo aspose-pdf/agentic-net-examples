@@ -1,56 +1,23 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main(string[] args)
     {
-        // At least two PDF files are required.
-        if (args.Length < 2)
+        // Expect at least an output file and two input PDFs
+        if (args.Length < 3)
         {
-            Console.Error.WriteLine("Usage: concatpdf <input1.pdf> <input2.pdf> [<input3.pdf> ...] [<output.pdf>]");
+            Console.Error.WriteLine("Usage: concatpdf <output.pdf> <input1.pdf> <input2.pdf> [more input PDFs...]");
             return;
         }
 
-        // Determine output file. If the last argument looks like an output path (ends with .pdf) and is not an existing input file, treat it as output.
-        string outputPath;
-        List<string> inputPaths = new List<string>();
-        if (args.Length > 2 && args[args.Length - 1].EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
-        {
-            string possibleOutput = args[args.Length - 1];
-            bool isExistingInput = false;
-            foreach (var a in args)
-            {
-                if (string.Equals(a, possibleOutput, StringComparison.OrdinalIgnoreCase) && File.Exists(a))
-                {
-                    isExistingInput = true;
-                    break;
-                }
-            }
+        string outputPath = args[0];
+        string[] inputPaths = new string[args.Length - 1];
+        Array.Copy(args, 1, inputPaths, 0, args.Length - 1);
 
-            if (!isExistingInput)
-            {
-                outputPath = possibleOutput;
-                for (int i = 0; i < args.Length - 1; i++)
-                    inputPaths.Add(args[i]);
-            }
-            else
-            {
-                outputPath = "merged.pdf";
-                foreach (var a in args)
-                    inputPaths.Add(a);
-            }
-        }
-        else
-        {
-            outputPath = "merged.pdf";
-            foreach (var a in args)
-                inputPaths.Add(a);
-        }
-
-        // Verify that all input files exist.
+        // Verify that all input files exist
         foreach (var path in inputPaths)
         {
             if (!File.Exists(path))
@@ -60,32 +27,40 @@ class Program
             }
         }
 
-        // Open input streams.
-        List<Stream> inputStreams = new List<Stream>();
+        // Prepare input streams array
+        Stream[] inputStreams = new Stream[inputPaths.Length];
         try
         {
-            foreach (var path in inputPaths)
-                inputStreams.Add(new FileStream(path, FileMode.Open, FileAccess.Read));
+            for (int i = 0; i < inputPaths.Length; i++)
+            {
+                inputStreams[i] = new FileStream(inputPaths[i], FileMode.Open, FileAccess.Read);
+            }
 
-            // Open output stream.
+            // Open output stream (will be created/overwritten)
             using (Stream outputStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
             {
                 PdfFileEditor editor = new PdfFileEditor();
-                // Let the editor close the streams after concatenation.
+                // Close input streams automatically after concatenation (optional but safe)
                 editor.CloseConcatenatedStreams = true;
 
-                bool success = editor.Concatenate(inputStreams.ToArray(), outputStream);
-                if (success)
-                    Console.WriteLine($"Successfully concatenated {inputStreams.Count} PDFs into '{outputPath}'.");
+                bool result = editor.Concatenate(inputStreams, outputStream);
+                if (result)
+                {
+                    Console.WriteLine($"Successfully concatenated {inputPaths.Length} PDFs into '{outputPath}'.");
+                }
                 else
+                {
                     Console.Error.WriteLine("Concatenation failed.");
+                }
             }
         }
         finally
         {
-            // Ensure any streams not closed by the editor are disposed.
-            foreach (var s in inputStreams)
-                s?.Dispose();
+            // Ensure all input streams are disposed even if an exception occurs
+            foreach (var stream in inputStreams)
+            {
+                stream?.Dispose();
+            }
         }
     }
 }

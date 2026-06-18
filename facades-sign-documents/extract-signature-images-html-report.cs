@@ -16,58 +16,56 @@ class Program
             return;
         }
 
-        // StringBuilder to compose the HTML report
-        StringBuilder html = new StringBuilder();
-        html.AppendLine("<!DOCTYPE html>");
-        html.AppendLine("<html lang=\"en\">");
-        html.AppendLine("<head><meta charset=\"UTF-8\"><title>Signature Report</title></head>");
-        html.AppendLine("<body>");
-        html.AppendLine("<h1>Signature Images Extracted from PDF</h1>");
-
-        // Use PdfFileSignature facade to work with signatures
-        using (PdfFileSignature pdfSignature = new PdfFileSignature())
+        try
         {
-            // Bind the PDF file
-            pdfSignature.BindPdf(inputPdf);
-
-            // Retrieve all signature names (true = include empty fields if needed)
-            var signatureNames = pdfSignature.GetSignatureNames(true);
-
-            foreach (var sigName in signatureNames)
+            // Initialize the facade and bind the PDF
+            using (PdfFileSignature pdfSignature = new PdfFileSignature())
             {
-                // Extract the signature image as a stream (JPEG by default)
-                using (Stream imgStream = pdfSignature.ExtractImage(sigName))
+                pdfSignature.BindPdf(inputPdf);
+
+                // Retrieve all signature names (including empty ones if desired)
+                var signatureNames = pdfSignature.GetSignatureNames(true);
+
+                StringBuilder htmlBuilder = new StringBuilder();
+                htmlBuilder.AppendLine("<!DOCTYPE html>");
+                htmlBuilder.AppendLine("<html><head><meta charset=\"UTF-8\"><title>Signature Report</title></head><body>");
+                htmlBuilder.AppendLine("<h1>Signature Images Report</h1>");
+
+                foreach (var sigName in signatureNames)
                 {
-                    if (imgStream == null)
+                    // Extract the image stream for the current signature
+                    using (Stream imgStream = pdfSignature.ExtractImage(sigName))
                     {
-                        // No image found for this signature
-                        html.AppendLine($"<h3>{sigName}</h3>");
-                        html.AppendLine("<p>No image available.</p>");
-                        continue;
-                    }
+                        if (imgStream == null)
+                        {
+                            // No image for this signature – skip
+                            continue;
+                        }
 
-                    // Read the image bytes
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        imgStream.CopyTo(ms);
-                        byte[] imgBytes = ms.ToArray();
+                        // Read the image into a memory buffer
+                        using (MemoryStream ms = new MemoryStream())
+                        {
+                            imgStream.CopyTo(ms);
+                            string base64 = Convert.ToBase64String(ms.ToArray());
 
-                        // Convert to Base64 for embedding in HTML
-                        string base64 = Convert.ToBase64String(imgBytes);
-
-                        // Append image to the HTML report
-                        html.AppendLine($"<h3>{sigName}</h3>");
-                        html.AppendLine($"<img src=\"data:image/jpeg;base64,{base64}\" alt=\"Signature {sigName}\" style=\"max-width:600px;\"/>");
+                            // Embed the image as a data‑URL in the HTML
+                            htmlBuilder.AppendLine($"<h3>Signature: {sigName}</h3>");
+                            htmlBuilder.AppendLine(
+                                $"<img src=\"data:image/jpeg;base64,{base64}\" alt=\"Signature {sigName}\" style=\"max-width:600px;\"/>");
+                        }
                     }
                 }
+
+                htmlBuilder.AppendLine("</body></html>");
+
+                // Write the HTML report to disk
+                File.WriteAllText(outputHtml, htmlBuilder.ToString());
+                Console.WriteLine($"Signature report generated: {outputHtml}");
             }
         }
-
-        html.AppendLine("</body>");
-        html.AppendLine("</html>");
-
-        // Write the HTML report to disk
-        File.WriteAllText(outputHtml, html.ToString());
-        Console.WriteLine($"Signature report generated: {outputHtml}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

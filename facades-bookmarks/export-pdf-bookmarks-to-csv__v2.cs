@@ -1,62 +1,67 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;   // PdfBookmarkEditor, Bookmark, Bookmarks
+using Aspose.Pdf.Facades; // PdfBookmarkEditor, Bookmark, Bookmarks
 
-class ExportBookmarksToExcel
+class ExportBookmarksToCsv
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";      // source PDF with bookmarks
-        const string outputCsv = "bookmarks.csv";  // Excel‑compatible CSV file
+        const string inputPdfPath = "input.pdf";
+        const string outputCsvPath = "bookmarks.csv"; // Excel can open CSV files
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        try
-        {
-            // Load the PDF and extract its bookmarks
-            using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
-            {
-                editor.BindPdf(inputPdf);
-                Bookmarks rootBookmarks = editor.ExtractBookmarks();
+        // Initialize the bookmark editor and bind the PDF file
+        PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor();
+        bookmarkEditor.BindPdf(inputPdfPath);
 
-                // Write bookmarks to CSV (Excel can open CSV directly)
-                using (StreamWriter writer = new StreamWriter(outputCsv, false, System.Text.Encoding.UTF8))
+        // Extract all bookmarks (recursive hierarchy)
+        Bookmarks allBookmarks = bookmarkEditor.ExtractBookmarks();
+
+        // Create a CSV writer (Excel‑compatible)
+        using (var writer = new StreamWriter(outputCsvPath))
+        {
+            // Write header row
+            writer.WriteLine("Title,Level,Destination Page");
+
+            // Row counter is not needed for CSV; we just write lines sequentially
+
+            // Recursive traversal to write bookmarks
+            void WriteBookmarks(Bookmarks bookmarks, int level)
+            {
+                foreach (Bookmark bm in bookmarks)
                 {
-                    writer.WriteLine("Title,Level,Destination"); // header row
-                    WriteBookmarksRecursive(rootBookmarks, 1, writer);
+                    // Escape commas in the title by surrounding with double quotes if needed
+                    string title = bm.Title ?? string.Empty;
+                    if (title.Contains(",") || title.Contains('"'))
+                    {
+                        title = "\"" + title.Replace("\"", "\"\"") + "\"";
+                    }
+
+                    // Destination page may be -1 if not set; write empty string in that case
+                    string page = bm.PageNumber > 0 ? bm.PageNumber.ToString() : string.Empty;
+
+                    writer.WriteLine($"{title},{level},{page}");
+
+                    // Process child bookmarks, if any
+                    if (bm.ChildItem != null && bm.ChildItem.Count > 0)
+                    {
+                        WriteBookmarks(bm.ChildItem, level + 1);
+                    }
                 }
             }
 
-            Console.WriteLine($"Bookmarks exported to '{outputCsv}'.");
+            // Start recursion at level 1 (top‑level bookmarks)
+            WriteBookmarks(allBookmarks, 1);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
-    }
 
-    // Recursively writes each bookmark with its hierarchy level.
-    private static void WriteBookmarksRecursive(Bookmarks bookmarks, int level, StreamWriter writer)
-    {
-        foreach (Bookmark bm in bookmarks)
-        {
-            // Escape title for CSV (wrap in double quotes and double any internal quotes)
-            string safeTitle = $"\"{bm.Title?.Replace("\"", "\"\"")}\"";
+        // Clean up
+        bookmarkEditor.Close();
 
-            // Destination is the page number the bookmark points to (0 if not set)
-            int destination = bm.PageNumber;
-
-            writer.WriteLine($"{safeTitle},{level},{destination}");
-
-            // If the bookmark has child items, process them with increased level
-            if (bm.ChildItem != null && bm.ChildItem.Count > 0)
-            {
-                WriteBookmarksRecursive(bm.ChildItem, level + 1, writer);
-            }
-        }
+        Console.WriteLine($"Bookmarks exported to '{outputCsvPath}'.");
     }
 }

@@ -1,61 +1,61 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // Core Aspose.Pdf namespace (contains Document, Permissions, CryptoAlgorithm)
 
 class Program
 {
     static void Main()
     {
-        // Folder containing the original PDFs
-        const string inputFolder = "input_pdfs";
-        // Folder where encrypted PDFs will be written
-        const string outputFolder = "encrypted_pdfs";
+        // Folder containing the PDFs to encrypt
+        const string inputFolder = @"C:\PdfFolder";
+        // Folder where encrypted PDFs will be saved
+        const string outputFolder = @"C:\PdfFolder\Encrypted";
 
         if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Input folder does not exist: {inputFolder}");
             return;
         }
 
         // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Retrieve all PDF files in the input folder (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-
-        foreach (string pdfPath in pdfFiles)
+        // Enumerate all PDF files in the input folder (non‑recursive)
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
             try
             {
-                // Derive passwords from the file name (without extension)
-                string baseName = Path.GetFileNameWithoutExtension(pdfPath);
-                string userPassword = baseName;               // user password
-                string ownerPassword = baseName + "_owner";   // owner password
+                // Derive a password from the file name (without extension)
+                string password = Path.GetFileNameWithoutExtension(pdfPath);
 
-                // Define desired permissions (example: allow printing and content extraction)
-                Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
-
-                // Load the PDF document inside a using block for deterministic disposal
+                // Load the PDF document
                 using (Document doc = new Document(pdfPath))
                 {
-                    // Encrypt using AES‑256 (preferred algorithm)
-                    doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+                    // Define permissions (example: allow printing and content extraction)
+                    Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-                    // Construct the output file name
-                    string outputPath = Path.Combine(
-                        outputFolder,
-                        $"{baseName}_encrypted.pdf");
+                    // Encrypt using the derived password for both user and owner,
+                    // AES‑256 algorithm (preferred per encryption rule)
+                    doc.Encrypt(userPassword: password,
+                                ownerPassword: password,
+                                permissions: perms,
+                                cryptoAlgorithm: CryptoAlgorithm.AESx256);
 
-                    // Save the encrypted PDF (extension .pdf ensures PDF output)
+                    // Build the output file path (same name, placed in the output folder)
+                    string outputPath = Path.Combine(outputFolder, Path.GetFileName(pdfPath));
+
+                    // Save the encrypted PDF (PDF format, no SaveOptions needed)
                     doc.Save(outputPath);
                 }
 
-                Console.WriteLine($"Encrypted: {pdfPath} → {Path.Combine(outputFolder, $"{baseName}_encrypted.pdf")}");
+                Console.WriteLine($"Encrypted: {Path.GetFileName(pdfPath)} → {outputFolder}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error encrypting '{pdfPath}': {ex.Message}");
+                Console.Error.WriteLine($"Failed to encrypt '{pdfPath}': {ex.Message}");
             }
         }
+
+        Console.WriteLine("Batch encryption completed.");
     }
 }

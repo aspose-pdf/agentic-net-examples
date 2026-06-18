@@ -1,41 +1,32 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF path, start page (1‑based), and output PDF path
-        const string inputPath  = "input.pdf";
-        const int    startPage  = 3;               // split from this page to the end
+        // Input PDF file path
+        const string inputPath = "input.pdf";
+        // Output PDF file path (pages from startPage to the end)
         const string outputPath = "output_split.pdf";
+        // Page number to start splitting (1‑based indexing)
+        const int startPage = 3;
 
-        // Validate input file existence
+        // Verify that the source file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Load the document first to obtain the page count and validate the start page.
-            Document pdfDocument = new Document(inputPath);
-            int pageCount = pdfDocument.Pages.Count;
-
-            if (startPage < 1 || startPage > pageCount)
-            {
-                Console.Error.WriteLine($"Start page {startPage} is out of range. Document has {pageCount} pages.");
-                return;
-            }
-
-            // PdfFileEditor does NOT implement IDisposable; instantiate directly.
+            // PdfFileEditor does NOT implement IDisposable; instantiate directly
             PdfFileEditor editor = new PdfFileEditor();
 
-            // Split from the specified start page to the end of the document.
-            // SplitToEnd uses 1‑based page indexing, matching Aspose.Pdf conventions.
+            // Split from the specified start page to the end of the document
+            // SplitToEnd saves the rear part (from startPage onward) as a new PDF file
             bool success = editor.SplitToEnd(inputPath, startPage, outputPath);
 
             if (success)
@@ -45,7 +36,7 @@ class Program
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during PDF split: {ex.Message}");
+            Console.Error.WriteLine($"Error during split operation: {ex.Message}");
         }
     }
 }

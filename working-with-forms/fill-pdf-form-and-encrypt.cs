@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath = "input.pdf";          // PDF with form fields
         const string outputPath = "filled_encrypted.pdf";
         const string userPassword = "user123";
         const string ownerPassword = "owner123";
@@ -20,34 +20,35 @@ class Program
 
         try
         {
-            // Load the PDF document inside a using block for deterministic disposal
+            // Load the PDF document
             using (Document doc = new Document(inputPath))
             {
-                // Fill form fields if the document contains a form
-                if (doc.Form != null && doc.Form.Count > 0)
+                // Fill form fields safely – use concrete field types that expose the Value property
+                if (doc.Form.HasField("Name"))
                 {
-                    // Example: set the "Name" field
-                    Field nameField = doc.Form["Name"] as Field;
-                    if (nameField != null)
+                    if (doc.Form["Name"] is TextBoxField nameField)
+                    {
                         nameField.Value = "John Doe";
-
-                    // Example: set the "Date" field
-                    Field dateField = doc.Form["Date"] as Field;
-                    if (dateField != null)
-                        dateField.Value = DateTime.Now.ToShortDateString();
+                    }
                 }
 
-                // Define permissions for the encrypted PDF (allow printing and content extraction)
-                Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+                if (doc.Form.HasField("Date"))
+                {
+                    if (doc.Form["Date"] is TextBoxField dateField)
+                    {
+                        dateField.Value = DateTime.Today.ToShortDateString();
+                    }
+                }
 
-                // Encrypt the document using AES-256 (preferred algorithm)
+                // Apply encryption – use AES-256 and allow printing & content extraction
+                Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
                 // Save the encrypted PDF
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"PDF saved and encrypted to '{outputPath}'.");
+            Console.WriteLine($"Form filled and encrypted PDF saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

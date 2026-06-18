@@ -1,14 +1,14 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // PDF containing the 'LegalSignature' field
-        const string outputCer = "LegalSignature.cer"; // Destination for the extracted certificate
+        const string inputPdf = "input.pdf";
+        const string outputCer = "LegalSignature.cer";
+        const string signatureName = "LegalSignature";
 
         if (!File.Exists(inputPdf))
         {
@@ -16,43 +16,28 @@ class Program
             return;
         }
 
-        try
+        // Bind the PDF and extract the certificate from the specified signature field
+        using (PdfFileSignature pdfSignature = new PdfFileSignature())
         {
-            // Load the PDF document (Document implements IDisposable)
-            using (Document doc = new Document(inputPdf))
+            pdfSignature.BindPdf(inputPdf);
+
+            // ExtractCertificate returns a Stream containing the DER‑encoded X.509 certificate
+            using (Stream certStream = pdfSignature.ExtractCertificate(signatureName))
             {
-                // Initialize the PdfFileSignature facade
-                using (PdfFileSignature pdfSign = new PdfFileSignature())
+                if (certStream == null)
                 {
-                    // Bind the already loaded Document instance
-                    pdfSign.BindPdf(doc);
+                    Console.Error.WriteLine($"No certificate found in signature '{signatureName}'.");
+                    return;
+                }
 
-                    // Extract the certificate stream from the specified signature field
-                    Stream certStream = pdfSign.ExtractCertificate("LegalSignature");
-
-                    if (certStream == null)
-                    {
-                        Console.Error.WriteLine("Certificate not found in the 'LegalSignature' field.");
-                        return;
-                    }
-
-                    // Ensure the stream is positioned at the beginning
-                    if (certStream.CanSeek)
-                        certStream.Position = 0;
-
-                    // Write the certificate to a .cer file
-                    using (FileStream fileOut = new FileStream(outputCer, FileMode.Create, FileAccess.Write))
-                    {
-                        certStream.CopyTo(fileOut);
-                    }
-
-                    Console.WriteLine($"Certificate extracted and saved to '{outputCer}'.");
+                // Write the certificate stream to a .cer file
+                using (FileStream file = new FileStream(outputCer, FileMode.Create, FileAccess.Write))
+                {
+                    certStream.CopyTo(file);
                 }
             }
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Certificate extracted to '{outputCer}'.");
     }
 }

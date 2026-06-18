@@ -6,37 +6,23 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_no_bookmarks.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_no_bookmarks.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
+        // Delete all bookmarks using PdfBookmarkEditor (facade API)
+        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
         {
-            // Create the bookmark editor facade
-            PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor();
-
-            // Load the PDF document into the editor
-            bookmarkEditor.BindPdf(inputPdf);
-
-            // Delete all bookmarks
-            bookmarkEditor.DeleteBookmarks();
-
-            // Save the modified PDF
-            bookmarkEditor.Save(outputPdf);
-
-            // Release resources held by the facade
-            bookmarkEditor.Close();
-
-            Console.WriteLine($"Bookmarks removed. Saved to '{outputPdf}'.");
+            editor.BindPdf(inputPath);   // load the PDF
+            editor.DeleteBookmarks();    // remove every bookmark
+            editor.Save(outputPath);     // save the modified PDF
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
-        }
+
+        Console.WriteLine($"All bookmarks deleted. Saved to '{outputPath}'.");
     }
 }

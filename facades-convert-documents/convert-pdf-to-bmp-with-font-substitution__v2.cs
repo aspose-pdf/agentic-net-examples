@@ -8,56 +8,38 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file
-        const string inputPdf = "input.pdf";
+        // Directory containing the PDF and where BMP files will be written
+        string dataDir = @"C:\Data\";
+        string pdfFileName = "input.pdf";
 
-        // Directory where BMP images will be saved
-        const string outputDir = "BmpOutput";
-
-        // Verify input file exists
-        if (!File.Exists(inputPdf))
+        string pdfPath = Path.Combine(dataDir, pdfFileName);
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputDir);
+        // Register a substitution for any missing font (replace with Arial)
+        FontRepository.Substitutions.Add(new SimpleFontSubstitution("MissingFont", "Arial"));
 
-        // Global font substitution: replace missing fonts with a known font (e.g., Arial)
-        // Add more substitutions as required for your documents
-        FontRepository.Substitutions.Add(new SimpleFontSubstitution("Helvetica", "Arial"));
-        FontRepository.Substitutions.Add(new SimpleFontSubstitution("TimesNewRomanPSMT", "Arial"));
-
-        // Load the PDF document inside a using block for proper disposal
-        using (Document pdfDocument = new Document(inputPdf))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDocument = new Document(pdfPath))
         {
-            // Create a resolution for the output images (300 DPI is a common choice)
+            // Define the resolution for the BMP images (300 DPI)
             Resolution resolution = new Resolution(300);
-
-            // Initialize the BMP device with the desired resolution
             BmpDevice bmpDevice = new BmpDevice(resolution);
 
-            // Set rendering options – specify a default fallback font name
-            bmpDevice.RenderingOptions = new RenderingOptions
-            {
-                DefaultFontName = "Arial"
-            };
-
-            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+            // Iterate over all pages (1‑based indexing)
             for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
             {
-                // Build the output file name for each page
-                string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.bmp");
-
-                // Convert the current page to BMP and write it to a file stream
-                using (FileStream bmpStream = new FileStream(outputPath, FileMode.Create))
+                string bmpPath = Path.Combine(dataDir, $"page_{pageNumber}.bmp");
+                using (FileStream bmpStream = new FileStream(bmpPath, FileMode.Create))
                 {
+                    // Convert the current page to BMP and write to the stream
                     bmpDevice.Process(pdfDocument.Pages[pageNumber], bmpStream);
                 }
+                Console.WriteLine($"Saved BMP image: {bmpPath}");
             }
         }
-
-        Console.WriteLine("PDF successfully converted to BMP images.");
     }
 }

@@ -6,28 +6,28 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Add a bookmark titled "Project Overview" that navigates to page 5
+        // Use PdfBookmarkEditor from Aspose.Pdf.Facades to add a bookmark.
         using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
         {
-            // Load the PDF document
+            // Load the source PDF.
             editor.BindPdf(inputPath);
 
-            // Create the bookmark (page numbers are 1‑based)
+            // Create a bookmark titled "Project Overview" that points to page 5.
             editor.CreateBookmarkOfPage("Project Overview", 5);
 
-            // Persist the changes
+            // Save the modified PDF.
             editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Bookmark added. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Bookmark added and saved to '{outputPath}'.");
     }
 }

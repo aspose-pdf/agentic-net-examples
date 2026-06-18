@@ -1,44 +1,42 @@
 using System;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "HeaderDate.pdf";
+        // Output PDF path
+        const string outputPath = "HeaderWithDate.pdf";
 
-        // Create a new PDF document and add a single page.
+        // Create a new PDF document
         using (Document doc = new Document())
         {
+            // Add a single page (more pages can be added later)
             Page page = doc.Pages.Add();
 
-            // Define a rectangle for the header (top of the page).
-            // Coordinates: llx, lly, urx, ury (points, 1/72 inch).
-            Aspose.Pdf.Rectangle headerRect = new Aspose.Pdf.Rectangle(0, 770, 595, 842);
+            // Define a rectangle for the header date field (positioned at the top)
+            // Coordinates: lower‑left X, lower‑left Y, upper‑right X, upper‑right Y
+            // Here we place the field 50 points from the left edge and 30 points from the top edge.
+            double pageHeight = page.PageInfo.Height;
+            Aspose.Pdf.Rectangle dateRect = new Aspose.Pdf.Rectangle(50, pageHeight - 30, 200, pageHeight - 10);
 
-            // Create a DateField that will be placed in the header.
-            DateField dateField = new DateField(page, headerRect);
-            dateField.PartialName = "dateHeader";          // Field name.
-            dateField.IsSharedField = true;                // Appear on all pages.
-            dateField.ReadOnly = true;                     // Prevent editing.
-
-            // Add the field to the document's form.
+            // Create a DateField (a form field that shows the current date)
+            // The DateField internally uses JavaScript to populate its value when the PDF is opened.
+            DateField dateField = new DateField(page, dateRect);
             doc.Form.Add(dateField);
 
-            // JavaScript to set the field value to the current date when the document opens.
-            // util.printd formats the date; adjust the format string as needed.
-            string js = "var f = this.getField('dateHeader'); " +
-                        "f.value = util.printd('mm/dd/yyyy', new Date());";
+            // Make the field shared so the same header appears on every page
+            dateField.IsSharedField = true;
 
-            // Assign the JavaScript as the document's open action.
-            doc.OpenAction = new JavascriptAction(js);
+            // Optional: set the date format (e.g., "MM/dd/yyyy")
+            dateField.DateFormat = "MM/dd/yyyy";
 
-            // Save the PDF.
+            // Save the document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with header date saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with header date created: {outputPath}");
     }
 }

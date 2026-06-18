@@ -1,17 +1,15 @@
 using System;
 using System.IO;
-using System.Text;
-using System.Drawing.Imaging;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";          // source PDF
-        const string outputDir  = "ExtractedImages";    // folder for images
-        const string keyword    = "YOUR_KEYWORD";       // text to search for (case‑sensitive)
+        const string inputPdf = "input.pdf";
+        const string outputDir = "ExtractedImages";
+        const string keyword = "CONFIDENTIAL";
 
         if (!File.Exists(inputPdf))
         {
@@ -21,58 +19,45 @@ class Program
 
         Directory.CreateDirectory(outputDir);
 
-        // Load the document once to obtain the total page count.
-        using (Document doc = new Document(inputPdf))
+        // Initialize the extractor and bind the PDF file
+        PdfExtractor extractor = new PdfExtractor();
+        extractor.BindPdf(inputPdf);
+
+        // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+        for (int pageNum = 1; pageNum <= extractor.Document.Pages.Count; pageNum++)
         {
-            int pageCount = doc.Pages.Count;
+            // Extract text of the current page using TextAbsorber
+            TextAbsorber absorber = new TextAbsorber();
+            absorber.Visit(extractor.Document.Pages[pageNum]);
+            string pageText = absorber.Text;
 
-            // PdfExtractor is a disposable facade – use a using block.
-            using (PdfExtractor extractor = new PdfExtractor())
+            // If the page contains the keyword, extract its images
+            if (!string.IsNullOrEmpty(pageText) &&
+                pageText.Contains(keyword, StringComparison.OrdinalIgnoreCase))
             {
-                // Bind the PDF file to the extractor.
-                extractor.BindPdf(inputPdf);
+                // Limit extraction to the current page only
+                extractor.StartPage = pageNum;
+                extractor.EndPage   = pageNum;
 
-                // Iterate through each page.
-                for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++)
+                // Perform image extraction for this page
+                extractor.ExtractImage();
+
+                int imageIndex = 1;
+                while (extractor.HasNextImage())
                 {
-                    // Restrict operations to the current page.
-                    extractor.StartPage = pageNumber;
-                    extractor.EndPage   = pageNumber;
+                    string imagePath = Path.Combine(
+                        outputDir,
+                        $"Page{pageNum}_Image{imageIndex}.png");
 
-                    // ----- STEP 1: extract text from the page -----
-                    extractor.ExtractText();
-
-                    // Capture the extracted text into a memory stream.
-                    using (MemoryStream textStream = new MemoryStream())
-                    {
-                        extractor.GetText(textStream);
-                        string pageText = Encoding.UTF8.GetString(textStream.ToArray());
-
-                        // Check whether the page contains the target keyword.
-                        if (pageText.Contains(keyword))
-                        {
-                            // ----- STEP 2: extract images from the same page -----
-                            extractor.ExtractImage();
-
-                            int imageIndex = 1;
-                            while (extractor.HasNextImage())
-                            {
-                                string imagePath = Path.Combine(
-                                    outputDir,
-                                    $"page_{pageNumber}_img_{imageIndex}.png");
-
-                                // Save the image as PNG (any ImageFormat is acceptable).
-                                extractor.GetNextImage(imagePath, ImageFormat.Png);
-                                imageIndex++;
-                            }
-                        }
-                    }
+                    // Save the next image to the specified file
+                    extractor.GetNextImage(imagePath);
+                    imageIndex++;
                 }
-
-                // Release any resources held by the extractor.
-                extractor.Close();
             }
         }
+
+        // Release resources held by the extractor
+        extractor.Close();
 
         Console.WriteLine("Image extraction completed.");
     }

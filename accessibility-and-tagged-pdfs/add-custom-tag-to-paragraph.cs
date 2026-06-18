@@ -9,34 +9,35 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "customTagParagraph.pdf";
+        const string outputPath = "custom_tagged.pdf";
 
-        // Create a new PDF document (wrapped in using for proper disposal)
+        // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Obtain the tagged‑content interface
+            // Access the tagged content API
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Optional: set language and title for the PDF
+            // Optional: set document language and title
             tagged.SetLanguage("en-US");
-            tagged.SetTitle("Custom Tag Example");
+            tagged.SetTitle("Document with custom paragraph tag");
 
-            // Root element of the logical structure tree
+            // Get the root element of the logical structure
             StructureElement root = tagged.RootElement;
 
-            // Create a paragraph structure element
+            // Create a paragraph element
             ParagraphElement paragraph = tagged.CreateParagraphElement();
 
-            // Assign a custom tag name to represent a specialized content type
-            paragraph.SetTag("MySpecialParagraph");
+            // Assign a custom tag name to represent specialized content
+            // Use SetTag (the correct API) to set a custom tag name.
+            paragraph.SetTag("SpecialParagraph");
 
             // Set the visible text of the paragraph
-            paragraph.SetText("This paragraph has a custom tag for specialized content.");
+            paragraph.SetText("This paragraph uses a custom tag for specialized content.");
 
-            // Attach the paragraph to the root of the structure tree
+            // Append the paragraph to the root element
             root.AppendChild(paragraph);
 
-            // Save the resulting PDF – guard against missing GDI+ on non‑Windows platforms
+            // Save the PDF – guard against missing libgdiplus on non‑Windows platforms
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 doc.Save(outputPath);
@@ -47,18 +48,17 @@ class Program
                 try
                 {
                     doc.Save(outputPath);
-                    Console.WriteLine($"PDF saved to '{outputPath}'.");
+                    Console.WriteLine($"PDF saved to '{outputPath}'. (Saved on non‑Windows platform – ensure libgdiplus is installed if needed.)");
                 }
                 catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
                 {
-                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. " +
-                                      "The PDF could not be saved using Aspose.Pdf's default renderer.");
+                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. The PDF could not be saved.");
                 }
             }
         }
     }
 
-    // Helper that walks the inner‑exception chain looking for a DllNotFoundException
+    // Helper to detect a nested DllNotFoundException (e.g., missing libgdiplus)
     private static bool ContainsDllNotFound(Exception? ex)
     {
         while (ex != null)

@@ -2,49 +2,52 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-namespace AsposePdfAnnotationExport
+namespace AsposePdfApi
 {
-    /// <summary>
-    /// Provides functionality to export PDF annotations to XFDF using in‑memory streams.
-    /// </summary>
-    public static class PdfAnnotationExporter
+    public static class PdfAnnotationHelper
     {
         /// <summary>
-        /// Binds a PDF from a memory buffer, exports all annotations to XFDF,
+        /// Binds a PDF from a memory stream, exports all annotations to XFDF,
         /// and returns the XFDF data as a byte array.
         /// </summary>
-        /// <param name="pdfData">Byte array containing the PDF file.</param>
-        /// <returns>Byte array with the exported XFDF content.</returns>
-        public static byte[] ExportAnnotationsToXfdf(byte[] pdfData)
+        /// <param name="pdfBytes">Byte array containing the source PDF.</param>
+        /// <returns>Byte array containing the exported XFDF.</returns>
+        public static byte[] ExportAnnotationsToXfdf(byte[] pdfBytes)
         {
-            // Input PDF stream (read‑only)
-            using (MemoryStream pdfStream = new MemoryStream(pdfData))
-            // Facade for annotation operations
+            // Validate input
+            if (pdfBytes == null || pdfBytes.Length == 0)
+                throw new ArgumentException("PDF data must be a non‑empty byte array.", nameof(pdfBytes));
+
+            // Load the PDF into a MemoryStream and bind it to the editor
+            using (MemoryStream pdfStream = new MemoryStream(pdfBytes))
             using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
             {
-                // Bind the PDF document to the editor
                 editor.BindPdf(pdfStream);
 
-                // Output stream that will hold the XFDF data
+                // Export annotations to an XFDF stream
                 using (MemoryStream xfdfStream = new MemoryStream())
                 {
-                    // Export all annotations into the XFDF stream
                     editor.ExportAnnotationsToXfdf(xfdfStream);
-
-                    // Return the XFDF bytes
                     return xfdfStream.ToArray();
                 }
             }
         }
     }
 
-    // A minimal console entry point – required for the build runner to execute the assembly.
-    // It does not perform any work; it simply exists so the runtime can start the process.
+    // ---------------------------------------------------------------------
+    // Minimal entry point – required because the project is built as an
+    // executable (CS5001). The method does not perform any work; it simply
+    // satisfies the compiler. Real usage should be performed from another
+    // project or unit test that references this library.
+    // ---------------------------------------------------------------------
     internal class Program
     {
         private static void Main(string[] args)
         {
-            // No‑op – the library method can be called from tests or other callers.
+            // Example (commented out) showing how the helper could be used:
+            // byte[] pdf = File.ReadAllBytes("sample.pdf");
+            // byte[] xfdf = PdfAnnotationHelper.ExportAnnotationsToXfdf(pdf);
+            // File.WriteAllBytes("sample.xfdf", xfdf);
         }
     }
 }

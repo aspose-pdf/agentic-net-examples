@@ -1,26 +1,27 @@
 using System;
-using System.Drawing; // for SizeF
+using System.Drawing;          // for SizeF
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // core Aspose.Pdf namespace
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string epubPath   = "input.epub";
-        const string pdfPath    = "output.pdf";
+        // Input EPUB file path
+        const string epubPath = "input.epub";
+        // Output PDF file path
+        const string pdfPath = "output.pdf";
 
         // Verify the source file exists
         if (!File.Exists(epubPath))
         {
-            Console.Error.WriteLine($"EPUB file not found: {epubPath}");
+            Console.Error.WriteLine($"File not found: {epubPath}");
             return;
         }
 
-        // Define a custom page size (width x height) in points.
-        // Example: 600 x 800 points (≈8.33 x 11.11 inches at 72 DPI)
-        SizeF customPageSize = new SizeF(600f, 800f);
+        // Define a custom page size (e.g., 8.5 x 11 inches at 72 DPI)
+        // Width = 8.5 * 72 = 612, Height = 11 * 72 = 792
+        SizeF customPageSize = new SizeF(612f, 792f);
 
         // Create load options with the custom page size
         EpubLoadOptions loadOptions = new EpubLoadOptions(customPageSize);

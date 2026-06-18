@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -10,7 +10,7 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "filtered.pdf";
-        const string currentUser = "John Doe"; // author name to keep
+        const string currentUser = "John Doe";
 
         if (!File.Exists(inputPath))
         {
@@ -18,47 +18,53 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Iterate through all pages (1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
             {
-                Page page = doc.Pages[pageIndex];
-                AnnotationCollection annots = page.Annotations;
-
-                // Collect annotations to remove (cannot modify collection while iterating)
-                List<Annotation> toRemove = new List<Annotation>();
-
-                foreach (Annotation annot in annots)
+                // Iterate through all pages (1‑based indexing)
+                for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    // Only markup annotations have a Title (the /T entry)
-                    if (annot is MarkupAnnotation markup)
+                    Page page = doc.Pages[i];
+                    AnnotationCollection annotations = page.Annotations;
+
+                    // Gather annotations that do NOT belong to the current user
+                    List<Annotation> toRemove = new List<Annotation>();
+                    foreach (Annotation ann in annotations)
                     {
-                        // If the annotation's author (Title) does not match the current user, mark for removal
-                        if (!string.Equals(markup.Title, currentUser, StringComparison.OrdinalIgnoreCase))
+                        // Only markup annotations have a Title (the /T entry)
+                        if (ann is MarkupAnnotation markup)
                         {
-                            toRemove.Add(annot);
+                            // Compare author name (case‑insensitive)
+                            if (!string.Equals(markup.Title, currentUser, StringComparison.OrdinalIgnoreCase))
+                            {
+                                toRemove.Add(ann);
+                            }
+                        }
+                        else
+                        {
+                            // Non‑markup annotations are removed as they lack an author
+                            toRemove.Add(ann);
                         }
                     }
-                    else
+
+                    // Remove the collected annotations
+                    foreach (Annotation ann in toRemove)
                     {
-                        // Non‑markup annotations are removed as they have no author information
-                        toRemove.Add(annot);
+                        annotations.Delete(ann);
                     }
                 }
 
-                // Remove the unwanted annotations
-                foreach (Annotation unwanted in toRemove)
-                {
-                    annots.Delete(unwanted);
-                }
+                // Save the filtered document
+                doc.Save(outputPath);
             }
 
-            // Save the filtered PDF (lifecycle rule: save inside using)
-            doc.Save(outputPath);
+            Console.WriteLine($"Filtered PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Filtered PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -2,65 +2,83 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // BorderSide enum is in Aspose.Pdf namespace, but keeping for clarity
 
 class Program
 {
     static void Main()
     {
-        // Create a new PDF document and add a blank page
+        const string outputPath = "table_with_border.pdf";
+
+        // Create a new PDF document
         using (Document doc = new Document())
         {
+            // Add a page to the document
             Page page = doc.Pages.Add();
 
             // Create a table
             Table table = new Table();
 
-            // Configure a solid black border of width 2 points on all sides
-            BorderInfo border = new BorderInfo(
-                BorderSide.Left | BorderSide.Top | BorderSide.Right | BorderSide.Bottom,
-                2f,                                   // border width
-                Aspose.Pdf.Color.Black);             // border color
+            // Define column widths (optional)
+            table.ColumnWidths = "100 100 100";
 
-            table.Border = border;
+            // Set a default cell border (optional, for visual clarity)
+            table.DefaultCellBorder = new BorderInfo(
+                Aspose.Pdf.BorderSide.All,
+                0.5f,
+                Aspose.Pdf.Color.LightGray);
 
-            // (Optional) Add a simple row and cell so the table is visible
-            Row row = table.Rows.Add();
-            Cell cell = row.Cells.Add("Sample cell");
+            // Apply a solid black border to the entire table
+            table.Border = new BorderInfo(
+                Aspose.Pdf.BorderSide.All,
+                1f,
+                Aspose.Pdf.Color.Black);
 
-            // Add the table to the page's paragraph collection
+            // Include the border in column width calculations
+            table.IsBordersIncluded = true;
+
+            // Add first row with three cells
+            Row row1 = table.Rows.Add();
+            row1.Cells.Add("Cell 1");
+            row1.Cells.Add("Cell 2");
+            row1.Cells.Add("Cell 3");
+
+            // Add second row with three cells
+            Row row2 = table.Rows.Add();
+            row2.Cells.Add("Cell 4");
+            row2.Cells.Add("Cell 5");
+            row2.Cells.Add("Cell 6");
+
+            // Add the table to the page
             page.Paragraphs.Add(table);
 
-            // Save the PDF – guard against missing GDI+ (libgdiplus) on non‑Windows platforms
-            string outputPath = "TableWithBorder.pdf";
+            // Save the document.
+            // On non‑Windows platforms GDI+ may be missing; handle gracefully.
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 doc.Save(outputPath);
-                Console.WriteLine($"PDF saved to '{outputPath}'.");
             }
             else
             {
                 try
                 {
                     doc.Save(outputPath);
-                    Console.WriteLine($"PDF saved to '{outputPath}'.");
                 }
                 catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
                 {
-                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. " +
-                                      "The PDF could not be saved using Document.Save().");
+                    Console.WriteLine("GDI+ (libgdiplus) is not available on this platform; PDF cannot be saved.");
                 }
             }
         }
+
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 
-    // Helper method to detect a nested DllNotFoundException (e.g., missing libgdiplus)
-    private static bool ContainsDllNotFound(Exception? ex)
+    // Helper to detect a nested DllNotFoundException (e.g., missing libgdiplus)
+    static bool ContainsDllNotFound(Exception ex)
     {
         while (ex != null)
         {
-            if (ex is DllNotFoundException)
-                return true;
+            if (ex is DllNotFoundException) return true;
             ex = ex.InnerException;
         }
         return false;

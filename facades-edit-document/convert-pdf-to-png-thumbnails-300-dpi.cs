@@ -3,12 +3,14 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Devices;
 
-class Program
+class PdfToPngConverter
 {
     static void Main()
     {
+        // Input PDF file path
         const string inputPdfPath = "input.pdf";
-        const string outputFolder = "thumbnails";
+        // Output directory for PNG thumbnails
+        const string outputDir = "Thumbnails";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -16,33 +18,39 @@ class Program
             return;
         }
 
-        Directory.CreateDirectory(outputFolder);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for proper disposal
         using (Document pdfDocument = new Document(inputPdfPath))
         {
             // Create a Resolution object with 300 DPI
             Resolution resolution = new Resolution(300);
 
-            // Initialize PngDevice with the specified resolution
-            PngDevice pngDevice = new PngDevice(resolution);
-
-            // Enable transparent background for the PNG output
-            pngDevice.TransparentBackground = true;
+            // Initialize PngDevice with the desired resolution
+            PngDevice pngDevice = new PngDevice(resolution)
+            {
+                // Enable transparent background for the generated PNGs
+                TransparentBackground = true
+            };
 
             // Iterate through all pages (1‑based indexing)
             for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
             {
-                string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.png");
+                // Build the output PNG file name
+                string outputPngPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
 
-                // Save each page as a PNG image
-                using (FileStream pngStream = new FileStream(outputPath, FileMode.Create))
+                // Write the PNG image to a file stream
+                using (FileStream pngStream = new FileStream(outputPngPath, FileMode.Create))
                 {
+                    // Convert the specific page to PNG and save it
                     pngDevice.Process(pdfDocument.Pages[pageNumber], pngStream);
                 }
+
+                Console.WriteLine($"Page {pageNumber} saved as PNG: {outputPngPath}");
             }
         }
 
-        Console.WriteLine("PDF pages have been converted to PNG thumbnails with 300 DPI and transparent background.");
+        Console.WriteLine("PDF to PNG conversion completed.");
     }
 }

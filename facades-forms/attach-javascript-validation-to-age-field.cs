@@ -7,36 +7,30 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output_with_js.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
-        {
-            // Initialize the FormEditor facade with the loaded document
-            using (FormEditor formEditor = new FormEditor(doc))
-            {
-                // JavaScript that shows a warning if the entered age is less than 18
-                string js = "if (event.value < 18) app.alert('You must be at least 18 years old');";
-
-                // Attach the script to the field named "Age"
-                bool attached = formEditor.SetFieldScript("Age", js);
-                if (!attached)
-                {
-                    Console.Error.WriteLine("Failed to attach JavaScript to the 'Age' field.");
-                }
-
-                // Save the modified PDF
-                formEditor.Save(outputPath);
+        // JavaScript that validates the "Age" field. It shows an alert if the value is less than 18.
+        string js = @"
+            var f = this.getField('Age');
+            if (f.value != '' && parseInt(f.value) < 18) {
+                app.alert('Age must be at least 18 years old.');
             }
-        }
+        ";
 
-        Console.WriteLine($"PDF saved with JavaScript to '{outputPath}'.");
+        // Attach the script using FormEditor (Aspose.Pdf.Facades).
+        FormEditor editor = new FormEditor();
+        editor.BindPdf(inputPdf);
+        editor.SetFieldScript("Age", js);
+        editor.Save(outputPdf);
+        editor.Close();
+
+        Console.WriteLine($"PDF saved with JavaScript attached: {outputPdf}");
     }
 }

@@ -1,15 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations;   // JavascriptAction
+using Aspose.Pdf.Forms;        // Form, ButtonField
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";          // existing PDF with form fields
-        const string outputPath = "output_with_reset.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,24 +17,27 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a reset button on the first page
-            // Rectangle: left, bottom, right, top (coordinates in points)
-            Aspose.Pdf.Rectangle btnRect = new Aspose.Pdf.Rectangle(100, 500, 200, 540);
+            // Access the form object
+            Form form = doc.Form;
+
+            // Define the button rectangle (lower‑left‑x, lower‑left‑y, upper‑right‑x, upper‑right‑y)
+            Aspose.Pdf.Rectangle btnRect = new Aspose.Pdf.Rectangle(100, 100, 200, 130);
+
+            // Create a push button field on the document
             ButtonField resetBtn = new ButtonField(doc, btnRect);
+            resetBtn.Name        = "ResetButton";      // field name
+            resetBtn.PartialName = "ResetButton";
+            resetBtn.NormalCaption = "Reset";          // text shown on the button
 
-            // Set button appearance (caption)
-            resetBtn.NormalCaption = "Reset";
-            resetBtn.AlternateCaption = "Reset";
+            // Attach JavaScript that clears all form fields when the button is clicked
+            // Use a valid action property – OnPressMouseBtn (or OnReleaseMouseBtn) – instead of the non‑existent OnActivated
+            resetBtn.Actions.OnPressMouseBtn = new JavascriptAction("this.resetForm();");
 
-            // Assign a JavaScript action that resets the form when the button is clicked.
-            // The OnReleaseMouseBtn action is triggered when the user releases the mouse button over the field.
-            resetBtn.Actions.OnReleaseMouseBtn = new JavascriptAction("this.resetForm();");
-
-            // Add the button to the form (page number is 1‑based)
-            doc.Form.Add(resetBtn, 1);
+            // Add the button to the form
+            form.Add(resetBtn);
 
             // Save the modified PDF
             doc.Save(outputPath);

@@ -16,27 +16,20 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPath))
-            {
-                // Initialize the content editor and bind the document
-                PdfContentEditor editor = new PdfContentEditor();
-                editor.BindPdf(doc);
+            // Initialize the content editor facade
+            PdfContentEditor editor = new PdfContentEditor();
+            editor.BindPdf(doc);
 
-                // Replace all occurrences of "Draft" with "Final" on all pages
-                editor.ReplaceText("Draft", "Final");
+            // Replace every occurrence of "Draft" with "Final" on all pages (0 = all pages)
+            editor.ReplaceText("Draft", 0, "Final");
 
-                // Save the modified document using the editor (ensures all edits are persisted)
-                editor.Save(outputPath);
-            }
-
-            Console.WriteLine($"All occurrences of 'Draft' replaced with 'Final'. Saved to '{outputPath}'.");
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"All occurrences of \"Draft\" replaced with \"Final\". Saved to '{outputPath}'.");
     }
 }

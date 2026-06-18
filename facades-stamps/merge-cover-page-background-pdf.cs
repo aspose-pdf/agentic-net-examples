@@ -1,14 +1,15 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string coverPath   = "cover.pdf";   // PDF page to use as background
-        const string mainPath    = "document.pdf"; // Main PDF document
-        const string outputPath  = "merged.pdf";
+        const string coverPath   = "cover.pdf";   // PDF to be used as background (first page)
+        const string mainPath    = "main.pdf";    // Main document
+        const string outputPath  = "merged.pdf";  // Resulting PDF
 
         // Verify input files exist
         if (!File.Exists(coverPath))
@@ -24,21 +25,18 @@ class Program
 
         // Initialize PdfFileStamp facade
         PdfFileStamp fileStamp = new PdfFileStamp();
+        fileStamp.InputFile  = mainPath;   // document to which the stamp will be applied
+        fileStamp.OutputFile = outputPath; // where the merged result will be saved
 
-        // Bind the main document (input) and specify output file
-        fileStamp.BindPdf(mainPath);
-        fileStamp.OutputFile = outputPath; // deprecated but functional; alternatively use Save later
-
-        // Create a stamp from the first page of the cover PDF
+        // Create a stamp that uses the first page of the cover PDF as background
         Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-        stamp.BindPdf(coverPath, 1);   // use page 1 of cover as stamp
-        stamp.IsBackground = true;    // place it behind existing content
+        stamp.BindPdf(coverPath, 1);   // bind page 1 of cover.pdf
+        stamp.IsBackground = true;    // place it behind existing page content
 
-        // Add the stamp to the facade
+        // Apply the stamp to all pages of the main document
         fileStamp.AddStamp(stamp);
 
-        // Save the result and release resources
-        fileStamp.Save(outputPath);
+        // Finalize and save the result
         fileStamp.Close();
 
         Console.WriteLine($"Merged PDF saved to '{outputPath}'.");

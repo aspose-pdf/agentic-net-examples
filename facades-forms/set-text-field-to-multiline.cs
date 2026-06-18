@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -16,23 +15,20 @@ class Program
             return;
         }
 
-        // FormEditor works as a facade for editing AcroForm fields.
-        // The constructor takes the source PDF and the destination PDF.
-        using (FormEditor formEditor = new FormEditor(inputPdf, outputPdf))
+        // FormEditor is a SaveableFacade – wrap it in a using block for deterministic disposal
+        using (FormEditor formEditor = new FormEditor())
         {
-            // Change the "Comments" text field from single‑line to multiline.
-            // Returns true if the operation succeeds.
-            bool success = formEditor.Single2Multiple("Comments");
-            if (!success)
-            {
-                Console.Error.WriteLine("Failed to set multiline property for field 'Comments'.");
-                return;
-            }
+            // Load the source PDF
+            formEditor.BindPdf(inputPdf);
 
-            // Persist changes to the output file.
-            formEditor.Save();
+            // Change the "Comments" text field from single‑line to multiline
+            // Single2Multiple returns true on success; ignore the return value here
+            formEditor.Single2Multiple("Comments");
+
+            // Save the modified PDF
+            formEditor.Save(outputPdf);
         }
 
-        Console.WriteLine($"Multiline field saved to '{outputPdf}'.");
+        Console.WriteLine($"Multiline field set and saved to '{outputPdf}'.");
     }
 }

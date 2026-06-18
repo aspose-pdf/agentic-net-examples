@@ -1,15 +1,14 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Folder containing the PDF forms
+        // Directory containing the source PDF forms
         const string inputFolder = "FormPdfs";
-        // Output folder for the exported XML files
+        // Directory where the exported XML files will be saved
         const string outputFolder = "ExportedXml";
 
         if (!Directory.Exists(inputFolder))
@@ -21,31 +20,38 @@ class Program
         Directory.CreateDirectory(outputFolder);
 
         // Get all PDF files in the input folder
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+        if (pdfFiles.Length == 0)
+        {
+            Console.WriteLine("No PDF files found to process.");
+            return;
+        }
 
         foreach (string pdfPath in pdfFiles)
         {
-            // Determine the XML output file name (same base name, .xml extension)
-            string xmlFileName = Path.GetFileNameWithoutExtension(pdfPath) + ".xml";
-            string xmlPath = Path.Combine(outputFolder, xmlFileName);
-
-            // Use FormEditor to bind the PDF (required by the task)
-            using (FormEditor editor = new FormEditor())
+            try
             {
-                editor.BindPdf(pdfPath);
+                // Determine output XML file name (same base name as PDF)
+                string xmlFileName = Path.GetFileNameWithoutExtension(pdfPath) + ".xml";
+                string xmlPath = Path.Combine(outputFolder, xmlFileName);
 
-                // Create a Form instance from the bound document to export data
-                using (Form form = new Form(editor.Document))
+                // Use the Form facade to bind the PDF and export its form data to XML
+                using (Form form = new Form())
                 {
-                    // Export the form fields to an XML stream
+                    form.BindPdf(pdfPath);
+
                     using (FileStream xmlStream = new FileStream(xmlPath, FileMode.Create, FileAccess.Write))
                     {
                         form.ExportXml(xmlStream);
                     }
                 }
-            }
 
-            Console.WriteLine($"Exported XML for '{Path.GetFileName(pdfPath)}' to '{xmlPath}'.");
+                Console.WriteLine($"Exported form data: '{pdfPath}' -> '{xmlPath}'");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+            }
         }
     }
 }

@@ -2,12 +2,12 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-public static class PdfHelper
+public static class PdfImageHelper
 {
     /// <summary>
-    /// Adds an image to a specific page of a PDF file at the given rectangle coordinates.
+    /// Adds an image to a specific page of a PDF document at the given rectangle coordinates.
     /// </summary>
-    /// <param name="inputPdfPath">Path to the source PDF.</param>
+    /// <param name="inputPdfPath">Path to the source PDF file.</param>
     /// <param name="outputPdfPath">Path where the modified PDF will be saved.</param>
     /// <param name="imagePath">Path to the image file to be added.</param>
     /// <param name="pageNumber">1‑based page number where the image will be placed.</param>
@@ -25,35 +25,55 @@ public static class PdfHelper
         float upperRightX,
         float upperRightY)
     {
-        // Validate arguments (optional but helpful)
         if (string.IsNullOrWhiteSpace(inputPdfPath))
             throw new ArgumentException("Input PDF path is required.", nameof(inputPdfPath));
         if (string.IsNullOrWhiteSpace(outputPdfPath))
             throw new ArgumentException("Output PDF path is required.", nameof(outputPdfPath));
         if (string.IsNullOrWhiteSpace(imagePath))
             throw new ArgumentException("Image path is required.", nameof(imagePath));
-        if (!File.Exists(inputPdfPath))
-            throw new FileNotFoundException("Input PDF not found.", inputPdfPath);
-        if (!File.Exists(imagePath))
-            throw new FileNotFoundException("Image file not found.", imagePath);
         if (pageNumber < 1)
             throw new ArgumentOutOfRangeException(nameof(pageNumber), "Page number must be 1 or greater.");
 
-        // Use the parameter‑less constructor and bind the source PDF.
-        using (PdfFileMend mend = new PdfFileMend())
+        // Use the non‑obsolete constructor and bind the source PDF explicitly.
+        PdfFileMend mender = new PdfFileMend();
+        mender.BindPdf(inputPdfPath);
+
+        using (FileStream imgStream = File.OpenRead(imagePath))
         {
-            mend.BindPdf(inputPdfPath);
-            mend.AddImage(imagePath, pageNumber, lowerLeftX, lowerLeftY, upperRightX, upperRightY);
-            mend.Save(outputPdfPath);
+            // AddImage adds the image to the given page. Coordinates are in points (1/72 inch).
+            bool success = mender.AddImage(
+                imgStream,
+                pageNumber,
+                lowerLeftX,
+                lowerLeftY,
+                upperRightX,
+                upperRightY);
+
+            if (!success)
+                throw new InvalidOperationException("Failed to add the image to the PDF.");
         }
+
+        // Save the modified PDF to the destination path and close the facade.
+        mender.Save(outputPdfPath);
+        mender.Close();
     }
 }
 
-// Minimal entry point so the project builds as an executable.
+// Adding a minimal entry point so the project compiles as an executable.
 public class Program
 {
     public static void Main(string[] args)
     {
-        // The helper can be invoked from other code or unit tests.
+        // The helper can be called from here or from any other consumer.
+        // Example (commented out to avoid runtime errors when paths are missing):
+        // PdfImageHelper.AddImageToPage(
+        //     inputPdfPath: "source.pdf",
+        //     outputPdfPath: "result.pdf",
+        //     imagePath: "logo.png",
+        //     pageNumber: 2,
+        //     lowerLeftX: 50f,
+        //     lowerLeftY: 100f,
+        //     upperRightX: 200f,
+        //     upperRightY: 300f);
     }
 }

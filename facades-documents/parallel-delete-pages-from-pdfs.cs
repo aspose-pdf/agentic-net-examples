@@ -1,28 +1,24 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Aspose.Pdf.Facades;
 
 class PdfBatchPageDeleter
 {
-    /// <summary>
-    /// Deletes the specified pages from each PDF file in the input collection in parallel.
-    /// The resulting PDFs are saved to the output directory with the same file name
-    /// appended by "_deleted".
-    /// </summary>
-    /// <param name="inputFiles">Full paths of the source PDF files.</param>
-    /// <param name="pagesToDelete">Array of page numbers to delete (1‑based indexing).</param>
-    /// <param name="outputDirectory">Directory where the processed PDFs will be written.</param>
-    public static void DeletePagesParallel(string[] inputFiles, int[] pagesToDelete, string outputDirectory)
+    // Deletes the specified pages from each PDF in the input list in parallel.
+    // inputFiles   : full paths of source PDF files.
+    // pagesToDelete: page numbers (1‑based) to remove from every file.
+    // outputFolder : folder where the processed PDFs will be written.
+    public static void DeletePagesParallel(string[] inputFiles, int[] pagesToDelete, string outputFolder)
     {
         if (inputFiles == null) throw new ArgumentNullException(nameof(inputFiles));
         if (pagesToDelete == null) throw new ArgumentNullException(nameof(pagesToDelete));
-        if (string.IsNullOrWhiteSpace(outputDirectory)) throw new ArgumentException("Output directory must be specified.", nameof(outputDirectory));
+        if (string.IsNullOrWhiteSpace(outputFolder)) throw new ArgumentException("Output folder must be specified.", nameof(outputFolder));
 
-        // Ensure the output directory exists.
-        Directory.CreateDirectory(outputDirectory);
+        Directory.CreateDirectory(outputFolder);
 
-        // Process each file concurrently.
+        // Parallel.ForEach creates a separate thread for each iteration.
         Parallel.ForEach(inputFiles, inputPath =>
         {
             try
@@ -33,23 +29,24 @@ class PdfBatchPageDeleter
                     return;
                 }
 
-                // Build output file name.
-                string fileName = Path.GetFileNameWithoutExtension(inputPath);
-                string outputPath = Path.Combine(outputDirectory, $"{fileName}_deleted.pdf");
+                // Build output file name: original name + "_trimmed.pdf"
+                string outputPath = Path.Combine(
+                    outputFolder,
+                    Path.GetFileNameWithoutExtension(inputPath) + "_trimmed.pdf");
 
-                // Each thread uses its own PdfFileEditor instance.
+                // Each thread uses its own PdfFileEditor instance (not IDisposable).
                 PdfFileEditor editor = new PdfFileEditor();
 
-                // Delete the pages. The Delete method returns true on success.
+                // Delete the pages and save to the new file.
                 bool success = editor.Delete(inputPath, pagesToDelete, outputPath);
 
                 if (success)
                 {
-                    Console.WriteLine($"Deleted pages from '{inputPath}' → '{outputPath}'");
+                    Console.WriteLine($"Processed: {inputPath} → {outputPath}");
                 }
                 else
                 {
-                    Console.Error.WriteLine($"Failed to delete pages from '{inputPath}'.");
+                    Console.Error.WriteLine($"Failed to delete pages from: {inputPath}");
                 }
             }
             catch (Exception ex)
@@ -62,20 +59,20 @@ class PdfBatchPageDeleter
     // Example usage.
     static void Main()
     {
-        // Example input PDFs.
+        // List of PDFs to process.
         string[] pdfFiles = new string[]
         {
-            "C:\\Docs\\Report1.pdf",
-            "C:\\Docs\\Report2.pdf",
-            "C:\\Docs\\Report3.pdf"
+            @"C:\Docs\Report1.pdf",
+            @"C:\Docs\Report2.pdf",
+            @"C:\Docs\Report3.pdf"
         };
 
-        // Pages to delete (e.g., remove pages 2 and 5 from each document).
-        int[] pagesToRemove = new int[] { 2, 5 };
+        // Pages to delete (e.g., remove pages 2 and 3 from each document).
+        int[] pagesToRemove = new int[] { 2, 3 };
 
-        // Destination folder for the processed PDFs.
-        string outputFolder = "C:\\Docs\\Processed";
+        // Destination folder for the trimmed PDFs.
+        string outputDir = @"C:\Docs\Trimmed";
 
-        DeletePagesParallel(pdfFiles, pagesToRemove, outputFolder);
+        DeletePagesParallel(pdfFiles, pagesToRemove, outputDir);
     }
 }

@@ -1,44 +1,39 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_clean.pdf";
+        const string inputPdf  = "input.pdf";          // source PDF containing temporary fields
+        const string outputPdf = "cleaned_output.pdf"; // PDF after removal
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Retrieve all field names from the PDF
-        List<string> fieldsToRemove = new List<string>();
-        using (Form form = new Form(inputPath))
+        // Load the form to obtain the list of field names
+        using (Form form = new Form(inputPdf))
         {
-            foreach (string fieldName in form.FieldNames)
+            // Initialize FormEditor with input and output files
+            using (FormEditor editor = new FormEditor(inputPdf, outputPdf))
             {
-                if (fieldName.StartsWith("Temp_", StringComparison.Ordinal))
+                // Iterate over all field names and remove those that start with "Temp_"
+                foreach (string fieldName in form.FieldNames)
                 {
-                    fieldsToRemove.Add(fieldName);
+                    if (fieldName.StartsWith("Temp_", StringComparison.Ordinal))
+                    {
+                        editor.RemoveField(fieldName);
+                    }
                 }
+                // No explicit Save call is required; the output file is written when the editor is disposed.
             }
         }
 
-        // Remove the identified fields and save the result
-        using (FormEditor editor = new FormEditor(inputPath, outputPath))
-        {
-            foreach (string fieldName in fieldsToRemove)
-            {
-                editor.RemoveField(fieldName);
-            }
-            // Disposing the FormEditor writes the output file.
-        }
-
-        Console.WriteLine($"Temporary fields removed. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Temporary fields removed. Result saved to '{outputPdf}'.");
     }
 }

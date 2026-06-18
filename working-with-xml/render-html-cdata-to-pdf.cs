@@ -1,61 +1,54 @@
 using System;
 using System.IO;
-using System.Xml.Linq;
+using System.Xml;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // required for HtmlFragment
-using Aspose.Pdf.Drawing; // for page handling (optional)
 
 class Program
 {
     static void Main()
     {
-        // Input XML file containing CDATA sections with HTML fragments
-        const string xmlPath = "input.xml";
-        // Output PDF file
-        const string pdfPath = "output.pdf";
+        const string inputXmlPath  = "input.xml";   // XML containing CDATA sections with HTML
+        const string outputPdfPath = "output.pdf";
 
-        if (!File.Exists(xmlPath))
+        if (!File.Exists(inputXmlPath))
         {
-            Console.Error.WriteLine($"XML file not found: {xmlPath}");
+            Console.Error.WriteLine($"Input file not found: {inputXmlPath}");
             return;
         }
 
-        try
+        // Load the XML document (no special load options required for plain XML)
+        XmlDocument xmlDoc = new XmlDocument();
+        xmlDoc.Load(inputXmlPath);
+
+        // Create a new PDF document and ensure deterministic disposal
+        using (Document pdfDoc = new Document())
         {
-            // Load the XML document (no special load options required)
-            XDocument xDoc = XDocument.Load(xmlPath);
+            // Add a single page – additional pages can be added as needed
+            Page page = pdfDoc.Pages.Add();
 
-            // Create a new empty PDF document
-            using (Document pdfDoc = new Document())
+            // Iterate through all CDATA sections in the XML
+            foreach (XmlNode node in xmlDoc.SelectNodes("//*"))
             {
-                // Add a single page to host the HTML fragments
-                Page page = pdfDoc.Pages.Add();
-
-                // Iterate over all CDATA nodes in the XML
-                foreach (XCData cdata in xDoc.DescendantNodes().OfType<XCData>())
+                foreach (XmlNode child in node.ChildNodes)
                 {
-                    // The CDATA value is an HTML fragment
-                    string htmlContent = cdata.Value;
+                    if (child.NodeType == XmlNodeType.CDATA)
+                    {
+                        // The CDATA value contains an HTML fragment
+                        string htmlFragment = child.Value;
 
-                    // Create an HtmlFragment instance (renders HTML into PDF)
-                    HtmlFragment htmlFragment = new HtmlFragment(htmlContent);
+                        // Create an Aspose.Pdf.HtmlFragment from the HTML string
+                        HtmlFragment fragment = new HtmlFragment(htmlFragment);
 
-                    // Optionally, you can set HtmlLoadOptions on the fragment if needed
-                    // htmlFragment.HtmlLoadOptions = new HtmlLoadOptions();
-
-                    // Add the fragment to the page's paragraph collection
-                    page.Paragraphs.Add(htmlFragment);
+                        // Add the fragment to the page's paragraph collection
+                        page.Paragraphs.Add(fragment);
+                    }
                 }
-
-                // Save the resulting PDF
-                pdfDoc.Save(pdfPath);
             }
 
-            Console.WriteLine($"PDF generated successfully: {pdfPath}");
+            // Save the result as a PDF file
+            pdfDoc.Save(outputPdfPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF generated successfully: {outputPdfPath}");
     }
 }

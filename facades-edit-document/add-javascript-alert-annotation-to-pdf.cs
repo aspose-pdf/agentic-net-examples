@@ -1,15 +1,15 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using System.Drawing; // Required for Rectangle and Color types
+using System.Drawing;               // Rectangle and Color are defined here
+using Aspose.Pdf.Facades;          // PdfContentEditor resides in this namespace
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
+        const string jsCode     = "app.alert('Hello from Aspose.Pdf!');";
 
         if (!File.Exists(inputPath))
         {
@@ -17,29 +17,21 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
-        {
-            // Initialize the content editor with the loaded document
-            using (PdfContentEditor editor = new PdfContentEditor(doc))
-            {
-                // JavaScript code to display an alert
-                string jsCode = "app.alert('Hello from Aspose.PDF!');";
+        // Bind the existing PDF document
+        PdfContentEditor editor = new PdfContentEditor();
+        editor.BindPdf(inputPath);
 
-                // Define the clickable area (System.Drawing.Rectangle)
-                System.Drawing.Rectangle rect = new System.Drawing.Rectangle(100, 500, 200, 50);
+        // Define the clickable area (x, y, width, height)
+        // Adjust the coordinates as needed for your document
+        Rectangle rect = new Rectangle(100, 500, 200, 50); // left=100, top=500, width=200, height=50
 
-                // Define the rectangle color (System.Drawing.Color)
-                System.Drawing.Color rectColor = System.Drawing.Color.Red;
+        // Create a JavaScript link that shows an alert when the annotation is activated
+        editor.CreateJavaScriptLink(jsCode, rect, 1, Color.Red);
 
-                // Create a JavaScript link annotation on page 1
-                editor.CreateJavaScriptLink(jsCode, rect, 1, rectColor);
+        // Save the modified PDF
+        editor.Save(outputPath);
+        editor.Close();
 
-                // Save the modified PDF
-                editor.Save(outputPath);
-            }
-        }
-
-        Console.WriteLine($"JavaScript annotation added. Saved to '{outputPath}'.");
+        Console.WriteLine($"JavaScript annotation added and saved to '{outputPath}'.");
     }
 }

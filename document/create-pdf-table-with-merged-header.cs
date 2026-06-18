@@ -7,135 +7,107 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "merged_header_table.pdf";
+        const string outputPath = "MergedHeaderTable.pdf";
 
-        // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Create a table and configure basic appearance
-            Table table = new Table
-            {
-                // Three columns, each 150 points wide
-                ColumnWidths = "150 150 150",
-                // Optional: border around the whole table
-                Border = new BorderInfo(BorderSide.All, 1f, Aspose.Pdf.Color.Black),
-                // Optional: default padding inside cells
-                DefaultCellPadding = new MarginInfo(5, 5, 5, 5)
-            };
+            Table table = new Table { ColumnWidths = "150 150 150" };
 
             // -------------------------------------------------
-            // Header row with a single cell that spans all columns
+            // First header row – a single cell that spans all 3 columns
             // -------------------------------------------------
             Row mergedHeaderRow = table.Rows.Add();
-
-            // Create the cell that will span the three columns
             Cell mergedHeaderCell = mergedHeaderRow.Cells.Add();
-            mergedHeaderCell.ColSpan = 3; // merge across three columns
-            mergedHeaderCell.BackgroundColor = Aspose.Pdf.Color.LightGray;
-            mergedHeaderCell.Alignment = HorizontalAlignment.Center;
+            mergedHeaderCell.ColSpan = 3;
             mergedHeaderCell.DefaultCellTextState = new TextState
             {
                 Font = FontRepository.FindFont("Helvetica"),
-                FontSize = 14,
-                ForegroundColor = Aspose.Pdf.Color.Black
+                FontSize = 16,
+                ForegroundColor = Aspose.Pdf.Color.Blue,
+                FontStyle = FontStyles.Bold
             };
-            mergedHeaderCell.Paragraphs.Add(new TextFragment("Sales Report 2023"));
+            mergedHeaderCell.Paragraphs.Add(new TextFragment("Merged Header Across All Columns"));
 
             // -------------------------------------------------
-            // Second header row with individual column titles
+            // Second header row – separate column titles
             // -------------------------------------------------
             Row columnHeaderRow = table.Rows.Add();
 
-            Cell productHeader = columnHeaderRow.Cells.Add();
-            productHeader.BackgroundColor = Aspose.Pdf.Color.LightBlue;
-            productHeader.Alignment = HorizontalAlignment.Center;
-            productHeader.DefaultCellTextState = new TextState
+            Cell col1Header = columnHeaderRow.Cells.Add();
+            col1Header.DefaultCellTextState = new TextState
             {
-                Font = FontRepository.FindFont("Helvetica-Bold"),
+                Font = FontRepository.FindFont("Helvetica"),
                 FontSize = 12,
-                ForegroundColor = Aspose.Pdf.Color.White
+                ForegroundColor = Aspose.Pdf.Color.Black,
+                FontStyle = FontStyles.Bold
             };
-            productHeader.Paragraphs.Add(new TextFragment("Product"));
+            col1Header.Paragraphs.Add(new TextFragment("Column 1"));
 
-            Cell quantityHeader = columnHeaderRow.Cells.Add();
-            quantityHeader.BackgroundColor = Aspose.Pdf.Color.LightBlue;
-            quantityHeader.Alignment = HorizontalAlignment.Center;
-            quantityHeader.DefaultCellTextState = new TextState
+            Cell col2Header = columnHeaderRow.Cells.Add();
+            col2Header.DefaultCellTextState = new TextState
             {
-                Font = FontRepository.FindFont("Helvetica-Bold"),
+                Font = FontRepository.FindFont("Helvetica"),
                 FontSize = 12,
-                ForegroundColor = Aspose.Pdf.Color.White
+                ForegroundColor = Aspose.Pdf.Color.Black,
+                FontStyle = FontStyles.Bold
             };
-            quantityHeader.Paragraphs.Add(new TextFragment("Quantity"));
+            col2Header.Paragraphs.Add(new TextFragment("Column 2"));
 
-            Cell priceHeader = columnHeaderRow.Cells.Add();
-            priceHeader.BackgroundColor = Aspose.Pdf.Color.LightBlue;
-            priceHeader.Alignment = HorizontalAlignment.Center;
-            priceHeader.DefaultCellTextState = new TextState
+            Cell col3Header = columnHeaderRow.Cells.Add();
+            col3Header.DefaultCellTextState = new TextState
             {
-                Font = FontRepository.FindFont("Helvetica-Bold"),
+                Font = FontRepository.FindFont("Helvetica"),
                 FontSize = 12,
-                ForegroundColor = Aspose.Pdf.Color.White
+                ForegroundColor = Aspose.Pdf.Color.Black,
+                FontStyle = FontStyles.Bold
             };
-            priceHeader.Paragraphs.Add(new TextFragment("Price"));
+            col3Header.Paragraphs.Add(new TextFragment("Column 3"));
 
             // -------------------------------------------------
-            // Data rows
+            // Add a few data rows
             // -------------------------------------------------
-            string[,] data = {
-                { "Widget A", "120", "$5.00" },
-                { "Widget B", "80",  "$7.50" },
-                { "Widget C", "150", "$3.20" }
-            };
-
-            for (int i = 0; i < data.GetLength(0); i++)
+            for (int i = 1; i <= 5; i++)
             {
                 Row dataRow = table.Rows.Add();
-                for (int j = 0; j < data.GetLength(1); j++)
-                {
-                    Cell dataCell = dataRow.Cells.Add();
-                    dataCell.Alignment = HorizontalAlignment.Center;
-                    dataCell.DefaultCellTextState = new TextState
-                    {
-                        Font = FontRepository.FindFont("Helvetica"),
-                        FontSize = 11,
-                        ForegroundColor = Aspose.Pdf.Color.Black
-                    };
-                    dataCell.Paragraphs.Add(new TextFragment(data[i, j]));
-                }
+
+                Cell cell1 = dataRow.Cells.Add();
+                cell1.Paragraphs.Add(new TextFragment($"Row {i} - A"));
+
+                Cell cell2 = dataRow.Cells.Add();
+                cell2.Paragraphs.Add(new TextFragment($"Row {i} - B"));
+
+                Cell cell3 = dataRow.Cells.Add();
+                cell3.Paragraphs.Add(new TextFragment($"Row {i} - C"));
             }
 
-            // Add the table to the page
+            // Add the table to the page's paragraph collection
             page.Paragraphs.Add(table);
 
             // -------------------------------------------------
-            // Save the PDF – guard against missing GDI+ on non‑Windows platforms
+            // Save the PDF – guard against missing libgdiplus on non‑Windows platforms
             // -------------------------------------------------
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 doc.Save(outputPath);
-                Console.WriteLine($"PDF created: {outputPath}");
             }
             else
             {
                 try
                 {
                     doc.Save(outputPath);
-                    Console.WriteLine($"PDF created (non‑Windows platform): {outputPath}");
                 }
                 catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
                 {
-                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. " +
-                                      "The PDF could not be saved using Aspose.Pdf's default renderer.");
+                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. PDF was not saved.");
                 }
             }
         }
+
+        Console.WriteLine($"PDF with merged header table saved to '{outputPath}'.");
     }
 
-    // Helper that walks the inner‑exception chain looking for a DllNotFoundException
     private static bool ContainsDllNotFound(Exception? ex)
     {
         while (ex != null)

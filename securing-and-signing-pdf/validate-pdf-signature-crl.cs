@@ -3,6 +3,7 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Security;
+using System.Security.Cryptography.X509Certificates;
 
 class Program
 {
@@ -19,40 +20,30 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPdf))
         {
-            // Iterate over all form fields and process only signature fields
+            // Iterate over all form fields and find signature fields
             foreach (Field field in doc.Form.Fields)
             {
                 if (field is SignatureField sigField)
                 {
-                    // Retrieve the underlying signature object (PKCS7, PKCS1, etc.)
+                    // Obtain the Signature object associated with the field
                     Signature signature = sigField.Signature;
-                    if (signature == null)
-                    {
-                        Console.WriteLine($"Signature field '{sigField.PartialName}' does not contain a signature.");
-                        continue;
-                    }
 
-                    // Configure validation options to use CRL distribution points
+                    // Set up validation options to use CRL checking only
                     ValidationOptions options = new ValidationOptions
                     {
-                        ValidationMethod = ValidationMethod.Crl,          // Use CRL for revocation checking
-                        ValidationMode   = ValidationMode.Strict,        // Fail the verification if revocation check fails
+                        ValidationMethod = ValidationMethod.Crl,          // Use CRL distribution points
+                        ValidationMode   = ValidationMode.Strict,        // Fail if revocation check fails
                         CheckCertificateChain = false                    // Skip chain validation (focus on revocation)
                     };
 
-                    // Perform the verification
-                    bool isValid = signature.Verify(options, out ValidationResult validationResult);
+                    // Perform verification
+                    ValidationResult validationResult;
+                    bool isValid = signature.Verify(options, out validationResult);
 
-                    // Output the verification result
-                    Console.WriteLine($"Signature field '{sigField.PartialName}':");
-                    Console.WriteLine($"  Valid: {isValid}");
-                    if (validationResult != null)
-                    {
-                        // The ValidationResult type provides details about the verification outcome.
-                        // Typical properties include IsValid, ErrorMessage, etc.
-                        // Adjust the property names according to the actual library version if needed.
-                        Console.WriteLine($"  Validation details: {validationResult}");
-                    }
+                    // Output results
+                    Console.WriteLine($"Signature field: {sigField.PartialName}");
+                    Console.WriteLine($"  Verification passed: {isValid}");
+                    Console.WriteLine($"  ValidationResult: {validationResult}");
                 }
             }
         }

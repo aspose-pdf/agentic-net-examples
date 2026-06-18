@@ -7,59 +7,57 @@ class Program
 {
     static void Main()
     {
-        // Input directory containing PDFs to process
-        const string inputDir = "InputPdfs";
-        // Output directory for the modified PDFs
-        const string outputDir = "OutputPdfs";
+        // Folder containing PDFs to process
+        const string inputFolder = @"C:\PdfInput";
+        // Folder where updated PDFs will be saved
+        const string outputFolder = @"C:\PdfOutput";
 
-        // Author names: source (to replace) and destination (new value)
-        const string srcAuthor = "Old Author";
-        const string desAuthor = "New Author";
+        // Author names: source (to replace) and destination (new)
+        const string sourceAuthor = "Old Author";
+        const string newAuthor    = "New Author";
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputDir);
+        // Ensure output folder exists
+        Directory.CreateDirectory(outputFolder);
 
-        // Verify that the input directory exists; if not, inform the user and exit gracefully
-        if (!Directory.Exists(inputDir))
-        {
-            Console.WriteLine($"Input directory '{inputDir}' does not exist. Please create it and place PDF files inside before running the program.");
-            return;
-        }
-
-        // Get all PDF files in the input directory
-        string[] pdfFiles = Directory.GetFiles(inputDir, "*.pdf", SearchOption.TopDirectoryOnly);
-
+        // Get all PDF files in the input folder
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
         if (pdfFiles.Length == 0)
         {
-            Console.WriteLine($"No PDF files found in '{inputDir}'. Nothing to process.");
+            Console.WriteLine("No PDF files found in the input folder.");
             return;
         }
 
         foreach (string inputPath in pdfFiles)
         {
-            // Determine output file path (same name, different folder)
-            string outputPath = Path.Combine(outputDir, Path.GetFileName(inputPath));
+            // Build output file path (same name, different folder)
+            string outputPath = Path.Combine(outputFolder, Path.GetFileName(inputPath));
 
-            // Use PdfAnnotationEditor to modify annotation authors
-            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+            try
             {
-                // Load the PDF document into the editor
-                editor.BindPdf(inputPath);
+                // Use PdfAnnotationEditor (facade) inside a using block for deterministic disposal
+                using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+                {
+                    // Bind the source PDF file
+                    editor.BindPdf(inputPath);
 
-                // Determine the total number of pages (1‑based indexing)
-                int pageCount = editor.Document.Pages.Count;
+                    // Determine the total number of pages in the document
+                    int pageCount = editor.Document.Pages.Count; // 1‑based indexing
 
-                // Update the author for all annotations on all pages
-                editor.ModifyAnnotationsAuthor(1, pageCount, srcAuthor, desAuthor);
+                    // Modify the author of all annotations on all pages
+                    editor.ModifyAnnotationsAuthor(1, pageCount, sourceAuthor, newAuthor);
 
-                // Save the modified PDF
-                editor.Save(outputPath);
+                    // Save the modified PDF to the output location
+                    editor.Save(outputPath);
+                }
 
-                // The using statement disposes the editor; explicit Close() is optional
-                // editor.Close();
+                Console.WriteLine($"Processed: {Path.GetFileName(inputPath)} → {outputPath}");
             }
-
-            Console.WriteLine($"Processed: {Path.GetFileName(inputPath)} → {outputPath}");
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
+            }
         }
+
+        Console.WriteLine("Batch annotation author update completed.");
     }
 }

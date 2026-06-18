@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "even_page_numbers.pdf";
+        const string outputPath = "even_pages_numbered.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,29 +15,29 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF document (using statement ensures proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Loop through pages using 1‑based indexing; process only even pages
+            for (int i = 2; i <= doc.Pages.Count; i += 2)
             {
-                // Apply numbering only to even pages
-                if (i % 2 == 0)
+                Page page = doc.Pages[i];
+
+                // Create a page number stamp for the current even page
+                PageNumberStamp stamp = new PageNumberStamp()
                 {
-                    // Create a page number stamp with default format "#"
-                    PageNumberStamp stamp = new PageNumberStamp();
+                    // Center the number at the bottom of the page
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment   = VerticalAlignment.Bottom,
+                    // Optional: adjust margins if needed
+                    BottomMargin = 20
+                };
 
-                    // Position the stamp at the bottom center of the page
-                    stamp.HorizontalAlignment = HorizontalAlignment.Center;
-                    stamp.VerticalAlignment   = VerticalAlignment.Bottom;
-                    stamp.BottomMargin        = 10; // distance from bottom edge
-
-                    // Add the stamp to the current page
-                    doc.Pages[i].AddStamp(stamp);
-                }
+                // Add the stamp to the page
+                page.AddStamp(stamp);
             }
 
-            // Save the modified PDF (lifecycle rule: use Save)
+            // Save the modified document as PDF
             doc.Save(outputPath);
         }
 

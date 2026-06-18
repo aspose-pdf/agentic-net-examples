@@ -1,12 +1,12 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // Core Aspose.Pdf namespace
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,16 +15,17 @@ class Program
             return;
         }
 
-        // Load the PDF document; using ensures proper disposal
+        // Document lifecycle must be wrapped in a using block (rule: document-disposal-with-using)
         using (Document doc = new Document(inputPath))
         {
-            // Delete the first page (page numbers are 1‑based)
+            // Pages are 1‑based (rule: page-indexing-one-based)
+            // Delete the first page; subsequent pages shift automatically.
             doc.Pages.Delete(1);
 
-            // Save the updated PDF
+            // Save the modified PDF (rule: document-disposal-with-using ensures proper disposal)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"First page deleted. Output saved to '{outputPath}'.");
+        Console.WriteLine($"First page removed. Result saved to '{outputPath}'.");
     }
 }

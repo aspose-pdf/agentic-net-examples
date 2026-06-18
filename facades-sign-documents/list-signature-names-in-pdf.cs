@@ -1,50 +1,45 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf.Facades;
 
 class Program
 {
-    static void Main()
+    // Lists all non‑empty signature names in the specified PDF file.
+    static void ListSignatureNames(string pdfPath)
     {
-        // Path to the PDF file whose signatures you want to list
-        const string pdfPath = "input.pdf";
-
-        // Verify that the file exists before proceeding
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // List all signature names in the PDF
-        ListSignatureNames(pdfPath);
-    }
-
-    /// <summary>
-    /// Binds the specified PDF file to a PdfFileSignature facade and prints
-    /// the names of all non‑empty signatures (active signatures by default).
-    /// </summary>
-    /// <param name="pdfFile">Full path to the PDF document.</param>
-    static void ListSignatureNames(string pdfFile)
-    {
-        // PdfFileSignature implements IDisposable via SaveableFacade,
-        // so we wrap it in a using block for deterministic disposal.
-        using (PdfFileSignature pdfSignature = new PdfFileSignature())
+        // PdfFileSignature implements IDisposable, so use a using block.
+        using (PdfFileSignature pdfSign = new PdfFileSignature())
         {
-            // Bind the PDF file to the facade for processing.
-            pdfSignature.BindPdf(pdfFile);
+            // Bind the PDF document to the facade.
+            pdfSign.BindPdf(pdfPath);
 
-            // Retrieve the list of signature names.
-            // The default parameter (onlyActive = true) returns only active signatures.
-            var signatureNames = pdfSignature.GetSignatureNames();
+            // Retrieve the names of all non‑empty signatures.
+            IList<SignatureName> names = pdfSign.GetSignatureNames();
 
             // Output each signature name.
-            for (int i = 0; i < signatureNames.Count; i++)
+            for (int i = 0; i < names.Count; i++)
             {
-                Console.WriteLine($"Signature name: {signatureNames[i]}");
+                Console.WriteLine($"Signature name: {names[i]}");
             }
-
-            // No need to call Save() here because we are only reading information.
         }
+    }
+
+    static void Main(string[] args)
+    {
+        // Expect the PDF file path as the first argument.
+        if (args.Length == 0)
+        {
+            Console.Error.WriteLine("Usage: Program <pdf-file-path>");
+            return;
+        }
+
+        ListSignatureNames(args[0]);
     }
 }

@@ -1,7 +1,8 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text;          // TextStamp and related types
+using System.Drawing;          // System.Drawing.Color
 
 class Program
 {
@@ -17,26 +18,28 @@ class Program
             return;
         }
 
-        // Load the document.
+        // Load the PDF document (wrapped in using for deterministic disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through each page and add a header stamp.
-            foreach (Page page in doc.Pages)
+            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+            for (int pageNumber = 1; pageNumber <= doc.Pages.Count; pageNumber++)
             {
-                // Create a TextStamp for the header.
+                // Create a TextStamp that will act as the header
                 TextStamp headerStamp = new TextStamp(companyName);
-                headerStamp.TextState.Font = FontRepository.FindFont("Helvetica");
-                headerStamp.TextState.FontSize = 12;
-                headerStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-                headerStamp.HorizontalAlignment = HorizontalAlignment.Center;
-                headerStamp.VerticalAlignment = VerticalAlignment.Top;
-                headerStamp.YIndent = 20f; // offset from the top edge
 
-                // Add the stamp to the current page.
-                page.AddStamp(headerStamp);
+                // Configure the visual appearance of the stamp
+                headerStamp.TextState.Font = FontRepository.FindFont("Helvetica");
+                headerStamp.TextState.FontSize = 12f;
+                headerStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+                headerStamp.HorizontalAlignment = HorizontalAlignment.Center;   // Centered horizontally
+                headerStamp.VerticalAlignment = VerticalAlignment.Top;          // At the top of the page
+                headerStamp.YIndent = 20f;                                      // Slight offset from the top edge
+
+                // Add the stamp to the current page
+                doc.Pages[pageNumber].AddStamp(headerStamp);
             }
 
-            // Save the modified document.
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

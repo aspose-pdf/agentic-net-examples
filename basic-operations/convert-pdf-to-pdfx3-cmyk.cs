@@ -1,59 +1,42 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                     // Core Aspose.Pdf namespace
-using Aspose.Pdf.Text;                // For any text handling (not used here)
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPdfPath  = "input.pdf";
-        // Output PDF/X‑3 compliant file path
-        const string outputPdfPath = "output_pdfx3.pdf";
-        // Path to a CMYK ICC profile (ensure this file exists on the system)
-        const string cmykIccProfilePath = "cmyk.icc";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_pdfx3.pdf";
+        const string iccProfilePath = "CMYK.icc"; // Path to a CMYK ICC profile
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        if (!File.Exists(cmykIccProfilePath))
+        if (!File.Exists(iccProfilePath))
         {
-            Console.Error.WriteLine($"CMYK ICC profile not found: {cmykIccProfilePath}");
+            Console.Error.WriteLine($"ICC profile not found: {iccProfilePath}");
             return;
         }
 
-        try
+        // Load the source PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Load the source PDF document
-            using (Aspose.Pdf.Document pdfDoc = new Aspose.Pdf.Document(inputPdfPath))
-            {
-                // Configure conversion options for PDF/X‑3
-                Aspose.Pdf.PdfFormatConversionOptions conversionOptions =
-                    new Aspose.Pdf.PdfFormatConversionOptions(PdfFormat.PDF_X_3)
-                    {
-                        // Attach an OutputIntent with a CMYK ICC profile to force color space conversion
-                        OutputIntent = new OutputIntent("CMYK_OutputIntent"),
-                        IccProfileFileName = cmykIccProfilePath,
-                        // Optional: optimize file size
-                        OptimizeFileSize = true
-                    };
+            // Configure conversion options for PDF/X‑3 compliance
+            PdfFormatConversionOptions options = new PdfFormatConversionOptions(PdfFormat.PDF_X_3);
+            // Force all color spaces to CMYK by specifying a CMYK ICC profile
+            options.IccProfileFileName = iccProfilePath;
 
-                // Perform the conversion to PDF/X‑3 with CMYK color space
-                pdfDoc.Convert(conversionOptions);
+            // Convert the document to PDF/X‑3 using the specified options
+            doc.Convert(options);
 
-                // Save the converted document
-                pdfDoc.Save(outputPdfPath);
-            }
-
-            Console.WriteLine($"PDF/X‑3 compliant file saved to '{outputPdfPath}'.");
+            // Save the converted document
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF/X‑3 compliant file saved to '{outputPath}'.");
     }
 }

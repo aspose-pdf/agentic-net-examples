@@ -7,42 +7,37 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.txt";
+        // Input PDF file (must exist)
+        const string inputPdfPath = "input.pdf";
+        // Output text file
+        const string outputTxtPath = "extracted_text.txt";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Load the PDF document (core API)
-            using (Document doc = new Document(inputPath))
+            // Create a TextAbsorber to extract visible text.
+            // Use Pure formatting mode to get readable text without hidden OCR layers.
+            TextAbsorber absorber = new TextAbsorber
             {
-                // Create a TextAbsorber to extract text
-                TextAbsorber absorber = new TextAbsorber();
+                ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure)
+            };
 
-                // Configure extraction options to get only visible text
-                // The constructor requires a TextFormattingMode enum value.
-                TextExtractionOptions extractOpts = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
-                // If the API provides a flag for hidden text, ensure it is disabled:
-                // extractOpts.ExtractHiddenText = false; // (uncomment if available)
+            // Apply the absorber to all pages of the document
+            pdfDoc.Pages.Accept(absorber);
 
-                absorber.ExtractionOptions = extractOpts;
+            // Retrieve the extracted text
+            string extractedText = absorber.Text;
 
-                // Apply the absorber to the whole document (all pages)
-                absorber.Visit(doc);
-
-                // Write the extracted visible text to a .txt file
-                File.WriteAllText(outputPath, absorber.Text);
-                Console.WriteLine($"Visible text extracted to '{outputPath}'.");
-            }
+            // Write the text to the output file
+            File.WriteAllText(outputTxtPath, extractedText);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Text extracted to '{outputTxtPath}'.");
     }
 }

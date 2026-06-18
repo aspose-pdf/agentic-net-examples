@@ -1,35 +1,30 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core API for Document
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputFdfPath = "output.fdf";
+        const string inputPdf = "input.pdf";
+        const string outputFdf = "output.fdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document using the core Document class
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Bind the PDF to the Form facade and export its form data to an FDF file
+        using (Form form = new Form())
         {
-            // Bind the document to the Facade Form (fully qualified, no using directive)
-            using (Aspose.Pdf.Facades.Form form = new Aspose.Pdf.Facades.Form(pdfDoc))
+            form.BindPdf(inputPdf);
+            using (FileStream fdfStream = new FileStream(outputFdf, FileMode.Create, FileAccess.Write))
             {
-                // Export the form fields to an FDF file via a FileStream
-                using (FileStream fdfStream = new FileStream(outputFdfPath, FileMode.Create, FileAccess.Write))
-                {
-                    form.ExportFdf(fdfStream);
-                }
-                // The PDF itself is unchanged; no additional Save call is required
+                form.ExportFdf(fdfStream);
             }
         }
 
-        Console.WriteLine($"Form data successfully exported to '{outputFdfPath}'.");
+        Console.WriteLine($"Form data exported to FDF: {outputFdf}");
     }
 }

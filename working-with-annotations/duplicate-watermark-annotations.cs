@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -8,68 +6,59 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-
-        if (!File.Exists(inputPath))
+        // Create a sample PDF with a watermark annotation on the first page
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
+            // Add first page
+            Page firstPage = doc.Pages.Add();
+            // Define rectangle for the watermark (lower‑left X, lower‑left Y, upper‑right X, upper‑right Y)
+            Rectangle rect = new Rectangle(100, 500, 400, 550);
+            // Create the watermark annotation
+            WatermarkAnnotation watermark = new WatermarkAnnotation(firstPage, rect);
+            watermark.Opacity = 0.5f;
+            watermark.Color = Color.Gray;
+            watermark.Contents = "Sample Watermark";
+            // Add the annotation to the first page
+            firstPage.Annotations.Add(watermark);
+
+            // Add a second page (without any annotation yet)
+            doc.Pages.Add();
+
+            // Save the sample PDF
+            doc.Save("input.pdf");
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Open the PDF and duplicate the watermark annotations to all other pages
+        using (Document doc = new Document("input.pdf"))
         {
-            // Ensure the document has at least two pages
-            if (doc.Pages.Count < 2)
+            // Get the first page (source of the watermarks)
+            Page sourcePage = doc.Pages[1];
+            // Iterate through annotations on the first page
+            int annotationCount = sourcePage.Annotations.Count;
+            for (int i = 1; i <= annotationCount; i++)
             {
-                Console.Error.WriteLine("Document must contain at least two pages.");
-                return;
-            }
-
-            // Collect all WatermarkAnnotations from the first page
-            Page firstPage = doc.Pages[1];
-            List<WatermarkAnnotation> sourceWatermarks = new List<WatermarkAnnotation>();
-
-            for (int i = 1; i <= firstPage.Annotations.Count; i++)
-            {
-                Annotation ann = firstPage.Annotations[i];
-                if (ann is WatermarkAnnotation wm)
+                Annotation srcAnnotation = sourcePage.Annotations[i];
+                WatermarkAnnotation srcWatermark = srcAnnotation as WatermarkAnnotation;
+                if (srcWatermark == null)
                 {
-                    sourceWatermarks.Add(wm);
+                    continue; // Skip non‑watermark annotations
+                }
+
+                // Duplicate this watermark to each subsequent page
+                for (int pageIndex = 2; pageIndex <= doc.Pages.Count; pageIndex++)
+                {
+                    Page targetPage = doc.Pages[pageIndex];
+                    WatermarkAnnotation newWatermark = new WatermarkAnnotation(targetPage, srcWatermark.Rect);
+                    newWatermark.Opacity = srcWatermark.Opacity;
+                    newWatermark.Color = srcWatermark.Color;
+                    newWatermark.Contents = srcWatermark.Contents;
+                    newWatermark.Name = srcWatermark.Name;
+                    targetPage.Annotations.Add(newWatermark);
                 }
             }
 
-            // Duplicate each collected watermark onto every subsequent page
-            for (int pageIndex = 2; pageIndex <= doc.Pages.Count; pageIndex++)
-            {
-                Page targetPage = doc.Pages[pageIndex];
-
-                foreach (WatermarkAnnotation srcWm in sourceWatermarks)
-                {
-                    // Create a new watermark annotation on the target page with the same rectangle
-                    WatermarkAnnotation dupWm = new WatermarkAnnotation(targetPage, srcWm.Rect);
-
-                    // Copy relevant visual and metadata properties
-                    dupWm.Color   = srcWm.Color;
-                    dupWm.Opacity = srcWm.Opacity;
-                    dupWm.Contents = srcWm.Contents;
-                    dupWm.Border   = srcWm.Border;
-                    dupWm.Flags    = srcWm.Flags;
-                    dupWm.Name     = srcWm.Name;
-                    dupWm.Height   = srcWm.Height;
-                    dupWm.Width    = srcWm.Width;
-                    dupWm.ZIndex   = srcWm.ZIndex;
-
-                    // Add the duplicated annotation to the page
-                    targetPage.Annotations.Add(dupWm);
-                }
-            }
-
-            // Save the modified document
-            doc.Save(outputPath);
+            // Save the resulting PDF
+            doc.Save("output.pdf");
         }
-
-        Console.WriteLine($"Watermark annotations duplicated and saved to '{outputPath}'.");
     }
 }

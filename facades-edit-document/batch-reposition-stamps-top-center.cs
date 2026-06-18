@@ -8,7 +8,7 @@ class BatchStampReposition
     static void Main()
     {
         // Folder containing source PDFs
-        const string inputFolder = @"C:\InputPdfs";
+        const string inputFolder  = @"C:\InputPdfs";
         // Folder where modified PDFs will be saved
         const string outputFolder = @"C:\OutputPdfs";
 
@@ -20,68 +20,61 @@ class BatchStampReposition
 
         Directory.CreateDirectory(outputFolder);
 
-        // Process each PDF file in the input folder
+        // Process every PDF file in the input folder
         foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
+            string outputPath = Path.Combine(
+                outputFolder,
+                Path.GetFileNameWithoutExtension(inputPath) + "_repositioned.pdf");
+
             try
             {
-                // First, read page dimensions using Document (read‑only)
-                double[] pageWidths;
-                double[] pageHeights;
-                int pageCount;
-
+                // Load the PDF document
                 using (Document doc = new Document(inputPath))
                 {
-                    pageCount = doc.Pages.Count;
-                    pageWidths = new double[pageCount + 1];   // 1‑based indexing
-                    pageHeights = new double[pageCount + 1];
-
-                    for (int i = 1; i <= pageCount; i++)
+                    // Facade for editing existing stamps
+                    using (PdfContentEditor editor = new PdfContentEditor())
                     {
-                        pageWidths[i] = doc.Pages[i].PageInfo.Width;
-                        pageHeights[i] = doc.Pages[i].PageInfo.Height;
-                    }
-                }
+                        editor.BindPdf(doc);
 
-                // Now reposition existing stamps using PdfContentEditor
-                using (PdfContentEditor editor = new PdfContentEditor())
-                {
-                    editor.BindPdf(inputPath);
-
-                    for (int pageNum = 1; pageNum <= pageCount; pageNum++)
-                    {
-                        // Retrieve all stamps on the current page
-                        StampInfo[] stamps = editor.GetStamps(pageNum);
-                        if (stamps == null) continue;
-
-                        // Move each stamp to the top‑center of the page
-                        for (int idx = 0; idx < stamps.Length; idx++)
+                        // Iterate through all pages (1‑based indexing)
+                        for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
                         {
-                            // StampInfo does not expose size; we place the stamp
-                            // at horizontal centre (pageWidth / 2) and a small offset
-                            // from the top edge (pageHeight - 10 points).
-                            double newX = pageWidths[pageNum] / 2.0;
-                            double newY = pageHeights[pageNum] - 10.0; // 10 points margin from top
+                            // Retrieve all stamps on the current page
+                            StampInfo[] stamps = editor.GetStamps(pageNum);
+                            if (stamps == null || stamps.Length == 0)
+                                continue; // No stamps on this page
 
-                            // MoveStamp expects 1‑based stamp index
-                            int stampIndex = idx + 1;
-                            editor.MoveStamp(pageNum, stampIndex, newX, newY);
+                            // Page dimensions
+                            double pageWidth  = doc.Pages[pageNum].PageInfo.Width;
+                            double pageHeight = doc.Pages[pageNum].PageInfo.Height;
+
+                            // Desired vertical position: a small margin (20 units) below the top edge
+                            double newY = pageHeight - 20;
+
+                            // Desired horizontal position: centre of the page
+                            double newX = pageWidth / 2;
+
+                            // Move each stamp to the new coordinates
+                            // StampInfo does not expose an index, so we use the loop counter (1‑based)
+                            for (int idx = 0; idx < stamps.Length; idx++)
+                            {
+                                // MoveStamp expects 1‑based stamp index
+                                editor.MoveStamp(pageNum, idx + 1, newX, newY);
+                            }
                         }
-                    }
 
-                    // Save the modified PDF to the output folder
-                    string outputPath = Path.Combine(outputFolder, Path.GetFileName(inputPath));
-                    editor.Save(outputPath);
+                        // Save the modified document
+                        doc.Save(outputPath);
+                    }
                 }
 
-                Console.WriteLine($"Processed: {Path.GetFileName(inputPath)}");
+                Console.WriteLine($"Repositioned stamps saved to '{outputPath}'.");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{Path.GetFileName(inputPath)}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
             }
         }
-
-        Console.WriteLine("Batch stamp repositioning completed.");
     }
 }

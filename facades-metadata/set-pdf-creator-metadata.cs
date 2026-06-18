@@ -6,27 +6,35 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string creator = "My Custom Creator";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string creator   = "My Custom Creator";
 
-        if (!File.Exists(inputPath))
+        // Verify the source file exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF file info facade
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
-        {
-            // Assign a custom Creator value
-            pdfInfo.Creator = creator;
+        // Load the PDF metadata via PdfFileInfo
+        PdfFileInfo pdfInfo = new PdfFileInfo(inputPdf);
 
-            // Persist the changes to a new PDF file
-            bool saved = pdfInfo.SaveNewInfo(outputPath);
-            Console.WriteLine(saved
-                ? $"Creator set and saved to '{outputPath}'."
-                : "Failed to save the updated PDF.");
+        // Assign a custom Creator value
+        pdfInfo.Creator = creator;
+
+        // Persist the updated metadata to a new PDF file
+        bool saved = pdfInfo.SaveNewInfo(outputPdf);
+        if (!saved)
+        {
+            Console.Error.WriteLine("Failed to save the updated PDF.");
         }
+        else
+        {
+            Console.WriteLine($"Creator set to \"{creator}\" and saved as \"{outputPdf}\".");
+        }
+
+        // Release resources held by the facade
+        pdfInfo.Close();
     }
 }

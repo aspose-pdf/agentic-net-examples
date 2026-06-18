@@ -1,80 +1,89 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
-using Aspose.Pdf.Facades; // PdfFileEditor resides here
+using Aspose.Pdf.Facades;
 
-class PdfPageRemovalUtility
+namespace PdfUtilities
 {
-    /// <summary>
-    /// Removes the specified pages from each PDF file in the input collection.
-    /// The operation is performed in parallel.
-    /// </summary>
-    /// <param name="inputPdfPaths">Full paths of the source PDF files.</param>
-    /// <param name="pagesToRemove">Page numbers (1‑based) that should be deleted from each file.</param>
-    /// <param name="outputDirectory">Directory where the processed PDFs will be saved.</param>
-    public static void RemovePagesFromPdfs(IEnumerable<string> inputPdfPaths, IEnumerable<int> pagesToRemove, string outputDirectory)
+    public static class PdfPageRemover
     {
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDirectory);
-
-        // Convert the page numbers to an array once (PdfFileEditor expects int[])
-        int[] pagesArray = new List<int>(pagesToRemove).ToArray();
-
-        // Process each PDF file in parallel
-        Parallel.ForEach(inputPdfPaths, inputPath =>
+        /// <summary>
+        /// Removes the specified pages from each PDF file in <paramref name="inputFiles"/> in parallel.
+        /// The resulting PDFs are saved to <paramref name="outputDirectory"/> preserving the original file name.
+        /// </summary>
+        /// <param name="inputFiles">Full paths of the source PDF files.</param>
+        /// <param name="pagesToRemove">Page numbers to delete (1‑based indexing as required by Aspose.Pdf).</param>
+        /// <param name="outputDirectory">Folder where the processed PDFs will be written.</param>
+        public static void RemovePagesFromPdfs(IEnumerable<string> inputFiles, IEnumerable<int> pagesToRemove, string outputDirectory)
         {
-            try
+            if (inputFiles == null) throw new ArgumentNullException(nameof(inputFiles));
+            if (pagesToRemove == null) throw new ArgumentNullException(nameof(pagesToRemove));
+            if (string.IsNullOrWhiteSpace(outputDirectory)) throw new ArgumentException("Output directory must be provided.", nameof(outputDirectory));
+
+            // Ensure output folder exists
+            Directory.CreateDirectory(outputDirectory);
+
+            // Prepare a distinct array of page numbers to delete (Aspose expects an int[])
+            int[] pagesArray = pagesToRemove.Distinct().ToArray();
+
+            // Process each PDF in parallel
+            Parallel.ForEach(inputFiles, inputFile =>
             {
-                // Validate source file
-                if (!File.Exists(inputPath))
+                try
                 {
-                    Console.Error.WriteLine($"Source file not found: {inputPath}");
-                    return;
+                    if (!File.Exists(inputFile))
+                    {
+                        Console.Error.WriteLine($"File not found: {inputFile}");
+                        return;
+                    }
+
+                    // Build output file path (same name, different folder)
+                    string outputPath = Path.Combine(outputDirectory, Path.GetFileName(inputFile));
+
+                    // Use PdfFileEditor.Delete(string, int[], string) – the official Facades API for page removal
+                    PdfFileEditor editor = new PdfFileEditor();
+                    bool success = editor.Delete(inputFile, pagesArray, outputPath);
+
+                    if (success)
+                    {
+                        Console.WriteLine($"Processed: {inputFile} → {outputPath}");
+                    }
+                    else
+                    {
+                        Console.Error.WriteLine($"Failed to delete pages from: {inputFile}");
+                    }
                 }
-
-                // Determine output file name (original name with "_modified" suffix)
-                string fileName = Path.GetFileNameWithoutExtension(inputPath);
-                string outputPath = Path.Combine(outputDirectory, $"{fileName}_modified.pdf");
-
-                // Use PdfFileEditor.Delete(string, int[], string) to remove pages and save
-                PdfFileEditor editor = new PdfFileEditor();
-                bool success = editor.Delete(inputPath, pagesArray, outputPath);
-
-                if (success)
+                catch (Exception ex)
                 {
-                    Console.WriteLine($"Processed: {inputPath} -> {outputPath}");
+                    Console.Error.WriteLine($"Error processing '{inputFile}': {ex.Message}");
                 }
-                else
-                {
-                    Console.Error.WriteLine($"Failed to delete pages from: {inputPath}");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
-            }
-        });
+            });
+        }
     }
 
     // Example usage
-    static void Main()
+    class Program
     {
-        // List of PDF files to process
-        var pdfFiles = new List<string>
+        static void Main()
         {
-            @"C:\Docs\Report1.pdf",
-            @"C:\Docs\Report2.pdf",
-            @"C:\Docs\Report3.pdf"
-        };
+            // List of PDF files to process
+            var pdfFiles = new List<string>
+            {
+                @"C:\Docs\Report1.pdf",
+                @"C:\Docs\Report2.pdf",
+                @"C:\Docs\Report3.pdf"
+            };
 
-        // Pages to remove (example: remove pages 2 and 5)
-        var pages = new List<int> { 2, 5 };
+            // Pages to remove (example: remove pages 2 and 5)
+            var pagesToDelete = new List<int> { 2, 5 };
 
-        // Output folder
-        string outFolder = @"C:\Docs\Processed";
+            // Destination folder for the modified PDFs
+            string outputFolder = @"C:\Docs\Processed";
 
-        // Execute the removal
-        RemovePagesFromPdfs(pdfFiles, pages, outFolder);
+            // Execute the removal
+            PdfPageRemover.RemovePagesFromPdfs(pdfFiles, pagesToDelete, outputFolder);
+        }
     }
 }

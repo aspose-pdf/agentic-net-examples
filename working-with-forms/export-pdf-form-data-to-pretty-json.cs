@@ -3,33 +3,36 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
-class Program
+class ExportFormDataToJson
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string jsonPath = "formdata.json";
+        // Input PDF containing form fields
+        const string inputPdfPath = "input.pdf";
 
-        // Verify input file exists
-        if (!File.Exists(inputPdf))
+        // Output JSON file path
+        const string outputJsonPath = "formData.json";
+
+        // Ensure the input file exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document (wrapped in using for deterministic disposal)
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Configure export options: enable pretty‑printing (indented JSON)
-            ExportFieldsToJsonOptions options = new ExportFieldsToJsonOptions
+            // Configure JSON export options: enable pretty‑printing (indented output)
+            ExportFieldsToJsonOptions jsonOptions = new ExportFieldsToJsonOptions
             {
-                WriteIndented = true
+                WriteIndented = true   // true => indented (human‑readable) JSON
             };
 
-            // Export all form fields to a JSON file
-            doc.Form.ExportToJson(jsonPath, options);
+            // Export all form fields to the specified JSON file with the options
+            pdfDoc.Form.ExportToJson(outputJsonPath, jsonOptions);
         }
 
-        Console.WriteLine($"Form data exported to '{jsonPath}'.");
+        Console.WriteLine($"Form data exported to JSON file: {outputJsonPath}");
     }
 }

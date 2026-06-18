@@ -1,8 +1,6 @@
 using System;
 using System.IO;
-using System.Text;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
 
 class Program
@@ -12,63 +10,62 @@ class Program
         const string inputPdf = "input.pdf";
         const string outputCsv = "form_fields_audit.csv";
 
+        // Verify input file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        try
+        // Load the PDF document (lifecycle rule: use provided load)
+        using (Document doc = new Document(inputPdf))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPdf))
+            // Check if the document contains any form fields
+            if (doc.Form == null || doc.Form.Count == 0)
             {
-                Form form = doc.Form;
+                Console.WriteLine("No form fields found in the PDF.");
+                return;
+            }
 
-                // Create CSV file for output
-                using (StreamWriter writer = new StreamWriter(outputCsv, false, Encoding.UTF8))
+            // Create (or overwrite) the CSV file
+            using (StreamWriter writer = new StreamWriter(outputCsv, false))
+            {
+                // Write CSV header
+                writer.WriteLine("FieldName,FieldType,DefaultValue");
+
+                // Iterate over each form field
+                foreach (Field field in doc.Form.Fields)
                 {
-                    // CSV header
-                    writer.WriteLine("FieldName,FieldType,DefaultValue");
+                    // Field name (full hierarchical name)
+                    string name = field.FullName ?? string.Empty;
 
-                    // Iterate over all form fields
-                    foreach (WidgetAnnotation widget in form)
-                    {
-                        // Only process fields that derive from Field to access the Value property
-                        if (widget is Field field)
-                        {
-                            string name = field.FullName ?? string.Empty;
-                            string type = field.GetType().Name;
-                            string defaultValue = field.Value?.ToString() ?? string.Empty;
+                    // Runtime type of the field (e.g., TextBoxField, CheckBoxField)
+                    string type = field.GetType().Name;
 
-                            // Escape CSV special characters
-                            name = EscapeCsv(name);
-                            type = EscapeCsv(type);
-                            defaultValue = EscapeCsv(defaultValue);
+                    // Default/value of the field; may be null
+                    string value = field.Value?.ToString() ?? string.Empty;
 
-                            writer.WriteLine($"{name},{type},{defaultValue}");
-                        }
-                    }
+                    // Escape values that may contain commas or quotes
+                    name = EscapeCsv(name);
+                    type = EscapeCsv(type);
+                    value = EscapeCsv(value);
+
+                    // Write a CSV line
+                    writer.WriteLine($"{name},{type},{value}");
                 }
-
-                Console.WriteLine($"Form field metadata exported to '{outputCsv}'.");
             }
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Form field metadata exported to '{outputCsv}'.");
     }
 
-    // Helper to escape commas, quotes, and newlines in CSV fields
-    static string EscapeCsv(string value)
+    // Helper to escape CSV fields according to RFC 4180
+    static string EscapeCsv(string s)
     {
-        if (value.Contains("\""))
-            value = value.Replace("\"", "\"\"");
-
-        if (value.Contains(",") || value.Contains("\"") || value.Contains("\n") || value.Contains("\r"))
-            value = $"\"{value}\"";
-
-        return value;
+        if (s.Contains("\""))
+            s = s.Replace("\"", "\"\"");
+        if (s.Contains(",") || s.Contains("\"") || s.Contains("\n") || s.Contains("\r"))
+            s = $"\"{s}\"";
+        return s;
     }
 }

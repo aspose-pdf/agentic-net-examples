@@ -16,51 +16,51 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the source PDF inside a using block (lifecycle rule)
         using (Document doc = new Document(inputPath))
         {
-            // Determine how many pages we can process (max 3)
-            int pagesToProcess = Math.Min(3, doc.Pages.Count);
-
-            // HTML content for the header (includes embedded CSS)
+            // Define the HTML header with embedded CSS styling
             string headerHtml = @"
-                <style>
-                    .myHeader {
-                        font-family: Helvetica, Arial, sans-serif;
-                        font-size: 14pt;
-                        color: #0066CC;
-                        text-align: center;
-                        margin-top: 5pt;
-                    }
-                </style>
-                <div class='myHeader'>Confidential Report – Page {page}</div>";
+                <html>
+                <head>
+                    <style>
+                        .myHeader { 
+                            font-family: Arial, Helvetica, sans-serif; 
+                            font-size: 14pt; 
+                            color: #003366; 
+                            text-align: center; 
+                            margin: 5pt 0; 
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class='myHeader'>Confidential Report – Page {pageNumber}</div>
+                </body>
+                </html>";
 
-            // Apply the header to the first three pages
-            for (int i = 1; i <= pagesToProcess; i++)
+            // Apply the header to the first three pages (1‑based indexing)
+            for (int i = 1; i <= Math.Min(3, doc.Pages.Count); i++)
             {
                 Page page = doc.Pages[i];
 
                 // Create a new HeaderFooter object
                 HeaderFooter header = new HeaderFooter();
 
-                // Replace placeholder with actual page number
-                string pageHeaderHtml = headerHtml.Replace("{page}", i.ToString());
+                // HtmlFragment parses the HTML string; placeholders like {pageNumber}
+                // are not automatically replaced, so we inject the actual page number.
+                string pageHeaderHtml = headerHtml.Replace("{pageNumber}", i.ToString());
 
-                // Create an HtmlFragment containing the styled header
-                HtmlFragment htmlFragment = new HtmlFragment(pageHeaderHtml);
-                // No need to set IsHtml – HtmlFragment treats the string as HTML by default
-
-                // Add the fragment to the header's paragraph collection
-                header.Paragraphs.Add(htmlFragment);
+                // Add the HTML fragment to the header
+                header.Paragraphs.Add(new HtmlFragment(pageHeaderHtml));
 
                 // Assign the header to the page
                 page.Header = header;
             }
 
-            // Save the modified document (PDF format)
+            // Save the modified PDF (lifecycle rule)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with HTML header on first three pages: '{outputPath}'");
+        Console.WriteLine($"PDF saved with HTML header on first three pages: {outputPath}");
     }
 }

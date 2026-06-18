@@ -9,7 +9,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName = "myField";
+        const string fieldName = "myField"; // name of the form field to remove
 
         if (!File.Exists(inputPath))
         {
@@ -17,28 +17,33 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Retrieve the field by its name – the Form indexer returns a WidgetAnnotation,
-            // so we need to cast it to Aspose.Pdf.Forms.Field before we can use Form methods.
-            Field? field = doc.Form[fieldName] as Field;
-
-            if (field != null)
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                // Remove the field using the Delete(Field) overload (or Remove if preferred).
-                doc.Form.Delete(field);
-                Console.WriteLine($"Field '{fieldName}' removed.");
-            }
-            else
-            {
-                Console.WriteLine($"Field '{fieldName}' not found.");
-            }
+                // The Form indexer returns a WidgetAnnotation; cast it to Field safely.
+                Field? field = doc.Form[fieldName] as Field;
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+                if (field != null)
+                {
+                    // Remove the field using the Delete overload that accepts a Field instance.
+                    doc.Form.Delete(field);
+                    Console.WriteLine($"Field '{fieldName}' removed.");
+                }
+                else
+                {
+                    Console.WriteLine($"Field '{fieldName}' not found in the document.");
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
+                Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+            }
         }
-
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

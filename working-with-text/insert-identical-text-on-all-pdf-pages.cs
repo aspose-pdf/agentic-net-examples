@@ -7,41 +7,39 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string textToInsert = "Identical plain text";
+        const string plainText  = "Sample plain text";
 
-        // Verify input file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (using statement ensures proper disposal)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over each page in the document
-            foreach (Page page in doc.Pages)
+            // Iterate over all pages (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Create a TextFragment with the desired text
-                TextFragment fragment = new TextFragment(textToInsert);
-                // Set position on the page (example coordinates)
-                fragment.Position = new Position(100, 700);
-                // Set basic text styling
-                fragment.TextState.Font = FontRepository.FindFont("Helvetica");
-                fragment.TextState.FontSize = 12;
-                fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+                Page page = doc.Pages[i];
 
-                // Use TextBuilder to append the fragment to the current page
+                // Create a TextFragment with the desired text
+                TextFragment fragment = new TextFragment(plainText);
+
+                // Optional: set the position of the text on the page
+                fragment.Position = new Position(100, 700); // X=100, Y=700
+
+                // Append the text fragment to the page using TextBuilder
                 TextBuilder builder = new TextBuilder(page);
                 builder.AppendText(fragment);
             }
 
-            // Save the modified PDF
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Text inserted on all pages. Saved to '{outputPath}'.");
+        Console.WriteLine($"Plain text added to all pages. Saved as '{outputPath}'.");
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -6,43 +7,39 @@ class Program
 {
     static void Main()
     {
-        // Input and output PDF file paths
         const string inputPath  = "input.pdf";
         const string outputPath = "encrypted.pdf";
-
-        // User password to protect the PDF; owner password is left undefined (null)
         const string userPassword = "user123";
-        string ownerPassword = null; // null or string.Empty will cause a random owner password to be generated
 
-        // Ensure the input file exists
-        if (!System.IO.File.Exists(inputPath))
+        // Verify that the source PDF exists
+        if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        try
-        {
-            // Initialize the PdfFileSecurity facade with input and output files
-            PdfFileSecurity fileSecurity = new PdfFileSecurity(inputPath, outputPath);
+        // Initialize the facade with source and destination file names
+        PdfFileSecurity fileSecurity = new PdfFileSecurity(inputPath, outputPath);
 
-            // Encrypt the PDF using a user password only.
-            // DocumentPrivilege.Print grants printing rights; adjust as needed.
-            // KeySize.x256 provides strong 256‑bit encryption.
-            bool encrypted = fileSecurity.EncryptFile(
-                userPassword,
-                ownerPassword,
-                DocumentPrivilege.Print,
-                KeySize.x256);
+        // Encrypt using only a user password.
+        // Owner password is passed as null – a random owner password will be generated.
+        // DocumentPrivilege.Print allows printing; adjust as needed.
+        // KeySize.x256 selects 256‑bit AES encryption.
+        bool encrypted = fileSecurity.EncryptFile(
+            userPassword,          // user password
+            null,                  // owner password (undefined)
+            DocumentPrivilege.Print,
+            KeySize.x256);
 
-            if (encrypted)
-                Console.WriteLine($"PDF encrypted successfully. Output saved to '{outputPath}'.");
-            else
-                Console.Error.WriteLine("Encryption failed.");
-        }
-        catch (Exception ex)
+        if (encrypted)
         {
-            Console.Error.WriteLine($"Error during encryption: {ex.Message}");
+            Console.WriteLine($"PDF encrypted successfully: {outputPath}");
         }
+        else
+        {
+            Console.Error.WriteLine("Encryption failed.");
+        }
+
+        // PdfFileSecurity writes the output file during EncryptFile; no further Save call is required.
     }
 }

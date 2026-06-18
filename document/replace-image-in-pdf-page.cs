@@ -2,64 +2,64 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class Program
+class ReplaceImageInPdf
 {
     static void Main()
     {
-        // Input PDF, the page containing the image, and the new image file.
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "output.pdf";
-        const string newImagePath  = "newImage.jpg";
+        // Paths – adjust as needed
+        const string inputPdfPath   = "input.pdf";
+        const string outputPdfPath  = "output.pdf";
+        const string newImagePath   = "newImage.jpg";
+        const int    targetPageNum  = 1;   // 1‑based page index
+        const int    imageIndex     = 1;   // 1‑based index of the image in the page's resources
 
-        // Page number (1‑based) where the image to replace is located.
-        const int pageNumber = 1;
-
-        // Index of the image in the page's image collection (1‑based).
-        // Adjust this value if the target image is not the first one.
-        const int imageIndex = 1;
-
+        // Verify files exist
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-
         if (!File.Exists(newImagePath))
         {
-            Console.Error.WriteLine($"Replacement image not found: {newImagePath}");
+            Console.Error.WriteLine($"New image not found: {newImagePath}");
             return;
         }
 
-        // Load the PDF document.
+        // Load the PDF, modify, and save – all within using for deterministic disposal
         using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Validate that the requested page exists.
-            if (pageNumber < 1 || pageNumber > pdfDoc.Pages.Count)
+            // Ensure the requested page exists
+            if (targetPageNum < 1 || targetPageNum > pdfDoc.Pages.Count)
             {
-                Console.Error.WriteLine($"Page {pageNumber} is out of range. Document has {pdfDoc.Pages.Count} pages.");
+                Console.Error.WriteLine($"Page {targetPageNum} is out of range. Document has {pdfDoc.Pages.Count} pages.");
                 return;
             }
 
-            // Validate that the requested image index exists on the page.
-            Page srcPage = pdfDoc.Pages[pageNumber];
-            int imagesCount = srcPage.Resources.Images.Count; // 1‑based collection
-            if (imageIndex < 1 || imageIndex > imagesCount)
+            // Get the target page
+            Page page = pdfDoc.Pages[targetPageNum];
+
+            // Access the image collection for this page
+            XImageCollection images = page.Resources.Images;
+
+            // Validate the image index
+            if (imageIndex < 1 || imageIndex > images.Count)
             {
-                Console.Error.WriteLine($"Image index {imageIndex} is out of range. Page {pageNumber} contains {imagesCount} image(s).");
+                Console.Error.WriteLine($"Image index {imageIndex} is out of range. Page contains {images.Count} images.");
                 return;
             }
 
-            // Replace the image resource with the new image stream.
-            // The Replace method keeps the original placement (rectangle, transformation matrix, etc.).
-            using (FileStream imgStream = File.OpenRead(newImagePath))
+            // Replace the image at the specified index with the new image stream
+            using (FileStream newImgStream = File.OpenRead(newImagePath))
             {
-                srcPage.Resources.Images.Replace(imageIndex, imgStream);
+                // XImageCollection.Replace keeps the original resource reference,
+                // so any existing placements on the page retain their layout.
+                images.Replace(imageIndex, newImgStream);
             }
 
-            // Save the modified PDF.
+            // Save the modified PDF
             pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Image on page {pageNumber} (index {imageIndex}) replaced successfully. Saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Image replaced successfully. Output saved to '{outputPdfPath}'.");
     }
 }

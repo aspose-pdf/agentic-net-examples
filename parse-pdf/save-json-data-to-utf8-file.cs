@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        // Example JSON string containing form data
+        // JSON string containing form data
         string jsonData = @"{
     ""FirstName"": ""John"",
     ""LastName"": ""Doe"",
@@ -14,7 +14,7 @@ class Program
 }";
 
         // Path to the output file (UTF‑8 encoded)
-        const string outputPath = "formData.json";
+        const string outputPath = "formdata.json";
 
         // Write the JSON string to the file using UTF‑8 encoding
         File.WriteAllText(outputPath, jsonData, Encoding.UTF8);

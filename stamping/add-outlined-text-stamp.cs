@@ -1,47 +1,38 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;   // TextState, FontRepository
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "stamped_output.pdf";
-
-        if (!File.Exists(inputPath))
+        // Create a sample PDF with a single blank page
+        using (Document document = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
+            document.Pages.Add();
+            document.Save("input.pdf");
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Open the sample PDF for stamping
+        using (Document document = new Document("input.pdf"))
         {
-            // Create a TextStamp with the desired text
-            TextStamp textStamp = new TextStamp("OUTLINED TEXT");
+            // Configure text state for outlined effect (simulated with a bold font)
+            TextState textState = new TextState();
+            textState.Font = FontRepository.FindFont("Arial-BoldMT");
+            textState.FontSize = 48;
+            textState.ForegroundColor = Color.Black;
 
-            // The current Aspose.Pdf version does not expose TextRenderingMode on TextState.
-            // To achieve an outlined‑like appearance, use a bold font (or a heavier weight).
-            textStamp.TextState.Font = FontRepository.FindFont("Helvetica-Bold");
-            textStamp.TextState.FontSize = 48;
-            textStamp.TextState.ForegroundColor = Color.Black; // stroke/fill color
-
-            // Optional visual settings
-            textStamp.Opacity = 1.0;      // fully opaque
-            textStamp.Background = false; // draw on top of page content
+            // Create a text stamp using the configured text state
+            TextStamp textStamp = new TextStamp("Outlined Text", textState);
             textStamp.HorizontalAlignment = HorizontalAlignment.Center;
-            textStamp.VerticalAlignment   = VerticalAlignment.Center;
+            textStamp.VerticalAlignment = VerticalAlignment.Center;
+            textStamp.Opacity = 1.0f;
 
-            // Add the stamp to the first page (or iterate pages as needed)
-            Page page = doc.Pages[1];
-            page.AddStamp(textStamp);
+            // Add the stamp to the first page (1‑based indexing)
+            document.Pages[1].AddStamp(textStamp);
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            // Save the stamped PDF
+            document.Save("output.pdf");
         }
-
-        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
     }
 }

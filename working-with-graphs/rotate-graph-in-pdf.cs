@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Runtime.InteropServices;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
@@ -8,48 +7,41 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "rotated_graph.pdf";
-        const double rotationDegrees = 45; // rotation angle in degrees
-
-        if (!File.Exists(inputPath))
+        // Create a new PDF document and ensure deterministic disposal
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            // Add a blank page (page indexing is 1‑based)
+            Page page = doc.Pages.Add();
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
-        {
-            // Get the first page (Aspose.Pdf uses 1‑based indexing)
-            Aspose.Pdf.Page page = doc.Pages[1];
+            // Use the Graph constructor that accepts double values
+            Graph graph = new Graph(400.0, 200.0);
 
-            // Create a Graph container (width, height) – this will hold vector shapes
-            Aspose.Pdf.Drawing.Graph graph = new Aspose.Pdf.Drawing.Graph(400, 200);
+            // Apply a rotation to the entire graph (degrees). Use double literal as required.
+            graph.GraphInfo.RotationAngle = 45.0;
 
-            // Set the rotation for the entire graph (applies to all child shapes)
-            graph.GraphInfo = new Aspose.Pdf.GraphInfo
-            {
-                RotationAngle = rotationDegrees
-            };
+            // Create a rectangle shape for the graph.
+            // Constructor parameters: lower‑left X, lower‑left Y, width, height (all float).
+            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(
+                50f,   // llx
+                50f,   // lly
+                100f,  // width  (150 - 50)
+                50f);  // height (100 - 50)
 
-            // Example shape: a rectangle
-            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(0, 0, 100, 50);
-            rect.GraphInfo = new Aspose.Pdf.GraphInfo
+            // Configure visual appearance using GraphInfo and Aspose.Pdf.Color
+            rect.GraphInfo = new GraphInfo
             {
                 FillColor = Aspose.Pdf.Color.LightGray,
                 Color = Aspose.Pdf.Color.Black,
-                LineWidth = 2
+                LineWidth = 2f
             };
 
-            // Add the rectangle to the graph
+            // Add the rectangle to the graph and the graph to the page
             graph.Shapes.Add(rect);
-
-            // Add the graph to the page's paragraph collection
             page.Paragraphs.Add(graph);
 
-            // Save the document.
-            // On non‑Windows platforms the PDF save may require libgdiplus; handle gracefully.
+            string outputPath = "rotated_graph.pdf";
+
+            // Guard Document.Save for platforms where libgdiplus (GDI+) is unavailable (e.g., macOS/Linux).
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 doc.Save(outputPath);
@@ -62,16 +54,14 @@ class Program
                 }
                 catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
                 {
-                    Console.WriteLine("GDI+ (libgdiplus) not available; saved PDF without rendering the graph.");
+                    Console.WriteLine("GDI+ (libgdiplus) is not available on this platform. PDF saved without rendering the graph.");
                 }
             }
         }
-
-        Console.WriteLine($"Document saved to '{outputPath}'.");
     }
 
-    // Helper to detect nested DllNotFoundException (e.g., missing libgdiplus)
-    static bool ContainsDllNotFound(Exception ex)
+    // Helper to detect a nested DllNotFoundException (libgdiplus) inside a TypeInitializationException.
+    private static bool ContainsDllNotFound(Exception? ex)
     {
         while (ex != null)
         {

@@ -7,9 +7,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "protected.pdf";
-        const string userPassword = "user123";
+        const string userPassword  = "user123";
         const string ownerPassword = "owner123";
 
         if (!File.Exists(inputPath))
@@ -18,15 +18,23 @@ class Program
             return;
         }
 
-        // Initialize the facade with input and output files
+        // Initialize the facade with source and destination files
         PdfFileSecurity fileSecurity = new PdfFileSecurity(inputPath, outputPath);
 
-        // Encrypt the PDF with desired privileges and key size
-        bool result = fileSecurity.EncryptFile(userPassword, ownerPassword, DocumentPrivilege.Print, KeySize.x256);
+        // Encrypt the PDF:
+        // - userPassword / ownerPassword set as provided
+        // - DocumentPrivilege.Print allows printing only
+        // - KeySize.x256 selects 256‑bit AES encryption
+        bool encrypted = fileSecurity.EncryptFile(userPassword, ownerPassword,
+                                                  DocumentPrivilege.Print, KeySize.x256);
 
-        if (result)
-            Console.WriteLine($"PDF encrypted successfully: {outputPath}");
-        else
-            Console.Error.WriteLine("Failed to encrypt PDF.");
+        if (!encrypted)
+        {
+            Console.Error.WriteLine($"Encryption failed: {fileSecurity.LastException?.Message}");
+            return;
+        }
+
+        // EncryptFile writes the output file; no further Save call is required
+        Console.WriteLine($"PDF encrypted successfully: {outputPath}");
     }
 }

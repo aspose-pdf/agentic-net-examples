@@ -15,25 +15,19 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Define corporate brand color (RGB values)
-            int r = 30;   // Red component (0‑255)
-            int g = 144;  // Green component (0‑255)
-            int b = 255;  // Blue component (0‑255)
+            // Define the corporate brand color (example RGB: 30, 144, 255)
+            Aspose.Pdf.Color brandColor = Aspose.Pdf.Color.FromArgb(30, 144, 255);
 
-            // Create Aspose.Pdf.Color from RGB components
-            Aspose.Pdf.Color brandColor = Aspose.Pdf.Color.FromArgb(r, g, b);
-
-            // Apply the background color to every page (1‑based indexing)
+            // Apply the background color to each page (1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                Page page = doc.Pages[i];
-                page.Background = brandColor;
+                doc.Pages[i].Background = brandColor;
             }
 
-            // Save the modified PDF (lifecycle rule: Document.Save)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

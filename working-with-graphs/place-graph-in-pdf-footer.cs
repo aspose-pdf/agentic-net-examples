@@ -6,54 +6,52 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "graph_footer.pdf";
-
-        // Create a new PDF document and ensure proper disposal
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a single page
+            // Add a page (1‑based indexing)
             Page page = doc.Pages.Add();
 
-            // Create a graph (width: 200pt, height: 100pt)
-            Graph graph = new Graph(200, 100);
+            // Define page margins (in points)
+            page.PageInfo.Margin = new MarginInfo
+            {
+                Top = 50,
+                Bottom = 50,
+                Left = 40,
+                Right = 40
+            };
 
-            // Define visual appearance of the graph
-            graph.GraphInfo = new GraphInfo
+            // Create a Graph object (width, height) that will be placed in the footer
+            // NOTE: Graph constructor now expects double values
+            Graph graph = new Graph(200.0, 30.0); // 200pt wide, 30pt high
+
+            // Add a simple rectangle shape to the graph
+            // Rectangle constructor expects float values
+            var rect = new Aspose.Pdf.Drawing.Rectangle(0f, 0f, 200f, 30f);
+            rect.GraphInfo = new GraphInfo
             {
                 FillColor = Color.LightGray,
                 Color = Color.Black,
-                LineWidth = 1
-            };
-
-            // Add a rectangle shape inside the graph
-            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(0, 0, 200, 100);
-            rect.GraphInfo = new GraphInfo
-            {
-                FillColor = Color.Yellow,
-                Color = Color.DarkBlue,
-                LineWidth = 2
+                LineWidth = 1f // float literal
             };
             graph.Shapes.Add(rect);
 
-            // Configure the page footer
+            // Initialize the page footer
             page.Footer = new HeaderFooter();
 
-            // Set footer margins relative to the page edges
+            // Optional: set footer margins (relative to page margins)
             page.Footer.Margin = new MarginInfo
             {
-                Top = 5,      // distance from the top of the footer area
-                Bottom = 5,   // distance from the bottom of the footer area
-                Left = 20,    // left margin inside the footer
-                Right = 20    // right margin inside the footer
+                Bottom = 10 // extra space from the bottom edge of the page
             };
 
             // Add the graph to the footer's paragraph collection
             page.Footer.Paragraphs.Add(graph);
 
-            // Save the PDF
-            doc.Save(outputPath);
+            // Save the PDF document
+            doc.Save("GraphInFooter.pdf");
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine("PDF with graph in footer created successfully.");
     }
 }

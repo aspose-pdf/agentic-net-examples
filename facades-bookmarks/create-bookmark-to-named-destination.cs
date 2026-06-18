@@ -2,15 +2,15 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Annotations;   // NamedDestination, Bookmark
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";   // source PDF
-        const string outputPath = "output.pdf";  // PDF with new bookmark
-        const string destName   = "MyNamedDestination"; // name of the destination
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_with_bookmark.pdf";
+        const string destName   = "MyNamedDestination";
 
         if (!File.Exists(inputPath))
         {
@@ -18,45 +18,40 @@ class Program
             return;
         }
 
-        // Use PdfBookmarkEditor facade (implements IDisposable)
-        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document
-            editor.BindPdf(inputPath);
-
-            // Access the underlying Document to ensure the destination page exists
-            Document doc = editor.Document;
-            if (doc.Pages.Count < 2) // example: we want the destination on page 2
+            // Ensure the document has at least one page
+            if (doc.Pages.Count == 0)
             {
-                Console.Error.WriteLine("The PDF does not contain page 2 for the named destination.");
+                Console.Error.WriteLine("The PDF has no pages.");
                 return;
             }
 
-            // Create a named destination (adds it to the document's name dictionary)
-            // The destination will point to page 2 (you can adjust as needed)
-            // Note: NamedDestination only registers the name; the actual location is the page it is associated with.
-            // Here we associate it with page 2 by creating a GoToAction later if needed.
-            NamedDestination namedDest = new NamedDestination(doc, destName);
-            // Optionally, you could create a GoToAction using the named destination:
-            // GoToAction action = new GoToAction(doc, destName);
-            // (Not required for the bookmark itself.)
+            // Define a named destination that points to page 1 (adjust as needed)
+            Page targetPage = doc.Pages[1];
+            GoToAction goTo = new GoToAction(targetPage);
+            doc.NamedDestinations.Add(destName, goTo);
 
             // Create a bookmark that references the named destination
+            PdfBookmarkEditor editor = new PdfBookmarkEditor();
+            editor.BindPdf(doc);
+
             Bookmark bookmark = new Bookmark
             {
-                Title      = $"Go to {destName}",
-                Action     = "Named",   // indicates that Destination is a named destination
-                Destination = destName   // the name defined above
-                // No PageNumber is set because the action type is "Named"
+                Title      = "Jump to Named Destination",
+                Action     = "Named",          // Use the "Named" action type
+                Destination = destName         // Name of the destination defined above
             };
 
-            // Add the bookmark to the PDF outline
+            // Add the bookmark to the document
             editor.CreateBookmarks(bookmark);
 
-            // Save the modified PDF
+            // Save the updated PDF using the facade's Save method
             editor.Save(outputPath);
+            editor.Close(); // optional, Dispose will be called automatically at the end of using if wrapped
         }
 
-        Console.WriteLine($"Bookmark pointing to named destination '{destName}' saved to '{outputPath}'.");
+        Console.WriteLine($"Bookmark created and saved to '{outputPath}'.");
     }
 }

@@ -7,44 +7,37 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf   = "secured.pdf";               // Encrypted PDF
-        const string outputPdf  = "secured_with_attachment.pdf";
-        const string password   = "userpass";                  // User/owner password
-        const string attachFile = "attachment.txt";            // File to attach
-        const string description = "Sample attachment";
+        // Input PDF (encrypted), its password, attachment file and output PDF paths
+        const string inputPdfPath   = "secured.pdf";
+        const string userPassword   = "userPass";
+        const string attachmentPath = "attachment.txt";
+        const string outputPdfPath  = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        // Validate files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(attachFile))
+        if (!File.Exists(attachmentPath))
         {
-            Console.Error.WriteLine($"Attachment file not found: {attachFile}");
+            Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
             return;
         }
 
-        try
+        // Open the encrypted PDF using its password
+        using (Document doc = new Document(inputPdfPath, userPassword))
         {
-            // Open the encrypted PDF using the password
-            using (Document doc = new Document(inputPdf, password))
-            {
-                // Initialize the Facade editor with the opened document
-                using (PdfContentEditor editor = new PdfContentEditor(doc))
-                {
-                    // Add the file attachment (no visual annotation)
-                    editor.AddDocumentAttachment(attachFile, description);
+            // Initialize the Facade editor with the opened document
+            PdfContentEditor editor = new PdfContentEditor(doc);
 
-                    // Save the modified PDF
-                    editor.Save(outputPdf);
-                }
-            }
+            // Add the file attachment (no visual annotation)
+            editor.AddDocumentAttachment(attachmentPath, "Sample attachment description");
 
-            Console.WriteLine($"Attachment added and saved to '{outputPdf}'.");
+            // Save the modified PDF
+            editor.Save(outputPdfPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Attachment added and saved to '{outputPdfPath}'.");
     }
 }

@@ -1,97 +1,113 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades;   // PdfBookmarkEditor, Bookmark, Bookmarks
 
 class Program
 {
     static void Main()
     {
-        const string pdfInputPath   = "input.pdf";
-        const string csvBookmarksPath = "bookmarks.csv";
-        const string pdfOutputPath  = "output.pdf";
+        // Input PDF, CSV with bookmarks, and output PDF paths
+        const string pdfPath      = "input.pdf";
+        const string csvPath      = "bookmarks.csv";
+        const string outputPath   = "output.pdf";
 
-        if (!File.Exists(pdfInputPath))
+        // Verify files exist
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfInputPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
-        if (!File.Exists(csvBookmarksPath))
+        if (!File.Exists(csvPath))
         {
-            Console.Error.WriteLine($"CSV not found: {csvBookmarksPath}");
+            Console.Error.WriteLine($"CSV not found: {csvPath}");
             return;
         }
 
-        // Parse CSV and build bookmark hierarchy
-        // CSV format per line: Title,Level,DestinationPage
-        var topLevelBookmarks = new List<Bookmark>();
-        // Keeps the most recent bookmark at each level (1‑based)
-        var lastAtLevel = new Dictionary<int, Bookmark>();
+        // ------------------------------------------------------------
+        // Parse CSV file.
+        // Expected format per line: Title,Level,PageNumber
+        // Example: "Chapter 1",1,5
+        // ------------------------------------------------------------
+        var topLevelBookmarks = new List<Bookmark>();          // holds level‑1 bookmarks
+        var lastBookmarkAtLevel = new Dictionary<int, Bookmark>(); // tracks the most recent bookmark per level
 
-        foreach (var rawLine in File.ReadLines(csvBookmarksPath))
+        foreach (string rawLine in File.ReadAllLines(csvPath))
         {
-            // Skip empty lines
             if (string.IsNullOrWhiteSpace(rawLine))
-                continue;
+                continue; // skip empty lines
 
-            var parts = rawLine.Split(',');
+            string[] parts = rawLine.Split(',');
             if (parts.Length < 3)
                 continue; // malformed line
 
-            string title      = parts[0].Trim();
+            string title = parts[0].Trim();
+
             if (!int.TryParse(parts[1].Trim(), out int level) || level < 1)
                 continue; // invalid level
-            if (!int.TryParse(parts[2].Trim(), out int pageNumber) || pageNumber < 1)
-                continue; // invalid destination
 
-            // Create bookmark for this entry
-            Bookmark bm = new Bookmark {
+            if (!int.TryParse(parts[2].Trim(), out int pageNumber) || pageNumber < 1)
+                continue; // invalid page number
+
+            // Create a new bookmark instance
+            Bookmark bookmark = new Bookmark {
                 Title      = title,
-                PageNumber = pageNumber,
-                Action     = "GoTo" // explicit action for clarity
+                PageNumber = pageNumber
             };
 
-            // Attach to hierarchy
             if (level == 1)
             {
-                topLevelBookmarks.Add(bm);
+                // Top‑level bookmark
+                topLevelBookmarks.Add(bookmark);
             }
             else
             {
-                // Find parent at level-1
-                if (lastAtLevel.TryGetValue(level - 1, out Bookmark parent))
+                // Find the parent bookmark (level‑1)
+                if (lastBookmarkAtLevel.TryGetValue(level - 1, out Bookmark parent))
                 {
-                    // Ensure parent has a child collection
+                    // Ensure the parent has a child collection
                     if (parent.ChildItem == null)
                         parent.ChildItem = new Bookmarks();
 
-                    parent.ChildItem.Add(bm);
+                    parent.ChildItem.Add(bookmark);
                 }
                 else
                 {
-                    // Orphaned entry – treat as top level
-                    topLevelBookmarks.Add(bm);
+                    // No parent found – treat as top‑level to avoid loss
+                    topLevelBookmarks.Add(bookmark);
                 }
             }
 
-            // Update the last bookmark seen at this level
-            lastAtLevel[level] = bm;
+            // Update the tracker for the current level
+            lastBookmarkAtLevel[level] = bookmark;
+
+            // Remove deeper levels from the tracker (they are no longer ancestors)
+            var keysToRemove = new List<int>();
+            foreach (int key in lastBookmarkAtLevel.Keys)
+                if (key > level)
+                    keysToRemove.Add(key);
+            foreach (int key in keysToRemove)
+                lastBookmarkAtLevel.Remove(key);
         }
 
-        // Apply bookmarks to the PDF using PdfBookmarkEditor
-        PdfBookmarkEditor editor = new PdfBookmarkEditor();
-        editor.BindPdf(pdfInputPath);
-
-        // Add each top‑level bookmark (which may contain nested children)
-        foreach (var bm in topLevelBookmarks)
+        // ------------------------------------------------------------
+        // Apply the bookmarks to the PDF using PdfBookmarkEditor.
+        // ------------------------------------------------------------
+        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
         {
-            editor.CreateBookmarks(bm);
+            // Load the source PDF
+            editor.BindPdf(pdfPath);
+
+            // Add each top‑level bookmark (hierarchy is already attached)
+            foreach (Bookmark bm in topLevelBookmarks)
+            {
+                editor.CreateBookmarks(bm);
+            }
+
+            // Save the result
+            editor.Save(outputPath);
         }
 
-        // Save the updated PDF
-        editor.Save(pdfOutputPath);
-        editor.Close();
-
-        Console.WriteLine($"Bookmarks imported and saved to '{pdfOutputPath}'.");
+        Console.WriteLine($"Bookmarks imported successfully to '{outputPath}'.");
     }
 }

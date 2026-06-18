@@ -8,7 +8,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string attachmentName = "myfile.txt";
+        const string attachmentName = "example.txt";
 
         if (!File.Exists(inputPath))
         {
@@ -16,26 +16,26 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Verify the attachment exists
-            var fileSpec = doc.EmbeddedFiles.FindByName(attachmentName);
-            if (fileSpec != null)
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
             {
-                // Delete the attachment by its filename
-                doc.EmbeddedFiles.Delete(attachmentName);
-                Console.WriteLine($"Attachment '{attachmentName}' deleted.");
-            }
-            else
-            {
-                Console.WriteLine($"Attachment '{attachmentName}' not found.");
+                // Check if the attachment exists and delete it by name
+                if (doc.EmbeddedFiles.FindByName(attachmentName) != null)
+                {
+                    doc.EmbeddedFiles.Delete(attachmentName);
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Save the updated PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Attachment '{attachmentName}' removed. Saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

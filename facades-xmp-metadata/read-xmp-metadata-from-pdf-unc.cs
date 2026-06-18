@@ -10,27 +10,27 @@ class Program
         // UNC path to the PDF file on a network share
         const string pdfPath = @"\\server\share\documents\sample.pdf";
 
-        // Verify that the file exists before attempting to read it
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Use the PdfXmpMetadata facade to read XMP metadata
-        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
+        try
         {
-            // Bind the PDF located at the UNC path
-            xmp.BindPdf(pdfPath);
-
-            // Retrieve the entire XMP metadata as an XML byte array
-            byte[] xmlBytes = xmp.GetXmpMetadata();
-
-            // Convert the byte array to a UTF‑8 string for display or further processing
-            string xml = Encoding.UTF8.GetString(xmlBytes);
-
-            Console.WriteLine("XMP Metadata (XML):");
-            Console.WriteLine(xml);
+            // Use the PdfXmpMetadata facade to read XMP metadata
+            using (PdfXmpMetadata xmp = new PdfXmpMetadata())
+            {
+                xmp.BindPdf(pdfPath);                     // Initialize with the PDF file
+                byte[] rawData = xmp.GetXmpMetadata();    // Retrieve XMP as XML bytes
+                string xml = Encoding.UTF8.GetString(rawData);
+                Console.WriteLine("XMP Metadata:");
+                Console.WriteLine(xml);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error reading XMP metadata: {ex.Message}");
         }
     }
 }

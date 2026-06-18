@@ -9,9 +9,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // source PDF with form fields
-        const string outputJson = "filtered_fields.json"; // destination JSON file
-        const string prefix = "Customer_";            // only fields whose names start with this
+        const string inputPdf = "input.pdf";
+        const string outputJson = "filtered_fields.json";
+        const string prefix = "Customer_"; // only fields whose names start with this prefix will be exported
 
         if (!File.Exists(inputPdf))
         {
@@ -19,10 +19,17 @@ class Program
             return;
         }
 
-        // Open the PDF document
+        // Load the PDF document
         using (Document doc = new Document(inputPdf))
         {
-            // Collect fields whose names begin with the specified prefix
+            // Ensure the document contains a form
+            if (doc.Form == null || doc.Form.Fields == null)
+            {
+                Console.WriteLine("No form fields found in the document.");
+                return;
+            }
+
+            // Collect field names and values that match the prefix
             var filtered = new Dictionary<string, object>();
 
             foreach (Field field in doc.Form.Fields)
@@ -30,36 +37,35 @@ class Program
                 // Field.Name may be null for some internal fields; guard against it
                 if (!string.IsNullOrEmpty(field.Name) && field.Name.StartsWith(prefix, StringComparison.Ordinal))
                 {
-                    // Most field types expose a Value property; use it if available
+                    // Retrieve the field value; most field types expose a Value property
+                    // For checkboxes/radio buttons the value may be a boolean or string
                     object value = GetFieldValue(field);
                     filtered[field.Name] = value;
                 }
             }
 
-            // Serialize the filtered collection to JSON
+            // Serialize the filtered collection to JSON with indentation
             JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-            using (FileStream fs = new FileStream(outputJson, FileMode.Create, FileAccess.Write))
-            {
-                JsonSerializer.Serialize(fs, filtered, jsonOptions);
-            }
+            string json = JsonSerializer.Serialize(filtered, jsonOptions);
 
-            Console.WriteLine($"Exported {filtered.Count} fields to '{outputJson}'.");
+            // Write the JSON to the output file
+            File.WriteAllText(outputJson, json);
+            Console.WriteLine($"Filtered fields exported to '{outputJson}'.");
         }
     }
 
-    // Helper to extract a field's value in a generic way
+    // Helper method to extract a field's value in a generic way
     private static object GetFieldValue(Field field)
     {
-        // Most concrete field types inherit the Value property.
-        // If the field does not expose a value, return null.
-        try
+        // Most concrete field types inherit from Field and expose a Value property.
+        // Use reflection to read it safely without depending on a specific subclass.
+        var valueProp = field.GetType().GetProperty("Value");
+        if (valueProp != null)
         {
-            // The Value property returns an object; for checkboxes/radio buttons it may be a bool or string.
-            return field.Value;
+            return valueProp.GetValue(field);
         }
-        catch
-        {
-            return null;
-        }
+
+        // Fallback for fields that may not have a Value property (e.g., Button)
+        return null;
     }
 }

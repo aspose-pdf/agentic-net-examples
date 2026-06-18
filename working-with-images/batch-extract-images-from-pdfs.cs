@@ -6,63 +6,51 @@ class Program
 {
     static void Main()
     {
-        // Folder containing the PDFs to process
-        const string inputFolder = "InputPdfs";
-        // Folder where extracted images will be saved
-        const string outputFolder = "ExtractedImages";
+        // Input folder containing PDF files
+        const string inputFolder = @"C:\InputPdfs";
+        // Output folder where extracted images will be saved
+        const string outputFolder = @"C:\ExtractedImages";
 
         if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Input folder does not exist: {inputFolder}");
             return;
         }
 
-        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Get all PDF files in the input folder
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
-        if (pdfFiles.Length == 0)
-        {
-            Console.WriteLine("No PDF files found in the input folder.");
-            return;
-        }
-
-        foreach (string pdfPath in pdfFiles)
+        // Process each PDF file in the input folder
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
             try
             {
-                // Load each PDF inside a using block for deterministic disposal
+                // Load the PDF document (wrapped in using for deterministic disposal)
                 using (Document doc = new Document(pdfPath))
                 {
-                    // Pages are 1‑based in Aspose.Pdf
-                    for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+                    string pdfBaseName = Path.GetFileNameWithoutExtension(pdfPath);
+
+                    // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+                    for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
                     {
-                        Page page = doc.Pages[pageIndex];
+                        Page page = doc.Pages[pageNum];
                         int imageIndex = 1;
 
-                        // Iterate over the image collection; it yields XImage objects directly
+                        // Iterate over the XImage collection (direct foreach, not a dictionary)
                         foreach (XImage img in page.Resources.Images)
                         {
-                            // Save the image to a memory stream first
-                            using (var ms = new MemoryStream())
+                            // Build a unique file name for each extracted image
+                            string imageFileName = $"{pdfBaseName}_page{pageNum}_img{imageIndex}.png";
+                            string imagePath = Path.Combine(outputFolder, imageFileName);
+
+                            // Save the image to the output folder using a FileStream because the
+                            // XImage.Save overload that accepts a string path is not available in
+                            // the referenced Aspose.Pdf version.
+                            using (FileStream fs = new FileStream(imagePath, FileMode.Create, FileAccess.Write))
                             {
-                                img.Save(ms); // XImage.Save accepts a Stream, not a file path
-                                byte[] imageBytes = ms.ToArray();
-
-                                // Determine a suitable file extension based on the image header
-                                string extension = GetImageExtensionFromBytes(imageBytes);
-
-                                // Build a unique file name: <pdfname>_page<page>_img<index>.<ext>
-                                string pdfName = Path.GetFileNameWithoutExtension(pdfPath);
-                                string fileName = $"{pdfName}_page{pageIndex}_img{imageIndex}{extension}";
-                                string outPath = Path.Combine(outputFolder, fileName);
-
-                                // Write the image bytes to disk
-                                File.WriteAllBytes(outPath, imageBytes);
-                                Console.WriteLine($"Saved image: {outPath}");
+                                img.Save(fs);
                             }
 
+                            Console.WriteLine($"Extracted: {imagePath}");
                             imageIndex++;
                         }
                     }
@@ -73,45 +61,7 @@ class Program
                 Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         }
-    }
 
-    // Helper method to obtain a file extension based on the image header bytes.
-    // Falls back to .png if the format cannot be determined.
-    static string GetImageExtensionFromBytes(byte[] bytes)
-    {
-        if (bytes == null || bytes.Length < 4)
-            return ".png"; // default
-
-        // JPEG: FF D8 FF
-        if (bytes.Length >= 3 && bytes[0] == 0xFF && bytes[1] == 0xD8 && bytes[2] == 0xFF)
-            return ".jpg";
-
-        // PNG: 89 50 4E 47 0D 0A 1A 0A
-        if (bytes.Length >= 8 && bytes[0] == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47)
-            return ".png";
-
-        // GIF: 47 49 46 38 (GIF8)
-        if (bytes.Length >= 4 && bytes[0] == 0x47 && bytes[1] == 0x49 && bytes[2] == 0x46 && bytes[3] == 0x38)
-            return ".gif";
-
-        // BMP: 42 4D
-        if (bytes.Length >= 2 && bytes[0] == 0x42 && bytes[1] == 0x4D)
-            return ".bmp";
-
-        // TIFF (little endian): 49 49 2A 00
-        if (bytes.Length >= 4 && bytes[0] == 0x49 && bytes[1] == 0x49 && bytes[2] == 0x2A && bytes[3] == 0x00)
-            return ".tiff";
-
-        // TIFF (big endian): 4D 4D 00 2A
-        if (bytes.Length >= 4 && bytes[0] == 0x4D && bytes[1] == 0x4D && bytes[2] == 0x00 && bytes[3] == 0x2A)
-            return ".tiff";
-
-        // WebP: RIFF....WEBP
-        if (bytes.Length >= 12 && bytes[0] == 0x52 && bytes[1] == 0x49 && bytes[2] == 0x46 && bytes[3] == 0x46 &&
-            bytes[8] == 0x57 && bytes[9] == 0x45 && bytes[10] == 0x42 && bytes[11] == 0x50)
-            return ".webp";
-
-        // Default fallback
-        return ".png";
+        Console.WriteLine("Image extraction completed.");
     }
 }

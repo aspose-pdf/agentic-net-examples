@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,30 +16,34 @@ class Program
             return;
         }
 
-        // Load the PDF document; using ensures deterministic disposal.
+        // Load the PDF document using a using block (lifecycle rule)
         using (Document doc = new Document(inputPath))
         {
-            // Instantiate the PdfContentEditor facade.
-            PdfContentEditor editor = new PdfContentEditor();
-
+            PdfContentEditor editor = null;
             try
             {
-                // Bind the loaded document to the editor.
+                // Create the PdfContentEditor facade
+                editor = new PdfContentEditor();
+
+                // Bind the loaded document to the facade
                 editor.BindPdf(doc);
 
-                // Example edit: replace all occurrences of "Hello" with "Hi".
+                // Example operation: replace all occurrences of "Hello" with "Hi"
                 editor.ReplaceText("Hello", "Hi");
 
-                // Save the edited document to a new file.
+                // Save the modified document via the facade
                 editor.Save(outputPath);
             }
             finally
             {
-                // Ensure the facade releases all resources.
-                editor.Close();
+                // Ensure the facade releases all resources
+                if (editor != null)
+                {
+                    editor.Close(); // disposes the bound document and releases resources
+                }
             }
         }
 
-        Console.WriteLine($"Edited PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

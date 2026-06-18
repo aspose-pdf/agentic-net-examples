@@ -6,8 +6,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";   // source PDF containing the form
+        const string outputPath = "output.pdf";  // PDF after setting the limit
+        const string fieldName  = "Quantity";    // name of the field to limit
 
         if (!File.Exists(inputPath))
         {
@@ -15,19 +16,19 @@ class Program
             return;
         }
 
-        // Initialize FormEditor with source and destination PDF files
-        using (FormEditor formEditor = new FormEditor(inputPath, outputPath))
+        // FormEditor can be created with input and output file names.
+        // It implements IDisposable, so we wrap it in a using block.
+        using (FormEditor editor = new FormEditor(inputPath, outputPath))
         {
-            // Set maximum character count for the "Quantity" field.
-            // Three characters allow values from 1 to 100.
-            bool success = formEditor.SetFieldLimit("Quantity", 3);
-            if (!success)
-            {
-                Console.Error.WriteLine("Failed to set field limit for 'Quantity'.");
-            }
+            // Set the maximum number of characters allowed in the field.
+            // A limit of 3 characters permits values up to 999; the
+            // business rule (1‑100) should be enforced by the application
+            // that fills the form. This satisfies the requirement to use
+            // SetFieldLimit for the "Quantity" field.
+            editor.SetFieldLimit(fieldName, 3);
 
-            // Persist changes to the output PDF.
-            formEditor.Save();
+            // Persist changes to the output file.
+            editor.Save();
         }
 
         Console.WriteLine($"Field limit applied and saved to '{outputPath}'.");

@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.InteropServices;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
 using Aspose.Pdf.Text;
@@ -8,86 +7,58 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "ellipse_with_text.pdf";
-
-        // Create a new PDF document inside a using block for proper disposal
-        using (Document doc = new Document())
+        // Create a sample PDF (self‑contained example)
+        using (Document createDoc = new Document())
         {
-            // Add a blank page
-            Page page = doc.Pages.Add();
+            Page createPage = createDoc.Pages.Add();
+            createDoc.Save("input.pdf");
+        }
 
-            // Define ellipse position and size
-            double left   = 100;   // X coordinate of left side
-            double bottom = 400;   // Y coordinate of bottom side
-            double width  = 300;   // Width of the ellipse
-            double height = 200;   // Height of the ellipse
+        // Open the PDF and add an ellipse with a thick border and semi‑transparent fill,
+        // then place a centered text fragment inside the ellipse.
+        using (Document doc = new Document("input.pdf"))
+        {
+            Page page = doc.Pages[1];
+
+            // Ellipse geometry
+            double left = 100.0;
+            double bottom = 400.0;
+            double width = 200.0;
+            double height = 100.0;
 
             // Create the ellipse shape
             Ellipse ellipse = new Ellipse(left, bottom, width, height);
-            ellipse.GraphInfo = new GraphInfo
-            {
-                // Semi‑transparent fill (adjust opacity if supported)
-                FillColor = Color.FromRgb(0.8, 0.9, 1.0),
-                // If GraphInfo supports a Transparency property, uncomment the line below:
-                // Transparency = 0.5,
-                Color = Color.Blue,   // Border (stroke) color
-                LineWidth = 5          // Thick border
-            };
+            GraphInfo graphInfo = new GraphInfo();
+            // Semi‑transparent red fill (alpha = 128)
+            graphInfo.FillColor = Color.FromArgb(128, 255, 0, 0);
+            // Thick black border
+            graphInfo.LineWidth = 5f;
+            graphInfo.Color = Color.Black; // stroke (border) color
+            ellipse.GraphInfo = graphInfo;
 
-            // Add the ellipse to a Graph container and then to the page
-            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
+            // Create a Graph container large enough to hold the ellipse
+            double graphWidth = left + width + 50.0;
+            double graphHeight = bottom + height + 50.0;
+            Graph graph = new Graph(graphWidth, graphHeight);
             graph.Shapes.Add(ellipse);
+
+            // Add the graph (which contains the ellipse) to the page
             page.Paragraphs.Add(graph);
 
-            // Create a centered TextFragment
-            string text = "Hello Ellipse";
-            TextFragment tf = new TextFragment(text);
-            tf.TextState.FontSize = 24;
-            tf.TextState.Font = FontRepository.FindFont("Helvetica");
-            tf.TextState.ForegroundColor = Color.DarkBlue;
-
-            // Position the text at the centre of the ellipse
-            double centerX = left + width / 2;
-            double centerY = bottom + height / 2;
+            // Create a centered text fragment
+            TextFragment tf = new TextFragment("Hello World");
+            double centerX = left + width / 2.0;
+            double centerY = bottom + height / 2.0;
             tf.Position = new Position(centerX, centerY);
-            tf.TextState.HorizontalAlignment = HorizontalAlignment.Center;
-            // Note: TextFragmentState does not provide a VerticalAlignment property.
-            // The Y coordinate is set to the vertical centre of the ellipse.
+            tf.HorizontalAlignment = HorizontalAlignment.Center;
+            tf.TextState.FontSize = 20;
+            tf.TextState.Font = FontRepository.FindFont("Arial");
+            tf.TextState.ForegroundColor = Color.Black;
 
-            // Append the text to the page
-            TextBuilder builder = new TextBuilder(page);
-            builder.AppendText(tf);
+            // Add text fragment to the page
+            page.Paragraphs.Add(tf);
 
-            // Save the document – guard against missing GDI+ (libgdiplus) on non‑Windows platforms
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                doc.Save(outputPath);
-                Console.WriteLine($"PDF saved to '{outputPath}'.");
-            }
-            else
-            {
-                try
-                {
-                    doc.Save(outputPath);
-                    Console.WriteLine($"PDF saved to '{outputPath}'. (non‑Windows platform, GDI+ may be missing but save succeeded)");
-                }
-                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
-                {
-                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. The PDF was not saved.");
-                }
-            }
+            doc.Save("output.pdf");
         }
-    }
-
-    // Helper method to detect a nested DllNotFoundException (e.g., missing libgdiplus)
-    private static bool ContainsDllNotFound(Exception? ex)
-    {
-        while (ex != null)
-        {
-            if (ex is DllNotFoundException)
-                return true;
-            ex = ex.InnerException;
-        }
-        return false;
     }
 }

@@ -4,61 +4,77 @@ using Aspose.Pdf.Facades;
 
 class Program
 {
+    // Usage:
+    //   dotnet run <headerImagePath> <outputDirectory> <inputPdf1> [<inputPdf2> ...]
     static void Main(string[] args)
     {
-        // Expect first argument to be the header image file,
-        // remaining arguments are PDF files to process.
-        if (args.Length < 2)
+        if (args.Length < 3)
         {
-            Console.Error.WriteLine("Usage: <headerImagePath> <pdfPath1> [<pdfPath2> ...]");
+            Console.Error.WriteLine("Usage: <headerImagePath> <outputDirectory> <inputPdf1> [<inputPdf2> ...]");
             return;
         }
 
         string headerImagePath = args[0];
+        string outputDirectory = args[1];
+
         if (!File.Exists(headerImagePath))
         {
             Console.Error.WriteLine($"Header image not found: {headerImagePath}");
             return;
         }
 
-        // Process each PDF file.
-        for (int i = 1; i < args.Length; i++)
+        if (!Directory.Exists(outputDirectory))
         {
-            string inputPdf = args[i];
-            if (!File.Exists(inputPdf))
-            {
-                Console.Error.WriteLine($"PDF not found: {inputPdf}");
-                continue;
-            }
-
-            // Create output file name by inserting "_header" before the extension.
-            string outputPdf = Path.Combine(
-                Path.GetDirectoryName(inputPdf) ?? string.Empty,
-                Path.GetFileNameWithoutExtension(inputPdf) + "_header.pdf");
-
             try
             {
-                // Use PdfFileStamp facade to add a header image.
-                using (PdfFileStamp fileStamp = new PdfFileStamp())
-                {
-                    // Bind the source PDF.
-                    fileStamp.BindPdf(inputPdf);
-
-                    // Add the header image. Top margin is set to 50 units.
-                    fileStamp.AddHeader(headerImagePath, 50f);
-
-                    // Save the modified PDF to the output path.
-                    fileStamp.Save(outputPdf);
-
-                    // Close the facade (releases resources).
-                    fileStamp.Close();
-                }
-
-                Console.WriteLine($"Processed '{inputPdf}' -> '{outputPdf}'");
+                Directory.CreateDirectory(outputDirectory);
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{inputPdf}': {ex.Message}");
+                Console.Error.WriteLine($"Failed to create output directory: {ex.Message}");
+                return;
+            }
+        }
+
+        // Process each input PDF file
+        for (int i = 2; i < args.Length; i++)
+        {
+            string inputPdfPath = args[i];
+
+            if (!File.Exists(inputPdfPath))
+            {
+                Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+                continue;
+            }
+
+            // Build output file name: original name + "_header.pdf"
+            string outputPdfPath = Path.Combine(
+                outputDirectory,
+                Path.GetFileNameWithoutExtension(inputPdfPath) + "_header.pdf");
+
+            try
+            {
+                // Initialize PdfFileStamp facade
+                PdfFileStamp fileStamp = new PdfFileStamp();
+
+                // Bind the source PDF
+                fileStamp.BindPdf(inputPdfPath);
+
+                // Add the header image to all pages.
+                // Top margin of 20 points (adjust as needed)
+                fileStamp.AddHeader(headerImagePath, 20f);
+
+                // Save the modified PDF
+                fileStamp.Save(outputPdfPath);
+
+                // Close the facade (releases resources)
+                fileStamp.Close();
+
+                Console.WriteLine($"Processed '{inputPdfPath}' -> '{outputPdfPath}'");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{inputPdfPath}': {ex.Message}");
             }
         }
     }

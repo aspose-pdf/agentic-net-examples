@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms; // SignatureField and Signature are defined here
+using Aspose.Pdf.Forms;
 
 class Program
 {
@@ -15,24 +15,24 @@ class Program
             return;
         }
 
-        // Load the PDF document (wrapped in using for deterministic disposal)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all form fields and filter for signature fields
+            // Iterate over all fields and filter for signature fields
             foreach (Field field in doc.Form.Fields)
             {
                 if (field is SignatureField sigField)
                 {
-                    // The actual signature object associated with the field (may be null if not signed yet)
-                    Aspose.Pdf.Forms.Signature signature = sigField.Signature;
+                    // The Signature object contains the metadata (Reason, Location, etc.)
+                    Signature signature = sigField.Signature;
 
-                    // Retrieve the Reason and Location properties (guard against null signatures)
-                    string reason   = signature?.Reason ?? "<none>";
-                    string location = signature?.Location ?? "<none>";
+                    string reason   = signature?.Reason   ?? "(no reason)";
+                    string location = signature?.Location ?? "(no location)";
 
-                    Console.WriteLine($"Signature field: {sigField.FullName}");
+                    Console.WriteLine($"Signature Field: {sigField.FullName}");
                     Console.WriteLine($"  Reason:   {reason}");
                     Console.WriteLine($"  Location: {location}");
+                    Console.WriteLine();
                 }
             }
         }

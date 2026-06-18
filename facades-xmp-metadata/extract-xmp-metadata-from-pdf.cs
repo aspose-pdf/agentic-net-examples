@@ -1,33 +1,33 @@
 using System;
 using System.IO;
+using System.Text;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string pdfPath = "input.pdf";
+        const string outputPath = "xmp.xml";
 
-        // Verify that the source PDF exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Create a new PdfXmpMetadata facade instance
-        PdfXmpMetadata xmp = new PdfXmpMetadata();
+        // Bind the PDF and retrieve the XMP metadata as a byte array
+        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
+        {
+            xmp.BindPdf(pdfPath);
+            byte[] data = xmp.GetXmpMetadata();
 
-        // Bind the PDF file to the facade
-        xmp.BindPdf(inputPdf);
+            // Convert the byte array to a UTF‑8 string
+            string xml = Encoding.UTF8.GetString(data);
 
-        // Retrieve the entire XMP metadata as an XML byte array
-        byte[] xmpData = xmp.GetXmpMetadata();
-
-        // Save the XML representation for inspection
-        File.WriteAllBytes("output_xmp.xml", xmpData);
-
-        // Release resources held by the facade
-        xmp.Close();
+            // Save the raw XMP XML to a file
+            File.WriteAllText(outputPath, xml, Encoding.UTF8);
+            Console.WriteLine($"XMP metadata saved to '{outputPath}'.");
+        }
     }
 }

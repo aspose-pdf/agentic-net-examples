@@ -1,8 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices; // Resolution type
+using Aspose.Pdf.Devices;
 
 class Program
 {
@@ -13,29 +12,29 @@ class Program
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         try
         {
-            // Convert a single page to a high‑resolution PNG
+            // Convert only page 7 to a PNG with 300 DPI using PdfConverter (Facades API)
             using (PdfConverter converter = new PdfConverter())
             {
-                // Bind source PDF
+                // Bind the source PDF file
                 converter.BindPdf(inputPdf);
 
-                // Convert only page 7 (1‑based index)
+                // Set the page range to page 7 (Aspose.Pdf uses 1‑based indexing)
                 converter.StartPage = 7;
-                converter.EndPage   = 7;
+                converter.EndPage = 7;
 
-                // Set resolution to 300 DPI – requires a Resolution object
+                // Set the desired resolution (300 DPI) – requires a Resolution object
                 converter.Resolution = new Resolution(300);
 
-                // Perform conversion
+                // Initialize conversion
                 converter.DoConvert();
 
-                // Save the image; format is inferred from the file extension (.png)
+                // Export the page as PNG. The overload without ImageFormat infers the format from the file extension.
                 converter.GetNextImage(outputPng);
             }
 

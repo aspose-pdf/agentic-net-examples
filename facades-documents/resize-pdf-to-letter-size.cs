@@ -7,31 +7,27 @@ class Program
 {
     static void Main()
     {
+        // Input and output file paths
         const string inputPath  = "input.pdf";
         const string outputPath = "resized_letter.pdf";
 
+        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Resize all pages to Letter size (8.5" x 11" = 612 x 792 points)
-        using (PdfPageEditor editor = new PdfPageEditor())
-        {
-            // Load the source PDF
-            editor.BindPdf(inputPath);
+        // Create a PdfPageEditor facade and bind the source PDF (file‑path overload)
+        PdfPageEditor editor = new PdfPageEditor();
+        editor.BindPdf(inputPath);
 
-            // Set the target page size
-            editor.PageSize = new PageSize(612, 792); // width, height in points
+        // Set the page size to US Letter (8.5in x 11in = 612pt x 792pt)
+        editor.PageSize = new PageSize(612f, 792f); // width, height in points
 
-            // Apply the size change to the document
-            editor.ApplyChanges();
+        // Save the resized document to a new file
+        editor.Save(outputPath);
 
-            // Save the resized PDF
-            editor.Save(outputPath);
-        }
-
-        Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF resized to Letter size and saved as '{outputPath}'.");
     }
 }

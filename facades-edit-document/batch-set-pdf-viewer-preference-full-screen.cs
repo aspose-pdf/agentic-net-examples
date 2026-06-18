@@ -1,14 +1,13 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;   // Facade classes (PdfContentEditor)
-using Aspose.Pdf;          // ViewerPreference constants
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Directory containing the PDF files to process
-        const string inputDirectory = "pdfs";
+        // Directory containing PDF files
+        const string inputDirectory = @"C:\PdfFiles";
 
         if (!Directory.Exists(inputDirectory))
         {
@@ -21,7 +20,7 @@ class Program
         {
             try
             {
-                // Initialize the content editor facade
+                // Initialize the facade for editing PDF viewer preferences
                 PdfContentEditor editor = new PdfContentEditor();
 
                 // Bind the existing PDF file
@@ -30,11 +29,8 @@ class Program
                 // Set the viewer preference to full‑screen mode
                 editor.ChangeViewerPreference(ViewerPreference.PageModeFullScreen);
 
-                // Save the changes back to the same file
+                // Save changes (overwrites the original file)
                 editor.Save(pdfPath);
-
-                // Release resources held by the facade
-                editor.Close();
 
                 Console.WriteLine($"Updated viewer preference for: {Path.GetFileName(pdfPath)}");
             }

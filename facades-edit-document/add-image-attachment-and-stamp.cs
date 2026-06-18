@@ -1,22 +1,21 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF, image to attach and use as stamp, and output PDF paths
-        const string inputPdfPath   = "input.pdf";
-        const string imagePath      = "logo.png";
-        const string intermediatePdfPath = "temp_stamp.pdf";
-        const string outputPdfPath  = "output.pdf";
+        const string inputPdf = "input.pdf";
+        const string imagePath = "logo.png";
+        const string attachmentDescription = "Logo image attachment";
+        const string tempPdf = "temp_with_attachment.pdf"; // intermediate file with attachment
+        const string finalPdf = "output.pdf";              // final result with stamp
 
         // Verify required files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
         if (!File.Exists(imagePath))
@@ -26,46 +25,43 @@ class Program
         }
 
         // ------------------------------------------------------------
-        // 1. Add a stamp that uses the image (via BindImage)
-        // ------------------------------------------------------------
-        // PdfFileStamp is a facade for stamping; it implements IDisposable.
-        using (PdfFileStamp fileStamp = new PdfFileStamp())
-        {
-            // Bind the source PDF
-            fileStamp.BindPdf(inputPdfPath);
-
-            // Create a stamp and bind the image file
-            Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-            stamp.BindImage(imagePath);                     // Image used as stamp
-            stamp.SetOrigin(100, 500);                     // Position of the stamp (lower‑left corner)
-            stamp.SetImageSize(150, 150);                  // Width and height of the stamp
-            stamp.Opacity = 0.7f;                          // Semi‑transparent
-            stamp.IsBackground = false;                    // Draw over page content
-
-            // Add the stamp to the document
-            fileStamp.AddStamp(stamp);
-
-            // Save to an intermediate file (still without attachment)
-            fileStamp.Save(intermediatePdfPath);
-            fileStamp.Close(); // Required for facades
-        }
-
-        // ------------------------------------------------------------
-        // 2. Attach the same image file to the PDF (no visual annotation)
+        // Step 1: Add the image file as a document attachment (no annotation)
         // ------------------------------------------------------------
         using (PdfContentEditor editor = new PdfContentEditor())
         {
-            // Bind the PDF that already contains the stamp
-            editor.BindPdf(intermediatePdfPath);
+            // Bind the source PDF
+            editor.BindPdf(inputPdf);
 
-            // Add the image as a document attachment (no visible annotation)
-            editor.AddDocumentAttachment(imagePath, "Embedded image attachment");
+            // Add the image as an attachment with a description
+            editor.AddDocumentAttachment(imagePath, attachmentDescription);
 
-            // Save the final PDF with both stamp and attachment
-            editor.Save(outputPdfPath);
-            editor.Close(); // Required for facades
+            // Save the PDF that now contains the attachment
+            editor.Save(tempPdf);
         }
 
-        Console.WriteLine($"PDF created with stamp and attachment: {outputPdfPath}");
+        // ------------------------------------------------------------
+        // Step 2: Add a stamp annotation that references the same image
+        // ------------------------------------------------------------
+        using (PdfFileStamp fileStamp = new PdfFileStamp())
+        {
+            // Bind the PDF that already has the attachment
+            fileStamp.BindPdf(tempPdf);
+
+            // Create a stamp object and bind the image file to it
+            Stamp stamp = new Stamp();
+            stamp.BindImage(imagePath);               // reference the image file
+            stamp.SetOrigin(100, 700);                // position on the page (x, y)
+            stamp.SetImageSize(100, 100);             // width and height of the stamp
+            stamp.Opacity = 0.7f;                     // semi‑transparent
+            stamp.PageNumber = 1;                     // target page (1‑based)
+
+            // Add the stamp to the document (page is defined via stamp.PageNumber)
+            fileStamp.AddStamp(stamp);
+
+            // Save the final PDF with the stamp annotation
+            fileStamp.Save(finalPdf);
+        }
+
+        Console.WriteLine($"Stamp added and saved to {finalPdf}");
     }
 }

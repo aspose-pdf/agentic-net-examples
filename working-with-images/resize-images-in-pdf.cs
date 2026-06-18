@@ -1,83 +1,78 @@
 using System;
 using System.IO;
-using System.Drawing;
-using System.Drawing.Imaging;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Operators;
 
-// Read scaling factor from a simple configuration file (e.g., "config.txt" containing a double value)
-double scalingFactor = 1.0;
-const string configPath = "config.txt";
-if (File.Exists(configPath))
+class Program
 {
-    string text = File.ReadAllText(configPath).Trim();
-    if (!double.TryParse(text, out scalingFactor) || scalingFactor <= 0)
+    static void Main()
     {
-        Console.Error.WriteLine($"Invalid scaling factor in '{configPath}'. Using default 1.0.");
-        scalingFactor = 1.0;
-    }
-}
-else
-{
-    Console.Error.WriteLine($"Config file '{configPath}' not found. Using default scaling factor 1.0.");
-}
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "resized_output.pdf";
+        const string configPath = "config.txt"; // file containing a single double value
 
-// Input and output PDF paths
-const string inputPdf  = "input.pdf";
-const string outputPdf = "output_resized.pdf";
-
-if (!File.Exists(inputPdf))
-{
-    Console.Error.WriteLine($"Input PDF '{inputPdf}' not found.");
-    return;
-}
-
-// Load the PDF document
-using (Document pdfDoc = new Document(inputPdf))
-{
-    // Iterate through all pages
-    foreach (Page page in pdfDoc.Pages)
-    {
-        // Absorb image placements on the current page
-        ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
-        page.Accept(absorber);
-
-        // Process each image placement
-        foreach (ImagePlacement imgPlacement in absorber.ImagePlacements)
+        if (!File.Exists(inputPdfPath))
         {
-            // Extract the original image into a memory stream
-            using (MemoryStream originalStream = new MemoryStream())
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
+        }
+
+        if (!File.Exists(configPath))
+        {
+            Console.Error.WriteLine($"Config file not found: {configPath}");
+            return;
+        }
+
+        // Read scaling factor from configuration file
+        double scaleFactor;
+        try
+        {
+            string text = File.ReadAllText(configPath).Trim();
+            scaleFactor = double.Parse(text);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to read scaling factor: {ex.Message}");
+            return;
+        }
+
+        // Open PDF, apply scaling to each image, and save
+        using (Document doc = new Document(inputPdfPath))
+        {
+            // Iterate through all pages (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                imgPlacement.Image.Save(originalStream, ImageFormat.Png);
-                originalStream.Position = 0;
+                Page page = doc.Pages[i];
+                OperatorCollection ops = page.Contents;
 
-                // Load the image with System.Drawing (Windows‑only)
-                using (Bitmap originalBitmap = new Bitmap(originalStream))
+                // Walk through the content stream and look for image drawing operators (Do)
+                // For each image we wrap the draw call with a scaling matrix.
+                for (int opIdx = 0; opIdx < ops.Count; opIdx++)
                 {
-                    // Compute new dimensions based on the scaling factor
-                    int newWidth  = (int)(originalBitmap.Width  * scalingFactor);
-                    int newHeight = (int)(originalBitmap.Height * scalingFactor);
-
-                    // Create a scaled bitmap
-                    using (Bitmap scaledBitmap = new Bitmap(originalBitmap, new Size(newWidth, newHeight)))
+                    if (ops[opIdx] is Do doOp)
                     {
-                        // Save the scaled bitmap back to a stream
-                        using (MemoryStream scaledStream = new MemoryStream())
-                        {
-                            scaledBitmap.Save(scaledStream, ImageFormat.Png);
-                            scaledStream.Position = 0;
+                        // Insert GSave before the image
+                        ops.Insert(opIdx, new GSave());
+                        opIdx++; // move past the inserted GSave
 
-                            // Replace the original image in the PDF with the scaled one
-                            imgPlacement.Replace(scaledStream);
-                        }
+                        // Apply scaling matrix – uniform scaling on X and Y axes
+                        // ConcatenateMatrix(a, b, c, d, e, f) corresponds to the PDF "cm" operator.
+                        // For uniform scaling we set a = d = scaleFactor, others = 0.
+                        ops.Insert(opIdx, new ConcatenateMatrix(scaleFactor, 0, 0, scaleFactor, 0, 0));
+                        opIdx++; // move past the matrix operator
+
+                        // The original Do operator (draw image) stays where it is.
+                        // After the image we need to restore the graphics state.
+                        ops.Insert(opIdx + 1, new GRestore());
+                        // No need to adjust opIdx further because we want the loop to continue after the Do.
                     }
                 }
             }
-        }
-    }
 
-    // Save the modified PDF
-    pdfDoc.Save(outputPdf);
-    Console.WriteLine($"Images resized with factor {scalingFactor} and saved to '{outputPdf}'.");
+            // Save the modified PDF
+            doc.Save(outputPdfPath);
+        }
+
+        Console.WriteLine($"Images resized with factor {scaleFactor} and saved to '{outputPdfPath}'.");
+    }
 }

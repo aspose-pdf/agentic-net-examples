@@ -6,69 +6,46 @@ class Program
 {
     static void Main()
     {
-        // Directory containing the original PDFs
-        const string sourceDir = "pdfs";
+        // Directory containing PDFs to process
+        const string inputFolder = "InputPdfs";
+        // Folder where backup copies will be stored
+        const string backupFolder = "BackupPdfs";
 
-        // Directory where backup copies will be stored
-        const string backupDir = "pdfs_backup";
-
-        // Ensure the backup directory exists
-        Directory.CreateDirectory(backupDir);
-
-        // Verify that the source directory exists; if not, inform the user and exit gracefully
-        if (!Directory.Exists(sourceDir))
+        if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"Source directory '{sourceDir}' does not exist. No PDFs to process.");
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
             return;
         }
 
-        // Retrieve all PDF files from the source directory
-        string[] pdfFiles = Directory.GetFiles(sourceDir, "*.pdf");
+        // Ensure backup folder exists
+        Directory.CreateDirectory(backupFolder);
 
-        if (pdfFiles.Length == 0)
+        // Process each PDF file in the input folder
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            Console.WriteLine($"No PDF files found in '{sourceDir}'.");
-            return;
-        }
-
-        foreach (string pdfPath in pdfFiles)
-        {
-            string fileName = Path.GetFileName(pdfPath);
-            string backupPath = Path.Combine(backupDir, fileName);
-
             try
             {
-                // Create a backup copy of the original PDF (overwrite if it already exists)
+                // Create backup copy (same file name in backup folder)
+                string backupPath = Path.Combine(backupFolder, Path.GetFileName(pdfPath));
                 File.Copy(pdfPath, backupPath, overwrite: true);
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Failed to create backup for '{pdfPath}': {ex.Message}");
-                continue; // Skip metadata update for this file
-            }
+                Console.WriteLine($"Backup created: {backupPath}");
 
-            // Modify metadata using the PdfFileInfo facade
-            try
-            {
-                using (PdfFileInfo pdfInfo = new PdfFileInfo())
+                // Modify metadata using PdfFileInfo facade
+                using (PdfFileInfo info = new PdfFileInfo(pdfPath))
                 {
-                    // Load the original PDF into the facade
-                    pdfInfo.BindPdf(pdfPath);
+                    // Example metadata changes
+                    info.Title = "Updated Title";
+                    info.Author = "Updated Author";
+                    info.Subject = "Updated Subject";
+                    info.Keywords = "updated,metadata";
 
-                    // Set new metadata values
-                    pdfInfo.Title   = $"Modified {fileName}";
-                    pdfInfo.Author  = "Aspose.Pdf Example";
-                    pdfInfo.Subject = "Metadata update demonstration";
-
-                    // Save the updated PDF back to the original location
-                    bool saved = pdfInfo.SaveNewInfo(pdfPath);
-                    if (!saved)
-                    {
-                        Console.Error.WriteLine($"Failed to save updated metadata for '{pdfPath}'.");
-                    }
+                    // Save the updated information back to the original file
+                    bool saved = info.SaveNewInfo(pdfPath);
+                    if (saved)
+                        Console.WriteLine($"Metadata updated for: {pdfPath}");
+                    else
+                        Console.Error.WriteLine($"Failed to save metadata for: {pdfPath}");
                 }
-
-                Console.WriteLine($"Processed '{fileName}': backup created and metadata updated.");
             }
             catch (Exception ex)
             {

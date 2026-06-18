@@ -4,58 +4,49 @@ using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Tagged;
 using Aspose.Pdf.LogicalStructure;
-using Aspose.Pdf.Annotations; // Added for Border class
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output_with_table_field.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the source PDF
+        // Load the existing PDF document
         using (Document doc = new Document(inputPath))
         {
-            // ------------------------------------------------------------
-            // 1. Create a TextBoxField that will host the table appearance
-            // ------------------------------------------------------------
-            // Define the rectangle where the field will be placed (coordinates in points)
+            // Access the form object (creates one if it does not exist)
+            Form form = doc.Form;
+
+            // Define the rectangle where the TextBoxField will be placed (page 1)
             Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 500, 400, 700);
-            TextBoxField txtField = new TextBoxField(doc, fieldRect)
-            {
-                // Optional visual settings
-                Color = Aspose.Pdf.Color.LightGray, // Use Aspose.Pdf.Color
-                Multiline = true,
-                Name = "TableField"
-            };
 
-            // Set the border after the TextBoxField instance has been created
-            txtField.Border = new Border(txtField) { Width = 1 };
-            // Border color is controlled by the annotation's Color property (already set above)
+            // Create a TextBoxField that will host the table appearance
+            TextBoxField txtField = new TextBoxField(doc, fieldRect);
+            txtField.Name = "TableField";
+            txtField.Multiline = true;   // allow multiline content
+            txtField.ReadOnly = true;    // make it read‑only because we display a table
 
-            // Add the field to the document's form (page number is 1‑based)
-            doc.Form.Add(txtField, 1);
+            // Add the field to the form on page 1
+            form.Add(txtField, 1);
 
-            // ------------------------------------------------------------
-            // 2. Build a tagged Table structure (will appear as a separate
-            //    element in the PDF's logical structure)
-            // ------------------------------------------------------------
+            // -------------------------------------------------
+            // Build a tagged table that will be shown in the PDF
+            // -------------------------------------------------
             ITaggedContent tagged = doc.TaggedContent;
-
-            // Ensure the document is marked as tagged (presence of TaggedContent implies tagging)
             StructureElement root = tagged.RootElement;
 
             // Create the table element
             TableElement table = tagged.CreateTableElement();
             table.AlternativeText = "Sample data table";
 
-            // Create table header (THead) with two columns
+            // ----- Table header -----
             TableTHeadElement thead = tagged.CreateTableTHeadElement();
             table.AppendChild(thead);
             TableTRElement headerRow = tagged.CreateTableTRElement();
@@ -69,36 +60,43 @@ class Program
             th2.SetText("Price");
             headerRow.AppendChild(th2);
 
-            // Create table body (TBody) with one data row
+            // ----- Table body -----
             TableTBodyElement tbody = tagged.CreateTableTBodyElement();
             table.AppendChild(tbody);
-            TableTRElement dataRow = tagged.CreateTableTRElement();
-            tbody.AppendChild(dataRow);
 
+            // First data row
+            TableTRElement row1 = tagged.CreateTableTRElement();
+            tbody.AppendChild(row1);
             TableTDElement td1 = tagged.CreateTableTDElement();
             td1.SetText("Widget A");
-            dataRow.AppendChild(td1);
-
+            row1.AppendChild(td1);
             TableTDElement td2 = tagged.CreateTableTDElement();
-            td2.SetText("$123.45");
-            dataRow.AppendChild(td2);
+            td2.SetText("$10");
+            row1.AppendChild(td2);
 
-            // Attach the table to the root of the logical structure
+            // Second data row
+            TableTRElement row2 = tagged.CreateTableTRElement();
+            tbody.AppendChild(row2);
+            TableTDElement td3 = tagged.CreateTableTDElement();
+            td3.SetText("Widget B");
+            row2.AppendChild(td3);
+            TableTDElement td4 = tagged.CreateTableTDElement();
+            td4.SetText("$15");
+            row2.AppendChild(td4);
+
+            // Attach the table to the document's logical structure
             root.AppendChild(table);
 
-            // ------------------------------------------------------------
-            // 3. Add an additional appearance for the TextBoxField that
-            //    visually aligns with the table rectangle (optional)
-            // ------------------------------------------------------------
-            // The appearance rectangle can be the same as the field rectangle
-            doc.Form.AddFieldAppearance(txtField, 1, fieldRect);
+            // -------------------------------------------------
+            // Add an additional appearance for the textbox field
+            // that covers the same rectangle as the table.
+            // -------------------------------------------------
+            form.AddFieldAppearance(txtField, 1, fieldRect);
 
-            // ------------------------------------------------------------
-            // 4. Save the modified PDF
-            // ------------------------------------------------------------
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with TextBoxField and embedded table: {outputPath}");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

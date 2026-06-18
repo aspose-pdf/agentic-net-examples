@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,35 +16,37 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages
+            // Remove any existing header and footer from each page
             foreach (Page page in doc.Pages)
             {
-                // Remove existing header and footer
                 page.Header = null;
                 page.Footer = null;
+            }
 
-                // Create a new header
-                HeaderFooter newHeader = new HeaderFooter();
-                // Add a paragraph with the desired header text
-                newHeader.Paragraphs.Add(new TextFragment("My New Header"));
-                // Assign the new header to the page
+            // Create a new header
+            HeaderFooter newHeader = new HeaderFooter();
+            // Add a paragraph with the desired header text
+            newHeader.Paragraphs.Add(new TextFragment("My New Header"));
+
+            // Create a new footer
+            HeaderFooter newFooter = new HeaderFooter();
+            // Add a paragraph with the desired footer text
+            newFooter.Paragraphs.Add(new TextFragment("Page Footer"));
+
+            // Assign the new header and footer to all pages
+            foreach (Page page in doc.Pages)
+            {
                 page.Header = newHeader;
-
-                // Create a new footer
-                HeaderFooter newFooter = new HeaderFooter();
-                // Add a paragraph with the desired footer text
-                newFooter.Paragraphs.Add(new TextFragment("Page " + page.Number));
-                // Assign the new footer to the page
                 page.Footer = newFooter;
             }
 
-            // Save the modified PDF (lifecycle rule: use Save with path)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Headers and footers updated and saved to '{outputPath}'.");
+        Console.WriteLine($"Headers and footers have been updated and saved to '{outputPath}'.");
     }
 }

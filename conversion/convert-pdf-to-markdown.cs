@@ -1,34 +1,30 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Aspose.Pdf namespace contains Document, MarkdownSaveOptions
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPdfPath = "input.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.md";
 
-        // Output Markdown file path
-        const string outputMdPath = "output.md";
-
-        // Verify input file exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document, process, and save as Markdown
-        using (Document pdfDocument = new Document(inputPdfPath))
+        // Load the PDF document inside a using block for proper disposal
+        using (Document doc = new Document(inputPath))
         {
             // Create default Markdown save options
             MarkdownSaveOptions mdOptions = new MarkdownSaveOptions();
 
             // Save the document as Markdown using the options
-            pdfDocument.Save(outputMdPath, mdOptions);
+            doc.Save(outputPath, mdOptions);
         }
 
-        Console.WriteLine($"PDF successfully converted to Markdown: '{outputMdPath}'");
+        Console.WriteLine($"PDF successfully converted to Markdown: '{outputPath}'");
     }
 }

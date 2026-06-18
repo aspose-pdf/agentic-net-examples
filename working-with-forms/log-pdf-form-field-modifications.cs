@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations; // needed for Border class
 
 class Program
 {
@@ -9,54 +10,58 @@ class Program
     {
         const string inputPdf = "input.pdf";
         const string outputPdf = "output.pdf";
-        const string logPath = "field_modifications.log";
+        const string logFile = "field_modifications.log";
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Start with a clean log file
-        File.WriteAllText(logPath, string.Empty);
-
-        // Load the PDF document (using the recommended lifecycle pattern)
+        // Open the PDF document (lifecycle rule: use using)
         using (Document doc = new Document(inputPdf))
         {
-            // Access the form object
-            Form form = doc.Form;
-
-            // Iterate over each field in the form
-            foreach (Field field in form)
+            // Open the audit log for appending
+            using (StreamWriter log = new StreamWriter(logFile, true))
             {
-                // Log the original value of the field
-                string originalValue = field.Value?.ToString() ?? "(null)";
-                Log(logPath, $"Field '{field.FullName}' original value: {originalValue}");
+                // -------------------------------------------------
+                // Add a new text box field to the document
+                // -------------------------------------------------
+                TextBoxField txtField = new TextBoxField(doc);
+                txtField.PartialName = "SampleTextBox";
+                txtField.Rect = new Aspose.Pdf.Rectangle(100, 500, 300, 530);
+                txtField.Value = "Initial value";
+                txtField.Color = Aspose.Pdf.Color.LightGray;
 
-                // Example modification: if the field is a text box, set a new value
-                if (field is TextBoxField txtField)
+                // Add the field to page 1 (Form.Add overload)
+                doc.Form.Add(txtField, 1);
+                log.WriteLine($"{DateTime.Now:u} Added TextBoxField '{txtField.PartialName}' on page 1 at {txtField.Rect}");
+
+                // -------------------------------------------------
+                // Update the field's value
+                // -------------------------------------------------
+                txtField.Value = "Updated value";
+                log.WriteLine($"{DateTime.Now:u} Updated TextBoxField '{txtField.PartialName}' value to '{txtField.Value}'");
+
+                // -------------------------------------------------
+                // Change visual appearance (border)
+                // -------------------------------------------------
+                // Border requires the parent annotation (the field) in its constructor.
+                txtField.Border = new Border(txtField)
                 {
-                    txtField.Value = "Updated value";
-                    Log(logPath, $"Field '{field.FullName}' new value set to: {txtField.Value}");
-                }
+                    Width = 1
+                };
+                // Border color is controlled by the field's own Color property; already set to LightGray.
+                log.WriteLine($"{DateTime.Now:u} Set border for TextBoxField '{txtField.PartialName}' (Width=1)");
 
-                // Example modification: make the field read‑only
-                bool originalReadOnly = field.ReadOnly;
-                field.ReadOnly = true;
-                Log(logPath, $"Field '{field.FullName}' ReadOnly changed from {originalReadOnly} to {field.ReadOnly}");
+                // -------------------------------------------------
+                // Save the modified PDF (lifecycle rule: use Save)
+                // -------------------------------------------------
+                doc.Save(outputPdf);
+                log.WriteLine($"{DateTime.Now:u} Saved modified PDF to '{outputPdf}'");
             }
-
-            // Save the modified PDF (PDF format is the default)
-            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Modifications logged to '{logPath}'. PDF saved to '{outputPdf}'.");
-    }
-
-    // Helper method to append a timestamped entry to the log file
-    static void Log(string filePath, string message)
-    {
-        string line = $"{DateTime.UtcNow:O} - {message}{Environment.NewLine}";
-        File.AppendAllText(filePath, line);
+        Console.WriteLine("Form field modifications have been logged.");
     }
 }

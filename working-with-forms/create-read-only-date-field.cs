@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -6,35 +7,37 @@ class Program
 {
     static void Main()
     {
-        const string outputPdf = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Create a new PDF document (no external file required)
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Ensure there is at least one page
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Define the rectangle for the date field (left, bottom, right, top)
+        // Load the existing PDF document
+        using (Document doc = new Document(inputPath))
+        {
+            // Define the position and size of the date field (llx, lly, urx, ury)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 250, 630);
 
-            // Create the DateField on the first page and configure it
-            DateField dateField = new DateField(page, rect)
-            {
-                // Initial value – today’s date
-                Value = DateTime.Today,
-                // Desired display format
-                DateFormat = "MM/dd/yyyy",
-                // Make the field read‑only so the user cannot modify it later
-                ReadOnly = true
-            };
+            // Create a new DateField on the first page
+            DateField dateField = new DateField(doc.Pages[1], rect);
+
+            // Populate the field with the current date and time
+            dateField.Value = DateTime.Now;
+
+            // Set the field to read‑only to prevent further edits
+            dateField.ReadOnly = true;
 
             // Add the field to the document's form collection
             doc.Form.Add(dateField);
 
-            // Save the modified PDF
-            doc.Save(outputPdf);
+            // Save the updated PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Date field created as read‑only and saved to '{outputPdf}'.");
+        Console.WriteLine($"Date field set to read‑only and saved to '{outputPath}'.");
     }
 }

@@ -16,14 +16,14 @@ class Program
         }
 
         // Process each PDF file in the folder
-        foreach (string filePath in Directory.GetFiles(folderPath, "*.pdf"))
+        foreach (string pdfFile in Directory.GetFiles(folderPath, "*.pdf"))
         {
             try
             {
-                // Load the PDF document
-                using (Document doc = new Document(filePath))
+                // Load the document inside a using block for deterministic disposal
+                using (Document doc = new Document(pdfFile))
                 {
-                    // Ensure there is at least one page to delete
+                    // Ensure the document has at least one page
                     if (doc.Pages.Count > 0)
                     {
                         // Pages are 1‑based; delete the last page
@@ -31,15 +31,15 @@ class Program
                         doc.Pages.Delete(lastPageIndex);
                     }
 
-                    // Save the modified document back to the same file
-                    doc.Save(filePath);
+                    // Save the modified document back to the same file (overwrites original)
+                    doc.Save(pdfFile);
                 }
 
-                Console.WriteLine($"Processed: {Path.GetFileName(filePath)}");
+                Console.WriteLine($"Processed: {Path.GetFileName(pdfFile)}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{filePath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{pdfFile}': {ex.Message}");
             }
         }
     }

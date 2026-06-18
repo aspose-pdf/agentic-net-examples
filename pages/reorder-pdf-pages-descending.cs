@@ -1,7 +1,5 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
-using System.Linq;
 using Aspose.Pdf;
 
 class Program
@@ -9,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "sorted_descending.pdf";
+        const string outputPath = "reordered_descending.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,25 +15,21 @@ class Program
             return;
         }
 
-        // Load the source PDF
+        // Load source PDF
         using (Document srcDoc = new Document(inputPath))
         {
-            // Extract pages into a list for custom sorting
-            List<Page> pageList = srcDoc.Pages.Cast<Page>().ToList();
-
-            // Sort pages in descending order based on their original position
-            // (IndexOf returns 1‑based page numbers)
-            pageList = pageList
-                .OrderByDescending(p => srcDoc.Pages.IndexOf(p))
-                .ToList();
-
-            // Create a new empty document to hold the reordered pages
+            // Create a new empty PDF document
             using (Document destDoc = new Document())
             {
-                // Add pages to the new document in the sorted order
-                foreach (Page pg in pageList)
+                // Remove the automatically created blank page
+                if (destDoc.Pages.Count > 0)
+                    destDoc.Pages.Delete(1);
+
+                // Add pages from source in descending order
+                for (int i = srcDoc.Pages.Count; i >= 1; i--)
                 {
-                    destDoc.Pages.Add(pg);
+                    // Insert the page at the end of the destination collection
+                    destDoc.Pages.Add(srcDoc.Pages[i]);
                 }
 
                 // Optional: reorganize the page tree for better performance
@@ -46,6 +40,6 @@ class Program
             }
         }
 
-        Console.WriteLine($"Pages reordered and saved to '{outputPath}'.");
+        Console.WriteLine($"Pages reordered descending and saved to '{outputPath}'.");
     }
 }

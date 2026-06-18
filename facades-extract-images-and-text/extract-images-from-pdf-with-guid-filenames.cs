@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Drawing.Imaging;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -18,29 +19,27 @@ class Program
         // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Use PdfExtractor (implements IDisposable) inside a using block
+        // Use PdfExtractor to extract images
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the source PDF
+            // Bind the source PDF file
             extractor.BindPdf(inputPdf);
 
-            // Prepare the extractor to pull images
+            // Prepare for image extraction
             extractor.ExtractImage();
 
-            // Iterate over all images in the document
+            // Iterate through all extracted images
             while (extractor.HasNextImage())
             {
-                // Generate a unique file name using a GUID
-                string guidFileName = Guid.NewGuid().ToString() + ".png"; // extension can be any supported type
+                // Generate a unique file name using GUID
+                string uniqueName = Guid.NewGuid().ToString();
+                string outputPath = Path.Combine(outputDir, uniqueName + ".png");
 
-                // Full path for the extracted image
-                string outputPath = Path.Combine(outputDir, guidFileName);
-
-                // Save the image. The overload without ImageFormat saves the image in its original format.
-                extractor.GetNextImage(outputPath);
+                // Save the next image as PNG
+                extractor.GetNextImage(outputPath, ImageFormat.Png);
             }
         }
 
-        Console.WriteLine("Image extraction completed.");
+        Console.WriteLine($"Images extracted to '{outputDir}'.");
     }
 }

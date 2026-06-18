@@ -1,96 +1,65 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-public static class BookletGenerator
+namespace AsposePdfApi
 {
-    /// <summary>
-    /// Creates a booklet PDF using only the right‑hand pages from the second half of the source PDF.
-    /// </summary>
-    /// <param name="inputPath">Full path to the source PDF.</param>
-    /// <param name="outputPath">Full path where the booklet PDF will be saved.</param>
-    /// <returns>True if the booklet was created successfully; otherwise false.</returns>
-    public static bool CreateBookletFromSecondHalfRight(string inputPath, string outputPath)
+    public static class BookletGenerator
     {
-        if (string.IsNullOrWhiteSpace(inputPath) || string.IsNullOrWhiteSpace(outputPath))
+        /// <summary>
+        /// Generates a booklet using only the right (odd-numbered) pages from the second half of the source PDF.
+        /// </summary>
+        /// <param name="inputPdfPath">Path to the source PDF file.</param>
+        /// <param name="outputPdfPath">Path where the booklet PDF will be saved.</param>
+        /// <returns>True if the booklet was created successfully; otherwise false.</returns>
+        public static bool CreateBookletFromSecondHalfRightPages(string inputPdfPath, string outputPdfPath)
         {
-            Console.Error.WriteLine("Input and output paths must be provided.");
-            return false;
-        }
+            if (string.IsNullOrEmpty(inputPdfPath) || string.IsNullOrEmpty(outputPdfPath))
+                throw new ArgumentException("Input and output file paths must be provided.");
 
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"Source file not found: {inputPath}");
-            return false;
-        }
+            if (!File.Exists(inputPdfPath))
+                throw new FileNotFoundException($"Source PDF not found: {inputPdfPath}");
 
-        try
-        {
-            // Load the source document only to obtain the total page count.
+            // Determine the total number of pages in the source document.
             int totalPages;
-            using (Document srcDoc = new Document(inputPath))
+            using (Document srcDoc = new Document(inputPdfPath))
             {
                 totalPages = srcDoc.Pages.Count;
             }
 
-            if (totalPages == 0)
-            {
-                Console.Error.WriteLine("Source PDF contains no pages.");
-                return false;
-            }
+            // Calculate the start page of the second half (1‑based indexing).
+            int half = totalPages / 2;
+            int secondHalfStart = half + 1; // pages greater than half belong to the second half
 
-            // Determine the start of the second half (1‑based indexing).
-            int secondHalfStart = (totalPages / 2) + 1; // e.g., for 10 pages start = 6
-
-            // Build the right‑pages array: all pages from the second half.
-            int rightCount = totalPages - secondHalfStart + 1;
-            int[] rightPages = new int[rightCount];
-            for (int i = 0; i < rightCount; i++)
+            // Collect right (odd) page numbers from the second half.
+            List<int> rightPagesList = new List<int>();
+            for (int pageNum = secondHalfStart; pageNum <= totalPages; pageNum++)
             {
-                rightPages[i] = secondHalfStart + i; // pages are 1‑based
+                if (pageNum % 2 == 1) // odd page numbers are considered "right" pages
+                    rightPagesList.Add(pageNum);
             }
 
             // Left pages array is empty because we only want right pages.
             int[] leftPages = new int[0];
+            int[] rightPages = rightPagesList.ToArray();
 
-            // Use PdfFileEditor to create the customized booklet.
+            // Create the booklet using PdfFileEditor.
             PdfFileEditor editor = new PdfFileEditor();
-            bool success = editor.MakeBooklet(inputPath, outputPath, leftPages, rightPages);
-
-            if (!success)
-            {
-                Console.Error.WriteLine("MakeBooklet operation reported failure.");
-            }
+            bool success = editor.MakeBooklet(inputPdfPath, outputPdfPath, leftPages, rightPages);
 
             return success;
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error while creating booklet: {ex.Message}");
-            return false;
-        }
     }
-}
 
-public class Program
-{
-    /// <summary>
-    /// Entry point required for a console application.
-    /// Usage: BookletGenerator.exe <inputPdfPath> <outputPdfPath>
-    /// </summary>
-    public static void Main(string[] args)
+    // Dummy entry point to satisfy the compiler when the project is built as an executable.
+    // The method does not perform any operation; it merely provides the required Main method.
+    public class Program
     {
-        if (args.Length != 2)
+        public static void Main(string[] args)
         {
-            Console.WriteLine("Usage: BookletGenerator <inputPdfPath> <outputPdfPath>");
-            return;
+            // No action required. The library methods can be invoked from external callers or unit tests.
         }
-
-        string inputPath = args[0];
-        string outputPath = args[1];
-
-        bool result = BookletGenerator.CreateBookletFromSecondHalfRight(inputPath, outputPath);
-        Console.WriteLine(result ? "Booklet created successfully." : "Failed to create booklet.");
     }
 }

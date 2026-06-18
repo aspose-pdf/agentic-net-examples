@@ -1,16 +1,17 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
+using System.Collections.Generic;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";                 // source PDF
-        const string outputHtmlDir = "HtmlPages";                // folder for per‑page HTML files
-        const string indexHtmlPath = "index.html";               // index file to create
+        // Input PDF file
+        const string inputPdfPath = "input.pdf";
+
+        // Folder where individual HTML pages and the index will be saved
+        const string outputFolder = "HtmlPages";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -18,33 +19,25 @@ class Program
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputHtmlDir);
+        // Ensure the output folder exists
+        Directory.CreateDirectory(outputFolder);
 
-        // List to keep the generated page file names (relative to the index file)
+        // List to keep track of generated page file names (in order)
         List<string> pageFiles = new List<string>();
 
-        // Load the PDF document
-        using (Document pdfDocument = new Document(inputPdfPath))
+        // Configure HTML save options to split each PDF page into its own HTML file
+        HtmlSaveOptions htmlOptions = new HtmlSaveOptions
         {
-            // Configure HTML save options to split into separate pages
-            HtmlSaveOptions htmlOptions = new HtmlSaveOptions
-            {
-                SplitIntoPages = true
-            };
+            SplitIntoPages = true,
 
-            // Custom strategy – called for each generated HTML page
-            htmlOptions.CustomHtmlSavingStrategy = delegate (Aspose.Pdf.HtmlSaveOptions.HtmlPageMarkupSavingInfo htmlInfo)
+            // Custom strategy to control how each page's HTML markup is saved
+            CustomHtmlSavingStrategy = delegate (HtmlSaveOptions.HtmlPageMarkupSavingInfo htmlInfo)
             {
-                // Determine a file name for this page
+                // The suggested file name for this page (e.g., "output_1.html")
                 string fileName = htmlInfo.SupposedFileName;
-                if (string.IsNullOrEmpty(fileName))
-                {
-                    // Fallback: use the HTML host page number
-                    fileName = $"page_{htmlInfo.HtmlHostPageNumber}.html";
-                }
 
-                string fullPath = Path.Combine(outputHtmlDir, fileName);
+                // Full path for the page file
+                string fullPath = Path.Combine(outputFolder, fileName);
 
                 // Write the HTML content stream to the file
                 using (FileStream fs = new FileStream(fullPath, FileMode.Create, FileAccess.Write))
@@ -52,41 +45,42 @@ class Program
                     htmlInfo.ContentStream.CopyTo(fs);
                 }
 
-                // Store the relative path for the index page
+                // Record the file name for later index generation
                 pageFiles.Add(fileName);
-            };
+            }
+        };
 
-            // The actual path passed to Save is irrelevant when using a custom strategy,
-            // but a valid string is required.
-            string dummyPath = Path.Combine(outputHtmlDir, "dummy.html");
-            pdfDocument.Save(dummyPath, htmlOptions);
-        }
-
-        // Build the index.html that links to each page file
-        StringBuilder sb = new StringBuilder();
-        sb.AppendLine("<!DOCTYPE html>");
-        sb.AppendLine("<html lang=\"en\">");
-        sb.AppendLine("<head>");
-        sb.AppendLine("    <meta charset=\"UTF-8\">");
-        sb.AppendLine("    <title>PDF Pages Index</title>");
-        sb.AppendLine("</head>");
-        sb.AppendLine("<body>");
-        sb.AppendLine("    <h1>PDF Pages</h1>");
-        sb.AppendLine("    <ul>");
-
-        foreach (string pageFile in pageFiles)
+        // Load the PDF and perform the conversion
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Use a relative link from the index file to the page file
-            sb.AppendLine($"        <li><a href=\"{outputHtmlDir}/{pageFile}\">{pageFile}</a></li>");
+            // The first argument is a dummy path; actual page files are saved via the custom strategy
+            pdfDoc.Save(Path.Combine(outputFolder, "dummy.html"), htmlOptions);
         }
 
-        sb.AppendLine("    </ul>");
-        sb.AppendLine("</body>");
-        sb.AppendLine("</html>");
+        // Generate an index.html that links to each individual page file
+        string indexPath = Path.Combine(outputFolder, "index.html");
+        using (StreamWriter writer = new StreamWriter(indexPath))
+        {
+            writer.WriteLine("<!DOCTYPE html>");
+            writer.WriteLine("<html>");
+            writer.WriteLine("<head>");
+            writer.WriteLine("    <meta charset=\"UTF-8\">");
+            writer.WriteLine("    <title>PDF Pages Index</title>");
+            writer.WriteLine("</head>");
+            writer.WriteLine("<body>");
+            writer.WriteLine("    <h1>PDF Pages</h1>");
+            writer.WriteLine("    <ul>");
 
-        // Write the index file
-        File.WriteAllText(indexHtmlPath, sb.ToString());
+            foreach (string pageFile in pageFiles)
+            {
+                writer.WriteLine($"        <li><a href=\"{pageFile}\">{pageFile}</a></li>");
+            }
 
-        Console.WriteLine($"Conversion complete. Pages saved in '{outputHtmlDir}'. Index created at '{indexHtmlPath}'.");
+            writer.WriteLine("    </ul>");
+            writer.WriteLine("</body>");
+            writer.WriteLine("</html>");
+        }
+
+        Console.WriteLine($"Conversion complete. HTML pages and index saved to '{outputFolder}'.");
     }
 }

@@ -7,65 +7,61 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "encrypted.pdf";   // Path to the source PDF (may be encrypted)
-        const string outputPdf = "decrypted.pdf";   // Path where the decrypted PDF will be saved
-        const string password  = "user123";        // Password for the encrypted PDF (user or owner)
+        const string inputPath  = "encrypted_input.pdf";
+        const string outputPath = "decrypted_output.pdf";
+        const string password   = "userPassword"; // user or owner password
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // PdfFileSecurity does NOT implement IDisposable, so we instantiate it directly.
-        PdfFileSecurity security = new PdfFileSecurity();
-
-        try
+        // PdfFileSecurity is a facade that can bind, decrypt and save PDF files.
+        // It implements IDisposable, so we wrap it in a using block.
+        using (PdfFileSecurity security = new PdfFileSecurity())
         {
-            // Attempt to bind the PDF without a password.
-            // If the file is encrypted, this call throws InvalidPasswordException.
-            security.BindPdf(inputPdf);
-        }
-        catch (InvalidPasswordException)
-        {
-            // The PDF is encrypted. Bind it using a Document created with the password.
-            // Document constructor overload (string fileName, string password) handles encrypted PDFs.
-            using (Document doc = new Document(inputPdf, password))
+            try
             {
-                security.BindPdf(doc);
+                // Attempt to bind the PDF without a password.
+                // If the file is not encrypted this succeeds.
+                security.BindPdf(inputPath);
             }
-        }
-        catch (Exception ex)
-        {
-            // Any other binding error is reported and the program exits.
-            Console.Error.WriteLine($"Error binding PDF: {ex.Message}");
-            return;
-        }
+            catch (InvalidPasswordException)
+            {
+                // The PDF is encrypted and requires a password.
+                // Load the document with the supplied password and re‑bind.
+                try
+                {
+                    using (Document doc = new Document(inputPath, password))
+                    {
+                        security.BindPdf(doc);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"Failed to open encrypted PDF: {ex.Message}");
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Any other binding error (corrupt file, unsupported format, etc.)
+                Console.Error.WriteLine($"BindPdf failed: {ex.Message}");
+                return;
+            }
 
-        try
-        {
-            // Decrypt the bound PDF using the same password.
-            // DecryptFile throws if the password is incorrect or decryption fails.
-            security.DecryptFile(password);
-
-            // Save the decrypted PDF to the desired output path.
-            security.Save(outputPdf);
-            Console.WriteLine($"Decrypted PDF saved to '{outputPdf}'.");
-        }
-        catch (InvalidPasswordException ex)
-        {
-            // Password was incorrect.
-            Console.Error.WriteLine($"Invalid password: {ex.Message}");
-        }
-        catch (Exception ex)
-        {
-            // General error during decryption or saving.
-            Console.Error.WriteLine($"Error during decryption/save: {ex.Message}");
-        }
-        finally
-        {
-            // Release any resources held by the facade.
-            security.Close();
+            try
+            {
+                // Decrypt the bound PDF and write the result to outputPath.
+                // DecryptFile uses the owner password if present; otherwise the user password.
+                security.DecryptFile(outputPath);
+                Console.WriteLine($"Decrypted PDF saved to '{outputPath}'.");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Decryption failed: {ex.Message}");
+            }
         }
     }
 }

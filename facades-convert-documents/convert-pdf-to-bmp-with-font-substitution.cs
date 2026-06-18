@@ -1,65 +1,50 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices; // for Resolution
-using Aspose.Pdf.Text;   // for SimpleFontSubstitution
+using Aspose.Pdf.Text;
+using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputDir = "BmpImages";
+        const string inputPdfPath  = "input.pdf";
+        const string outputFolder  = "BmpPages";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
         // Ensure output directory exists
-        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(outputFolder);
 
-        // Load PDF document (lifecycle rule: use using for disposal)
-        using (Document pdfDoc = new Document(inputPath))
+        // Register font substitution: Times New Roman → Calibri
+        FontRepository.Substitutions.Add(new SimpleFontSubstitution("Times New Roman", "Calibri"));
+
+        // Create a BmpDevice with desired resolution (e.g., 150 DPI)
+        BmpDevice bmpDevice = new BmpDevice(new Resolution(150));
+
+        // Load the PDF document inside a using block for proper disposal
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
-            // Apply custom font substitution: Times New Roman → Calibri
-            // Use FontRepository.Substitutions with SimpleFontSubstitution
-            FontRepository.Substitutions.Add(new SimpleFontSubstitution("Times New Roman", "Calibri"));
-
-            // Initialize PdfConverter (facade for PDF‑to‑image conversion)
-            using (PdfConverter converter = new PdfConverter())
+            // Iterate over all pages (1‑based indexing)
+            for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
             {
-                // Bind the loaded document to the converter
-                converter.BindPdf(pdfDoc);
+                // Prepare output file path for each page
+                string outputPath = Path.Combine(outputFolder, $"Page_{pageNumber}.bmp");
 
-                // Convert all pages (page indexing is 1‑based)
-                converter.StartPage = 1;
-                converter.EndPage   = pdfDoc.Pages.Count;
-
-                // Set desired resolution (dots per inch) using Resolution object
-                converter.Resolution = new Resolution(300);
-
-                // Prepare converter for processing
-                converter.DoConvert();
-
-                int pageNumber = 1;
-                // Iterate through pages and save each as BMP
-                while (converter.HasNextImage())
+                // Convert the page to BMP and write to file
+                using (FileStream imageStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
                 {
-                    string outPath = Path.Combine(outputDir, $"page_{pageNumber}.bmp");
-                    // Save current page image in BMP format
-                    converter.GetNextImage(outPath, ImageFormat.Bmp);
-                    pageNumber++;
+                    bmpDevice.Process(pdfDocument.Pages[pageNumber], imageStream);
                 }
 
-                // Release internal resources
-                converter.Close();
+                Console.WriteLine($"Saved BMP image: {outputPath}");
             }
         }
 
-        Console.WriteLine("PDF successfully converted to BMP images.");
+        Console.WriteLine("PDF to BMP conversion completed.");
     }
 }

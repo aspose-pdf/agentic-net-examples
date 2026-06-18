@@ -1,65 +1,58 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string pdfPath = "input.pdf";
         const string imagePath = "image.png";
+        const string outputPath = "output.pdf";
 
-        // Verify source PDF exists
-        if (!File.Exists(inputPdf))
+        // Verify source files exist
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
-
-        // Verify image file exists
         if (!File.Exists(imagePath))
         {
             Console.Error.WriteLine($"Image file not found: {imagePath}");
             return;
         }
 
-        // Validate image format (JPG, PNG, GIF, BMP, TIFF)
-        if (!IsSupportedImage(imagePath))
+        // Validate image format (allow only JPG, PNG, GIF, BMP, TIFF)
+        string ext = Path.GetExtension(imagePath).ToLowerInvariant();
+        string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tif", ".tiff" };
+        if (Array.IndexOf(allowedExtensions, ext) < 0)
         {
-            Console.Error.WriteLine("Unsupported image format. Allowed extensions: .jpg, .jpeg, .png, .gif, .bmp, .tif, .tiff");
+            Console.Error.WriteLine($"Unsupported image format: {ext}");
             return;
         }
 
-        // Use PdfFileMend (Facade) to add the image
-        using (PdfFileMend mender = new PdfFileMend())
+        // Add the image to the PDF using PdfFileMend facade
+        using (PdfFileMend pdfMend = new PdfFileMend())
         {
             // Bind the existing PDF document
-            mender.BindPdf(inputPdf);
+            pdfMend.BindPdf(pdfPath);
 
-            // Add the image to page 1 at the specified rectangle
+            // Add the image to page 1 with specified rectangle coordinates
             using (FileStream imgStream = File.OpenRead(imagePath))
             {
-                // lower-left (10,10), upper-right (200,200) – adjust as needed
-                mender.AddImage(imgStream, 1, 10f, 10f, 200f, 200f);
+                bool added = pdfMend.AddImage(imgStream, 1, 10f, 10f, 200f, 200f);
+                if (!added)
+                {
+                    Console.Error.WriteLine("Failed to add the image to the PDF.");
+                    return;
+                }
             }
 
             // Save the modified PDF
-            mender.Save(outputPdf);
-            mender.Close();
+            pdfMend.Save(outputPath);
         }
 
-        Console.WriteLine($"Image added successfully. Output saved to '{outputPdf}'.");
-    }
-
-    // Helper to check allowed image extensions
-    static bool IsSupportedImage(string filePath)
-    {
-        string ext = Path.GetExtension(filePath).ToLowerInvariant();
-        return ext == ".jpg" || ext == ".jpeg" ||
-               ext == ".png" ||
-               ext == ".gif" ||
-               ext == ".bmp" ||
-               ext == ".tif" || ext == ".tiff";
+        Console.WriteLine($"Image successfully added. Output saved to '{outputPath}'.");
     }
 }

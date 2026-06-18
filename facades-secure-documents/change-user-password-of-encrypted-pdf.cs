@@ -6,33 +6,49 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";   // Encrypted source PDF
-        const string outputPath = "output.pdf";  // PDF with updated user password
-        const string ownerPassword   = "ownerPass";   // Existing owner password
-        const string newUserPassword = "newUserPass"; // Desired new user password
+        // Paths to the source (encrypted) PDF and the destination PDF
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
+        // Original owner password (required to authorize the change)
+        const string ownerPassword = "owner123";
+
+        // New user password you want to set; keep the owner password unchanged (null generates a random one)
+        const string newUserPassword = "newUser123";
+        const string newOwnerPassword = null; // null or empty => random owner password
+
+        // Verify that the input file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Initialize the facade with source and destination files
-            PdfFileSecurity fileSecurity = new PdfFileSecurity(inputPath, outputPath);
+            // ---------- Lifecycle: create ----------
+            // Create a PdfFileSecurity instance (no parameters)
+            PdfFileSecurity security = new PdfFileSecurity();
 
-            // Change only the user password; keep the owner password unchanged
-            bool changed = fileSecurity.ChangePassword(ownerPassword, newUserPassword, ownerPassword);
+            // ---------- Lifecycle: load ----------
+            // Bind the encrypted PDF file to the facade
+            security.BindPdf(inputPath);
+
+            // ---------- Operation ----------
+            // Change only the user password while preserving all other encryption settings
+            bool changed = security.ChangePassword(ownerPassword, newUserPassword, newOwnerPassword);
 
             if (!changed)
             {
-                Console.Error.WriteLine("Failed to change the password.");
+                Console.Error.WriteLine("Password change failed.");
+                return;
             }
-            else
-            {
-                Console.WriteLine($"User password updated successfully. Output saved to '{outputPath}'.");
-            }
+
+            // ---------- Lifecycle: save ----------
+            // Save the resulting PDF with the new password
+            security.Save(outputPath);
+
+            Console.WriteLine($"User password changed successfully. Output saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

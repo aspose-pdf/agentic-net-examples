@@ -1,61 +1,61 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core API (Document, Page, ImageStamp)
+using Aspose.Pdf;                     // Core Aspose.Pdf namespace
+using Aspose.Pdf.Annotations;        // For stamp-related classes (if needed)
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";      // source PDF
-        const string overlayImg = "overlay.png";   // semi‑transparent image to overlay
-        const string outputPdf = "output.pdf";     // result PDF
+        // Paths – adjust as needed
+        const string inputPdfPath   = "input.pdf";
+        const string overlayImgPath = "overlay.png";   // Image to be used as semi‑transparent overlay
+        const string outputPdfPath  = "output.pdf";
 
         // Verify files exist
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(overlayImg))
+        if (!File.Exists(overlayImgPath))
         {
-            Console.Error.WriteLine($"Overlay image not found: {overlayImg}");
+            Console.Error.WriteLine($"Overlay image not found: {overlayImgPath}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        // Load the source PDF
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Create an ImageStamp from the overlay image
-            ImageStamp stamp = new ImageStamp(overlayImg)
+            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+            for (int i = 1; i <= pdfDoc.Pages.Count; i++)
             {
-                // Place the stamp over the page content (false = top layer)
-                Background = false,
+                Page page = pdfDoc.Pages[i];
 
-                // Semi‑transparent (0.0 = fully transparent, 1.0 = opaque)
-                Opacity = 0.5f,
+                // Create an ImageStamp that uses the overlay image file
+                // Fully qualify the type to avoid ambiguity with System.Drawing.Image
+                Aspose.Pdf.ImageStamp imgStamp = new Aspose.Pdf.ImageStamp(overlayImgPath);
 
-                // Center the image on each page
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Center,
+                // Make the stamp cover the whole page
+                imgStamp.Width  = page.PageInfo.Width;
+                imgStamp.Height = page.PageInfo.Height;
+                imgStamp.XIndent = 0;
+                imgStamp.YIndent = 0;
 
-                // Scale the image to fit the page while preserving aspect ratio
-                // (Zoom = 1.0 means original size; adjust if needed)
-                Zoom = 1.0f
-            };
+                // Set semi‑transparent opacity (0.0 = fully transparent, 1.0 = opaque)
+                imgStamp.Opacity = 0.3f;   // 30 % opacity
 
-            // Apply the stamp to every page (pages are 1‑based)
-            foreach (Page page in doc.Pages)
-            {
-                page.AddStamp(stamp);
+                // Place the stamp on top of existing content (Background = false)
+                imgStamp.Background = false;
+
+                // Add the stamp to the current page
+                page.AddStamp(imgStamp);
             }
 
-            // Optional: replace any remaining transparency with opaque graphics
-            // doc.FlattenTransparency();
-
             // Save the modified PDF
-            doc.Save(outputPdf);
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Overlay applied and saved to '{outputPdf}'.");
+        Console.WriteLine($"Overlay applied and saved to '{outputPdfPath}'.");
     }
 }

@@ -1,64 +1,66 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using System.Drawing; // required for Color
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text; // FormattedText, EncodingType
 
 class Program
 {
     static void Main()
     {
-        // Paths for source PDF, logo image, and output PDF
-        const string inputPdf  = "input.pdf";
-        const string logoImage = "logo.png";
+        const string inputPdf = "input.pdf";
         const string outputPdf = "output.pdf";
+        const string logoPath = "logo.png";
+        const string customText = "My Company";
 
-        // Verify required files exist
+        // Validate input files
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(logoImage))
+        if (!File.Exists(logoPath))
         {
-            Console.Error.WriteLine($"Logo image not found: {logoImage}");
+            Console.Error.WriteLine($"Logo image not found: {logoPath}");
             return;
         }
 
-        // Initialize PdfFileStamp facade and specify input/output files
+        // Bind the source PDF to the stamp facade
         PdfFileStamp fileStamp = new PdfFileStamp();
-        fileStamp.InputFile  = inputPdf;
-        fileStamp.OutputFile = outputPdf;
+        fileStamp.BindPdf(inputPdf);
 
         // Create a stamp instance
-        Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
+        Stamp stamp = new Stamp();
 
         // Bind the logo image to the stamp
-        stamp.BindImage(logoImage);
+        stamp.BindImage(logoPath);
 
-        // Prepare formatted text for the stamp
-        FormattedText formattedText = new FormattedText(
-            "Custom Text",                     // Text content
-            System.Drawing.Color.Black,        // Text color (System.Drawing.Color is required)
-            "Helvetica",                       // Font name
-            EncodingType.Winansi,              // Encoding
-            false,                             // IsEmbedded (false = use system font)
-            12);                               // Font size
+        // Create formatted text for the custom caption using the correct constructor signature
+        // (text, color, fontName, encoding, embedFont, fontSize)
+        FormattedText ft = new FormattedText(
+            customText,
+            Color.Black,               // System.Drawing.Color
+            "Helvetica",
+            EncodingType.Winansi,
+            false,
+            12f);
 
-        // Bind the formatted text to the same stamp
-        stamp.BindLogo(formattedText);
+        // Bind the formatted text to the same stamp (combined image‑and‑text stamp)
+        // In the Facades API the method is BindLogo for a FormattedText object.
+        stamp.BindLogo(ft);
 
-        // Optional: set stamp appearance (position, opacity, background)
-        stamp.SetOrigin(100, 150);   // X, Y coordinates (bottom‑left origin)
-        stamp.Opacity = 0.8f;        // Semi‑transparent
-        stamp.IsBackground = false; // Place stamp on top of page content
+        // Configure stamp appearance
+        stamp.SetOrigin(100f, 500f);          // position (X, Y) from bottom‑left of the page
+        stamp.SetImageSize(100f, 100f);       // image width and height
+        stamp.IsBackground = false;          // place stamp above page content
+        stamp.Opacity = 0.8f;                 // semi‑transparent
 
-        // Add the combined image‑and‑text stamp to the PDF
+        // Add the combined stamp to the document
         fileStamp.AddStamp(stamp);
 
-        // Finalize and save the output PDF
+        // Save the resulting PDF
+        fileStamp.Save(outputPdf);
         fileStamp.Close();
 
-        Console.WriteLine($"Stamp with logo and text saved to '{outputPdf}'.");
+        Console.WriteLine($"Combined stamp saved to '{outputPdf}'.");
     }
 }

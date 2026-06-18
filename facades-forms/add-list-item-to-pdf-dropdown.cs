@@ -15,16 +15,16 @@ class Program
             return;
         }
 
-        // Initialize FormEditor with source and destination PDFs
+        // Open the PDF with FormEditor, specify output file
         using (FormEditor formEditor = new FormEditor(inputPath, outputPath))
         {
-            // Add a new option "Option A" to the dropdown (combo box) named "Choices"
+            // Add a new item "Option A" to the dropdown (combo box) named "Choices"
             formEditor.AddListItem("Choices", "Option A");
 
             // Persist changes
             formEditor.Save();
         }
 
-        Console.WriteLine($"List item added and saved to '{outputPath}'.");
+        Console.WriteLine($"Dropdown field updated and saved to '{outputPath}'.");
     }
 }

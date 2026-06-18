@@ -6,35 +6,36 @@ class Program
 {
     static void Main()
     {
-        // Paths – adjust as necessary
-        const string excelPath = "Report.xlsx";          // Excel workbook to embed
-        const string outputPdf = "PortfolioWithExcel.pdf";
+        const string excelPath = "workbook.xlsx";
+        const string outputPdf = "portfolio.pdf";
 
-        // Verify the Excel file exists
         if (!File.Exists(excelPath))
         {
             Console.Error.WriteLine($"Excel file not found: {excelPath}");
             return;
         }
 
-        // Create a new PDF document (portfolio) and add a blank page
-        Document pdfDoc = new Document();
-        pdfDoc.Pages.Add(); // a page makes the PDF viewable
+        // Create a new PDF document
+        using (Document pdfDoc = new Document())
+        {
+            // Ensure the document has a collection for portfolio files
+            if (pdfDoc.Collection == null)
+                pdfDoc.Collection = new Collection();
 
-        // Create a FileSpecification for the Excel workbook
-        // First argument – file name as it will appear in the portfolio
-        // Second argument – custom description shown in the UI
-        var fileSpec = new FileSpecification("Report.xlsx", "Quarterly financial report – Excel workbook");
+            // Create a file specification for the Excel workbook with a custom description
+            var fileSpec = new FileSpecification(excelPath, "Quarterly financial report")
+            {
+                // Embed the file content
+                Contents = new MemoryStream(File.ReadAllBytes(excelPath))
+            };
 
-        // Assign the file contents via a stream (required overload)
-        fileSpec.Contents = new MemoryStream(File.ReadAllBytes(excelPath));
+            // Add the file specification to the portfolio collection
+            pdfDoc.Collection.Add(fileSpec);
 
-        // Add the specification to the document's embedded files collection
-        pdfDoc.EmbeddedFiles.Add(fileSpec);
+            // Save the PDF portfolio
+            pdfDoc.Save(outputPdf);
+        }
 
-        // Save the resulting PDF portfolio
-        pdfDoc.Save(outputPdf);
-
-        Console.WriteLine($"PDF portfolio created: {outputPdf}");
+        Console.WriteLine($"PDF portfolio created at '{outputPdf}'.");
     }
 }

@@ -18,25 +18,25 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document (wrapped in using for deterministic disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Build a regex that matches the keyword ignoring case
+            // Build a case‑insensitive regular expression for the keyword
             Regex regex = new Regex(Regex.Escape(keyword), RegexOptions.IgnoreCase);
 
-            // Create a TextFragmentAbsorber that uses the regex for searching
+            // Create a TextFragmentAbsorber that uses the regex
             TextFragmentAbsorber absorber = new TextFragmentAbsorber(regex);
 
-            // Search the entire document – use the Pages collection's Accept method
+            // Search the entire document
             doc.Pages.Accept(absorber);
 
-            // Highlight each found fragment by setting its background color
+            // Highlight each found text fragment by setting a background color
             foreach (TextFragment fragment in absorber.TextFragments)
             {
                 fragment.TextState.BackgroundColor = Aspose.Pdf.Color.Yellow;
             }
 
-            // Save the modified PDF (PDF format, no SaveOptions needed)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

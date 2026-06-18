@@ -1,91 +1,93 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output_bookmarked.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output_with_bookmarks.pdf";
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Initialize the bookmark editor and bind the PDF file
-        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
+        // Load the PDF document (required for proper disposal)
+        using (Document doc = new Document(inputPdf))
         {
-            editor.BindPdf(inputPdf);
+            // Initialize the bookmark editor and bind the loaded document
+            Aspose.Pdf.Facades.PdfBookmarkEditor bookmarkEditor = new Aspose.Pdf.Facades.PdfBookmarkEditor();
+            bookmarkEditor.BindPdf(doc);
 
-            // Build hierarchical bookmarks
-            // Example hierarchy:
-            // Chapter 1 (page 1)
-            //   Section 1.1 (page 2)
-            //   Section 1.2 (page 3)
-            // Chapter 2 (page 5)
-            //   Section 2.1 (page 6)
+            // ------------------------------------------------------------
+            // Build a hierarchical bookmark structure.
+            // Example structure:
+            //   Chapter 1 (page 1)
+            //     Section 1.1 (page 2)
+            //     Section 1.2 (page 3)
+            //   Chapter 2 (page 5)
+            // ------------------------------------------------------------
 
-            // Leaf bookmarks for Chapter 1
-            Bookmark sec11 = new Bookmark
+            // Child bookmarks for Chapter 1
+            Aspose.Pdf.Facades.Bookmark section1 = new Aspose.Pdf.Facades.Bookmark
             {
-                Title = "Section 1.1",
+                Title      = "Section 1.1",
                 PageNumber = 2,
-                Action = "GoTo"
+                Action     = "GoTo"
             };
-            Bookmark sec12 = new Bookmark
+
+            Aspose.Pdf.Facades.Bookmark section2 = new Aspose.Pdf.Facades.Bookmark
             {
-                Title = "Section 1.2",
+                Title      = "Section 1.2",
                 PageNumber = 3,
-                Action = "GoTo"
+                Action     = "GoTo"
             };
-            // Group sections under Chapter 1
-            Bookmarks chapter1Children = new Bookmarks();
-            chapter1Children.Add(sec11);
-            chapter1Children.Add(sec12);
-            Bookmark chapter1 = new Bookmark
+
+            // Container for Chapter 1 children
+            Aspose.Pdf.Facades.Bookmarks chapter1Children = new Aspose.Pdf.Facades.Bookmarks();
+            chapter1Children.Add(section1);
+            chapter1Children.Add(section2);
+
+            // Chapter 1 bookmark (parent)
+            Aspose.Pdf.Facades.Bookmark chapter1 = new Aspose.Pdf.Facades.Bookmark
             {
-                Title = "Chapter 1",
+                Title      = "Chapter 1",
                 PageNumber = 1,
-                Action = "GoTo",
-                ChildItem = chapter1Children
+                Action     = "GoTo",
+                ChildItems = chapter1Children
             };
 
-            // Leaf bookmark for Chapter 2
-            Bookmark sec21 = new Bookmark
+            // Chapter 2 bookmark (no children in this example)
+            Aspose.Pdf.Facades.Bookmark chapter2 = new Aspose.Pdf.Facades.Bookmark
             {
-                Title = "Section 2.1",
-                PageNumber = 6,
-                Action = "GoTo"
-            };
-            // Group under Chapter 2
-            Bookmarks chapter2Children = new Bookmarks();
-            chapter2Children.Add(sec21);
-            Bookmark chapter2 = new Bookmark
-            {
-                Title = "Chapter 2",
+                Title      = "Chapter 2",
                 PageNumber = 5,
-                Action = "GoTo",
-                ChildItem = chapter2Children
+                Action     = "GoTo"
             };
 
-            // Top‑level collection of chapters
-            Bookmarks rootBookmarks = new Bookmarks();
-            rootBookmarks.Add(chapter1);
-            rootBookmarks.Add(chapter2);
+            // Top‑level collection of bookmarks
+            Aspose.Pdf.Facades.Bookmarks topLevel = new Aspose.Pdf.Facades.Bookmarks();
+            topLevel.Add(chapter1);
+            topLevel.Add(chapter2);
 
-            // Add each top‑level bookmark (which includes its children) to the PDF
-            foreach (Bookmark bm in rootBookmarks)
+            // Add each top‑level bookmark to the document.
+            // The CreateBookmarks(Bookmark) method can be called for each root bookmark.
+            foreach (Aspose.Pdf.Facades.Bookmark rootBookmark in topLevel)
             {
-                editor.CreateBookmarks(bm);
+                bookmarkEditor.CreateBookmarks(rootBookmark);
             }
 
-            // Save the PDF with the new bookmark hierarchy
-            editor.Save(outputPdf);
+            // Save the modified PDF with the new bookmark hierarchy
+            bookmarkEditor.Save(outputPdf);
+
+            // Clean up the facade (optional, as it will be disposed when the program ends)
+            bookmarkEditor.Close();
         }
 
-        Console.WriteLine($"Bookmarks added and saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF with hierarchical bookmarks saved to '{outputPdf}'.");
     }
 }

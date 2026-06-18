@@ -9,39 +9,39 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output_with_js_link.pdf";
-        const string url = "https://www.example.com";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
+        // Load the existing PDF (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Choose the page where the link will be placed (first page in this example)
+            // Ensure there is at least one page
             Page page = doc.Pages[1];
 
-            // Define the rectangle area for the link annotation (coordinates: llx, lly, urx, ury)
+            // Define the clickable area (fully qualified to avoid ambiguity)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Create the link annotation
+            // Create the LinkAnnotation first
             LinkAnnotation link = new LinkAnnotation(page, rect);
-            // Optional visual appearance
+
+            // Set visual styling after the object is instantiated
             link.Color = Aspose.Pdf.Color.Blue;
-            // Border must be set after the annotation instance exists
             link.Border = new Border(link) { Width = 1 };
-            // Assign a JavaScript action that opens the URL in a new browser window
-            link.Action = new JavascriptAction($"app.launchURL('{url}', true);");
+
+            // Attach a JavaScript action that shows a modal dialog
+            link.Action = new JavascriptAction("app.alert('Custom modal dialog box');");
 
             // Add the annotation to the page
             page.Annotations.Add(link);
 
-            // Save the modified PDF
+            // Save the modified PDF (lifecycle rule: use Document.Save)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with JavaScript link: '{outputPath}'.");
+        Console.WriteLine($"PDF with JavaScript link saved to '{outputPath}'.");
     }
 }

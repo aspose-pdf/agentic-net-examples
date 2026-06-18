@@ -7,12 +7,13 @@ class Program
 {
     static void Main()
     {
-        // Paths for the source PDF, the file to attach, and the resulting PDF
-        const string sourcePdfPath = "input.pdf";
-        const string attachmentPath = "attachment.txt";
-        const string outputPdfPath = "output_with_attachment.pdf";
+        // Paths – adjust as needed
+        const string sourcePdfPath = "source.pdf";               // Original PDF
+        const string attachmentPath = "attachment.bin";          // File to attach
+        const string outputPdfPath = "withAttachment.pdf";       // PDF after adding attachment
+        const string extractedPath = "extracted.bin";            // Where the extracted file will be saved
 
-        // Verify that required files exist
+        // Verify that source files exist
         if (!File.Exists(sourcePdfPath))
         {
             Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
@@ -24,36 +25,77 @@ class Program
             return;
         }
 
-        // ---------- Add attachment ----------
-        // PdfContentEditor is a Facades class used for editing PDFs.
+        // ------------------------------------------------------------
+        // 1. Add the attachment to the PDF using PdfContentEditor
+        // ------------------------------------------------------------
         using (PdfContentEditor editor = new PdfContentEditor())
         {
-            editor.BindPdf(sourcePdfPath);                                   // Load the PDF
-            editor.AddDocumentAttachment(attachmentPath, "Sample attachment"); // Add the file as an attachment
-            editor.Save(outputPdfPath);                                      // Save the modified PDF
+            editor.BindPdf(sourcePdfPath);
+            // AddDocumentAttachment adds the file without any visual annotation
+            editor.AddDocumentAttachment(attachmentPath, "Sample attachment");
+            editor.Save(outputPdfPath);
         }
 
-        // ---------- Retrieve attachment name for verification ----------
-        // PdfExtractor extracts attachment information from a PDF.
+        // ------------------------------------------------------------
+        // 2. Extract the attachment from the edited PDF using PdfExtractor
+        // ------------------------------------------------------------
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            extractor.BindPdf(outputPdfPath);    // Load the PDF that now contains the attachment
-            extractor.ExtractAttachment();       // Required before calling GetAttachNames()
-            IList<string> attachmentNames = extractor.GetAttachNames(); // List of attachment file specification names
+            extractor.BindPdf(outputPdfPath);
+            // Must call ExtractAttachment before retrieving names or streams
+            extractor.ExtractAttachment();
 
+            IList<string> attachmentNames = extractor.GetAttachNames();
             if (attachmentNames == null || attachmentNames.Count == 0)
             {
-                Console.WriteLine("No attachments were found in the PDF.");
+                Console.Error.WriteLine("No attachments found in the PDF.");
                 return;
             }
 
-            Console.WriteLine("Attachments found in the PDF:");
-            foreach (string name in attachmentNames)
+            // Assuming only one attachment was added
+            string extractedFileName = attachmentNames[0];
+            MemoryStream[] attachmentStreams = extractor.GetAttachment();
+
+            // Find the stream that corresponds to the extracted file name
+            // The order of streams matches the order of names returned by GetAttachNames()
+            int index = attachmentNames.IndexOf(extractedFileName);
+            if (index < 0 || index >= attachmentStreams.Length)
             {
-                // The name returned is the file specification name stored in the PDF.
-                // It usually matches the original file name, but we output it for verification.
-                Console.WriteLine(name);
+                Console.Error.WriteLine("Mismatch between attachment names and streams.");
+                return;
             }
+
+            MemoryStream extractedStream = attachmentStreams[index];
+            extractedStream.Position = 0; // Ensure we read from the beginning
+
+            // Save the extracted attachment to disk (optional, for visual verification)
+            using (FileStream fs = new FileStream(extractedPath, FileMode.Create, FileAccess.Write))
+            {
+                extractedStream.CopyTo(fs);
+            }
+
+            // ------------------------------------------------------------
+            // 3. Compare the original attachment with the extracted one
+            // ------------------------------------------------------------
+            byte[] originalBytes = File.ReadAllBytes(attachmentPath);
+            byte[] extractedBytes = File.ReadAllBytes(extractedPath);
+
+            bool areEqual = originalBytes.Length == extractedBytes.Length;
+            if (areEqual)
+            {
+                for (int i = 0; i < originalBytes.Length; i++)
+                {
+                    if (originalBytes[i] != extractedBytes[i])
+                    {
+                        areEqual = false;
+                        break;
+                    }
+                }
+            }
+
+            Console.WriteLine(areEqual
+                ? "Success: Extracted attachment matches the original file."
+                : "Failure: Extracted attachment does NOT match the original file.");
         }
     }
 }

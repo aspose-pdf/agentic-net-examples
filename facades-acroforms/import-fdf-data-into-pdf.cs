@@ -6,13 +6,14 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string fdfPath = "data.fdf";
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "output.pdf";
+        const string fdfPath       = "data.fdf";
 
-        if (!File.Exists(inputPdf))
+        // Verify that required files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
@@ -22,26 +23,19 @@ class Program
             return;
         }
 
-        try
+        // Form facade handles AcroForm operations; it implements IDisposable
+        using (Form form = new Form(inputPdfPath, outputPdfPath))
         {
-            // Initialize the Form facade with source and destination PDFs
-            using (Form form = new Form(inputPdf, outputPdf))
+            // Open the FDF file as a read‑only stream and import its data
+            using (FileStream fdfStream = new FileStream(fdfPath, FileMode.Open, FileAccess.Read))
             {
-                // Open the FDF file as a stream and import its data into the PDF
-                using (FileStream fdfStream = new FileStream(fdfPath, FileMode.Open, FileAccess.Read))
-                {
-                    form.ImportFdf(fdfStream);
-                }
-
-                // Save the modified PDF to the output path
-                form.Save();
+                form.ImportFdf(fdfStream);
             }
 
-            Console.WriteLine($"Form data imported successfully to '{outputPdf}'.");
+            // Persist the changes to the output PDF
+            form.Save();
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Form data imported successfully to '{outputPdfPath}'.");
     }
 }

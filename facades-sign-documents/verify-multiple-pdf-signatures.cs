@@ -1,38 +1,36 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "signed_document.pdf";
+        const string inputPath = "signed.pdf";
 
-        // Ensure the PDF file exists before attempting to bind it.
-        if (!File.Exists(inputPdf))
+        if (!System.IO.File.Exists(inputPath))
         {
-            Console.WriteLine($"File '{inputPdf}' not found.");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF and work with its signatures
-        using (PdfFileSignature pdfSignature = new PdfFileSignature())
+        // Create the PdfFileSignature facade and bind the PDF
+        PdfFileSignature pdfSign = new PdfFileSignature();
+        pdfSign.BindPdf(inputPath);
+
+        // Retrieve all non‑empty signature names
+        IList<SignatureName> names = pdfSign.GetSignatureNames();
+
+        // Verify each signature and output the result
+        foreach (SignatureName sigName in names)
         {
-            pdfSignature.BindPdf(inputPdf);
-
-            // Retrieve all non‑empty signature names
-            IList<SignatureName> signatureNames = pdfSignature.GetSignatureNames();
-
-            // Verify each signature and output the result
-            foreach (SignatureName sigName in signatureNames)
-            {
-                // SignatureName exposes the actual name via the Name property
-                string name = sigName.Name;
-                // Use the non‑obsolete VerifySignature method
-                bool isValid = pdfSignature.VerifySignature(name);
-                Console.WriteLine($"Signature '{name}': Valid = {isValid}");
-            }
+            string nameStr = sigName.ToString();
+            bool isValid = pdfSign.VerifySigned(nameStr);
+            Console.WriteLine($"Signature name: {nameStr}");
+            Console.WriteLine($"  Valid: {isValid}");
         }
+
+        // Release resources
+        pdfSign.Close();
     }
 }

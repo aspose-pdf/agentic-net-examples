@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
@@ -13,83 +12,62 @@ class Program
 
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the source PDF
+        // Load the source PDF (lifecycle: load)
         using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Collect image information from the PDF
-            var figures = new List<(int Index, string Name, string AltText)>();
-            int figureCounter = 1;
+            // Create a new page that will hold the Table of Figures
+            Page tocPage = pdfDoc.Pages.Add();
 
+            // Initialize a table with two columns: Figure number and Description
+            Table figuresTable = new Table
+            {
+                // Define column widths (in points). Adjust as needed.
+                ColumnWidths = "50 400"
+            };
+
+            // Add header row
+            Row header = figuresTable.Rows.Add();
+            header.Cells.Add("Figure #");
+            header.Cells.Add("Description");
+
+            // Iterate through all pages and their image resources
+            int figureIndex = 1;
             foreach (Page page in pdfDoc.Pages)
             {
-                // Iterate over image resources on the page. XImage does not expose an AlternativeText property
-                // in the core API, so we use a placeholder description when none is available.
                 foreach (XImage img in page.Resources.Images)
                 {
-                    // Use a generic description because XImage lacks AlternativeText.
-                    string alt = "No description";
+                    // Create a new row for each image
+                    Row row = figuresTable.Rows.Add();
+                    row.Cells.Add(figureIndex.ToString());
 
-                    // XImage.Name may be null; generate a name if needed.
-                    string imgName = !string.IsNullOrEmpty(img.Name) ? img.Name : $"Image_{figureCounter}";
+                    // XImage does not expose AlternativeText. Use the image name if available,
+                    // otherwise leave the description empty.
+                    string description = img.Name ?? string.Empty;
+                    row.Cells.Add(description);
 
-                    figures.Add((figureCounter, imgName, alt));
-                    figureCounter++;
+                    figureIndex++;
                 }
             }
 
-            // Add a new page at the end to host the Table of Figures
-            Page tocPage = pdfDoc.Pages.Add();
+            // Add the completed table to the Table of Figures page
+            tocPage.Paragraphs.Add(figuresTable);
 
-            // Create a table with two columns: Figure number and Description
-            Table table = new Table
-            {
-                // Adjust column widths as needed (percentage or absolute units)
-                ColumnWidths = "80 420"
-            };
-
-            // Header row
-            Row header = table.Rows.Add();
-            header.Cells.Add("Figure");
-            header.Cells.Add("Description");
-            // Optional: make header bold
-            foreach (Cell cell in header.Cells)
-            {
-                cell.DefaultCellTextState = new TextState
-                {
-                    FontSize = 12,
-                    FontStyle = FontStyles.Bold,
-                    Font = FontRepository.FindFont("Helvetica"),
-                    ForegroundColor = Aspose.Pdf.Color.Black
-                };
-            }
-
-            // Data rows for each extracted image
-            foreach (var fig in figures)
-            {
-                Row row = table.Rows.Add();
-                row.Cells.Add($"Figure {fig.Index}");
-                row.Cells.Add(fig.AltText);
-            }
-
-            // Add the table to the new page
-            tocPage.Paragraphs.Add(table);
-
-            // Prepare DOCX save options
+            // Prepare DOCX conversion options
             DocSaveOptions docxOptions = new DocSaveOptions
             {
-                // Export as DOCX
+                // Output format: DOCX
                 Format = DocSaveOptions.DocFormat.DocX,
                 // Use Flow mode for better editability
                 Mode = DocSaveOptions.RecognitionMode.Flow,
-                // Enable bullet recognition (optional)
+                // Optional: recognize bullets in the source PDF
                 RecognizeBullets = true
             };
 
-            // Save the PDF (now containing the Table of Figures) as DOCX
+            // Save the PDF (now containing the Table of Figures) as DOCX (lifecycle: save)
             pdfDoc.Save(outputDocxPath, docxOptions);
         }
 

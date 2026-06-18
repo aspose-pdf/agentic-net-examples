@@ -2,62 +2,73 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations; // Added for WidgetAnnotation
 
-class ExportFormFieldsToCsv
+class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputCsvPath = "form_fields.csv";
+        const string inputPdf = "input.pdf";
+        const string outputCsv = "form_fields.csv";
 
-        if (!File.Exists(inputPdfPath))
+        // Verify input file exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdfPath))
+        try
         {
-            // Ensure the document actually contains a form
-            if (pdfDoc.Form == null || pdfDoc.Form.Count == 0)
+            // Load the PDF document (lifecycle rule: use Document constructor)
+            using (Document doc = new Document(inputPdf))
             {
-                Console.WriteLine("No form fields found in the PDF.");
-                return;
-            }
-
-            // Open a CSV file for writing (UTF‑8 with BOM for Excel compatibility)
-            using (StreamWriter writer = new StreamWriter(outputCsvPath, false, new System.Text.UTF8Encoding(true)))
-            {
-                // Write CSV header
-                writer.WriteLine("FieldName,Value");
-
-                // Helper to escape CSV values
-                string Escape(string s)
+                // Check that the document actually contains a form
+                if (doc.Form == null || doc.Form.Count == 0)
                 {
-                    if (s.Contains('"'))
-                        s = s.Replace("\"", "\"\"");
-                    if (s.Contains(',') || s.Contains('"') || s.Contains('\n') || s.Contains('\r'))
-                        s = $"\"{s}\"";
-                    return s;
+                    Console.WriteLine("No form fields found in the PDF.");
+                    return;
                 }
 
-                // Iterate over all form fields
-                foreach (Field field in pdfDoc.Form.Fields)
+                // Create a StreamWriter for the CSV output (standard .NET I/O)
+                using (StreamWriter writer = new StreamWriter(outputCsv, false, System.Text.Encoding.UTF8))
                 {
-                    // Field name – use FullName if available, otherwise fallback to Name
-                    var widget = field as WidgetAnnotation;
-                    string fieldName = widget?.FullName ?? field.Name ?? string.Empty;
+                    // Write CSV header
+                    writer.WriteLine("FieldName,Value");
 
-                    // Field value – convert to string, handling nulls
-                    string fieldValue = field.Value?.ToString() ?? string.Empty;
+                    // Iterate over each form field
+                    foreach (Field field in doc.Form)
+                    {
+                        // Retrieve the field's full name and its current value
+                        string name = field.FullName ?? string.Empty;
+                        string value = field.Value?.ToString() ?? string.Empty;
 
-                    writer.WriteLine($"{Escape(fieldName)},{Escape(fieldValue)}");
+                        // Escape values that may contain commas, quotes or line breaks
+                        name = EscapeCsv(name);
+                        value = EscapeCsv(value);
+
+                        // Write a CSV line
+                        writer.WriteLine($"{name},{value}");
+                    }
                 }
             }
 
-            Console.WriteLine($"Form fields exported to CSV: {outputCsvPath}");
+            Console.WriteLine($"Form fields exported successfully to '{outputCsv}'.");
         }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    // Helper method to escape CSV fields according to RFC 4180
+    static string EscapeCsv(string text)
+    {
+        if (text.Contains("\""))
+            text = text.Replace("\"", "\"\"");
+
+        if (text.Contains(",") || text.Contains("\"") || text.Contains("\n") || text.Contains("\r"))
+            text = $"\"{text}\"";
+
+        return text;
     }
 }

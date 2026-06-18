@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -8,77 +7,69 @@ class BatchAddTextAnnotation
 {
     static void Main()
     {
-        // Determine base folder (current executable directory) – works on any OS
-        string baseFolder = AppDomain.CurrentDomain.BaseDirectory;
+        // Folder containing PDF files to process
+        const string inputFolder = @"C:\PdfInput";
+        // Folder where processed PDFs will be saved (can be the same as inputFolder to overwrite)
+        const string outputFolder = @"C:\PdfOutput";
 
-        // Input folder – "PdfFolder" under the base directory
-        string inputFolder = Path.Combine(baseFolder, "PdfFolder");
-        // Output folder – "PdfFolder\Processed" under the base directory
-        string outputFolder = Path.Combine(baseFolder, "PdfFolder", "Processed");
+        if (!Directory.Exists(inputFolder))
+        {
+            Console.Error.WriteLine($"Input folder does not exist: {inputFolder}");
+            return;
+        }
 
-        // Ensure both folders exist (create if missing). If the input folder is empty, the program will simply finish.
-        Directory.CreateDirectory(inputFolder);
         Directory.CreateDirectory(outputFolder);
 
-        // Get all PDF files in the input folder (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+        // Define the annotation that will be added to each first page
+        // Position: lower‑left (100, 500), upper‑right (300, 550) – adjust as needed
+        Aspose.Pdf.Rectangle annotRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+        const string annotTitle = "Standard Note";
+        const string annotContents = "This is a standard text annotation added to the first page.";
+        Aspose.Pdf.Color annotColor = Aspose.Pdf.Color.Yellow; // Background color of the annotation
 
-        foreach (string pdfPath in pdfFiles)
+        // Process each PDF file in the input folder
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            // Open each PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(pdfPath))
+            string fileName = Path.GetFileName(pdfPath);
+            string outputPath = Path.Combine(outputFolder, fileName);
+
+            try
             {
-                // Access the first page (1‑based indexing)
-                Page firstPage = doc.Pages[1];
-
-                // Define the annotation rectangle (fully qualified to avoid ambiguity)
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-
-                // Create a TextAnnotation and set its properties
-                TextAnnotation annotation = new TextAnnotation(firstPage, rect)
+                // Load the PDF document
+                using (Document doc = new Document(pdfPath))
                 {
-                    Title    = "Note",
-                    Contents = "Standard annotation added by batch process.",
-                    Open     = true,
-                    // Use Aspose.Pdf.Color for cross‑platform compatibility
-                    Color    = Aspose.Pdf.Color.Yellow,
-                    // Icon can be set to any supported value, e.g., Note
-                    Icon     = TextIcon.Note
-                };
+                    // Ensure the document has at least one page
+                    if (doc.Pages.Count < 1)
+                    {
+                        Console.WriteLine($"Skipping '{fileName}': no pages found.");
+                        continue;
+                    }
 
-                // Add the annotation to the page's annotation collection
-                firstPage.Annotations.Add(annotation);
+                    // Create a new TextAnnotation on the first page
+                    Page firstPage = doc.Pages[1]; // 1‑based indexing
+                    TextAnnotation textAnnot = new TextAnnotation(firstPage, annotRect)
+                    {
+                        Title = annotTitle,
+                        Contents = annotContents,
+                        Color = annotColor,
+                        Open = true // annotation window opened by default
+                    };
 
-                // Build the output file path (same file name, different folder)
-                string outputPath = Path.Combine(outputFolder, Path.GetFileName(pdfPath));
+                    // Add the annotation to the page's annotation collection
+                    firstPage.Annotations.Add(textAnnot);
 
-                // Save the modified PDF – the same call works on Windows and non‑Windows platforms.
-                // If GDI+ (libgdiplus) is missing on Linux/macOS, Aspose.Pdf will still save the file; the try/catch is kept for safety.
-                try
-                {
+                    // Save the modified document (overwrites if outputPath equals inputPath)
                     doc.Save(outputPath);
                 }
-                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
-                {
-                    Console.WriteLine($"Warning: GDI+ (libgdiplus) is not available on this platform. PDF saved without rendering‑dependent features: {outputPath}");
-                }
+
+                Console.WriteLine($"Processed and saved: {outputPath}");
             }
-
-            Console.WriteLine($"Processed: {Path.GetFileName(pdfPath)}");
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{fileName}': {ex.Message}");
+            }
         }
 
-        Console.WriteLine("Batch processing completed.");
-    }
-
-    // Helper to detect a nested DllNotFoundException (e.g., missing libgdiplus)
-    private static bool ContainsDllNotFound(Exception? ex)
-    {
-        while (ex != null)
-        {
-            if (ex is DllNotFoundException)
-                return true;
-            ex = ex.InnerException;
-        }
-        return false;
+        Console.WriteLine("Batch annotation completed.");
     }
 }

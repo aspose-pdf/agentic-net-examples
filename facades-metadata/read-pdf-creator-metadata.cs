@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -15,13 +14,13 @@ class Program
             return;
         }
 
-        // Load PDF metadata using PdfFileInfo facade
+        // Open the PDF file info facade to read metadata
         using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
         {
-            // Access the Creator property and store it in a variable
+            // Store the Creator metadata in a variable
             string creator = pdfInfo.Creator;
 
-            // Example usage: display the creator value
+            // Example usage: output the value
             Console.WriteLine($"Creator: {creator}");
         }
     }

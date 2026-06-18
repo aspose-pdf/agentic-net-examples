@@ -15,13 +15,13 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF, modify its metadata, and save.
         using (Document doc = new Document(inputPath))
         {
-            // Replace the Author metadata with the current user name
+            // Replace the Author metadata with the current user name.
             doc.Info.Author = Environment.UserName;
 
-            // Save the updated document
+            // Save the updated document.
             doc.Save(outputPath);
         }
 

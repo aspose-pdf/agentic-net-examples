@@ -6,33 +6,42 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        // Path to the source PDF file
+        const string inputPdf = "sample.pdf";
 
-        if (!File.Exists(inputPath))
+        // Ensure the source file exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
+        // Create a memory stream that will hold the resulting PDF
         using (MemoryStream outputStream = new MemoryStream())
         {
-            // Load the PDF with a facade
+            // Instantiate a facade that supports editing and saving to a stream
+            // PdfPageEditor inherits from SaveableFacade, which provides Save(Stream)
             PdfPageEditor editor = new PdfPageEditor();
-            editor.BindPdf(inputPath);
 
-            // Example modification (optional)
+            // Bind the PDF file to the editor (can also use a stream via BindPdf(Stream))
+            editor.BindPdf(inputPdf);
+
+            // Example modification: change the zoom factor of the document
             editor.Zoom = 0.75f;
 
-            // Save the modified PDF into the memory stream
+            // Save the modified PDF directly into the memory stream
             editor.Save(outputStream);
 
-            // Prepare the stream for further use
+            // At this point the MemoryStream contains the PDF data.
+            // Reset the position if the stream will be read later.
             outputStream.Position = 0;
 
-            Console.WriteLine($"Modified PDF size in memory: {outputStream.Length} bytes");
+            // Example: write the stream length to console
+            Console.WriteLine($"Modified PDF saved to memory stream ({outputStream.Length} bytes).");
 
-            // Release resources held by the facade
-            editor.Close();
+            // The stream can now be passed to other components without touching the file system.
+            // For demonstration, we could write it back to disk (optional):
+            // File.WriteAllBytes("modified_output.pdf", outputStream.ToArray());
         }
     }
 }

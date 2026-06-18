@@ -2,81 +2,68 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";
-        const string outputPdfPath  = "signed_output.pdf";
-        const string certificatePath = "certificate.pfx";
-        const string certificatePassword = "password";
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "signed_output.pdf";
+        const string certPath = "certificate.pfx";
+        const string certPassword = "password";
+        const string customXmlPath = "customSignature.xml";
 
-        // Custom XML data to embed (example)
-        const string customXml = "<SignatureData><Compliance>StandardXYZ</Compliance></SignatureData>";
-
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdfPath) ||
+            !File.Exists(certPath) ||
+            !File.Exists(customXmlPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(certificatePath))
-        {
-            Console.Error.WriteLine($"Certificate file not found: {certificatePath}");
+            Console.Error.WriteLine("One or more required files are missing.");
             return;
         }
 
-        try
+        // Load the PDF document (lifecycle rule: use using)
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Load the PDF document
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Define the rectangle for the signature field (fully qualified to avoid ambiguity)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+
+            // Create a signature field on the first page
+            SignatureField signatureField = new SignatureField(doc, rect)
             {
-                // ------------------------------------------------------------
-                // 1. Add a signature field to the first page
-                // ------------------------------------------------------------
-                // Define the rectangle where the visible signature will appear
-                Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-                // Create the signature field and add it to the page
-                SignatureField sigField = new SignatureField(pdfDoc, sigRect);
-                pdfDoc.Pages[1].Annotations.Add(sigField);
+                PartialName = "Signature1"
+            };
+            doc.Pages[1].Annotations.Add(signatureField);
 
-                // ------------------------------------------------------------
-                // 2. Create a PKCS#7 signature object using the certificate
-                // ------------------------------------------------------------
-                PKCS7 pkcs7Signature = new PKCS7(certificatePath, certificatePassword);
-                pkcs7Signature.Reason      = "Document approved";
-                pkcs7Signature.ContactInfo = "contact@example.com";
-                pkcs7Signature.Location    = "New York, USA";
-                pkcs7Signature.Date        = DateTime.UtcNow;
+            // Load custom XML data that must be embedded in the signature
+            byte[] customXml = File.ReadAllBytes(customXmlPath);
 
-                // ------------------------------------------------------------
-                // 3. Sign the field with the PKCS#7 signature
-                // ------------------------------------------------------------
-                sigField.Sign(pkcs7Signature);
+            // Create a PKCS#7 signature object using the certificate
+            PKCS7 pkcs7 = new PKCS7(certPath, certPassword)
+            {
+                Reason = "Compliance with external standard",
+                Location = "Company HQ",
+                Date = DateTime.UtcNow
+            };
 
-                // ------------------------------------------------------------
-                // 4. Embed custom XML signature data (hidden on the page)
-                // ------------------------------------------------------------
-                // Place the XML as a hidden text fragment outside the visible page area
-                TextFragment xmlFragment = new TextFragment(customXml);
-                // Make the fragment effectively invisible
-                xmlFragment.TextState.FontSize = 0.1f;
-                xmlFragment.TextState.ForegroundColor = Aspose.Pdf.Color.White;
-                // Position it far outside the page bounds
-                xmlFragment.Position = new Position(-1000, -1000);
-                pdfDoc.Pages[1].Paragraphs.Add(xmlFragment);
+            // Embed custom XML data via the CustomSignHash delegate.
+            // The delegate receives the document hash and the digest algorithm and must return the signature bytes.
+            pkcs7.CustomSignHash = (byte[] hash, DigestHashAlgorithm alg) =>
+            {
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    ms.Write(hash, 0, hash.Length);
+                    ms.Write(customXml, 0, customXml.Length);
+                    return ms.ToArray();
+                }
+            };
 
-                // ------------------------------------------------------------
-                // 5. Save the signed PDF
-                // ------------------------------------------------------------
-                pdfDoc.Save(outputPdfPath);
-                Console.WriteLine($"Signed PDF saved to '{outputPdfPath}'.");
-            }
+            // Sign the document using the signature field
+            signatureField.Sign(pkcs7);
+
+            // Save the signed PDF (lifecycle rule: use Save)
+            doc.Save(outputPdfPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Signed PDF saved to '{outputPdfPath}'.");
     }
 }

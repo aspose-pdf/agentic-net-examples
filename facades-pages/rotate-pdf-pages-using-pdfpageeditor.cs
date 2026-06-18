@@ -6,24 +6,32 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "rotated.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
+        // Verify that the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Rotate all pages 90 degrees using PdfPageEditor
+        // PdfPageEditor implements IFacade and is disposable, so use a using block
         using (PdfPageEditor editor = new PdfPageEditor())
         {
-            editor.BindPdf(inputPath);   // load the PDF
-            editor.Rotation = 90;        // allowed values: 0, 90, 180, 270
-            editor.ApplyChanges();       // apply the rotation
-            editor.Save(outputPath);     // save the modified PDF
+            // Bind the PDF file for editing
+            editor.BindPdf(inputPath);
+
+            // Example edit: rotate all pages by 90 degrees (allowed values: 0, 90, 180, 270)
+            editor.Rotation = 90;
+
+            // Apply the pending changes to the document
+            editor.ApplyChanges();
+
+            // Save the modified PDF to a new file
+            editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Edited PDF saved to '{outputPath}'.");
     }
 }

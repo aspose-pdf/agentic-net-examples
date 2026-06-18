@@ -2,57 +2,69 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-public static class PdfMetadataHelper
+namespace AsposePdfApi
 {
     /// <summary>
-    /// Removes the entire XMP metadata block from a PDF file and saves the result.
+    /// Utility class that provides PDF metadata manipulation helpers.
     /// </summary>
-    /// <param name="inputPdfPath">Path to the source PDF.</param>
-    /// <param name="outputPdfPath">Path where the metadata‑free PDF will be saved.</param>
-    public static void RemoveXmpMetadata(string inputPdfPath, string outputPdfPath)
+    public static class PdfMetadataUtility
     {
-        // Validate input file existence.
-        if (!File.Exists(inputPdfPath))
-            throw new FileNotFoundException($"Input PDF not found: {inputPdfPath}");
-
-        // Use the PdfXmpMetadata facade to manipulate XMP data.
-        // The facade implements IDisposable, so wrap it in a using block.
-        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
+        /// <summary>
+        /// Removes the entire XMP metadata block from the specified PDF file
+        /// and saves the result to a new file.
+        /// </summary>
+        /// <param name="inputPdfPath">Path to the source PDF.</param>
+        /// <param name="outputPdfPath">Path where the metadata‑free PDF will be saved.</param>
+        public static void RemoveXmpMetadata(string inputPdfPath, string outputPdfPath)
         {
-            // Bind the facade to the source PDF.
+            // Verify that the input file exists
+            if (!File.Exists(inputPdfPath))
+                throw new FileNotFoundException($"Input PDF not found: {inputPdfPath}");
+
+            // Create the XMP metadata facade, bind the PDF, clear the XMP block, and save.
+            // PdfXmpMetadata implements SaveableFacade, which provides BindPdf, Clear, and Save methods.
+            PdfXmpMetadata xmp = new PdfXmpMetadata();
+
+            // Load the PDF into the facade
             xmp.BindPdf(inputPdfPath);
 
-            // Clear all XMP elements – this removes the entire XMP block.
+            // Remove all XMP elements
             xmp.Clear();
 
-            // Save the modified PDF to the specified output path.
+            // Persist the changes to a new file
             xmp.Save(outputPdfPath);
         }
     }
-}
 
-public class Program
-{
     /// <summary>
-    /// Simple entry point to make the project compile as an executable.
-    /// Accepts two arguments: input PDF path and output PDF path.
+    /// Simple console entry point required for a runnable project.
     /// </summary>
-    public static void Main(string[] args)
+    public class Program
     {
-        if (args.Length != 2)
+        /// <summary>
+        /// Expected arguments: <c>inputPdfPath outputPdfPath</c>
+        /// </summary>
+        public static void Main(string[] args)
         {
-            Console.WriteLine("Usage: <inputPdfPath> <outputPdfPath>");
-            return;
-        }
+            if (args == null || args.Length != 2)
+            {
+                Console.WriteLine("Usage: AsposePdfApi <inputPdfPath> <outputPdfPath>");
+                return;
+            }
 
-        try
-        {
-            PdfMetadataHelper.RemoveXmpMetadata(args[0], args[1]);
-            Console.WriteLine($"Metadata removed successfully. Output saved to '{args[1]}'");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            string inputPath = args[0];
+            string outputPath = args[1];
+
+            try
+            {
+                PdfMetadataUtility.RemoveXmpMetadata(inputPath, outputPath);
+                Console.WriteLine($"Metadata removed successfully. Output saved to: {outputPath}");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+                Environment.Exit(1);
+            }
         }
     }
 }

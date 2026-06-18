@@ -1,48 +1,66 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Path to the PDF that will receive the attachments
-        const string basePdfPath = "base.pdf";
+        // Input PDF to which attachments will be added
+        const string sourcePdfPath = "source.pdf";
+        // Output PDF with all attachments
+        const string outputPdfPath = "output_with_attachments.pdf";
 
-        // Path where the resulting PDF will be saved
-        const string outputPdfPath = "output.pdf";
-
-        // Directory containing files to be attached
-        const string attachmentsDirectory = "attachments";
-
-        // Validate inputs
-        if (!File.Exists(basePdfPath))
+        // Collection of files to attach
+        string[] attachmentFiles = new string[]
         {
-            Console.Error.WriteLine($"Base PDF not found: {basePdfPath}");
+            "file1.docx",
+            "image.png",
+            "data.xlsx"
+        };
+
+        // Verify source PDF exists
+        if (!File.Exists(sourcePdfPath))
+        {
+            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
             return;
         }
 
-        if (!Directory.Exists(attachmentsDirectory))
+        // Verify each attachment exists before processing
+        foreach (string att in attachmentFiles)
         {
-            Console.Error.WriteLine($"Attachments directory not found: {attachmentsDirectory}");
-            return;
+            if (!File.Exists(att))
+            {
+                Console.Error.WriteLine($"Attachment not found: {att}");
+                return;
+            }
         }
 
-        // Gather all files to attach
-        string[] filesToAttach = Directory.GetFiles(attachmentsDirectory);
-
-        // Initialize the content editor and bind the base PDF
-        Aspose.Pdf.Facades.PdfContentEditor editor = new Aspose.Pdf.Facades.PdfContentEditor();
-        editor.BindPdf(basePdfPath);
-
-        // Attach each file to the PDF
-        foreach (string attachmentPath in filesToAttach)
+        try
         {
-            string description = $"Attachment: {Path.GetFileName(attachmentPath)}";
-            editor.AddDocumentAttachment(attachmentPath, description);
-        }
+            // Use PdfContentEditor to bind the source PDF
+            using (PdfContentEditor editor = new PdfContentEditor())
+            {
+                editor.BindPdf(sourcePdfPath);
 
-        // Save the PDF with all attachments
-        editor.Save(outputPdfPath);
-        Console.WriteLine($"All attachments added. Saved to '{outputPdfPath}'.");
+                // Attach each file with a simple description
+                foreach (string attPath in attachmentFiles)
+                {
+                    // Description can be any string; here we use the file name
+                    string description = Path.GetFileName(attPath);
+                    editor.AddDocumentAttachment(attPath, description);
+                }
+
+                // Save the resulting PDF
+                editor.Save(outputPdfPath);
+            }
+
+            Console.WriteLine($"Attachments added successfully. Output saved to '{outputPdfPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

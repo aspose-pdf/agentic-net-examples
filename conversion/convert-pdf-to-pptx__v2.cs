@@ -6,22 +6,30 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string pptxPath = "output.pptx";
+        // Paths
+        const string inputPdfPath = "input.pdf";
+        const string outputPptxPath = "output.pptx";
 
-        if (!File.Exists(pdfPath))
+        // Verify input PDF exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
         // ---------- Convert PDF to PPTX ----------
-        // Aspose.Pdf can directly save a PDF document as a PPTX file.
-        using (Document pdfDoc = new Document(pdfPath))
+        // Aspose.Pdf can directly save a PDF as PPTX using SaveFormat.Pptx
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            pdfDoc.Save(pptxPath, SaveFormat.Pptx);
+            pdfDoc.Save(outputPptxPath, SaveFormat.Pptx);
         }
 
-        Console.WriteLine($"PDF converted to PPTX: {pptxPath}");
+        // NOTE: Password‑protecting a PPTX file requires Aspose.Slides.
+        // If password protection is required, add a reference to the Aspose.Slides
+        // NuGet package and use Presentation.ProtectionManager.Encrypt(...).
+        // The current project builds without Aspose.Slides, so only the conversion
+        // step is performed here.
+
+        Console.WriteLine($"PDF successfully converted to PPTX: {outputPptxPath}");
     }
 }

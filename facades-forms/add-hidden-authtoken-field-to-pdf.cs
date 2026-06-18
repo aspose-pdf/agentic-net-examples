@@ -3,61 +3,59 @@ using System.IO;
 using System.Security.Cryptography;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Forms; // required for TextBoxField and other form classes
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_with_token.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Generate a secure random token (32 bytes, Base64 encoded)
-        string authToken;
-        using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
-        {
-            byte[] tokenBytes = new byte[32];
-            rng.GetBytes(tokenBytes);
-            authToken = Convert.ToBase64String(tokenBytes);
-        }
+        // Generate a secure random token (256‑bit) and encode it as Base64
+        string authToken = GenerateSecureToken(32); // 32 bytes = 256 bits
 
-        // Load the PDF using the Facades Form class (fully qualified to avoid ambiguity)
+        // Use the Facades Form class to bind the PDF, modify it, and save it
         using (Aspose.Pdf.Facades.Form pdfForm = new Aspose.Pdf.Facades.Form())
         {
-            pdfForm.BindPdf(inputPath);               // Initialize the facade with the source PDF
-            Document doc = pdfForm.Document;          // Access the underlying Document object
+            // Load the existing PDF
+            pdfForm.BindPdf(inputPdf);
 
-            // Ensure the document has at least one page
-            if (doc.Pages.Count == 0)
-            {
-                Console.Error.WriteLine("The PDF has no pages.");
-                return;
-            }
+            // Access the underlying Document object
+            Document doc = pdfForm.Document;
 
-            // Create a hidden text field named "AuthToken" on the first page
-            Page firstPage = doc.Pages[1]; // 1‑based indexing
-            // Rectangle with zero size; field will not be visible
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(0, 0, 0, 0);
-            TextBoxField hiddenField = new TextBoxField(firstPage, rect)
+            // Create a hidden text field on the first page.
+            // A zero‑size rectangle makes the field invisible; no need for FieldFlags.
+            var hiddenField = new TextBoxField(
+                doc.Pages[1],
+                new Rectangle(0, 0, 0, 0) // zero‑size rectangle
+            )
             {
                 PartialName = "AuthToken",
                 Value = authToken
-                // No need to set Flags; zero‑size rectangle makes the field invisible
             };
 
-            // Add the field to the document's form
+            // Add the field to the document's AcroForm
             doc.Form.Add(hiddenField);
 
-            // Save the modified PDF via the Form facade
-            pdfForm.Save(outputPath);
+            // Save the modified PDF via the Facades API
+            pdfForm.Save(outputPdf);
         }
 
-        Console.WriteLine($"Hidden field \"AuthToken\" added and saved to '{outputPath}'.");
+        Console.WriteLine($"Hidden field \"AuthToken\" added and saved to '{outputPdf}'.");
+    }
+
+    // Helper: generate a cryptographically strong random token and return Base64 string
+    private static string GenerateSecureToken(int byteLength)
+    {
+        byte[] tokenBytes = new byte[byteLength];
+        RandomNumberGenerator.Fill(tokenBytes);
+        return Convert.ToBase64String(tokenBytes);
     }
 }

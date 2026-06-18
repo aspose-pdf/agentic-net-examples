@@ -1,15 +1,14 @@
 using System;
 using System.IO;
 using System.IO.Compression;
-using System.Collections.Generic;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades; // PdfFileEditor resides here
 
-class Program
+class ZipPdfConcatenator
 {
     static void Main()
     {
         const string zipPath = "input.zip";          // Path to the zip archive
-        const string mergedFileName = "merged.pdf";  // Name of the merged PDF inside the zip
+        const string mergedFileName = "merged.pdf";  // Name for the concatenated PDF inside the zip
 
         if (!File.Exists(zipPath))
         {
@@ -17,62 +16,57 @@ class Program
             return;
         }
 
-        // Open the zip archive for update (read/write)
-        using (FileStream zipStream = new FileStream(zipPath, FileMode.Open, FileAccess.ReadWrite))
-        using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Update))
+        // Open the zip archive in Update mode so we can read and write entries
+        using (FileStream zipFileStream = new FileStream(zipPath, FileMode.Open, FileAccess.ReadWrite))
+        using (ZipArchive archive = new ZipArchive(zipFileStream, ZipArchiveMode.Update))
         {
-            // Collect streams of all PDF entries in the archive
-            List<Stream> pdfStreams = new List<Stream>();
-            foreach (ZipArchiveEntry entry in archive.Entries)
+            // Gather all PDF entries
+            var pdfEntries = new System.Collections.Generic.List<ZipArchiveEntry>();
+            foreach (var entry in archive.Entries)
             {
                 if (entry.FullName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
-                {
-                    // Open the entry stream for reading and keep it until concatenation finishes
-                    Stream entryStream = entry.Open();
-                    pdfStreams.Add(entryStream);
-                }
+                    pdfEntries.Add(entry);
             }
 
-            if (pdfStreams.Count == 0)
+            if (pdfEntries.Count == 0)
             {
                 Console.WriteLine("No PDF files found in the archive.");
                 return;
             }
 
-            // Prepare the output stream that will hold the concatenated PDF
-            using (MemoryStream mergedStream = new MemoryStream())
+            // Open streams for each PDF entry
+            var inputStreams = new System.Collections.Generic.List<Stream>();
+            foreach (var entry in pdfEntries)
             {
-                // Use PdfFileEditor to concatenate the PDF streams
-                PdfFileEditor editor = new PdfFileEditor();
-                bool success = editor.Concatenate(pdfStreams.ToArray(), mergedStream);
-                if (!success)
-                {
-                    Console.Error.WriteLine("Failed to concatenate PDF files.");
-                    // Dispose the input streams before exiting
-                    foreach (var s in pdfStreams) s.Dispose();
-                    return;
-                }
+                // Open the entry stream for reading
+                Stream entryStream = entry.Open(); // returns a readable stream
+                inputStreams.Add(entryStream);
+            }
 
-                // Reset position to the beginning before writing to the zip entry
-                mergedStream.Position = 0;
+            // Prepare the output stream that will hold the concatenated PDF
+            using (MemoryStream outputStream = new MemoryStream())
+            {
+                // Use PdfFileEditor to concatenate the PDFs
+                PdfFileEditor editor = new PdfFileEditor();
+                editor.CloseConcatenatedStreams = true; // close input streams after operation
+                editor.Concatenate(inputStreams.ToArray(), outputStream);
+
+                // Ensure the output stream is positioned at the beginning before writing
+                outputStream.Position = 0;
 
                 // Remove existing merged entry if it exists
-                ZipArchiveEntry? existing = archive.GetEntry(mergedFileName);
-                existing?.Delete();
+                var existingMerged = archive.GetEntry(mergedFileName);
+                existingMerged?.Delete();
 
-                // Create a new entry for the merged PDF and write the data
-                ZipArchiveEntry mergedEntry = archive.CreateEntry(mergedFileName);
-                using (Stream entryOut = mergedEntry.Open())
+                // Create a new entry for the merged PDF
+                ZipArchiveEntry mergedEntry = archive.CreateEntry(mergedFileName, CompressionLevel.Optimal);
+                using (Stream mergedEntryStream = mergedEntry.Open())
                 {
-                    mergedStream.CopyTo(entryOut);
+                    outputStream.CopyTo(mergedEntryStream);
                 }
             }
 
-            // Dispose all input PDF streams now that they are no longer needed
-            foreach (var s in pdfStreams)
-            {
-                s.Dispose();
-            }
+            // At this point, input streams have been closed by the editor (CloseConcatenatedStreams = true)
         }
 
         Console.WriteLine("PDF files concatenated and saved back into the zip archive.");

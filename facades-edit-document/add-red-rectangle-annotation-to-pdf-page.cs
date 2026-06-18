@@ -1,44 +1,51 @@
 using System;
 using System.IO;
-using System.Drawing;               // Required for Rectangle and Color used by PdfContentEditor
-using Aspose.Pdf.Facades;          // PdfContentEditor resides here
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";   // Source PDF
-        const string outputPath = "output.pdf";  // Destination PDF
-        const int    pageNumber = 1;             // Target page (1‑based indexing)
+        // Input PDF file path
+        const string inputPath  = "input.pdf";
+        // Output PDF file path
+        const string outputPath = "output.pdf";
+        // Page number (1‑based) where the annotation will be placed
+        const int pageNumber = 1;
 
+        // Define the annotation rectangle (coordinates are in points).
+        // Example: lower‑left (100, 500), width 200, height 100.
+        // System.Drawing.Rectangle is required by the API.
+        var rect = new System.Drawing.Rectangle(100, 500, 200, 100);
+
+        // Annotation contents (optional, can be empty)
+        const string contents = "Red rectangle annotation";
+
+        // Border thickness: 2 mm ≈ 6 points (integer value)
+        const int borderWidth = 6;
+
+        // Ensure the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Define the annotation rectangle in points (1 point = 1/72 inch).
-        // Example coordinates: lower‑left corner (100,500) with width 200 and height 100.
-        Rectangle annotRect = new Rectangle(100, 500, 300, 600); // x, y, width, height
-
-        // Convert 2 mm border thickness to points.
-        // 1 mm = 72 pt / 25.4 ≈ 2.8346 pt → 2 mm ≈ 5.669 pt → round to nearest integer.
-        int borderWidth = (int)Math.Round(2.0 * 72.0 / 25.4); // ≈6 points
-
-        // Create the editor, bind the PDF, add a red square (rectangle) annotation, and save.
-        PdfContentEditor editor = new PdfContentEditor();
+        // Use PdfContentEditor to add the square (rectangle) annotation
+        var editor = new PdfContentEditor();
         editor.BindPdf(inputPath);
-        // Parameters: rectangle, contents, color, square(true for rectangle), page, border width.
+        // Create a square annotation (square = true) with red color
         editor.CreateSquareCircle(
-            annotRect,
-            "Red rectangle annotation",
-            Color.Red,
-            true,          // true => square (rectangle) shape
-            pageNumber,
-            borderWidth);
-        editor.Save(outputPath);
-        editor.Close();
+            rect,                     // rectangle defining position and size
+            contents,                 // annotation text
+            System.Drawing.Color.Red, // border color
+            true,                     // true => square (rectangle), false => circle
+            pageNumber,               // target page (1‑based)
+            borderWidth);             // border thickness in points
 
+        // Save the modified PDF
+        editor.Save(outputPath);
         Console.WriteLine($"Red rectangle annotation added to page {pageNumber} and saved as '{outputPath}'.");
     }
 }

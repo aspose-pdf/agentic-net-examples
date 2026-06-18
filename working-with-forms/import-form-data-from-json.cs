@@ -1,55 +1,47 @@
 using System;
 using System.IO;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Aspose.Pdf;               // Core Aspose.Pdf namespace
-using Aspose.Pdf.Forms;        // For form handling (ImportFromJson)
+using Aspose.Pdf;               // Core PDF API
+using Aspose.Pdf.Forms;        // Form handling (Form, Field, etc.)
 
 class Program
 {
-    // Entry point – async to allow awaiting the HTTP request
-    static async Task Main()
+    static void Main()
     {
-        const string templatePath = "TemplateForm.pdf";   // PDF with form fields
-        const string outputPath   = "PopulatedForm.pdf"; // Resulting PDF
-        const string apiUrl       = "https://example.com/api/formdata"; // REST endpoint returning JSON
+        // Paths – adjust as needed
+        const string pdfPath   = "input.pdf";      // PDF with form fields
+        const string jsonPath  = "data.json";      // JSON array with field values
+        const string outputPdf = "filled_output.pdf";
 
-        // Verify that the template PDF exists
-        if (!File.Exists(templatePath))
+        // Verify input files exist
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Template PDF not found: {templatePath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            return;
+        }
+        if (!File.Exists(jsonPath))
+        {
+            Console.Error.WriteLine($"JSON not found: {jsonPath}");
             return;
         }
 
-        // Load the PDF document containing the form
-        using (Document pdfDoc = new Document(templatePath))
+        try
         {
-            // Create an HttpClient to fetch the JSON payload
-            using (HttpClient httpClient = new HttpClient())
+            // Load the PDF document (using block ensures proper disposal)
+            using (Document doc = new Document(pdfPath))
             {
-                try
-                {
-                    // Request the JSON data as a stream (no need to load the whole string into memory)
-                    using (Stream jsonStream = await httpClient.GetStreamAsync(apiUrl))
-                    {
-                        // Import the JSON data into the PDF form fields.
-                        // Document.Form.ImportFromJson matches fields by their full names.
-                        pdfDoc.Form.ImportFromJson(jsonStream);
-                    }
+                // Bulk import of form field values from the JSON file.
+                // ImportFromJson reads the JSON and updates matching fields.
+                doc.Form.ImportFromJson(jsonPath);
 
-                    // Save the updated PDF with populated form fields
-                    pdfDoc.Save(outputPath);
-                    Console.WriteLine($"Form data imported and PDF saved to '{outputPath}'.");
-                }
-                catch (HttpRequestException httpEx)
-                {
-                    Console.Error.WriteLine($"Error fetching JSON from API: {httpEx.Message}");
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine($"Unexpected error: {ex.Message}");
-                }
+                // Save the updated document.
+                doc.Save(outputPdf);
             }
+
+            Console.WriteLine($"Form data imported and saved to '{outputPdf}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

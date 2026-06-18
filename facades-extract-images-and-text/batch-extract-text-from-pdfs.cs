@@ -9,7 +9,7 @@ class Program
         // Folder containing PDF files
         const string inputFolder = "InputPdfs";
         // Folder where extracted text files will be saved
-        const string outputFolder = "ExtractedText";
+        const string outputFolder = "ExtractedTexts";
 
         if (!Directory.Exists(inputFolder))
         {
@@ -19,25 +19,25 @@ class Program
 
         Directory.CreateDirectory(outputFolder);
 
-        // Get all PDF files in the input folder
+        // Get all PDF files in the input folder (non‑recursive)
         string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
 
         foreach (string pdfPath in pdfFiles)
         {
-            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
-            string txtPath = Path.Combine(outputFolder, fileNameWithoutExt + ".txt");
+            string baseName = Path.GetFileNameWithoutExtension(pdfPath);
+            string txtPath = Path.Combine(outputFolder, baseName + ".txt");
 
             try
             {
-                // Use PdfExtractor to extract text from the PDF
+                // Use PdfExtractor to bind the PDF, extract text, and save it to a .txt file
                 using (PdfExtractor extractor = new PdfExtractor())
                 {
-                    extractor.BindPdf(pdfPath);      // Initialize the facade with the PDF file
-                    extractor.ExtractText();         // Extract text from all pages
-                    extractor.GetText(txtPath);      // Save extracted text to a .txt file
+                    extractor.BindPdf(pdfPath);
+                    extractor.ExtractText();               // Unicode extraction of all pages
+                    extractor.GetText(txtPath);            // Write extracted text to file
                 }
 
-                Console.WriteLine($"Extracted text saved to: {txtPath}");
+                Console.WriteLine($"Extracted: {pdfPath} -> {txtPath}");
             }
             catch (Exception ex)
             {

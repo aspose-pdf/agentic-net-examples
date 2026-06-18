@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_strikeout.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,19 +16,20 @@ class Program
             return;
         }
 
-        // Load the existing PDF document
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Define the rectangle that covers the target paragraph.
-            // Adjust the coordinates (llx, lly, urx, ury) as needed.
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 520);
+            // Assume the paragraph is on the first page; define its rectangle (llx, lly, urx, ury)
+            // Adjust the coordinates as needed to cover the target paragraph.
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 400, 520);
 
-            // Create a strikeout annotation on the first page.
+            // Create a StrikeOut annotation on the specified page and rectangle
             StrikeOutAnnotation strike = new StrikeOutAnnotation(doc.Pages[1], rect)
             {
-                Title = "reviewer",               // Author of the annotation
-                Color = Aspose.Pdf.Color.Red,    // Visual color of the strikeout line
-                Opacity = 0.5                     // Optional opacity
+                // Set the author (reviewer) of the annotation
+                Title = "reviewer",
+                // Optional: set the color of the strikeout line
+                Color = Aspose.Pdf.Color.Red
             };
 
             // Add the annotation to the page's annotation collection

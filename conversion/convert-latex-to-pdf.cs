@@ -6,34 +6,39 @@ class Program
 {
     static void Main()
     {
-        // Path to the source LaTeX file and the desired PDF output.
-        const string inputTexPath  = "input.tex";
-        const string outputPdfPath = "output.pdf";
+        // Path to the directory containing the LaTeX source file.
+        string dataDir = @"YOUR_DATA_DIRECTORY";
 
-        // Verify that the LaTeX source file exists.
-        if (!File.Exists(inputTexPath))
+        // Input LaTeX file.
+        string texFile = Path.Combine(dataDir, "sample.tex");
+
+        // Desired output PDF file.
+        string pdfFile = Path.Combine(dataDir, "sample.pdf");
+
+        // Verify that the LaTeX source exists.
+        if (!File.Exists(texFile))
         {
-            Console.Error.WriteLine($"Error: LaTeX file not found at '{inputTexPath}'.");
+            Console.Error.WriteLine($"LaTeX file not found: {texFile}");
             return;
         }
 
-        // Configure TeX loading options.
-        // RasterizeFormulas = true ensures that complex equations are rendered correctly.
-        // ShowTerminalOutput can be set to true for debugging the LaTeX compilation process.
-        Aspose.Pdf.TeXLoadOptions texLoadOptions = new Aspose.Pdf.TeXLoadOptions
+        // Initialize TeX load options.
+        // RasterizeFormulas = false keeps equations as vector graphics,
+        // preserving quality and editability.
+        TeXLoadOptions texLoadOptions = new TeXLoadOptions
         {
-            RasterizeFormulas = true,
-            ShowTerminalOutput = false
+            RasterizeFormulas = false,
+            ShowTerminalOutput = true // optional: display LaTeX compiler output.
         };
 
-        // Load the LaTeX file and convert it to a PDF document.
-        // The Document constructor takes the file path and the TeXLoadOptions instance.
-        using (Aspose.Pdf.Document pdfDocument = new Aspose.Pdf.Document(inputTexPath, texLoadOptions))
+        // Load the .tex file and convert it to a PDF document.
+        // The Document constructor takes the file path and the load options.
+        using (Document pdfDocument = new Document(texFile, texLoadOptions))
         {
-            // Save the generated PDF.
-            pdfDocument.Save(outputPdfPath);
+            // Save the resulting PDF.
+            pdfDocument.Save(pdfFile);
         }
 
-        Console.WriteLine($"Successfully converted LaTeX to PDF: '{outputPdfPath}'.");
+        Console.WriteLine($"LaTeX successfully converted to PDF: {pdfFile}");
     }
 }

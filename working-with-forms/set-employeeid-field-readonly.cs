@@ -19,17 +19,18 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the form field named "EmployeeID"
-            // The Form indexer returns a WidgetAnnotation, so we need to cast it to Field.
-            Field employeeField = doc.Form["EmployeeID"] as Field;
-            if (employeeField != null)
+            // Access the form field named "EmployeeID"
+            // Use the concrete field type (e.g., TextBoxField) instead of the generic WidgetAnnotation
+            TextBoxField employeeIdField = doc.Form["EmployeeID"] as TextBoxField;
+
+            if (employeeIdField == null)
             {
-                // Make the field read‑only to prevent user edits
-                employeeField.ReadOnly = true;
+                Console.Error.WriteLine("Field 'EmployeeID' not found or is not a text box.");
             }
             else
             {
-                Console.WriteLine("Field 'EmployeeID' not found in the document.");
+                // Set the field to read‑only so users cannot modify it
+                employeeIdField.ReadOnly = true;
             }
 
             // Save the modified PDF

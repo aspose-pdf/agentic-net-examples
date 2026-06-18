@@ -1,61 +1,31 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
-using System.Text.Json;
-using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputJsonPath = "fields_layout.json";
+        const string inputPdf = "input.pdf";
+        const string outputJson = "fields.json";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document (using rule for document disposal)
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Initialize the Form facade with the source PDF
+        using (Form form = new Form(inputPdf))
         {
-            // Collect layout information for each form field
-            var fieldsLayout = new List<FieldLayout>();
-
-            foreach (var field in pdfDoc.Form.Fields)
+            // Export all form fields (including their layout rectangles) to JSON
+            using (FileStream jsonStream = new FileStream(outputJson, FileMode.Create, FileAccess.Write))
             {
-                // Rectangle describing the field position on its page
-                Aspose.Pdf.Rectangle rect = field.Rect;
-
-                fieldsLayout.Add(new FieldLayout
-                {
-                    Name = field.FullName,
-                    Page = field.PageIndex,               // 1‑based page index
-                    LowerLeftX = rect.LLX,
-                    LowerLeftY = rect.LLY,
-                    UpperRightX = rect.URX,
-                    UpperRightY = rect.URY
-                });
+                // 'true' makes the JSON output indented for readability
+                form.ExportJson(jsonStream, true);
             }
-
-            // Serialize layout data to indented JSON
-            JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-            string json = JsonSerializer.Serialize(fieldsLayout, jsonOptions);
-            File.WriteAllText(outputJsonPath, json);
         }
 
-        Console.WriteLine($"Form field layout exported to '{outputJsonPath}'.");
-    }
-
-    // Helper class representing the JSON structure for a field
-    private class FieldLayout
-    {
-        public string Name { get; set; }
-        public int Page { get; set; }
-        public double LowerLeftX { get; set; }
-        public double LowerLeftY { get; set; }
-        public double UpperRightX { get; set; }
-        public double UpperRightY { get; set; }
+        Console.WriteLine($"Form field layout exported to '{outputJson}'.");
     }
 }

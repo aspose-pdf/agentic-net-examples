@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "sanitized.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -18,13 +18,13 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Remove all annotations from every page
+            // Remove all annotations from each page
             foreach (Page page in doc.Pages)
             {
                 page.Annotations.Clear();
             }
 
-            // Save the cleaned PDF
+            // Save the sanitized PDF
             doc.Save(outputPath);
         }
 

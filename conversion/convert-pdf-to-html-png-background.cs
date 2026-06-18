@@ -6,43 +6,32 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string inputPdf  = "input.pdf";
         const string outputHtml = "output.html";
 
+        // Verify that the source PDF exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Load PDF document (using block ensures proper disposal)
-            using (Document pdfDoc = new Document(inputPdf))
-            {
-                // Configure HTML save options
-                HtmlSaveOptions htmlOpts = new HtmlSaveOptions();
+            // Configure HTML conversion options
+            HtmlSaveOptions htmlOpts = new HtmlSaveOptions();
 
-                // Render page backgrounds as PNG images by using the appropriate raster image saving mode
-                htmlOpts.RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsEmbeddedPartsOfPngPageBackground;
+            // Render all background images as a single PNG per page
+            htmlOpts.RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsEmbeddedPartsOfPngPageBackground;
 
-                // (Optional) Render other raster images as embedded PNG page backgrounds
-                // htmlOpts.RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsEmbeddedPartsOfPngPageBackground;
+            // Optional: improve rendering of tiled background images
+            htmlOpts.TryMergeAdjacentSameBackgroundImages = true;
 
-                // Save as HTML using explicit options (required for non‑PDF output)
-                pdfDoc.Save(outputHtml, htmlOpts);
-            }
-
-            Console.WriteLine($"PDF successfully converted to HTML: {outputHtml}");
+            // Save the document as HTML using the configured options
+            pdfDoc.Save(outputHtml, htmlOpts);
         }
-        catch (TypeInitializationException)
-        {
-            // HTML conversion relies on GDI+ and is Windows‑only
-            Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF successfully converted to HTML with PNG backgrounds: {outputHtml}");
     }
 }

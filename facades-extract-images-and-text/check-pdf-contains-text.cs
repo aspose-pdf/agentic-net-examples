@@ -1,39 +1,40 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades; // PdfExtractor resides here
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPdfPath = "input.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
-
-        bool containsText = false;
 
         // Use PdfExtractor (Facade) to extract text from the PDF
         using (PdfExtractor extractor = new PdfExtractor())
         {
             // Bind the PDF file to the extractor
-            extractor.BindPdf(inputPath);
+            extractor.BindPdf(inputPdfPath);
 
-            // Extract all text (Unicode encoding is default)
+            // Extract text using default Unicode encoding
             extractor.ExtractText();
 
-            // Write the extracted text into a memory stream
+            // Store extracted text in a memory stream
             using (MemoryStream textStream = new MemoryStream())
             {
                 extractor.GetText(textStream);
-                // If the stream length is greater than zero, the PDF had text
-                containsText = textStream.Length > 0;
+
+                // Determine if any text was extracted
+                bool containsText = textStream.Length > 0;
+
+                Console.WriteLine(containsText
+                    ? "The PDF contains text."
+                    : "The PDF does not contain any text.");
             }
         }
-
-        Console.WriteLine($"PDF contains text: {containsText}");
     }
 }

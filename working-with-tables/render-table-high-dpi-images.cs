@@ -1,89 +1,82 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string outputPdf = "TableWithHighDpiImages.pdf";
-        const string imagePath1 = "highres1.jpg";
-        const string imagePath2 = "highres2.png";
+        // Input image files (high‑DPI PNGs, JPEGs, etc.)
+        string[] imagePaths = { "image1.png", "image2.png", "image3.png", "image4.png" };
+        const string outputPdfPath = "TableWithHighDpiImages.pdf";
+        const string outputHtmlPath = "TableWithHighDpiImages.html";
 
-        // Ensure the image files exist before proceeding
-        if (!File.Exists(imagePath1) || !File.Exists(imagePath2))
+        // Verify that all image files exist
+        foreach (string path in imagePaths)
         {
-            Console.Error.WriteLine("One or more image files not found.");
-            return;
+            if (!File.Exists(path))
+            {
+                Console.Error.WriteLine($"Image not found: {path}");
+                return;
+            }
         }
 
-        // Create a new PDF document inside a using block for deterministic disposal
+        // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a single page to the document
+            // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Create a table with two columns
+            // Create a table with 2 columns and 2 rows (adjust as needed)
             Table table = new Table
             {
-                // Define column widths (in points). Adjust as required.
-                ColumnWidths = "200 200",
-                // Optional visual styling
-                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f),
-                DefaultCellPadding = new MarginInfo(5, 5, 5, 5)
+                // Position the table on the page (coordinates are in points)
+                // Fully qualify Rectangle to avoid ambiguity with System.Drawing
+                Left = 50,
+                Top = 700,
+                // Optional: set column widths (percentage of the page width)
+                ColumnWidths = "250 250"
             };
 
-            // ---------- First Row ----------
-            Row row1 = table.Rows.Add();
-
-            // First cell – text
-            Cell textCell = row1.Cells.Add();
-            TextFragment tf = new TextFragment("Sample Text");
-            tf.TextState.FontSize = 12;
-            tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-            textCell.Paragraphs.Add(tf);
-
-            // Second cell – high‑DPI image
-            Cell imgCell1 = row1.Cells.Add();
-            Image img1 = new Image
+            // Add rows and cells, inserting an image into each cell
+            int imgIndex = 0;
+            for (int r = 0; r < 2; r++)
             {
-                File = imagePath1,
-                // Instruct Aspose.Pdf to respect the image's native resolution
-                IsApplyResolution = true,
-                // Scale factor >1 can be used to increase the effective DPI in the PDF
-                ImageScale = 2.0
-            };
-            imgCell1.Paragraphs.Add(img1);
+                Row row = table.Rows.Add();
+                for (int c = 0; c < 2; c++)
+                {
+                    Cell cell = row.Cells.Add();
 
-            // ---------- Second Row ----------
-            Row row2 = table.Rows.Add();
+                    // Load the image from file
+                    Aspose.Pdf.Image img = new Aspose.Pdf.Image();
+                    img.File = imagePaths[imgIndex % imagePaths.Length];
+                    // The image is added to the cell's paragraph collection.
+                    // No ImageFragment class exists; Image is the correct type.
+                    cell.Paragraphs.Add(img);
 
-            // First cell – another high‑DPI image
-            Cell imgCell2 = row2.Cells.Add();
-            Image img2 = new Image
-            {
-                File = imagePath2,
-                IsApplyResolution = true,
-                ImageScale = 2.0
-            };
-            imgCell2.Paragraphs.Add(img2);
+                    imgIndex++;
+                }
+            }
 
-            // Second cell – text
-            Cell textCell2 = row2.Cells.Add();
-            TextFragment tf2 = new TextFragment("More Text");
-            tf2.TextState.FontSize = 12;
-            tf2.TextState.ForegroundColor = Aspose.Pdf.Color.DarkBlue;
-            textCell2.Paragraphs.Add(tf2);
-
-            // Add the completed table to the page
+            // Add the table to the page's paragraph collection
             page.Paragraphs.Add(table);
 
-            // Save the PDF
-            doc.Save(outputPdf);
+            // Save as PDF (default format)
+            doc.Save(outputPdfPath);
+
+            // OPTIONAL: Save as HTML with a higher image resolution.
+            // HtmlSaveOptions.ImageResolution controls the DPI of raster images in the HTML output.
+            HtmlSaveOptions htmlOpts = new HtmlSaveOptions
+            {
+                ImageResolution = 600, // High‑DPI rendering (e.g., 600 DPI)
+                RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg,
+                PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml
+            };
+            doc.Save(outputHtmlPath, htmlOpts);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF saved to '{outputPdfPath}'.");
+        Console.WriteLine($"HTML saved to '{outputHtmlPath}' with high‑DPI images.");
     }
 }

@@ -1,13 +1,13 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core API (Document, Page, PageLabel, NumberingStyle)
+using Aspose.Pdf;               // Core PDF API (Document, Page, PageLabel, NumberingStyle)
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";   // existing PDF
+        const string outputPath = "output.pdf";  // result with blank front‑matter page
 
         if (!File.Exists(inputPath))
         {
@@ -15,27 +15,25 @@ class Program
             return;
         }
 
-        // Load the existing PDF (Document implements IDisposable, so wrap in using)
+        // Load the source PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Insert a blank page at the very beginning.
-            // PageCollection.Insert expects a 1‑based position.
+            // Insert a new blank page at the very beginning (position 1, 1‑based indexing)
+            // The returned Page object can be further customized if needed.
             doc.Pages.Insert(1);
 
-            // Create a custom page label.
-            // NumberingStyle.None means no automatic number is added;
-            // Prefix supplies the literal label text.
+            // Create a custom page label "i"
             PageLabel customLabel = new PageLabel
             {
-                NumberingStyle = NumberingStyle.None,
-                Prefix = "i"
+                Prefix = "i",                     // literal prefix
+                NumberingStyle = NumberingStyle.None, // no automatic numbering
+                StartingValue = 0                 // not used when NumberingStyle is None
             };
 
-            // PageLabelCollection uses zero‑based indexes.
-            // Update the label for the newly inserted first page (index 0).
+            // PageLabelCollection uses zero‑based indexes, so the first page is index 0
             doc.PageLabels.UpdateLabel(0, customLabel);
 
-            // Save the modified PDF.
+            // Save the modified document
             doc.Save(outputPath);
         }
 

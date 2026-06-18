@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputCsvPath = "pages_dimensions.csv";
+        const string inputPdfPath = "input.pdf";      // Path to the source PDF
+        const string outputCsvPath = "pages_dimensions.csv"; // Path for the CSV output
 
         if (!File.Exists(inputPdfPath))
         {
@@ -15,36 +15,30 @@ class Program
             return;
         }
 
-        try
+        // Open the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Load the PDF document
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Prepare the CSV file for writing
+            using (StreamWriter writer = new StreamWriter(outputCsvPath, false))
             {
-                // Prepare CSV writer
-                using (StreamWriter writer = new StreamWriter(outputCsvPath, false))
+                // Write CSV header
+                writer.WriteLine("PageNumber,Width,Height");
+
+                // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
+                for (int i = 1; i <= pdfDoc.Pages.Count; i++)
                 {
-                    // Write CSV header
-                    writer.WriteLine("PageNumber,Width,Height");
+                    Page page = pdfDoc.Pages[i];
 
-                    // Iterate over all pages (1‑based indexing)
-                    for (int i = 1; i <= pdfDoc.Pages.Count; i++)
-                    {
-                        Page page = pdfDoc.Pages[i];
-                        double width = page.PageInfo.Width;
-                        double height = page.PageInfo.Height;
+                    // Page dimensions are available via PageInfo
+                    double width = page.PageInfo.Width;
+                    double height = page.PageInfo.Height;
 
-                        // Write dimensions for the current page
-                        writer.WriteLine($"{i},{width},{height}");
-                    }
+                    // Write a CSV line for the current page
+                    writer.WriteLine($"{i},{width},{height}");
                 }
-
-                // No need to save the PDF; just export dimensions
-                Console.WriteLine($"Page dimensions exported to '{outputCsvPath}'.");
             }
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Page dimensions exported to '{outputCsvPath}'.");
     }
 }

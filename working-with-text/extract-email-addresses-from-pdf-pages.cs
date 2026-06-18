@@ -17,28 +17,27 @@ class Program
             return;
         }
 
-        // Dictionary to hold email addresses per page (1‑based page index)
+        // Dictionary to hold email addresses found on each page (page number -> list of emails)
         var emailsByPage = new Dictionary<int, List<string>>();
 
         // Regular expression for email addresses
-        string emailPattern = @"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}";
+        Regex emailPattern = new Regex(@"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", RegexOptions.IgnoreCase);
 
-        // Open the PDF document inside a using block (ensures proper disposal)
+        // TextFragmentAbsorber configured to use regular expressions
+        TextFragmentAbsorber absorber = new TextFragmentAbsorber(emailPattern, new TextSearchOptions(true));
+
+        // Load the PDF document (using block ensures proper disposal)
         using (Document doc = new Document(inputPath))
         {
             // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
             for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
-                // Create a TextFragmentAbsorber that searches using the regex pattern
-                TextFragmentAbsorber absorber = new TextFragmentAbsorber(
-                    new Regex(emailPattern),
-                    new TextSearchOptions(true) // enable regular‑expression search
-                );
+                Page page = doc.Pages[pageNum];
 
                 // Apply the absorber to the current page
-                doc.Pages[pageNum].Accept(absorber);
+                page.Accept(absorber);
 
-                // Collect found email addresses from this page
+                // Collect matched email addresses from this page
                 var emails = new List<string>();
                 foreach (TextFragment fragment in absorber.TextFragments)
                 {
@@ -51,6 +50,9 @@ class Program
                 {
                     emailsByPage[pageNum] = emails;
                 }
+
+                // Reset absorber for the next page
+                absorber.Reset();
             }
         }
 

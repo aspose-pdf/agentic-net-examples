@@ -7,15 +7,16 @@ class Program
     static void Main()
     {
         // Paths to the destination PDF, source PDF, and the resulting output PDF
-        const string destinationPdf = "destination.pdf";
-        const string sourcePdf      = "source.pdf";
-        const string outputPdf      = "merged.pdf";
+        const string destinationPdf = "dest.pdf";
+        const string sourcePdf = "source.pdf";
+        const string outputPdf = "merged.pdf";
 
-        // Position (1‑based) in the destination PDF where the pages will be inserted
-        const int insertPosition = 3;
+        // Position (1‑based) in the destination PDF where pages will be inserted
+        // For example, 2 means after the first page
+        const int insertPosition = 2;
 
-        // Array of page numbers (1‑based) to take from the source PDF
-        int[] pagesToInsert = new int[] { 2, 4, 5 };
+        // Specific pages from the source PDF to insert (1‑based page numbers)
+        int[] pagesToInsert = new int[] { 3, 5, 7 };
 
         // Verify that the input files exist before proceeding
         if (!File.Exists(destinationPdf))
@@ -30,23 +31,24 @@ class Program
             return;
         }
 
-        // Use PdfFileEditor (Aspose.Pdf.Facades) to insert the specified pages
+        // PdfFileEditor does not implement IDisposable, so no using block is required
         PdfFileEditor editor = new PdfFileEditor();
-        bool result = editor.Insert(
-            destinationPdf,   // inputFile – the PDF into which pages will be inserted
-            insertPosition,   // insertLocation – position in the destination PDF (1‑based)
-            sourcePdf,        // portFile – the PDF providing pages to insert
-            pagesToInsert,    // pageNumber – array of pages from the source PDF
-            outputPdf);       // outputFile – resulting PDF with pages inserted
 
-        // Report the outcome
-        if (result)
+        try
         {
-            Console.WriteLine($"Pages inserted successfully. Output saved to '{outputPdf}'.");
+            // Insert the specified pages from sourcePdf into destinationPdf at insertPosition
+            // The method returns true on success, false otherwise
+            bool result = editor.Insert(destinationPdf, insertPosition, sourcePdf, pagesToInsert, outputPdf);
+
+            if (result)
+                Console.WriteLine($"Pages inserted successfully. Output saved to '{outputPdf}'.");
+            else
+                Console.Error.WriteLine("Insert operation failed.");
         }
-        else
+        catch (Exception ex)
         {
-            Console.Error.WriteLine("Failed to insert pages.");
+            // Handle any unexpected errors during the insertion process
+            Console.Error.WriteLine($"Error during insertion: {ex.Message}");
         }
     }
 }

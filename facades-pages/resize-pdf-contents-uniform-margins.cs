@@ -1,44 +1,49 @@
 using System;
-using System.IO;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        // Paths to the source and destination PDF files
+        const string sourcePdf = "input.pdf";
+        const string destinationPdf = "output.pdf";
 
-        // Verify that the source PDF exists
-        if (!File.Exists(inputPath))
+        // Verify that the source file exists
+        if (!System.IO.File.Exists(sourcePdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {sourcePdf}");
             return;
         }
 
-        // Create an instance of PdfFileEditor (no IDisposable implementation required)
-        PdfFileEditor editor = new PdfFileEditor();
+        // Create an instance of PdfFileEditor (does NOT implement IDisposable)
+        PdfFileEditor fileEditor = new PdfFileEditor();
 
-        // Define uniform margins of 10% on all sides using the static MarginsPercent factory method
+        // Define uniform margins of 10% on all sides.
+        // MarginsPercent creates a ContentsResizeParameters object where the
+        // content size is calculated automatically based on the margins.
         PdfFileEditor.ContentsResizeParameters parameters =
             PdfFileEditor.ContentsResizeParameters.MarginsPercent(
-                left: 10,   // left margin (10% of page width)
-                right: 10,  // right margin (10% of page width)
-                top: 10,    // top margin (10% of page height)
-                bottom: 10  // bottom margin (10% of page height)
-            );
+                left:   10,   // left margin 10% of page width
+                right:  10,   // right margin 10% of page width
+                top:    10,   // top margin 10% of page height
+                bottom: 10);  // bottom margin 10% of page height
 
-        // Resize contents of all pages (null pages array means all pages)
-        bool success = editor.ResizeContents(inputPath, outputPath, null, parameters);
+        // Resize the contents of all pages (pages = null) using the defined parameters.
+        // The method returns true on success.
+        bool result = fileEditor.ResizeContents(
+            source: sourcePdf,
+            destination: destinationPdf,
+            pages: null,          // null processes every page in the document
+            parameters: parameters);
 
-        // Report the result
-        if (success)
+        if (result)
         {
-            Console.WriteLine($"Contents resized and saved to '{outputPath}'.");
+            Console.WriteLine($"Contents resized successfully. Output saved to '{destinationPdf}'.");
         }
         else
         {
-            Console.Error.WriteLine("Resize operation failed.");
+            Console.Error.WriteLine("Failed to resize contents.");
         }
     }
 }

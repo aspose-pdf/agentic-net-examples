@@ -1,12 +1,13 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace provides Document, Page, PageNumberStamp, HorizontalAlignment, VerticalAlignment
+using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
-class Program
+class AddPageNumbers
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output_with_page_numbers.pdf";
 
         if (!File.Exists(inputPath))
@@ -18,23 +19,29 @@ class Program
         // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
-            foreach (Page page in doc.Pages)
+            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Create a PageNumberStamp – format defaults to "#"
-                PageNumberStamp stamp = new PageNumberStamp
-                {
-                    // Position the stamp at the bottom center of the page
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment   = VerticalAlignment.Bottom,
-                    BottomMargin        = 10 // distance from the bottom edge
-                };
+                Page page = doc.Pages[i];
+
+                // Create a PageNumberStamp – default format is "#"
+                PageNumberStamp stamp = new PageNumberStamp();
+
+                // Position the stamp in the footer (centered at the bottom)
+                stamp.HorizontalAlignment = HorizontalAlignment.Center;
+                stamp.VerticalAlignment   = VerticalAlignment.Bottom;
+                stamp.BottomMargin       = 20; // distance from the bottom edge
+
+                // Optional: style the page number text
+                stamp.TextState.FontSize = 12;
+                stamp.TextState.Font      = FontRepository.FindFont("Helvetica");
+                stamp.TextState.ForegroundColor = Color.Black;
 
                 // Add the stamp to the current page
                 page.AddStamp(stamp);
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (no SaveOptions needed for PDF output)
             doc.Save(outputPath);
         }
 

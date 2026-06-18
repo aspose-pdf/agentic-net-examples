@@ -6,33 +6,38 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        string inputPdf = "input.pdf";
-        // Output DOC file path
-        string outputDoc = "output.doc";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.doc";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdf))
+        try
         {
-            // Configure DOC save options
-            DocSaveOptions saveOptions = new DocSaveOptions
+            // Load the PDF document
+            using (Document pdfDoc = new Document(inputPath))
             {
-                // Specify DOC format
-                Format = DocSaveOptions.DocFormat.Doc,
-                // Use the Textbox recognition mode (closest to plain‑text extraction)
-                Mode = DocSaveOptions.RecognitionMode.Textbox
-            };
+                // Configure DOC save options to extract plain text only
+                DocSaveOptions saveOptions = new DocSaveOptions
+                {
+                    // Set output format to DOC
+                    Format = DocSaveOptions.DocFormat.Doc,
+                    // Use the Textbox recognition mode for plain text extraction
+                    Mode = DocSaveOptions.RecognitionMode.Textbox
+                };
 
-            // Save the document as DOC using the specified options
-            pdfDoc.Save(outputDoc, saveOptions);
+                // Save the document as DOC with the specified options
+                pdfDoc.Save(outputPath, saveOptions);
+            }
+
+            Console.WriteLine($"PDF successfully converted to DOC: {outputPath}");
         }
-
-        Console.WriteLine($"PDF successfully converted to DOC: {outputDoc}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+        }
     }
 }

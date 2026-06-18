@@ -1,68 +1,59 @@
 using System;
 using System.IO;
-using System.Text;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Forms; // Required for form field access
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputCsvPath = "form_fields.csv";
+        const string inputPdf = "input.pdf";
+        const string outputCsv = "form_fields.csv";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdfPath))
+        // Load the PDF document (wrapped in using for deterministic disposal)
+        using (Document doc = new Document(inputPdf))
         {
-            // Ensure the document actually contains a form
-            if (doc.Form == null || doc.Form.Count == 0)
+            // Create a CSV file to store the extracted form field data
+            using (StreamWriter writer = new StreamWriter(outputCsv))
             {
-                Console.WriteLine("No form fields found in the PDF.");
-                return;
-            }
-
-            // Prepare a StreamWriter for CSV output
-            using (StreamWriter writer = new StreamWriter(outputCsvPath, false, Encoding.UTF8))
-            {
-                // Write CSV header
-                writer.WriteLine("FieldName,Value");
+                // Write CSV header line
+                writer.WriteLine("FullName,PartialName,Name,Value,ReadOnly,Required,FieldType");
 
                 // Iterate over all form fields in the document
                 foreach (Field field in doc.Form.Fields)
                 {
-                    // FullName provides the fully qualified field name; fall back to Name if FullName is null
-                    string fieldName = field.FullName ?? field.Name ?? string.Empty;
+                    // Extract relevant properties; use null‑coalescing for Value which may be null
+                    string fullName    = EscapeCsv(field.FullName ?? string.Empty);
+                    string partialName = EscapeCsv(field.PartialName ?? string.Empty);
+                    string name        = EscapeCsv(field.Name ?? string.Empty);
+                    string value       = EscapeCsv(field.Value?.ToString() ?? string.Empty);
+                    string readOnly    = field.ReadOnly.ToString();
+                    string required    = field.Required.ToString();
+                    string fieldType   = EscapeCsv(field.GetType().Name);
 
-                    // Value may be null; convert to string safely
-                    string fieldValue = field.Value?.ToString() ?? string.Empty;
-
-                    // Escape double quotes by doubling them and wrap fields containing commas or quotes in quotes
-                    fieldName = EscapeCsv(fieldName);
-                    fieldValue = EscapeCsv(fieldValue);
-
-                    writer.WriteLine($"{fieldName},{fieldValue}");
+                    // Write a CSV record for the current field
+                    writer.WriteLine($"{fullName},{partialName},{name},{value},{readOnly},{required},{fieldType}");
                 }
             }
-
-            Console.WriteLine($"Form fields exported to CSV: {outputCsvPath}");
         }
+
+        Console.WriteLine($"Form fields exported to '{outputCsv}'.");
     }
 
-    // Helper method to escape CSV fields according to RFC 4180
-    private static string EscapeCsv(string input)
+    // Helper method to escape commas, quotes, and line breaks in CSV fields
+    static string EscapeCsv(string input)
     {
-        if (input.Contains("\""))
-            input = input.Replace("\"", "\"\"");
-
-        if (input.Contains(",") || input.Contains("\"") || input.Contains("\n") || input.Contains("\r"))
-            return $"\"{input}\"";
-
+        if (input.Contains("\"") || input.Contains(",") || input.Contains("\n") || input.Contains("\r"))
+        {
+            string escaped = input.Replace("\"", "\"\"");
+            return $"\"{escaped}\"";
+        }
         return input;
     }
 }

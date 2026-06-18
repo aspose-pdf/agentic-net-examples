@@ -6,21 +6,21 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "flattened.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "flattened_output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document inside a using block for deterministic disposal
+            // Load the PDF document
             using (Document doc = new Document(inputPath))
             {
-                // Flatten all form fields – their values become static page content
+                // Flatten all form fields: remove them and place their values directly on the page
                 doc.Flatten();
 
                 // Save the flattened PDF

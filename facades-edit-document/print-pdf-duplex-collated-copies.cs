@@ -1,10 +1,7 @@
 using System;
-using System.IO;
-using System.Drawing.Printing;               // for default printer name
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Printing;                  // PrinterSettings, Duplex, PageSettings, PaperSizes
-using Aspose.Pdf.Devices;                    // Margins
+using Aspose.Pdf.Printing;
 
 class Program
 {
@@ -12,42 +9,39 @@ class Program
     {
         const string pdfPath = "input.pdf";
 
-        if (!File.Exists(pdfPath))
+        // Ensure the PDF file exists before attempting to print
+        if (!System.IO.File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Initialize PdfViewer and bind the PDF file
+        // Initialize the PdfViewer facade and bind the PDF document
         using (PdfViewer viewer = new PdfViewer())
         {
             viewer.BindPdf(pdfPath);
 
-            // Prepare printer settings
-            Aspose.Pdf.Printing.PrinterSettings printerSettings = new Aspose.Pdf.Printing.PrinterSettings();
-
-            // Use the system's default printer
-            PrintDocument sysPrintDoc = new PrintDocument();
-            printerSettings.PrinterName = sysPrintDoc.PrinterSettings.PrinterName;
-
-            // Enable duplex printing (flip on the long edge)
-            printerSettings.Duplex = Aspose.Pdf.Printing.Duplex.Vertical; // or Duplex.Horizontal for short‑edge flip
-
-            // Set number of copies and collate them
-            printerSettings.Copies = 2;      // example: 2 copies
-            printerSettings.Collate = true; // collated copies
-
-            // Optional: define page settings (paper size, margins, etc.)
-            Aspose.Pdf.Printing.PageSettings pageSettings = new Aspose.Pdf.Printing.PageSettings
+            // Configure printer settings: enable duplex printing, set collated copies
+            PrinterSettings printerSettings = new PrinterSettings
             {
-                PaperSize = Aspose.Pdf.Printing.PaperSizes.A4,
-                Margins = new Aspose.Pdf.Devices.Margins(0, 0, 0, 0)
+                // Use the default system printer; replace with a specific name if required
+                // PrinterName = "YourPrinterName",
+                Copies = 2,                 // number of copies to print
+                Collate = true,             // collated copies
+                Duplex = Duplex.Vertical   // double‑sided printing (flip on long edge)
+            };
+
+            // Optional: configure page settings (paper size, margins, etc.)
+            PageSettings pageSettings = new PageSettings
+            {
+                // PaperSize = PaperSize.A4,
+                // Margins = new Margins(0, 0, 0, 0)
             };
 
             // Print the document with the specified settings
             viewer.PrintDocumentWithSettings(pageSettings, printerSettings);
         }
 
-        Console.WriteLine("Print job submitted.");
+        Console.WriteLine("Print job submitted successfully.");
     }
 }

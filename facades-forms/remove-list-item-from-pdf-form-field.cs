@@ -1,35 +1,35 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
+        const string fieldName  = "Choices";
+        const string itemName   = "Option B";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // FormEditor implements IDisposable – use using for deterministic disposal
+        using (FormEditor formEditor = new FormEditor())
         {
-            // Initialize FormEditor with the loaded document
-            using (FormEditor formEditor = new FormEditor(doc))
-            {
-                // Delete the list item "Option B" from the list field "Choices"
-                formEditor.DelListItem("Choices", "Option B");
+            // Load the PDF document
+            formEditor.BindPdf(inputPath);
 
-                // Save the modified PDF
-                formEditor.Save(outputPath);
-            }
+            // Delete the specified list item from the field
+            formEditor.DelListItem(fieldName, itemName);
+
+            // Save the updated PDF
+            formEditor.Save(outputPath);
         }
 
-        Console.WriteLine($"List item removed. Saved to '{outputPath}'.");
+        Console.WriteLine($"Deleted \"{itemName}\" from list field \"{fieldName}\". Saved to \"{outputPath}\".");
     }
 }

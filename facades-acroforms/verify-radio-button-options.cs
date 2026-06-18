@@ -7,15 +7,15 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";          // Path to the PDF containing the form
-        const string fieldName = "RadioGroup1";      // Fully qualified name of the radio button group
+        const string pdfPath = "form.pdf";               // Input PDF containing the form
+        const string radioFieldName = "Color";           // Fully‑qualified name of the radio group
 
-        // Expected options: key = option name, value = export value
-        var expectedOptions = new Dictionary<string, string>
+        // Expected export values for the radio button options
+        var expected = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            { "OptionA", "ValueA" },
-            { "OptionB", "ValueB" },
-            { "OptionC", "ValueC" }
+            "White",
+            "Black",
+            "Red"
         };
 
         if (!File.Exists(pdfPath))
@@ -24,39 +24,30 @@ class Program
             return;
         }
 
-        // Load the PDF form using the Facade class (implements IDisposable)
-        using (Form form = new Form(pdfPath))
+        // Load the PDF form using the Facades Form class
+        Form form = new Form(pdfPath);
+
+        // Retrieve the radio button options: dictionary keyed by item name, value = export value
+        Dictionary<string, string> options = form.GetButtonOptionValues(radioFieldName);
+
+        // Collect the actual export values
+        var actual = new HashSet<string>(options.Values, StringComparer.OrdinalIgnoreCase);
+
+        // Compare the actual set with the expected set
+        if (expected.SetEquals(actual))
         {
-            // Retrieve the option dictionary for the specified radio button field
-            Dictionary<string, string> actualOptions = form.GetButtonOptionValues(fieldName);
-
-            if (actualOptions == null || actualOptions.Count == 0)
-            {
-                Console.WriteLine($"No options found for field '{fieldName}'.");
-                return;
-            }
-
-            // Compare the actual options with the expected set
-            bool allMatch = true;
-
-            // Check for missing or extra options
-            if (actualOptions.Count != expectedOptions.Count)
-                allMatch = false;
-
-            foreach (var expected in expectedOptions)
-            {
-                if (!actualOptions.TryGetValue(expected.Key, out string actualValue) ||
-                    !string.Equals(actualValue, expected.Value, StringComparison.Ordinal))
-                {
-                    allMatch = false;
-                    Console.WriteLine($"Mismatch for option '{expected.Key}': expected '{expected.Value}', got '{actualValue ?? "null"}'.");
-                }
-            }
-
-            if (allMatch)
-                Console.WriteLine("Radio button options match the expected set.");
-            else
-                Console.WriteLine("Radio button options do NOT match the expected set.");
+            Console.WriteLine("Radio button options match the expected set.");
         }
+        else
+        {
+            Console.WriteLine("Radio button options do NOT match the expected set.");
+            Console.WriteLine("Expected values:");
+            foreach (var val in expected) Console.WriteLine($"  {val}");
+            Console.WriteLine("Actual values:");
+            foreach (var val in actual) Console.WriteLine($"  {val}");
+        }
+
+        // Clean up the facade
+        form.Close();
     }
 }

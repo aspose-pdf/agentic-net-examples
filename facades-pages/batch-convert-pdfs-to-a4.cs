@@ -2,40 +2,67 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Devices; // for PageSize enum
 
-class Program
+class BatchA4Converter
 {
     static void Main()
     {
-        // List of PDF files to be converted to A4 size
-        string[] inputFiles = { "doc1.pdf", "doc2.pdf", "doc3.pdf" };
+        // Input folder containing PDFs to be processed
+        const string inputFolder = "InputPdfs";
+        // Output folder where resized PDFs will be saved
+        const string outputFolder = "OutputA4Pdfs";
 
-        foreach (var inputPath in inputFiles)
+        // Verify input folder exists
+        if (!Directory.Exists(inputFolder))
         {
-            // Verify the source file exists
-            if (!File.Exists(inputPath))
-            {
-                Console.Error.WriteLine($"File not found: {inputPath}");
-                continue;
-            }
-
-            // Build the output file name (e.g., doc1_A4.pdf)
-            string directory = Path.GetDirectoryName(inputPath);
-            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(inputPath);
-            string outputPath = Path.Combine(directory, $"{fileNameWithoutExt}_A4.pdf");
-
-            // Retrieve A4 page dimensions (points)
-            double a4Width = PageSize.A4.Width;
-            double a4Height = PageSize.A4.Height;
-
-            // Use PdfFileEditor to resize all pages to A4
-            PdfFileEditor editor = new PdfFileEditor();
-            bool result = editor.ResizeContents(inputPath, outputPath, null, a4Width, a4Height);
-
-            if (result)
-                Console.WriteLine($"Successfully converted to A4: {outputPath}");
-            else
-                Console.Error.WriteLine($"Conversion failed for: {inputPath}");
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            return;
         }
+
+        // Create output folder if it does not exist
+        Directory.CreateDirectory(outputFolder);
+
+        // Get all PDF files in the input folder (non‑recursive)
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
+        if (pdfFiles.Length == 0)
+        {
+            Console.WriteLine("No PDF files found to process.");
+            return;
+        }
+
+        foreach (string inputPath in pdfFiles)
+        {
+            // Build output file path preserving original file name
+            string fileName = Path.GetFileName(inputPath);
+            string outputPath = Path.Combine(outputFolder, fileName);
+
+            try
+            {
+                // PdfPageEditor is a Facade that can modify page size
+                using (PdfPageEditor editor = new PdfPageEditor())
+                {
+                    // Bind the source PDF file
+                    editor.BindPdf(inputPath);
+
+                    // Set the target page size to A4 (210mm x 297mm)
+                    editor.PageSize = PageSize.A4;
+
+                    // ProcessPages defaults to all pages when left null,
+                    // so we do not need to assign it explicitly.
+
+                    // Save the modified PDF to the output location
+                    editor.Save(outputPath);
+                }
+
+                Console.WriteLine($"Converted to A4: {outputPath}");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
+            }
+        }
+
+        Console.WriteLine("Batch conversion completed.");
     }
 }

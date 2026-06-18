@@ -6,33 +6,29 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputFdf = "output.fdf";
+        const string inputPdfPath = "input.pdf";
+        const string outputFdfPath = "output.fdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
         // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdf))
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
-            // Bind the document to the Form facade (fully qualified to avoid using Aspose.Pdf.Facades namespace)
-            using (Aspose.Pdf.Facades.Form form = new Aspose.Pdf.Facades.Form(pdfDoc))
+            // Initialize the Form facade (fully qualified, no using Aspose.Pdf.Facades)
+            var formFacade = new Aspose.Pdf.Facades.Form(pdfDocument);
+
+            // Export form fields to an FDF file via a FileStream
+            using (FileStream fdfStream = new FileStream(outputFdfPath, FileMode.Create, FileAccess.Write))
             {
-                // Open a file stream for the FDF output
-                using (FileStream fdfStream = new FileStream(outputFdf, FileMode.Create, FileAccess.Write))
-                {
-                    // Export the form fields to the FDF stream
-                    form.ExportFdf(fdfStream);
-                    // The using block ensures the stream is closed
-                }
-                // The using block ensures the Form facade is disposed
+                formFacade.ExportFdf(fdfStream);
+                // The using block ensures the stream is closed
             }
-            // The using block ensures the Document is disposed
         }
 
-        Console.WriteLine($"Form data exported to FDF: {outputFdf}");
+        Console.WriteLine($"Form data exported to '{outputFdfPath}'.");
     }
 }

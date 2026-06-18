@@ -1,15 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf;               // Bookmark class
-using Aspose.Pdf.Facades;      // PdfBookmarkEditor
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_cleaned.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,29 +17,26 @@ class Program
             return;
         }
 
-        // Bind the PDF file to the bookmark editor
+        // Bind the PDF to the bookmark editor
         PdfBookmarkEditor editor = new PdfBookmarkEditor();
         editor.BindPdf(inputPath);
 
         // Extract all existing bookmarks
         Bookmarks allBookmarks = editor.ExtractBookmarks();
 
-        // Collect unique (title, page) pairs
-        var uniqueBookmarks = new List<(string Title, int Page)>();
-        var seen = new HashSet<string>(); // key = "title|page"
+        // Keep only unique (Title, PageNumber) pairs
+        var uniquePairs = new HashSet<(string Title, int PageNumber)>();
+        var uniqueBookmarks = new List<(string Title, int PageNumber)>();
 
         foreach (Bookmark bm in allBookmarks)
         {
-            if (string.IsNullOrEmpty(bm.Title))
-                continue; // skip malformed entries
+            // Some bookmarks may not have a page number (e.g., external links); skip them
+            if (bm.PageNumber <= 0) continue;
 
-            int page = bm.PageNumber; // 0 if not set
-            string key = $"{bm.Title}|{page}";
-
-            if (!seen.Contains(key))
+            var key = (bm.Title, bm.PageNumber);
+            if (uniquePairs.Add(key))
             {
-                seen.Add(key);
-                uniqueBookmarks.Add((bm.Title, page));
+                uniqueBookmarks.Add(key);
             }
         }
 
@@ -49,12 +46,12 @@ class Program
         // Re‑create only the unique bookmarks
         foreach (var (title, page) in uniqueBookmarks)
         {
-            if (page > 0) // PdfBookmarkEditor expects a valid 1‑based page number
-                editor.CreateBookmarkOfPage(title, page);
+            editor.CreateBookmarkOfPage(title, page);
         }
 
         // Save the cleaned PDF
         editor.Save(outputPath);
+        editor.Close();
 
         Console.WriteLine($"Duplicate bookmarks removed. Saved to '{outputPath}'.");
     }

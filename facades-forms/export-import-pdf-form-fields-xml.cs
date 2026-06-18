@@ -1,75 +1,51 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades; // Provides the Form class for import/export of XML data
-using Aspose.Pdf.Forms;   // Provides form field classes such as TextBoxField
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string sourcePdf = "input.pdf";          // Original PDF with form fields
-        const string exportXml = "form_fields.xml";    // XML file to archive the form data
-        const string reimportPdf = "reimported.pdf";   // PDF after re‑importing the XML data
+        const string pdfPath = "input.pdf";          // Source PDF with form fields
+        const string xmlPath = "form_fields.xml";    // Destination XML file
+        const string importedPdfPath = "imported.pdf"; // PDF after re‑import
 
-        // Ensure a source PDF exists – create a minimal one with a form field if missing
-        if (!File.Exists(sourcePdf))
+        // Verify source PDF exists
+        if (!File.Exists(pdfPath))
         {
-            CreateSamplePdf(sourcePdf);
-            Console.WriteLine($"Sample PDF created at '{sourcePdf}'.");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            return;
         }
 
         // -------------------------------------------------
-        // Export the form fields to XML for archival
+        // Export form fields to XML (archival)
         // -------------------------------------------------
-        using (Aspose.Pdf.Facades.Form formExporter = new Aspose.Pdf.Facades.Form(sourcePdf))
-        using (FileStream xmlOut = new FileStream(exportXml, FileMode.Create, FileAccess.Write))
+        using (Form form = new Form(pdfPath))               // Load PDF into Form facade
         {
-            // ExportXml writes the form field values (except button values) to the provided stream
-            formExporter.ExportXml(xmlOut);
-        }
-        Console.WriteLine($"Form data exported to '{exportXml}'.");
-
-        // -------------------------------------------------
-        // Re‑import the previously exported XML back into a PDF
-        // -------------------------------------------------
-        using (Aspose.Pdf.Facades.Form formImporter = new Aspose.Pdf.Facades.Form(sourcePdf))
-        using (FileStream xmlIn = new FileStream(exportXml, FileMode.Open, FileAccess.Read))
-        {
-            // ImportXml reads the XML stream and populates the form fields
-            formImporter.ImportXml(xmlIn);
-
-            // Save the PDF with the imported data to a new file
-            formImporter.Save(reimportPdf);
-        }
-        Console.WriteLine($"PDF with re‑imported data saved as '{reimportPdf}'.");
-    }
-
-    /// <summary>
-    /// Creates a very simple PDF containing a single text box form field.
-    /// This helper is used only when the expected input file does not exist.
-    /// </summary>
-    private static void CreateSamplePdf(string path)
-    {
-        // Create an empty document
-        using (Document doc = new Document())
-        {
-            // Add a page
-            Page page = doc.Pages.Add();
-
-            // Define a rectangle for the text box field (in points)
-            var rect = new Aspose.Pdf.Rectangle(100, 700, 300, 650);
-
-            // Create a text box field and add it to the page's form
-            TextBoxField txtField = new TextBoxField(page, rect)
+            using (FileStream xmlStream = new FileStream(xmlPath, FileMode.Create, FileAccess.Write))
             {
-                PartialName = "SampleTextBox",
-                Value = "Initial value"
-            };
-            doc.Form.Add(txtField);
-
-            // Save the document to the specified path
-            doc.Save(path);
+                form.ExportXml(xmlStream);                  // Write form data to XML stream
+            }
         }
+
+        Console.WriteLine($"Form fields exported to XML: {xmlPath}");
+
+        // -------------------------------------------------
+        // Re‑import the XML back into a PDF (optional demo)
+        // -------------------------------------------------
+        // Create a copy of the original PDF to avoid overwriting it
+        File.Copy(pdfPath, importedPdfPath, true);
+
+        using (Form form = new Form(importedPdfPath))       // Load the copy for import
+        {
+            using (FileStream xmlStream = new FileStream(xmlPath, FileMode.Open, FileAccess.Read))
+            {
+                form.ImportXml(xmlStream);                  // Load form data from XML
+            }
+
+            form.Save();                                    // Persist changes to the same file
+        }
+
+        Console.WriteLine($"XML data imported back into PDF: {importedPdfPath}");
     }
 }

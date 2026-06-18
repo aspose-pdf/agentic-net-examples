@@ -1,47 +1,53 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text;          // needed for Heading (inherits TextFragment)
 
 class Program
 {
     static void Main()
     {
-        // Paths for the source template and the resulting PDF
-        const string inputPath  = "template.pdf";
+        // Input PDF path (must exist)
+        const string inputPath  = "input.pdf";
+        // Output PDF path
         const string outputPath = "output.pdf";
 
-        // Dynamic data that will appear in the heading
-        string userName = "John Doe";
-        string date     = DateTime.Now.ToString("MMMM dd, yyyy");
-
-        // Verify that the input file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the existing PDF document (lifecycle rule: use using)
+        // Dynamic values for the heading
+        string userName = Environment.UserName;
+        string today    = DateTime.Now.ToString("MMMM dd, yyyy");
+
+        // Open the PDF inside a using block (ensures proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Create a level‑1 heading (Heading(int) where the int is the level)
-            Heading heading = new Heading(1);
-            heading.Text = $"Report for {userName} – {date}";
+            // OPTIONAL: set the document title (PDF metadata)
+            doc.SetTitle($"Report for {userName} - {today}");
 
-            // Optional styling for the heading
-            heading.TextState.Font = FontRepository.FindFont("Helvetica");
-            heading.TextState.FontSize = 18;
-            heading.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
+            // Create a heading (level 1) and set its text dynamically
+            Heading heading = new Heading(1)               // level 1 heading
+            {
+                Text = $"Report generated for {userName} on {today}",
+                // Position the heading near the top of the page (x=50, y=750)
+                Position = new Position(50, 750),
+                // Use a larger font size for visibility
+                TextState = { FontSize = 20, Font = FontRepository.FindFont("Helvetica") },
+                // Center the heading horizontally
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
 
-            // Add the heading to the first page (page indexing is 1‑based)
-            Page firstPage = doc.Pages[1];
+            // Add the heading to the first page
+            Page firstPage = doc.Pages[1];                  // 1‑based indexing
             firstPage.Paragraphs.Add(heading);
 
-            // Save the modified PDF (lifecycle rule: save inside using)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with dynamic heading to '{outputPath}'.");
     }
 }

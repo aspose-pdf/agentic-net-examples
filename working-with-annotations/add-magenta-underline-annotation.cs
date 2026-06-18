@@ -7,33 +7,36 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "underline_magenta.pdf";
+        const string inputPath  = "input.pdf";   // existing PDF or create a new one
+        const string outputPath = "output.pdf";
 
+        // Ensure the input file exists; if not, create a blank PDF with one page
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
+            using (Document newDoc = new Document())
+            {
+                newDoc.Pages.Add(); // add a single blank page
+                newDoc.Save(inputPath);
+            }
         }
 
-        // Load the PDF (create‑load‑save lifecycle)
+        // Load the PDF, add an underline annotation, set its color and thickness, then save
         using (Document doc = new Document(inputPath))
         {
-            // Get the first page (Aspose.Pdf uses 1‑based indexing)
+            // Choose the page to annotate (first page in this example)
             Page page = doc.Pages[1];
 
-            // Define the rectangle where the underline will appear
-            // (fully qualified to avoid ambiguity)
+            // Define the rectangle where the annotation will appear
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 520);
 
             // Create the underline annotation
-            UnderlineAnnotation underline = new UnderlineAnnotation(page, rect);
+            UnderlineAnnotation underline = new UnderlineAnnotation(page, rect)
+            {
+                // Set the annotation color to magenta
+                Color = Aspose.Pdf.Color.Magenta
+            };
 
-            // Set the annotation color to magenta
-            underline.Color = Aspose.Pdf.Color.Magenta;
-
-            // Set the border thickness to 2 points.
-            // Border requires the parent annotation in its constructor.
+            // Set the border (thickness) to 2 points
             underline.Border = new Border(underline) { Width = 2 };
 
             // Add the annotation to the page
@@ -43,6 +46,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Underline annotation saved to '{outputPath}'.");
+        Console.WriteLine($"Underline annotation added. Saved to '{outputPath}'.");
     }
 }

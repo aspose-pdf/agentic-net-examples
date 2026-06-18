@@ -4,31 +4,49 @@ using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Text;
 
-class Program
+class PdfToTiffConverter
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputTiff = "output.tiff";
+        const string inputPdfPath = "input.pdf";
+        const string outputTiffPath = "output.tiff";
 
-        if (!File.Exists(inputPdf))
+        // Verify source PDF exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Register a custom font substitution: replace missing Symbol font with Arial Unicode MS.
-        // This substitution is applied globally for the current AppDomain.
+        // ------------------------------------------------------------
+        // Font substitution: replace Symbol font with Arial Unicode MS
+        // ------------------------------------------------------------
+        // The PdfConverter class does not expose a FontSubstitution property.
+        // Use the global FontRepository.Substitutions collection with a
+        // SimpleFontSubstitution entry instead.
         FontRepository.Substitutions.Add(new SimpleFontSubstitution("Symbol", "Arial Unicode MS"));
 
-        // Convert PDF pages to a single multi‑page TIFF file.
+        // Convert PDF to TIFF
         using (PdfConverter converter = new PdfConverter())
         {
-            converter.BindPdf(inputPdf);
+            // Bind the PDF document
+            converter.BindPdf(inputPdfPath);
+
+            // (Optional) set rendering options, e.g., resolution
+            // converter.RenderingOptions = new RenderingOptions { Resolution = 300 };
+
+            // Ensure all pages are processed (StartPage/EndPage are optional
+            // but shown here for completeness).
+            converter.StartPage = 1;
+            converter.EndPage = converter.PageCount; // converts all pages
+
+            // Perform the conversion
             converter.DoConvert();
-            converter.SaveAsTIFF(outputTiff);
+
+            // Save all pages as a single multi‑page TIFF file
+            converter.SaveAsTIFF(outputTiffPath);
         }
 
-        Console.WriteLine($"TIFF image saved to '{outputTiff}'.");
+        Console.WriteLine($"PDF successfully converted to TIFF: {outputTiffPath}");
     }
 }

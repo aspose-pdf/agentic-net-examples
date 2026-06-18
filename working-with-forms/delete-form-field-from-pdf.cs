@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -23,11 +23,11 @@ class Program
                 // Delete the form field named "OldPhoneNumber"
                 doc.Form.Delete("OldPhoneNumber");
 
-                // Save the modified PDF
+                // Save the modified document
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Form field 'OldPhoneNumber' deleted. Saved to '{outputPath}'.");
+            Console.WriteLine($"Form field deleted. Saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

@@ -8,22 +8,27 @@ class Program
     {
         const string inputPath = "input.pdf";
 
-        // Verify the file exists before attempting to load it
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Check whether the PDF has been saved with incremental updates
-            // HasIncrementalUpdate is a method, so invoke it
-            bool hasIncremental = doc.HasIncrementalUpdate();
+            // Load the PDF document within a using block for proper disposal
+            using (Document doc = new Document(inputPath))
+            {
+                // Check if the PDF has been saved with incremental updates
+                bool hasIncremental = doc.HasIncrementalUpdate();
 
-            // Output the result
-            Console.WriteLine($"Has incremental updates: {hasIncremental}");
+                // Output the result
+                Console.WriteLine($"Has incremental updates: {hasIncremental}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

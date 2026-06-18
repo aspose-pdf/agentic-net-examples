@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "encrypted.pdf";
+        const string outputPath = "encrypted_print_only.pdf";
         const string userPassword  = "user123";
         const string ownerPassword = "owner123";
 
@@ -19,20 +19,20 @@ class Program
 
         try
         {
-            // Load the existing PDF
+            // Load the PDF document
             using (Document doc = new Document(inputPath))
             {
-                // Allow only printing
+                // Set permissions to allow only printing
                 Permissions perms = Permissions.PrintDocument;
 
-                // Encrypt with AES‑256 algorithm
+                // Encrypt using AES-256 algorithm
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
                 // Save the encrypted PDF
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
+            Console.WriteLine($"Encrypted PDF saved to '{outputPath}' with print‑only permission.");
         }
         catch (Exception ex)
         {

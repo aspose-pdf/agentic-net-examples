@@ -1,16 +1,20 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf;
-using Aspose.Pdf.Vector;   // SvgExtractor and related vector types
+using Aspose.Pdf.Vector;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";          // source PDF
-        const string outputSvgPath = "element_0.svg";      // target SVG file
-        const int    elementIndex  = 0;                    // zero‑based index of the graphic element
+        // Input PDF file containing vector graphics
+        const string inputPdfPath = "input.pdf";
+
+        // Output SVG file for the selected graphic element
+        const string outputSvgPath = "element.svg";
+
+        // Zero‑based index of the graphic element to extract
+        const int elementIndex = 0;
 
         if (!File.Exists(inputPdfPath))
         {
@@ -18,43 +22,39 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block (ensures deterministic disposal)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Aspose.Pdf uses 1‑based page indexing
+            // Ensure the document has at least one page
             if (pdfDoc.Pages.Count < 1)
             {
-                Console.Error.WriteLine("The document contains no pages.");
+                Console.Error.WriteLine("The PDF does not contain any pages.");
                 return;
             }
 
-            // Select the first page (adjust the index if another page is required)
-            Page page = pdfDoc.Pages[1];
+            // Select the page from which to extract the graphic element (first page here)
+            Page page = pdfDoc.Pages[1]; // Aspose.Pdf uses 1‑based indexing for pages
 
-            // SvgExtractor extracts vector graphics from a page.
-            // The Extract(Page) overload returns a list of SVG strings,
-            // one entry per graphic element found on the page.
+            // Create an SvgExtractor instance (default options)
             SvgExtractor extractor = new SvgExtractor();
-            List<string> svgElements = extractor.Extract(page);
 
-            if (svgElements == null || svgElements.Count == 0)
+            // Extract all vector graphics on the page as SVG strings
+            var svgStrings = extractor.Extract(page);
+
+            // Validate the requested index
+            if (elementIndex < 0 || elementIndex >= svgStrings.Count)
             {
-                Console.WriteLine("No vector graphic elements were found on the page.");
+                Console.Error.WriteLine($"Invalid element index. Page contains {svgStrings.Count} graphic element(s).");
                 return;
             }
 
-            if (elementIndex < 0 || elementIndex >= svgElements.Count)
-            {
-                Console.Error.WriteLine($"Invalid element index. Page contains {svgElements.Count} elements.");
-                return;
-            }
+            // Retrieve the SVG content for the specified element
+            string selectedSvg = svgStrings[elementIndex];
 
-            // Retrieve the SVG content of the requested element.
-            string svgContent = svgElements[elementIndex];
+            // Write the SVG content to the output file
+            File.WriteAllText(outputSvgPath, selectedSvg);
 
-            // Save the SVG string to a file.
-            File.WriteAllText(outputSvgPath, svgContent);
-            Console.WriteLine($"Graphic element #{elementIndex} saved as SVG to '{outputSvgPath}'.");
+            Console.WriteLine($"Graphic element #{elementIndex} extracted and saved to '{outputSvgPath}'.");
         }
     }
 }

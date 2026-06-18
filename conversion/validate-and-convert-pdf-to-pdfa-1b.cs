@@ -8,36 +8,35 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output_pdfa1b.pdf";
-        const string validationLog = "validation_log.xml";
-        const string conversionLog = "conversion_log.xml";
+        const string validationLog = "validation_log.txt";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        try
+        // Load the source PDF
+        using (Document doc = new Document(inputPath))
         {
-            // Load the source PDF
-            using (Document doc = new Document(inputPath))
+            // Validate the original PDF against PDF/A‑1b and write the log
+            bool isValid = doc.Validate(validationLog, PdfFormat.PDF_A_1B);
+            Console.WriteLine($"Validation result: {(isValid ? "OK" : "Issues found")} (log saved to {validationLog})");
+
+            // Prepare conversion options for PDF/A‑1b
+            PdfFormatConversionOptions convOptions = new PdfFormatConversionOptions(PdfFormat.PDF_A_1B)
             {
-                // Validate against PDF/A‑1b and write the XML log
-                bool isValid = doc.Validate(validationLog, PdfFormat.PDF_A_1B);
-                Console.WriteLine($"Validation result: {(isValid ? "OK" : "Issues found")} (log: {validationLog})");
+                // Delete objects that cannot be converted
+                ErrorAction = ConvertErrorAction.Delete
+            };
 
-                // Convert the document to PDF/A‑1b, logging conversion details
-                doc.Convert(conversionLog, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
-                Console.WriteLine($"Conversion completed (log: {conversionLog})");
+            // Convert the document to PDF/A‑1b
+            doc.Convert(convOptions);
 
-                // Save the PDF/A‑1b compliant document
-                doc.Save(outputPath);
-                Console.WriteLine($"PDF/A‑1b saved to '{outputPath}'.");
-            }
+            // Save the converted PDF/A‑1b document
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF/A‑1b file saved to '{outputPath}'.");
     }
 }

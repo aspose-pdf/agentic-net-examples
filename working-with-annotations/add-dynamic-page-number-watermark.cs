@@ -8,7 +8,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "watermarked_output.pdf";
 
         if (!File.Exists(inputPath))
@@ -20,35 +20,38 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Define a text state for the page number appearance
-            TextState ts = new TextState
-            {
-                Font = FontRepository.FindFont("Helvetica"),
-                FontSize = 12,
-                ForegroundColor = Aspose.Pdf.Color.Gray
-            };
-
-            // Iterate through all pages (1‑based indexing)
+            // Iterate over all pages (1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Position of the watermark annotation (adjust as needed)
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(50, 750, 150, 770);
+                // Define the rectangle where the watermark will appear
+                // (left, bottom, right, top) – adjust as needed
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
                 // Create the WatermarkAnnotation for the current page
-                WatermarkAnnotation wm = new WatermarkAnnotation(page, rect)
-                {
-                    Color = Aspose.Pdf.Color.LightGray,
-                    Opacity = 0.5
-                };
+                WatermarkAnnotation watermark = new WatermarkAnnotation(page, rect);
 
-                // Set the page number as the annotation text
-                string pageNumber = i.ToString();
-                wm.SetTextAndState(new[] { pageNumber }, ts);
+                // Build the FormattedText that contains the page number and its style.
+                // Fully‑qualified type names are used to avoid importing the Facades namespace.
+                var formattedText = new Aspose.Pdf.Facades.FormattedText(
+                    i.ToString(),                                 // text (page number)
+                    System.Drawing.Color.Gray,                    // foreground colour
+                    "Helvetica",                                 // font name (built‑in)
+                    Aspose.Pdf.Facades.EncodingType.Winansi,      // encoding
+                    false,                                         // embed font flag
+                    24);                                           // font size
+
+                // Assign the formatted text to the annotation.
+                // SetText expects a FormattedText instance, not a plain string.
+                watermark.SetText(formattedText);
+
+                // Optional visual settings for the annotation border and opacity.
+                watermark.Color = Color.LightGray; // annotation border colour
+                watermark.Opacity = 0.5;            // semi‑transparent
 
                 // Add the annotation to the page
-                page.Annotations.Add(wm);
+                page.Annotations.Add(watermark);
             }
 
             // Save the modified PDF

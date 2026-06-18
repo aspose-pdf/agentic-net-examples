@@ -1,6 +1,6 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.Json;
 using Aspose.Pdf.Facades;
 
@@ -8,65 +8,62 @@ class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string inputPdfPath   = "template_form.pdf";
-        const string outputPdfPath  = "filled_form.pdf";
-        const string configFilePath = "default_values.json";
+        // Paths to the source PDF form, the JSON data file and the output PDF
+        const string inputPdfPath  = "form_template.pdf";
+        const string jsonDataPath  = "field_values.json";
+        const string outputPdfPath = "filled_form.pdf";
 
-        // Verify files exist
+        // Verify that the required files exist
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(configFilePath))
+        if (!File.Exists(jsonDataPath))
         {
-            Console.Error.WriteLine($"Config file not found: {configFilePath}");
+            Console.Error.WriteLine($"JSON data file not found: {jsonDataPath}");
             return;
         }
 
-        // Load default values from a simple JSON file:
-        // { "FirstName": "John", "LastName": "Doe", "Country": "USA" }
-        Dictionary<string, string> defaultValues;
+        // Load the JSON file into a dictionary of fieldName => fieldValue
+        Dictionary<string, string> fieldValues;
         try
         {
-            string json = File.ReadAllText(configFilePath);
-            defaultValues = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+            string jsonContent = File.ReadAllText(jsonDataPath);
+            fieldValues = JsonSerializer.Deserialize<Dictionary<string, string>>(jsonContent);
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Failed to read config: {ex.Message}");
+            Console.Error.WriteLine($"Failed to read or parse JSON: {ex.Message}");
             return;
         }
 
-        // Open the PDF form using Aspose.Pdf.Facades.Form
-        using (Form form = new Form(inputPdfPath))
+        // Use Aspose.Pdf.Facades.Form to open the PDF and fill fields
+        try
         {
-            // Iterate over each entry in the configuration and fill the matching field
-            foreach (var kvp in defaultValues)
+            // Form implements IDisposable via SaveableFacade, so we wrap it in a using block
+            using (Form form = new Form(inputPdfPath))
             {
-                string fieldName  = kvp.Key;
-                string fieldValue = kvp.Value;
-
-                // Ensure the field exists in the document before attempting to fill it
-                if (Array.Exists(form.FieldNames, name => name.Equals(fieldName, StringComparison.Ordinal)))
+                // Iterate over each entry in the JSON dictionary and fill the corresponding field
+                foreach (KeyValuePair<string, string> kvp in fieldValues)
                 {
-                    bool filled = form.FillField(fieldName, fieldValue);
+                    // FillField returns true if the field was found and filled successfully
+                    bool filled = form.FillField(kvp.Key, kvp.Value);
                     if (!filled)
                     {
-                        Console.Error.WriteLine($"Failed to fill field: {fieldName}");
+                        Console.WriteLine($"Warning: Field \"{kvp.Key}\" not found in the PDF form.");
                     }
                 }
-                else
-                {
-                    Console.Error.WriteLine($"Field not found in PDF: {fieldName}");
-                }
+
+                // Save the updated PDF to the specified output path
+                form.Save(outputPdfPath);
             }
 
-            // Save the updated PDF to the output path
-            form.Save(outputPdfPath);
+            Console.WriteLine($"Form fields filled and saved to \"{outputPdfPath}\".");
         }
-
-        Console.WriteLine($"Form fields populated and saved to '{outputPdfPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error processing PDF form: {ex.Message}");
+        }
     }
 }

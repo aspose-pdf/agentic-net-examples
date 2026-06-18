@@ -16,31 +16,32 @@ class Program
             return;
         }
 
-        // Load the PDF (document disposal with using)
+        // Load the PDF document (wrapped in using for deterministic disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                Page page = doc.Pages[i];
+                Page page = doc.Pages[pageIndex];
 
-                // Annotations collection is also 1‑based
-                for (int j = 1; j <= page.Annotations.Count; j++)
+                // Iterate through all annotations on the page (also 1‑based)
+                for (int annIndex = 1; annIndex <= page.Annotations.Count; annIndex++)
                 {
-                    Annotation ann = page.Annotations[j];
+                    Annotation ann = page.Annotations[annIndex];
 
-                    // Change opacity of HighlightAnnotation instances
+                    // Process only HighlightAnnotation instances
                     if (ann is HighlightAnnotation highlight)
                     {
-                        highlight.Opacity = 0.6; // 60 % opacity
+                        // Set opacity to 60% (value range is 0.0 – 1.0)
+                        highlight.Opacity = 0.6;
                     }
                 }
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (no SaveOptions needed for PDF output)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Highlight annotation opacity updated and saved to '{outputPath}'.");
     }
 }

@@ -1,50 +1,52 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 using Aspose.Pdf.Devices;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPdf = "input.pdf";
-        // Directory where BMP images will be saved
-        const string outputDir = "output_images";
-
-        // Verify that the source PDF exists
-        if (!File.Exists(inputPdf))
+        // Create a sample PDF document (self‑contained example)
+        string samplePdfPath = "sample.pdf";
+        using (Document sampleDoc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
-            return;
+            // Add a page and a simple text fragment
+            Page page = sampleDoc.Pages.Add();
+            TextFragment fragment = new TextFragment("Sample PDF for BMP conversion");
+            page.Paragraphs.Add(fragment);
+            // Save the sample PDF to disk
+            sampleDoc.Save(samplePdfPath);
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
-
-        // Load the PDF document inside a using block for proper disposal
-        using (Document pdfDocument = new Document(inputPdf))
+        // Load the PDF document to be converted
+        using (Document pdfDocument = new Document(samplePdfPath))
         {
-            // Create a Resolution object with 200 DPI
-            Resolution resolution = new Resolution(200);
-
-            // Initialize BmpDevice with the specified resolution.
-            // CropBox is used by default, so no extra configuration is needed.
-            BmpDevice bmpDevice = new BmpDevice(resolution);
-
-            // Pages collection is 1‑based; iterate through all pages
-            for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
+            // Initialise PdfConverter with the loaded document
+            using (PdfConverter converter = new PdfConverter(pdfDocument))
             {
-                // Build the output BMP file name
-                string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.bmp");
+                // Configure conversion settings
+                converter.StartPage = 1;
+                converter.EndPage = pdfDocument.Pages.Count;
+                converter.Resolution = new Resolution(300); // 300 DPI
+                converter.CoordinateType = PageCoordinateType.CropBox; // use CropBox (default)
 
-                // Convert the current page to BMP and write it to a file stream
-                using (FileStream bmpStream = new FileStream(outputPath, FileMode.Create))
+                // Perform initial conversion preparation
+                converter.DoConvert();
+
+                int pageNumber = converter.StartPage;
+                while (converter.HasNextImage())
                 {
-                    bmpDevice.Process(pdfDocument.Pages[pageNumber], bmpStream);
+                    string outputBmp = $"image{pageNumber}_out.bmp";
+                    using (FileStream bmpStream = new FileStream(outputBmp, FileMode.Create))
+                    {
+                        // Save each page as BMP image
+                        converter.GetNextImage(bmpStream, System.Drawing.Imaging.ImageFormat.Bmp);
+                    }
+                    pageNumber++;
                 }
-
-                Console.WriteLine($"Saved BMP image: {outputPath}");
             }
         }
     }

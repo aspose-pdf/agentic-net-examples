@@ -7,47 +7,49 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputDir = "output_images";
+        const string inputPdfPath  = "input.pdf";
+        const string outputFolder  = "output_images";
         const double bradleyThreshold = 0.5; // value between 0.0 and 1.0
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF document (lifecycle rule: using block)
-        using (Document pdfDoc = new Document(inputPdf))
+        // Load the PDF document (lifecycle rule: wrap in using)
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
             // Create a PNG device with desired resolution
             Resolution resolution = new Resolution(300);
             PngDevice pngDevice = new PngDevice(resolution);
 
-            // TiffDevice provides the Bradley binarization method
-            TiffDevice tiffDevice = new TiffDevice();
+            // TiffDevice provides the BinarizeBradley method
+            TiffDevice binarizer = new TiffDevice();
 
-            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
+            // Iterate pages (1‑based indexing)
+            for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
             {
-                // Convert the current page to a PNG image in memory
+                // Render page to a PNG in memory
                 using (MemoryStream pngStream = new MemoryStream())
                 {
-                    pngDevice.Process(pdfDoc.Pages[pageNum], pngStream);
-                    pngStream.Position = 0; // reset stream for reading
+                    pngDevice.Process(pdfDocument.Pages[pageNumber], pngStream);
+                    pngStream.Position = 0; // reset for reading
 
-                    // Apply Bradley binarization and write the result to a file
-                    string outPath = Path.Combine(outputDir, $"page_{pageNum}_bradley.png");
-                    using (FileStream outFile = new FileStream(outPath, FileMode.Create))
+                    // Prepare output file path
+                    string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}_bradley.png");
+
+                    // Apply Bradley binarization and write result to file
+                    using (FileStream outputFile = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
                     {
-                        tiffDevice.BinarizeBradley(pngStream, outFile, bradleyThreshold);
+                        binarizer.BinarizeBradley(pngStream, outputFile, bradleyThreshold);
                     }
+
+                    Console.WriteLine($"Page {pageNumber} processed: {outputPath}");
                 }
             }
         }
-
-        Console.WriteLine("PDF to PNG conversion with Bradley binarization completed.");
     }
 }

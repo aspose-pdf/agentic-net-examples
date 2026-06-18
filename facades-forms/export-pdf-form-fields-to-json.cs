@@ -6,25 +6,34 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string jsonPath = "form_fields.json";
+        const string inputPdfPath  = "input.pdf";
+        const string outputJsonPath = "form_fields.json";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Initialize the Form facade with the PDF document
-        using (Form form = new Form(pdfPath))
+        try
         {
-            // Export all form field definitions to a JSON file (indented for readability)
-            using (FileStream jsonStream = new FileStream(jsonPath, FileMode.Create, FileAccess.Write))
+            // Initialize the Facade Form with the source PDF.
+            using (Form form = new Form(inputPdfPath))
             {
-                form.ExportJson(jsonStream, true);
+                // Create the output JSON file stream.
+                using (FileStream jsonStream = new FileStream(outputJsonPath, FileMode.Create, FileAccess.Write))
+                {
+                    // Export all form field definitions (and values) to JSON.
+                    // The second parameter 'indented' defaults to true for readable output.
+                    form.ExportJson(jsonStream);
+                }
             }
-        }
 
-        Console.WriteLine($"Form field definitions exported to '{jsonPath}'.");
+            Console.WriteLine($"Form fields exported to JSON: '{outputJsonPath}'");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during export: {ex.Message}");
+        }
     }
 }

@@ -7,9 +7,10 @@ class Program
 {
     static void Main()
     {
+        // Input PDF path, output PDF path and the text to rotate
         const string inputPath  = "input.pdf";
         const string outputPath = "rotated_output.pdf";
-        const string searchText = "Target Text"; // text fragment to rotate
+        const string targetText = "RotateMe";   // text fragment to rotate
 
         if (!File.Exists(inputPath))
         {
@@ -17,25 +18,26 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use Document constructor)
+        // Load the PDF document inside a using block (ensures proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Find the desired text fragment on the first page
-            TextFragmentAbsorber absorber = new TextFragmentAbsorber(searchText);
-            doc.Pages[1].Accept(absorber);
+            // Find the desired text fragment on all pages
+            TextFragmentAbsorber absorber = new TextFragmentAbsorber(targetText);
+            doc.Pages.Accept(absorber);
 
-            if (absorber.TextFragments.Count == 0)
+            // Ensure at least one occurrence was found
+            if (absorber.TextFragments.Count > 0)
             {
-                Console.WriteLine("Text not found.");
+                // Rotate the first matching fragment by 45 degrees
+                // TextFragment.TextState is a TextFragmentState object which has a Rotation property
+                absorber.TextFragments[1].TextState.Rotation = 45;
             }
             else
             {
-                // Rotate the first occurrence by 45 degrees
-                TextFragment fragment = absorber.TextFragments[1];
-                fragment.TextState.Rotation = 45; // rotation in degrees
+                Console.WriteLine($"Text \"{targetText}\" not found in the document.");
             }
 
-            // Save the modified document (lifecycle rule: use Document.Save)
+            // Save the modified document
             doc.Save(outputPath);
         }
 

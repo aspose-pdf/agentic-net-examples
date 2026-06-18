@@ -2,16 +2,15 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string srcText = "Hello World";
-        const string destText = "Hi Universe";
+        const string srcText    = "old text";   // text to find
+        const string destText   = "new text";   // replacement text
 
         if (!File.Exists(inputPath))
         {
@@ -19,32 +18,27 @@ class Program
             return;
         }
 
-        // Load the PDF document with deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Prepare a font and text state for the replacement (optional)
-            Aspose.Pdf.Text.Font font = FontRepository.FindFont("Courier New");
-            font.IsEmbedded = true;
-
-            TextState textState = new TextState
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
             {
-                Font = font,
-                FontSize = 14,
-                FontStyle = FontStyles.Bold,
-                ForegroundColor = Aspose.Pdf.Color.Blue
-            };
+                // Initialize the content editor and bind the document
+                PdfContentEditor editor = new PdfContentEditor();
+                editor.BindPdf(doc);
 
-            // Bind the document to PdfContentEditor
-            PdfContentEditor editor = new PdfContentEditor();
-            editor.BindPdf(doc);
+                // Replace text only on page 3 (Aspose.Pdf uses 1‑based page indexing)
+                editor.ReplaceText(srcText, 3, destText);
 
-            // Replace text only on page 3 (Aspose.Pdf uses 1‑based page indexing)
-            editor.ReplaceText(srcText, 3, destText, textState);
+                // Save the modified document
+                doc.Save(outputPath);
+            }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Text on page 3 replaced and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Text replaced on page 3 and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

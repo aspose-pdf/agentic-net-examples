@@ -1,47 +1,32 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Security;
 
 class Program
 {
     static void Main()
     {
-        // Paths for the source XML and the resulting PDF
-        const string xmlInputPath  = "source.xml";
-        const string pdfOutputPath = "restricted.pdf";
-
-        // Passwords for encryption
-        const string userPassword  = "user123";
+        const string xmlPath = "input.xml";
+        const string pdfPath = "output.pdf";
+        const string userPassword = "user123";
         const string ownerPassword = "owner123";
 
-        // Verify the XML source exists
-        if (!File.Exists(xmlInputPath))
+        if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"XML file not found: {xmlInputPath}");
+            Console.Error.WriteLine($"File not found: {xmlPath}");
             return;
         }
 
-        // Load the XML file into a PDF document using XmlLoadOptions (input‑only format)
+        // Load the XML file and convert it to a PDF document
         XmlLoadOptions loadOpts = new XmlLoadOptions();
-        using (Document pdfDoc = new Document(xmlInputPath, loadOpts))
+        using (Document doc = new Document(xmlPath, loadOpts))
         {
-            // Define custom permissions:
-            // - Do NOT include PrintDocument or ExtractContent to block printing and copying.
-            // - Allow other typical operations (e.g., modifying content) as needed.
-            Permissions customPerms = Permissions.ModifyContent |
-                                      Permissions.ModifyTextAnnotations |
-                                      Permissions.FillForm |
-                                      Permissions.AssembleDocument |
-                                      Permissions.PrintingQuality; // printing allowed only at low quality
-
-            // Encrypt the PDF with the custom permissions using AES‑256 (preferred algorithm)
-            pdfDoc.Encrypt(userPassword, ownerPassword, customPerms, CryptoAlgorithm.AESx256);
-
-            // Save the encrypted PDF. No SaveOptions needed because the output format is PDF.
-            pdfDoc.Save(pdfOutputPath);
+            // Set permissions to restrict printing and copying (no PrintDocument or ExtractContent bits)
+            Permissions perms = (Permissions)0; // no permissions granted
+            doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+            doc.Save(pdfPath); // save the encrypted PDF
         }
 
-        Console.WriteLine($"Encrypted PDF with restricted printing/copying saved to '{pdfOutputPath}'.");
+        Console.WriteLine($"PDF saved with restricted permissions to '{pdfPath}'.");
     }
 }

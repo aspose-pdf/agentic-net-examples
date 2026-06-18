@@ -11,27 +11,28 @@ class Program
         // Create a new PDF document and ensure proper disposal
         using (Document doc = new Document())
         {
-            // Add a blank page
+            // Add a blank page (first page)
             Page page = doc.Pages.Add();
 
-            // Define the checkbox rectangle positioned near the top of the page
-            // Rectangle constructor: (llx, lly, urx, ury)
-            var rect = new Aspose.Pdf.Rectangle(50, 730, 70, 750);
+            // Define the rectangle for the checkbox positioned near the top of the page
+            // Constructor: Rectangle(llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(50, 750, 70, 770);
 
-            // Create the checkbox field on the page
-            var checkbox = new CheckboxField(page, rect)
+            // Create the checkbox field on the specified page and rectangle
+            CheckboxField checkbox = new CheckboxField(page, rect)
             {
-                PartialName = "TopCheckbox", // field name
-                Checked = false               // default unchecked state
+                Name = "TopCheckbox",   // Field name used in form data
+                ExportValue = "Yes",    // Value exported when the box is checked
+                Checked = false         // Initial state (unchecked)
             };
 
             // Add the checkbox to the document's AcroForm
             doc.Form.Add(checkbox);
 
-            // Save the PDF
+            // Save the PDF to disk
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with top‑positioned checkbox saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with top-positioned checkbox saved to '{outputPath}'.");
     }
 }

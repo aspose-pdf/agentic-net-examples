@@ -8,7 +8,7 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output_pdfa1b.pdf";
-        const string logPath    = "conversion_log.xml";
+        const string logPath    = "conversion_log.txt";
 
         if (!File.Exists(inputPath))
         {
@@ -18,7 +18,7 @@ class Program
 
         try
         {
-            // Load the source PDF
+            // Load the PDF document
             using (Document doc = new Document(inputPath))
             {
                 // Convert to PDF/A‑1b, logging any conversion errors
@@ -28,7 +28,7 @@ class Program
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"PDF/A‑1b compliant document saved to '{outputPath}'.");
+            Console.WriteLine($"PDF/A‑1b compliant file saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

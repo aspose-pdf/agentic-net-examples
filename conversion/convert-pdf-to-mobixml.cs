@@ -9,22 +9,30 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.mobi";
 
+        // Verify that the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document pdfDoc = new Document(inputPath))
+        try
         {
-            // Initialize MobiXmlSaveOptions with default settings
-            var saveOptions = new MobiXmlSaveOptions();
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPath))
+            {
+                // Initialize default MobiXml save options
+                MobiXmlSaveOptions saveOptions = new MobiXmlSaveOptions();
 
-            // Save the document as MobiXml using the save options
-            pdfDoc.Save(outputPath, saveOptions);
+                // Save the document as MobiXml using the explicit save options
+                pdfDoc.Save(outputPath, saveOptions);
+            }
+
+            Console.WriteLine($"PDF successfully converted to MobiXml: '{outputPath}'");
         }
-
-        Console.WriteLine($"PDF successfully converted to MobiXml: {outputPath}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+        }
     }
 }

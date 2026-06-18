@@ -6,47 +6,50 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file
-        const string inputPath = "input.pdf";
+        const string inputPdf   = "input.pdf";          // source PDF
+        const string nupPdf     = "temp_nup.pdf";       // intermediate N‑up PDF
+        const string bookletPdf = "booklet_output.pdf"; // final booklet PDF
 
-        // Intermediate N‑up PDF (2 columns × 2 rows)
-        const string nupPath = "temp_nup.pdf";
-
-        // Final booklet PDF
-        const string outputPath = "booklet_output.pdf";
-
-        // Verify the source file exists
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
         try
         {
-            // Create a PdfFileEditor instance (does not implement IDisposable)
+            // 1. Create N‑up layout (e.g., 2 columns × 2 rows)
             PdfFileEditor editor = new PdfFileEditor();
-
-            // Step 1: Create an N‑up layout.
-            // This will place 2 columns and 2 rows of pages on each output page.
-            // The overload used: MakeNUp(string inputFile, string outputFile, int x, int y)
-            editor.MakeNUp(inputPath, nupPath, 2, 2);
-
-            // Step 2: Convert the N‑up PDF into a booklet.
-            // The overload used: MakeBooklet(string inputFile, string outputFile)
-            editor.MakeBooklet(nupPath, outputPath);
-
-            // Optional: clean up the intermediate N‑up file
-            if (File.Exists(nupPath))
+            bool nupResult = editor.MakeNUp(inputPdf, nupPdf, 2, 2);
+            if (!nupResult)
             {
-                File.Delete(nupPath);
+                Console.Error.WriteLine("Failed to create N‑up layout.");
+                return;
             }
 
-            Console.WriteLine($"Booklet created successfully: {outputPath}");
+            // 2. Convert the N‑up PDF into a booklet
+            bool bookletResult = editor.MakeBooklet(nupPdf, bookletPdf);
+            if (!bookletResult)
+            {
+                Console.Error.WriteLine("Failed to create booklet.");
+                return;
+            }
+
+            Console.WriteLine($"Booklet created successfully: {bookletPdf}");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during processing: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
+        finally
+        {
+            // Clean up the intermediate N‑up file
+            try
+            {
+                if (File.Exists(nupPdf))
+                    File.Delete(nupPdf);
+            }
+            catch { /* ignore cleanup errors */ }
         }
     }
 }

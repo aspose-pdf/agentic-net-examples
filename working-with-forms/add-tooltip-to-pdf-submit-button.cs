@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -10,6 +9,8 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
+        const string buttonName = "SubmitBtn"; // name of the submit button in the PDF
+        const string tooltip = "Please fill all required fields before submitting.";
 
         if (!File.Exists(inputPath))
         {
@@ -17,33 +18,31 @@ class Program
             return;
         }
 
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Define button rectangle (Aspose.Pdf.Rectangle, not System.Drawing.Rectangle)
-            Aspose.Pdf.Rectangle btnRect = new Aspose.Pdf.Rectangle(100, 500, 200, 540);
+            // Access the form associated with the document
+            Form form = doc.Form;
 
-            // Create a push‑button field
-            ButtonField submitBtn = new ButtonField(doc, btnRect)
+            // Verify that the button field exists
+            if (form.HasField(buttonName))
             {
-                PartialName = "SubmitBtn",
-                // Tooltip property is not available in this API version – use AlternateName as a fallback
-                AlternateName = "All required fields must be filled before submitting.",
-                Contents = "Submit",
-                Required = true
-            };
-
-            // SubmitFormAction expects a FileSpecification for the URL in this version
-            var urlSpec = new FileSpecification("https://example.com/submit", "Submit URL");
-            SubmitFormAction submitAction = new SubmitFormAction
+                // Retrieve the field and cast it to ButtonField
+                ButtonField submitButton = form[buttonName] as ButtonField;
+                if (submitButton != null)
+                {
+                    // Set the tooltip (AlternateName) that appears in PDF viewers
+                    submitButton.AlternateName = tooltip;
+                }
+                else
+                {
+                    Console.Error.WriteLine($"Field '{buttonName}' is not a button field.");
+                }
+            }
+            else
             {
-                Url = urlSpec
-            };
-
-            // Attach the action to the button's mouse‑press event
-            submitBtn.Actions.OnPressMouseBtn = submitAction;
-
-            // Add the button to page 1 of the document
-            doc.Form.Add(submitBtn, 1);
+                Console.Error.WriteLine($"Button field '{buttonName}' not found in the document.");
+            }
 
             // Save the modified PDF
             doc.Save(outputPath);

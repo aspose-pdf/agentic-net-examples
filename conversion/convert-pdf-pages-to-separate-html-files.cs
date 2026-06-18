@@ -1,13 +1,13 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core API and all SaveOptions are in this namespace
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // source PDF
-        const string outputHtml = "output.html";       // base name for HTML files
+        const string inputPdf  = "input.pdf";
+        const string outputHtml = "output.html";   // base name; pages will be saved as output.html, output_2.html, ...
 
         if (!File.Exists(inputPdf))
         {
@@ -17,21 +17,27 @@ class Program
 
         try
         {
-            // Load the PDF document (using block ensures proper disposal)
+            // Load the PDF document
             using (Document pdfDoc = new Document(inputPdf))
             {
-                // Configure HTML save options to split each PDF page into its own HTML file
+                // Configure HTML save options to split each page into a separate file
                 HtmlSaveOptions htmlOpts = new HtmlSaveOptions
                 {
-                    SplitIntoPages = true
+                    SplitIntoPages = true,
+                    // Optional: embed images as PNG inside SVG to keep a single output folder
+                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
                 };
 
-                // Save the document; Aspose.Pdf will generate multiple HTML files
-                // (e.g., output.html, output_1.html, output_2.html, …)
+                // Save – the converter will create one HTML file per page
                 pdfDoc.Save(outputHtml, htmlOpts);
             }
 
             Console.WriteLine("PDF pages have been converted to individual HTML files.");
+        }
+        catch (TypeInitializationException)
+        {
+            // HTML conversion relies on GDI+ which is Windows‑only
+            Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
         }
         catch (Exception ex)
         {

@@ -8,45 +8,41 @@ class Program
     {
         const string inputPath      = "input.pdf";
         const string encryptedPath  = "encrypted.pdf";
-        const string finalPath      = "final_encrypted.pdf";
+        const string finalPath      = "final.pdf";
         const string userPassword   = "user123";
         const string ownerPassword  = "owner123";
 
-        // Verify source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // -------------------------------------------------
-        // Step 1: Encrypt the PDF with both user and owner passwords
-        // -------------------------------------------------
+        // Step 1: Encrypt the PDF with both user and owner passwords.
         using (Document doc = new Document(inputPath))
         {
-            // Define desired permissions (example: allow printing and content extraction)
+            // Define permissions (example: allow printing and content extraction).
             Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-            // Encrypt using AES‑256 (preferred algorithm)
+            // Encrypt using AES-256 (preferred algorithm).
             doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-            // Save the encrypted document
+            // Save the encrypted document.
             doc.Save(encryptedPath);
         }
 
-        // -------------------------------------------------
-        // Step 2: Remove the user password while keeping the document encrypted
-        // -------------------------------------------------
-        // Open the encrypted file using the owner password (required for password changes)
-        using (Document encDoc = new Document(encryptedPath, ownerPassword))
+        // Step 2: Remove the user password while keeping the document encrypted.
+        // Open the encrypted PDF using the owner password (required for password changes).
+        using (Document doc = new Document(encryptedPath, ownerPassword))
         {
-            // Change passwords: keep the same owner password, set a blank user password
-            encDoc.ChangePasswords(ownerPassword, "", ownerPassword);
+            // Change passwords: keep the same owner password, set the new user password to empty.
+            doc.ChangePasswords(ownerPassword, string.Empty, ownerPassword);
 
-            // Save the result – it remains encrypted but can be opened without a user password
-            encDoc.Save(finalPath);
+            // Save the resulting PDF (now only protected by the owner password).
+            doc.Save(finalPath);
         }
 
-        Console.WriteLine("Encryption completed. User password removed in final file.");
+        Console.WriteLine($"Encrypted PDF saved to: {encryptedPath}");
+        Console.WriteLine($"User password removed, final PDF saved to: {finalPath}");
     }
 }

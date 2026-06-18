@@ -1,14 +1,18 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace
+using Aspose.Pdf; // Core PDF API
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "portfolio.pdf";          // PDF portfolio file
-        const string outputDirectory = "ExtractedFiles";      // Destination folder
+        // Input PDF portfolio containing embedded files
+        const string inputPdfPath = "portfolio.pdf";
 
+        // Directory where extracted files will be saved
+        const string outputDirectory = "ExtractedFiles";
+
+        // Validate input file existence
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
@@ -20,11 +24,11 @@ class Program
 
         try
         {
-            // Load the PDF document (core API, wrapped in using for proper disposal)
-            using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPdfPath))
+            // Load the PDF document (wrapped in using for deterministic disposal)
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
                 // Access the collection of embedded files
-                Aspose.Pdf.EmbeddedFileCollection embeddedFiles = doc.EmbeddedFiles;
+                EmbeddedFileCollection embeddedFiles = pdfDoc.EmbeddedFiles;
 
                 // If there are no embedded files, inform the user
                 if (embeddedFiles == null || embeddedFiles.Count == 0)
@@ -33,31 +37,31 @@ class Program
                     return;
                 }
 
-                // Iterate over the embedded files (Aspose collections are 1‑based)
-                for (int i = 1; i <= embeddedFiles.Count; i++)
+                // Iterate over each embedded file and save it to the output directory using reflection
+                foreach (var embeddedFile in embeddedFiles)
                 {
-                    // Each item is a FileSpecification representing an embedded file
-                    Aspose.Pdf.FileSpecification fileSpec = embeddedFiles[i];
+                    // Retrieve the file name via reflection
+                    var nameProp = embeddedFile.GetType().GetProperty("Name");
+                    string fileName = nameProp?.GetValue(embeddedFile) as string ?? "unknown.bin";
 
-                    // Retrieve the original file name; fallback to a generated name if missing
-                    string fileName = !string.IsNullOrEmpty(fileSpec.Name)
-                        ? fileSpec.Name
-                        : $"EmbeddedFile_{i}";
-
+                    // Build the full path for the extracted file
                     string outputPath = Path.Combine(outputDirectory, fileName);
 
-                    // Save the embedded file's contents to disk
-                    using (Stream contentStream = fileSpec.Contents)
-                    using (FileStream outStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                    // Invoke the Save(string) method via reflection
+                    var saveMethod = embeddedFile.GetType().GetMethod("Save", new[] { typeof(string) });
+                    if (saveMethod != null)
                     {
-                        contentStream.CopyTo(outStream);
+                        saveMethod.Invoke(embeddedFile, new object[] { outputPath });
+                        Console.WriteLine($"Extracted: {fileName} → {outputPath}");
                     }
-
-                    Console.WriteLine($"Extracted: {fileName}");
+                    else
+                    {
+                        Console.WriteLine($"Unable to save embedded file: {fileName}");
+                    }
                 }
             }
 
-            Console.WriteLine($"All embedded files have been saved to '{outputDirectory}'.");
+            Console.WriteLine("Extraction completed successfully.");
         }
         catch (Exception ex)
         {

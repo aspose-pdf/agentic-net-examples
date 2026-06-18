@@ -1,44 +1,43 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // Core PDF API, includes TeXSaveOptions
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPdfPath = "input.pdf";
+        // Input PDF file
+        const string inputPdf = "input.pdf";
 
-        // Desired output directory for LaTeX files and resources
-        const string outputDirectory = "output";
+        // Desired output directory for LaTeX files
+        const string outputDir = "LatexOutput";
 
-        // Full path of the resulting .tex file
-        string outputTexPath = Path.Combine(outputDirectory, "output.tex");
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDir);
+
+        // Full path for the generated .tex file (name can be chosen as needed)
+        string texFilePath = Path.Combine(outputDir, "output.tex");
 
         // Verify input file exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDirectory);
-
-        // Load the PDF document (lifecycle rule: use using for disposal)
-        using (Document pdfDocument = new Document(inputPdfPath))
+        // Load the PDF, convert to LaTeX (TeX) and save
+        using (Document pdfDocument = new Document(inputPdf))
         {
-            // Initialize TeXSaveOptions (non‑PDF format requires explicit options)
-            TeXSaveOptions texOptions = new TeXSaveOptions
+            // Initialize TeXSaveOptions and set the output directory
+            TeXSaveOptions saveOptions = new TeXSaveOptions
             {
-                // Set the directory where auxiliary files (e.g., images) will be written
-                OutDirectoryPath = outputDirectory
+                OutDirectoryPath = outputDir
             };
 
-            // Save the document as LaTeX (.tex) using the specified options
-            pdfDocument.Save(outputTexPath, texOptions);
+            // Save as LaTeX (.tex) using the specified options
+            pdfDocument.Save(texFilePath, saveOptions);
         }
 
-        Console.WriteLine($"LaTeX file successfully saved to '{outputTexPath}'.");
+        Console.WriteLine($"LaTeX file saved to: {texFilePath}");
     }
 }

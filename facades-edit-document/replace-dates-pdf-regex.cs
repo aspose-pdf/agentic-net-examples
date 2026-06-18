@@ -3,7 +3,7 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Facades; // for ReplaceTextStrategy
-using Aspose.Pdf.Text;   // for TextState (optional)
+using Aspose.Pdf.Text;   // optional, not used directly but included for completeness
 
 class Program
 {
@@ -21,32 +21,31 @@ class Program
         // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create and bind the PdfContentEditor facade
+            // Initialize the content editor and bind it to the document
             PdfContentEditor editor = new PdfContentEditor();
             editor.BindPdf(doc);
 
-            // Configure the replace‑text strategy to use regular expressions
-            ReplaceTextStrategy strategy = new ReplaceTextStrategy
+            // Configure the replace text strategy to use regular expressions
+            ReplaceTextStrategy replaceStrategy = new ReplaceTextStrategy
             {
                 IsRegularExpressionUsed = true,
+                // Replace all occurrences on all affected pages
                 ReplaceScope = ReplaceTextStrategy.Scope.ReplaceAll
             };
-            // Assign the strategy to the editor (property exists in the API)
-            editor.ReplaceTextStrategy = strategy;
+            editor.ReplaceTextStrategy = replaceStrategy;
 
             // Regular expression to match dates in MM/DD/YYYY format
-            string srcPattern = @"\b(\d{2})/(\d{2})/(\d{4})\b";
-            // Replacement pattern to produce YYYY‑MM‑DD
+            string srcPattern = @"(\d{2})/(\d{2})/(\d{4})";
+            // Replacement pattern to reorder to YYYY-MM-DD
             string destPattern = "$3-$1-$2";
 
             // Perform the replacement on all pages (page number 0 means all pages)
-            // No specific TextState is required, so null is passed
-            editor.ReplaceText(srcPattern, 0, destPattern, null);
+            editor.ReplaceText(srcPattern, 0, destPattern);
 
             // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Date format conversion completed. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Date format replacement completed. Output saved to '{outputPath}'.");
     }
 }

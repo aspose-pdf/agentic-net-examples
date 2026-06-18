@@ -6,47 +6,47 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file
-        const string inputPdf = "input.pdf";
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "output_images";
 
-        // Directory where JPEG images will be saved
-        const string outputDir = "Images";
-
-        // Verify that the source PDF exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
         // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(outputFolder);
 
-        // -------------------------------------------------
-        // Create and configure the PdfConverter facade
-        // -------------------------------------------------
-        PdfConverter converter = new PdfConverter();
-
-        // Bind the PDF file to the converter
-        converter.BindPdf(inputPdf);
-
-        // Perform the initial conversion setup
-        converter.DoConvert();
-
-        // Iterate through each page image and save as JPEG
-        int pageNumber = 1;
-        while (converter.HasNextImage())
+        try
         {
-            // Build the output file name with a page number suffix
-            string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.jpg");
+            // PdfConverter is a Facade that converts PDF pages to images
+            using (PdfConverter converter = new PdfConverter())
+            {
+                // Bind the source PDF file
+                converter.BindPdf(inputPdfPath);
 
-            // Save the current page image (default format is JPEG)
-            converter.GetNextImage(outputPath);
+                // Prepare the converter (default settings are used)
+                converter.DoConvert();
 
-            pageNumber++;
+                int pageNumber = 1;
+                // GetNextImage() without specifying format saves as JPEG by default
+                while (converter.HasNextImage())
+                {
+                    string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.jpg");
+                    converter.GetNextImage(outputPath);
+                    pageNumber++;
+                }
+
+                // Close the converter and release resources
+                converter.Close();
+            }
+
+            Console.WriteLine($"PDF pages have been converted to JPEG images in '{outputFolder}'.");
         }
-
-        // Release resources held by the converter
-        converter.Close();
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+        }
     }
 }

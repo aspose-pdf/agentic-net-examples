@@ -6,9 +6,12 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";          // source PDF file
-        const string outputPath = "output_front.pdf";   // where the split part will be saved
-        const int    endPage    = 5;                    // split up to this page (inclusive)
+        // Path to the source PDF file
+        const string inputPath = "input.pdf";
+        // Desired output file for the extracted front part
+        const string outputPath = "output_front.pdf";
+        // End page (inclusive) up to which pages will be extracted
+        const int endPage = 5;
 
         if (!File.Exists(inputPath))
         {
@@ -19,30 +22,30 @@ class Program
         // Open the source PDF as a read‑only stream
         using (FileStream inputStream = new FileStream(inputPath, FileMode.Open, FileAccess.Read))
         {
-            // Use a MemoryStream to keep the result in memory
+            // Prepare an in‑memory stream to receive the split result
             using (MemoryStream outputStream = new MemoryStream())
             {
-                // PdfFileEditor does NOT implement IDisposable – instantiate directly
+                // PdfFileEditor does NOT implement IDisposable, so instantiate directly
                 PdfFileEditor editor = new PdfFileEditor();
 
-                // Split from the first page up to 'endPage' and write the front part to outputStream
-                bool succeeded = editor.SplitFromFirst(inputStream, endPage, outputStream);
-                if (!succeeded)
+                // Perform the split: pages 1 .. endPage are written to outputStream
+                bool success = editor.SplitFromFirst(inputStream, endPage, outputStream);
+                if (!success)
                 {
                     Console.Error.WriteLine("SplitFromFirst operation failed.");
                     return;
                 }
 
-                // Reset the position before reading the stream
+                // Reset the position of the memory stream before reading its contents
                 outputStream.Position = 0;
 
-                // Persist the in‑memory result to a file (optional)
+                // Persist the in‑memory result to a physical file (optional)
                 using (FileStream fileOut = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
                 {
                     outputStream.CopyTo(fileOut);
                 }
 
-                Console.WriteLine($"Front part up to page {endPage} saved to '{outputPath}'.");
+                Console.WriteLine($"Pages 1‑{endPage} saved to '{outputPath}'.");
             }
         }
     }

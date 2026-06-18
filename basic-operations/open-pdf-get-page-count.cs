@@ -6,21 +6,24 @@ class Program
 {
     static void Main()
     {
+        // Path to the PDF file on disk
         const string pdfPath = "sample.pdf";
 
+        // Verify that the file exists before attempting to open it
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Use the Document constructor to open the PDF file.
-        // Wrap in a using block for deterministic disposal (document-disposal-with-using rule).
+        // Use a using block to ensure the Document is disposed properly
         using (Document doc = new Document(pdfPath))
         {
-            // Pages collection is 1‑based; Count gives the total number of pages.
+            // Retrieve the number of pages (Pages collection is 1‑based)
             int pageCount = doc.Pages.Count;
-            Console.WriteLine($"The PDF contains {pageCount} page{(pageCount == 1 ? "" : "s")}.");
+
+            // Output the page count to the console
+            Console.WriteLine($"The document contains {pageCount} page{(pageCount == 1 ? "" : "s")}.");
         }
     }
 }

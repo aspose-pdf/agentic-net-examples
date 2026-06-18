@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // Required for FontRepository
+using Aspose.Pdf.Text; // needed for FontRepository
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_page_numbers.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,22 +16,19 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a PageNumberStamp – default format is "#"
-            PageNumberStamp pageNumberStamp = new PageNumberStamp
-            {
-                // Position the stamp at the bottom center of each page
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Bottom,
-                // Optional: set margin from the bottom edge
-                BottomMargin = 20,
-                // Optional: make the stamp part of the page background (false = overlay)
-                Background = false,
-                // Optional: set font size (will be adjusted if AutoAdjustFontSizeToFitStampRectangle is true)
-                TextState = { FontSize = 12, Font = FontRepository.FindFont("Helvetica") }
-            };
+            // Create a page number stamp with default format "#"
+            Aspose.Pdf.PageNumberStamp pageNumberStamp = new Aspose.Pdf.PageNumberStamp();
+
+            // Configure appearance of the stamp
+            pageNumberStamp.HorizontalAlignment = HorizontalAlignment.Center;
+            pageNumberStamp.VerticalAlignment   = VerticalAlignment.Bottom;
+            pageNumberStamp.BottomMargin        = 20; // distance from bottom edge
+            pageNumberStamp.TextState.FontSize  = 12;
+            pageNumberStamp.TextState.Font      = FontRepository.FindFont("Helvetica");
+            pageNumberStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
 
             // Apply the stamp to every existing page
             foreach (Page page in doc.Pages)
@@ -39,13 +36,16 @@ class Program
                 page.AddStamp(pageNumberStamp);
             }
 
-            // Refresh pagination artifacts so they stay correct if pages are added/removed later
+            // Example: insert a new blank page at position 2 (pages are 1‑based)
+            doc.Pages.Insert(2);
+
+            // After inserting pages, update pagination so numbers reflect the new layout
             doc.Pages.UpdatePagination();
 
-            // Save the modified PDF
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Page numbers added and saved to '{outputPath}'.");
+        Console.WriteLine($"Document with automatic page numbers saved to '{outputPath}'.");
     }
 }

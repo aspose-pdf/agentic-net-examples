@@ -6,11 +6,12 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";          // existing PDF
-        const string attachmentPath = "attachment.docx"; // file to attach
-        const string attachmentDesc = "Attached document"; // description
-        const string outputPdfPath = "output.pdf";        // result PDF
+        const string inputPdfPath   = "input.pdf";          // existing PDF
+        const string attachmentPath = "attachment_file.pdf"; // file to attach
+        const string outputPdfPath  = "output.pdf";         // result PDF
+        const string description    = "Description of attachment_file";
 
+        // Verify that the source PDF and attachment exist
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
@@ -23,20 +24,19 @@ class Program
             return;
         }
 
-        // Use PdfContentEditor facade to edit the PDF and add a hidden attachment.
-        using (var editor = new PdfContentEditor())
+        // Use PdfContentEditor (a SaveableFacade) to add the attachment
+        using (PdfContentEditor editor = new PdfContentEditor())
         {
-            // Bind the existing PDF file.
+            // Bind the existing PDF document
             editor.BindPdf(inputPdfPath);
 
-            // Add the file attachment (no visible annotation).
-            // AddDocumentAttachment is the correct method for this purpose.
-            editor.AddDocumentAttachment(attachmentPath, attachmentDesc);
+            // Add the file attachment (no visual annotation)
+            editor.AddDocumentAttachment(attachmentPath, description);
 
-            // Save the modified PDF.  Use Save(...) – the older OutputFile property is obsolete.
+            // Save the modified PDF to a new file
             editor.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Attachment added. Saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Attachment added successfully. Output saved to '{outputPdfPath}'.");
     }
 }

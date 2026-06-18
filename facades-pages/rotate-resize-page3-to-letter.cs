@@ -12,35 +12,36 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document within a using block for proper disposal
-        using (Document doc = new Document(inputPath))
+        // Use PdfPageEditor (Facade) to edit page 3:
+        // - Rotate 90 degrees
+        // - Change page size to Letter (8.5" x 11" = 612 x 792 points)
+        using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // Use PdfPageEditor inside a using block (it implements IDisposable)
-            using (PdfPageEditor editor = new PdfPageEditor())
-            {
-                editor.BindPdf(doc);                     // Bind the loaded document
+            // Load the source PDF
+            editor.BindPdf(inputPath);
 
-                // Specify that only page 3 should be processed
-                editor.ProcessPages = new int[] { 3 };
+            // Process only page 3
+            editor.ProcessPages = new int[] { 3 };
 
-                // Set rotation to 90 degrees – the Rotation enum must be cast to int
-                editor.Rotation = (int)Rotation.on90;
+            // Set rotation – cast the enum value to int because the property expects an int
+            editor.Rotation = (int)Rotation.on90;
 
-                // Change page size to Letter – use explicit dimensions (Letter = 8.5" x 11" = 612 x 792 points)
-                editor.PageSize = new PageSize(612, 792);
+            // Set the desired output page size. The Letter size is not exposed as a
+            // static member in recent Aspose.Pdf versions, so we create it manually.
+            // 1 point = 1/72 inch. Letter = 8.5" x 11" => 612 x 792 points.
+            editor.PageSize = new PageSize(612, 792);
 
-                // Apply the changes to the document
-                editor.ApplyChanges();
+            // Apply the changes to the document
+            editor.ApplyChanges();
 
-                // Save the modified document
-                editor.Save(outputPath);
-            }
+            // Save the modified PDF
+            editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Page 3 rotated 90° and resized to Letter saved as '{outputPath}'.");
+        Console.WriteLine($"Page 3 rotated and resized. Saved to '{outputPath}'.");
     }
 }

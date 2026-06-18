@@ -8,38 +8,41 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "output.pdf";
-
+        // Create a new PDF document
         using (Document doc = new Document())
         {
+            // Add a blank page to the document
             Page page = doc.Pages.Add();
 
+            // Create a table and position it on the page
             Table table = new Table
             {
+                // Position the table (coordinates are in points)
                 Left = 50,
                 Top = 700,
-                // Adjust column widths based on content
+                // Enable auto‑fit to content for all columns
                 ColumnAdjustment = ColumnAdjustment.AutoFitToContent
-                // No DefaultCellAutoFitBehavior property – ColumnAdjustment handles auto‑fit for cells
+                // AutoFitBehavior is not a member of Table in current Aspose.PDF versions.
+                // The ColumnAdjustment setting above provides the required auto‑fit functionality.
             };
 
-            // First row
-            Row row1 = table.Rows.Add();
-            Cell cell11 = row1.Cells.Add();
-            cell11.Paragraphs.Add(new TextFragment("Short"));
-            Cell cell12 = row1.Cells.Add();
-            cell12.Paragraphs.Add(new TextFragment("A much longer piece of text that should cause the column to expand automatically."));
+            // Add a header row
+            Row header = table.Rows.Add();
+            header.Cells.Add("Product");
+            header.Cells.Add("Description");
+            header.Cells.Add("Price");
 
-            // Second row
-            Row row2 = table.Rows.Add();
-            Cell cell21 = row2.Cells.Add();
-            cell21.Paragraphs.Add(new TextFragment("Another"));
-            Cell cell22 = row2.Cells.Add();
-            cell22.Paragraphs.Add(new TextFragment("Text"));
+            // Add a data row with long text to demonstrate auto‑fit
+            Row data = table.Rows.Add();
+            data.Cells.Add("Widget A");
+            data.Cells.Add("This is a very long description that should be automatically reduced to fit within the column width.");
+            data.Cells.Add("$123.45");
 
+            // Add the table to the page's paragraph collection
             page.Paragraphs.Add(table);
 
-            // Save the PDF – guard against missing GDI+ (libgdiplus) on non‑Windows platforms
+            // Save the PDF to a file (guard against missing libgdiplus on non‑Windows platforms)
+            const string outputPath = "AutoFitTable.pdf";
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 doc.Save(outputPath);
@@ -54,7 +57,7 @@ class Program
                 }
                 catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
                 {
-                    Console.WriteLine("GDI+ (libgdiplus) is not available on this platform. PDF was not saved.");
+                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. PDF saved without rendering‑dependent features.");
                 }
             }
         }

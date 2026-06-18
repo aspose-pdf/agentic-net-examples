@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "encrypted.pdf";
-        const string outputPath = "edited.pdf";
+        const string outputPath = "rotated.pdf";
         const string password = "userpass";
 
         if (!File.Exists(inputPath))
@@ -17,14 +17,14 @@ class Program
             return;
         }
 
-        // Open the encrypted PDF by supplying the user (or owner) password.
+        // Load the encrypted PDF by providing the user (or owner) password.
         using (Document doc = new Document(inputPath, password))
         {
-            // Bind the opened document to PdfPageEditor.
+            // Bind the loaded document to PdfPageEditor.
             using (PdfPageEditor editor = new PdfPageEditor(doc))
             {
-                // Example manipulation: rotate every page 90 degrees.
-                editor.Rotation = 90;
+                // Example manipulation: rotate all pages 90 degrees.
+                editor.Rotation = 90; // Valid values: 0, 90, 180, 270
 
                 // Apply the changes to the document.
                 editor.ApplyChanges();

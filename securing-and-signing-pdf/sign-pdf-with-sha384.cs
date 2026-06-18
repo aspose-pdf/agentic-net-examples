@@ -9,48 +9,51 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "signed_output.pdf";
-        const string pfxPath = "certificate.pfx";
-        const string pfxPassword = "password";
+        const string inputPdf   = "input.pdf";          // PDF to be signed
+        const string outputPdf  = "signed_output.pdf"; // Resulting signed PDF
+        const string pfxPath    = "certificate.pfx";   // PFX containing signing certificate
+        const string pfxPassword = "pfxPassword";      // Password for the PFX file
 
-        if (!File.Exists(inputPdf) || !File.Exists(pfxPath))
+        // Verify that required files exist
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine("Input PDF or certificate file not found.");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
+        }
+        if (!File.Exists(pfxPath))
+        {
+            Console.Error.WriteLine($"Certificate file not found: {pfxPath}");
             return;
         }
 
-        // Load the PDF document
+        // Load the certificate (private key must be exportable or accessible)
+        X509Certificate2 cert = new X509Certificate2(pfxPath, pfxPassword, X509KeyStorageFlags.MachineKeySet);
+
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPdf))
         {
-            // Define the signature rectangle (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 300, 150);
+            // Define the rectangle where the signature appearance will be placed
+            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
+            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Create a signature field on the first page
+            // Add a signature field to the first page
             SignatureField sigField = new SignatureField(doc.Pages[1], sigRect)
             {
-                Name = "Signature1"
+                // Optional: set a name for the field
+                PartialName = "Signature1"
             };
             doc.Form.Add(sigField);
 
-            // Load the signing certificate
-            X509Certificate2 cert = new X509Certificate2(pfxPath, pfxPassword);
+            // Create an ExternalSignature specifying SHA‑384 as the digest algorithm
+            ExternalSignature externalSig = new ExternalSignature(cert, DigestHashAlgorithm.Sha384);
 
-            // Create an external signature using SHA‑384
-            ExternalSignature externalSig = new ExternalSignature(cert, Aspose.Pdf.DigestHashAlgorithm.Sha384)
-            {
-                Reason = "Approved",
-                ContactInfo = "john.doe@example.com",
-                Location = "New York"
-            };
-
-            // Sign the signature field
+            // Sign the document using the signature field
             sigField.Sign(externalSig);
 
             // Save the signed PDF
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF signed with SHA‑384 and saved to '{outputPdf}'.");
+        Console.WriteLine($"Document signed with SHA‑384 and saved to '{outputPdf}'.");
     }
 }

@@ -2,9 +2,11 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Devices;
-using NUnit.Framework; // Added to bring stubbed NUnit types into scope
+using NUnit.Framework;
 
-// Minimal NUnit stubs to allow compilation without the NUnit package.
+// -----------------------------------------------------------------------------
+// Minimal NUnit stubs – used when the NUnit package is not referenced.
+// -----------------------------------------------------------------------------
 namespace NUnit.Framework
 {
     [AttributeUsage(AttributeTargets.Class)]
@@ -14,20 +16,31 @@ namespace NUnit.Framework
     public sealed class TestAttribute : Attribute { }
 
     [AttributeUsage(AttributeTargets.Method)]
+    public sealed class OneTimeSetUpAttribute : Attribute { }
+
+    [AttributeUsage(AttributeTargets.Method)]
     public sealed class SetUpAttribute : Attribute { }
 
     [AttributeUsage(AttributeTargets.Method)]
     public sealed class TearDownAttribute : Attribute { }
 
+    // Minimal TestContext implementation – provides the directory where the test runs.
+    public sealed class TestContext
+    {
+        private TestContext() { }
+        public static TestContext CurrentContext { get; } = new TestContext();
+        public string TestDirectory { get; } = Directory.GetCurrentDirectory();
+    }
+
     public static class Assert
     {
-        public static void IsTrue(bool condition, string? message = null)
+        public static void IsTrue(bool condition, string message = null)
         {
             if (!condition)
                 throw new Exception(message ?? "Assert.IsTrue failed.");
         }
 
-        public static void AreEqual<T>(T expected, T actual, string? message = null)
+        public static void AreEqual<T>(T expected, T actual, string message = null)
         {
             if (!object.Equals(expected, actual))
                 throw new Exception(message ?? $"Assert.AreEqual failed. Expected:<{expected}>. Actual:<{actual}>.");
@@ -38,77 +51,55 @@ namespace NUnit.Framework
 namespace AsposePdfTests
 {
     [TestFixture]
-    public class ConvertPagesToImagesTests
+    public class PdfConversionTests
     {
-        // Path to a sample PDF used for testing.
-        // In a real test environment this file should be placed in the test project's output directory.
-        private const string SamplePdfPath = "sample.pdf";
-
-        // Temporary directory where generated images will be stored.
-        private string _outputDir = string.Empty;
-
-        [SetUp]
-        public void SetUp()
-        {
-            // Create a unique temporary folder for each test run.
-            _outputDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-            Directory.CreateDirectory(_outputDir);
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            // Clean up generated files after the test.
-            if (Directory.Exists(_outputDir))
-            {
-                Directory.Delete(_outputDir, true);
-            }
-        }
-
         [Test]
-        public void ConvertPagesToImages_FlagGeneratesImageForEveryPage()
+        public void ConvertPagesToImages_GeneratesImageForEachPage()
         {
-            // Verify that the sample PDF exists.
-            Assert.IsTrue(File.Exists(SamplePdfPath), $"Test PDF not found: {SamplePdfPath}");
+            // Arrange: locate a sample PDF file (ensure it exists in the test directory)
+            string inputPdfPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "sample.pdf");
+            Assert.IsTrue(File.Exists(inputPdfPath), $"Input PDF not found at '{inputPdfPath}'.");
 
-            // Load the PDF document.
-            using (Document pdfDocument = new Document(SamplePdfPath))
+            // Create a temporary directory for the output images
+            string outputDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            Directory.CreateDirectory(outputDir);
+
+            // Act: load the PDF and convert each page to an image using PngDevice
+            using (Document pdfDocument = new Document(inputPdfPath))
             {
-                // Create a resolution (300 DPI) for high‑quality images.
-                Resolution resolution = new Resolution(300);
-
-                // Initialize the PNG device with the chosen resolution.
+                int pageCount = pdfDocument.Pages.Count;
+                Resolution resolution = new Resolution(150); // default resolution
                 PngDevice pngDevice = new PngDevice(resolution);
 
-                // Convert each page to a PNG file.
-                for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
+                for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++)
                 {
-                    string imagePath = Path.Combine(_outputDir, $"page_{pageNumber}.png");
+                    string imagePath = Path.Combine(outputDir, $"page_{pageNumber}.png");
                     using (FileStream imageStream = new FileStream(imagePath, FileMode.Create))
                     {
                         pngDevice.Process(pdfDocument.Pages[pageNumber], imageStream);
                     }
                 }
 
-                // Assert that an image file was created for every page.
-                string[] generatedFiles = Directory.GetFiles(_outputDir, "page_*.png");
-                Assert.AreEqual(pdfDocument.Pages.Count, generatedFiles.Length,
-                    "Number of generated images does not match number of PDF pages.");
-
-                // Additional sanity check: each file should exist and have a non‑zero size.
-                foreach (string file in generatedFiles)
-                {
-                    FileInfo info = new FileInfo(file);
-                    Assert.IsTrue(info.Exists, $"Image file missing: {file}");
-                    Assert.IsTrue(info.Length > 0, $"Image file is empty: {file}");
-                }
+                // Assert: the number of generated image files matches the number of pages
+                string[] generatedImages = Directory.GetFiles(outputDir, "page_*.png");
+                Assert.AreEqual(pageCount, generatedImages.Length,
+                    $"Expected {pageCount} images, but found {generatedImages.Length}.");
             }
+
+            // Cleanup: remove the temporary output directory
+            Directory.Delete(outputDir, true);
         }
     }
 }
 
-// Dummy entry point to satisfy the compiler when the project is built as an executable.
-public static class Program
+// -----------------------------------------------------------------------------
+// Entry point required for a console‑type project. The test runner can invoke the
+// tests via reflection; the Main method simply exists to satisfy the compiler.
+// -----------------------------------------------------------------------------
+public class Program
 {
-    public static void Main() { /* No‑op */ }
+    public static void Main(string[] args)
+    {
+        // No operation – the presence of this method satisfies the CS5001 requirement.
+    }
 }

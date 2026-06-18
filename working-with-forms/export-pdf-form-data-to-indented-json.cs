@@ -3,7 +3,7 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
-class ExportFormDataToJson
+class Program
 {
     static void Main()
     {
@@ -20,7 +20,7 @@ class ExportFormDataToJson
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for proper disposal
         using (Document pdfDoc = new Document(inputPdfPath))
         {
             // Configure export options: enable indentation for readability

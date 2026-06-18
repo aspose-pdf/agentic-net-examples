@@ -1,55 +1,57 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string imagePath  = "stamp.png";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string imagePath = "stamp.png";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
         if (!File.Exists(imagePath))
         {
-            Console.Error.WriteLine($"Aspose.Pdf.Facades.Stamp image not found: {imagePath}");
+            Console.Error.WriteLine($"Stamp image not found: {imagePath}");
             return;
         }
 
-        // Initialize the facade with input and output PDF files
-        PdfFileStamp fileStamp = new PdfFileStamp(inputPath, outputPath);
+        // Retrieve page dimensions (assumes all pages have the same size)
+        PdfFileInfo info = new PdfFileInfo();
+        info.BindPdf(inputPdf);
+        double pageWidth = info.GetPageWidth(1);
+        double pageHeight = info.GetPageHeight(1);
+        info.Close();
 
-        // Create a stamp and bind the image to it
-        Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
+        // Initialize the PdfFileStamp facade and bind the source PDF
+        PdfFileStamp fileStamp = new PdfFileStamp();
+        fileStamp.BindPdf(inputPdf);
+
+        // Create and configure the image stamp
+        Stamp stamp = new Stamp();
         stamp.BindImage(imagePath);
-
-        // Set the desired size of the stamp (width, height)
-        float stampWidth  = 100f;
-        float stampHeight = 100f;
-        stamp.SetImageSize(stampWidth, stampHeight);
-
+        // Optional: set the stamp size (width, height) in points
+        stamp.SetImageSize(50f, 50f);
         // Rotate the stamp by 30 degrees
         stamp.Rotation = 30f;
-
         // Position the stamp at the bottom‑right corner of each page
-        // Use a small margin from the page edges
-        float margin   = 10f;
-        float originX  = fileStamp.PageWidth  - stampWidth  - margin;
-        float originY  = margin; // bottom margin
-        stamp.SetOrigin(originX, originY);
+        // SetOrigin defines the lower‑left corner of the stamp
+        float x = (float)(pageWidth - 50); // page width minus stamp width
+        float y = 0f;                       // bottom edge
+        stamp.SetOrigin(x, y);
 
         // Apply the stamp to all pages of the document
         fileStamp.AddStamp(stamp);
 
-        // Save and close the result
+        // Save the modified PDF and release resources
+        fileStamp.Save(outputPdf);
         fileStamp.Close();
 
-        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Rotated image stamp applied. Output saved to '{outputPdf}'.");
     }
 }

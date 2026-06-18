@@ -1,11 +1,10 @@
 using System;
 using System.IO;
-using System.Collections;
 using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-// Minimal NUnit stubs to allow compilation without the NUnit package
+// Minimal NUnit stubs to allow compilation without the real NUnit package
 namespace NUnit.Framework
 {
     [AttributeUsage(AttributeTargets.Class)]
@@ -21,95 +20,71 @@ namespace NUnit.Framework
             if (!condition)
                 throw new Exception(message ?? "Assert.IsTrue failed.");
         }
-
-        public static void AreEqual<T>(T expected, T actual, string message = null)
-        {
-            if (!object.Equals(expected, actual))
-                throw new Exception(message ?? $"Assert.AreEqual failed. Expected:<{expected}>. Actual:<{actual}>.");
-        }
     }
 }
 
-namespace AsposePdfAttachmentTests
+namespace AsposePdfTests
 {
     [NUnit.Framework.TestFixture]
     public class AttachmentTests
     {
-        private const string AttachmentFileName = "sample.txt";
-        private const string AttachmentContent = "This is a test attachment.";
-
-        // Helper to create a simple PDF with one blank page
-        private static string CreateBlankPdf()
+        [NUnit.Framework.Test]
+        public void AttachmentIsPresentAfterSave()
         {
-            string pdfPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".pdf");
+            // Arrange: create a simple source PDF
+            string tempDir = Path.GetTempPath();
+            string sourcePdf = Path.Combine(tempDir, "source.pdf");
+            string outputPdf = Path.Combine(tempDir, "output.pdf");
+            string attachmentFile = Path.Combine(tempDir, "attachment.txt");
+
+            // Create a dummy attachment file
+            File.WriteAllText(attachmentFile, "Sample attachment content");
+
+            // Create a one‑page PDF and save it (using the documented lifecycle rule)
             using (Document doc = new Document())
             {
-                // Add a blank page (Aspose.Pdf adds a default page automatically)
-                doc.Save(pdfPath);
+                doc.Pages.Add();
+                doc.Save(sourcePdf);
             }
-            return pdfPath;
-        }
 
-        // Helper to create a temporary file that will be attached
-        private static string CreateAttachmentFile()
-        {
-            string filePath = Path.Combine(Path.GetTempPath(), AttachmentFileName);
-            File.WriteAllText(filePath, AttachmentContent);
-            return filePath;
-        }
+            // Act: add the attachment using PdfContentEditor (facade) and save
+            PdfContentEditor editor = new PdfContentEditor();
+            editor.BindPdf(sourcePdf);
+            editor.AddDocumentAttachment(attachmentFile, "Sample attachment");
+            editor.Save(outputPdf);
+            editor.Close();
 
-        [NUnit.Framework.Test]
-        public void Attachment_Should_Appear_After_Save()
-        {
-            // Arrange: create a blank PDF and an attachment file
-            string inputPdf = CreateBlankPdf();
-            string attachmentFile = CreateAttachmentFile();
-            string outputPdf = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".pdf");
+            // Assert: extract attachment names and verify the added file is present
+            PdfExtractor extractor = new PdfExtractor();
+            extractor.BindPdf(outputPdf);
+            extractor.ExtractAttachment();
+            IList<string> names = extractor.GetAttachNames(); // Fixed CS0266
 
-            try
+            bool attachmentFound = false;
+            foreach (string name in names)
             {
-                // Act: add the attachment using PdfContentEditor and save the result
-                using (PdfContentEditor editor = new PdfContentEditor())
+                if (string.Equals(name, Path.GetFileName(attachmentFile), StringComparison.OrdinalIgnoreCase))
                 {
-                    editor.BindPdf(inputPdf);
-                    editor.AddDocumentAttachment(attachmentFile, "Test attachment description");
-                    editor.Save(outputPdf);
-                }
-
-                // Assert: verify that the attachment exists in the saved PDF
-                using (PdfExtractor extractor = new PdfExtractor())
-                {
-                    extractor.BindPdf(outputPdf);
-                    extractor.ExtractAttachment(); // Populate attachment information
-                    IList<string> attachmentNames = extractor.GetAttachNames(); // Generic IList<string>
-                    bool found = false;
-                    foreach (string name in attachmentNames)
-                    {
-                        if (name.Equals(AttachmentFileName, StringComparison.OrdinalIgnoreCase))
-                        {
-                            found = true;
-                            break;
-                        }
-                    }
-                    NUnit.Framework.Assert.IsTrue(found, $"Attachment '{AttachmentFileName}' was not found in the PDF.");
+                    attachmentFound = true;
+                    break;
                 }
             }
-            finally
-            {
-                // Cleanup temporary files
-                if (File.Exists(inputPdf)) File.Delete(inputPdf);
-                if (File.Exists(attachmentFile)) File.Delete(attachmentFile);
-                if (File.Exists(outputPdf)) File.Delete(outputPdf);
-            }
+
+            NUnit.Framework.Assert.IsTrue(attachmentFound, "The attachment was not found in the saved PDF.");
+
+            // Cleanup temporary files (optional)
+            try { File.Delete(sourcePdf); } catch { }
+            try { File.Delete(outputPdf); } catch { }
+            try { File.Delete(attachmentFile); } catch { }
         }
     }
+}
 
-    // Dummy entry point to satisfy the compiler when building as an executable
-    public static class Program
+// Adding a dummy entry point to satisfy the compiler when building as an executable.
+public class Program
+{
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
-        {
-            // No runtime logic required for the unit test library.
-        }
+        // No operation – the test runner will discover and execute the tests.
     }
 }

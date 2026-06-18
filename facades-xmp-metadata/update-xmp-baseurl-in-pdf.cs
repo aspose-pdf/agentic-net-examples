@@ -3,56 +3,57 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class Program
+public class PdfMetadataService
 {
-    // Entry point – simulate a web‑service call by passing the host URL as an argument.
-    static void Main(string[] args)
+    // Updates the XMP BaseURL of a PDF to match the supplied base URL.
+    public void UpdatePdfBaseUrl(string inputPdfPath, string outputPdfPath, string baseUrl)
     {
-        // Expected arguments: input PDF path, output PDF path, host URL (e.g. "https://example.com")
-        if (args.Length != 3)
-        {
-            Console.Error.WriteLine("Usage: <inputPdf> <outputPdf> <hostUrl>");
-            return;
-        }
+        // Ensure the base URL ends with a slash (XMP expects a directory‑style URL).
+        if (!baseUrl.EndsWith("/"))
+            baseUrl += "/";
 
-        string inputPdfPath  = args[0];
-        string outputPdfPath = args[1];
-        string hostUrl       = args[2];
+        // Load the PDF document.
+        using (Document pdfDoc = new Document(inputPdfPath))
+        {
+            // Bind the XMP metadata facade to the loaded document.
+            PdfXmpMetadata xmpMeta = new PdfXmpMetadata(pdfDoc);
 
-        if (!File.Exists(inputPdfPath))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
-            return;
-        }
+            // Set the BaseURL XMP property.
+            xmpMeta.Add(DefaultMetadataProperties.BaseURL, new XmpValue(baseUrl));
 
-        try
-        {
-            UpdateXmpBaseUrl(inputPdfPath, outputPdfPath, hostUrl);
-            Console.WriteLine($"XMP BaseURL updated and saved to '{outputPdfPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            // Retrieve the updated XMP packet.
+            byte[] xmpBytes = xmpMeta.GetXmpMetadata();
+
+            // Apply the updated XMP metadata back to the document.
+            using (MemoryStream xmpStream = new MemoryStream(xmpBytes))
+            {
+                pdfDoc.SetXmpMetadata(xmpStream);
+            }
+
+            // Save the modified PDF.
+            pdfDoc.Save(outputPdfPath);
         }
     }
+}
 
-    // Updates the XMP BaseURL property of a PDF document.
-    static void UpdateXmpBaseUrl(string inputPdf, string outputPdf, string baseUrl)
+class Program
+{
+    static void Main(string[] args)
     {
-        // Load the source PDF (lifecycle rule – use using block for deterministic disposal)
-        using (Document pdfDoc = new Document(inputPdf))
+        // Expected arguments: <inputPdfPath> <outputPdfPath> <baseUrl>
+        if (args.Length < 3)
         {
-            // Bind the XMP metadata facade to the loaded document
-            PdfXmpMetadata xmpMetadata = new PdfXmpMetadata(pdfDoc);
-
-            // Add or replace the BaseURL entry in the XMP packet
-            // DefaultMetadataProperties.BaseURL corresponds to the xmp:BaseURL property.
-            // XmpValue wraps the string value.
-            xmpMetadata.Add(DefaultMetadataProperties.BaseURL, new XmpValue(baseUrl));
-
-            // Save the updated PDF (save rule – use the facade's Save method)
-            // This writes the modified XMP packet back into the PDF.
-            xmpMetadata.Save(outputPdf);
+            Console.WriteLine("Usage: <inputPdfPath> <outputPdfPath> <baseUrl>");
+            return;
         }
+
+        string inputPdf = args[0];
+        string outputPdf = args[1];
+        string baseUrl = args[2];
+
+        var service = new PdfMetadataService();
+        service.UpdatePdfBaseUrl(inputPdf, outputPdf, baseUrl);
+
+        Console.WriteLine("XMP BaseURL updated successfully.");
     }
 }

@@ -1,71 +1,76 @@
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
+using System.Runtime.InteropServices; // for OS check
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // optional, kept for completeness
+using Aspose.Pdf.Text; // for text handling if needed
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "table_with_padding.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Create a new PDF document
-        using (Document doc = new Document())
+        // Suppress known NuGet vulnerability warnings (NU1903) that may be treated as errors
+        #pragma warning disable NU1903
+        // Load existing PDF or create a new one if the file does not exist
+        using (Document doc = File.Exists(inputPath) ? new Document(inputPath) : new Document())
         {
-            // Add a blank page
-            Page page = doc.Pages.Add();
+            // Ensure there is at least one page to host the table
+            if (doc.Pages.Count == 0)
+                doc.Pages.Add();
 
-            // Create a table with 3 columns and 4 rows and set default cell padding
-            Table table = new Table
+            // Create a table with two columns
+            Table table = new Table();
+
+            // Define default cell padding (5 points on each side) using MarginInfo
+            MarginInfo defaultPadding = new MarginInfo
             {
-                ColumnWidths = "100 100 100",
-                DefaultCellPadding = new MarginInfo
-                {
-                    Left = 5,
-                    Right = 5,
-                    Top = 5,
-                    Bottom = 5
-                }
+                Top    = 5,
+                Bottom = 5,
+                Left   = 5,
+                Right  = 5
             };
 
-            // Populate the table with sample data
-            for (int r = 0; r < 4; r++)
-            {
-                Row row = table.Rows.Add();
-                for (int c = 0; c < 3; c++)
-                {
-                    Cell cell = row.Cells.Add($"R{r + 1}C{c + 1}");
-                    // Optional: set a border to visualize the padding
-                    cell.Border = new BorderInfo(BorderSide.All, 0.5f);
-                }
-            }
+            // Apply the padding to the entire table
+            table.DefaultCellPadding = defaultPadding;
 
-            // Add the table to the page
-            page.Paragraphs.Add(table);
+            // Add header row
+            Row headerRow = table.Rows.Add();
+            headerRow.Cells.Add("Header 1");
+            headerRow.Cells.Add("Header 2");
 
-            // Save the PDF – guard against missing GDI+ (libgdiplus) on non‑Windows platforms
+            // Add a data row
+            Row dataRow = table.Rows.Add();
+            dataRow.Cells.Add("Data 1");
+            dataRow.Cells.Add("Data 2");
+
+            // Insert the table into the first page
+            doc.Pages[1].Paragraphs.Add(table);
+
+            // Save the modified document – guard against missing libgdiplus on non‑Windows platforms
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 doc.Save(outputPath);
-                Console.WriteLine($"PDF saved to '{outputPath}'.");
             }
             else
             {
                 try
                 {
                     doc.Save(outputPath);
-                    Console.WriteLine($"PDF saved to '{outputPath}'.");
                 }
                 catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
                 {
-                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. PDF was not saved.");
+                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. PDF saved without GDI+ dependent features.");
                 }
             }
         }
+        #pragma warning restore NU1903
+
+        Console.WriteLine($"Table with default cell padding saved to '{outputPath}'.");
     }
 
-    // Helper to detect a nested DllNotFoundException (libgdiplus) inside TypeInitializationException
+    // Helper to detect a nested DllNotFoundException (e.g., missing libgdiplus)
     private static bool ContainsDllNotFound(Exception? ex)
     {
         while (ex != null)

@@ -7,42 +7,43 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Ensure the source PDF exists – create a simple two‑page PDF if it does not.
         if (!File.Exists(inputPath))
         {
-            using (Document tempDoc = new Document())
-            {
-                // Add two blank pages so that page index 2 is valid.
-                tempDoc.Pages.Add();
-                tempDoc.Pages.Add();
-                tempDoc.Save(inputPath);
-            }
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // Load the source PDF
+        // Load the PDF document using a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Initialize the page editor facade
-            using (PdfPageEditor editor = new PdfPageEditor())
-            {
-                editor.BindPdf(doc);                     // bind the document
-                editor.ProcessPages = new int[] { 2 };   // target only page 2 (1‑based indexing)
+            // Initialize the PdfPageEditor facade
+            PdfPageEditor editor = new PdfPageEditor();
 
-                // Set transition to outward box (BoxOut) and zoom to 1.3×
-                editor.TransitionType = PdfPageEditor.OUTBOX; // BoxOut transition
-                editor.Zoom = 1.3f;                           // 1.0 = 100%
-                // Optional: set a short duration (seconds) for the transition
-                editor.TransitionDuration = 1;               // 1 second
+            // Bind the loaded document to the editor
+            editor.BindPdf(doc);
 
-                // Apply the changes and save the result
-                editor.ApplyChanges();
-                editor.Save(outputPath);
-            }
+            // Apply changes only to page 2 (1‑based indexing)
+            editor.ProcessPages = new int[] { 2 };
+
+            // Set transition type to BoxOut (OUTBOX constant)
+            editor.TransitionType = PdfPageEditor.OUTBOX;
+
+            // Set zoom coefficient to 1.3 (130%) – use a float literal
+            editor.Zoom = 1.3f;
+
+            // Apply the changes to the document
+            editor.ApplyChanges();
+
+            // Save the modified PDF
+            editor.Save(outputPath);
+
+            // Release resources held by the editor
+            editor.Close();
         }
 
-        Console.WriteLine($"Page 2 saved with BoxOut transition and 1.3 zoom to '{outputPath}'.");
+        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }
 }

@@ -1,22 +1,14 @@
 using System;
 using System.IO;
+using System.Text;
 using Aspose.Pdf;
 
-class PdfAttachmentReport
+class Program
 {
-    // Escapes a CSV field by doubling quotes and surrounding with quotes if needed.
-    static string EscapeCsv(string field)
-    {
-        if (field == null) return "";
-        bool mustQuote = field.Contains(",") || field.Contains("\"") || field.Contains("\n") || field.Contains("\r");
-        string escaped = field.Replace("\"", "\"\"");
-        return mustQuote ? $"\"{escaped}\"" : escaped;
-    }
-
     static void Main()
     {
-        const string pdfPath = "input.pdf";                 // Path to the source PDF
-        const string csvPath = "attachments_report.csv";    // Output CSV file
+        const string pdfPath = "input.pdf";
+        const string csvPath = "attachments_report.csv";
 
         if (!File.Exists(pdfPath))
         {
@@ -24,41 +16,47 @@ class PdfAttachmentReport
             return;
         }
 
-        // Load the PDF document (lifecycle rule: wrap in using for deterministic disposal)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(pdfPath))
         {
-            // Open a StreamWriter for the CSV output
-            using (StreamWriter writer = new StreamWriter(csvPath, false, System.Text.Encoding.UTF8))
-            {
-                // Write CSV header
-                writer.WriteLine("Name,Size,Description");
+            // Prepare CSV content with header
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("Name,Size (bytes),Description");
 
-                // Iterate over all embedded file attachments
-                foreach (FileSpecification attachment in doc.EmbeddedFiles)
+            // Iterate over all embedded file attachments (use EmbeddedFiles collection)
+            if (doc.EmbeddedFiles != null)
+            {
+                foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
                 {
                     // Attachment name (may be null)
-                    string name = attachment.Name ?? string.Empty;
+                    string name = fileSpec.Name ?? string.Empty;
 
-                    // Description (may be null)
-                    string description = attachment.Description ?? string.Empty;
+                    // Attachment description (may be null)
+                    string description = fileSpec.Description ?? string.Empty;
 
-                    // Determine size in bytes.
+                    // Determine the size of the embedded file by copying its Contents stream to a memory stream
                     long size = 0;
-                    if (attachment.Params != null && attachment.Params.Size > 0)
+                    if (fileSpec.Contents != null)
                     {
-                        size = attachment.Params.Size;
-                    }
-                    else if (attachment.Contents != null && attachment.Contents.CanSeek)
-                    {
-                        size = attachment.Contents.Length;
+                        using (MemoryStream ms = new MemoryStream())
+                        {
+                            fileSpec.Contents.CopyTo(ms);
+                            size = ms.Length;
+                        }
                     }
 
-                    // Write a CSV line with proper escaping
-                    writer.WriteLine($"{EscapeCsv(name)},{size},{EscapeCsv(description)}");
+                    // Escape commas and quotes for CSV compliance
+                    string escapedName = $"\"{name.Replace("\"", "\"\"")}\"";
+                    string escapedDescription = $"\"{description.Replace("\"", "\"\"")}\"";
+
+                    sb.AppendLine($"{escapedName},{size},{escapedDescription}");
                 }
             }
+
+            // Write the CSV data to the output file (UTF‑8 encoding)
+            File.WriteAllText(csvPath, sb.ToString(), Encoding.UTF8);
         }
 
-        Console.WriteLine($"Attachment report generated: {csvPath}");
+        Console.WriteLine($"Attachment report saved to '{csvPath}'.");
     }
 }

@@ -1,38 +1,41 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices; // Resolution and CompressionType enums
+using Aspose.Pdf.Facades;          // PdfConverter
+using Aspose.Pdf.Devices;          // CompressionType
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string inputPdf  = "input.pdf";
         const string outputTiff = "output.tiff";
 
-        // Verify input file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Initialize the PDF converter facade
-        using (PdfConverter converter = new PdfConverter())
+        try
         {
-            // Bind the source PDF document
-            converter.BindPdf(inputPdf);
+            // Create and configure the PDF converter
+            using (PdfConverter converter = new PdfConverter())
+            {
+                // Bind the source PDF file
+                converter.BindPdf(inputPdf);
 
-            // Set the resolution (DPI) for the output TIFF
-            converter.Resolution = new Resolution(300);
+                // Prepare the converter (required before saving)
+                converter.DoConvert();
 
-            // Perform the conversion
-            converter.DoConvert();
+                // Save all pages as a multi‑page TIFF using LZW compression
+                converter.SaveAsTIFF(outputTiff, CompressionType.LZW);
+            }
 
-            // Save all pages as a single multi‑page TIFF using LZW compression.
-            converter.SaveAsTIFF(outputTiff, CompressionType.LZW);
+            Console.WriteLine($"PDF successfully converted to TIFF: {outputTiff}");
         }
-
-        Console.WriteLine($"PDF successfully converted to TIFF: {outputTiff}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
+        }
     }
 }

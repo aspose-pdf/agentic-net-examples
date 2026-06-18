@@ -1,67 +1,72 @@
 using System;
 using System.IO;
-using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using System.Security.Cryptography.X509Certificates;
 
 class Program
 {
     static void Main()
     {
         const string inputPdf = "signed.pdf";
-        const string outputDir = "certificates";
+        const string outputDir = "certs";
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        try
+        // Load the PDF document (lifecycle rule: use using)
+        using (Document doc = new Document(inputPdf))
         {
-            // Load the PDF document (lifecycle rule: use using)
-            using (Document doc = new Document(inputPdf))
+            // Check for signature fields
+            if (doc.Form == null || doc.Form.Fields == null)
             {
-                // Iterate over all fields and process only signature fields
-                foreach (Field field in doc.Form.Fields)
+                Console.WriteLine("No form fields found in the document.");
+                return;
+            }
+
+            int signatureIndex = 1;
+
+            // Iterate over each field and process only signature fields
+            foreach (Field field in doc.Form.Fields)
+            {
+                if (field is SignatureField sigField)
                 {
-                    if (field is SignatureField sigField)
+                    // Extract the leaf certificate as an X509Certificate2 object
+                    X509Certificate2 leafCert = sigField.ExtractCertificateObject();
+
+                    if (leafCert == null)
                     {
-                        // Extract the leaf certificate as an X509Certificate2 object
-                        X509Certificate2 leafCert = sigField.ExtractCertificateObject();
-                        if (leafCert == null)
-                        {
-                            Console.WriteLine($"No certificate found in signature field '{sigField.PartialName}'.");
-                            continue;
-                        }
-
-                        // Build the certificate chain for the leaf certificate
-                        X509Chain chain = new X509Chain();
-                        chain.Build(leafCert);
-
-                        // Save each certificate in the chain as a DER file
-                        int index = 0;
-                        foreach (X509ChainElement element in chain.ChainElements)
-                        {
-                            string certPath = Path.Combine(outputDir,
-                                $"{Path.GetFileNameWithoutExtension(inputPdf)}_sig_{sigField.PartialName}_cert_{index}.der");
-
-                            // Write the raw DER bytes to file (simplified with WriteAllBytes)
-                            File.WriteAllBytes(certPath, element.Certificate.RawData);
-
-                            Console.WriteLine($"Saved certificate {index} of signature '{sigField.PartialName}' to '{certPath}'.");
-                            index++;
-                        }
+                        Console.WriteLine($"Signature {signatureIndex}: no certificate extracted.");
+                        signatureIndex++;
+                        continue;
                     }
+
+                    // Build the certificate chain for the extracted leaf certificate
+                    X509Chain chain = new X509Chain();
+                    chain.Build(leafCert);
+
+                    int certIndex = 0;
+
+                    // Save each certificate in the chain as a DER file
+                    foreach (X509ChainElement element in chain.ChainElements)
+                    {
+                        byte[] derBytes = element.Certificate.Export(X509ContentType.Cert);
+                        string fileName = $"sig{signatureIndex}_cert{certIndex}.der";
+                        string filePath = Path.Combine(outputDir, fileName);
+                        File.WriteAllBytes(filePath, derBytes);
+                        Console.WriteLine($"Saved certificate: {filePath}");
+                        certIndex++;
+                    }
+
+                    signatureIndex++;
                 }
             }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

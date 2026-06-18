@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;   // Border, BorderStyle
-using Aspose.Pdf.Forms;        // ButtonField
+using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Forms;
 
 class Program
 {
@@ -17,34 +17,33 @@ class Program
             return;
         }
 
-        // Load the PDF document (using block ensures proper disposal)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages
+            // Iterate over all pages
             foreach (Page page in doc.Pages)
             {
-                // Annotations collection uses 1‑based indexing
-                for (int idx = 1; idx <= page.Annotations.Count; idx++)
+                // Iterate over all annotations on the page
+                foreach (Annotation ann in page.Annotations)
                 {
-                    Annotation ann = page.Annotations[idx];
-
                     // Process only button fields
                     if (ann is ButtonField button)
                     {
-                        // Create a Border linked to this annotation and set style & thickness
-                        button.Border = new Border(button)
-                        {
-                            Style = BorderStyle.Dashed, // Dashed border
-                            Width = 2                  // Thickness of two points
-                        };
+                        // Ensure a Border object exists
+                        if (button.Border == null)
+                            button.Border = new Border(button);
+
+                        // Set border style to dashed and thickness to 2 points
+                        button.Border.Style = BorderStyle.Dashed;
+                        button.Border.Width = 2;
                     }
                 }
             }
 
-            // Save the modified PDF (lifecycle rule: use provided save logic)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"All button annotations updated and saved to '{outputPath}'.");
+        Console.WriteLine($"Button borders updated and saved to '{outputPath}'.");
     }
 }

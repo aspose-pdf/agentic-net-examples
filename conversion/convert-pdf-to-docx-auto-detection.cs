@@ -1,38 +1,38 @@
 using System;
 using System.IO;
-using Aspose.Pdf;   // Aspose.Pdf namespace contains Document, DocSaveOptions, etc.
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Paths to the source PDF and the target DOCX file.
-        const string inputPdfPath  = "input.pdf";
-        const string outputDocxPath = "output.docx";
+        // Input PDF file path
+        const string inputPdf = "input.pdf";
+        // Output DOCX file path
+        const string outputDocx = "output.docx";
 
-        // Verify that the source file exists.
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal.
-        using (Document pdfDocument = new Document(inputPdfPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDocument = new Document(inputPdf))
         {
-            // Configure save options for DOCX conversion.
-            // - Format specifies the output as DOCX.
-            // - Mode set to Flow (automatic content detection) to let the engine decide the best layout.
+            // Configure DOCX save options
             DocSaveOptions saveOptions = new DocSaveOptions
             {
+                // Specify DOCX format
                 Format = DocSaveOptions.DocFormat.DocX,
-                Mode   = DocSaveOptions.RecognitionMode.Flow
+                // Use automatic content detection (full recognition mode)
+                Mode = DocSaveOptions.RecognitionMode.Flow
             };
 
-            // Save the PDF as a DOCX file using the specified options.
-            pdfDocument.Save(outputDocxPath, saveOptions);
+            // Save the PDF as DOCX using the configured options
+            pdfDocument.Save(outputDocx, saveOptions);
         }
 
-        Console.WriteLine($"PDF successfully converted to DOCX: {outputDocxPath}");
+        Console.WriteLine($"PDF successfully converted to DOCX: {outputDocx}");
     }
 }

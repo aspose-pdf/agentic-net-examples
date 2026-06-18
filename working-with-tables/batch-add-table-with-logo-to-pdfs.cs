@@ -7,78 +7,87 @@ class BatchAddTableWithLogo
 {
     static void Main()
     {
-        // Resolve input and output folders relative to the executable location.
-        // This makes the code work on any OS (Windows, Linux, macOS).
-        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-        string inputFolder = Path.Combine(baseDir, "InputPdfs");
-        string outputFolder = Path.Combine(baseDir, "OutputPdfs");
-        // Path to the company logo image (PNG, JPG, etc.) – also resolved relative to the base directory.
-        string logoPath = Path.Combine(baseDir, "Resources", "logo.png");
+        // Input folder containing PDFs
+        const string inputFolder = @"C:\InputPdfs";
+        // Output folder for processed PDFs
+        const string outputFolder = @"C:\OutputPdfs";
+        // Path to the company logo image (any supported format)
+        const string logoPath = @"C:\Assets\company_logo.png";
 
-        // Validate that the required folders/files exist before proceeding.
-        if (!Directory.Exists(inputFolder))
-        {
-            Console.Error.WriteLine($"Input folder does not exist: {inputFolder}");
-            return;
-        }
-        if (!File.Exists(logoPath))
-        {
-            Console.Error.WriteLine($"Logo image not found: {logoPath}");
-            return;
-        }
-
-        // Ensure the output directory exists.
+        // Ensure output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Process each PDF file in the input folder.
+        // Verify logo file exists
+        if (!File.Exists(logoPath))
+        {
+            Console.Error.WriteLine($"Logo file not found: {logoPath}");
+            return;
+        }
+
+        // Process each PDF file in the input folder
         foreach (string pdfFile in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            // Determine output file path (same name, different folder).
-            string outputPath = Path.Combine(outputFolder, Path.GetFileName(pdfFile));
-
-            // Load the PDF document inside a using block for deterministic disposal.
-            using (Document doc = new Document(pdfFile))
+            try
             {
-                // Get the first page (Aspose.Pdf uses 1‑based indexing).
-                Page page = doc.Pages[1];
-
-                // Create a table that will hold the logo and accompanying text.
-                Table table = new Table
+                // Load the PDF document (using statement ensures proper disposal)
+                using (Document doc = new Document(pdfFile))
                 {
-                    // Define two columns: first for the logo, second for the text.
-                    ColumnWidths = "100 400",
-                    // Optional visual styling.
-                    Border = new BorderInfo(BorderSide.All, 1f, Aspose.Pdf.Color.Black),
-                    DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Gray),
-                    DefaultCellPadding = new MarginInfo(5f, 5f, 5f, 5f)
-                };
+                    // Create a table with two columns: logo and company name
+                    Table table = new Table
+                    {
+                        // Optional styling – use float literals for width values
+                        Border = new BorderInfo(BorderSide.All, 1f, Aspose.Pdf.Color.Black),
+                        DefaultCellPadding = new MarginInfo(5f, 5f, 5f, 5f),
+                        DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Gray)
+                    };
 
-                // Add a single row to the table.
-                var row = table.Rows.Add();
+                    // Define column widths (percentage of page width)
+                    // First column for logo (20%), second for text (80%)
+                    table.ColumnWidths = "20 80";
 
-                // ----- Logo cell -----
-                var logoCell = row.Cells.Add();
-                Image logoImage = new Image { File = logoPath };
-                // Optionally set a fixed width/height to fit the cell (adjust as needed).
-                // logoImage.FixWidth = 80f; // example
-                logoCell.Paragraphs.Add(logoImage);
+                    // Add a single row
+                    Row row = table.Rows.Add();
 
-                // ----- Text cell -----
-                var textCell = row.Cells.Add();
-                TextFragment companyName = new TextFragment("Acme Corporation");
-                companyName.TextState.FontSize = 14;
-                companyName.TextState.Font = FontRepository.FindFont("Helvetica");
-                companyName.TextState.ForegroundColor = Aspose.Pdf.Color.DarkBlue;
-                textCell.Paragraphs.Add(companyName);
+                    // ----- Cell 1: Logo image -----
+                    Cell logoCell = row.Cells.Add();
+                    // Create an Image object and set its source file
+                    Image logoImg = new Image
+                    {
+                        File = logoPath,
+                        // Scale the image to fit the cell (optional)
+                        ImageScale = 0.5f // float literal required by Aspose.Pdf
+                    };
+                    // Add the image to the cell's paragraph collection
+                    logoCell.Paragraphs.Add(logoImg);
 
-                // Insert the table at the beginning of the page's content.
-                page.Paragraphs.Insert(0, table);
+                    // ----- Cell 2: Company name text -----
+                    Cell textCell = row.Cells.Add();
+                    TextFragment tf = new TextFragment("Acme Corporation")
+                    {
+                        // Use cross‑platform Aspose.Pdf.Color
+                        TextState = { FontSize = 14, Font = FontRepository.FindFont("Helvetica"), ForegroundColor = Aspose.Pdf.Color.DarkBlue }
+                    };
+                    textCell.Paragraphs.Add(tf);
 
-                // Save the modified document to the output location.
-                doc.Save(outputPath);
+                    // Insert the table at the top of the first page
+                    Page firstPage = doc.Pages[1];
+                    // Optionally set a margin from the top of the page – use float literals
+                    table.Margin = new MarginInfo(0f, 0f, 20f, 0f);
+                    firstPage.Paragraphs.Add(table);
+
+                    // Build output file path preserving original name
+                    string outputPath = Path.Combine(outputFolder, Path.GetFileName(pdfFile));
+
+                    // Save the modified document (using the standard Save method)
+                    doc.Save(outputPath);
+                }
+
+                Console.WriteLine($"Processed: {Path.GetFileName(pdfFile)}");
             }
-
-            Console.WriteLine($"Processed: {Path.GetFileName(pdfFile)} → {outputPath}");
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{pdfFile}': {ex.Message}");
+            }
         }
 
         Console.WriteLine("Batch processing completed.");

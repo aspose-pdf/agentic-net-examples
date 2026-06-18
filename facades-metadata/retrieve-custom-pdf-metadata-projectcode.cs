@@ -5,25 +5,23 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
+        const string inputPath = "input.pdf";
 
-        if (!System.IO.File.Exists(pdfPath))
+        // Verify the PDF file exists before proceeding.
+        if (!System.IO.File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Initialize the PdfFileInfo facade for the specified PDF file
-        using (PdfFileInfo fileInfo = new PdfFileInfo(pdfPath))
+        // Initialize PdfFileInfo facade with the PDF file.
+        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
         {
-            // Retrieve the custom metadata value associated with the key "ProjectCode"
-            string projectCode = fileInfo.GetMetaInfo("ProjectCode");
+            // Retrieve the custom metadata value for "ProjectCode".
+            string projectCode = pdfInfo.GetMetaInfo("ProjectCode");
 
-            // Display the result; an empty string indicates the key was not present
-            if (string.IsNullOrEmpty(projectCode))
-                Console.WriteLine("ProjectCode metadata not found.");
-            else
-                Console.WriteLine($"ProjectCode: {projectCode}");
+            // Display the retrieved value (empty string if the key does not exist).
+            Console.WriteLine($"ProjectCode: {projectCode}");
         }
     }
 }

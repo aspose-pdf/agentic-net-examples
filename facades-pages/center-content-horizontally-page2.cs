@@ -16,28 +16,24 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Use PdfPageEditor from Aspose.Pdf.Facades to modify page layout
+        using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // Initialize the page editor facade
-            using (PdfPageEditor editor = new PdfPageEditor())
-            {
-                // Bind the loaded document to the editor
-                editor.BindPdf(doc);
+            // Load the source PDF
+            editor.BindPdf(inputPath);
 
-                // Specify that only page 2 should be processed
-                editor.ProcessPages = new int[] { 2 };
+            // Apply changes only to page 2 (1‑based indexing)
+            editor.ProcessPages = new int[] { 2 };
 
-                // Center the original content horizontally on the result page
-                // Use the non‑obsolete HorizontalAlignment enum
-                editor.HorizontalAlignment = HorizontalAlignment.Center;
+            // Center the original content horizontally on the result page
+            // Use the non‑obsolete HorizontalAlignment enum (Aspose.Pdf.HorizontalAlignment)
+            editor.HorizontalAlignment = Aspose.Pdf.HorizontalAlignment.Center;
 
-                // Apply the changes to the document
-                editor.ApplyChanges();
+            // Apply the modifications
+            editor.ApplyChanges();
 
-                // Save the modified PDF
-                editor.Save(outputPath);
-            }
+            // Save the edited PDF
+            editor.Save(outputPath);
         }
 
         Console.WriteLine($"Centered content on page 2 saved to '{outputPath}'.");

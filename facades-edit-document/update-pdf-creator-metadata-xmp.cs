@@ -1,36 +1,36 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;   // Facade classes for XMP handling
-using Aspose.Pdf;          // XmpValue
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string newCreator = "My New Creator";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string newCreator = "My Application";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Create the XMP metadata facade and bind the source PDF
+        // Bind the PDF to the XMP metadata facade
         PdfXmpMetadata xmp = new PdfXmpMetadata();
-        xmp.BindPdf(inputPath);
+        xmp.BindPdf(inputPdf);
 
-        // Add or replace the creator field (dc:creator) in the XMP metadata.
-        // DefaultMetadataProperties does not expose a "Creator" constant, so use the literal property name.
-        xmp.Add("dc:creator", new XmpValue(newCreator));
+        // Replace the creator field (dc:creator) if it exists, otherwise add it
+        if (xmp.ContainsKey("dc:creator"))
+        {
+            xmp.Remove("dc:creator");
+        }
+        xmp.Add("dc:creator", newCreator);
 
-        // Save the updated PDF with the modified XMP metadata
-        xmp.Save(outputPath);
-
-        // Release resources
+        // Save the PDF with the updated XMP metadata
+        xmp.Save(outputPdf);
         xmp.Close();
 
-        Console.WriteLine($"Creator field updated and saved to '{outputPath}'.");
+        Console.WriteLine($"Creator field updated and saved to '{outputPdf}'.");
     }
 }

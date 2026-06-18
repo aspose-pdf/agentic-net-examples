@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -7,31 +6,31 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
+        const string inputPath = "input.pdf";
 
-        if (!File.Exists(pdfPath))
+        if (!System.IO.File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load PDF metadata using the Facades API
-        using (PdfFileInfo fileInfo = new PdfFileInfo(pdfPath))
+        // Load PDF meta‑information via the Facades API.
+        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
         {
-            // Verify that the document is encrypted
-            if (!fileInfo.IsEncrypted)
+            // Check whether the document is encrypted.
+            if (!pdfInfo.IsEncrypted)
             {
                 Console.WriteLine("The PDF is not encrypted.");
                 return;
             }
 
-            // Access the underlying Document to read the CryptoAlgorithm property
-            Document doc = fileInfo.Document;
+            // Access the underlying Document to read the CryptoAlgorithm property.
+            Document doc = pdfInfo.Document;
             CryptoAlgorithm? algorithm = doc.CryptoAlgorithm; // Nullable enum
 
             if (algorithm.HasValue)
             {
-                Console.WriteLine($"Current encryption algorithm: {algorithm.Value}");
+                Console.WriteLine($"Encryption algorithm: {algorithm.Value}");
             }
             else
             {

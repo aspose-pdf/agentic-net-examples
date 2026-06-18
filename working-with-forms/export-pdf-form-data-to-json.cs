@@ -6,35 +6,34 @@ class ExportFormDataToJson
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string inputPdfPath = "input.pdf";
-        const string jsonTextPath = "formdata.json";
+        // Paths for the input PDF and the output text file that will contain the JSON string.
+        const string pdfPath = "input.pdf";
+        const string jsonTextPath = "formData.txt";
 
-        // Ensure the source PDF exists
-        if (!File.Exists(inputPdfPath))
+        // Ensure the source PDF exists.
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle: load)
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF document inside a using block for deterministic disposal.
+        using (Document doc = new Document(pdfPath))
         {
-            // Export form fields to JSON using a memory stream
+            // Export the form fields to JSON using a memory stream.
             using (MemoryStream jsonStream = new MemoryStream())
             {
-                // ExportToJson writes JSON to the provided stream
-                pdfDoc.Form.ExportToJson(jsonStream);
+                // The ExportToJson method writes the JSON representation of the form fields to the provided stream.
+                doc.Form.ExportToJson(jsonStream);
 
-                // Convert the stream contents to a string
-                jsonStream.Position = 0; // rewind
-                string jsonString = new StreamReader(jsonStream).ReadToEnd();
+                // Convert the stream contents to a UTF‑8 string.
+                string jsonString = System.Text.Encoding.UTF8.GetString(jsonStream.ToArray());
 
-                // Save the JSON string to a text file
+                // Write the JSON string to a plain text file.
                 File.WriteAllText(jsonTextPath, jsonString);
             }
         }
 
-        Console.WriteLine($"Form data exported to JSON file: {jsonTextPath}");
+        Console.WriteLine($"Form data exported to JSON and saved in '{jsonTextPath}'.");
     }
 }

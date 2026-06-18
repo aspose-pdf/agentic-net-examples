@@ -1,12 +1,12 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core API for PDF manipulation
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,23 +15,30 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Page numbers are 1‑based; delete the third page if it exists
-            if (doc.Pages.Count >= 3)
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
             {
-                doc.Pages.Delete(3);   // Delete specified page (index = 3)
-            }
-            else
-            {
-                Console.WriteLine("The document has fewer than 3 pages; no deletion performed.");
+                // Delete the third page (pages are 1‑based)
+                if (doc.Pages.Count >= 3)
+                {
+                    doc.Pages.Delete(3);
+                }
+                else
+                {
+                    Console.WriteLine("Document has fewer than 3 pages; no page deleted.");
+                }
+
+                // Save the modified document
+                doc.Save(outputPath);
             }
 
-            // Save the modified document
-            doc.Save(outputPath);
+            Console.WriteLine($"Third page removed and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Third page removed (if present). Saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

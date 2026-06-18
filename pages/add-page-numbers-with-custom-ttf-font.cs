@@ -7,53 +7,52 @@ class Program
 {
     static void Main()
     {
-        // Input PDF, output PDF and path to the custom TrueType font file
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "output.pdf";
-        const string ttfFontPath   = "customfont.ttf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_numbered.pdf";
+        const string fontPath   = "custom_font.ttf"; // path to external TTF file
 
-        // Verify that required files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(ttfFontPath))
-        {
-            Console.Error.WriteLine($"TrueType font not found: {ttfFontPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        if (!File.Exists(fontPath))
         {
-            // Load the external TrueType font and mark it for embedding
-            Font customFont = FontRepository.FindFont(ttfFontPath);
-            customFont.IsEmbedded = true;          // ensure the font is embedded in the output PDF
+            Console.Error.WriteLine($"Font file not found: {fontPath}");
+            return;
+        }
 
-            // Create a PageNumberStamp that will be applied to each page
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
+        {
+            // Load the external TrueType font and ensure it will be embedded
+            Font customFont = FontRepository.FindFont(fontPath);
+            customFont.IsEmbedded = true;
+
+            // Required for embedding standard Type1 fonts if they are used later
+            doc.EmbedStandardFonts = true;
+
+            // Create a page number stamp with default format "#"
             PageNumberStamp pageNumberStamp = new PageNumberStamp();
-            pageNumberStamp.Format = "Page # of " + pdfDoc.Pages.Count; // custom format
+            pageNumberStamp.StartingNumber = 1;                     // first page number
             pageNumberStamp.HorizontalAlignment = HorizontalAlignment.Center;
             pageNumberStamp.VerticalAlignment   = VerticalAlignment.Bottom;
-            pageNumberStamp.BottomMargin = 20;    // distance from the bottom edge
-            pageNumberStamp.StartingNumber = 1;   // start numbering from 1
-
-            // Apply the custom font to the stamp's text state
-            pageNumberStamp.TextState.Font = customFont;
+            pageNumberStamp.BottomMargin = 20;                     // distance from bottom edge
+            pageNumberStamp.TextState.Font = customFont;           // apply custom font
             pageNumberStamp.TextState.FontSize = 12;               // desired font size
-            pageNumberStamp.TextState.ForegroundColor = Color.Black; // text color
+            pageNumberStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
 
-            // Add the stamp to every page in the document
-            foreach (Page page in pdfDoc.Pages)
+            // Apply the stamp to every page in the document
+            foreach (Page page in doc.Pages)
             {
                 page.AddStamp(pageNumberStamp);
             }
 
-            // Save the modified PDF; the custom font will be embedded automatically
-            pdfDoc.Save(outputPdfPath);
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Page numbers added with custom font. Output saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Page numbers added with custom font. Output saved to '{outputPath}'.");
     }
 }

@@ -1,0 +1,49 @@
+using System;
+using System.IO;
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
+
+class Program
+{
+    static void Main()
+    {
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_bookmarked.pdf";
+
+        if (!File.Exists(inputPath))
+        {
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
+
+        // Load the PDF document (1‑based page indexing)
+        using (Document doc = new Document(inputPath))
+        {
+            // Initialize the bookmark editor and bind the loaded document
+            using (PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor())
+            {
+                bookmarkEditor.BindPdf(doc);
+
+                // Iterate through each page and add a bookmark for every image found
+                for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+                {
+                    Page page = doc.Pages[pageNum];
+                    int imageIndex = 0;
+
+                    foreach (XImage img in page.Resources.Images)
+                    {
+                        imageIndex++;
+                        string bookmarkName = $"Image {imageIndex} on page {pageNum}";
+                        // Create a bookmark that points to the page containing the image
+                        bookmarkEditor.CreateBookmarkOfPage(bookmarkName, pageNum);
+                    }
+                }
+
+                // Save the PDF with the newly created bookmarks
+                bookmarkEditor.Save(outputPath);
+            }
+        }
+
+        Console.WriteLine($"Bookmarks added and saved to '{outputPath}'.");
+    }
+}

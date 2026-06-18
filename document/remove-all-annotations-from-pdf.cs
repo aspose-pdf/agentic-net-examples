@@ -7,32 +7,33 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "clean_output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document (lifecycle rule: use using)
+            // Load the PDF (using the documented lifecycle rule)
             using (Document doc = new Document(inputPath))
             {
-                // Remove all annotations from each page
-                foreach (Page page in doc.Pages)
+                // Pages are 1‑based; iterate through each page
+                for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    // The correct method to clear annotations is Clear(), not Delete()
-                    page.Annotations.Clear();
+                    Page page = doc.Pages[i];
+                    // Clear all annotations on the current page
+                    page.Annotations.Clear(); // AnnotationCollection.Clear deletes all annotations
                 }
 
-                // Save the cleaned PDF (save-to-non-pdf rule: Save() writes PDF)
+                // Save the cleaned PDF (Save without options always writes PDF)
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"All annotations removed. Clean PDF saved to '{outputPath}'.");
+            Console.WriteLine($"All annotations removed. Saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

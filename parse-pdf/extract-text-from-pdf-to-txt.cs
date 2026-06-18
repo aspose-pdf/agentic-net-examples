@@ -16,22 +16,29 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        try
         {
-            // Create a TextAbsorber to extract text from all pages
-            TextAbsorber absorber = new TextAbsorber();
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPdfPath))
+            {
+                // Create a TextAbsorber to collect text from all pages
+                TextAbsorber absorber = new TextAbsorber();
 
-            // Accept the absorber for the entire Pages collection
-            pdfDoc.Pages.Accept(absorber);
+                // Accept the absorber for the entire Pages collection (1‑based indexing is handled internally)
+                pdfDoc.Pages.Accept(absorber);
 
-            // Retrieve the concatenated text
-            string extractedText = absorber.Text;
+                // Retrieve the concatenated text
+                string extractedText = absorber.Text ?? string.Empty;
 
-            // Write the text to a .txt file
-            File.WriteAllText(outputTxtPath, extractedText);
+                // Write the text to the output .txt file (overwrites if it exists)
+                File.WriteAllText(outputTxtPath, extractedText);
+            }
+
+            Console.WriteLine($"Text extracted and saved to '{outputTxtPath}'.");
         }
-
-        Console.WriteLine($"Text extracted to '{outputTxtPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

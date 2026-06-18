@@ -1,86 +1,39 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using Aspose.Pdf.Facades;                  // PdfExtractor, ImageMergeMode, PdfConverter
-using Aspose.Pdf.Drawing;                 // ImageFormat
-
-// ---------------------------------------------------------------------------
-// Minimal NUnit stubs – required only when the NUnit package is not referenced.
-// They allow any leftover test attributes in the source to compile without
-// pulling the full NUnit library.
-// ---------------------------------------------------------------------------
-namespace NUnit.Framework
-{
-    [AttributeUsage(AttributeTargets.Class)]
-    public sealed class TestFixtureAttribute : Attribute { }
-
-    [AttributeUsage(AttributeTargets.Method)]
-    public sealed class TestAttribute : Attribute { }
-
-    [AttributeUsage(AttributeTargets.Method)]
-    public sealed class SetUpAttribute : Attribute { }
-
-    [AttributeUsage(AttributeTargets.Method)]
-    public sealed class TearDownAttribute : Attribute { }
-
-    public delegate void TestDelegate();
-
-    public static class Assert
-    {
-        public static void AreEqual<T>(T expected, T actual, string message = null)
-        {
-            if (!object.Equals(expected, actual))
-                throw new Exception(message ?? $"Assert.AreEqual failed. Expected:<{expected}>. Actual:<{actual}>.");
-        }
-
-        public static T Throws<T>(TestDelegate code) where T : Exception
-        {
-            try
-            {
-                code();
-            }
-            catch (T ex)
-            {
-                return ex;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Assert.Throws failed. Expected {typeof(T)} but got {ex.GetType()}.", ex);
-            }
-            throw new Exception($"Assert.Throws failed. No exception thrown. Expected {typeof(T)}.");
-        }
-    }
-}
+using Aspose.Pdf.Facades;
+using System.Drawing.Imaging; // needed for PdfExtractor.GetNextImage
+using Aspose.Pdf.Drawing;   // needed for PdfConverter.MergeImages
 
 class Program
 {
     static void Main()
     {
         const string inputPdf = "input.pdf";
-        const string outputPng = "sprite_sheet.png";
+        const string outputPng = "sprite.png";
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // List to hold each extracted image as a stream
+        // -----------------------------------------------------------------
+        // 1. Extract all images from the PDF into memory streams (PNG format)
+        // -----------------------------------------------------------------
         List<Stream> imageStreams = new List<Stream>();
-
-        // Extract images from the PDF using PdfExtractor
         using (PdfExtractor extractor = new PdfExtractor())
         {
             extractor.BindPdf(inputPdf);
-            extractor.ExtractImage(); // start image extraction
+            extractor.ExtractImage();
 
             while (extractor.HasNextImage())
             {
-                // Store each image in a memory stream
+                // Each image is written to a MemoryStream as PNG
                 MemoryStream ms = new MemoryStream();
-                // GetNextImage writes the image (default format JPEG) into the stream
-                extractor.GetNextImage(ms);
-                ms.Position = 0; // reset for later reading
+                // Fully qualified to avoid ambiguity with Aspose.Pdf.Drawing.ImageFormat
+                extractor.GetNextImage(ms, System.Drawing.Imaging.ImageFormat.Png);
+                ms.Position = 0;               // reset for later reading
                 imageStreams.Add(ms);
             }
         }
@@ -91,27 +44,31 @@ class Program
             return;
         }
 
-        // Merge all extracted images into a single sprite sheet (horizontal layout)
-        // ImageMergeMode.Horizontal creates a side‑by‑side sprite sheet.
-        // Spacing and margin are set to 0 (no extra spacing).
-        Stream mergedStream = PdfConverter.MergeImages(
+        // ---------------------------------------------------------------
+        // 2. Merge the extracted images into a single sprite sheet (horizontal)
+        // ---------------------------------------------------------------
+        // ImageMergeMode.Horizontal arranges images side‑by‑side.
+        using (Stream mergedStream = PdfConverter.MergeImages(
             imageStreams,
-            ImageFormat.Png,
+            Aspose.Pdf.Drawing.ImageFormat.Png, // Aspose.Pdf.Drawing.ImageFormat
             ImageMergeMode.Horizontal,
-            0,   // spacing
-            0);  // margin
-
-        // Save the merged sprite sheet to a PNG file
-        using (FileStream outFile = new FileStream(outputPng, FileMode.Create, FileAccess.Write))
+            null,   // optional spacing between images (null = default)
+            null)) // optional max width/height (null = auto)
         {
-            mergedStream.CopyTo(outFile);
+            // -----------------------------------------------------------
+            // 3. Save the merged sprite sheet to a PNG file
+            // -----------------------------------------------------------
+            using (FileStream outFile = new FileStream(outputPng, FileMode.Create, FileAccess.Write))
+            {
+                mergedStream.CopyTo(outFile);
+            }
         }
 
-        // Clean up the individual image streams
+        // Clean up individual image streams
         foreach (var s in imageStreams)
+        {
             s.Dispose();
-
-        mergedStream.Dispose();
+        }
 
         Console.WriteLine($"Sprite sheet created: {outputPng}");
     }

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text;
 using Aspose.Pdf;
 using Aspose.Pdf.Tagged;
 using Aspose.Pdf.LogicalStructure;
@@ -19,42 +20,43 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Access the tagged content interface
+            // Access tagged content interface
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Verify that the document contains a structure tree
-            if (tagged?.RootElement == null)
+            if (tagged == null)
             {
-                Console.WriteLine("The PDF is not tagged or has no structure tree.");
+                Console.WriteLine("The document is not tagged.");
                 return;
             }
 
-            // Start traversal from the root element
+            // Root of the structure tree (no cast needed)
             StructureElement root = tagged.RootElement;
+
+            // Collect text from all structure elements
+            StringBuilder sb = new StringBuilder();
+            TraverseStructure(root, sb);
+
+            // Output the extracted text
             Console.WriteLine("Extracted text from the structure tree:");
-            TraverseStructure(root, 0);
+            Console.WriteLine(sb.ToString());
         }
     }
 
-    // Recursively walk the structure tree and output text from each element
-    static void TraverseStructure(StructureElement element, int depth)
+    // Recursively walk the structure tree and gather ActualText
+    static void TraverseStructure(StructureElement element, StringBuilder sb)
     {
-        string indent = new string(' ', depth * 2);
-
-        // Prefer ActualText; fall back to AlternativeText if ActualText is empty
-        string text = element.ActualText ?? element.AlternativeText ?? string.Empty;
-
-        if (!string.IsNullOrWhiteSpace(text))
+        // Append the element's text if present
+        if (!string.IsNullOrEmpty(element.ActualText))
         {
-            Console.WriteLine($"{indent}{element.GetType().Name}: {text}");
+            sb.AppendLine(element.ActualText);
         }
 
-        // Process child elements
+        // Iterate over child elements (ElementList) using ChildElements
         foreach (Element child in element.ChildElements)
         {
-            if (child is StructureElement childStruct)
+            if (child is StructureElement childStructure)
             {
-                TraverseStructure(childStruct, depth + 1);
+                TraverseStructure(childStructure, sb);
             }
         }
     }

@@ -6,12 +6,12 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputDir = "SplitPages";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
@@ -21,35 +21,31 @@ class Program
         try
         {
             // Load the source PDF
-            using (Document sourceDoc = new Document(inputPdf))
+            using (Document srcDoc = new Document(inputPath))
             {
-                int pageCount = sourceDoc.Pages.Count; // Pages are 1‑based
+                int pageCount = srcDoc.Pages.Count;
 
+                // Iterate over each page, copy it into a new document and save
                 for (int i = 1; i <= pageCount; i++)
                 {
-                    // Create a new PDF document for the single page
-                    using (Document singlePageDoc = new Document())
-                    {
-                        // Add the i‑th page from the source document
-                        // Pages.Add copies the page into the target document
-                        singlePageDoc.Pages.Add(sourceDoc.Pages[i]);
+                    // Create a new empty document
+                    Document pageDoc = new Document();
 
-                        // Build the output file name, e.g., "page_1.pdf"
-                        string outPath = Path.Combine(outputDir, $"page_{i}.pdf");
+                    // Add the current page from the source document to the new document
+                    // The Add method clones the page, so resources are copied correctly
+                    pageDoc.Pages.Add(srcDoc.Pages[i]);
 
-                        // Save the single‑page PDF
-                        singlePageDoc.Save(outPath);
-
-                        Console.WriteLine($"Saved page {i} → {outPath}");
-                    }
+                    string outPath = Path.Combine(outputDir, $"Page_{i}.pdf");
+                    pageDoc.Save(outPath);
+                    pageDoc.Dispose();
                 }
             }
 
-            Console.WriteLine("PDF splitting completed successfully.");
+            Console.WriteLine("PDF split into individual pages successfully.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during splitting: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

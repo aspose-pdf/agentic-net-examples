@@ -1,63 +1,64 @@
 using System;
 using System.Data;
-using System.IO;
 using System.Runtime.InteropServices;
-using Aspose.Pdf;                     // Core Aspose.Pdf namespace
-using Aspose.Pdf.Text;               // For text related classes if needed
+using Aspose.Pdf;
+using Aspose.Pdf.Text;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        // Prepare sample data in a DataTable
+        // Prepare in‑memory data
         DataTable dt = new DataTable("Sample");
         dt.Columns.Add("ID", typeof(int));
         dt.Columns.Add("Name", typeof(string));
-        dt.Columns.Add("Quantity", typeof(int));
+        dt.Columns.Add("Price", typeof(decimal));
 
-        dt.Rows.Add(1, "Apples", 10);
-        dt.Rows.Add(2, "Bananas", 20);
-        dt.Rows.Add(3, "Cherries", 15);
+        dt.Rows.Add(1, "Apple", 0.99m);
+        dt.Rows.Add(2, "Banana", 0.59m);
+        dt.Rows.Add(3, "Cherry", 2.49m);
 
-        const string outputPath = "DataTableExport.pdf";
-
-        // Create a PDF document and add a page
+        // Create a PDF document
         using (Document doc = new Document())
         {
+            // Add a page
             Page page = doc.Pages.Add();
 
-            // Create a Table and configure basic appearance
+            // Create a table and set its position
             Table table = new Table
             {
-                // Define column widths (space‑separated values)
-                ColumnWidths = "100 200 100",
-                // Optional: set a border for the whole table
-                Border = new BorderInfo(BorderSide.All, 0.5f)
+                // Position the table on the page (coordinates in points)
+                Left = 50,
+                Top = 700,
+                // Optional visual styling – colour settings are applied only on Windows to avoid GDI+ issues on other OSes
+                Border = GetBorderInfo(BorderSide.All, 0.5f),
+                DefaultCellBorder = GetBorderInfo(BorderSide.All, 0.5f),
+                DefaultCellPadding = new MarginInfo(5, 5, 5, 5)
             };
 
+            // Define column widths (optional)
+            table.ColumnWidths = "100 150 100";
+
             // Import the DataTable into the Aspose.Pdf.Table
-            // Parameters:
-            //   dt                – source DataTable
-            //   true              – import column names as the first row
-            //   0                 – start importing at the first row of the target table (zero‑based)
-            //   0                 – start importing at the first column of the target table (zero‑based)
+            // Parameters: source DataTable, import column names as first row,
+            // start at row 0, column 0 (zero‑based indices)
             table.ImportDataTable(dt, true, 0, 0);
 
-            // Add the populated table to the page
+            // Add the table to the page
             page.Paragraphs.Add(table);
 
-            // Save the document – guard against missing GDI+ on non‑Windows platforms
+            // Save the PDF – guard against missing libgdiplus on non‑Windows platforms
+            string outputPath = "DataTableExport.pdf";
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 doc.Save(outputPath);
-                Console.WriteLine($"PDF saved to '{outputPath}'.");
             }
             else
             {
                 try
                 {
                     doc.Save(outputPath);
-                    Console.WriteLine($"PDF saved to '{outputPath}'.");
                 }
                 catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
                 {
@@ -65,10 +66,27 @@ class Program
                 }
             }
         }
+
+        Console.WriteLine("PDF generation completed.");
+    }
+
+    // Helper to create BorderInfo – colour is set via constructor only on Windows
+    private static BorderInfo GetBorderInfo(BorderSide side, float width)
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            // Aspose.Pdf.Color is used for border colour
+            return new BorderInfo(side, width, Aspose.Pdf.Color.Black);
+        }
+        else
+        {
+            // On non‑Windows platforms we omit the colour argument
+            return new BorderInfo(side, width);
+        }
     }
 
     // Helper to detect a nested DllNotFoundException (e.g., missing libgdiplus)
-    private static bool ContainsDllNotFound(Exception ex)
+    private static bool ContainsDllNotFound(Exception? ex)
     {
         while (ex != null)
         {

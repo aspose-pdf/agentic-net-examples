@@ -1,62 +1,61 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string firstPdfPath  = "first.pdf";   // PDF to annotate
-        const string secondPdfPath = "second.pdf";  // PDF to merge after the first
-        const string editedPdfPath = "first_annotated.pdf";
-        const string outputPdfPath = "merged_output.pdf";
+        const string firstInputPath  = "first.pdf";          // PDF to annotate
+        const string secondInputPath = "second.pdf";         // PDF to merge
+        const string tempAnnotated   = "first_annotated.pdf";// Temp file after annotation
+        const string outputPath      = "merged_output.pdf"; // Final merged PDF
 
         // Verify input files exist
-        if (!File.Exists(firstPdfPath))
+        if (!File.Exists(firstInputPath) || !File.Exists(secondInputPath))
         {
-            Console.Error.WriteLine($"File not found: {firstPdfPath}");
-            return;
-        }
-        if (!File.Exists(secondPdfPath))
-        {
-            Console.Error.WriteLine($"File not found: {secondPdfPath}");
+            Console.Error.WriteLine("One or more input files are missing.");
             return;
         }
 
-        // -------------------------------------------------
-        // Step 1: Add a text annotation to the first PDF
-        // -------------------------------------------------
-        PdfContentEditor annotationEditor = new PdfContentEditor();
-        annotationEditor.BindPdf(firstPdfPath);
-
-        // Create a text annotation on page 1
-        // System.Drawing.Rectangle is required for the geometry
-        annotationEditor.CreateText(
-            new System.Drawing.Rectangle(100, 500, 300, 550), // left, top, width, height
-            "Note",                                          // title
-            "This PDF has been annotated.",                  // contents
-            true,                                            // open by default
-            "Note",                                          // icon name
-            1);                                              // page number (1‑based)
-
-        // Save the annotated PDF to a temporary file
-        annotationEditor.Save(editedPdfPath);
-        annotationEditor.Close();
-
-        // -------------------------------------------------
-        // Step 2: Merge the second PDF after the annotated PDF
-        // -------------------------------------------------
-        using (Document target = new Document(editedPdfPath))
-        using (Document source = new Document(secondPdfPath))
+        // ------------------------------------------------------------
+        // Step 1: Open the first PDF, add a text annotation, save it.
+        // ------------------------------------------------------------
+        using (Document doc = new Document(firstInputPath))
         {
-            // Append all pages from the source document
-            target.Pages.Add(source.Pages);
+            // Define annotation rectangle (left, bottom, right, top)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Save the combined document
-            target.Save(outputPdfPath);
+            // Create a TextAnnotation on the first page
+            TextAnnotation annotation = new TextAnnotation(doc.Pages[1], rect)
+            {
+                Title    = "Note",
+                Contents = "Added via Aspose.Pdf",
+                Color    = Aspose.Pdf.Color.Yellow,
+                Open     = true,
+                Icon     = TextIcon.Note
+            };
+
+            // Add the annotation to the page
+            doc.Pages[1].Annotations.Add(annotation);
+
+            // Save the annotated document to a temporary file
+            doc.Save(tempAnnotated);
         }
 
-        Console.WriteLine($"Merged PDF saved to '{outputPdfPath}'.");
+        // ------------------------------------------------------------
+        // Step 2: Merge the annotated first PDF with the second PDF.
+        // ------------------------------------------------------------
+        PdfFileEditor pdfEditor = new PdfFileEditor();
+
+        // Concatenate the two PDFs: first (annotated) + second => outputPath
+        // The method returns a bool indicating success; we ignore it here.
+        pdfEditor.Concatenate(tempAnnotated, secondInputPath, outputPath);
+
+        // No explicit Close needed; PdfFileEditor does not implement IDisposable.
+
+        Console.WriteLine($"Merged PDF saved to '{outputPath}'.");
     }
 }

@@ -7,45 +7,52 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";          // source PDF
-        const string outputPath = "booklet_output.pdf"; // final booklet PDF
+        const string inputPath  = "input.pdf";          // Original PDF
+        const string tempPath   = "temp_landscape.pdf"; // Intermediate rotated PDF
+        const string outputPath = "booklet.pdf";        // Final booklet
 
+        // Verify the input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Rotate all pages to landscape orientation and keep the same page size (A4)
-        using (MemoryStream rotatedStream = new MemoryStream())
+        // ------------------------------------------------------------
+        // Step 1: Rotate all pages to landscape orientation
+        // ------------------------------------------------------------
+        // Load the source PDF inside a using block (document disposal rule)
+        using (Document doc = new Document(inputPath))
         {
-            using (Document doc = new Document(inputPath))               // load PDF
-            {
-                using (PdfPageEditor pageEditor = new PdfPageEditor())   // facade for page editing
-                {
-                    pageEditor.BindPdf(doc);                             // bind the document
-                    pageEditor.PageSize = PageSize.A4;                    // set target page size
-                    pageEditor.Rotation = 90;                            // rotate 90° to make landscape
-                    pageEditor.ApplyChanges();                           // apply rotation to all pages
-                    pageEditor.Save(rotatedStream);                      // save rotated PDF to memory
-                }
-            }
+            // Create a PdfPageEditor facade and bind the loaded document
+            PdfPageEditor editor = new PdfPageEditor();
+            editor.BindPdf(doc);
 
-            // Reset stream position before reading
-            rotatedStream.Position = 0;
+            // Set the desired page size (A4) – rotation will make it landscape
+            editor.PageSize = PageSize.A4;
 
-            // Create booklet from the rotated PDF (PdfFileEditor does NOT implement IDisposable)
-            PdfFileEditor fileEditor = new PdfFileEditor();
-            using (MemoryStream bookletStream = new MemoryStream())
-            {
-                // MakeBooklet overload that works with streams
-                fileEditor.MakeBooklet(rotatedStream, bookletStream);
+            // Rotate every page 90 degrees clockwise to achieve landscape layout
+            editor.Rotation = 90;
 
-                // Write the resulting booklet to the output file
-                File.WriteAllBytes(outputPath, bookletStream.ToArray());
-            }
+            // Apply the changes and save to a temporary file
+            editor.ApplyChanges();
+            editor.Save(tempPath);
+            editor.Close(); // Dispose the facade resources
         }
 
-        Console.WriteLine($"Booklet created successfully at '{outputPath}'.");
+        // ------------------------------------------------------------
+        // Step 2: Generate a booklet from the rotated PDF
+        // ------------------------------------------------------------
+        PdfFileEditor pfe = new PdfFileEditor();
+        bool success = pfe.MakeBooklet(tempPath, outputPath);
+
+        if (success)
+        {
+            Console.WriteLine($"Booklet created successfully: {outputPath}");
+        }
+        else
+        {
+            Console.Error.WriteLine("Failed to create booklet.");
+        }
     }
 }

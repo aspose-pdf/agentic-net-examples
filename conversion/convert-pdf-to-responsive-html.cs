@@ -1,87 +1,77 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 
-class PdfToResponsiveHtml
+class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string pdfPath      = "input.pdf";
-        const string htmlPath     = "output.html";
-        const string cssPath      = "responsive.css";   // Existing mobile‑friendly stylesheet
-        const string tempHtmlPath = "temp_output.html";
+        // Input PDF path
+        const string inputPdf = "input.pdf";
+        // Output HTML path
+        const string outputHtml = "output.html";
+        // Path to the responsive CSS file that will be linked from the HTML
+        const string cssFile = "responsive.css";
 
-        if (!File.Exists(pdfPath))
+        // Verify input PDF exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        if (!File.Exists(cssPath))
+        // Ensure a responsive CSS file exists; create a simple one if missing
+        if (!File.Exists(cssFile))
         {
-            Console.Error.WriteLine($"CSS not found: {cssPath}");
-            return;
+            File.WriteAllText(cssFile,
+@"/* Simple responsive CSS */
+body { margin:0; padding:0; font-family:Arial,Helvetica,sans-serif; }
+img { max-width:100%; height:auto; }
+@media only screen and (max-width:600px) {
+    .content { padding:10px; }
+}");
         }
 
-        try
+        // Convert PDF to HTML using HtmlSaveOptions (required explicit options)
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // ---------- Convert PDF → HTML ----------
-            using (Document pdfDoc = new Document(pdfPath))
-            {
-                // HtmlSaveOptions must be supplied – otherwise Save() writes PDF.
-                HtmlSaveOptions htmlOpts = new HtmlSaveOptions
-                {
-                    // Use embedded PNG images wrapped in SVG (cross‑platform friendly)
-                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg,
-                    // Generate a single HTML file (easier to inject CSS)
-                    SplitIntoPages = false,
-                    // Optional: make layout flow so pages adapt to screen width
-                    FixedLayout = false,
-                    // Optional: enable responsive flow of pages based on viewer size
-                    PagesFlowTypeDependsOnViewersScreenSize = true
-                };
+            HtmlSaveOptions htmlOpts = new HtmlSaveOptions();
 
-                // Save to a temporary HTML file first
-                pdfDoc.Save(tempHtmlPath, htmlOpts);
-            }
+            // Use flow layout (FixedLayout = false) for better responsiveness
+            htmlOpts.FixedLayout = false;
 
-            // ---------- Inject responsive CSS ----------
-            // Read the generated HTML
-            string htmlContent = File.ReadAllText(tempHtmlPath);
+            // Embed raster images as PNG inside SVG to keep a single HTML file
+            htmlOpts.RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg;
 
-            // Prepare the <link> tag for the stylesheet
-            string cssLinkTag = $"<link rel=\"stylesheet\" type=\"text/css\" href=\"{Path.GetFileName(cssPath)}\" />";
+            // Optional: set a page title
+            htmlOpts.Title = "Converted HTML";
 
-            // Insert the <link> just before the closing </head> tag.
-            // If </head> is not found, prepend the link at the start of the file.
+            // Save the HTML file
+            pdfDoc.Save(outputHtml, htmlOpts);
+        }
+
+        // After conversion, inject a <link> tag that references the responsive CSS
+        if (File.Exists(outputHtml))
+        {
+            string htmlContent = File.ReadAllText(outputHtml);
+            string linkTag = $"<link rel=\"stylesheet\" type=\"text/css\" href=\"{Path.GetFileName(cssFile)}\" />{Environment.NewLine}";
+
+            // Insert the link before the closing </head> tag (case‑insensitive search)
             int headCloseIdx = htmlContent.IndexOf("</head>", StringComparison.OrdinalIgnoreCase);
             if (headCloseIdx >= 0)
             {
-                htmlContent = htmlContent.Insert(headCloseIdx, cssLinkTag + Environment.NewLine);
+                htmlContent = htmlContent.Insert(headCloseIdx, linkTag);
+                File.WriteAllText(outputHtml, htmlContent);
+                Console.WriteLine($"HTML saved to '{outputHtml}' with responsive CSS linked.");
             }
             else
             {
-                htmlContent = cssLinkTag + Environment.NewLine + htmlContent;
+                Console.Error.WriteLine("Unable to locate </head> tag in the generated HTML.");
             }
-
-            // Write the final HTML with the CSS reference
-            File.WriteAllText(htmlPath, htmlContent);
-
-            // Clean up the temporary file
-            File.Delete(tempHtmlPath);
-
-            Console.WriteLine($"PDF successfully converted to responsive HTML: {htmlPath}");
         }
-        catch (TypeInitializationException)
+        else
         {
-            // HTML conversion relies on GDI+ and is Windows‑only.
-            Console.Error.WriteLine("HTML conversion requires Windows (GDI+). Operation skipped on this platform.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine("HTML conversion failed; output file not found.");
         }
     }
 }

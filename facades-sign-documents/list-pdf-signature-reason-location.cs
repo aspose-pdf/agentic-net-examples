@@ -1,42 +1,44 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf; // for SignatureName type
 
-class Program
+class SignatureAudit
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
 
-        // Verify the input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // PdfFileSignature implements IDisposable, so use a using block
+        // Bind the PDF to the PdfFileSignature facade
         using (PdfFileSignature pdfSign = new PdfFileSignature())
         {
-            // Load the PDF document for signature inspection
             pdfSign.BindPdf(inputPath);
 
             // Get all non‑empty signature names
-            var signatureNames = pdfSign.GetSignatureNames();
+            IList<SignatureName> names = pdfSign.GetSignatureNames();
 
-            // Iterate through each signature and output its reason and location
-            for (int i = 0; i < signatureNames.Count; i++)
+            if (names == null || names.Count == 0)
             {
-                SignatureName sigName = signatureNames[i];
+                Console.WriteLine("No signatures found.");
+                return;
+            }
 
-                // Retrieve metadata for the current signature
-                string reason   = pdfSign.GetReason(sigName);
+            Console.WriteLine("Signature audit:");
+            foreach (SignatureName sigName in names)
+            {
+                // Retrieve reason and location for each signature
+                string reason = pdfSign.GetReason(sigName);
                 string location = pdfSign.GetLocation(sigName);
 
-                // Output the information
-                Console.WriteLine($"Signature: {sigName}");
-                Console.WriteLine($"  Reason  : {reason}");
+                Console.WriteLine($"- Name: {sigName}");
+                Console.WriteLine($"  Reason: {reason}");
                 Console.WriteLine($"  Location: {location}");
             }
         }

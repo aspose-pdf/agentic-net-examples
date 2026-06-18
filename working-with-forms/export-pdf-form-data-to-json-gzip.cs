@@ -13,34 +13,37 @@ class Program
 
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        try
+        // Open the PDF document (lifecycle rule: use using for disposal)
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Load the PDF document
-            using (Document pdfDoc = new Document(inputPdfPath))
-            // Create the output file stream
-            using (FileStream fileStream = new FileStream(outputGzipPath, FileMode.Create, FileAccess.Write))
-            // Wrap the file stream with GZip compression
-            using (GZipStream gzipStream = new GZipStream(fileStream, CompressionLevel.Optimal))
+            // Prepare JSON export options (optional: indented output)
+            ExportFieldsToJsonOptions jsonOptions = new ExportFieldsToJsonOptions
             {
-                // Optional: configure JSON export options (e.g., no indentation for smaller size)
-                ExportFieldsToJsonOptions jsonOptions = new ExportFieldsToJsonOptions
+                WriteIndented = true
+            };
+
+            // Export form fields to a memory stream as JSON
+            using (MemoryStream jsonStream = new MemoryStream())
+            {
+                // Export form fields (Form.ExportToJson writes JSON to the provided stream)
+                doc.Form.ExportToJson(jsonStream, jsonOptions);
+
+                // Reset stream position before reading
+                jsonStream.Position = 0;
+
+                // Create the output GZip file and compress the JSON data
+                using (FileStream fileStream = new FileStream(outputGzipPath, FileMode.Create, FileAccess.Write))
+                using (GZipStream gzipStream = new GZipStream(fileStream, CompressionLevel.Optimal))
                 {
-                    WriteIndented = false
-                };
-
-                // Export all form fields to JSON directly into the compressed stream
-                pdfDoc.Form.ExportToJson(gzipStream, jsonOptions);
+                    jsonStream.CopyTo(gzipStream);
+                }
             }
+        }
 
-            Console.WriteLine($"Form data exported and compressed to '{outputGzipPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"Form data exported and compressed to '{outputGzipPath}'.");
     }
 }

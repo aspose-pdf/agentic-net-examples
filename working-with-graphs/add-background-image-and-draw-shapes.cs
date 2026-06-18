@@ -7,78 +7,71 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string bgImagePath = "background.jpg";
+        const string outputPath = "graph_with_background.pdf";
+        const string backgroundImagePath = "background.png";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(backgroundImagePath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
-            return;
-        }
-        if (!File.Exists(bgImagePath))
-        {
-            Console.Error.WriteLine($"Background image not found: {bgImagePath}");
+            Console.Error.WriteLine($"Background image not found: {backgroundImagePath}");
             return;
         }
 
-        // Load the existing PDF document
-        using (Document doc = new Document(inputPath))
+        using (Document doc = new Document())
         {
-            // Work with the first page (Aspose.Pdf uses 1‑based indexing)
-            Page page = doc.Pages[1];
+            Page page = doc.Pages.Add();
 
-            // Apply a background image to the page (drawn behind all other content)
-            Aspose.Pdf.Image bg = new Aspose.Pdf.Image();
-            bg.File = bgImagePath;
-            page.BackgroundImage = bg;
+            // ---------- 1. Set the page background image ----------
+            // Use Aspose.Pdf.Image (not Aspose.Pdf.Drawing.Image) for page background
+            Aspose.Pdf.Image bgImg = new Aspose.Pdf.Image { File = backgroundImagePath };
+            page.BackgroundImage = bgImg;
 
-            // Create a graph that spans the whole page
-            double pageWidth = page.PageInfo.Width;
-            double pageHeight = page.PageInfo.Height;
-            Graph graph = new Graph(pageWidth, pageHeight)
+            // ---------- 2. Create a Graph (graphics container) ----------
+            const double graphWidth = 400.0;   // points
+            const double graphHeight = 200.0;  // points
+            Graph graph = new Graph(graphWidth, graphHeight)
             {
-                // Ensure the graph is rendered above the background image
-                ZIndex = 1
+                Left = 100.0,   // points from the left edge
+                Top = 400.0     // points from the bottom edge
             };
 
-            // Add a rectangle shape on top of the background
-            Aspose.Pdf.Drawing.Rectangle rectShape = new Aspose.Pdf.Drawing.Rectangle(100, 500, 200, 100);
-            rectShape.GraphInfo = new GraphInfo
+            // ---------- 3. Add shapes to the graph (use fully‑qualified types) ----------
+            // Rectangle
+            var rect = new Aspose.Pdf.Drawing.Rectangle(0f, 0f, 150f, 80f);
+            rect.GraphInfo = new GraphInfo
             {
                 FillColor = Aspose.Pdf.Color.LightGray,
                 Color = Aspose.Pdf.Color.Black,
-                LineWidth = 2
+                LineWidth = 2f
             };
-            graph.Shapes.Add(rectShape);
+            graph.Shapes.Add(rect);
 
-            // Add an ellipse shape on top of the background
-            Aspose.Pdf.Drawing.Ellipse ellipse = new Aspose.Pdf.Drawing.Ellipse(300, 500, 150, 100);
+            // Line
+            float[] linePoints = { 160f, 0f, 300f, 80f };
+            var line = new Aspose.Pdf.Drawing.Line(linePoints);
+            line.GraphInfo = new GraphInfo
+            {
+                Color = Aspose.Pdf.Color.Red,
+                LineWidth = 2f
+            };
+            graph.Shapes.Add(line);
+
+            // Ellipse
+            var ellipse = new Aspose.Pdf.Drawing.Ellipse(0f, 100f, 120f, 80f);
             ellipse.GraphInfo = new GraphInfo
             {
                 FillColor = Aspose.Pdf.Color.Yellow,
-                Color = Aspose.Pdf.Color.Red,
+                Color = Aspose.Pdf.Color.DarkBlue,
                 LineWidth = 1.5f
             };
             graph.Shapes.Add(ellipse);
 
-            // Add a line shape on top of the background
-            float[] linePoints = { 50, 700, 400, 750 };
-            Aspose.Pdf.Drawing.Line line = new Aspose.Pdf.Drawing.Line(linePoints);
-            line.GraphInfo = new GraphInfo
-            {
-                Color = Aspose.Pdf.Color.Blue,
-                LineWidth = 2
-            };
-            graph.Shapes.Add(line);
-
-            // Insert the graph into the page's content (shapes will appear over the background image)
+            // ---------- 4. Add the graph to the page (shapes render over background) ----------
             page.Paragraphs.Add(graph);
 
-            // Save the modified PDF
+            // Save the document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with background image and shapes saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

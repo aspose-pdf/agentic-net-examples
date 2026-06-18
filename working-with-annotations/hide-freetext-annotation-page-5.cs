@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,44 +16,36 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the existing PDF
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least five pages
+            // Verify that page 5 exists (pages are 1‑based)
             if (doc.Pages.Count < 5)
             {
-                Console.Error.WriteLine("The document does not contain a page 5.");
+                Console.Error.WriteLine("The document has fewer than 5 pages.");
                 return;
             }
 
-            // Get page five (1‑based indexing)
-            Page pageFive = doc.Pages[5];
+            Page page5 = doc.Pages[5];
 
-            // Locate the first FreeTextAnnotation on page five
-            FreeTextAnnotation freeText = null;
-            foreach (Annotation ann in pageFive.Annotations)
+            // Scan all annotations on page 5
+            for (int i = 1; i <= page5.Annotations.Count; i++)
             {
-                if (ann is FreeTextAnnotation fta)
+                Annotation ann = page5.Annotations[i];
+
+                // Target only FreeTextAnnotation instances
+                if (ann is FreeTextAnnotation freeText)
                 {
-                    freeText = fta;
-                    break;
+                    // Attach a HideAction that marks the annotation as hidden
+                    // The second parameter (true) sets the hidden flag
+                    freeText.Actions.Add(new HideAction(freeText, true));
                 }
             }
-
-            if (freeText == null)
-            {
-                Console.Error.WriteLine("No FreeTextAnnotation found on page 5.");
-                return;
-            }
-
-            // Add a HideAction to make the annotation invisible while keeping its data
-            // The second parameter 'true' sets the annotation to hidden.
-            freeText.Actions.Add(new HideAction(freeText, true));
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"FreeTextAnnotation on page 5 has been hidden. Saved to '{outputPath}'.");
+        Console.WriteLine($"Free‑text annotation on page 5 hidden; output saved to '{outputPath}'.");
     }
 }

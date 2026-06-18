@@ -1,30 +1,28 @@
 using System;
+using System.IO;
 using Aspose.Pdf.Facades;
 
-namespace AsposePdfApi
+class Program
 {
-    class Program
+    static void Main()
     {
-        static void Main()
+        const string pdfPath = "input.pdf";
+
+        // Verify the PDF file exists before attempting to read metadata.
+        if (!File.Exists(pdfPath))
         {
-            const string inputPath = "sample.pdf";
+            Console.Error.WriteLine($"File not found: {pdfPath}");
+            return;
+        }
 
-            // Verify that the PDF file exists before attempting to read its metadata.
-            if (!System.IO.File.Exists(inputPath))
-            {
-                Console.Error.WriteLine($"File not found: {inputPath}");
-                return;
-            }
+        // PdfFileInfo implements IDisposable, so wrap it in a using block.
+        using (PdfFileInfo fileInfo = new PdfFileInfo(pdfPath))
+        {
+            // The Author property provides the author metadata of the PDF.
+            string author = fileInfo.Author;
 
-            // PdfFileInfo implements IDisposable (via SaveableFacade), so we wrap it in a using block.
-            using (PdfFileInfo info = new PdfFileInfo(inputPath))
-            {
-                // Retrieve the Author metadata; if it is not set, display a placeholder.
-                string author = info.Author ?? "(no author set)";
-
-                // Output the author information to the console.
-                Console.WriteLine($"Author: {author}");
-            }
+            // Output the author to the console. If the property is empty, an empty line is printed.
+            Console.WriteLine($"Author: {author}");
         }
     }
 }

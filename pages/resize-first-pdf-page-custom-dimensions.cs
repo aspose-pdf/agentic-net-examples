@@ -6,25 +6,26 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
+        // Verify the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Open the PDF document (lifecycle rule: use using)
+        // Load the PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based (global rule)
+            // Aspose.Pdf uses 1‑based page indexing (rule: page-indexing-one-based)
             Page firstPage = doc.Pages[1];
 
-            // Change the size of the first page to 500 × 700 points
+            // Change the first page size to 500 × 700 points
             firstPage.SetPageSize(500, 700);
 
-            // Save the modified document (lifecycle rule)
+            // Save the modified document (PDF format)
             doc.Save(outputPath);
         }
 

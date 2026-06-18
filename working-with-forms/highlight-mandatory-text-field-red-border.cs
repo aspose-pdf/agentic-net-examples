@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -10,7 +9,7 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName  = "MandatoryField"; // name of the text field to highlight
+        const string fieldName  = "MandatoryField"; // replace with the actual field name
 
         if (!File.Exists(inputPath))
         {
@@ -21,23 +20,19 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the text field by its name (case‑sensitive)
+            // Retrieve the text field from the form collection
             TextBoxField txtField = doc.Form[fieldName] as TextBoxField;
             if (txtField == null)
             {
                 Console.Error.WriteLine($"Text field '{fieldName}' not found.");
-                return;
+            }
+            else
+            {
+                // Change the border (annotation) color to red to highlight the field
+                txtField.Color = Aspose.Pdf.Color.Red;
             }
 
-            // Set the border (annotation) color to red.
-            // The Border class requires the parent annotation in its constructor,
-            // but the actual border color is controlled by the annotation's Color property.
-            txtField.Color = Aspose.Pdf.Color.Red;
-
-            // Optionally adjust border width (default is 1). This demonstrates creating a Border object.
-            // txtField.Border = new Border(txtField) { Width = 2 };
-
-            // Save the modified PDF
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 

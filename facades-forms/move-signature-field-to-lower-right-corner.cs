@@ -1,54 +1,57 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";   // source PDF containing the "Signature" field
-        const string outputPdf = "output.pdf";  // PDF after moving the field
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Typical A4 page size in points: 595 (width) x 842 (height)
-        // Desired field size: 150 x 50 points
-        // Place it in the lower‑right corner with a 20‑point margin
-        float pageWidth = 595f;
-        float margin    = 20f;
-        float fieldWidth  = 150f;
-        float fieldHeight = 50f;
+        // Load the PDF document
+        Document doc = new Document(inputPath);
 
-        float llx = pageWidth - fieldWidth - margin; // lower‑left X
-        float lly = margin;                         // lower‑left Y
-        float urx = pageWidth - margin;             // upper‑right X
-        float ury = margin + fieldHeight;           // upper‑right Y
-
-        // FormEditor works with AcroForm fields. It does not implement IDisposable,
-        // so we just instantiate it, perform the move, and save the result.
-        FormEditor formEditor = new FormEditor(inputPdf, outputPdf);
-        try
+        // Ensure the document has at least 5 pages (1‑based indexing)
+        if (doc.Pages.Count < 5)
         {
-            // Move the field named "Signature" on page 5 to the calculated rectangle.
-            // Page numbers are 1‑based.
+            Console.Error.WriteLine("Document does not contain page 5.");
+            return;
+        }
+
+        Page page5 = doc.Pages[5];
+
+        // Desired size of the signature field (in points)
+        const float fieldWidth = 150f; // width
+        const float fieldHeight = 50f; // height
+
+        // Position the field in the lower‑right corner with a 20‑point margin
+        // page5.PageInfo.Width is double, so cast to float after the calculation
+        float llx = (float)(page5.PageInfo.Width - fieldWidth - 20f); // lower‑left X
+        float lly = 20f;                                            // lower‑left Y
+        float urx = llx + fieldWidth;                               // upper‑right X
+        float ury = lly + fieldHeight;                              // upper‑right Y
+
+        // Use the non‑obsolete FormEditor constructor that works with a Document instance
+        using (FormEditor formEditor = new FormEditor(doc))
+        {
             bool moved = formEditor.MoveField("Signature", llx, lly, urx, ury);
             if (!moved)
             {
-                Console.Error.WriteLine("Failed to move the field. Verify that the field name exists.");
+                Console.Error.WriteLine("Failed to move the field. Verify the field name exists.");
             }
 
-            // Persist changes to the output file.
-            formEditor.Save();
-            Console.WriteLine($"Field \"Signature\" moved and saved to '{outputPdf}'.");
+            // Save the changes to the specified output file (non‑obsolete overload)
+            formEditor.Save(outputPath);
         }
-        finally
-        {
-            // FormEditor does not require explicit disposal, but we close it to release resources.
-            formEditor.Close();
-        }
+
+        Console.WriteLine($"Signature field repositioned and saved to '{outputPath}'.");
     }
 }

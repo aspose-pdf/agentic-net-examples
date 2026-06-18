@@ -7,9 +7,8 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "flattened.pdf";
+        const string outputPath = "flattened_output.pdf";
 
-        // Ensure the input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
@@ -26,21 +25,25 @@ class Program
         // Flatten all annotations in the document
         editor.FlatteningAnnotations();
 
-        // Save the flattened PDF
+        // Save the flattened document
         editor.Save(outputPath);
-        editor.Close(); // Release resources held by the facade
+
+        // Release resources held by the editor
+        editor.Close();
+        editor.Dispose();
 
         // Record new file size
         long newSize = new FileInfo(outputPath).Length;
 
-        // Calculate and log size reduction
+        // Calculate reduction
         long reductionBytes = originalSize - newSize;
         double reductionPercent = originalSize > 0
-            ? (double)reductionBytes * 100.0 / originalSize
-            : 0.0;
+            ? (double)reductionBytes / originalSize * 100
+            : 0;
 
-        Console.WriteLine($"Original size: {originalSize} bytes");
-        Console.WriteLine($"Flattened size: {newSize} bytes");
-        Console.WriteLine($"Size reduced by: {reductionBytes} bytes ({reductionPercent:0.##}%)");
+        // Log the results
+        Console.WriteLine($"Original size: {originalSize:N0} bytes");
+        Console.WriteLine($"Flattened size: {newSize:N0} bytes");
+        Console.WriteLine($"Size reduction: {reductionBytes:N0} bytes ({reductionPercent:F2}%)");
     }
 }

@@ -1,39 +1,40 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "PaymentMethodForm.pdf";
+        const string outputPath = "payment_form.pdf";
 
-        // Create a new PDF document and add a page.
+        // Create a new PDF document
         using (Document doc = new Document())
         {
+            // Add a blank page (1‑based indexing)
             Page page = doc.Pages.Add();
 
-            // Define rectangles for the two radio button options.
-            // Rectangle(left, bottom, right, top)
-            Rectangle creditRect = new Rectangle(100, 700, 120, 720);
-            Rectangle debitRect  = new Rectangle(100, 660, 120, 680);
+            // Create a radio button field on the page
+            RadioButtonField paymentRadio = new RadioButtonField(page);
+            // Set the group name
+            paymentRadio.PartialName = "PaymentMethod";
 
-            // Create a radio button field bound to the page.
-            RadioButtonField paymentMethod = new RadioButtonField(page);
+            // Define rectangles for each option (coordinates in points)
+            Aspose.Pdf.Rectangle rectCredit = new Aspose.Pdf.Rectangle(100, 700, 120, 720);
+            Aspose.Pdf.Rectangle rectDebit  = new Aspose.Pdf.Rectangle(100, 660, 120, 680);
 
-            // Set the field name (group name) – this is the name used to identify the group.
-            paymentMethod.PartialName = "PaymentMethod";
-            paymentMethod.Name = "PaymentMethod";
+            // Add the two options to the group
+            paymentRadio.AddOption("Credit", rectCredit);
+            paymentRadio.AddOption("Debit",  rectDebit);
 
-            // Add the two options with their visual bounds.
-            paymentMethod.AddOption("Credit", creditRect);
-            paymentMethod.AddOption("Debit",  debitRect);
+            // Ensure exactly one option is selected at a time
+            paymentRadio.NoToggleToOff = true;
 
-            // Add the radio button field to the document's form collection.
-            doc.Form.Add(paymentMethod);
+            // Add the radio button field to the document's form collection
+            doc.Form.Add(paymentRadio);
 
-            // Save the PDF.
+            // Save the PDF
             doc.Save(outputPath);
         }
 

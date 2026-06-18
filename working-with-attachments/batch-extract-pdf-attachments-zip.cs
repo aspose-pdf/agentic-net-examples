@@ -2,91 +2,74 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 
-class BatchAttachmentExtractor
+class Program
 {
     static void Main()
     {
-        // Folder containing the source PDF files. Use a path that works on any OS.
-        // If the absolute Windows style path does not exist, fall back to a relative folder.
-        const string rawInputFolder = @"C:\InputPdfs"; // original intent
-        string inputFolder = Directory.Exists(rawInputFolder) ? rawInputFolder : Path.GetFullPath("InputPdfs");
-
-        // Path for the consolidated ZIP archive (also made OS‑agnostic)
-        const string rawOutputZipPath = @"C:\Output\attachments.zip";
-        string outputZipPath = Path.GetFullPath(
-            Directory.Exists(Path.GetDirectoryName(rawOutputZipPath) ?? string.Empty)
-                ? rawOutputZipPath
-                : Path.Combine("Output", "attachments.zip"));
-
-        // Ensure the output directory exists
-        string? outputDir = Path.GetDirectoryName(outputZipPath);
-        if (!string.IsNullOrEmpty(outputDir))
+        // Input PDF files – adjust the paths as needed
+        string[] pdfFiles = new string[]
         {
-            Directory.CreateDirectory(outputDir);
-        }
+            "Document1.pdf",
+            "Document2.pdf",
+            "Document3.pdf"
+        };
 
-        // Collect all PDF files in the input folder
-        if (!Directory.Exists(inputFolder))
-        {
-            Console.WriteLine($"Input folder does not exist: {inputFolder}");
-            return;
-        }
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-        if (pdfFiles.Length == 0)
-        {
-            Console.WriteLine("No PDF files found in the specified folder.");
-            return;
-        }
+        // Output ZIP archive that will contain all extracted attachments
+        const string outputZipPath = "AllAttachments.zip";
 
-        // Create the ZIP archive (overwrite if it already exists)
-        using (FileStream zipStream = new FileStream(outputZipPath, FileMode.Create))
-        using (ZipArchive zip = new ZipArchive(zipStream, ZipArchiveMode.Create))
+        // Create (or overwrite) the ZIP archive
+        using (FileStream zipStream = new FileStream(outputZipPath, FileMode.Create, FileAccess.Write))
+        using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Create))
         {
             foreach (string pdfPath in pdfFiles)
             {
-                // Open each PDF inside a using block for deterministic disposal
+                if (!File.Exists(pdfPath))
+                {
+                    Console.Error.WriteLine($"File not found: {pdfPath}");
+                    continue;
+                }
+
+                // Open the PDF document inside a using block for deterministic disposal
                 using (Document doc = new Document(pdfPath))
                 {
-                    // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-                    for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+                    // The EmbeddedFiles collection holds the attached files (FileSpecification objects)
+                    if (doc.EmbeddedFiles == null || doc.EmbeddedFiles.Count == 0)
                     {
-                        Page page = doc.Pages[pageIndex];
+                        Console.WriteLine($"No attachments found in: {pdfPath}");
+                        continue;
+                    }
 
-                        // Iterate through all annotations on the page
-                        for (int annIndex = 1; annIndex <= page.Annotations.Count; annIndex++)
+                    foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
+                    {
+                        // Ensure the file specification has a name and content stream
+                        if (string.IsNullOrEmpty(fileSpec.Name) || fileSpec.Contents == null)
+                            continue;
+
+                        // Create a unique entry name to avoid collisions between PDFs
+                        string safePdfName = Path.GetFileNameWithoutExtension(pdfPath);
+                        string entryName = $"{safePdfName}_{fileSpec.Name}";
+
+                        // Create a new entry in the ZIP archive
+                        ZipArchiveEntry zipEntry = archive.CreateEntry(entryName, CompressionLevel.Optimal);
+
+                        // Copy the attachment's content into the ZIP entry
+                        using (Stream entryStream = zipEntry.Open())
+                        using (Stream attachmentStream = fileSpec.Contents)
                         {
-                            Annotation ann = page.Annotations[annIndex];
+                            // Reset the attachment stream position in case it is not at the beginning
+                            if (attachmentStream.CanSeek)
+                                attachmentStream.Position = 0;
 
-                            // We're interested only in file attachment annotations
-                            if (ann is FileAttachmentAnnotation fileAnn && fileAnn.File != null)
-                            {
-                                FileSpecification fileSpec = fileAnn.File;
-
-                                // Determine a unique entry name inside the ZIP:
-                                // <pdf‑file‑name>/<attachment‑file‑name>
-                                string pdfBaseName = Path.GetFileNameWithoutExtension(pdfPath);
-                                string attachmentName = !string.IsNullOrEmpty(fileSpec.Name)
-                                    ? fileSpec.Name
-                                    : $"attachment_{Guid.NewGuid()}";
-                                string entryName = $"{pdfBaseName}/{attachmentName}";
-
-                                // Create a new entry in the ZIP archive
-                                ZipArchiveEntry entry = zip.CreateEntry(entryName, CompressionLevel.Optimal);
-                                using (Stream entryStream = entry.Open())
-                                using (Stream contentStream = fileSpec.Contents)
-                                {
-                                    // Copy the embedded file data directly into the ZIP entry
-                                    contentStream.CopyTo(entryStream);
-                                }
-                            }
+                            attachmentStream.CopyTo(entryStream);
                         }
+
+                        Console.WriteLine($"Extracted '{fileSpec.Name}' from '{pdfPath}' into archive.");
                     }
                 }
             }
         }
 
-        Console.WriteLine($"All attachments have been extracted to: {outputZipPath}");
+        Console.WriteLine($"All attachments have been consolidated into '{outputZipPath}'.");
     }
 }

@@ -6,88 +6,74 @@ using Aspose.Pdf.Annotations;
 
 class Program
 {
+    // Recursively creates outline items from XML elements.
+    static void AddOutlineItems(OutlineCollection outlineRoot, OutlineItemCollection parentItem, XElement xmlElement, Document pdfDoc, ref int pageIndex)
+    {
+        // Create a new outline entry for the current XML element.
+        var outlineItem = new OutlineItemCollection(outlineRoot)
+        {
+            Title = xmlElement.Name.LocalName,
+            // Assign a destination page (1‑based). If the PDF has fewer pages, the last page is used.
+            Action = new GoToAction(pdfDoc.Pages[Math.Min(pageIndex, pdfDoc.Pages.Count)])
+        };
+        // Increment page index for the next element.
+        pageIndex++;
+
+        // Attach the new item to its parent (or to the root collection if parentItem is null).
+        if (parentItem == null)
+        {
+            outlineRoot.Add(outlineItem);
+        }
+        else
+        {
+            parentItem.Add(outlineItem);
+        }
+
+        // Process child XML elements recursively.
+        foreach (var child in xmlElement.Elements())
+        {
+            AddOutlineItems(outlineRoot, outlineItem, child, pdfDoc, ref pageIndex);
+        }
+    }
+
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";   // PDF to which the outline will be added
-        const string xmlPath       = "structure.xml"; // XML describing the hierarchy
-        const string outputPdfPath = "output_with_outline.pdf";
+        const string pdfInputPath  = "input.pdf";   // Existing PDF to which the outline will be added
+        const string xmlInputPath  = "structure.xml"; // XML describing the hierarchical structure
+        const string pdfOutputPath = "output_with_outline.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfInputPath))
         {
-            Console.Error.WriteLine($"PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfInputPath}");
+            return;
+        }
+        if (!File.Exists(xmlInputPath))
+        {
+            Console.Error.WriteLine($"XML not found: {xmlInputPath}");
             return;
         }
 
-        if (!File.Exists(xmlPath))
+        // Load the XML that defines the hierarchy.
+        XDocument xmlDoc = XDocument.Load(xmlInputPath);
+        // Load the PDF document.
+        using (Document pdfDoc = new Document(pdfInputPath))
         {
-            Console.Error.WriteLine($"XML not found: {xmlPath}");
-            return;
-        }
+            // Ensure the document has an outline collection.
+            OutlineCollection outlines = pdfDoc.Outlines;
 
-        // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdfPath))
-        {
-            // Load the XML that defines the hierarchical structure
-            XDocument xmlDoc = XDocument.Load(xmlPath);
-            XElement rootElement = xmlDoc.Root;
-            if (rootElement == null)
+            // Start page numbering at 1.
+            int pageCounter = 1;
+
+            // For each top‑level XML element, create a corresponding top‑level bookmark.
+            foreach (var rootElement in xmlDoc.Root.Elements())
             {
-                Console.Error.WriteLine("XML does not contain a root element.");
-                return;
+                AddOutlineItems(outlines, null, rootElement, pdfDoc, ref pageCounter);
             }
 
-            // Create a top‑level outline item for the XML root
-            OutlineItemCollection rootOutline = new OutlineItemCollection(pdfDoc.Outlines)
-            {
-                Title = rootElement.Name.LocalName,
-                // Example: link to the first page; adjust as needed (e.g., use an attribute to map pages)
-                Destination = new GoToAction(pdfDoc.Pages[1])
-            };
-            pdfDoc.Outlines.Add(rootOutline);
-
-            // Recursively add child outline items
-            AddChildOutlines(rootOutline, rootElement, pdfDoc);
-
-            // Save the modified PDF
-            pdfDoc.Save(outputPdfPath);
-            Console.WriteLine($"PDF with hierarchical outline saved to '{outputPdfPath}'.");
-        }
-    }
-
-    // Recursively creates outline items for each XML element and attaches them to the parent outline item
-    private static void AddChildOutlines(OutlineItemCollection parentOutline, XElement xmlElement, Document pdfDoc)
-    {
-        foreach (XElement child in xmlElement.Elements())
-        {
-            // Create a new outline item for the child element
-            OutlineItemCollection childOutline = new OutlineItemCollection(pdfDoc.Outlines)
-            {
-                Title = child.Name.LocalName,
-                // If the XML element has a "page" attribute, use it; otherwise default to page 1
-                Destination = GetDestinationForElement(child, pdfDoc)
-            };
-
-            // Attach the child outline to its parent
-            parentOutline.Add(childOutline);
-
-            // Recurse to handle deeper levels
-            AddChildOutlines(childOutline, child, pdfDoc);
-        }
-    }
-
-    // Determines the destination for an outline item.
-    // Looks for a "page" attribute on the XML element; if present, links to that page.
-    // Falls back to the first page if the attribute is missing or invalid.
-    private static GoToAction GetDestinationForElement(XElement element, Document pdfDoc)
-    {
-        int pageNumber = 1; // default page
-        XAttribute pageAttr = element.Attribute("page");
-        if (pageAttr != null && int.TryParse(pageAttr.Value, out int parsed) && parsed >= 1 && parsed <= pdfDoc.Pages.Count)
-        {
-            pageNumber = parsed;
+            // Save the modified PDF.
+            pdfDoc.Save(pdfOutputPath);
         }
 
-        // Create a GoToAction that jumps to the specified page
-        return new GoToAction(pdfDoc.Pages[pageNumber]);
+        Console.WriteLine($"PDF with hierarchical outline saved to '{pdfOutputPath}'.");
     }
 }

@@ -1,6 +1,6 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -16,48 +16,40 @@ class Program
             return;
         }
 
-        // Load the PDF – Document implements IDisposable, so wrap in using
+        // Dictionary to group annotations by their AnnotationType
+        var groups = new Dictionary<AnnotationType, List<Annotation>>();
+
+        // Load the PDF inside a using block (lifecycle rule)
         using (Document doc = new Document(inputPath))
         {
-            // Group key: annotation type; value: list of (annotation, page number)
-            var groups = new Dictionary<AnnotationType, List<(Annotation ann, int page)>>();
-
-            // Pages are 1‑based in Aspose.Pdf
+            // Pages are 1‑based indexed
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
                 AnnotationCollection annotations = page.Annotations;
 
+                // Iterate over each annotation on the page
                 foreach (Annotation annotation in annotations)
                 {
                     AnnotationType type = annotation.AnnotationType;
 
-                    if (!groups.TryGetValue(type, out var list))
+                    // Create a list for the type if it does not exist yet
+                    if (!groups.TryGetValue(type, out List<Annotation> list))
                     {
-                        list = new List<(Annotation, int)>();
+                        list = new List<Annotation>();
                         groups[type] = list;
                     }
 
-                    list.Add((annotation, i));
+                    list.Add(annotation);
                 }
             }
+        }
 
-            // Simple console report
-            Console.WriteLine("=== Annotation Summary ===");
-            foreach (var kvp in groups)
-            {
-                AnnotationType type = kvp.Key;
-                List<(Annotation ann, int page)> items = kvp.Value;
-
-                Console.WriteLine($"{type}: {items.Count} occurrence(s)");
-                int idx = 1;
-                foreach (var (ann, pageNum) in items)
-                {
-                    // Show basic details – Contents may be empty for some types
-                    string contents = string.IsNullOrEmpty(ann.Contents) ? "(no contents)" : ann.Contents;
-                    Console.WriteLine($"  {idx++}. Page {pageNum}, Contents: {contents}");
-                }
-            }
+        // Simple reporting: print the count of each annotation type
+        Console.WriteLine("Annotation report:");
+        foreach (var kvp in groups)
+        {
+            Console.WriteLine($"{kvp.Key}: {kvp.Value.Count} instance(s)");
         }
     }
 }

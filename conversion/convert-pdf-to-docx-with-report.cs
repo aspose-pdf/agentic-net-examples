@@ -1,13 +1,25 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 using Aspose.Pdf; // Document, DocSaveOptions, etc.
 
 class Program
 {
+    // Simple DTO for conversion statistics.
+    private class ConversionStats
+    {
+        public string InputFile { get; set; }
+        public string OutputFile { get; set; }
+        public long InputFileSizeBytes { get; set; }
+        public long OutputFileSizeBytes { get; set; }
+        public int PageCount { get; set; }
+        public long ConversionTimeMs { get; set; }
+    }
+
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
+        const string inputPdfPath = "input.pdf";
         const string outputDocxPath = "output.docx";
         const string reportJsonPath = "conversion_report.json";
 
@@ -17,63 +29,50 @@ class Program
             return;
         }
 
-        try
+        var stopwatch = Stopwatch.StartNew();
+
+        // Load the PDF document.
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
-            // Load the PDF document inside a using block (ensures disposal).
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Prepare DOCX save options.
+            DocSaveOptions saveOptions = new DocSaveOptions
             {
-                // Gather basic statistics before conversion.
-                int pageCount = pdfDoc.Pages.Count;
-
-                // Configure DOCX save options (non‑PDF format requires explicit options).
-                DocSaveOptions saveOptions = new DocSaveOptions
-                {
-                    // Output format: DOCX.
-                    Format = DocSaveOptions.DocFormat.DocX,
-                    // Use Flow mode for better editability (optional).
-                    Mode = DocSaveOptions.RecognitionMode.Flow,
-                    // Enable bullet recognition (optional).
-                    RecognizeBullets = true
-                };
-
-                // Convert and save as DOCX.
-                pdfDoc.Save(outputDocxPath, saveOptions);
-
-                // Build a simple report object.
-                var report = new
-                {
-                    InputFile   = inputPdfPath,
-                    OutputFile  = outputDocxPath,
-                    Pages       = pageCount,
-                    Success     = true,
-                    TimestampUtc = DateTime.UtcNow
-                };
-
-                // Serialize report to indented JSON.
-                string json = JsonSerializer.Serialize(report, new JsonSerializerOptions { WriteIndented = true });
-
-                // Write JSON report to file.
-                File.WriteAllText(reportJsonPath, json);
-
-                Console.WriteLine($"Conversion completed. Report saved to '{reportJsonPath}'.");
-            }
-        }
-        catch (Exception ex)
-        {
-            // In case of any error, generate a failure report.
-            var errorReport = new
-            {
-                InputFile   = inputPdfPath,
-                OutputFile  = outputDocxPath,
-                Success     = false,
-                ErrorMessage = ex.Message,
-                TimestampUtc = DateTime.UtcNow
+                // Save as DOCX format.
+                Format = DocSaveOptions.DocFormat.DocX,
+                // Use Flow mode for better editability (optional).
+                Mode = DocSaveOptions.RecognitionMode.Flow
             };
 
-            string errorJson = JsonSerializer.Serialize(errorReport, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(reportJsonPath, errorJson);
+            // Save the document as DOCX.
+            pdfDocument.Save(outputDocxPath, saveOptions);
+        }
 
-            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+        stopwatch.Stop();
+
+        // Gather statistics.
+        ConversionStats stats = new ConversionStats {
+            InputFile = inputPdfPath,
+            OutputFile = outputDocxPath,
+            InputFileSizeBytes = new FileInfo(inputPdfPath).Length,
+            OutputFileSizeBytes = new FileInfo(outputDocxPath).Length,
+            PageCount = GetPageCount(inputPdfPath),
+            ConversionTimeMs = stopwatch.ElapsedMilliseconds
+        };
+
+        // Serialize statistics to JSON.
+        JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+        string json = JsonSerializer.Serialize(stats, jsonOptions);
+        File.WriteAllText(reportJsonPath, json);
+
+        Console.WriteLine($"Conversion completed. Report saved to '{reportJsonPath}'.");
+    }
+
+    // Helper to retrieve page count without keeping the document open.
+    private static int GetPageCount(string pdfPath)
+    {
+        using (Document doc = new Document(pdfPath))
+        {
+            return doc.Pages.Count;
         }
     }
 }

@@ -3,7 +3,7 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class Program
+class InsertTableBeforeImage
 {
     static void Main()
     {
@@ -16,67 +16,56 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (lifecycle rule: use Document constructor)
         using (Document doc = new Document(inputPath))
         {
             // Iterate through all pages
-            for (int p = 1; p <= doc.Pages.Count; p++)
+            foreach (Page page in doc.Pages)
             {
-                Page page = doc.Pages[p];
-
-                // ParagraphCollection is 1‑based. Scan for Image objects.
-                for (int i = 1; i <= page.Paragraphs.Count; i++)
+                // Scan the page's paragraph collection to locate an Image object
+                for (int i = 0; i < page.Paragraphs.Count; i++)
                 {
-                    // The concrete type for an image placed on a page is Aspose.Pdf.Image
+                    // Image is a subclass of Aspose.Pdf.Image
                     if (page.Paragraphs[i] is Image)
                     {
-                        // Build a simple table to insert before the image
+                        // Create a simple table to insert before the image
                         Table table = new Table
                         {
-                            // Optional visual settings
-                            Border = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Black),
-                            DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Gray),
-                            DefaultCellPadding = new MarginInfo(5, 5, 5, 5)
+                            // Position the table at the top-left of the page (optional)
+                            // Left and Top are in points; adjust as needed
+                            Left = 50,
+                            Top  = (float)page.PageInfo.Height - 100f
                         };
 
-                        // Define two columns (adjust widths as needed)
+                        // Define two columns
                         table.ColumnWidths = "200 200";
 
-                        // Header row
+                        // Add a header row
                         Row header = table.Rows.Add();
-                        header.Cells.Add("Column 1");
-                        header.Cells.Add("Column 2");
-                        // Apply a simple background to header cells
-                        foreach (Cell cell in header.Cells)
-                        {
-                            cell.BackgroundColor = Aspose.Pdf.Color.LightGray;
-                            cell.DefaultCellTextState = new TextState
-                            {
-                                FontSize = 12,
-                                FontStyle = FontStyles.Bold,
-                                Font = FontRepository.FindFont("Helvetica")
-                            };
-                        }
+                        header.Cells.Add("Header 1");
+                        header.Cells.Add("Header 2");
+                        // Apply a background color to the header (using Aspose.Pdf.Color)
+                        header.BackgroundColor = Aspose.Pdf.Color.LightGray;
 
-                        // Data row
+                        // Add a data row
                         Row data = table.Rows.Add();
-                        data.Cells.Add("Value A");
-                        data.Cells.Add("Value B");
+                        data.Cells.Add("Cell A1");
+                        data.Cells.Add("Cell B1");
 
-                        // Insert the table before the image (at the same index)
+                        // Insert the table at the current index (before the image)
                         page.Paragraphs.Insert(i, table);
 
-                        // If there may be multiple images and you only want the first,
-                        // break out of the inner loop after insertion.
-                        // break;
+                        // Since we inserted a new paragraph, the image shifts to i+1.
+                        // Break after first insertion per page (remove if multiple images per page are needed)
+                        break;
                     }
                 }
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (lifecycle rule: use Document.Save)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Table inserted before images and saved to '{outputPath}'.");
+        Console.WriteLine($"Table inserted before image and saved to '{outputPath}'.");
     }
 }

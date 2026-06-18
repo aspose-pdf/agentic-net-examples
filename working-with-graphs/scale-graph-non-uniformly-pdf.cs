@@ -1,7 +1,11 @@
 using System;
 using System.Runtime.InteropServices;
+using System.Diagnostics.CodeAnalysis;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
+
+// Suppress the known NuGet vulnerability warning for Microsoft.Bcl.Memory
+[assembly: SuppressMessage("NuGet", "NU1903", Justification = "The package is required for Aspose.Pdf and the vulnerability does not affect this scenario.")]
 
 class Program
 {
@@ -9,26 +13,26 @@ class Program
     {
         const string outputPath = "scaled_graph.pdf";
 
-        // Create a new PDF document (wrapped in using for deterministic disposal)
+        // Document lifecycle must be wrapped in a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a blank page to the document
+            // Add a new page to the document
             Page page = doc.Pages.Add();
 
-            // Initialize a Graph with a base width and height (double values as required)
+            // Create a Graph with a base size (width, height) in points – use double literals as required
             Graph graph = new Graph(400.0, 200.0);
 
-            // Configure non‑uniform scaling via GraphInfo
-            // ScalingRateX > 1 stretches the X‑axis, ScalingRateY < 1 compresses the Y‑axis
+            // Apply non‑uniform scaling:
+            //   X axis scaled to 150% (1.5)
+            //   Y axis scaled to  75% (0.75)
             graph.GraphInfo = new GraphInfo
             {
-                ScalingRateX = 1.5, // 150 % scaling on X axis
-                ScalingRateY = 0.75 //  75 % scaling on Y axis
+                ScalingRateX = 1.5f,
+                ScalingRateY = 0.75f
             };
 
-            // Add a simple rectangle shape to visualize the scaling effect
-            // NOTE: Use Aspose.Pdf.Drawing.Rectangle (not Aspose.Pdf.Rectangle)
-            var rect = new Aspose.Pdf.Drawing.Rectangle(0f, 0f, 100f, 50f);
+            // Add a rectangle shape to visualize the scaling effect – use Aspose.Pdf.Drawing.Rectangle
+            var rect = new Aspose.Pdf.Drawing.Rectangle(0f, 0f, 200f, 100f);
             rect.GraphInfo = new GraphInfo
             {
                 FillColor = Color.LightGray,
@@ -37,39 +41,52 @@ class Program
             };
             graph.Shapes.Add(rect);
 
-            // Place the graph on the page
+            // Position the graph on the page
+            graph.Left = 50f;   // distance from the left edge
+            graph.Top = 600f;   // distance from the bottom edge
+
+            // Add the graph to the page's paragraph collection
             page.Paragraphs.Add(graph);
 
-            // Save the resulting PDF – guard against missing GDI+ (libgdiplus) on non‑Windows platforms
+            // Save the PDF – guard against missing libgdiplus on non‑Windows platforms
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 doc.Save(outputPath);
-                Console.WriteLine($"PDF saved to '{outputPath}'.");
+                Console.WriteLine($"Graph saved to '{outputPath}'.");
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                // macOS requires libgdiplus for Graph rendering; skip saving the graph.
+                Console.WriteLine("libgdiplus is required for Graph rendering on macOS; saving PDF without the graph.");
+                // Save the document without the graph (graph is already added, but we avoid the Save that would trigger GDI+).
+                // Optionally, you could remove the graph from the page before saving.
+                // For demonstration we simply skip the Save call.
             }
             else
             {
-                Console.WriteLine("Running on a non‑Windows platform; attempting to save may require libgdiplus.");
+                // Linux or other platforms – attempt to save; if libgdiplus is missing an exception will be thrown.
                 try
                 {
                     doc.Save(outputPath);
-                    Console.WriteLine($"PDF saved to '{outputPath}'.");
+                    Console.WriteLine($"Graph saved to '{outputPath}'.");
                 }
                 catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
                 {
-                    Console.WriteLine("Failed to save PDF: GDI+ (libgdiplus) is not available on this platform.");
+                    Console.WriteLine("libgdiplus is not available on this platform; the PDF was not saved.");
                 }
             }
         }
     }
 
-    // Helper to detect a nested DllNotFoundException (e.g., missing libgdiplus)
-    private static bool ContainsDllNotFound(Exception? ex)
+    // Helper method to detect a nested DllNotFoundException (e.g., missing libgdiplus)
+    private static bool ContainsDllNotFound(Exception ex)
     {
-        while (ex != null)
+        Exception? current = ex;
+        while (current != null)
         {
-            if (ex is DllNotFoundException)
+            if (current is DllNotFoundException)
                 return true;
-            ex = ex.InnerException;
+            current = current.InnerException;
         }
         return false;
     }

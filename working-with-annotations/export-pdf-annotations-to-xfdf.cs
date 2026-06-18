@@ -6,23 +6,25 @@ class Program
 {
     static void Main()
     {
-        // Input PDF path
+        // Path to the source PDF file
         const string pdfPath = "input.pdf";
 
-        // Verify the file exists
+        // Ensure the PDF exists
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Determine XFDF output path (same folder, same name with .xfdf extension)
-        string xfdfPath = Path.ChangeExtension(pdfPath, ".xfdf");
+        // Build the XFDF file path beside the PDF (same name, .xfdf extension)
+        string xfdfPath = Path.Combine(
+            Path.GetDirectoryName(pdfPath) ?? string.Empty,
+            Path.GetFileNameWithoutExtension(pdfPath) + ".xfdf");
 
-        // Load the PDF document (using block ensures proper disposal)
+        // Load the PDF document, export its annotations to XFDF, and dispose the document
         using (Document doc = new Document(pdfPath))
         {
-            // Export all annotations (including those on the current page) to XFDF file
+            // Export all annotations (including those on the current page) to the XFDF file
             doc.ExportAnnotationsToXfdf(xfdfPath);
         }
 

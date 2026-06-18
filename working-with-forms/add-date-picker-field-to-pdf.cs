@@ -2,52 +2,44 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations; // JavascriptAction
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_with_datefield.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Open the source PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has a form object
-            Form form = doc.Form;
+            // Rectangle where the date field will be placed (llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 700, 250, 730);
 
-            // Choose the page where the date field will be placed (first page in this example)
-            Page page = doc.Pages[1];
+            // Create a DateField on the first page
+            DateField dateField = new DateField(doc.Pages[1], rect)
+            {
+                Name = "DatePicker",
+                DateFormat = "mm/dd/yyyy"
+            };
 
-            // Define the rectangle for the field (left, bottom, right, top)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 530);
+            // Attach JavaScript that opens the calendar widget when the field is clicked
+            // Use a valid action property from AnnotationActionCollection (OnPressMouseBtn)
+            dateField.Actions.OnPressMouseBtn = new JavascriptAction("app.execMenuItem('ShowDatePicker');");
 
-            // Create the DateField, add it to the form and initialize it for the page
-            DateField dateField = new DateField(page, rect);
-            form.Add(dateField);
-            dateField.Init(page);
-
-            // Set a display format for the date (e.g., mm/dd/yyyy)
-            dateField.DateFormat = "mm/dd/yyyy";
-
-            // Attach a JavaScript action that opens the built‑in calendar picker
-            // The JavaScript command "app.execMenuItem('ShowDatePicker');" triggers the PDF viewer's date picker UI
-            dateField.OnActivated = new JavascriptAction("app.execMenuItem('ShowDatePicker');");
-
-            // Optionally set a tooltip (alternate name) for better UX
-            dateField.AlternateName = "Select a date";
+            // Add the field to the document's form collection
+            doc.Form.Add(dateField);
 
             // Save the modified PDF
-            doc.Save(outputPdf);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Date picker field added and saved to '{outputPdf}'.");
+        Console.WriteLine($"Date picker field added and saved to '{outputPath}'.");
     }
 }

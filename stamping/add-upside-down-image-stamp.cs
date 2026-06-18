@@ -6,50 +6,38 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string imagePath  = "logo.png";
+        // Create a sample image file (1x1 PNG)
+        string imagePath = "sample.png";
+        byte[] pngBytes = new byte[] {
+            0x89,0x50,0x4E,0x47,0x0D,0x0A,0x1A,0x0A,
+            0x00,0x00,0x00,0x0D,0x49,0x48,0x44,0x52,
+            0x00,0x00,0x00,0x01,0x00,0x00,0x00,0x01,
+            0x08,0x06,0x00,0x00,0x00,0x1F,0x15,0xC4,
+            0x89,0x00,0x00,0x00,0x0A,0x49,0x44,0x41,
+            0x54,0x78,0x9C,0x63,0x60,0x00,0x00,0x00,
+            0x02,0x00,0x01,0xE2,0x21,0xBC,0x33,0x00,
+            0x00,0x00,0x00,0x49,0x45,0x4E,0x44,0xAE,
+            0x42,0x60,0x82
+        };
+        File.WriteAllBytes(imagePath, pngBytes);
 
-        // Verify that the source PDF and image exist
-        if (!File.Exists(inputPath))
+        // Create a sample PDF with a single page
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
-            return;
+            doc.Pages.Add();
+            doc.Save("input.pdf");
         }
-        if (!File.Exists(imagePath))
-        {
-            Console.Error.WriteLine($"Image file not found: {imagePath}");
-            return;
-        }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Open the PDF and add an upside‑down image stamp
+        using (Document pdfDoc = new Document("input.pdf"))
         {
-            // Select the page to which the stamp will be applied (first page in this example)
-            Page page = doc.Pages[1];
-
-            // Create an ImageStamp from the image file
+            Page page = pdfDoc.Pages[1];
             ImageStamp imgStamp = new ImageStamp(imagePath);
-
-            // Set the position of the stamp on the page (coordinates are from the lower‑left corner)
-            imgStamp.XIndent = 100; // horizontal offset
-            imgStamp.YIndent = 100; // vertical offset
-
-            // Optionally set the size of the stamp
-            imgStamp.Width  = 200;
-            imgStamp.Height = 100;
-
-            // Rotate the stamp 180 degrees so it appears upside‑down
-            imgStamp.Rotate = Rotation.on180;   // multiples of 90° are supported
-            // Alternatively, for arbitrary angles: imgStamp.RotateAngle = 180;
-
-            // Add the configured stamp to the selected page
+            imgStamp.Rotate = Rotation.on180; // upside‑down rotation
+            imgStamp.XIndent = 100;
+            imgStamp.YIndent = 100;
             page.AddStamp(imgStamp);
-
-            // Save the modified PDF (PDF format is the default)
-            doc.Save(outputPath);
+            pdfDoc.Save("output.pdf");
         }
-
-        Console.WriteLine($"Image stamp added and saved to '{outputPath}'.");
     }
 }

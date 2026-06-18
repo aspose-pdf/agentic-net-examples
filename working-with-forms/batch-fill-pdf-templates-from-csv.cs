@@ -1,8 +1,11 @@
 using System;
-using System.IO;
 using System.Data;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
+
+// Alias to disambiguate the Table class from Aspose.Pdf.Text (if present)
+using AsposePdfTable = Aspose.Pdf.Table;
 
 class BatchPdfFiller
 {
@@ -11,7 +14,7 @@ class BatchPdfFiller
         // Paths – adjust as needed
         const string csvPath = "data.csv";               // CSV with data rows
         const string templatePath = "template.pdf";      // PDF template to fill
-        const string outputFolder = "FilledOutputs";     // Folder for generated PDFs
+        const string outputDir = "FilledOutputs";        // Directory for results
 
         if (!File.Exists(csvPath))
         {
@@ -24,44 +27,54 @@ class BatchPdfFiller
             return;
         }
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
+        Directory.CreateDirectory(outputDir);
 
         // Load CSV into a DataTable
         DataTable csvTable = LoadCsvIntoDataTable(csvPath);
 
-        // Process each data row
-        for (int rowIndex = 0; rowIndex < csvTable.Rows.Count; rowIndex++)
+        // Iterate over each data row and generate a filled PDF
+        for (int i = 0; i < csvTable.Rows.Count; i++)
         {
-            DataRow dataRow = csvTable.Rows[rowIndex];
+            DataRow row = csvTable.Rows[i];
 
-            // Load the template PDF
+            // Create a DataTable containing only the current row (including column names)
+            DataTable singleRowTable = csvTable.Clone(); // copies schema
+            singleRowTable.ImportRow(row);
+
+            // Load the template PDF inside a using block (ensures disposal)
             using (Document doc = new Document(templatePath))
             {
-                // Create a new Table and import the single row
-                Table table = new Table();
-                // Build a temporary DataTable containing only the current row
-                DataTable singleRowTable = csvTable.Clone(); // copy schema
-                singleRowTable.ImportRow(dataRow);
-                // Import data into the table (no column names, start at first cell)
-                table.ImportDataTable(singleRowTable, false, 0, 0);
+                // Ensure the document has at least one page
+                Page page = doc.Pages.Count > 0 ? doc.Pages[1] : doc.Pages.Add();
 
-                // Add the table to the first page
-                Page firstPage = doc.Pages[1];
-                firstPage.Paragraphs.Add(table);
+                // Create a table and import the data (include column names as first row)
+                AsposePdfTable table = new AsposePdfTable();
+                table.ImportDataTable(singleRowTable, true, 0, 0);
 
-                // Save the filled PDF with a unique name
-                string outputPath = Path.Combine(outputFolder, $"filled_{rowIndex + 1}.pdf");
+                // Optional: style the table via GraphInfo (example: set border)
+                table.Border = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Black);
+
+                // Auto‑fit columns to content (optional, replaces removed ColumnCount usage)
+                table.ColumnAdjustment = ColumnAdjustment.AutoFitToContent;
+
+                // Add the table to the page
+                page.Paragraphs.Add(table);
+
+                // Build output file name
+                string outputPath = Path.Combine(outputDir, $"filled_{i + 1}.pdf");
+
+                // Save the filled PDF
                 doc.Save(outputPath);
                 Console.WriteLine($"Saved: {outputPath}");
             }
         }
     }
 
-    // Helper: reads a CSV file (comma‑separated, first line contains headers) into a DataTable
-    static DataTable LoadCsvIntoDataTable(string csvFilePath)
+    // Helper: reads a CSV file (comma‑separated, first line = headers) into a DataTable
+    private static DataTable LoadCsvIntoDataTable(string csvFilePath)
     {
         DataTable table = new DataTable();
+
         using (StreamReader reader = new StreamReader(csvFilePath))
         {
             bool isFirstLine = true;
@@ -85,15 +98,16 @@ class BatchPdfFiller
                 else
                 {
                     // Add data row
-                    DataRow row = table.NewRow();
+                    DataRow dataRow = table.NewRow();
                     for (int i = 0; i < fields.Length && i < table.Columns.Count; i++)
                     {
-                        row[i] = fields[i].Trim();
+                        dataRow[i] = fields[i].Trim();
                     }
-                    table.Rows.Add(row);
+                    table.Rows.Add(dataRow);
                 }
             }
         }
+
         return table;
     }
 }

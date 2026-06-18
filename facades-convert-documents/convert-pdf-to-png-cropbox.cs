@@ -1,53 +1,54 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file
-        const string inputPdfPath = "input.pdf";
-
-        // Directory where PNG images will be saved
+        const string inputPdf = "input.pdf";
         const string outputDir = "output_images";
 
-        // Verify that the source PDF exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Error: File not found – {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Ensure the output directory exists
+        // Ensure the output directory exists.
         Directory.CreateDirectory(outputDir);
 
-        // Initialize the PdfConverter facade
-        PdfConverter converter = new PdfConverter();
+        // Load the PDF document.
+        Document pdfDoc = new Document(inputPdf);
 
-        // Bind the PDF file to the converter
-        converter.BindPdf(inputPdfPath);
-
-        // Use the CropBox coordinate type so only the visible page area is rendered
-        converter.CoordinateType = PageCoordinateType.CropBox;
-
-        // Prepare the converter for image extraction
-        converter.DoConvert();
-
-        int pageIndex = 1;
-        // Extract each page as a PNG image
-        while (converter.HasNextImage())
+        int pageNumber = 1;
+        foreach (Page page in pdfDoc.Pages)
         {
-            string outputPath = Path.Combine(outputDir, $"page_{pageIndex}.png");
-            converter.GetNextImage(outputPath, ImageFormat.Png);
-            pageIndex++;
+            // Preserve the original MediaBox.
+            var originalMediaBox = page.MediaBox;
+
+            // If a CropBox is defined, use it as the rendering area.
+            // Aspose.Pdf devices render the MediaBox, so we temporarily replace it with the CropBox.
+            if (page.CropBox != null && page.CropBox.Width > 0 && page.CropBox.Height > 0)
+            {
+                page.MediaBox = page.CropBox;
+            }
+
+            string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
+            using (FileStream imageStream = new FileStream(outputPath, FileMode.Create))
+            {
+                // You can adjust the resolution as needed.
+                var resolution = new Resolution(300);
+                var pngDevice = new PngDevice(resolution);
+                pngDevice.Process(page, imageStream);
+            }
+
+            // Restore the original MediaBox to avoid side‑effects on subsequent operations.
+            page.MediaBox = originalMediaBox;
+            pageNumber++;
         }
 
-        // Release resources held by the converter
-        converter.Close();
-
-        Console.WriteLine($"Conversion complete. PNG files are saved in '{outputDir}'.");
+        Console.WriteLine("PDF successfully converted to PNG images.");
     }
 }

@@ -7,10 +7,10 @@ class Program
 {
     static void Main()
     {
-        // Folder containing PDFs to process
-        const string inputFolder  = @"C:\PdfBatch\Input";
-        // Folder where processed PDFs will be saved
-        const string outputFolder = @"C:\PdfBatch\Output";
+        // Folder containing source PDFs
+        const string inputFolder = "InputPdfs";
+        // Folder where PDFs with the new bookmark will be saved
+        const string outputFolder = "OutputPdfs";
 
         if (!Directory.Exists(inputFolder))
         {
@@ -23,35 +23,30 @@ class Program
         // Process each PDF file in the input folder
         foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            string fileName   = Path.GetFileNameWithoutExtension(inputPath);
+            string fileName = Path.GetFileNameWithoutExtension(inputPath);
             string outputPath = Path.Combine(outputFolder, $"{fileName}_reviewed.pdf");
 
-            try
+            // Initialize the bookmark editor (facade)
+            Aspose.Pdf.Facades.PdfBookmarkEditor editor = new Aspose.Pdf.Facades.PdfBookmarkEditor();
+
+            // Bind the source PDF file to the editor
+            editor.BindPdf(inputPath);
+
+            // Determine the last page number (Aspose.Pdf uses 1‑based indexing)
+            using (Document doc = new Document(inputPath))
             {
-                // Initialize the bookmark editor facade
-                PdfBookmarkEditor editor = new PdfBookmarkEditor();
-
-                // Bind the PDF file to the facade
-                editor.BindPdf(inputPath);
-
-                // Retrieve the total number of pages from the underlying Document
-                int lastPageNumber = editor.Document.Pages.Count;
-
+                int lastPage = doc.Pages.Count;
                 // Add a bookmark titled "Reviewed" that points to the last page
-                editor.CreateBookmarkOfPage("Reviewed", lastPageNumber);
-
-                // Save the modified PDF to the output location
-                editor.Save(outputPath);
-
-                // Release resources associated with the facade
-                editor.Close();
-
-                Console.WriteLine($"Processed: {inputPath} → {outputPath}");
+                editor.CreateBookmarkOfPage("Reviewed", lastPage);
             }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
-            }
+
+            // Save the modified PDF to the output location
+            editor.Save(outputPath);
+
+            // Release resources held by the facade
+            editor.Close();
         }
+
+        Console.WriteLine("Batch bookmark addition completed.");
     }
 }

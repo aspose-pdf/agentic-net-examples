@@ -6,44 +6,52 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        // Input PDF that may contain attachments
+        const string inputPdf  = "input.pdf";
+        // Output PDF after clearing and adding new attachments
         const string outputPdf = "output.pdf";
 
-        // Verify the source PDF exists
+        // Files to be attached to the PDF (path and description)
+        var newAttachments = new (string Path, string Description)[]
+        {
+            ("file1.docx", "First document attachment"),
+            ("image1.png",  "Sample image attachment"),
+            ("data.csv",    "CSV data attachment")
+        };
+
+        // Validate input PDF existence
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Use PdfContentEditor (facade) to manipulate attachments
+        // Validate each attachment file existence before processing
+        foreach (var (path, _) in newAttachments)
+        {
+            if (!File.Exists(path))
+            {
+                Console.Error.WriteLine($"Attachment file not found: {path}");
+                return;
+            }
+        }
+
+        // Use PdfContentEditor (a facade) to manipulate attachments
         using (PdfContentEditor editor = new PdfContentEditor())
         {
-            // Load the PDF document
+            // Bind the existing PDF document
             editor.BindPdf(inputPdf);
 
             // Remove all existing attachments
             editor.DeleteAttachments();
 
-            // Define new files to attach and their descriptions
-            string[] attachmentPaths = { "doc1.txt", "image1.png" };
-            string[] descriptions = { "Sample text document", "Sample image file" };
-
-            // Add each attachment if the file exists
-            for (int i = 0; i < attachmentPaths.Length; i++)
+            // Add the fresh set of attachments
+            foreach (var (path, description) in newAttachments)
             {
-                string path = attachmentPaths[i];
-                if (!File.Exists(path))
-                {
-                    Console.Error.WriteLine($"Attachment not found: {path}");
-                    continue;
-                }
-
-                // Add the attachment without any annotation
-                editor.AddDocumentAttachment(path, descriptions[i]);
+                editor.AddDocumentAttachment(path, description);
             }
 
-            // Save the updated PDF
+            // Save the modified PDF
             editor.Save(outputPdf);
         }
 

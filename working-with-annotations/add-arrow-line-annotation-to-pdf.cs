@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_with_arrow.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,35 +16,35 @@ class Program
             return;
         }
 
-        // Load the existing PDF document
+        // Load the PDF document (lifecycle rule: use using)
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the first page (Aspose.Pdf uses 1‑based indexing)
+            // Get the first page (1‑based indexing)
             Page page = doc.Pages[1];
 
-            // Define the annotation rectangle (position and size on the page)
+            // Define the annotation rectangle (position on the page)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
             // Define start and end points of the line
             Aspose.Pdf.Point start = new Aspose.Pdf.Point(120, 520);
-            Aspose.Pdf.Point end   = new Aspose.Pdf.Point(280, 530);
+            Aspose.Pdf.Point end   = new Aspose.Pdf.Point(280, 520);
 
-            // Create a line annotation and set its visual properties
+            // Create a line annotation and set arrow line endings
             LineAnnotation line = new LineAnnotation(page, rect, start, end)
             {
-                Color = Aspose.Pdf.Color.Blue,          // line color
-                Width = 2,                               // line thickness
-                StartingStyle = LineEnding.None,         // no arrow at the start
-                EndingStyle   = LineEnding.ClosedArrow   // arrow at the end
+                Color = Aspose.Pdf.Color.Blue,                                   // line color
+                StartingStyle = Aspose.Pdf.Annotations.LineEnding.ClosedArrow,    // arrow at start
+                EndingStyle   = Aspose.Pdf.Annotations.LineEnding.ClosedArrow,    // arrow at end
+                InteriorColor = Aspose.Pdf.Color.LightGray                       // fill color for closed arrows
             };
 
             // Add the annotation to the page
             page.Annotations.Add(line);
 
-            // Save the modified PDF
+            // Save the modified PDF (lifecycle rule: use Save inside using)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Saved PDF with arrow line annotation to '{outputPath}'.");
+        Console.WriteLine($"Annotated PDF saved to '{outputPath}'.");
     }
 }

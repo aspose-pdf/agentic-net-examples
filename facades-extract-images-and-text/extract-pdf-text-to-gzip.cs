@@ -12,25 +12,25 @@ class Program
 
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // PdfExtractor is a Facade; use using for deterministic disposal
+        // Extract text and write it directly into a GZip stream
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the PDF document to the extractor
+            // Load the PDF document
             extractor.BindPdf(inputPdfPath);
 
-            // Extract all text using Unicode encoding (default)
+            // Extract all text (Unicode encoding by default)
             extractor.ExtractText();
 
-            // Open the output file stream
+            // Create the output file stream
             using (FileStream fileStream = new FileStream(outputGzipPath, FileMode.Create, FileAccess.Write))
-            // Wrap the file stream with GZipStream for compression
-            using (GZipStream gzipStream = new GZipStream(fileStream, CompressionLevel.Optimal))
+            // Wrap it with GZip compression
+            using (GZipStream gzipStream = new GZipStream(fileStream, CompressionMode.Compress))
             {
-                // Write the extracted text directly into the compressed stream
+                // Save extracted text into the compressed stream
                 extractor.GetText(gzipStream);
             }
         }

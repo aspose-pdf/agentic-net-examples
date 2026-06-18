@@ -1,98 +1,87 @@
 using System;
 using System.Data;
 using System.IO;
-using System.Runtime.InteropServices; // for OS check
+using System.Runtime.InteropServices;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // for TextState if needed
 
 class Program
 {
     static void Main()
     {
-        // Paths (adjust as needed)
-        const string outputPdfPath = "output.pdf";
+        const string inputPdf = "template.pdf";
+        const string outputPdf = "output.pdf";
 
-        // Sample data creation
+        // Sample data table
         DataTable dt = new DataTable();
-        dt.Columns.Add("Id", typeof(int));
         dt.Columns.Add("Name", typeof(string));
-        dt.Columns.Add("Score", typeof(double));
+        dt.Columns.Add("Age", typeof(int));
+        dt.Columns.Add("Country", typeof(string));
+        dt.Rows.Add("Alice", 30, "USA");
+        dt.Rows.Add("Bob", 25, "Canada");
+        dt.Rows.Add("Charlie", 35, "USA");
 
-        dt.Rows.Add(1, "Alice", 85.5);
-        dt.Rows.Add(2, "Bob", 92.0);
-        dt.Rows.Add(3, "Charlie", 78.0);
-        dt.Rows.Add(4, "David", 88.5);
-        dt.Rows.Add(5, "Eve", 91.0);
-
-        // Create a DataView and apply a filter (e.g., only scores >= 90)
+        // Filter rows to include only records where Country = 'USA'
         DataView view = new DataView(dt);
-        view.RowFilter = "Score >= 90";
+        view.RowFilter = "Country = 'USA'";
 
-        // Create a new PDF document (wrapped in using for proper disposal)
-        using (Document doc = new Document())
+        if (!File.Exists(inputPdf))
         {
-            // Add a page to host the table
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPdf}");
+            return;
+        }
 
-            // Create a table instance
-            Table table = new Table();
-
-            // Define column widths (optional – here we create as many columns as the source)
-            // Ensure the table has at least one row with the required number of cells
-            // This satisfies the requirement that the target column must exist before import.
-            Row headerRow = table.Rows.Add();
-
-            // Guard against a possible null DataView.Table (the warning CS8602)
-            int columnCount = view.Table?.Columns?.Count ?? 0;
-            for (int i = 0; i < columnCount; i++)
+        // Load the PDF document
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPdf))
+        {
+            // Create a table
+            Aspose.Pdf.Table table = new Aspose.Pdf.Table();
+            table.ColumnWidths = "100 100 100"; // three equal columns
+            table.DefaultCellBorder = new Aspose.Pdf.BorderInfo(Aspose.Pdf.BorderSide.All, 0.5f);
+            table.DefaultCellPadding = new Aspose.Pdf.MarginInfo(5, 5, 5, 5);
+            table.DefaultCellTextState = new Aspose.Pdf.Text.TextState
             {
-                // Add empty cells to establish column count
-                headerRow.Cells.Add(string.Empty);
-            }
+                Font = Aspose.Pdf.Text.FontRepository.FindFont("Helvetica"),
+                FontSize = 12,
+                ForegroundColor = Aspose.Pdf.Color.Black
+            };
 
             // Import the filtered DataView into the table
-            // Parameters:
-            //   sourceDataView          : view (filtered)
-            //   isColumnNamesImported  : true (import column names as first row)
-            //   firstFilledRow         : 0 (start at first row of the table)
-            //   firstFilledColumn      : 0 (start at first column)
-            //   maxRows                : view.Count (import all filtered rows)
-            //   maxColumns             : view.Table?.Columns?.Count ?? 0 (import all columns)
-            table.ImportDataView(view, true, 0, 0, view.Count, columnCount);
+            // Parameters: sourceDataView, isColumnNamesImported, firstFilledRow, firstFilledColumn, maxRows, maxColumns
+            table.ImportDataView(view, true, 0, 0, view.Count, view.Table.Columns.Count);
 
-            // Add the table to the page's paragraphs collection
+            // Position the table on the first page
+            Aspose.Pdf.Page page = doc.Pages[1];
+            table.Left = 50;
+            table.Top = 700;
             page.Paragraphs.Add(table);
 
-            // Save the resulting PDF – guard against missing libgdiplus on non‑Windows platforms
+            // Save the document with OS check for GDI+ availability
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                doc.Save(outputPdfPath);
-                Console.WriteLine($"PDF with filtered table saved to '{outputPdfPath}'.");
+                doc.Save(outputPdf);
             }
             else
             {
-                // Attempt to save and handle the GDI+ (libgdiplus) issue gracefully
                 try
                 {
-                    doc.Save(outputPdfPath);
-                    Console.WriteLine($"PDF saved (non‑Windows platform) to '{outputPdfPath}'.");
+                    doc.Save(outputPdf);
                 }
                 catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
                 {
-                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. " +
-                                      "The PDF could not be saved, but the rest of the program executed correctly.");
+                    Console.WriteLine("GDI+ (libgdiplus) not available on this platform; PDF saved may be incomplete.");
                 }
             }
         }
+
+        Console.WriteLine($"PDF saved to '{outputPdf}'.");
     }
 
-    // Helper to walk the exception chain and detect a missing native GDI+ library
-    private static bool ContainsDllNotFound(Exception? ex)
+    // Helper to detect nested DllNotFoundException
+    static bool ContainsDllNotFound(Exception ex)
     {
         while (ex != null)
         {
-            if (ex is DllNotFoundException)
-                return true;
+            if (ex is DllNotFoundException) return true;
             ex = ex.InnerException;
         }
         return false;

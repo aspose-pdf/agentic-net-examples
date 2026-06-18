@@ -2,52 +2,50 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-namespace PdfSplitDemo
+namespace AsposePdfApi
 {
     public static class PdfSplitter
     {
         /// <summary>
-        /// Splits the input PDF stream from the specified start page to the end
-        /// and returns the resulting PDF as a MemoryStream.
+        /// Splits the provided PDF stream from the specified start page to the end of the document.
+        /// The resulting PDF is returned as a MemoryStream.
         /// </summary>
-        /// <param name="inputPdf">Stream containing the source PDF. Must be readable.</param>
-        /// <param name="startPage">
-        /// 1‑based page number where the split should begin.
-        /// Pages before this number are discarded.
-        /// </param>
-        /// <returns>
-        /// MemoryStream holding the split PDF. The stream position is set to 0.
-        /// </returns>
-        public static MemoryStream SplitFromStartToEnd(Stream inputPdf, int startPage)
+        /// <param name="inputPdfStream">Input PDF stream (must be readable).</param>
+        /// <param name="startPage">1‑based page number where the split should begin.</param>
+        /// <returns>A MemoryStream containing the split PDF (front part from startPage to the last page).</returns>
+        public static MemoryStream SplitFromStartToEnd(Stream inputPdfStream, int startPage)
         {
-            if (inputPdf == null) throw new ArgumentNullException(nameof(inputPdf));
+            if (inputPdfStream == null) throw new ArgumentNullException(nameof(inputPdfStream));
             if (startPage < 1) throw new ArgumentOutOfRangeException(nameof(startPage), "Page numbers are 1‑based.");
 
-            // PdfFileEditor does NOT implement IDisposable, so we do not wrap it in a using block.
-            PdfFileEditor editor = new PdfFileEditor();
-
-            // Output will be written to a MemoryStream which we return to the caller.
+            // Output stream that will hold the split PDF.
             MemoryStream outputStream = new MemoryStream();
 
-            // SplitToEnd extracts the rear part of the document starting at startPage.
-            // The method does NOT close the streams, so we keep outputStream alive.
-            editor.SplitToEnd(inputPdf, startPage, outputStream);
+            // PdfFileEditor does NOT implement IDisposable, so we instantiate it directly.
+            PdfFileEditor editor = new PdfFileEditor();
 
-            // Reset the position so the caller can read from the beginning.
+            // SplitToEnd splits from the given location (inclusive) to the end of the document.
+            // The method returns true on success; we let any failure propagate as an exception.
+            bool success = editor.SplitToEnd(inputPdfStream, startPage, outputStream);
+            if (!success)
+            {
+                // If the operation failed, clean up and throw an informative exception.
+                outputStream.Dispose();
+                throw new InvalidOperationException("Failed to split the PDF using PdfFileEditor.SplitToEnd.");
+            }
+
+            // Reset the position of the output stream so callers can read from the beginning.
             outputStream.Position = 0;
             return outputStream;
         }
     }
 
-    // Minimal entry point required for a console‑application project.
+    // Dummy entry point to satisfy the compiler when the project is built as an executable.
     internal class Program
     {
         private static void Main(string[] args)
         {
-            // Optional demonstration (can be removed for pure library usage).
-            // using var input = File.OpenRead("sample.pdf");
-            // using var result = PdfSplitter.SplitFromStartToEnd(input, 3);
-            // File.WriteAllBytes("output.pdf", result.ToArray());
+            // No operation – the library functionality is exposed via PdfSplitter.
         }
     }
 }

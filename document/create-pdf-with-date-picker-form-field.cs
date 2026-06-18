@@ -7,37 +7,35 @@ class Program
 {
     static void Main()
     {
-        // Output PDF path
-        const string outputPath = "DatePickerForm.pdf";
+        const string outputPath = "datefield_form.pdf";
 
-        // Create a new PDF document and add a blank page
+        // Create a new PDF document and ensure proper disposal
         using (Document doc = new Document())
         {
-            // Add first page (1‑based indexing)
-            doc.Pages.Add();
+            // Add a blank page (pages are 1‑based)
+            Page page = doc.Pages.Add();
 
-            // Define the rectangle where the date picker will appear
-            // Rectangle(left, bottom, right, top)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 300, 650);
+            // Define the rectangle where the date field will appear.
+            // Use the fully qualified Aspose.Pdf.Rectangle to avoid ambiguity.
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 250, 630);
 
-            // Create a DateField on the first page at the specified rectangle
-            DateField dateField = new DateField(doc.Pages[1], rect)
-            {
-                // Set a unique name for the field (used to retrieve its value later)
-                Name = "DateField",
-                PartialName = "DateField",
+            // Create a DateField on the specified page and rectangle.
+            DateField dateField = new DateField(page, rect);
 
-                // Optional: define the display format of the date
-                DateFormat = "MM/dd/yyyy"
-            };
+            // Set a partial name (field identifier) and an alternate name (tooltip).
+            dateField.PartialName = "DateOfBirth";
+            dateField.AlternateName = "Select your date of birth";
 
-            // Add the field to the document's form collection
+            // Optional: specify the display format for the date.
+            dateField.DateFormat = "MM/dd/yyyy";
+
+            // Add the field to the document's form collection.
             doc.Form.Add(dateField);
 
-            // Save the PDF (Document disposal is handled by the using block)
+            // Save the PDF. No SaveOptions are needed for PDF output.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with date picker field saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with date picker saved to '{outputPath}'.");
     }
 }

@@ -8,57 +8,66 @@ class Program
 {
     static void Main()
     {
-        // Create a new PDF document
+        const string outputPath = "graph_with_text.pdf";
+
+        // Create a new PDF document and ensure proper disposal
         using (Document doc = new Document())
         {
-            // Add a blank page to the document
+            // Add a blank page
             Page page = doc.Pages.Add();
 
-            // Determine if we are running on Windows (GDI+ is available)
-            bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            // Page dimensions (needed for positioning)
+            double pageHeight = page.PageInfo.Height;
 
-            if (isWindows)
+            // Define graph dimensions (width, height) and position (left, bottom)
+            double graphWidth  = 400;
+            double graphHeight = 200;
+            double graphLeft   = 100; // X coordinate of the graph's lower‑left corner
+            double graphBottom = 400; // Y coordinate of the graph's lower‑left corner
+
+            // Calculate the Y coordinate of the graph's upper‑left corner (Aspose.Pdf uses Top for vertical placement)
+            double graphTop = pageHeight - graphBottom - graphHeight;
+
+            // Create the Graph container using the double‑precision constructor (per verified fix)
+            Graph graph = new Graph(graphWidth, graphHeight)
             {
-                // Create a Graph container (width: 400 points, height: 200 points) – double literals as required
-                Graph graph = new Graph(400.0, 200.0);
-
-                // Define a rectangle shape that will serve as the background of the graph
-                var rect = new Aspose.Pdf.Drawing.Rectangle(0f, 0f, 400f, 200f);
-                rect.GraphInfo = new GraphInfo
+                Left = (float)graphLeft,
+                Top  = (float)graphTop,
+                GraphInfo = new GraphInfo
                 {
-                    FillColor = Color.LightGray, // background fill
-                    Color = Color.Black,         // border color
-                    LineWidth = 1f               // border thickness (float)
-                };
+                    Color = Aspose.Pdf.Color.LightGray, // border color
+                    LineWidth = 1f                     // float literal as required
+                }
+            };
 
-                // Add the rectangle to the graph's shape collection
-                graph.Shapes.Add(rect);
+            // Add the graph to the page
+            page.Paragraphs.Add(graph);
 
-                // Add the graph to the page's paragraph collection
-                page.Paragraphs.Add(graph);
-            }
-            else
-            {
-                Console.WriteLine("Skipping Graph rendering on non‑Windows platform (libgdiplus is required).");
-            }
+            // ----- Add text inside the graph -----
+            // Text to display
+            const string text = "Sample Text";
 
             // Create a TextFragment with the desired text
-            TextFragment tf = new TextFragment("Hello Aspose.Pdf!");
+            TextFragment tf = new TextFragment(text)
+            {
+                // Position the text (coordinates are relative to the page origin, bottom‑left)
+                // Choose coordinates that lie within the graph rectangle
+                Position = new Position(
+                    graphLeft + 20,                                 // 20 points inside the graph from left edge
+                    graphBottom + graphHeight - 30)                 // 30 points below the top edge of the graph
+            };
 
-            // Set font family, size, and color via the TextState object
+            // Configure font family, size and color via the existing TextState instance
             tf.TextState.Font = FontRepository.FindFont("Helvetica"); // font family
-            tf.TextState.FontSize = 24;                               // font size
-            tf.TextState.ForegroundColor = Color.Blue;                // font color
+            tf.TextState.FontSize = 14;                                 // font size
+            tf.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;      // text color
 
-            // Position the text inside the graph (coordinates are from the bottom‑left of the page)
-            tf.Position = new Position(100, 150); // X = 100, Y = 150
-
-            // Add the text fragment to the page (it will be rendered on top of the graph if the graph exists)
+            // Add the text fragment to the page (it will render over the graph)
             page.Paragraphs.Add(tf);
 
-            // Save the PDF document – guard the call on non‑Windows platforms where GDI+ may be missing
-            string outputPath = "output.pdf";
-            if (isWindows)
+            // ----- Save the document -----
+            // Guard the Save call on macOS/Linux where libgdiplus may be missing (per verified fix)
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 doc.Save(outputPath);
                 Console.WriteLine($"PDF saved to '{outputPath}'.");
@@ -68,17 +77,18 @@ class Program
                 try
                 {
                     doc.Save(outputPath);
-                    Console.WriteLine($"PDF saved to '{outputPath}' (graph omitted).");
+                    Console.WriteLine($"PDF saved to '{outputPath}'.");
                 }
                 catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
                 {
-                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. PDF was not saved.");
+                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. " +
+                                      "The PDF was generated without rendering the graph.");
                 }
             }
         }
     }
 
-    // Helper method to walk the inner‑exception chain and detect a missing native GDI+ library
+    // Helper method to walk nested exceptions and detect a missing native GDI+ library
     private static bool ContainsDllNotFound(Exception? ex)
     {
         while (ex != null)

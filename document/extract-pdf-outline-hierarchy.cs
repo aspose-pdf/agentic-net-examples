@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 
 class Program
@@ -8,46 +7,43 @@ class Program
     {
         const string inputPath = "input.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!System.IO.File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Access the outline (bookmark) hierarchy
-            Aspose.Pdf.OutlineCollection outlines = doc.Outlines;
+            OutlineCollection outlines = doc.Outlines;
 
-            if (outlines == null || outlines.Count == 0)
+            if (outlines.Count == 0)
             {
-                Console.WriteLine("The document contains no outlines.");
+                Console.WriteLine("The document has no outline entries.");
                 return;
             }
 
-            Console.WriteLine("Outline hierarchy:");
-            // Iterate over top‑level outline items
-            for (int i = 1; i <= outlines.Count; i++) // 1‑based indexing
-            {
-                Aspose.Pdf.OutlineItemCollection item = outlines[i];
-                PrintOutline(item, 0);
-            }
+            // Start printing from the first top‑level outline item
+            PrintOutline(outlines.First, 0);
         }
     }
 
     // Recursively prints an outline item and its children with indentation
-    static void PrintOutline(Aspose.Pdf.OutlineItemCollection item, int level)
+    static void PrintOutline(OutlineItemCollection item, int indentLevel)
     {
-        string indent = new string(' ', level * 2);
-        Console.WriteLine($"{indent}- {item.Title}");
-
-        // Traverse child items using the linked‑list style navigation (First/Next)
-        Aspose.Pdf.OutlineItemCollection child = item.First;
-        while (child != null)
+        while (item != null)
         {
-            PrintOutline(child, level + 1);
-            child = child.Next;
+            // Indentation based on hierarchy depth
+            string indent = new string(' ', indentLevel * 2);
+            Console.WriteLine($"{indent}- {item.Title}");
+
+            // If the item has child entries, recurse into them
+            if (item.First != null)
+                PrintOutline(item.First, indentLevel + 1);
+
+            // Move to the next sibling at the same level
+            item = item.Next;
         }
     }
 }

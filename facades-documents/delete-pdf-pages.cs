@@ -3,18 +3,18 @@ using System.IO;
 using System.Linq;
 using Aspose.Pdf.Facades;
 
-class DeletePdfPages
+class Program
 {
     static void Main(string[] args)
     {
         // Expected arguments:
-        // args[0] - input PDF file path
-        // args[1] - output PDF file path
-        // args[2] - comma‑separated list of page numbers to delete (1‑based)
-        if (args.Length < 3)
+        // 0 - input PDF file path
+        // 1 - output PDF file path
+        // 2 - comma‑separated list of page numbers to delete (1‑based)
+        if (args.Length != 3)
         {
-            Console.Error.WriteLine("Usage: DeletePdfPages <input.pdf> <output.pdf> <pages-to-delete>");
-            Console.Error.WriteLine("Example: DeletePdfPages input.pdf output.pdf 2,3,5");
+            Console.Error.WriteLine("Usage: DeletePages <input.pdf> <output.pdf> <pages>");
+            Console.Error.WriteLine("Example: DeletePages input.pdf output.pdf 2,3,5");
             return;
         }
 
@@ -24,15 +24,15 @@ class DeletePdfPages
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Error: Input file not found – {inputPath}");
+            Console.Error.WriteLine($"Error: Input file not found: {inputPath}");
             return;
         }
 
-        // Parse the page numbers (1‑based) into an int array
-        int[] pagesToDelete;
+        // Parse the page numbers into an int array
+        int[] pages;
         try
         {
-            pagesToDelete = pagesArg
+            pages = pagesArg
                 .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(p => int.Parse(p.Trim()))
                 .ToArray();
@@ -45,18 +45,18 @@ class DeletePdfPages
 
         try
         {
-            // Use PdfFileEditor to delete the specified pages
+            // Use Aspose.Pdf.Facades.PdfFileEditor to delete the specified pages
             PdfFileEditor editor = new PdfFileEditor();
-            bool success = editor.Delete(inputPath, pagesToDelete, outputPath);
+            bool result = editor.Delete(inputPath, pages, outputPath);
 
-            if (success)
+            if (result)
                 Console.WriteLine($"Pages deleted successfully. Output saved to '{outputPath}'.");
             else
-                Console.Error.WriteLine("Failed to delete pages. Operation returned false.");
+                Console.Error.WriteLine("Failed to delete pages.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Exception during processing: {ex.Message}");
+            Console.Error.WriteLine($"Exception: {ex.Message}");
         }
     }
 }

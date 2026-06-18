@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_transitions.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,16 +16,14 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Create the PdfPageEditor facade (lifecycle rule: use provided constructor)
+            // Initialize the page editor and bind the document
             PdfPageEditor editor = new PdfPageEditor();
-
-            // Bind the document to the editor
             editor.BindPdf(doc);
 
-            // Define a set of transition constants to apply sequentially
+            // Define a set of transition types to apply sequentially
             int[] transitions = new int[]
             {
                 PdfPageEditor.BLINDH,
@@ -46,12 +44,10 @@ class Program
                 PdfPageEditor.TBWIPE
             };
 
-            int pageCount = doc.Pages.Count; // page indexing is 1‑based (rule: page-indexing-one-based)
-
             // Apply a different transition to each page
-            for (int i = 1; i <= pageCount; i++)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Choose transition for this page (wrap around if more pages than transitions)
+                // Select transition based on page index
                 int transition = transitions[(i - 1) % transitions.Length];
 
                 // Specify the page to edit
@@ -59,16 +55,16 @@ class Program
 
                 // Set transition type and duration (seconds)
                 editor.TransitionType = transition;
-                editor.TransitionDuration = 2;
+                editor.TransitionDuration = 2; // 2 seconds per transition
 
-                // Apply the changes to the specified page
+                // Apply the changes to the current page
                 editor.ApplyChanges();
             }
 
-            // Save the modified PDF (lifecycle rule: use Document.Save)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with page transitions saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with transitions saved to '{outputPath}'.");
     }
 }

@@ -6,7 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "sample.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -14,7 +15,7 @@ class Program
             return;
         }
 
-        // Initialize PdfFileInfo and bind the PDF file
+        // Create a PdfFileInfo instance and bind the PDF file
         using (PdfFileInfo pdfInfo = new PdfFileInfo())
         {
             pdfInfo.BindPdf(inputPath);
@@ -25,14 +26,14 @@ class Program
             Console.WriteLine($"Number of pages: {pdfInfo.NumberOfPages}");
             Console.WriteLine($"PDF version: {pdfInfo.GetPdfVersion()}");
 
-            // Modify metadata as needed
-            pdfInfo.Title = "Updated Document Title";
+            // Modify metadata (example)
+            pdfInfo.Title = "Updated Title";
             pdfInfo.Author = "John Doe";
 
-            // Save the updated PDF to a new file
-            pdfInfo.SaveNewInfo("updated.pdf");
+            // Save the PDF with updated metadata to a new file
+            pdfInfo.SaveNewInfo(outputPath);
         }
 
-        Console.WriteLine("Metadata operations completed.");
+        Console.WriteLine($"Metadata updated and saved to '{outputPath}'.");
     }
 }

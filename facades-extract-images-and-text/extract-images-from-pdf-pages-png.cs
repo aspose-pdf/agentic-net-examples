@@ -1,49 +1,53 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using System.Drawing.Imaging; // ImageFormat for PNG
+using System.Drawing.Imaging; // <-- added for ImageFormat
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputDir = "ExtractedImages";
+        const string inputPdf = "input.pdf";
+        const string outputFolder = "ExtractedImages";
 
-        if (!File.Exists(inputPath))
+        // Verify input file exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        // Initialize the PDF extractor and bind the source PDF
-        PdfExtractor extractor = new PdfExtractor();
-        extractor.BindPdf(inputPath);
-
-        // Restrict extraction to pages 5 through 10 (1‑based indexing)
-        extractor.StartPage = 5;
-        extractor.EndPage = 10;
-
-        // Perform image extraction for the specified page range
-        extractor.ExtractImage();
-
-        int imageIndex = 1;
-        while (extractor.HasNextImage())
+        // Use PdfExtractor (implements IDisposable) within a using block
+        using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Build a unique file name for each extracted image
-            string outPath = Path.Combine(outputDir, $"image_{imageIndex}.png");
+            // Bind the PDF document to the extractor
+            extractor.BindPdf(inputPdf);
 
-            // Save the image as PNG
-            extractor.GetNextImage(outPath, ImageFormat.Png);
-            imageIndex++;
+            // Set the page range (Aspose.Pdf uses 1‑based indexing)
+            extractor.StartPage = 5;
+            extractor.EndPage   = 10;
+
+            // Perform image extraction for the specified pages
+            extractor.ExtractImage();
+
+            int imageCounter = 1;
+            // Iterate through all extracted images
+            while (extractor.HasNextImage())
+            {
+                // Build output file path (PNG format)
+                string outputPath = Path.Combine(outputFolder, $"image_{imageCounter}.png");
+
+                // Save the current image as PNG
+                extractor.GetNextImage(outputPath, ImageFormat.Png);
+
+                imageCounter++;
+            }
         }
 
-        // Release resources held by the extractor
-        extractor.Close();
-
-        Console.WriteLine($"Extraction complete. {imageIndex - 1} images saved to '{outputDir}'.");
+        Console.WriteLine("Image extraction completed.");
     }
 }

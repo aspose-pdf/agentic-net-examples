@@ -1,48 +1,42 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Paths for the encrypted input PDF and the decrypted output PDF
-        const string encryptedPdfPath = "encrypted_input.pdf";
-        const string decryptedPdfPath = "decrypted_output.pdf";
+        const string encryptedPdfPath = "encrypted.pdf";   // input encrypted PDF
+        const string userPassword     = "user123";        // password to open the PDF
+        const string outputPdfPath    = "decrypted.pdf";  // path for the unprotected PDF
 
-        // The user password required to open the encrypted PDF
-        const string userPassword = "user123";
-
-        // Verify that the input file exists before proceeding
         if (!File.Exists(encryptedPdfPath))
         {
-            Console.Error.WriteLine($"Error: File not found – {encryptedPdfPath}");
+            Console.Error.WriteLine($"File not found: {encryptedPdfPath}");
             return;
         }
 
         try
         {
-            // Open the encrypted document using the constructor that accepts a password
+            // Open the encrypted document using the user password
             using (Document doc = new Document(encryptedPdfPath, userPassword))
             {
-                // Decrypt the document; after this call the PDF is no longer protected
+                // Decrypt the document (removes encryption)
                 doc.Decrypt();
 
-                // Save the unprotected version to a new file
-                doc.Save(decryptedPdfPath);
+                // Save the unprotected version
+                doc.Save(outputPdfPath);
             }
 
-            Console.WriteLine($"Decryption successful. Unprotected PDF saved to '{decryptedPdfPath}'.");
+            Console.WriteLine($"Decrypted PDF saved to '{outputPdfPath}'.");
         }
-        catch (InvalidPasswordException ex)
+        catch (InvalidPasswordException)
         {
-            // Thrown when the supplied password is incorrect
-            Console.Error.WriteLine($"Invalid password: {ex.Message}");
+            Console.Error.WriteLine("Invalid password provided.");
         }
         catch (Exception ex)
         {
-            // General error handling
-            Console.Error.WriteLine($"An error occurred: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

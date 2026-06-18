@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // FontRepository
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -16,34 +16,34 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using)
         using (Document doc = new Document(inputPath))
         {
-            // Create a PageNumberStamp with default format "#"
-            PageNumberStamp pageNumberStamp = new PageNumberStamp();
+            // Create a stamp that prints the page number.
+            PageNumberStamp stamp = new PageNumberStamp();
 
-            // Configure superscript‑like appearance (smaller font size)
-            pageNumberStamp.TextState.Font = FontRepository.FindFont("Helvetica");
-            pageNumberStamp.TextState.FontSize = 8; // smaller than typical body text
-            // Use ForegroundColor instead of the non‑existent FontColor property
-            pageNumberStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+            // Superscript‑like appearance.
+            stamp.TextState.Font = FontRepository.FindFont("Helvetica");
+            stamp.TextState.FontSize = 8; // smaller than body text
+            stamp.YIndent = 4;            // move upward a little
 
-            // Position the stamp at the bottom‑right corner of each page
-            pageNumberStamp.HorizontalAlignment = HorizontalAlignment.Right;
-            pageNumberStamp.VerticalAlignment   = VerticalAlignment.Bottom;
-            pageNumberStamp.BottomMargin = 20; // distance from bottom edge
-            pageNumberStamp.RightMargin  = 20; // distance from right edge
+            // Position at bottom‑right.
+            stamp.HorizontalAlignment = HorizontalAlignment.Right;
+            stamp.VerticalAlignment = VerticalAlignment.Bottom;
 
-            // Apply the stamp to every page in the document
+            // Set margins – PageNumberStamp uses BottomMargin and RightMargin properties
+            // (MarginInfo is not available on this stamp type).
+            stamp.BottomMargin = 20;
+            stamp.RightMargin = 20;
+
+            // Apply the stamp to every page.
             foreach (Page page in doc.Pages)
             {
-                page.AddStamp(pageNumberStamp);
+                page.AddStamp(stamp);
             }
 
-            // Save the modified PDF (lifecycle rule: use Save inside using)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Page numbers with superscript formatting added to '{outputPath}'.");
+        Console.WriteLine($"Page numbers with superscript‑like formatting saved to '{outputPath}'.");
     }
 }

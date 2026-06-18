@@ -7,54 +7,55 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string csvPath   = "annotations.csv";
+        const string inputPdf = "input.pdf";
+        const string csvPath = "annotations_report.csv";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         try
         {
-            // Load the PDF and open a writer for the CSV
-            using (Document doc = new Document(inputPath))
+            // Load the PDF document
+            using (Document doc = new Document(inputPdf))
+            // Open a writer for the CSV output
             using (StreamWriter writer = new StreamWriter(csvPath, false))
             {
                 // CSV header
-                writer.WriteLine("PageNumber,AnnotationType,Rect,Title,Contents");
+                writer.WriteLine("PageNumber,AnnotationId,Author");
 
-                // Pages are 1‑based
-                for (int i = 1; i <= doc.Pages.Count; i++)
+                // Pages are 1‑based in Aspose.Pdf
+                for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
                 {
-                    Page page = doc.Pages[i];
+                    Page page = doc.Pages[pageIndex];
 
-                    // Iterate all annotations on the page
-                    foreach (Annotation ann in page.Annotations)
+                    // Annotations collection is also 1‑based
+                    for (int annIndex = 1; annIndex <= page.Annotations.Count; annIndex++)
                     {
-                        string typeName = ann.GetType().Name;
+                        Annotation annotation = page.Annotations[annIndex];
 
-                        // Rectangle coordinates (lower‑left x/y, upper‑right x/y)
-                        string rect = $"{ann.Rect.LLX},{ann.Rect.LLY},{ann.Rect.URX},{ann.Rect.URY}";
+                        // Use the annotation's Name as an identifier (Id property is not available in this version)
+                        string id = annotation.Name ?? string.Empty;
 
-                        // Title is only available on markup annotations
-                        string title = "";
-                        if (ann is MarkupAnnotation markup)
+                        // The author is stored in the Title property of markup annotations
+                        string author = string.Empty;
+                        if (annotation is MarkupAnnotation markup && !string.IsNullOrEmpty(markup.Title))
                         {
-                            title = markup.Title?.Replace("\"", "\"\"") ?? "";
+                            author = markup.Title;
                         }
 
-                        // Contents may be null
-                        string contents = ann.Contents?.Replace("\"", "\"\"") ?? "";
+                        // Simple CSV escaping for commas
+                        id = id.Replace(",", ";");
+                        author = author.Replace(",", ";");
 
-                        // Write a CSV line, quoting fields that may contain commas
-                        writer.WriteLine($"{i},\"{typeName}\",\"{rect}\",\"{title}\",\"{contents}\"");
+                        writer.WriteLine($"{pageIndex},{id},{author}");
                     }
                 }
             }
 
-            Console.WriteLine($"Annotations exported to '{csvPath}'.");
+            Console.WriteLine($"CSV report generated: {csvPath}");
         }
         catch (Exception ex)
         {

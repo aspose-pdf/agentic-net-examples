@@ -7,7 +7,7 @@ class Program
 {
     static void Main(string[] args)
     {
-        // Expect a single argument: path to the PDF file
+        // Expect a single argument: the path to the PDF file.
         if (args.Length != 1)
         {
             Console.Error.WriteLine("Usage: ExtractText <pdf-path>");
@@ -18,30 +18,37 @@ class Program
 
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"Error: File not found – '{pdfPath}'");
             return;
         }
 
-        // Use PdfExtractor from Aspose.Pdf.Facades to extract text
-        using (PdfExtractor extractor = new PdfExtractor())
+        try
         {
-            // Bind the PDF file to the extractor
-            extractor.BindPdf(pdfPath);
-
-            // Extract text using default Unicode encoding
-            extractor.ExtractText();
-
-            // Retrieve the extracted text into a memory stream
-            using (MemoryStream ms = new MemoryStream())
+            // PdfExtractor implements Facade (which provides Dispose), so we use a using block.
+            using (PdfExtractor extractor = new PdfExtractor())
             {
-                extractor.GetText(ms);
+                // Bind the PDF file to the extractor.
+                extractor.BindPdf(pdfPath);
 
-                // Convert the stream bytes to a string (Unicode encoding)
-                string extractedText = Encoding.Unicode.GetString(ms.ToArray());
+                // Perform the text extraction.
+                extractor.ExtractText();
 
-                // Output the text to the console
-                Console.WriteLine(extractedText);
+                // Retrieve the extracted text into a memory stream.
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    extractor.GetText(ms);
+
+                    // Convert the stream bytes to a string (Unicode encoding is used by default).
+                    string extractedText = Encoding.Unicode.GetString(ms.ToArray());
+
+                    // Output the extracted text to the console.
+                    Console.WriteLine(extractedText);
+                }
             }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during extraction: {ex.Message}");
         }
     }
 }

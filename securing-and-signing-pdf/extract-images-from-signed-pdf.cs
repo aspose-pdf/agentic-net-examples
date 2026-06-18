@@ -1,61 +1,55 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core PDF API
-using Aspose.Pdf.Forms;        // For signature fields (if needed)
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "signed_input.pdf";   // Path to the signed PDF
-        const string outputDir = "ExtractedImages";    // Directory to store PNG files
+        const string inputPdf = "signed_input.pdf";
+        const string outputRoot = "ExtractedImages";
 
-        // Verify input file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputDir);
+        // Ensure the root output folder exists
+        Directory.CreateDirectory(outputRoot);
 
-        try
+        // Load the signed PDF document
+        using (Document doc = new Document(inputPdf))
         {
-            // Load the PDF document (lifecycle: load)
-            using (Document doc = new Document(inputPdf))
+            // Iterate through all pages (1‑based indexing)
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-                for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+                Page page = doc.Pages[pageIndex];
+
+                // Create a folder for the current page
+                string pageFolder = Path.Combine(outputRoot, $"Page_{pageIndex}");
+                Directory.CreateDirectory(pageFolder);
+
+                int imageCounter = 1;
+
+                // Iterate over images in the page resources
+                foreach (XImage img in page.Resources.Images)
                 {
-                    Page page = doc.Pages[pageNum];
+                    // Use a generic PNG extension – Aspose.Pdf will write the image in its native format
+                    string imagePath = Path.Combine(pageFolder, $"Image_{imageCounter}.png");
 
-                    // Each page has a Resources.Images collection (XImageCollection)
-                    int imgIndex = 1;
-                    foreach (XImage img in page.Resources.Images)
+                    // Save the image using the Stream overload (XImage.Save(string) is not available)
+                    using (FileStream fs = new FileStream(imagePath, FileMode.Create, FileAccess.Write))
                     {
-                        // Build a unique file name per page and image
-                        string outPath = Path.Combine(
-                            outputDir,
-                            $"page{pageNum}_img{imgIndex}.png");
-
-                        // Save the image as PNG using a FileStream (overload expects Stream)
-                        using (FileStream fs = new FileStream(outPath, FileMode.Create, FileAccess.Write))
-                        {
-                            img.Save(fs); // XImage.Save determines format from file extension
-                        }
-
-                        Console.WriteLine($"Saved image: {outPath}");
-                        imgIndex++;
+                        img.Save(fs);
                     }
+
+                    Console.WriteLine($"Saved {imagePath}");
+                    imageCounter++;
                 }
             }
+        }
 
-            Console.WriteLine("Image extraction completed successfully.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during extraction: {ex.Message}");
-        }
+        Console.WriteLine("Image extraction completed.");
     }
 }

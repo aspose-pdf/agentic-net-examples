@@ -4,12 +4,12 @@ class Example
 {
     static void Main()
     {
-        // Create a ContentsResizeParameters instance with 5‑point margins on all sides.
-        // The static Margins method accepts absolute values (default space units).
+        // Create a ContentsResizeParameters instance with absolute margins of 5 points
+        // on the left, right, top, and bottom sides.
         PdfFileEditor.ContentsResizeParameters parameters =
             PdfFileEditor.ContentsResizeParameters.Margins(5, 5, 5, 5);
 
-        // The 'parameters' object can now be used with PdfFileEditor methods
-        // such as ResizeContents, AddMargins, etc.
+        // The 'parameters' object can now be passed to PdfFileEditor methods
+        // such as ResizeContents, AddMargins, etc., to apply the margin settings.
     }
 }

@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -8,88 +7,56 @@ class Program
 {
     static void Main()
     {
-        // Paths (adjust as needed)
-        const string outputPath = "AutoNumberedTable.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Create a new PDF document
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a page to the document
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Create a table with two columns
-            Table table = new Table
-            {
-                // Optional: set table position and width
-                Left = 50,
-                Top = 700,
-                ColumnWidths = "50 200" // first column 50 units, second column 200 units
-            };
+        // Load the existing PDF inside a using block for proper disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Create a new table
+            Table table = new Table();
 
-            // Sample data for the second column
-            string[] data = { "Apple", "Banana", "Cherry", "Date", "Elderberry" };
+            // Optional: set table position and width
+            table.Left = 50;
+            table.Top  = 700;
+            // Use a valid ColumnAdjustment enum value
+            table.ColumnAdjustment = ColumnAdjustment.AutoFitToContent;
 
-            // Add rows: first column will be filled later with numbers
-            foreach (string item in data)
+            // Define number of rows and columns (example values)
+            int rowCount    = 10; // total rows to create
+            int columnCount = 4;  // total columns (first column will hold numbers)
+
+            // Populate the table
+            for (int i = 0; i < rowCount; i++)
             {
                 // Add a new row
                 Row row = table.Rows.Add();
 
-                // Add empty cell for the auto‑numbered column
-                row.Cells.Add(new Cell());
+                // First cell: auto‑numbered value (1‑based)
+                Cell numberCell = row.Cells.Add();
+                numberCell.Paragraphs.Add(new TextFragment((i + 1).ToString()));
 
-                // Add cell with actual data
-                Cell dataCell = new Cell();
-                dataCell.Paragraphs.Add(new TextFragment(item));
-                row.Cells.Add(dataCell);
-            }
-
-            // Insert sequential numbers into the first cell of each row
-            for (int i = 0; i < table.Rows.Count; i++)
-            {
-                Row row = table.Rows[i];
-                // Ensure the first cell exists
-                if (row.Cells.Count > 0)
+                // Remaining cells: placeholder text
+                for (int j = 1; j < columnCount; j++)
                 {
-                    // Clear any existing content (if any) and add the number
-                    row.Cells[0].Paragraphs.Clear();
-                    row.Cells[0].Paragraphs.Add(new TextFragment((i + 1).ToString()));
+                    Cell cell = row.Cells.Add();
+                    cell.Paragraphs.Add(new TextFragment($"R{i + 1}C{j + 1}"));
                 }
             }
 
-            // Add the table to the page
-            page.Paragraphs.Add(table);
+            // Add the table to the first page of the document
+            doc.Pages[1].Paragraphs.Add(table);
 
-            // Save the PDF – guard against missing GDI+ (libgdiplus) on non‑Windows platforms
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                doc.Save(outputPath);
-                Console.WriteLine($"PDF saved to '{outputPath}'.");
-            }
-            else
-            {
-                try
-                {
-                    doc.Save(outputPath);
-                    Console.WriteLine($"PDF saved to '{outputPath}'.");
-                }
-                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
-                {
-                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. PDF was not saved.");
-                }
-            }
+            // Save the modified PDF using the provided save rule (inside the using block)
+            doc.Save(outputPath);
         }
-    }
 
-    // Helper that walks the inner‑exception chain looking for a DllNotFoundException
-    private static bool ContainsDllNotFound(Exception? ex)
-    {
-        while (ex != null)
-        {
-            if (ex is DllNotFoundException)
-                return true;
-            ex = ex.InnerException;
-        }
-        return false;
+        Console.WriteLine($"Table with auto‑numbered column saved to '{outputPath}'.");
     }
 }

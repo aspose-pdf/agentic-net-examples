@@ -9,28 +9,26 @@ class Program
         const string inputPath  = "input.pdf";
         const string outputPath = "output_a5.pdf";
 
-        // Verify the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (using ensures proper disposal)
+        // Load the PDF document (using block ensures proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based; iterate through each page
+            // Pages collection is 1‑based; iterate through all pages
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                Page page = doc.Pages[i];
-                // Resize the current page to A5 dimensions
-                page.Resize(PageSize.A5);
+                // Resize each page to the predefined A5 size
+                doc.Pages[i].Resize(PageSize.A5);
             }
 
-            // Save the resized document
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"All pages resized to A5 and saved to '{outputPath}'.");
+        Console.WriteLine($"All pages resized to A5 and saved as '{outputPath}'.");
     }
 }

@@ -16,31 +16,51 @@ class Program
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-
         if (!File.Exists(configPath))
         {
-            Console.Error.WriteLine($"Configuration file not found: {configPath}");
+            Console.Error.WriteLine($"Config file not found: {configPath}");
             return;
         }
 
-        // Read page numbers (comma, semicolon, or newline separated) and convert to an int array.
-        int[] pagesToDelete = File.ReadAllText(configPath)
-                                  .Split(new[] { ',', ';', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
-                                  .Select(s => int.Parse(s.Trim()))
-                                  .ToArray();
-
-        // Open the PDF, delete the specified pages, and save the result.
-        using (Document doc = new Document(inputPdf))
+        // Read page numbers from the configuration file.
+        // The file may contain numbers separated by commas, semicolons, or new lines.
+        int[] pagesToDelete;
+        try
         {
-            if (pagesToDelete.Length > 0)
-            {
-                // Page numbers are 1‑based; Delete(int[]) removes all listed pages.
-                doc.Pages.Delete(pagesToDelete);
-            }
-
-            doc.Save(outputPdf);
+            string configContent = File.ReadAllText(configPath);
+            pagesToDelete = configContent
+                .Split(new[] { ',', ';', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(s => int.Parse(s.Trim()))
+                .ToArray();
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to parse page numbers: {ex.Message}");
+            return;
         }
 
-        Console.WriteLine($"Processed PDF saved to '{outputPdf}'.");
+        if (pagesToDelete.Length == 0)
+        {
+            Console.WriteLine("No pages specified for deletion.");
+            return;
+        }
+
+        try
+        {
+            // Load the PDF, delete the specified pages, and save the result.
+            using (Document doc = new Document(inputPdf))
+            {
+                // Delete pages using the overload that accepts an int array.
+                // Page numbers are 1‑based as required by Aspose.Pdf.
+                doc.Pages.Delete(pagesToDelete);
+                doc.Save(outputPdf);
+            }
+
+            Console.WriteLine($"Pages deleted and saved to '{outputPdf}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
+        }
     }
 }

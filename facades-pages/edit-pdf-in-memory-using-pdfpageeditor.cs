@@ -1,13 +1,12 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,43 +15,37 @@ class Program
             return;
         }
 
-        // Load the source PDF into a byte array
-        byte[] inputBytes = File.ReadAllBytes(inputPath);
-
-        // Edit the PDF entirely in memory
-        byte[] outputBytes = EditPdfInMemory(inputBytes);
-
-        // Write the edited PDF to the destination file
-        File.WriteAllBytes(outputPath, outputBytes);
-        Console.WriteLine($"Edited PDF saved to '{outputPath}'.");
-    }
-
-    // Edits a PDF using PdfPageEditor with in‑memory streams.
-    // Example modifications: set zoom to 50% and rotate all pages 90°.
-    static byte[] EditPdfInMemory(byte[] pdfData)
-    {
-        // Input stream containing the original PDF
-        using (var inputStream = new MemoryStream(pdfData))
+        // Load the source PDF completely into a memory stream
+        using (FileStream fileStream = File.OpenRead(inputPath))
+        using (MemoryStream inputMemory = new MemoryStream())
         {
-            // PdfPageEditor works on the bound document
-            using (var editor = new PdfPageEditor())
+            fileStream.CopyTo(inputMemory);
+            inputMemory.Position = 0; // reset for reading
+
+            // Prepare a memory stream that will receive the edited PDF
+            using (MemoryStream outputMemory = new MemoryStream())
             {
-                // Bind the PDF from the input stream
-                editor.BindPdf(inputStream);
-
-                // Apply desired edits
-                editor.Zoom = 0.5f;      // 50 % zoom
-                editor.Rotation = 90;   // Rotate pages 90 degrees
-
-                // Output stream for the edited PDF
-                using (var outputStream = new MemoryStream())
+                // Create the PdfPageEditor facade and bind the input stream
+                using (PdfPageEditor editor = new PdfPageEditor())
                 {
-                    // Save the modified PDF into the output stream
-                    editor.Save(outputStream);
+                    editor.BindPdf(inputMemory);
 
-                    // Return the edited PDF as a byte array
-                    return outputStream.ToArray();
+                    // Example modifications:
+                    // - Reduce page size to 80% (zoom factor 0.8)
+                    // - Rotate all pages by 90 degrees
+                    editor.Zoom = 0.8f;
+                    editor.Rotation = 90; // valid values: 0, 90, 180, 270
+
+                    // Apply the changes (optional; Save will also apply them)
+                    editor.ApplyChanges();
+
+                    // Save the edited document into the output memory stream
+                    editor.Save(outputMemory);
                 }
+
+                // Persist the edited PDF to a file (optional, for verification)
+                File.WriteAllBytes(outputPath, outputMemory.ToArray());
+                Console.WriteLine($"Edited PDF saved to '{outputPath}'.");
             }
         }
     }

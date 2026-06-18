@@ -1,14 +1,14 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
-using System.Drawing.Imaging;
+using Aspose.Pdf;
+using Aspose.Pdf.Devices; // for BmpDevice and Resolution
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputDir = "BmpImages";
+        const string inputPdf = "input.pdf";
+        const string outputFolder = "BmpImages";
 
         if (!File.Exists(inputPdf))
         {
@@ -16,39 +16,32 @@ class Program
             return;
         }
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputDir);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        try
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPdf);
+
+        // Determine how many pages we will process (up to 10 or the total page count)
+        int pagesToConvert = Math.Min(10, pdfDocument.Pages.Count);
+
+        // Optional: set a higher resolution for better image quality
+        Resolution resolution = new Resolution(150);
+        // Create a BMP device with the desired resolution
+        BmpDevice bmpDevice = new BmpDevice(resolution);
+
+        for (int pageNumber = 1; pageNumber <= pagesToConvert; pageNumber++)
         {
-            // PdfConverter is a Facade that implements IDisposable
-            using (PdfConverter converter = new PdfConverter())
+            // Build the output BMP file name
+            string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.bmp");
+
+            // Convert the current page to a BMP image using the BmpDevice
+            using (FileStream imageStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
             {
-                // Bind the PDF file to the converter
-                converter.BindPdf(inputPdf);
-
-                // Limit conversion to pages 1 through 10
-                converter.StartPage = 1;   // minimal value is 1
-                converter.EndPage   = 10;  // end page inclusive
-
-                // Prepare the converter (required before extracting images)
-                converter.DoConvert();
-
-                int imageIndex = 1;
-                // Loop through available images and save each as BMP
-                while (converter.HasNextImage())
-                {
-                    string outputPath = Path.Combine(outputDir, $"page_{imageIndex}.bmp");
-                    converter.GetNextImage(outputPath, ImageFormat.Bmp);
-                    imageIndex++;
-                }
+                bmpDevice.Process(pdfDocument.Pages[pageNumber], imageStream);
             }
+        }
 
-            Console.WriteLine($"Conversion completed. BMP images saved to '{outputDir}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
-        }
+        Console.WriteLine("PDF to BMP conversion completed.");
     }
 }

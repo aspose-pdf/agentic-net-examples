@@ -8,47 +8,40 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "flattened_output.pdf";
+        const string outputPath = "flattened.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Ensure the document actually contains a form
-            if (doc.Form != null)
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
             {
-                // Retrieve the field named "Name" as a TextBoxField (or any Field that supports Value)
-                if (doc.Form["Name"] is TextBoxField nameField)
-                {
+                // Fill form fields – cast the returned WidgetAnnotation to a Field
+                Field? nameField = doc.Form["Name"] as Field;
+                if (nameField != null)
                     nameField.Value = "John Doe";
-                }
-                else if (doc.Form["Name"] is Field genericField && genericField != null)
-                {
-                    // Fallback for other field types that expose the Value property
-                    genericField.Value = "John Doe";
-                }
-                else
-                {
-                    Console.Error.WriteLine("Field 'Name' not found or is of an unsupported type.");
-                }
 
-                // Flatten all form fields so they become part of the page content
+                Field? dateField = doc.Form["Date"] as Field;
+                if (dateField != null)
+                    dateField.Value = DateTime.Today.ToShortDateString();
+
+                // Flatten the form – removes interactive fields and writes their values onto the page
                 doc.Form.Flatten();
-            }
-            else
-            {
-                Console.Error.WriteLine("The PDF does not contain any form fields.");
+
+                // Save the flattened PDF
+                doc.Save(outputPath);
             }
 
-            // Save the resulting PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Flattened PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Flattened PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

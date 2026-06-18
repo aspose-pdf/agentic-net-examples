@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
@@ -9,73 +9,82 @@ class AnnotationSummaryUtility
 {
     static void Main(string[] args)
     {
-        // Expect a directory path containing PDF files as the first argument.
-        if (args.Length == 0 || !Directory.Exists(args[0]))
+        // Expect one or more PDF file paths as command‑line arguments.
+        if (args.Length == 0)
         {
-            Console.Error.WriteLine("Please provide a valid directory path containing PDF files.");
+            Console.Error.WriteLine("Usage: AnnotationSummaryUtility <pdfPath1> [<pdfPath2> ...]");
             return;
         }
 
-        string inputDirectory = args[0];
-        string[] pdfFiles = Directory.GetFiles(inputDirectory, "*.pdf", SearchOption.TopDirectoryOnly);
-
-        if (pdfFiles.Length == 0)
+        // Prepare a simple text report.
+        string reportPath = "AnnotationSummaryReport.txt";
+        using (StreamWriter reportWriter = new StreamWriter(reportPath, false))
         {
-            Console.WriteLine("No PDF files found in the specified directory.");
-            return;
-        }
-
-        foreach (string pdfPath in pdfFiles)
-        {
-            try
+            foreach (string pdfPath in args)
             {
-                // Load the PDF to obtain page count (required for extraction range).
-                using (Document doc = new Document(pdfPath))
+                if (!File.Exists(pdfPath))
                 {
-                    int pageCount = doc.Pages.Count;
+                    Console.Error.WriteLine($"File not found: {pdfPath}");
+                    reportWriter.WriteLine($"{pdfPath}: File not found");
+                    continue;
+                }
 
-                    // Use PdfAnnotationEditor (Facade) to work with annotations.
-                    PdfAnnotationEditor editor = new PdfAnnotationEditor();
-                    editor.BindPdf(pdfPath);
-
-                    // Extract all annotations in the document.
-                    // Passing an empty AnnotationType array returns all annotation types.
-                    IList<Annotation> annotations = editor.ExtractAnnotations(1, pageCount, new AnnotationType[0]);
-
-                    // Count annotations by their type.
-                    Dictionary<string, int> typeCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-                    foreach (Annotation ann in annotations)
+                try
+                {
+                    // Create the facade and bind the PDF (load).
+                    using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
                     {
-                        string typeName = ann.AnnotationType.ToString();
-                        if (typeCounts.ContainsKey(typeName))
-                            typeCounts[typeName]++;
-                        else
-                            typeCounts[typeName] = 1;
-                    }
+                        editor.BindPdf(pdfPath);
 
-                    // Output the summary for the current PDF.
-                    Console.WriteLine($"--- Annotation Summary for: {Path.GetFileName(pdfPath)} ---");
-                    if (typeCounts.Count == 0)
-                    {
-                        Console.WriteLine("No annotations found.");
-                    }
-                    else
-                    {
-                        foreach (var kvp in typeCounts)
+                        // Get total number of pages (1‑based indexing).
+                        int pageCount = editor.Document.Pages.Count;
+
+                        // Retrieve all possible annotation types.
+                        AnnotationType[] allTypes = (AnnotationType[])Enum.GetValues(typeof(AnnotationType));
+
+                        // Extract all annotations in the document.
+                        IList<Aspose.Pdf.Annotations.Annotation> annotations =
+                            editor.ExtractAnnotations(1, pageCount, allTypes);
+
+                        // Count annotations per type.
+                        Dictionary<AnnotationType, int> typeCounts = new Dictionary<AnnotationType, int>();
+                        foreach (Aspose.Pdf.Annotations.Annotation annot in annotations)
                         {
-                            Console.WriteLine($"{kvp.Key}: {kvp.Value}");
+                            AnnotationType type = annot.AnnotationType;
+                            if (typeCounts.ContainsKey(type))
+                                typeCounts[type]++;
+                            else
+                                typeCounts[type] = 1;
                         }
-                    }
-                    Console.WriteLine();
 
-                    // Clean up the facade.
-                    editor.Close();
+                        // Write summary for this PDF.
+                        Console.WriteLine($"Processed: {pdfPath}");
+                        reportWriter.WriteLine($"File: {pdfPath}");
+                        if (typeCounts.Count == 0)
+                        {
+                            Console.WriteLine("  No annotations found.");
+                            reportWriter.WriteLine("  No annotations found.");
+                        }
+                        else
+                        {
+                            foreach (KeyValuePair<AnnotationType, int> kvp in typeCounts)
+                            {
+                                Console.WriteLine($"  {kvp.Key}: {kvp.Value}");
+                                reportWriter.WriteLine($"  {kvp.Key}: {kvp.Value}");
+                            }
+                        }
+                        reportWriter.WriteLine(); // blank line between files
+                    } // editor disposed here (load resources released)
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"Error processing {pdfPath}: {ex.Message}");
+                    reportWriter.WriteLine($"{pdfPath}: Error - {ex.Message}");
+                    reportWriter.WriteLine();
                 }
             }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
-            }
         }
+
+        Console.WriteLine($"Annotation summary written to '{reportPath}'.");
     }
 }

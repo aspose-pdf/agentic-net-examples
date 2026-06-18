@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -10,36 +9,37 @@ class Program
         const string inputPath  = "input.pdf";
         const string outputPath = "rotated_output.pdf";
 
-        if (!File.Exists(inputPath))
+        // Ensure the source file exists
+        if (!System.IO.File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Use PdfPageEditor facade to edit page rotations.
-        using (PdfPageEditor editor = new PdfPageEditor())
+        // Initialize the PdfPageEditor facade
+        PdfPageEditor editor = new PdfPageEditor();
+
+        // Bind the source PDF
+        editor.BindPdf(inputPath);
+
+        // Specify rotations for pages 3, 5 and 7 (1‑based indexing)
+        // Using multiple entries in the PageRotations dictionary
+        editor.PageRotations = new Dictionary<int, int>
         {
-            // Load the source PDF.
-            editor.BindPdf(inputPath);
+            { 3, 180 },
+            { 5, 180 },
+            { 7, 180 }
+        };
 
-            // Define rotations for specific pages (1‑based indexing).
-            var rotations = new Dictionary<int, int>
-            {
-                { 3, 180 },
-                { 5, 180 },
-                { 7, 180 }
-            };
+        // Apply the changes to the document
+        editor.ApplyChanges();
 
-            // Assign the rotations to the editor.
-            editor.PageRotations = rotations;
+        // Save the modified PDF
+        editor.Save(outputPath);
 
-            // Apply the changes to the document.
-            editor.ApplyChanges();
+        // Release resources held by the facade
+        editor.Close();
 
-            // Save the modified PDF.
-            editor.Save(outputPath);
-        }
-
-        Console.WriteLine($"Pages 3, 5, and 7 rotated 180° and saved to '{outputPath}'.");
+        Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
     }
 }

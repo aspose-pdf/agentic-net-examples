@@ -7,35 +7,34 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
             // Create an absorber that searches for the word "Draft"
             TextFragmentAbsorber absorber = new TextFragmentAbsorber("Draft");
 
-            // Search the entire document (all pages)
+            // Search the entire document
             absorber.Visit(doc);
 
-            // Apply a 15‑degree rotation to each found text fragment
+            // Rotate each found text fragment by 15 degrees
             foreach (TextFragment fragment in absorber.TextFragments)
             {
-                // Rotation is specified in degrees
-                fragment.TextState.Rotation = 15f;
+                fragment.TextState.Rotation = 15;
             }
 
-            // Save the modified PDF
+            // Save the modified document (PDF format)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Rotated 'Draft' text saved to '{outputPath}'.");
     }
 }

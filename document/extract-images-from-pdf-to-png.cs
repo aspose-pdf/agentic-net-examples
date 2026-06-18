@@ -1,44 +1,44 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using System.Drawing.Imaging; // ImageFormat.Png
+using Aspose.Pdf;               // Document, Page, XImage
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string inputPdf  = "input.pdf";
         const string outputDir = "ExtractedImages";
 
+        // Verify input file exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Ensure the output directory exists
+        // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document (using statement ensures proper disposal)
-        using (Document pdfDoc = new Document(inputPdf))
+        // Open the PDF document (1‑based page indexing)
+        using (Document doc = new Document(inputPdf))
         {
             int imageIndex = 1;
 
-            // Iterate through all pages (1‑based indexing)
-            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
-                Page page = pdfDoc.Pages[pageNum];
+                Page page = doc.Pages[pageNum];
 
                 // Iterate over all images defined in the page resources
-                foreach (XImage img in page.Resources.Images)
+                foreach (XImage xImg in page.Resources.Images)
                 {
-                    // Build a unique file name for each extracted image
                     string outPath = Path.Combine(outputDir, $"image_{imageIndex}.png");
 
-                    // Save the image as PNG preserving its original resolution.
-                    // XImage.Save only accepts a Stream in this version, so we open a FileStream.
-                    using (FileStream fs = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+                    // Save the image as PNG, preserving its original resolution
+                    // XImage supports saving to a stream or file with a specified ImageFormat
+                    using (FileStream fs = new FileStream(outPath, FileMode.Create))
                     {
-                        img.Save(fs);
+                        xImg.Save(fs, ImageFormat.Png);
                     }
 
                     Console.WriteLine($"Saved image {imageIndex} → {outPath}");

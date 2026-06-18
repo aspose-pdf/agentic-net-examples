@@ -17,15 +17,16 @@ class Program
 
         // 10 mm expressed in points (1 inch = 72 points, 1 mm = 72/25.4 points)
         const double mmToPoints = 72.0 / 25.4;
-        double leftMarginPoints = 10.0 * mmToPoints; // ≈ 28.3465 points
+        double leftMarginX = 10 * mmToPoints; // 10 mm from the left edge
 
-        // Move the first stamp on page 4 to the left margin (10 mm from the left edge)
-        PdfContentEditor editor = new PdfContentEditor();
-        editor.BindPdf(inputPath);
-        // stampIndex is 1‑based; assuming we want to move the first stamp on the page
-        editor.MoveStamp(pageNumber: 4, stampIndex: 1, x: leftMarginPoints, y: 0);
-        editor.Save(outputPath);
-        editor.Close();
+        // Move the first stamp (index 1) on page 4.
+        // PdfContentEditor uses 1‑based page indexing.
+        using (PdfContentEditor editor = new PdfContentEditor())
+        {
+            editor.BindPdf(inputPath);
+            editor.MoveStamp(pageNumber: 4, stampIndex: 1, x: leftMarginX, y: 0);
+            editor.Save(outputPath);
+        }
 
         Console.WriteLine($"Stamp repositioned and saved to '{outputPath}'.");
     }

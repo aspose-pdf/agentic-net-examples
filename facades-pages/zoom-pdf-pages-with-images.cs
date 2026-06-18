@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text; // for ImagePlacementAbsorber
 
 class Program
 {
@@ -18,45 +17,56 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
             // Collect page numbers that contain at least one image
             List<int> pagesWithImages = new List<int>();
 
+            // Iterate through all pages (1‑based indexing)
             for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
-                // ImagePlacementAbsorber finds image placements on a page
-                ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
-                doc.Pages[pageNum].Accept(absorber);
-
-                if (absorber.ImagePlacements.Count > 0)
+                // Use PdfExtractor to check for images on the current page
+                using (PdfExtractor extractor = new PdfExtractor())
                 {
-                    pagesWithImages.Add(pageNum);
+                    extractor.BindPdf(doc);
+                    extractor.StartPage = pageNum;
+                    extractor.EndPage   = pageNum;
+                    extractor.ExtractImage();
+
+                    if (extractor.HasNextImage())
+                    {
+                        pagesWithImages.Add(pageNum);
+                    }
                 }
             }
 
-            // If any pages contain images, apply zoom only to those pages
-            if (pagesWithImages.Count > 0)
+            // If no pages contain images, simply save the original document
+            if (pagesWithImages.Count == 0)
             {
-                // PdfPageEditor works on the same Document instance
-                PdfPageEditor editor = new PdfPageEditor();
+                doc.Save(outputPath);
+                Console.WriteLine("No image pages found. Document saved unchanged.");
+                return;
+            }
+
+            // Apply zoom to the identified pages using PdfPageEditor
+            using (PdfPageEditor editor = new PdfPageEditor())
+            {
                 editor.BindPdf(doc);
 
                 // Specify the pages to be edited
                 editor.ProcessPages = pagesWithImages.ToArray();
 
-                // Set desired zoom factor (e.g., 150% zoom)
+                // Set desired zoom factor (e.g., 150% of original size)
                 editor.Zoom = 1.5f;
 
-                // Apply the changes to the selected pages
+                // Apply the changes to the document
                 editor.ApplyChanges();
             }
 
-            // Save the modified document (PDF format)
+            // Save the modified PDF
             doc.Save(outputPath);
+            Console.WriteLine($"Zoom applied to {pagesWithImages.Count} page(s). Saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

@@ -6,59 +6,41 @@ class Program
 {
     static void Main()
     {
-        // Paths of the source PDF files (could be any source; here we read from disk)
-        string[] inputFiles = { "first.pdf", "second.pdf", "third.pdf" };
-        string outputFile = "merged.pdf";
+        const string inputPath1 = "first.pdf";
+        const string inputPath2 = "second.pdf";
+        const string outputPath = "merged.pdf";
 
-        // Verify that all input files exist
-        foreach (var path in inputFiles)
+        if (!File.Exists(inputPath1) || !File.Exists(inputPath2))
         {
-            if (!File.Exists(path))
-            {
-                Console.Error.WriteLine($"Input file not found: {path}");
-                return;
-            }
+            Console.Error.WriteLine("One or both input files not found.");
+            return;
         }
 
-        // Load each PDF into a MemoryStream (in‑memory representation)
-        MemoryStream[] inputStreams = new MemoryStream[inputFiles.Length];
-        try
+        // Load the source PDFs into memory streams
+        using (FileStream fileStream1 = new FileStream(inputPath1, FileMode.Open, FileAccess.Read))
+        using (FileStream fileStream2 = new FileStream(inputPath2, FileMode.Open, FileAccess.Read))
+        using (MemoryStream memoryStream1 = new MemoryStream())
+        using (MemoryStream memoryStream2 = new MemoryStream())
         {
-            for (int i = 0; i < inputFiles.Length; i++)
-            {
-                byte[] data = File.ReadAllBytes(inputFiles[i]);
-                inputStreams[i] = new MemoryStream(data);
-                inputStreams[i].Position = 0; // Ensure the stream is at the beginning
-            }
+            fileStream1.CopyTo(memoryStream1);
+            fileStream2.CopyTo(memoryStream2);
+            memoryStream1.Position = 0;
+            memoryStream2.Position = 0;
 
-            // Create the output file stream where the concatenated PDF will be written
-            using (FileStream outStream = new FileStream(outputFile, FileMode.Create, FileAccess.Write))
+            // Prepare the output stream that will receive the concatenated PDF
+            using (FileStream outputStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
             {
-                PdfFileEditor editor = new PdfFileEditor();
+                // PdfFileEditor does not implement IDisposable, so we instantiate it directly
+                Aspose.Pdf.Facades.PdfFileEditor editor = new Aspose.Pdf.Facades.PdfFileEditor();
 
-                // When true, the editor will close the input streams after concatenation
+                // Optional: close the input streams automatically after concatenation
                 editor.CloseConcatenatedStreams = true;
 
-                // Concatenate the in‑memory streams directly into the output stream
-                bool success = editor.TryConcatenate(inputStreams, outStream);
+                // Concatenate the two PDFs from memory and write directly to the output file
+                editor.Concatenate(memoryStream1, memoryStream2, outputStream);
+            }
+        }
 
-                if (success)
-                {
-                    Console.WriteLine($"Successfully concatenated PDFs to '{outputFile}'.");
-                }
-                else
-                {
-                    Console.Error.WriteLine("PDF concatenation failed.");
-                }
-            }
-        }
-        finally
-        {
-            // Dispose all MemoryStreams to release resources
-            foreach (var ms in inputStreams)
-            {
-                ms?.Dispose();
-            }
-        }
+        Console.WriteLine($"Concatenated PDF saved to '{outputPath}'.");
     }
 }

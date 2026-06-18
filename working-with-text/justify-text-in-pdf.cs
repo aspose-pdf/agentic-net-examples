@@ -1,7 +1,7 @@
 using System;
-using System.Runtime.InteropServices;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
+using System.Runtime.InteropServices;
 
 class Program
 {
@@ -9,57 +9,39 @@ class Program
     {
         const string outputPath = "justified.pdf";
 
-        // Create a new PDF document (lifecycle: create)
+        // Create a new PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document())
         {
-            // Add a page to the document
+            // Add a blank page
             Page page = doc.Pages.Add();
 
-            // Create a text fragment with sample content
-            TextFragment fragment = new TextFragment(
+            // Create a TextFragment with sample text
+            TextFragment tf = new TextFragment(
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
                 "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
             );
 
             // Set justification by configuring TextState.HorizontalAlignment to Justify
-            fragment.TextState.HorizontalAlignment = HorizontalAlignment.Justify;
+            tf.TextState.HorizontalAlignment = HorizontalAlignment.Justify;
 
-            // Position the text fragment on the page (optional)
-            fragment.Position = new Position(50, 750); // X=50, Y=750
+            // Optional: set font, size, and color (using Aspose.Pdf APIs)
+            tf.TextState.Font = FontRepository.FindFont("Helvetica");
+            tf.TextState.FontSize = 12;
+            tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
 
-            // Add the fragment to the page's paragraph collection
-            page.Paragraphs.Add(fragment);
+            // Add the TextFragment to the page's paragraph collection
+            page.Paragraphs.Add(tf);
 
-            // Save the PDF – guard against missing GDI+ (libgdiplus) on non‑Windows platforms
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            // Guard Document.Save on macOS where libgdiplus may be missing
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                doc.Save(outputPath);
-                Console.WriteLine($"PDF saved to '{outputPath}'.");
+                Console.WriteLine("libgdiplus is required for PDF creation on macOS. Skipping save.");
             }
             else
             {
-                try
-                {
-                    doc.Save(outputPath);
-                    Console.WriteLine($"PDF saved to '{outputPath}'.");
-                }
-                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
-                {
-                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. PDF was not saved.");
-                }
+                doc.Save(outputPath);
+                Console.WriteLine($"PDF saved to {outputPath}");
             }
         }
-    }
-
-    // Helper to detect a nested DllNotFoundException (e.g., missing libgdiplus)
-    private static bool ContainsDllNotFound(Exception? ex)
-    {
-        while (ex != null)
-        {
-            if (ex is DllNotFoundException)
-                return true;
-            ex = ex.InnerException;
-        }
-        return false;
     }
 }

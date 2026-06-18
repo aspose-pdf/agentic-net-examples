@@ -8,22 +8,25 @@ class Program
     static void Main()
     {
         // Input PDF file path
-        const string inputPdfPath = "input.pdf";
-        // Output JPEG file path
-        const string outputJpegPath = "page1.jpg";
+        const string pdfPath = "input.pdf";
+
         // Page number to convert (1‑based indexing)
         const int pageNumber = 1;
 
-        if (!File.Exists(inputPdfPath))
+        // Output JPEG file path
+        const string jpegPath = "page1.jpg";
+
+        // Ensure the source PDF exists
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
         // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDocument = new Document(inputPdfPath))
+        using (Document pdfDocument = new Document(pdfPath))
         {
-            // Validate requested page number
+            // Validate the requested page number
             if (pageNumber < 1 || pageNumber > pdfDocument.Pages.Count)
             {
                 Console.Error.WriteLine($"Invalid page number {pageNumber}. Document has {pdfDocument.Pages.Count} pages.");
@@ -33,14 +36,16 @@ class Program
             // Create a JpegDevice with default resolution (150 DPI) and maximum quality
             JpegDevice jpegDevice = new JpegDevice();
 
-            // Convert the specified page to JPEG and write to a file stream
-            using (FileStream jpegStream = new FileStream(outputJpegPath, FileMode.Create))
+            // Get the specific page (1‑based indexing)
+            Page page = pdfDocument.Pages[pageNumber];
+
+            // Save the page as a JPEG image using a FileStream
+            using (FileStream jpegStream = new FileStream(jpegPath, FileMode.Create))
             {
-                jpegDevice.Process(pdfDocument.Pages[pageNumber], jpegStream);
-                // Stream will be closed automatically by the using statement
+                jpegDevice.Process(page, jpegStream);
             }
         }
 
-        Console.WriteLine($"Page {pageNumber} saved as JPEG to '{outputJpegPath}'.");
+        Console.WriteLine($"Page {pageNumber} of '{pdfPath}' saved as JPEG to '{jpegPath}'.");
     }
 }

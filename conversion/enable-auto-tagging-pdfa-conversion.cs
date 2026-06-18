@@ -6,41 +6,44 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";          // source PDF
-        const string outputPath = "output_pdfa.pdf";    // PDF/A result
-        const string logPath    = "conversion_log.txt"; // conversion log
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_pdfa.pdf";
+        const string logPath    = "conversion.log";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the source document inside a using block for deterministic disposal
+        // Load the source PDF document
         using (Document doc = new Document(inputPath))
         {
             // Create conversion options for PDF/A‑1B format
             PdfFormatConversionOptions options = new PdfFormatConversionOptions(PdfFormat.PDF_A_1B);
 
-            // Assign auto‑tagging settings and enable the feature
-            options.AutoTaggingSettings = AutoTaggingSettings.Default;
-            options.AutoTaggingSettings.EnableAutoTagging = true;
-
-            // Optional: configure heading recognition strategy, etc.
-            // options.AutoTaggingSettings.HeadingRecognitionStrategy = HeadingRecognitionStrategy.Auto;
-
-            // Specify a log file to capture conversion messages
+            // Optional: write conversion messages to a log file
             options.LogFileName = logPath;
 
-            // Perform the conversion using the configured options
-            bool conversionResult = doc.Convert(options);
-            if (!conversionResult)
+            // Enable automatic tagging during the conversion
+            AutoTaggingSettings autoTagSettings = new AutoTaggingSettings
             {
-                Console.Error.WriteLine("Conversion failed. See log for details.");
+                EnableAutoTagging = true
+                // Additional settings can be configured here, e.g.:
+                // HeadingRecognitionStrategy = HeadingRecognitionStrategy.Automatic,
+                // HeadingLevels = new HeadingLevels()
+            };
+            options.AutoTaggingSettings = autoTagSettings;
+
+            // Perform the conversion; the method returns true on success
+            bool conversionSucceeded = doc.Convert(options);
+            if (!conversionSucceeded)
+            {
+                Console.Error.WriteLine("Conversion failed. See the log file for details.");
                 return;
             }
 
-            // Save the converted PDF/A document
+            // Save the resulting PDF/A document
             doc.Save(outputPath);
         }
 

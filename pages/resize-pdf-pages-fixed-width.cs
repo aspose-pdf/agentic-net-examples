@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "resized.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "resized_output.pdf";
         const double targetWidth = 800.0; // points
 
         if (!File.Exists(inputPath))
@@ -16,37 +16,32 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPath))
+            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Pages are 1‑based indexed
-                for (int i = 1; i <= doc.Pages.Count; i++)
-                {
-                    Page page = doc.Pages[i];
+                Page page = doc.Pages[i];
 
-                    // Current page dimensions
-                    double currentWidth = page.PageInfo.Width;
-                    double currentHeight = page.PageInfo.Height;
+                // Original dimensions
+                double originalWidth  = page.PageInfo.Width;
+                double originalHeight = page.PageInfo.Height;
 
-                    // Scale factor to achieve the target width while preserving aspect ratio
-                    double scale = targetWidth / currentWidth;
-                    double newHeight = currentHeight * scale;
+                // Compute scaling factor to achieve the target width
+                double scale = targetWidth / originalWidth;
 
-                    // Resize the page
-                    page.SetPageSize(targetWidth, newHeight);
-                }
+                // New height preserving aspect ratio
+                double newHeight = originalHeight * scale;
 
-                // Save the modified document
-                doc.Save(outputPath);
+                // Apply the new size
+                page.SetPageSize(targetWidth, newHeight);
             }
 
-            Console.WriteLine($"All pages resized to width {targetWidth} points and saved as '{outputPath}'.");
+            // Save the modified document (PDF format)
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Pages resized to width {targetWidth} points. Saved as '{outputPath}'.");
     }
 }

@@ -6,34 +6,34 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputHtml = "output.html";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.html";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         try
         {
-            using (Document pdfDoc = new Document(inputPdf))
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
             {
-                HtmlSaveOptions htmlOpts = new HtmlSaveOptions
-                {
-                    CompressSvgGraphicsIfAny = true
-                };
+                // Configure HTML save options with SVG compression
+                HtmlSaveOptions htmlOpts = new HtmlSaveOptions();
+                htmlOpts.CompressSvgGraphicsIfAny = true;
 
-                try
-                {
-                    pdfDoc.Save(outputHtml, htmlOpts);
-                    Console.WriteLine($"HTML saved to '{outputHtml}'.");
-                }
-                catch (TypeInitializationException)
-                {
-                    Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
-                }
+                // Save as HTML
+                doc.Save(outputPath, htmlOpts);
             }
+
+            Console.WriteLine($"PDF successfully converted to HTML: {outputPath}");
+        }
+        catch (TypeInitializationException)
+        {
+            // HTML conversion relies on GDI+ (Windows only)
+            Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
         }
         catch (Exception ex)
         {

@@ -6,36 +6,34 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_pdfa.pdf";
-        const string logPath = "conversion_log.txt";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output_pdfa.pdf";
+        const string logFile   = "conversion_log.txt";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
         try
         {
             // Load the source PDF
-            using (Document doc = new Document(inputPath))
+            using (Document doc = new Document(inputPdf))
             {
-                // Convert to PDF/A‑1b, skipping (deleting) elements that cannot be converted.
-                // The conversion is performed in‑place; after this call the document
-                // complies with PDF/A‑1b. The log file contains details about any
-                // elements that were removed.
-                doc.Convert(logPath, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
+                // Convert to PDF/A‑1b, skipping (i.e., not failing) non‑convertible elements
+                // ConvertErrorAction.None corresponds to “skip” behavior
+                doc.Convert(logFile, PdfFormat.PDF_A_1B, ConvertErrorAction.None);
 
-                // Save the resulting PDF/A document
-                doc.Save(outputPath);
+                // Save the converted PDF/A document
+                doc.Save(outputPdf);
             }
 
-            Console.WriteLine($"PDF successfully converted to PDF/A‑1b and saved as '{outputPath}'.");
+            Console.WriteLine($"Conversion completed. Output saved to '{outputPdf}'. Log written to '{logFile}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
         }
     }
 }

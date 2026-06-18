@@ -2,58 +2,61 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // RichMediaAnnotation resides here
+using Aspose.Pdf; // for AnnotationFlags
 
 class Program
 {
     static void Main()
     {
-        const string targetPdfPath = "target.pdf";   // PDF to receive the annotation
-        const string embedPdfPath = "embed.pdf";    // PDF to embed as rich media
-        const string outputPdfPath = "output.pdf";
+        const string sourcePdfPath = "source.pdf";          // PDF to embed
+        const string targetPdfPath = "target.pdf";          // PDF to annotate
+        const string outputPdfPath = "output.pdf";          // Resulting PDF
 
+        // Ensure source files exist
+        if (!File.Exists(sourcePdfPath))
+        {
+            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
+            return;
+        }
         if (!File.Exists(targetPdfPath))
         {
             Console.Error.WriteLine($"Target PDF not found: {targetPdfPath}");
             return;
         }
-        if (!File.Exists(embedPdfPath))
-        {
-            Console.Error.WriteLine($"Embedded PDF not found: {embedPdfPath}");
-            return;
-        }
 
-        // Load the target document (the one that will contain the annotation)
-        using (Document doc = new Document(targetPdfPath))
+        // Load the PDF that will receive the annotation
+        using (Document targetDoc = new Document(targetPdfPath))
         {
-            // Choose the page where the annotation will be placed (first page)
-            Page page = doc.Pages[1];
+            // Choose the page where the annotation will be placed (first page, 1‑based index)
+            Page page = targetDoc.Pages[1];
 
-            // Define the annotation rectangle (coordinates are in points)
+            // Define the rectangle for the annotation (coordinates in points)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 700);
 
             // Create the RichMediaAnnotation
-            RichMediaAnnotation richMedia = new RichMediaAnnotation(page, rect);
-
-            // Embed the PDF content as a stream
-            using (FileStream embedStream = File.OpenRead(embedPdfPath))
+            RichMediaAnnotation richMedia = new RichMediaAnnotation(page, rect)
             {
-                // Set the content type to PDF and provide the stream
-                richMedia.SetContent("application/pdf", embedStream);
+                // Make the annotation read‑only and prevent user interaction
+                Flags = AnnotationFlags.ReadOnly | AnnotationFlags.LockedContents,
+                // Optional: prevent activation by any event (if the enum provides a None value)
+                // ActivateOn = RichMediaAnnotation.ActivationEvent.None
+            };
+
+            // Embed the source PDF as a stream inside the annotation
+            using (FileStream embedStream = File.OpenRead(sourcePdfPath))
+            {
+                // The first parameter is a name for the embedded content (can be any string)
+                richMedia.SetContent("EmbeddedPdf", embedStream);
             }
-
-            // Do NOT set an activation event – leaving it unset disables automatic launch.
-            // richMedia.ActivateOn = RichMediaAnnotation.ActivationEvent.None; // Removed – enum has no 'None'
-
-            // Make the annotation read‑only (no user interaction)
-            richMedia.Flags = AnnotationFlags.ReadOnly;
 
             // Add the annotation to the page
             page.Annotations.Add(richMedia);
 
             // Save the modified document
-            doc.Save(outputPdfPath);
+            targetDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Rich media annotation added. Output saved to '{outputPdfPath}'.");
+        Console.WriteLine($"RichMediaAnnotation added and saved to '{outputPdfPath}'.");
     }
 }

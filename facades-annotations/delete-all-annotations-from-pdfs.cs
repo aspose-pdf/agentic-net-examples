@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        // Folder containing the PDF files
+        // Folder containing PDF files
         const string folderPath = @"C:\PdfFolder";
 
         if (!Directory.Exists(folderPath))
@@ -20,16 +20,16 @@ class Program
         {
             try
             {
-                // PdfAnnotationEditor implements IDisposable via SaveableFacade
+                // Initialize the annotation editor facade
                 using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
                 {
-                    // Bind the existing PDF file
+                    // Bind the current PDF file
                     editor.BindPdf(pdfFile);
 
                     // Delete all annotations in the document
                     editor.DeleteAnnotations();
 
-                    // Overwrite the original file with the cleaned PDF
+                    // Overwrite the original file with the cleaned version
                     editor.Save(pdfFile);
                 }
 

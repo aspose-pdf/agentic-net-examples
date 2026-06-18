@@ -7,35 +7,36 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        // Input PDF file path
+        const string inputPath = "input.pdf";
+        // Output PDF file path with the transition effect applied
         const string outputPath = "output.pdf";
 
+        // Ensure the input file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (creation rule)
+        // Load the PDF document and edit page 3 using PdfPageEditor
         using (Document doc = new Document(inputPath))
+        using (PdfPageEditor editor = new PdfPageEditor(doc))
         {
-            // Initialize PdfPageEditor with the loaded document
-            PdfPageEditor editor = new PdfPageEditor(doc);
-
-            // Specify that only page 3 should be edited
+            // Target only page 3 (pages are 1‑based)
             editor.ProcessPages = new int[] { 3 };
 
-            // Set transition type to a split effect (horizontal in)
+            // Set a split transition (horizontal split-in effect)
             editor.TransitionType = PdfPageEditor.SPLITHIN;
 
-            // Set transition duration to 2 seconds
+            // Set the transition duration to 2 seconds
             editor.TransitionDuration = 2;
 
             // Apply the changes to the document
             editor.ApplyChanges();
 
-            // Save the modified PDF (saving rule)
-            doc.Save(outputPath);
+            // Save the modified document
+            editor.Save(outputPath);
         }
 
         Console.WriteLine($"Transition applied and saved to '{outputPath}'.");

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq; // Needed for Count() / Any()
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Security;
@@ -8,7 +9,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "signed.pdf";
+        const string inputPath = "signed_document.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,26 +17,30 @@ class Program
             return;
         }
 
-        // Load the PDF document (using statement ensures proper disposal)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            bool anySignature = false;
+            // Ensure the document contains form fields
+            if (doc.Form == null || doc.Form.Fields == null || !doc.Form.Fields.Any())
+            {
+                Console.WriteLine("No form fields found in the document.");
+                return;
+            }
 
-            // Iterate over form fields and process only signature fields that contain a signature
+            bool anySignature = false;
+            // Iterate over all fields and process only signature fields
             foreach (Field field in doc.Form.Fields)
             {
                 if (field is SignatureField sigField && sigField.Signature != null)
                 {
                     anySignature = true;
 
-                    // Retrieve information about the signature algorithm
+                    // Retrieve algorithm information from the embedded signature
                     SignatureAlgorithmInfo algoInfo = sigField.Signature.GetSignatureAlgorithmInfo();
-
-                    // Extract the digest hash algorithm used for the signature
                     DigestHashAlgorithm digestAlg = algoInfo.DigestHashAlgorithm;
 
-                    // Log the signature field name and its digest algorithm
-                    Console.WriteLine($"Signature field '{sigField.PartialName}' uses digest algorithm: {digestAlg}");
+                    // Log the result for compliance reporting
+                    Console.WriteLine($"Signature field '{sigField.PartialName}': Digest Algorithm = {digestAlg}");
                 }
             }
 

@@ -1,47 +1,45 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;   // for JavascriptAction
 
 class Program
 {
     static void Main()
     {
-        // Path to the output PDF
+        // Paths for the output PDF
         const string outputPath = "DateFieldValidated.pdf";
 
-        // Create a new PDF document inside a using block for deterministic disposal
+        // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a page to host the date field
+            // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Define the rectangle where the date field will appear (llx, lly, urx, ury)
-            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 250, 630);
+            // Define the rectangle where the date field will be placed
+            // (llx, lly, urx, ury) – coordinates are in points
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 250, 620);
 
-            // Create the date field and add it to the document's form collection
+            // Create a DateField on the page
             DateField dateField = new DateField(page, rect);
             doc.Form.Add(dateField);
 
-            // Set the visual date format (optional, shows the expected format)
+            // Set the display format of the field (optional, helps the user)
             dateField.DateFormat = "MM/dd/yyyy";
 
-            // Add a JavaScript action that validates the entered value against MM/DD/YYYY
-            // The action runs when the field loses focus (OnLostFocus). Adjust as needed.
-            string js = @"
-                var re = /^\d{2}\/\d{2}\/\d{4}$/;
-                if (!re.test(this.value)) {
-                    app.alert('Invalid date format. Please use MM/DD/YYYY.');
-                    // Optionally clear the invalid value
-                    this.value = '';
-                }
-            ";
-            // Use the correct action property for losing focus
-            dateField.Actions.OnLostFocus = new JavascriptAction(js);
+            // Attach a JavaScript action that validates the entered value
+            // against the regular expression ^\d{2}/\d{2}/\d{4}$
+            // If the value does not match, show an alert and clear the field.
+            dateField.Actions.OnValidate = new JavascriptAction(
+                "var re = /^\\d{2}\\/\\d{2}\\/\\d{4}$/;" +
+                "if (!re.test(this.value)) {" +
+                "    app.alert('Invalid date format. Please use MM/DD/YYYY');" +
+                "    this.value = '';" +
+                "}"
+            );
 
-            // Save the PDF
+            // Save the PDF document
             doc.Save(outputPath);
         }
 

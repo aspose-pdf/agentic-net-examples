@@ -1,36 +1,36 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core API
-using Aspose.Pdf.Text;          // For any text-related needs (not used here)
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "branded_output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
+        // Verify input file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (using rule: document-disposal-with-using)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing per rule: page-indexing-one-based)
+            // Pages collection is 1‑based; iterate through all pages
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
-                // Set a LightGray background for branding
-                page.Background = Color.LightGray;   // Aspose.Pdf.Color
+                // Set the page background to LightGray using Aspose.Pdf.Color
+                page.Background = Aspose.Pdf.Color.LightGray;
             }
 
-            // Save the modified PDF (PDF format, no extra SaveOptions needed)
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Branded PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with LightGray background to '{outputPath}'.");
     }
 }

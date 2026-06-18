@@ -6,50 +6,38 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";          // source PDF
-        const string outputPath = "output_with_bg.pdf"; // result PDF
-        const string patternPath = "pattern.png";       // background pattern image
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string patternPath = "pattern.png";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPath) || !File.Exists(patternPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine("Input PDF or pattern image not found.");
             return;
         }
 
-        if (!File.Exists(patternPath))
-        {
-            Console.Error.WriteLine($"Pattern image not found: {patternPath}");
-            return;
-        }
-
-        // Load the PDF document (using block ensures proper disposal)
+        // Load the PDF document (using rule: document-disposal-with-using)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+            // Pages are 1‑based (rule: page-indexing-one-based)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Create a background artifact for the page
-                BackgroundArtifact bgArtifact = new BackgroundArtifact();
+                // Create a background artifact, set the image and opacity
+                BackgroundArtifact bg = new BackgroundArtifact();
+                bg.SetImage(patternPath);   // load image from file
+                bg.Opacity = 0.05;          // 5 percent opacity
+                bg.IsBackground = true;    // place behind page contents
 
-                // Set the image that will be used as the background pattern
-                bgArtifact.SetImage(patternPath);
-
-                // Place the artifact behind page contents
-                bgArtifact.IsBackground = true;
-
-                // Set a subtle opacity (5 percent)
-                bgArtifact.Opacity = 0.05;
-
-                // Add the artifact to the page's artifact collection
-                page.Artifacts.Add(bgArtifact);
+                // Add the artifact to the page
+                page.Artifacts.Add(bg);
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (rule: document-disposal-with-using)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with background pattern: {outputPath}");
+        Console.WriteLine($"Background pattern applied and saved to '{outputPath}'.");
     }
 }

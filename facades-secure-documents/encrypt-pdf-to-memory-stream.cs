@@ -1,43 +1,39 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
-class Program
+namespace EncryptPdfExample
 {
-    static void Main()
+    class Program
     {
-        const string inputPath = "input.pdf";
-        const string userPassword = "user123";
-        const string ownerPassword = "owner123";
-
-        if (!File.Exists(inputPath))
+        static void Main()
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            // Step 1: Create a sample PDF and save it to a file
+            using (Document sampleDoc = new Document())
+            {
+                Page page = sampleDoc.Pages.Add();
+                TextFragment fragment = new TextFragment("Sample PDF for encryption");
+                page.Paragraphs.Add(fragment);
+                sampleDoc.Save("input.pdf");
+            }
 
-        // Encrypt the PDF using PdfFileSecurity facade and write the result to a memory stream.
-        using (MemoryStream encryptedStream = new MemoryStream())
-        {
-            // Initialize the facade and bind the source PDF.
-            PdfFileSecurity security = new PdfFileSecurity();
-            security.BindPdf(inputPath);
+            // Step 2: Load the PDF, encrypt it, and save to a memory stream
+            using (Document encryptedDoc = new Document("input.pdf"))
+            {
+                Permissions permissions = Permissions.PrintDocument | Permissions.ExtractContent;
+                encryptedDoc.Encrypt("userPassword", "ownerPassword", permissions, CryptoAlgorithm.AESx256);
 
-            // Encrypt with full privileges and a 256‑bit key.
-            security.EncryptFile(
-                userPassword,
-                ownerPassword,
-                Aspose.Pdf.Facades.DocumentPrivilege.AllowAll,
-                Aspose.Pdf.Facades.KeySize.x256);
+                using (MemoryStream outputStream = new MemoryStream())
+                {
+                    encryptedDoc.Save(outputStream);
+                    // Reset the stream position to the beginning for further processing
+                    outputStream.Position = 0;
 
-            // Save the encrypted PDF into the memory stream.
-            security.Save(encryptedStream);
-
-            // Reset the stream position so it can be read/transmitted.
-            encryptedStream.Position = 0;
-
-            // Example usage: output the size of the encrypted PDF.
-            Console.WriteLine($"Encrypted PDF size: {encryptedStream.Length} bytes");
+                    // Example: display the size of the encrypted PDF
+                    Console.WriteLine("Encrypted PDF size (bytes): " + outputStream.Length);
+                }
+            }
         }
     }
 }

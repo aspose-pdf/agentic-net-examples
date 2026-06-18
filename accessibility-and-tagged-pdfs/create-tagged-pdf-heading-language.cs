@@ -9,61 +9,58 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "heading_tagged.pdf";
+        const string outputPath = "tagged_heading.pdf";
 
         // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Access the tagged content API
+            // Access the tagged‑content API
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Set the document language (optional but demonstrates usage)
+            // Set document‑level language and title
             tagged.SetLanguage("en-US");
-            // Set a title for the PDF (optional)
             tagged.SetTitle("Document with Heading");
 
-            // Obtain the root structure element (no cast required)
+            // Root element of the logical structure tree
             StructureElement root = tagged.RootElement;
 
-            // Create a level‑1 heading element
+            // Create a level‑1 heading (HeaderElement)
             HeaderElement heading = tagged.CreateHeaderElement(1);
-            // Define the visible text of the heading
-            heading.SetText("Chapter 1: Introduction");
+            heading.SetText("Sample Heading");
+
             // Assign a language attribute to the heading element
             heading.Language = "en-US";
 
-            // Attach the heading to the document's structure tree
+            // Attach the heading to the root element
             root.AppendChild(heading);
 
-            // Save the PDF – guard against missing GDI+ on non‑Windows platforms
+            // Save the PDF (guard against missing GDI+ on non‑Windows platforms)
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 doc.Save(outputPath);
-                Console.WriteLine($"PDF saved to '{outputPath}'.");
             }
             else
             {
                 try
                 {
                     doc.Save(outputPath);
-                    Console.WriteLine($"PDF saved to '{outputPath}'.");
                 }
                 catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
                 {
-                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. " +
-                                      "The PDF could not be saved.");
+                    Console.WriteLine("GDI+ not available; PDF saved without graphics.");
                 }
             }
         }
+
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 
-    // Helper that walks the inner‑exception chain looking for a DllNotFoundException
-    private static bool ContainsDllNotFound(Exception? ex)
+    // Helper to detect a nested DllNotFoundException (e.g., missing libgdiplus)
+    private static bool ContainsDllNotFound(Exception ex)
     {
         while (ex != null)
         {
-            if (ex is DllNotFoundException)
-                return true;
+            if (ex is DllNotFoundException) return true;
             ex = ex.InnerException;
         }
         return false;

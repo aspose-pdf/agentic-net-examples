@@ -6,43 +6,37 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string submitUrl  = "https://example.com/submit";
+        const string inputPdf  = "input.pdf";          // PDF containing a submit button
+        const string outputPdf = "output_with_confirm.pdf";
+        const string submitButtonName = "SubmitBtn";   // exact name of the push‑button field
+        const string submitUrl = "https://example.com/submit";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Edit the form using FormEditor (Aspose.Pdf.Facades)
-        using (FormEditor formEditor = new FormEditor())
-        {
-            // Load the existing PDF
-            formEditor.BindPdf(inputPath);
+        // Bind the existing PDF to the FormEditor facade
+        FormEditor formEditor = new FormEditor();
+        formEditor.BindPdf(inputPdf);
 
-            // Add a submit button named "SubmitBtn" on page 1
-            // Parameters: field name, page number, button caption, submit URL,
-            //             lower‑left X, lower‑left Y, upper‑right X, upper‑right Y
-            formEditor.AddSubmitBtn(
-                "SubmitBtn",
-                1,
-                "Submit",
-                submitUrl,
-                100, 100, 200, 150);
+        // Ensure the button performs a submit to the desired URL
+        formEditor.SetSubmitUrl(submitButtonName, submitUrl);
 
-            // JavaScript that shows a confirmation dialog.
-            // app.alert returns 4 for "Yes" when using the 3‑button style.
-            string js = "if(app.alert('Are you sure you want to submit?', 3) == 4) this.submitForm();";
+        // JavaScript that shows a confirmation dialog.
+        // app.alert returns 4 when the user clicks "Yes" in a question dialog (type 3).
+        string confirmJs = @"
+if (app.alert('Are you sure you want to submit the form?', 3) == 4) {
+    this.submitForm();
+}";
+        // Attach the script to the button (replaces any existing script)
+        formEditor.SetFieldScript(submitButtonName, confirmJs);
 
-            // Attach the script to the submit button.
-            formEditor.AddFieldScript("SubmitBtn", js);
+        // Save the modified PDF
+        formEditor.Save(outputPdf);
+        formEditor.Close();
 
-            // Save the modified PDF.
-            formEditor.Save(outputPath);
-        }
-
-        Console.WriteLine($"PDF with confirmation dialog saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with confirmation script: {outputPdf}");
     }
 }

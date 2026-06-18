@@ -1,80 +1,57 @@
 using System;
 using System.IO;
-using System.Linq;
-using Aspose.Pdf;
+using System.Collections.Generic;
 using Aspose.Pdf.Facades;
 
 class Program
 {
-    static void Main()
+    static void Main(string[] args)
     {
-        // Input directory containing PDFs to process
-        const string inputDir = "InputPdfs";
-        // Temporary directory for resized PDFs
-        const string resizedDir = "ResizedPdfs";
-        // Path for the intermediate concatenated PDF
-        const string mergedPath = "merged.pdf";
-        // Final booklet PDF output
-        const string bookletPath = "booklet.pdf";
-
-        // Validate input directory
-        if (!Directory.Exists(inputDir))
+        // Expect two arguments: input folder containing PDFs and output booklet file path
+        if (args.Length < 2)
         {
-            Console.Error.WriteLine($"Input directory not found: {inputDir}");
+            Console.Error.WriteLine("Usage: program <inputFolder> <outputBookletPdf>");
             return;
         }
 
-        // Ensure the temporary resized directory exists
-        Directory.CreateDirectory(resizedDir);
+        string inputFolder = args[0];
+        string outputBooklet = args[1];
 
-        // Collect all PDF files in the input directory
-        string[] inputFiles = Directory.GetFiles(inputDir, "*.pdf");
-        if (inputFiles.Length == 0)
+        // Gather all PDF files from the input folder
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
+        if (pdfFiles.Length == 0)
         {
-            Console.Error.WriteLine("No PDF files found to process.");
+            Console.Error.WriteLine("No PDF files found in the specified folder.");
             return;
         }
 
-        // Resize each PDF to 1024x768 and save to the temporary folder
-        var resizedFiles = inputFiles.Select(inputPath =>
+        // List to store paths of temporary resized PDFs
+        List<string> resizedFiles = new List<string>();
+        PdfFileEditor editor = new PdfFileEditor();
+
+        // Resize each PDF to 1024x768 points (default space units)
+        foreach (string file in pdfFiles)
         {
-            string fileName = Path.GetFileNameWithoutExtension(inputPath);
-            string resizedPath = Path.Combine(resizedDir, $"{fileName}_resized.pdf");
-
-            using (Document doc = new Document(inputPath))
-            {
-                // Resize every page to the target dimensions
-                foreach (Page page in doc.Pages)
-                {
-                    page.PageInfo.Width = 1024;
-                    page.PageInfo.Height = 768;
-                }
-
-                // Save the resized document
-                doc.Save(resizedPath);
-            }
-
-            Console.WriteLine($"Resized: {inputPath} -> {resizedPath}");
-            return resizedPath;
-        }).ToArray();
+            string tempFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".pdf");
+            // Resize all pages (null pages array indicates all pages)
+            editor.ResizeContents(file, tempFile, null, 1024, 768);
+            resizedFiles.Add(tempFile);
+        }
 
         // Concatenate all resized PDFs into a single PDF
-        PdfFileEditor editor = new PdfFileEditor();
-        bool concatSuccess = editor.Concatenate(resizedFiles, mergedPath);
-        if (!concatSuccess)
-        {
-            Console.Error.WriteLine("Failed to concatenate resized PDFs.");
-            return;
-        }
-        Console.WriteLine($"Concatenated PDF saved to: {mergedPath}");
+        string concatenatedFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + "_concat.pdf");
+        editor.Concatenate(resizedFiles.ToArray(), concatenatedFile);
 
-        // Create a booklet from the concatenated PDF
-        bool bookletSuccess = editor.MakeBooklet(mergedPath, bookletPath);
-        if (!bookletSuccess)
+        // Convert the concatenated PDF into a booklet
+        editor.MakeBooklet(concatenatedFile, outputBooklet);
+
+        // Clean up temporary files
+        foreach (string temp in resizedFiles)
         {
-            Console.Error.WriteLine("Failed to create booklet PDF.");
-            return;
+            try { File.Delete(temp); } catch { }
         }
-        Console.WriteLine($"Booklet PDF created at: {bookletPath}");
+        try { File.Delete(concatenatedFile); } catch { }
+
+        Console.WriteLine($"Booklet created successfully at '{outputBooklet}'.");
     }
 }

@@ -16,7 +16,7 @@ class Program
             return;
         }
 
-        // Determine total number of pages using Document (IDisposable, so use using)
+        // Determine total number of pages using Document (wrapped in using for proper disposal)
         int totalPages;
         using (Document doc = new Document(inputPath))
         {
@@ -26,14 +26,14 @@ class Program
         // Prepare array with first and last page numbers (1‑based indexing)
         int[] pagesToDelete = new int[] { 1, totalPages };
 
-        // PdfFileEditor does NOT implement IDisposable; instantiate directly
+        // PdfFileEditor does NOT implement IDisposable, so do NOT use a using block
         PdfFileEditor editor = new PdfFileEditor();
 
-        // Delete the specified pages and write the result to outputPath
-        bool result = editor.Delete(inputPath, pagesToDelete, outputPath);
+        // Delete the specified pages and save the result
+        bool success = editor.Delete(inputPath, pagesToDelete, outputPath);
 
-        if (result)
-            Console.WriteLine($"Successfully removed first and last pages. Output saved to '{outputPath}'.");
+        if (success)
+            Console.WriteLine($"First and last pages removed. Output saved to '{outputPath}'.");
         else
             Console.Error.WriteLine("Failed to delete pages.");
     }

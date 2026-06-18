@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output_with_validation.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,38 +16,34 @@ class Program
             return;
         }
 
-        // Load the existing PDF document
-        using (Document doc = new Document(inputPath))
+        // Load the PDF using the FormEditor facade
+        using (FormEditor editor = new FormEditor())
         {
-            // Initialize FormEditor with the loaded document
-            using (FormEditor formEditor = new FormEditor(doc))
-            {
-                // Add a push button that will trigger validation
-                // Parameters: field type, name, page number, lower-left x, lower-left y, upper-right x, upper-right y
-                formEditor.AddField(FieldType.PushButton, "ValidateBtn", 1, 100, 100, 200, 130);
+            editor.BindPdf(inputPath);
 
-                // JavaScript code to check required fields and show an alert if any are empty
-                string js = @"
-var missing = [];
-for (var i = 0; i < this.numFields; i++) {
-    var f = this.getField(this.getFieldName(i));
-    if (f.required && (f.value === null || f.value === '')) {
-        missing.push(f.name);
+            // Add a push‑button field that will trigger the validation script
+            // Parameters: field type, name, page number, llx, lly, urx, ury
+            editor.AddField(FieldType.PushButton, "ValidateBtn", 1, 50, 750, 150, 800);
+
+            // JavaScript that checks required fields and shows an alert if any are empty
+            // Adjust the field names in the array to match the actual form fields
+            string js = @"
+var required = ['FirstName','LastName','Email'];
+for (var i = 0; i < required.length; i++) {
+    var f = this.getField(required[i]);
+    if (f && (f.value === null || f.value === '')) {
+        app.alert('Please fill the required field: ' + required[i]);
+        f.setFocus();
+        break;
     }
-}
-if (missing.length > 0) {
-    app.alert('Please fill the required fields: ' + missing.join(', '));
-} else {
-    app.alert('All required fields are filled.');
 }
 ";
 
-                // Attach the JavaScript to the button (executed on mouse up)
-                formEditor.SetFieldScript("ValidateBtn", js);
+            // Attach the script to the button (replaces any existing script)
+            editor.SetFieldScript("ValidateBtn", js);
 
-                // Save the modified PDF with the validation button
-                formEditor.Save(outputPath);
-            }
+            // Save the modified PDF
+            editor.Save(outputPath);
         }
 
         Console.WriteLine($"PDF saved with validation button: {outputPath}");

@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "watermarked.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,41 +16,50 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        // Load the PDF document inside a using block (lifecycle rule)
         using (Document doc = new Document(inputPath))
         {
-            // Get the first page (Aspose.Pdf uses 1‑based indexing)
+            // Ensure the document has at least one page
+            if (doc.Pages.Count == 0)
+            {
+                Console.Error.WriteLine("The document contains no pages.");
+                return;
+            }
+
+            // Get the first page (1‑based indexing)
             Page page = doc.Pages[1];
 
-            // Define a rectangle that covers the whole page.
-            double llx = 0;
-            double lly = 0;
-            double urx = page.PageInfo.Width;
-            double ury = page.PageInfo.Height;
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
+            // Define a rectangle that spans the page diagonally.
+            // The rectangle is defined by lower‑left (llx, lly) and upper‑right (urx, ury) coordinates.
+            // Here we use the full page size to cover the diagonal.
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(
+                page.PageInfo.Margin.Left,
+                page.PageInfo.Margin.Bottom,
+                page.PageInfo.Width - page.PageInfo.Margin.Right,
+                page.PageInfo.Height - page.PageInfo.Margin.Top);
 
-            // Create a WatermarkAnnotation positioned on the page.
-            // NOTE: The modern Aspose.Pdf API does not expose a RotateAngle property on WatermarkAnnotation.
-            // To achieve a diagonal appearance we set the rectangle to span the page and rely on the
-            // annotation's internal rotation (if needed) via the GraphInfo.TransformationMatrix – which is
-            // not available. Therefore we approximate the diagonal effect by using a large rectangle that
-            // visually covers the page.
-            // Gradient fill is not directly supported by WatermarkAnnotation; we simulate it with a
-            // semi‑transparent color that can be changed to any desired shade.
+            // Create a WatermarkAnnotation on the page.
             WatermarkAnnotation watermark = new WatermarkAnnotation(page, rect)
             {
-                Opacity = 0.5,                                 // semi‑transparent
-                Color   = Aspose.Pdf.Color.FromArgb(128, 255, 0, 0) // placeholder for gradient (red with 50% opacity)
-                // RotateAngle property is not available in the current API version.
+                // Set the annotation's opacity (0 = fully transparent, 1 = fully opaque)
+                Opacity = 0.5f,
+
+                // Set a base color. A true gradient fill requires a custom appearance stream,
+                // which is beyond the scope of this simple example. The color here serves as
+                // a placeholder for the gradient effect.
+                Color = Aspose.Pdf.Color.LightGray,
+
+                // Optional: set contents (visible when the annotation is selected)
+                Contents = "Diagonal Watermark"
             };
 
             // Add the annotation to the page's annotation collection.
             page.Annotations.Add(watermark);
 
-            // Save the modified PDF (lifecycle rule: call Save inside using block).
+            // Save the modified document (save rule)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Watermark annotation added and saved to '{outputPath}'.");
+        Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
     }
 }

@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -16,10 +15,8 @@ class Program
             return;
         }
 
-        // Initialize the annotation editor facade
+        // Load the PDF into the annotation editor
         PdfAnnotationEditor editor = new PdfAnnotationEditor();
-
-        // Load the PDF document into the editor
         editor.BindPdf(inputPath);
 
         // Delete only annotations of type "Text"
@@ -27,9 +24,6 @@ class Program
 
         // Save the resulting PDF
         editor.Save(outputPath);
-
-        // Release resources held by the editor
-        editor.Close();
 
         Console.WriteLine($"Text annotations removed. Saved to '{outputPath}'.");
     }

@@ -1,18 +1,18 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades; // PdfFileEditor, PdfFileInfo
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF files to concatenate
+        // Input PDF files to be concatenated
         string[] inputFiles = { "file1.pdf", "file2.pdf", "file3.pdf" };
         // Output file path
-        const string outputFile = "merged.pdf";
+        string outputFile = "merged.pdf";
 
         // Verify that all input files exist
-        foreach (string file in inputFiles)
+        foreach (var file in inputFiles)
         {
             if (!File.Exists(file))
             {
@@ -21,35 +21,37 @@ class Program
             }
         }
 
-        // Initialize the PdfFileEditor facade
+        // Create PdfFileEditor instance (it does NOT implement IDisposable)
         PdfFileEditor editor = new PdfFileEditor();
 
-        // Preserve outlines, logical structure and user rights during concatenation
+        // Preserve outlines and logical structure during concatenation
         editor.CopyOutlines = true;
         editor.CopyLogicalStructure = true;
-        editor.PreserveUserRights = true;
 
-        // Perform concatenation
+        // Concatenate the PDFs
         bool concatenated = editor.Concatenate(inputFiles, outputFile);
         if (!concatenated)
         {
-            Console.Error.WriteLine("Failed to concatenate PDF files.");
+            Console.Error.WriteLine("Concatenation failed.");
             return;
         }
 
-        // Preserve metadata (author, title, subject, keywords) from the first PDF
-        using (PdfFileInfo sourceInfo = new PdfFileInfo(inputFiles[0]))
-        using (PdfFileInfo destInfo = new PdfFileInfo(outputFile))
-        {
-            destInfo.Author   = sourceInfo.Author;
-            destInfo.Title    = sourceInfo.Title;
-            destInfo.Subject  = sourceInfo.Subject;
-            destInfo.Keywords = sourceInfo.Keywords;
+        // Preserve original metadata (author, title, etc.) from the first source PDF
+        PdfFileInfo sourceInfo = new PdfFileInfo(inputFiles[0]);   // loads metadata of first PDF
+        PdfFileInfo resultInfo = new PdfFileInfo(outputFile);     // loads metadata of the concatenated PDF
 
-            // Save the updated metadata back to the output file
-            destInfo.SaveNewInfo(outputFile);
-        }
+        // Copy metadata fields
+        resultInfo.Author = sourceInfo.Author;
+        resultInfo.Title = sourceInfo.Title;
+        resultInfo.Subject = sourceInfo.Subject;
+        resultInfo.Keywords = sourceInfo.Keywords;
+        resultInfo.Creator = sourceInfo.Creator;
+        resultInfo.CreationDate = sourceInfo.CreationDate;
+        resultInfo.ModDate = sourceInfo.ModDate;
 
-        Console.WriteLine($"PDF files successfully concatenated to '{outputFile}'.");
+        // Save the updated metadata back to the output file
+        resultInfo.SaveNewInfo(outputFile);
+
+        Console.WriteLine($"PDFs concatenated successfully to '{outputFile}'.");
     }
 }

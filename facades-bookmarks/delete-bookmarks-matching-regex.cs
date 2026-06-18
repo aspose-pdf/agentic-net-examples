@@ -9,44 +9,49 @@ class Program
 {
     static void Main()
     {
-        // Input PDF, output PDF and the regex pattern for bookmark titles to remove
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string pattern    = @"^Draft.*$"; // example: titles starting with "Draft"
+        // Input PDF, output PDF and the regex pattern for bookmark titles to delete
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string pattern = @"^Draft.*$"; // example: titles starting with "Draft"
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Initialize the bookmark editor and bind the source PDF
-        PdfBookmarkEditor editor = new PdfBookmarkEditor();
-        editor.BindPdf(inputPath);
+        // Compile the regular expression once
+        Regex regex = new Regex(pattern, RegexOptions.Compiled);
 
-        // Extract all bookmarks from the document
-        Bookmarks allBookmarks = editor.ExtractBookmarks();
-
-        // Collect titles that match the regular expression
-        List<string> titlesToDelete = new List<string>();
-        foreach (Bookmark bm in allBookmarks)
+        // Use PdfBookmarkEditor to manipulate bookmarks
+        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
         {
-            if (!string.IsNullOrEmpty(bm.Title) && Regex.IsMatch(bm.Title, pattern))
+            // Load the PDF document
+            editor.BindPdf(inputPdf);
+
+            // Extract all bookmarks (including nested ones)
+            Bookmarks allBookmarks = editor.ExtractBookmarks();
+
+            // Collect titles that match the pattern
+            List<string> titlesToDelete = new List<string>();
+            foreach (Bookmark bm in allBookmarks)
             {
-                titlesToDelete.Add(bm.Title);
+                if (!string.IsNullOrEmpty(bm.Title) && regex.IsMatch(bm.Title))
+                {
+                    titlesToDelete.Add(bm.Title);
+                }
             }
+
+            // Delete each matching bookmark by title
+            foreach (string title in titlesToDelete)
+            {
+                editor.DeleteBookmarks(title);
+            }
+
+            // Save the modified PDF
+            editor.Save(outputPdf);
         }
 
-        // Delete each matching bookmark by title
-        foreach (string title in titlesToDelete)
-        {
-            editor.DeleteBookmarks(title);
-        }
-
-        // Save the modified PDF
-        editor.Save(outputPath);
-
-        Console.WriteLine($"Bookmarks matching pattern \"{pattern}\" have been removed.");
-        Console.WriteLine($"Result saved to: {outputPath}");
+        Console.WriteLine($"Bookmarks matching pattern \"{pattern}\" have been removed. Output saved to '{outputPdf}'.");
     }
 }

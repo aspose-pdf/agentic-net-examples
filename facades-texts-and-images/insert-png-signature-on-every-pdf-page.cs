@@ -1,60 +1,56 @@
 using System;
 using System.IO;
-using System.Linq;
-using Aspose.Pdf;                 // Document class for page count
-using Aspose.Pdf.Facades;        // PdfFileMend class
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf      = "input.pdf";          // source PDF
-        const string outputPdf     = "output_signed.pdf";  // result PDF
-        const string signatureImg  = "signature.png";      // PNG to place on each page
+        const string inputPdf  = "input.pdf";      // source PDF
+        const string outputPdf = "output.pdf";     // PDF with signature image
+        const string signatureImage = "signature.png"; // PNG to place on each page
 
-        // Ensure the source files exist
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(signatureImg))
-        {
-            Console.Error.WriteLine($"Signature image not found: {signatureImg}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Determine how many pages the document has (required for PdfFileMend)
-        int pageCount;
-        using (Document doc = new Document(inputPdf))
+        if (!File.Exists(signatureImage))
         {
-            pageCount = doc.Pages.Count;   // Aspose.Pdf uses 1‑based indexing
+            Console.Error.WriteLine($"Signature image not found: {signatureImage}");
+            return;
         }
 
-        // Build an array with all page numbers (1 … pageCount)
-        int[] allPages = Enumerable.Range(1, pageCount).ToArray();
-
-        // Create PdfFileMend, bind the source PDF, add the image to every page,
-        // then save the modified document.
+        // PdfFileMend works as a facade for adding images/text to existing PDFs.
         PdfFileMend mend = new PdfFileMend();
+
+        // Bind the source PDF. After binding, the Document property gives access to pages.
         mend.BindPdf(inputPdf);
 
-        // Coordinates for the bottom‑left corner.
-        // lowerLeftX = 0, lowerLeftY = 0 (origin is bottom‑left of the page)
-        // upperRightX/Y define the size of the image (e.g., 100×50 points)
-        const float lowerLeftX = 0f;
-        const float lowerLeftY = 0f;
-        const float upperRightX = 100f;
-        const float upperRightY = 50f;
+        // Determine number of pages (Aspose.Pdf uses 1‑based indexing).
+        int pageCount = mend.Document.Pages.Count;
 
-        bool success = mend.AddImage(signatureImg, allPages, lowerLeftX, lowerLeftY, upperRightX, upperRightY);
-        if (!success)
+        // Fixed size for the signature image (in points). Adjust as needed.
+        const float imgWidth  = 100f; // width of the image
+        const float imgHeight = 100f; // height of the image
+
+        // Add the image to the bottom‑left corner of every page.
+        for (int pageNum = 1; pageNum <= pageCount; pageNum++)
         {
-            Console.Error.WriteLine("Failed to add the signature image to the PDF.");
+            // Open the PNG as a stream for each insertion.
+            using (FileStream imgStream = File.OpenRead(signatureImage))
+            {
+                // lowerLeftX = 0, lowerLeftY = 0 places the image at the page origin.
+                // upperRightX/Y define the image rectangle size.
+                mend.AddImage(imgStream, pageNum, 0f, 0f, imgWidth, imgHeight);
+            }
         }
 
-        // Save the result and release resources.
+        // Save the modified PDF to the output path.
         mend.Save(outputPdf);
+
+        // Close the facade (releases internal resources).
         mend.Close();
 
         Console.WriteLine($"Signature image added to all pages. Output saved to '{outputPdf}'.");

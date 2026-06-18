@@ -1,66 +1,76 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        string dataDir   = "Data";                     // folder containing the image
-        string imagePath = Path.Combine(dataDir, "sample.png");
-        string outputPdf = Path.Combine(dataDir, "TableWithImage.pdf");
+        const string inputPdfPath  = "input.pdf";      // existing PDF
+        const string outputPdfPath = "output.pdf";     // result PDF
+        const string imagePath     = "picture.png";    // image file to embed
 
-        // Ensure the image file exists
+        // Ensure the source files exist
+        if (!File.Exists(inputPdfPath))
+        {
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
+        }
         if (!File.Exists(imagePath))
         {
-            Console.Error.WriteLine($"Image not found: {imagePath}");
+            Console.Error.WriteLine($"Image file not found: {imagePath}");
             return;
         }
 
-        // Create a new PDF document
-        using (Document doc = new Document())
+        // Load the PDF document
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Add a page to the document
-            doc.Pages.Add();
-            Page page = doc.Pages[1];
+            // Add a new page if the document has no pages
+            if (pdfDoc.Pages.Count == 0)
+                pdfDoc.Pages.Add();
 
-            // Create a table with two columns
+            // Use the first page for demonstration
+            Page page = pdfDoc.Pages[1];
+
+            // Create a table and add it to the page
             Table table = new Table
             {
-                // Define column widths (in points). Adjust as required.
-                ColumnWidths = "250 250"
+                // Define two equal-width columns (optional)
+                ColumnWidths = "200 200",
+                // Optional border for visual reference
+                Border = new BorderInfo(BorderSide.All, 1f, Color.Black)
             };
-
-            // Add a row to the table
-            Row row = table.Rows.Add();
-
-            // ----- First cell: simple text -----
-            Cell textCell = row.Cells.Add();
-            TextFragment tf = new TextFragment("This cell contains text.");
-            textCell.Paragraphs.Add(tf);
-
-            // ----- Second cell: image -----
-            Cell imageCell = row.Cells.Add();
-
-            // Create an Image object, set its source file, and add it to the cell
-            Image img = new Image
-            {
-                File = imagePath
-                // Optional: set explicit dimensions
-                // FixWidth  = 200,
-                // FixHeight = 150
-            };
-            imageCell.Paragraphs.Add(img);
-
-            // Add the table to the page
             page.Paragraphs.Add(table);
 
-            // Save the PDF
-            doc.Save(outputPdf);
+            // Add a row
+            Row row = table.Rows.Add();
+
+            // Add a cell where the image will be placed
+            Cell imageCell = row.Cells.Add();
+
+            // Load the image into a memory stream
+            using (FileStream imgFileStream = File.OpenRead(imagePath))
+            using (MemoryStream imgMemoryStream = new MemoryStream())
+            {
+                imgFileStream.CopyTo(imgMemoryStream);
+                imgMemoryStream.Position = 0; // reset stream position
+
+                // Create an Image object and assign the stream
+                Image pdfImage = new Image
+                {
+                    ImageStream = imgMemoryStream,
+                    // Optional scaling – fit the image within the cell
+                    ImageScale = 0.5f
+                };
+
+                // Add the image to the cell's paragraph collection
+                imageCell.Paragraphs.Add(pdfImage);
+            }
+
+            // Save the modified PDF
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF created: {outputPdf}");
+        Console.WriteLine($"Image inserted and PDF saved to '{outputPdfPath}'.");
     }
 }

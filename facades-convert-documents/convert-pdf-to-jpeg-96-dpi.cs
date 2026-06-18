@@ -1,46 +1,41 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices; // for Resolution and JpegDevice
+using Aspose.Pdf.Devices; // JpegDevice, Resolution
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file path
         const string inputPdf = "input.pdf";
+        const string outputDir = "output_images";
 
-        // Output directory for JPEG images
-        const string outputDir = "JpegImages";
-
+        // Verify source PDF exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Ensure the output directory exists
+        // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
         // Load the PDF document
-        Document pdfDocument = new Document(inputPdf);
-
-        // Set the desired resolution (96 DPI) for web‑friendly images
-        Resolution resolution = new Resolution(96);
-
-        // Iterate through each page and convert it to a JPEG image
-        for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
+        using (Document pdfDocument = new Document(inputPdf))
         {
-            string outputPath = Path.Combine(outputDir, $"image{pageNumber}.jpg");
+            // Set the desired resolution (96 DPI) and JPEG quality (100 is max)
+            Resolution resolution = new Resolution(96);
+            JpegDevice jpegDevice = new JpegDevice(resolution, 100);
 
-            using (FileStream imageStream = new FileStream(outputPath, FileMode.Create))
+            // Iterate through each page and save it as a JPEG image
+            for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
             {
-                // JpegDevice renders the page to a JPEG image using the specified resolution
-                JpegDevice jpegDevice = new JpegDevice(resolution);
-                jpegDevice.Process(pdfDocument.Pages[pageNumber], imageStream);
+                string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.jpg");
+                // The Process method can write directly to a file path
+                jpegDevice.Process(pdfDocument.Pages[pageNumber], outputPath);
             }
         }
 
-        Console.WriteLine($"PDF pages have been converted to JPEG images at '{outputDir}'.");
+        Console.WriteLine("PDF to JPEG conversion completed.");
     }
 }

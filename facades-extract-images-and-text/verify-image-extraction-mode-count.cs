@@ -1,11 +1,12 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using NUnit.Framework; // Added reference to NUnit stubs
+using NUnit.Framework;
 
-// Minimal NUnit stubs – used when the real NUnit package is not referenced.
+// -----------------------------------------------------------------------------
+// Minimal NUnit stubs – used when the NUnit package is not referenced.
+// -----------------------------------------------------------------------------
 namespace NUnit.Framework
 {
     [AttributeUsage(AttributeTargets.Class)]
@@ -14,27 +15,14 @@ namespace NUnit.Framework
     [AttributeUsage(AttributeTargets.Method)]
     public sealed class TestAttribute : Attribute { }
 
-    [AttributeUsage(AttributeTargets.Method)]
-    public sealed class OneTimeSetUpAttribute : Attribute { }
-
-    [AttributeUsage(AttributeTargets.Method)]
-    public sealed class OneTimeTearDownAttribute : Attribute { }
-
     public static class Assert
     {
-        public static void AreEqual<T>(T expected, T actual, string? message = null)
+        public static void AreEqual<T>(T expected, T actual, string message = null)
         {
             if (!object.Equals(expected, actual))
+            {
                 throw new Exception(message ?? $"Assert.AreEqual failed. Expected:<{expected}>. Actual:<{actual}>.");
-        }
-
-        // Overload for int to match typical usage without generic type inference.
-        public static void AreEqual(int expected, int actual, string? message = null) => AreEqual<int>(expected, actual, message);
-
-        public static void Greater(int actual, int expected, string? message = null)
-        {
-            if (!(actual > expected))
-                throw new Exception(message ?? $"Assert.Greater failed. Expected > {expected}, but was {actual}.");
+            }
         }
     }
 }
@@ -42,120 +30,112 @@ namespace NUnit.Framework
 namespace AsposePdfTests
 {
     [TestFixture]
-    public class ImageExtractionModeTests
+    public class PdfExtractorTests
     {
-        private string _pdfPath;
-        private string _imagePath;
+        // A 1x1 pixel PNG image (transparent) encoded in base64.
+        private static readonly byte[] PngBytes = Convert.FromBase64String(
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/5+BAQAE/wJ/6V8AAAAASUVORK5CYII=");
 
-        // Minimal 1x1 PNG (transparent) encoded in base64
-        private const string Base64Png =
-            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/5+BAQAE/wJ" +
-            "ZcKcAAAAASUVORK5CYII=";
-
-        [OneTimeSetUp]
-        public void SetUp()
+        private string CreateSamplePdf()
         {
-            // Create temporary folder
-            string tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-            Directory.CreateDirectory(tempDir);
+            // Create a temporary PDF file with two images in the resources.
+            // Only one of them is placed on the page.
+            string tempPdfPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".pdf");
 
-            // Write PNG file
-            _imagePath = Path.Combine(tempDir, "sample.png");
-            byte[] pngBytes = Convert.FromBase64String(Base64Png);
-            File.WriteAllBytes(_imagePath, pngBytes);
-
-            // Create PDF with two images on the first page
-            _pdfPath = Path.Combine(tempDir, "sample.pdf");
             using (Document doc = new Document())
             {
+                // Add a page.
                 Page page = doc.Pages.Add();
 
-                // First image
-                Aspose.Pdf.Image img1 = new Aspose.Pdf.Image
+                // Add first image to resources (unused).
+                using (MemoryStream msUnused = new MemoryStream(PngBytes))
                 {
-                    File = _imagePath,
-                    // Position the image
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-                page.Paragraphs.Add(img1);
+                    // The Add method returns the name of the image resource.
+                    page.Resources.Images.Add(msUnused);
+                }
 
-                // Second image (same file, different position)
-                Aspose.Pdf.Image img2 = new Aspose.Pdf.Image
+                // Add second image to resources and place it on the page (used).
+                using (MemoryStream msUsed = new MemoryStream(PngBytes))
                 {
-                    File = _imagePath,
-                    HorizontalAlignment = HorizontalAlignment.Right,
-                    VerticalAlignment = VerticalAlignment.Bottom
-                };
-                page.Paragraphs.Add(img2);
+                    // Add to resources.
+                    page.Resources.Images.Add(msUsed);
+                    // Place the image on the page.
+                    page.AddImage(msUsed, new Aspose.Pdf.Rectangle(100, 500, 300, 600));
+                }
 
-                doc.Save(_pdfPath);
+                // Save the PDF.
+                doc.Save(tempPdfPath);
             }
+
+            return tempPdfPath;
         }
 
-        [OneTimeTearDown]
-        public void TearDown()
-        {
-            try
-            {
-                if (File.Exists(_pdfPath)) File.Delete(_pdfPath);
-                if (File.Exists(_imagePath)) File.Delete(_imagePath);
-                string dir = Path.GetDirectoryName(_pdfPath);
-                if (Directory.Exists(dir)) Directory.Delete(dir, true);
-            }
-            catch
-            {
-                // Ignored – cleanup failure should not affect test results
-            }
-        }
-
-        private int CountExtractedImages(ExtractImageMode mode)
+        private int CountExtractedImages(PdfExtractor extractor)
         {
             int count = 0;
-            using (PdfExtractor extractor = new PdfExtractor())
+            while (extractor.HasNextImage())
             {
-                extractor.BindPdf(_pdfPath);
-                extractor.ExtractImageMode = mode;
-                extractor.ExtractImage();
-
-                while (extractor.HasNextImage())
+                // Extract to a memory stream; we don't need the actual file.
+                using (MemoryStream ms = new MemoryStream())
                 {
-                    // Use a dummy stream; we only need to advance the iterator
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        extractor.GetNextImage(ms);
-                    }
-                    count++;
+                    extractor.GetNextImage(ms);
                 }
+                count++;
             }
             return count;
         }
 
         [Test]
-        public void Verify_ImageExtractionMode_Influences_Count()
+        public void ImageExtractionModeInfluencesCount()
         {
-            // Count images when extracting all defined resources
-            int definedInResourcesCount = CountExtractedImages(ExtractImageMode.DefinedInResources);
+            // Arrange: create a PDF with one used and one unused image.
+            string pdfPath = CreateSamplePdf();
 
-            // Count images when extracting only actually used images
-            int actuallyUsedCount = CountExtractedImages(ExtractImageMode.ActuallyUsed);
+            try
+            {
+                // Act & Assert for DefinedInResources (should count both images).
+                using (PdfExtractor extractor = new PdfExtractor())
+                {
+                    extractor.BindPdf(pdfPath);
+                    extractor.ExtractImageMode = ExtractImageMode.DefinedInResources;
+                    extractor.ExtractImage();
 
-            // Both counts should be greater than zero (images are present)
-            Assert.Greater(definedInResourcesCount, 0, "No images were extracted with DefinedInResources mode.");
-            Assert.Greater(actuallyUsedCount, 0, "No images were extracted with ActuallyUsed mode.");
+                    int imageCount = CountExtractedImages(extractor);
+                    Assert.AreEqual(2, imageCount, "DefinedInResources should extract all images defined in resources.");
+                }
 
-            // For this simple PDF the counts are expected to be equal
-            Assert.AreEqual(definedInResourcesCount, actuallyUsedCount,
-                "Image counts differ between extraction modes for a PDF where all images are used.");
+                // Act & Assert for ActuallyUsed (should count only the image placed on the page).
+                using (PdfExtractor extractor = new PdfExtractor())
+                {
+                    extractor.BindPdf(pdfPath);
+                    extractor.ExtractImageMode = ExtractImageMode.ActuallyUsed;
+                    extractor.ExtractImage();
+
+                    int imageCount = CountExtractedImages(extractor);
+                    Assert.AreEqual(1, imageCount, "ActuallyUsed should extract only images that are shown on the page.");
+                }
+            }
+            finally
+            {
+                // Clean up the temporary PDF file.
+                if (File.Exists(pdfPath))
+                {
+                    File.Delete(pdfPath);
+                }
+            }
         }
     }
-}
 
-// Dummy entry point to satisfy the compiler when the project is built as an executable.
-public static class Program
-{
-    public static void Main(string[] args)
+    // ---------------------------------------------------------------------
+    // Minimal entry point required for a console‑type project.
+    // ---------------------------------------------------------------------
+    public class Program
     {
-        // No operation – tests are executed via the test runner.
+        public static void Main(string[] args)
+        {
+            // The project is primarily a test library; the Main method is
+            // intentionally left empty to satisfy the compiler's entry‑point
+            // requirement without affecting test execution.
+        }
     }
 }

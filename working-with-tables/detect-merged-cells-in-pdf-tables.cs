@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Reflection;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -15,10 +16,10 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a TableAbsorber and enable the FlowEngine to get ColSpan values
+            // Create a TableAbsorber and enable the FlowEngine to get span information
             TableAbsorber absorber = new TableAbsorber
             {
                 UseFlowEngine = true
@@ -27,33 +28,47 @@ class Program
             // Extract tables from the whole document
             absorber.Visit(doc);
 
-            // Iterate over each detected table
+            // Iterate over all detected tables
             for (int t = 0; t < absorber.TableList.Count; t++)
             {
                 var table = absorber.TableList[t];
-                Console.WriteLine($"Table {t + 1} found on page {table.PageNum}");
+                bool hasMergedCells = false;
 
-                // Iterate over rows
-                for (int r = 0; r < table.RowList.Count; r++)
+                // Examine each cell in the table
+                foreach (var row in table.RowList)
                 {
-                    var row = table.RowList[r];
-
-                    // Iterate over cells in the row
-                    for (int c = 0; c < row.CellList.Count; c++)
+                    foreach (var cell in row.CellList)
                     {
-                        AbsorbedCell cell = row.CellList[c];
+                        // ColSpan is always available
+                        int colSpan = cell.ColSpan;
 
-                        // ColSpan > 1 indicates a merged (horizontally spanned) cell
-                        if (cell.ColSpan > 1)
+                        // RowSpan may not be present on AbsorbedCell; use reflection to read it if it exists
+                        int rowSpan = 0;
+                        PropertyInfo rowSpanProp = cell.GetType().GetProperty("RowSpan");
+                        if (rowSpanProp != null && rowSpanProp.PropertyType == typeof(int))
                         {
-                            Console.WriteLine(
-                                $"  Merged cell detected at Table {t + 1}, Row {r + 1}, Column {c + 1} " +
-                                $"(ColSpan = {cell.ColSpan})");
+                            rowSpan = (int)rowSpanProp.GetValue(cell);
                         }
 
-                        // If RowSpan were available on AbsorbedCell, you would check similarly:
-                        // if (cell.RowSpan > 1) { ... }
+                        // If either span is greater than 1, the cell is merged
+                        if (colSpan > 1 || rowSpan > 1)
+                        {
+                            hasMergedCells = true;
+                            break;
+                        }
                     }
+
+                    if (hasMergedCells) break;
+                }
+
+                // Output the result for the current table
+                if (hasMergedCells)
+                {
+                    Console.WriteLine($"Table {t + 1} on page {table.PageNum} contains merged cells.");
+                }
+                else
+                {
+                    Console.WriteLine($"Table {t + 1} on page {table.PageNum} has no merged cells.");
                 }
             }
         }

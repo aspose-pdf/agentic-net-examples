@@ -1,57 +1,52 @@
 using System;
 using System.IO;
 using System.Diagnostics;
-using System.Collections.Generic;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Folder containing the 50 small PDF files (named file1.pdf … file50.pdf)
-        const string inputFolder = "InputPdfs";
-        const string outputFile = "concatenated_output.pdf";
+        const int fileCount = 50;                     // number of PDFs to concatenate
+        string inputFolder = "InputPdfs";             // folder containing the small PDFs
+        string outputPath = "concatenated.pdf";       // result file
 
-        // Collect input streams
-        List<FileStream> inputStreams = new List<FileStream>();
-        for (int i = 1; i <= 50; i++)
+        // Prepare an array of input streams for the 50 PDFs
+        Stream[] inputStreams = new Stream[fileCount];
+        for (int i = 0; i < fileCount; i++)
         {
-            string path = Path.Combine(inputFolder, $"file{i}.pdf");
-            if (!File.Exists(path))
+            string filePath = Path.Combine(inputFolder, $"file{i + 1}.pdf");
+            if (!File.Exists(filePath))
             {
-                Console.Error.WriteLine($"Missing input file: {path}");
+                Console.Error.WriteLine($"Missing input file: {filePath}");
                 return;
             }
 
-            // Open each file for reading
-            FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read);
-            inputStreams.Add(fs);
+            // Open each PDF as a read‑only FileStream
+            inputStreams[i] = new FileStream(filePath, FileMode.Open, FileAccess.Read);
         }
 
-        // Prepare output stream
-        using (FileStream outStream = new FileStream(outputFile, FileMode.Create, FileAccess.Write))
+        // Create the output stream where the concatenated PDF will be written
+        using (FileStream outputStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
         {
-            // Initialize the PdfFileEditor
-            PdfFileEditor editor = new PdfFileEditor
-            {
-                // Close input streams automatically after concatenation
-                CloseConcatenatedStreams = true
-            };
+            // PdfFileEditor does NOT implement IDisposable, so we instantiate it directly
+            PdfFileEditor editor = new PdfFileEditor();
+
+            // Instruct the editor to close the input streams after concatenation
+            editor.CloseConcatenatedStreams = true;
 
             // Measure execution time
             Stopwatch sw = Stopwatch.StartNew();
 
-            // Concatenate using the stream overload
-            editor.Concatenate(inputStreams.ToArray(), outStream);
+            // Use the stream overload that accepts an array of input streams and one output stream
+            bool success = editor.Concatenate(inputStreams, outputStream);
 
             sw.Stop();
-            Console.WriteLine($"Concatenated 50 PDFs in {sw.ElapsedMilliseconds} ms");
+
+            Console.WriteLine($"Concatenation succeeded: {success}");
+            Console.WriteLine($"Elapsed time: {sw.ElapsedMilliseconds} ms");
         }
 
-        // Dispose input streams (already closed if CloseConcatenatedStreams = true)
-        foreach (var fs in inputStreams)
-        {
-            fs.Dispose();
-        }
+        // Input streams have been closed by the editor because CloseConcatenatedStreams = true
     }
 }

@@ -1,22 +1,25 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf;
-using Aspose.Pdf.Security; // Added for DocumentPrivilege and KeySize enums
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string sourcePdfPath = "source.pdf";               // PDF to which the attachment will be added
-        const string attachmentPath = "attachment.pdf";          // File to be attached (must be a PDF for encryption)
-        const string encryptedAttachmentPath = "attachment_enc.pdf"; // Temporary encrypted version
-        const string outputPdfPath = "output.pdf";               // Resulting PDF
+        // Paths for the main PDF, the attachment to be encrypted, and the final output PDF
+        const string mainPdfPath      = "main.pdf";
+        const string attachmentPath   = "attachment.pdf";
+        const string outputPdfPath    = "result.pdf";
 
-        // Verify input files exist
-        if (!File.Exists(sourcePdfPath))
+        // Passwords for encrypting the attachment
+        const string userPassword  = "user123";
+        const string ownerPassword = "owner123";
+
+        // Ensure the source files exist
+        if (!File.Exists(mainPdfPath))
         {
-            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
+            Console.Error.WriteLine($"Main PDF not found: {mainPdfPath}");
             return;
         }
         if (!File.Exists(attachmentPath))
@@ -25,37 +28,45 @@ class Program
             return;
         }
 
-        // ------------------------------------------------------------
-        // Step 1: Encrypt the attachment (only PDF files can be encrypted
-        //         with PdfFileSecurity). The encrypted file is written to a
-        //         temporary location.
-        // ------------------------------------------------------------
-        using (PdfFileSecurity attachmentSecurity = new PdfFileSecurity())
+        // Encrypt the attachment PDF and keep it in memory
+        using (var encryptedAttachmentStream = new MemoryStream())
         {
-            attachmentSecurity.BindPdf(attachmentPath);
-            // Encrypt with user/owner passwords, allow printing, use 256‑bit AES
-            attachmentSecurity.EncryptFile(
-                userPassword: "attachUser",
-                ownerPassword: "attachOwner",
-                privilege: DocumentPrivilege.Print,
-                keySize: KeySize.x256);
-            attachmentSecurity.Save(encryptedAttachmentPath);
-        }
+            // Encrypt the attachment using PdfFileSecurity
+            using (var attachmentSecurity = new PdfFileSecurity())
+            {
+                // Bind the original attachment file
+                attachmentSecurity.BindPdf(attachmentPath);
 
-        // ------------------------------------------------------------
-        // Step 2: Add the encrypted attachment to the original PDF.
-        // ------------------------------------------------------------
-        using (PdfContentEditor pdfEditor = new PdfContentEditor())
-        {
-            pdfEditor.BindPdf(sourcePdfPath);
-            pdfEditor.AddDocumentAttachment(encryptedAttachmentPath, "Encrypted attachment");
-            pdfEditor.Save(outputPdfPath);
-        }
+                // Encrypt with desired privileges (e.g., allow printing) and 256‑bit key
+                attachmentSecurity.EncryptFile(
+                    userPassword,
+                    ownerPassword,
+                    DocumentPrivilege.Print,
+                    KeySize.x256);
 
-        // Clean up the temporary encrypted file
-        if (File.Exists(encryptedAttachmentPath))
-        {
-            File.Delete(encryptedAttachmentPath);
+                // Save the encrypted attachment into the memory stream
+                attachmentSecurity.Save(encryptedAttachmentStream);
+            }
+
+            // Reset stream position before reading it again
+            encryptedAttachmentStream.Position = 0;
+
+            // Add the encrypted attachment to the main PDF
+            using (var editor = new PdfContentEditor())
+            {
+                // Bind the main PDF document
+                editor.BindPdf(mainPdfPath);
+
+                // Add the encrypted attachment (no visual annotation, just the file)
+                // Parameters: stream, attachment file name, description
+                editor.AddDocumentAttachment(
+                    encryptedAttachmentStream,
+                    "EncryptedAttachment.pdf",
+                    "Password‑protected attachment");
+
+                // Save the modified PDF to the output path
+                editor.Save(outputPdfPath);
+            }
         }
 
         Console.WriteLine($"PDF with encrypted attachment saved to '{outputPdfPath}'.");

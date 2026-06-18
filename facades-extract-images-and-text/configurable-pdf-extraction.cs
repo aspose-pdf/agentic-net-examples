@@ -3,124 +3,143 @@ using System.IO;
 using System.Text.Json;
 using System.Collections.Generic;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf;
-using System.Drawing.Imaging;
 
 namespace PdfExtractionDemo
 {
-    // Configuration model matching the JSON file
+    // Configuration model matching the JSON structure
     public class ExtractionConfig
     {
         public bool ExtractText { get; set; } = true;
         public bool ExtractImages { get; set; } = true;
         public bool ExtractAttachments { get; set; } = true;
-        // Optional output directories
-        public string TextOutputPath { get; set; } = "ExtractedText.txt";
-        public string ImagesOutputDir { get; set; } = "Images";
-        public string AttachmentsOutputDir { get; set; } = "Attachments";
+        public string InputPdfPath { get; set; } = "input.pdf";
+        public string OutputDirectory { get; set; } = "ExtractionOutput";
     }
 
     class Program
     {
-        static void Main()
+        static void Main(string[] args)
         {
-            const string pdfPath = "input.pdf";
-            const string configPath = "extractionConfig.json";
-
-            if (!File.Exists(pdfPath))
-            {
-                Console.Error.WriteLine($"PDF file not found: {pdfPath}");
-                return;
-            }
+            // Determine config file location (default: config.json)
+            string configPath = args.Length > 0 ? args[0] : "config.json";
 
             if (!File.Exists(configPath))
             {
-                Console.Error.WriteLine($"Config file not found: {configPath}");
+                Console.Error.WriteLine($"Configuration file not found: {configPath}");
                 return;
             }
 
-            // Load configuration
+            // Deserialize configuration
             ExtractionConfig config;
             try
             {
                 string json = File.ReadAllText(configPath);
                 config = JsonSerializer.Deserialize<ExtractionConfig>(json);
-                if (config == null) throw new Exception("Deserialization returned null.");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Failed to read config: {ex.Message}");
+                Console.Error.WriteLine($"Failed to read configuration: {ex.Message}");
                 return;
             }
 
-            // Ensure output directories exist
-            if (config.ExtractImages && !Directory.Exists(config.ImagesOutputDir))
-                Directory.CreateDirectory(config.ImagesOutputDir);
-            if (config.ExtractAttachments && !Directory.Exists(config.AttachmentsOutputDir))
-                Directory.CreateDirectory(config.AttachmentsOutputDir);
+            // Validate input PDF
+            if (!File.Exists(config.InputPdfPath))
+            {
+                Console.Error.WriteLine($"Input PDF not found: {config.InputPdfPath}");
+                return;
+            }
 
-            // Use PdfExtractor within a using block for deterministic disposal
+            // Ensure output directory exists
+            Directory.CreateDirectory(config.OutputDirectory);
+
+            // Use PdfExtractor facade inside a using block for deterministic disposal
             using (PdfExtractor extractor = new PdfExtractor())
             {
-                // Bind the source PDF
-                extractor.BindPdf(pdfPath);
+                // Bind the source PDF file
+                extractor.BindPdf(config.InputPdfPath);
 
-                // -------- Text Extraction ----------
+                // ---------- Text Extraction ----------
                 if (config.ExtractText)
                 {
-                    // Use pure text mode (0) – default; can be changed if needed
-                    extractor.ExtractTextMode = 0;
-                    extractor.ExtractText();
-                    extractor.GetText(config.TextOutputPath);
-                    Console.WriteLine($"Text extracted to: {config.TextOutputPath}");
-                }
-
-                // -------- Image Extraction ----------
-                if (config.ExtractImages)
-                {
-                    // Extract all images defined in resources (default mode)
-                    extractor.ExtractImageMode = ExtractImageMode.DefinedInResources;
-                    extractor.ExtractImage();
-
-                    int imageIndex = 1;
-                    while (extractor.HasNextImage())
+                    try
                     {
-                        string imagePath = Path.Combine(config.ImagesOutputDir, $"Image_{imageIndex}.png");
-                        // Save each image as PNG; you can change ImageFormat if required
-                        extractor.GetNextImage(imagePath, ImageFormat.Png);
-                        Console.WriteLine($"Image saved: {imagePath}");
-                        imageIndex++;
+                        // Extract all text in pure mode (0) – default
+                        extractor.ExtractText();
+                        string textOutputPath = Path.Combine(config.OutputDirectory, "ExtractedText.txt");
+                        extractor.GetText(textOutputPath);
+                        Console.WriteLine($"Text extracted to: {textOutputPath}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.Error.WriteLine($"Text extraction failed: {ex.Message}");
                     }
                 }
 
-                // -------- Attachment Extraction ----------
-                if (config.ExtractAttachments)
+                // ---------- Image Extraction ----------
+                if (config.ExtractImages)
                 {
-                    extractor.ExtractAttachment();
-
-                    // Retrieve attachment names
-                    IList<string> attachmentNames = extractor.GetAttachNames();
-
-                    // Get all attachments as streams
-                    MemoryStream[] attachmentStreams = extractor.GetAttachment();
-
-                    for (int i = 0; i < attachmentStreams.Length; i++)
+                    try
                     {
-                        string name = attachmentNames[i];
-                        string outputFile = Path.Combine(config.AttachmentsOutputDir, name);
+                        // Extract images defined in resources (default mode)
+                        extractor.ExtractImage();
 
-                        using (FileStream fs = new FileStream(outputFile, FileMode.Create, FileAccess.Write))
+                        int imageIndex = 1;
+                        while (extractor.HasNextImage())
                         {
-                            attachmentStreams[i].Position = 0;
-                            attachmentStreams[i].CopyTo(fs);
+                            string imagePath = Path.Combine(config.OutputDirectory, $"Image_{imageIndex}.png");
+                            // Retrieve next image in PNG format
+                            extractor.GetNextImage(imagePath, System.Drawing.Imaging.ImageFormat.Png);
+                            Console.WriteLine($"Image {imageIndex} saved to: {imagePath}");
+                            imageIndex++;
                         }
 
-                        Console.WriteLine($"Attachment saved: {outputFile}");
+                        if (imageIndex == 1)
+                        {
+                            Console.WriteLine("No images found in the PDF.");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.Error.WriteLine($"Image extraction failed: {ex.Message}");
+                    }
+                }
+
+                // ---------- Attachment Extraction ----------
+                if (config.ExtractAttachments)
+                {
+                    try
+                    {
+                        // Extract all attachments to memory streams
+                        extractor.ExtractAttachment();
+                        IList<string> attachmentNames = extractor.GetAttachNames();
+
+                        // Retrieve streams for each attachment
+                        MemoryStream[] attachmentStreams = extractor.GetAttachment();
+
+                        for (int i = 0; i < attachmentStreams.Length; i++)
+                        {
+                            string attachmentPath = Path.Combine(config.OutputDirectory, attachmentNames[i]);
+                            using (FileStream fs = new FileStream(attachmentPath, FileMode.Create, FileAccess.Write))
+                            {
+                                attachmentStreams[i].Position = 0;
+                                attachmentStreams[i].CopyTo(fs);
+                            }
+                            Console.WriteLine($"Attachment saved to: {attachmentPath}");
+                        }
+
+                        if (attachmentNames.Count == 0)
+                        {
+                            Console.WriteLine("No attachments found in the PDF.");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.Error.WriteLine($"Attachment extraction failed: {ex.Message}");
                     }
                 }
             }
 
-            Console.WriteLine("Extraction completed.");
+            Console.WriteLine("Extraction process completed.");
         }
     }
 }

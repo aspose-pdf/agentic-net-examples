@@ -1,7 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Devices;
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -18,45 +17,37 @@ class Program
             return;
         }
 
-        // Ensure the output directory exists
+        // Ensure the output root folder exists
         Directory.CreateDirectory(outputFolder);
 
         // Get all PDF files in the input folder
         string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
         foreach (string pdfPath in pdfFiles)
         {
-            string baseName = Path.GetFileNameWithoutExtension(pdfPath);
-            try
+            // Create a sub‑folder for each PDF to keep its pages separate
+            string pdfName = Path.GetFileNameWithoutExtension(pdfPath);
+            string pdfOutputDir = Path.Combine(outputFolder, pdfName);
+            Directory.CreateDirectory(pdfOutputDir);
+
+            // Convert each page of the current PDF to a JPEG image
+            using (PdfConverter converter = new PdfConverter())
             {
-                // Load the PDF document
-                Document pdfDocument = new Document(pdfPath);
-                int pageCount = pdfDocument.Pages.Count;
+                // Load the PDF
+                converter.BindPdf(pdfPath);
+                // Prepare the converter
+                converter.DoConvert();
 
-                // Define the resolution for the JPEG images (you can adjust as needed)
-                var resolution = new Resolution(300);
-
-                // JpegDevice does NOT implement IDisposable, so instantiate it once and reuse.
-                JpegDevice jpegDevice = new JpegDevice(resolution);
-
-                for (int pageIndex = 1; pageIndex <= pageCount; pageIndex++)
+                int pageIndex = 1;
+                while (converter.HasNextImage())
                 {
-                    // Build output file name: <baseName>_page<index>.jpg
-                    string outputPath = Path.Combine(outputFolder,
-                        $"{baseName}_page{pageIndex}.jpg");
-
-                    // Write the JPEG directly to a file stream.
-                    using (FileStream outStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
-                    {
-                        jpegDevice.Process(pdfDocument.Pages[pageIndex], outStream);
-                    }
+                    // Default image format is JPEG, so no ImageFormat enum is needed
+                    string imagePath = Path.Combine(pdfOutputDir, $"page_{pageIndex}.jpg");
+                    converter.GetNextImage(imagePath);
+                    pageIndex++;
                 }
+            }
 
-                Console.WriteLine($"Successfully converted '{pdfPath}' to images.");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
-            }
+            Console.WriteLine($"Converted '{pdfPath}' to {pdfFiles.Length} JPEG images.");
         }
     }
 }

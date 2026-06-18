@@ -6,29 +6,30 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // source PDF containing the field
-        const string outputPdf = "output.pdf";         // PDF after the field is removed
-        const string fieldName = "ObsoleteField";      // name of the field to delete
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string fieldName = "ObsoleteField";
 
-        if (!File.Exists(inputPdf))
+        // Verify the source PDF exists
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // FormEditor implements IDisposable, so wrap it in a using block.
+        // FormEditor implements SaveableFacade, so we can use a using block for deterministic disposal
         using (FormEditor editor = new FormEditor())
         {
-            // Bind the source PDF.
-            editor.BindPdf(inputPdf);
+            // Load the PDF document into the editor
+            editor.BindPdf(inputPath);
 
-            // Remove the specified form field.
+            // Remove the unwanted form field
             editor.RemoveField(fieldName);
 
-            // Save the modified PDF to the output path.
-            editor.Save(outputPdf);
+            // Save the modified PDF to a new file
+            editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Field \"{fieldName}\" removed. Result saved to \"{outputPdf}\".");
+        Console.WriteLine($"Removed field '{fieldName}' and saved to '{outputPath}'.");
     }
 }

@@ -2,63 +2,75 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
-using Aspose.Pdf; // Document, Permissions, CryptoAlgorithm
+using Aspose.Pdf;
 
-class BatchPdfEncryptor
+class BatchEncryptPdf
 {
-    // Generates a password by hashing the file name with the current date.
-    private static string GeneratePassword(string fileName)
+    // Compute a SHA256 hash of the input string and return a hex representation.
+    private static string ComputeHash(string input)
     {
-        // Combine file name (without extension) and current date (yyyyMMdd).
-        string input = Path.GetFileNameWithoutExtension(fileName) + DateTime.UtcNow.ToString("yyyyMMdd");
-        // Compute SHA256 hash.
-        using (SHA256 sha256 = SHA256.Create())
+        using (SHA256 sha = SHA256.Create())
         {
-            byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(input));
-            // Convert to a Base64 string and take a reasonable length for a password.
-            return Convert.ToBase64String(hashBytes).Substring(0, 16);
+            byte[] bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(input));
+            StringBuilder sb = new StringBuilder(bytes.Length * 2);
+            foreach (byte b in bytes)
+                sb.Append(b.ToString("x2"));
+            return sb.ToString();
         }
     }
 
-    static void Main(string[] args)
+    // Generate a password from file name and current date.
+    private static string GeneratePassword(string filePath)
     {
-        // Use directories relative to the executable so the code works on any OS.
-        string baseDir = AppContext.BaseDirectory;
-        string inputDirectory = Path.Combine(baseDir, "PdfInput");
-        string outputDirectory = Path.Combine(baseDir, "PdfEncrypted");
+        string namePart = Path.GetFileNameWithoutExtension(filePath);
+        string datePart = DateTime.UtcNow.ToString("yyyyMMdd");
+        string raw = $"{namePart}_{datePart}";
+        // Use the full hash as password (or a subset if desired).
+        return ComputeHash(raw);
+    }
 
-        // Ensure both directories exist (create if missing).
-        Directory.CreateDirectory(inputDirectory);
+    static void Main()
+    {
+        // Directory containing PDFs to encrypt.
+        const string inputDirectory = @"C:\PdfInput";
+        // Directory where encrypted PDFs will be saved.
+        const string outputDirectory = @"C:\PdfEncrypted";
+
+        if (!Directory.Exists(inputDirectory))
+        {
+            Console.Error.WriteLine($"Input directory not found: {inputDirectory}");
+            return;
+        }
+
         Directory.CreateDirectory(outputDirectory);
 
-        // Define permissions for the encrypted PDFs.
+        // Permissions to apply after encryption.
         Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-        // Process each PDF file in the input directory.
-        foreach (string inputPath in Directory.GetFiles(inputDirectory, "*.pdf"))
+        foreach (string pdfPath in Directory.GetFiles(inputDirectory, "*.pdf"))
         {
-            string fileName = Path.GetFileName(inputPath);
-            string outputPath = Path.Combine(outputDirectory, fileName);
-
-            // Generate a password based on file name and current date.
-            string password = GeneratePassword(fileName);
-
             try
             {
-                // Load the PDF document.
-                using (Document doc = new Document(inputPath))
+                string password = GeneratePassword(pdfPath);
+                string outputPath = Path.Combine(outputDirectory, Path.GetFileName(pdfPath));
+
+                // Load, encrypt, and save the document.
+                using (Document doc = new Document(pdfPath))
                 {
-                    // Encrypt using the generated password for both user and owner.
-                    doc.Encrypt(password, password, perms, CryptoAlgorithm.AESx256);
-                    // Save the encrypted PDF.
+                    doc.Encrypt(
+                        userPassword: password,
+                        ownerPassword: password,
+                        permissions: perms,
+                        cryptoAlgorithm: CryptoAlgorithm.AESx256);
+
                     doc.Save(outputPath);
                 }
 
-                Console.WriteLine($"Encrypted '{fileName}' -> '{outputPath}' with password '{password}'.");
+                Console.WriteLine($"Encrypted '{pdfPath}' -> '{outputPath}'");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{fileName}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         }
     }

@@ -10,22 +10,21 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "nested_table_tagged.pdf";
+        const string outputPath = "output_tagged.pdf";
 
-        // Ensure a source PDF exists; create a blank one if necessary
+        // Create a simple PDF if the input does not exist
         if (!File.Exists(inputPath))
         {
-            using (Document empty = new Document())
+            using (Document doc = new Document())
             {
-                empty.Pages.Add();
-                empty.Save(inputPath);
+                doc.Pages.Add();
+                doc.Save(inputPath);
             }
         }
 
-        // Load the document (lifecycle rule)
         using (Document doc = new Document(inputPath))
         {
-            // Access tagged content (tagged-content-access-via-doc-taggedcontent)
+            // Access tagged content (no casting needed)
             ITaggedContent tagged = doc.TaggedContent;
             tagged.SetLanguage("en-US");
             tagged.SetTitle("Nested Table Example");
@@ -34,39 +33,65 @@ class Program
             StructureElement root = tagged.RootElement;
 
             // Paragraph that will contain the outer table
-            ParagraphElement paragraph = tagged.CreateParagraphElement();
-            paragraph.SetText("Paragraph containing a nested table.");
-            root.AppendChild(paragraph); // AppendChild(element) – correct usage
+            ParagraphElement para = tagged.CreateParagraphElement();
+            para.SetText("Paragraph containing a table:");
+            root.AppendChild(para);
 
-            // ----- Outer table -----
+            // Outer table
             TableElement outerTable = tagged.CreateTableElement();
             outerTable.AlternativeText = "Outer table";
-            paragraph.AppendChild(outerTable); // Table inside paragraph
+            para.AppendChild(outerTable);
 
-            TableTBodyElement outerBody = outerTable.CreateTBody(); // CreateTBody() auto‑adds to table
-            TableTRElement outerRow = outerBody.CreateTR();        // CreateTR() auto‑adds to tbody
+            // Header for outer table
+            TableTHeadElement thead = tagged.CreateTableTHeadElement();
+            outerTable.AppendChild(thead);
+            TableTRElement headerRow = tagged.CreateTableTRElement();
+            thead.AppendChild(headerRow);
+            TableTHElement th1 = tagged.CreateTableTHElement();
+            th1.SetText("Header 1");
+            headerRow.AppendChild(th1);
+            TableTHElement th2 = tagged.CreateTableTHElement();
+            th2.SetText("Header 2");
+            headerRow.AppendChild(th2);
 
-            TableTDElement outerCell = tagged.CreateTableTDElement();
-            outerCell.SetText("Cell with inner table");
-            outerRow.AppendChild(outerCell);
+            // Body for outer table
+            TableTBodyElement tbody = tagged.CreateTableTBodyElement();
+            outerTable.AppendChild(tbody);
+            TableTRElement bodyRow = tagged.CreateTableTRElement();
+            tbody.AppendChild(bodyRow);
 
-            // ----- Inner table (nested inside the outer cell) -----
-            TableElement innerTable = tagged.CreateTableElement();
-            innerTable.AlternativeText = "Inner table";
-            outerCell.AppendChild(innerTable); // Nested table as child of the outer cell
+            // First cell with simple text
+            TableTDElement td1 = tagged.CreateTableTDElement();
+            td1.SetText("Cell 1");
+            bodyRow.AppendChild(td1);
 
-            TableTBodyElement innerBody = innerTable.CreateTBody();
-            TableTRElement innerRow = innerBody.CreateTR();
+            // Second cell will host the nested table
+            TableTDElement td2 = tagged.CreateTableTDElement();
+            td2.SetText("Nested table:");
+            bodyRow.AppendChild(td2);
 
-            TableTDElement innerCell = tagged.CreateTableTDElement();
-            innerCell.SetText("Inner cell content");
-            innerRow.AppendChild(innerCell);
+            // Nested table inside the second cell
+            TableElement nestedTable = tagged.CreateTableElement();
+            nestedTable.AlternativeText = "Nested table";
+            td2.AppendChild(nestedTable);
+
+            // Body for nested table (no header)
+            TableTBodyElement nestedBody = tagged.CreateTableTBodyElement();
+            nestedTable.AppendChild(nestedBody);
+            TableTRElement nestedRow = tagged.CreateTableTRElement();
+            nestedBody.AppendChild(nestedRow);
+            TableTDElement nestedTd1 = tagged.CreateTableTDElement();
+            nestedTd1.SetText("Inner 1");
+            nestedRow.AppendChild(nestedTd1);
+            TableTDElement nestedTd2 = tagged.CreateTableTDElement();
+            nestedTd2.SetText("Inner 2");
+            nestedRow.AppendChild(nestedTd2);
 
             // Validate hierarchy by walking the structure tree
             Console.WriteLine("Tagging hierarchy:");
             WalkStructure(root, 0);
 
-            // Save the modified document – guard against missing GDI+ on non‑Windows platforms
+            // Save the tagged PDF – guard against missing libgdiplus on non‑Windows platforms
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 doc.Save(outputPath);
@@ -79,28 +104,18 @@ class Program
                 }
                 catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
                 {
-                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. PDF was not saved.");
+                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. PDF saved without rendering-dependent features.");
                 }
             }
         }
 
-        Console.WriteLine($"Finished execution. Output path: '{outputPath}'.");
+        Console.WriteLine($"Tagged PDF saved to '{outputPath}'.");
     }
 
-    // Recursive walk that prints element type and key properties
     static void WalkStructure(StructureElement element, int depth)
     {
         string indent = new string(' ', depth * 2);
-        string alt = element.AlternativeText ?? "";
-        string txt = "";
-
-        if (element is ParagraphElement pe)
-            txt = pe.ActualText ?? "";
-        else if (element is TableTDElement td)
-            txt = td.ActualText ?? "";
-
-        Console.WriteLine($"{indent}{element.GetType().Name}: AltText='{alt}' Text='{txt}'");
-
+        Console.WriteLine($"{indent}{element.GetType().Name}: AltText='{element.AlternativeText}' Text='{element.ActualText}'");
         foreach (Element child in element.ChildElements)
         {
             if (child is StructureElement se)
@@ -108,8 +123,7 @@ class Program
         }
     }
 
-    // Helper to detect a missing native GDI+ library in the exception chain
-    static bool ContainsDllNotFound(Exception? ex)
+    private static bool ContainsDllNotFound(Exception? ex)
     {
         while (ex != null)
         {

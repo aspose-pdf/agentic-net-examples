@@ -7,36 +7,37 @@ class Program
     static void Main()
     {
         const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_with_help_bookmark.pdf";
-        const string helpUrl   = "https://example.com/documentation";
+        const string outputPdf = "output.pdf";
+        const string url       = "https://example.com/documentation";
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Use PdfBookmarkEditor (facade) to add a bookmark that opens an external URL.
+        // Initialize the bookmark editor facade
         using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
         {
-            // Bind the existing PDF file.
+            // Load the PDF file into the facade
             editor.BindPdf(inputPdf);
 
-            // Create a bookmark instance.
+            // Create a bookmark that opens an external URL
             Bookmark helpBookmark = new Bookmark
             {
-                Title    = "Help",          // Visible name in the bookmarks pane.
-                Action   = "URI",           // Action type for opening a web address.
-                Destination = helpUrl       // The URL to open when the bookmark is clicked.
+                Title      = "Help",   // Bookmark name shown in the PDF viewer
+                Action     = "URI",    // Action type for opening a URL
+                Destination = url       // The URL to open when the bookmark is clicked
+                // No color is set to avoid using System.Drawing.Color
             };
 
-            // Add the bookmark to the document.
+            // Add the bookmark to the document
             editor.CreateBookmarks(helpBookmark);
 
-            // Save the modified PDF.
+            // Save the updated PDF
             editor.Save(outputPdf);
         }
 
-        Console.WriteLine($"Bookmark added and saved to '{outputPdf}'.");
+        Console.WriteLine($"Bookmark 'Help' added and saved to '{outputPdf}'.");
     }
 }

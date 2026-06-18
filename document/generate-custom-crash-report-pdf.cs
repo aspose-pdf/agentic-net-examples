@@ -1,52 +1,38 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace includes Document, PdfException, CrashReportOptions
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "sample.pdf";
-
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
-            return;
-        }
-
         try
         {
-            // Load the PDF document using a using block for deterministic disposal
-            using (Document doc = new Document(inputPdf))
+            // Simulate a PDF operation that throws an exception.
+            // Attempt to open a non‑existent PDF file to trigger an error.
+            using (Document doc = new Document("nonexistent.pdf"))
             {
-                // Example of a complex operation that may throw an exception:
-                // Attempt to access a page using an invalid (0‑based) index to trigger an error.
-                // Aspose.Pdf uses 1‑based indexing; this will raise an IndexOutOfRangeException.
-                Page invalidPage = doc.Pages[0];
-
-                // Perform additional processing here...
-                // (omitted – focus is on crash‑report generation)
+                // Force loading of the first page (will not be reached).
+                var page = doc.Pages[1];
             }
         }
         catch (Exception ex)
         {
-            // Prepare a custom crash report with additional diagnostic information
-            CrashReportOptions reportOptions = new CrashReportOptions(ex)
-            {
-                // Directory where the HTML crash report will be written
-                CrashReportDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "CrashReports"),
+            // Ensure we have a PdfException instance (wrap if necessary).
+            PdfException pdfEx = ex as PdfException ?? new PdfException("PDF operation failed", ex);
 
-                // Optional custom message – can include variable values, stack trace snippets, etc.
-                CustomMessage = $"Custom stack trace for debugging:\n{ex.StackTrace}"
-            };
+            // Create crash report options based on the exception.
+            CrashReportOptions options = new CrashReportOptions(pdfEx);
 
-            // Ensure the output directory exists
-            Directory.CreateDirectory(reportOptions.CrashReportDirectory);
+            // Include a custom message with additional debugging details.
+            options.CustomMessage = $"Custom debug info: Operation failed at {DateTime.Now}\nStackTrace:\n{ex.StackTrace}";
 
-            // Generate the crash report (HTML file) based on the caught exception
-            PdfException.GenerateCrashReport(reportOptions);
+            // Specify where the crash report HTML file should be written.
+            options.CrashReportDirectory = Directory.GetCurrentDirectory();
+            options.CrashReportFilename = "MyPdfCrashReport.html";
 
-            Console.Error.WriteLine($"Crash report generated at: {reportOptions.CrashReportPath}");
+            // Generate the crash report (HTML format) using Aspose.Pdf.
+            PdfException.GenerateCrashReport(options);
         }
     }
 }

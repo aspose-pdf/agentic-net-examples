@@ -8,62 +8,80 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "signed_output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "signed_output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (using statement ensures proper disposal)
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Open the personal (My) certificate store of the current user.
-            X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
-            store.Open(OpenFlags.ReadOnly);
-            X509Certificate2Collection allCerts = store.Certificates;
+            // Define the rectangle for the signature field (llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 100, 300, 200);
 
-            // Prompt the user to select a certificate from the smart card / store.
-            // The OS will handle PIN entry when the private key is accessed.
-            X509Certificate2Collection selected = X509Certificate2UI.SelectFromCollection(
-                allCerts,
-                "Select Certificate",
-                "Choose the certificate stored on your smart card",
-                X509SelectionFlag.SingleSelection);
+            // Add a signature field to the first page
+            SignatureField signatureField = new SignatureField(doc, rect);
+            doc.Pages[1].Annotations.Add(signatureField);
 
-            store.Close();
-
-            if (selected == null || selected.Count == 0)
+            // Retrieve a certificate with a private key from the smart card
+            X509Certificate2 cert = GetCertificateFromSmartCard();
+            if (cert == null)
             {
-                Console.Error.WriteLine("No certificate selected.");
+                Console.Error.WriteLine("No suitable certificate with a private key found on the smart card.");
                 return;
             }
 
-            X509Certificate2 cert = selected[0];
+            // Create an ExternalSignature using the certificate.
+            // Accessing the private key will trigger the OS PIN prompt.
+            ExternalSignature externalSignature = new ExternalSignature(cert)
+            {
+                Reason = "Document approval",
+                Location = Environment.MachineName,
+                ContactInfo = Environment.UserName
+            };
 
-            // Create an ExternalSignature that works with certificates whose private key
-            // is not exportable (e.g., smart cards). This will trigger the PIN prompt.
-            ExternalSignature externalSignature = new ExternalSignature(cert);
-
-            // Optional: set signature appearance properties
-            externalSignature.Reason   = "Document approval";
-            externalSignature.Location = Environment.MachineName;
-            externalSignature.Date     = DateTime.Now;
-
-            // Add a signature field to the first page (position can be adjusted as needed)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-            SignatureField sigField = new SignatureField(doc.Pages[1], rect);
-            doc.Pages[1].Annotations.Add(sigField);
-
-            // Sign the document using the selected certificate
-            sigField.Sign(externalSignature);
+            // Sign the PDF using the signature field
+            signatureField.Sign(externalSignature);
 
             // Save the signed PDF
-            doc.Save(outputPdf);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Signed PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Signed PDF saved to '{outputPath}'.");
+    }
+
+    // Helper: selects the first certificate in the current user's "My" store that has a private key.
+    // Accessing the private key forces the OS to request the smart card PIN.
+    static X509Certificate2 GetCertificateFromSmartCard()
+    {
+        using (X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser))
+        {
+            store.Open(OpenFlags.ReadOnly | OpenFlags.OpenExistingOnly);
+            foreach (X509Certificate2 cert in store.Certificates)
+            {
+                if (cert.HasPrivateKey)
+                {
+                    try
+                    {
+                        // Attempt to acquire the private key; this will prompt for the PIN if needed.
+                        var key = cert.GetRSAPrivateKey();
+                        if (key != null)
+                        {
+                            return cert;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // If the user cancels the PIN prompt or another error occurs, continue searching.
+                        Console.Error.WriteLine($"Unable to access private key: {ex.Message}");
+                    }
+                }
+            }
+        }
+        return null;
     }
 }

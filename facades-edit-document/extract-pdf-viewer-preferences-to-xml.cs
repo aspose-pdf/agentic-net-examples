@@ -1,14 +1,14 @@
 using System;
 using System.IO;
-using System.Xml;
+using System.Xml.Linq;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";          // source PDF
-        const string outputXmlPath = "viewer_prefs.xml"; // configuration file
+        const string inputPdfPath  = "input.pdf";
+        const string outputXmlPath = "viewer_preferences.xml";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -16,75 +16,61 @@ class Program
             return;
         }
 
-        // Create the PdfContentEditor facade and bind the PDF
-        PdfContentEditor editor = new PdfContentEditor();
-        try
+        // Load the PDF and retrieve viewer preferences using PdfContentEditor
+        using (PdfContentEditor editor = new PdfContentEditor())
         {
             editor.BindPdf(inputPdfPath);
-
-            // Retrieve the viewer preferences as an integer flag set
             int prefValue = editor.GetViewerPreference();
 
-            // Serialize the preferences to an XML file
-            using (XmlWriter writer = XmlWriter.Create(outputXmlPath, new XmlWriterSettings { Indent = true }))
+            // Define known ViewerPreference flags and their names
+            var knownFlags = new (int Flag, string Name)[]
             {
-                writer.WriteStartDocument();
-                writer.WriteStartElement("ViewerPreferences");
+                (ViewerPreference.CenterWindow,               "CenterWindow"),
+                (ViewerPreference.DirectionL2R,               "DirectionL2R"),
+                (ViewerPreference.DirectionR2L,               "DirectionR2L"),
+                (ViewerPreference.DisplayDocTitle,            "DisplayDocTitle"),
+                (ViewerPreference.DuplexFlipLongEdge,         "DuplexFlipLongEdge"),
+                (ViewerPreference.DuplexFlipShortEdge,        "DuplexFlipShortEdge"),
+                (ViewerPreference.FitWindow,                  "FitWindow"),
+                (ViewerPreference.HideMenubar,                "HideMenubar"),
+                (ViewerPreference.HideToolbar,                "HideToolbar"),
+                (ViewerPreference.HideWindowUI,               "HideWindowUI"),
+                (ViewerPreference.NonFullScreenPageModeUseNone,   "NonFullScreenPageModeUseNone"),
+                (ViewerPreference.NonFullScreenPageModeUseOC,     "NonFullScreenPageModeUseOC"),
+                (ViewerPreference.NonFullScreenPageModeUseOutlines,"NonFullScreenPageModeUseOutlines"),
+                (ViewerPreference.NonFullScreenPageModeUseThumbs, "NonFullScreenPageModeUseThumbs"),
+                (ViewerPreference.PageLayoutOneColumn,        "PageLayoutOneColumn"),
+                (ViewerPreference.PageLayoutSinglePage,       "PageLayoutSinglePage"),
+                (ViewerPreference.PageLayoutTwoColumnLeft,    "PageLayoutTwoColumnLeft"),
+                (ViewerPreference.PageLayoutTwoColumnRight,   "PageLayoutTwoColumnRight"),
+                (ViewerPreference.PageModeFullScreen,         "PageModeFullScreen"),
+                (ViewerPreference.PageModeUseAttachment,      "PageModeUseAttachment"),
+                (ViewerPreference.PageModeUseNone,            "PageModeUseNone"),
+                (ViewerPreference.PageModeUseOC,              "PageModeUseOC"),
+                (ViewerPreference.PageModeUseOutlines,        "PageModeUseOutlines"),
+                (ViewerPreference.PageModeUseThumbs,          "PageModeUseThumbs"),
+                (ViewerPreference.PickTrayByPDFSize,          "PickTrayByPDFSize"),
+                (ViewerPreference.PrintScalingAppDefault,    "PrintScalingAppDefault"),
+                (ViewerPreference.PrintScalingNone,           "PrintScalingNone"),
+                (ViewerPreference.Simplex,                    "Simplex")
+            };
 
-                // Store the raw integer value
-                writer.WriteElementString("PreferenceValue", prefValue.ToString());
+            // Build XML representation
+            XElement root = new XElement("ViewerPreferences",
+                new XAttribute("CombinedValue", prefValue));
 
-                // Optionally, store individual flags that are set
-                writer.WriteStartElement("Flags");
-                WriteFlagIfSet(writer, prefValue, ViewerPreference.CenterWindow, "CenterWindow");
-                WriteFlagIfSet(writer, prefValue, ViewerPreference.DirectionL2R, "DirectionL2R");
-                WriteFlagIfSet(writer, prefValue, ViewerPreference.DirectionR2L, "DirectionR2L");
-                WriteFlagIfSet(writer, prefValue, ViewerPreference.DisplayDocTitle, "DisplayDocTitle");
-                WriteFlagIfSet(writer, prefValue, ViewerPreference.DuplexFlipLongEdge, "DuplexFlipLongEdge");
-                WriteFlagIfSet(writer, prefValue, ViewerPreference.DuplexFlipShortEdge, "DuplexFlipShortEdge");
-                WriteFlagIfSet(writer, prefValue, ViewerPreference.FitWindow, "FitWindow");
-                WriteFlagIfSet(writer, prefValue, ViewerPreference.HideMenubar, "HideMenubar");
-                WriteFlagIfSet(writer, prefValue, ViewerPreference.HideToolbar, "HideToolbar");
-                WriteFlagIfSet(writer, prefValue, ViewerPreference.HideWindowUI, "HideWindowUI");
-                WriteFlagIfSet(writer, prefValue, ViewerPreference.NonFullScreenPageModeUseNone, "NonFullScreenPageModeUseNone");
-                WriteFlagIfSet(writer, prefValue, ViewerPreference.NonFullScreenPageModeUseOC, "NonFullScreenPageModeUseOC");
-                WriteFlagIfSet(writer, prefValue, ViewerPreference.NonFullScreenPageModeUseOutlines, "NonFullScreenPageModeUseOutlines");
-                WriteFlagIfSet(writer, prefValue, ViewerPreference.NonFullScreenPageModeUseThumbs, "NonFullScreenPageModeUseThumbs");
-                WriteFlagIfSet(writer, prefValue, ViewerPreference.PageLayoutOneColumn, "PageLayoutOneColumn");
-                WriteFlagIfSet(writer, prefValue, ViewerPreference.PageLayoutSinglePage, "PageLayoutSinglePage");
-                WriteFlagIfSet(writer, prefValue, ViewerPreference.PageLayoutTwoColumnLeft, "PageLayoutTwoColumnLeft");
-                WriteFlagIfSet(writer, prefValue, ViewerPreference.PageLayoutTwoColumnRight, "PageLayoutTwoColumnRight");
-                WriteFlagIfSet(writer, prefValue, ViewerPreference.PageModeFullScreen, "PageModeFullScreen");
-                WriteFlagIfSet(writer, prefValue, ViewerPreference.PageModeUseAttachment, "PageModeUseAttachment");
-                WriteFlagIfSet(writer, prefValue, ViewerPreference.PageModeUseNone, "PageModeUseNone");
-                WriteFlagIfSet(writer, prefValue, ViewerPreference.PageModeUseOC, "PageModeUseOC");
-                WriteFlagIfSet(writer, prefValue, ViewerPreference.PageModeUseOutlines, "PageModeUseOutlines");
-                WriteFlagIfSet(writer, prefValue, ViewerPreference.PageModeUseThumbs, "PageModeUseThumbs");
-                WriteFlagIfSet(writer, prefValue, ViewerPreference.PickTrayByPDFSize, "PickTrayByPDFSize");
-                WriteFlagIfSet(writer, prefValue, ViewerPreference.PrintScalingAppDefault, "PrintScalingAppDefault");
-                WriteFlagIfSet(writer, prefValue, ViewerPreference.PrintScalingNone, "PrintScalingNone");
-                WriteFlagIfSet(writer, prefValue, ViewerPreference.Simplex, "Simplex");
-                writer.WriteEndElement(); // Flags
-
-                writer.WriteEndElement(); // ViewerPreferences
-                writer.WriteEndDocument();
+            foreach (var (Flag, Name) in knownFlags)
+            {
+                if ((prefValue & Flag) != 0)
+                {
+                    root.Add(new XElement("Preference", new XAttribute("Name", Name)));
+                }
             }
 
-            Console.WriteLine($"Viewer preferences saved to '{outputXmlPath}'.");
+            XDocument xmlDoc = new XDocument(new XDeclaration("1.0", "utf-8", "yes"), root);
+            xmlDoc.Save(outputXmlPath);
         }
-        finally
-        {
-            // Ensure resources are released
-            editor.Close();
-        }
-    }
 
-    // Helper to write a flag element only if the corresponding bit is set
-    private static void WriteFlagIfSet(XmlWriter writer, int prefValue, int flag, string name)
-    {
-        if ((prefValue & flag) != 0)
-        {
-            writer.WriteElementString(name, "true");
-        }
+        Console.WriteLine($"Viewer preferences saved to '{outputXmlPath}'.");
     }
 }

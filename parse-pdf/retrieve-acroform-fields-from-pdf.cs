@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -21,20 +22,26 @@ class Program
             // Access the AcroForm of the document
             Form acroForm = doc.Form;
 
-            // Retrieve all fields in the lowest level of the form hierarchy
-            Field[] fields = acroForm.Fields;
+            // Output the total number of form fields
+            Console.WriteLine($"AcroForm fields count: {acroForm.Count}");
 
-            Console.WriteLine($"Total AcroForm fields: {fields.Length}");
-
-            // Iterate over each field and display its name and current value
-            foreach (Field field in fields)
+            // Iterate over each widget annotation in the form
+            foreach (WidgetAnnotation widget in acroForm)
             {
-                // Field.Name gives the partial name; FullName gives the qualified name
-                string fieldName = field.FullName ?? field.Name ?? "(unnamed)";
-                string fieldValue = field.Value?.ToString() ?? "(no value)";
-
-                Console.WriteLine($"Field: {fieldName}, Value: {fieldValue}");
+                // Cast to Field to access field‑specific properties
+                if (widget is Field field)
+                {
+                    Console.WriteLine($"Field Full Name : {field.FullName}");
+                    Console.WriteLine($"Partial Name    : {field.PartialName}");
+                    Console.WriteLine($"Value           : {field.Value}");
+                    Console.WriteLine($"ReadOnly        : {field.ReadOnly}");
+                    Console.WriteLine();
+                }
             }
+
+            // Alternative way: use the Fields array
+            // Field[] fieldsArray = acroForm.Fields;
+            // foreach (Field f in fieldsArray) { /* process f */ }
         }
     }
 }

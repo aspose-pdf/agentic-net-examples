@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // TableAbsorber and AbsorbedTable live here
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -15,28 +15,27 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Create a TableAbsorber to find tables
+            TableAbsorber absorber = new TableAbsorber();
+
+            // Extract tables from the whole document
+            absorber.Visit(doc);
+
+            // Iterate over each found table
+            for (int i = 0; i < absorber.TableList.Count; i++)
             {
-                Page page = doc.Pages[pageIndex];
+                AbsorbedTable table = absorber.TableList[i];
 
-                // Create a fresh TableAbsorber for the current page
-                TableAbsorber absorber = new TableAbsorber();
-                absorber.Visit(page);
+                // Get the rectangle that describes the table position
+                Aspose.Pdf.Rectangle rect = table.Rectangle;
 
-                // Loop through each detected table and output its rectangle coordinates
-                for (int i = 0; i < absorber.TableList.Count; i++)
-                {
-                    AbsorbedTable table = absorber.TableList[i];
-                    Aspose.Pdf.Rectangle rect = table.Rectangle;
-
-                    // Output the page number and rectangle bounds (llx, lly, urx, ury)
-                    Console.WriteLine($"Page {page.Number}: Table {i + 1} – " +
-                                      $"LLX={rect.LLX}, LLY={rect.LLY}, URX={rect.URX}, URY={rect.URY}");
-                }
+                // Output table index, page number and rectangle coordinates
+                Console.WriteLine(
+                    $"Table {i + 1} on page {table.PageNum}: " +
+                    $"LLX={rect.LLX}, LLY={rect.LLY}, URX={rect.URX}, URY={rect.URY}");
             }
         }
     }

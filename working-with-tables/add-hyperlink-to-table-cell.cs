@@ -1,64 +1,52 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Drawing;
 using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-
-        if (!File.Exists(inputPath))
+        // Create a sample PDF (self‑contained example)
+        using (Document createDoc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
+            createDoc.Pages.Add();
+            createDoc.Save("input.pdf");
         }
 
-        // Load the existing PDF
-        using (Document doc = new Document(inputPath))
+        // Open the sample PDF and add a table with a hyperlink inside a cell
+        using (Document doc = new Document("input.pdf"))
         {
             // Get the first page (1‑based indexing)
             Page page = doc.Pages[1];
 
-            // Create a table and add it to the page
+            // Create a table with a single column
             Table table = new Table();
+            table.ColumnWidths = "200";
+
+            // Add a row and a cell containing placeholder text
+            Row row = table.Rows.Add();
+            Cell cell = row.Cells.Add("Click here");
+
+            // Add the table to the page
             page.Paragraphs.Add(table);
 
-            // Add a single row and a single cell
-            Row row = table.Rows.Add();
-            Cell cell = row.Cells.Add();
+            // Define a rectangle that roughly covers the cell area
+            // (adjust the coordinates as needed for real layouts)
+            Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(100, 700, 300, 720);
 
-            // Add visible text to the cell
-            cell.Paragraphs.Add(new TextFragment("Click here for more info"));
+            // Create a LinkAnnotation with a web hyperlink
+            LinkAnnotation link = new LinkAnnotation(page, linkRect);
+            link.Hyperlink = new WebHyperlink("https://www.example.com");
+            link.Color = Aspose.Pdf.Color.Blue;
+            link.Border = new Border(link);
 
-            // Define the rectangle area for the hyperlink.
-            // Coordinates are in points, origin is bottom‑left of the page.
-            // Adjust these values to fit the actual cell position as needed.
-            Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(
-                llx: 100,   // left
-                lly: 500,   // bottom
-                urx: 250,   // right
-                ury: 520    // top
-            );
+            // Add the annotation to the page
+            page.Annotations.Add(link);
 
-            // Create a LinkAnnotation that points to an external URL
-            LinkAnnotation link = new LinkAnnotation(page, linkRect)
-            {
-                // Use GoToURIAction for external web links (preferred over Hyperlink property)
-                Action = new GoToURIAction("https://www.example.com")
-            };
-
-            // Add the annotation to the cell's paragraph collection.
-            // LinkAnnotation derives from BaseParagraph, so it can be added here.
-            cell.Paragraphs.Add(link);
-
-            // Save the modified PDF
-            doc.Save(outputPath);
+            // Save the updated document
+            doc.Save("output.pdf");
         }
-
-        Console.WriteLine($"PDF with hyperlink saved to '{outputPath}'.");
     }
 }

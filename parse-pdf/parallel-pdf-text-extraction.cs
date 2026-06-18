@@ -1,27 +1,25 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class Program
+class ParallelPdfTextExtractor
 {
-    static void Main()
+    // Entry point
+    static async Task Main()
     {
-        // Determine the directory that contains PDF files.
-        // Use a path relative to the executable so the code works on any OS.
-        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-        string inputDirectory = Path.Combine(baseDir, "PdfFiles");
+        // Directory containing PDF files
+        const string inputDirectory = @"C:\PdfFiles";
 
         if (!Directory.Exists(inputDirectory))
         {
-            Console.WriteLine($"PDF directory not found: {inputDirectory}");
+            Console.Error.WriteLine($"Input directory not found: {inputDirectory}");
             return;
         }
 
-        // Collect all PDF file paths
+        // Gather all PDF file paths
         string[] pdfFiles = Directory.GetFiles(inputDirectory, "*.pdf", SearchOption.TopDirectoryOnly);
         if (pdfFiles.Length == 0)
         {
@@ -29,38 +27,47 @@ class Program
             return;
         }
 
-        // Thread‑safe dictionary to hold extraction results: file path -> extracted text
-        var results = new ConcurrentDictionary<string, string>();
+        // Dictionary to hold extracted text keyed by file name
+        var results = new Dictionary<string, string>();
 
-        // Parallelize the extraction using TPL
-        Parallel.ForEach(pdfFiles, pdfPath =>
+        // List of tasks, each extracts text from one PDF
+        var extractionTasks = new List<Task>();
+
+        foreach (string pdfPath in pdfFiles)
         {
-            try
+            // Capture the current path for the lambda
+            string currentPath = pdfPath;
+
+            // Create a task that extracts text from the PDF
+            Task task = Task.Run(() =>
             {
-                // Load the PDF document (wrapped in using for deterministic disposal)
-                using (Document doc = new Document(pdfPath))
+                // Open the PDF document inside a using block for deterministic disposal
+                using (Document doc = new Document(currentPath))
                 {
-                    // Create a TextAbsorber to extract text from the whole document
+                    // Create a TextAbsorber to extract all text
                     TextAbsorber absorber = new TextAbsorber();
 
-                    // Accept the absorber for all pages
+                    // Accept the absorber for all pages in the document
                     doc.Pages.Accept(absorber);
 
-                    // Store the extracted text
-                    results[pdfPath] = absorber.Text;
+                    // Store the extracted text in the results dictionary (thread‑safe via lock)
+                    lock (results)
+                    {
+                        results[Path.GetFileName(currentPath)] = absorber.Text;
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                // In case of errors, store the exception message
-                results[pdfPath] = $"Error: {ex.Message}";
-            }
-        });
+            });
 
-        // Output the extraction results
-        foreach (KeyValuePair<string, string> kvp in results)
+            extractionTasks.Add(task);
+        }
+
+        // Await completion of all extraction tasks
+        await Task.WhenAll(extractionTasks);
+
+        // Output the extracted text for each file
+        foreach (var kvp in results)
         {
-            Console.WriteLine($"--- {Path.GetFileName(kvp.Key)} ---");
+            Console.WriteLine($"--- Text from {kvp.Key} ---");
             Console.WriteLine(kvp.Value);
             Console.WriteLine();
         }

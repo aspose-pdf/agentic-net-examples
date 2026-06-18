@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Drawing;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -8,13 +7,14 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";          // source PDF with a form field
-        const string outputPdf  = "output.pdf";         // PDF after applying background image
-        const string imagePath  = "brand_logo.png";     // image to use as background
+        const string inputPdfPath  = "input.pdf";          // source PDF with a form field
+        const string outputPdfPath = "output.pdf";         // PDF with background image applied
+        const string fieldName     = "BrandField";         // name of the form field to style
+        const string imagePath     = "brand_logo.png";    // image to use as background
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
@@ -24,71 +24,27 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document
+        using (Document doc = new Document(inputPdfPath))
         {
-            // -----------------------------------------------------------------
-            // 1. Try XFA form field background (XFA.SetFieldImage)
-            // -----------------------------------------------------------------
-            // NOTE: The XFA API is version‑specific. If the current Aspose.Pdf
-            // version does not expose Form.Xfa, this block is safely ignored.
-            try
+            // Ensure the document contains a form
+            if (doc.Form == null)
             {
-                // Attempt to obtain the XFA object via reflection to avoid compile‑time
-                // dependency on a property that may not exist in older versions.
-                var xfaProp = doc.Form.GetType().GetProperty("Xfa");
-                if (xfaProp != null)
-                {
-                    var xfa = xfaProp.GetValue(doc.Form);
-                    // Xfa class has a SetFieldImage(string, Stream) method.
-                    var setImgMethod = xfa.GetType().GetMethod("SetFieldImage", new[] { typeof(string), typeof(Stream) });
-                    if (setImgMethod != null)
-                    {
-                        using (FileStream imgStream = File.OpenRead(imagePath))
-                        {
-                            setImgMethod.Invoke(xfa, new object[] { "logoField", imgStream });
-                        }
-                    }
-                }
-            }
-            catch (Exception ex) when (ex is NullReferenceException || ex is NotSupportedException)
-            {
-                // XFA not present or field not XFA – ignore and try AcroForm approach
+                Console.Error.WriteLine("The PDF does not contain a form.");
+                return;
             }
 
-            // -----------------------------------------------------------------
-            // 2. AcroForm field background (TextBoxField.AddImage or ButtonField.AddImage)
-            // -----------------------------------------------------------------
-            // Retrieve the field by its fully qualified name and cast to the concrete type.
-            TextBoxField txtField = doc.Form["logoField"] as TextBoxField;
-            if (txtField != null)
+            // Set the background image for the specified XFA field.
+            // XFA.SetFieldImage expects a field name and a Stream containing the image.
+            using (FileStream imgStream = File.OpenRead(imagePath))
             {
-                // Load the image as a System.Drawing.Image (required by AddImage).
-                using (System.Drawing.Image img = System.Drawing.Image.FromFile(imagePath))
-                {
-                    txtField.AddImage(img);
-                }
-            }
-            else
-            {
-                // If not a TextBoxField, try a ButtonField.
-                ButtonField btnField = doc.Form["logoField"] as ButtonField;
-                if (btnField != null)
-                {
-                    using (System.Drawing.Image img = System.Drawing.Image.FromFile(imagePath))
-                    {
-                        btnField.AddImage(img);
-                    }
-                }
-                // Additional field types can be handled here if needed.
+                doc.Form.XFA.SetFieldImage(fieldName, imgStream);
             }
 
-            // -----------------------------------------------------------------
-            // Save the modified PDF (lifecycle rule: use Document.Save)
-            // -----------------------------------------------------------------
-            doc.Save(outputPdf);
+            // Save the modified PDF
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Background image applied and saved to '{outputPdf}'.");
+        Console.WriteLine($"Background image applied to field '{fieldName}' and saved to '{outputPdfPath}'.");
     }
 }

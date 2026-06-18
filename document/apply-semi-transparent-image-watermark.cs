@@ -6,44 +6,61 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "watermarked.pdf";
-        const string imagePath = "overlay.png";   // semi‑transparent PNG
+        const string inputPdfPath = "input.pdf";
+        const string overlayImagePath = "overlay.png"; // image to use as watermark
+        const string outputPdfPath = "watermarked_output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(imagePath))
-        {
-            Console.Error.WriteLine($"Overlay image not found: {imagePath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use Document constructor)
-        using (Document doc = new Document(inputPdf))
+        if (!File.Exists(overlayImagePath))
         {
-            // Apply the watermark to each page
-            foreach (Page page in doc.Pages)
+            Console.Error.WriteLine($"Overlay image not found: {overlayImagePath}");
+            return;
+        }
+
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdfPath))
+        {
+            // Iterate over all pages (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Create a watermark artifact
+                Page page = doc.Pages[i];
+
+                // Create a watermark artifact for the current page
                 WatermarkArtifact watermark = new WatermarkArtifact();
 
-                // Set the image for the watermark (uses the overload that accepts a file path)
-                watermark.SetImage(imagePath);
+                // Set the image for the watermark (can use file path or stream)
+                watermark.SetImage(overlayImagePath);
 
                 // Set semi‑transparent opacity (0.0 = fully transparent, 1.0 = opaque)
-                watermark.Opacity = 0.3f;   // 30 % opacity
+                watermark.Opacity = 0.3; // 30% opacity
 
-                // Add the artifact to the page (page.Artifacts is the collection for such objects)
+                // Optional: position the watermark.
+                // Position is measured from the bottom‑left corner of the page.
+                // Here we center the image; adjust X/Y as needed.
+                double pageWidth = page.PageInfo.Width;
+                double pageHeight = page.PageInfo.Height;
+                // Assuming the image size is known (e.g., 200x100 points)
+                double imgWidth = 200;
+                double imgHeight = 100;
+                double posX = (pageWidth - imgWidth) / 2;
+                double posY = (pageHeight - imgHeight) / 2;
+
+                // Use Aspose.Pdf.Point (not Aspose.Pdf.Text.Position) for watermark position
+                watermark.Position = new Aspose.Pdf.Point(posX, posY);
+
+                // Add the watermark artifact to the page's artifact collection
                 page.Artifacts.Add(watermark);
             }
 
-            // Save the modified PDF (lifecycle rule: use Document.Save)
-            doc.Save(outputPdf);
+            // Save the modified PDF
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Watermarked PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Watermarked PDF saved to '{outputPdfPath}'.");
     }
 }

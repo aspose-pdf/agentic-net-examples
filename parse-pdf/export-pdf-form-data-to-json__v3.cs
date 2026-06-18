@@ -1,39 +1,56 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 
-class Program
+class ExportFormData
 {
-    static void Main()
+    // Entry point of the command‑line utility
+    static void Main(string[] args)
     {
-        const string inputPdf = "input.pdf";
-        const string outputJson = "formdata.json";
-
-        if (!File.Exists(inputPdf))
+        // Expect exactly two arguments: input PDF path and output format flag
+        if (args.Length != 2)
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine("Usage: ExportFormData <pdfPath> <format>");
+            Console.Error.WriteLine("Supported format flags: json");
             return;
         }
 
-        // Open the PDF document
-        using (Document doc = new Document(inputPdf))
-        {
-            // Create a FileStream to write the JSON output
-            using (FileStream jsonStream = new FileStream(outputJson, FileMode.Create, FileAccess.Write))
-            {
-                // Optional export options
-                ExportFieldsToJsonOptions options = new ExportFieldsToJsonOptions
-                {
-                    WriteIndented = true,
-                    ExportPasswordValue = false
-                };
+        string pdfPath = args[0];
+        string formatFlag = args[1].ToLowerInvariant();
 
-                // Export all form fields to the JSON stream
-                doc.Form.ExportToJson(jsonStream, options);
-            }
+        if (!File.Exists(pdfPath))
+        {
+            Console.Error.WriteLine($"Error: PDF file not found – '{pdfPath}'.");
+            return;
         }
 
-        Console.WriteLine($"Form data exported to '{outputJson}'.");
+        // Determine output file name based on the requested format
+        string outputPath;
+        switch (formatFlag)
+        {
+            case "json":
+                outputPath = Path.ChangeExtension(pdfPath, ".json");
+                break;
+            default:
+                Console.Error.WriteLine($"Error: Unsupported format '{formatFlag}'. Only 'json' is supported.");
+                return;
+        }
+
+        try
+        {
+            // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+            using (Document doc = new Document(pdfPath))
+            {
+                // Export all form fields to JSON using the built‑in ExportToJson method
+                // This writes directly to the specified file; no manual Save() call is needed
+                doc.Form.ExportToJson(outputPath);
+            }
+
+            Console.WriteLine($"Form data exported to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during export: {ex.Message}");
+        }
     }
 }

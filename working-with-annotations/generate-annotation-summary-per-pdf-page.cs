@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using System.Text.Json;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
@@ -18,49 +18,41 @@ class Program
             return;
         }
 
-        // Load the PDF document using the recommended using pattern
+        // Dictionary: page number -> (annotation type name -> count)
+        var summary = new Dictionary<int, Dictionary<string, int>>();
+
+        // Load the PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPdf))
         {
-            var summary = new List<PageAnnotationSummary>();
-
-            // Pages are 1‑based in Aspose.Pdf
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Pages are 1‑based (global rule)
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                Page page = doc.Pages[i];
-                var counts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                Page page = doc.Pages[pageIndex];
+                var typeCounts = new Dictionary<string, int>();
 
                 // Annotations collection is also 1‑based
-                for (int j = 1; j <= page.Annotations.Count; j++)
+                for (int annIndex = 1; annIndex <= page.Annotations.Count; annIndex++)
                 {
-                    Annotation ann = page.Annotations[j];
+                    Annotation ann = page.Annotations[annIndex];
                     string typeName = ann.AnnotationType.ToString();
 
-                    if (counts.ContainsKey(typeName))
-                        counts[typeName]++;
+                    if (typeCounts.ContainsKey(typeName))
+                        typeCounts[typeName]++;
                     else
-                        counts[typeName] = 1;
+                        typeCounts[typeName] = 1;
                 }
 
-                summary.Add(new PageAnnotationSummary
-                {
-                    PageNumber = i,
-                    AnnotationCounts = counts
-                });
+                summary[pageIndex] = typeCounts;
             }
-
-            // Serialize the summary to JSON with indentation for readability
-            JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-            string json = JsonSerializer.Serialize(summary, jsonOptions);
-            File.WriteAllText(outputJson, json);
         }
+
+        // Serialize the summary to pretty‑printed JSON
+        JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+        string json = JsonSerializer.Serialize(summary, jsonOptions);
+
+        // Save JSON to file (standard .NET I/O)
+        File.WriteAllText(outputJson, json);
 
         Console.WriteLine($"Annotation summary saved to '{outputJson}'.");
     }
-}
-
-// Helper class representing the annotation count per page
-public class PageAnnotationSummary
-{
-    public int PageNumber { get; set; }
-    public Dictionary<string, int> AnnotationCounts { get; set; }
 }

@@ -3,82 +3,83 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms; // Required for Field type
+using Aspose.Pdf.Forms;
 
-class PdfBatchFiller
+class BatchFormFiller
 {
-    // Fills the same set of form fields in multiple PDF files concurrently.
-    // inputFiles: full paths of source PDFs.
-    // outputDir: directory where filled PDFs will be saved.
-    // fieldValues: dictionary where key = field name, value = text to set.
-    public static void FillFieldsInBatch(IEnumerable<string> inputFiles, string outputDir, Dictionary<string, string> fieldValues)
-    {
-        if (!Directory.Exists(outputDir))
-            Directory.CreateDirectory(outputDir);
-
-        // Parallel.ForEach will process files on multiple threads.
-        Parallel.ForEach(inputFiles, inputPath =>
-        {
-            // Ensure the source file exists.
-            if (!File.Exists(inputPath))
-                return;
-
-            // Derive output file name.
-            string outputPath = Path.Combine(outputDir, Path.GetFileNameWithoutExtension(inputPath) + "_filled.pdf");
-
-            // Each PDF is handled in its own using block (lifecycle rule).
-            using (Document doc = new Document(inputPath))
-            {
-                // Disable automatic recalculation for performance when many fields are set.
-                doc.Form.AutoRecalculate = false;
-
-                // Set each field value.
-                foreach (var kvp in fieldValues)
-                {
-                    // If the field exists, assign the value using the Field object.
-                    if (doc.Form.HasField(kvp.Key))
-                    {
-                        // The indexer returns a WidgetAnnotation; cast it to Field to access the Value property.
-                        if (doc.Form[kvp.Key] is Field field)
-                        {
-                            field.Value = kvp.Value;
-                        }
-                    }
-                }
-
-                // Re‑enable recalculation if needed (optional).
-                doc.Form.AutoRecalculate = true;
-
-                // Save the modified PDF.
-                doc.Save(outputPath);
-            }
-        });
-    }
-
-    // Example usage.
     static void Main()
     {
-        // List of PDFs to process.
-        var pdfFiles = new List<string>
+        // Input PDF files to process
+        string[] inputFiles = new[]
         {
             "Invoice1.pdf",
             "Invoice2.pdf",
             "Invoice3.pdf"
+            // add more file paths as needed
         };
 
-        // Output directory for filled PDFs.
-        string outputDirectory = "FilledPdfs";
+        // Directory where filled PDFs will be saved
+        string outputDirectory = "FilledOutputs";
+        Directory.CreateDirectory(outputDirectory);
 
-        // Fields to fill (same for all documents).
-        var fields = new Dictionary<string, string>
+        // Example field values to apply to each document
+        var fieldValues = new Dictionary<string, string>
         {
-            { "CustomerName", "Acme Corp" },
-            { "Date", DateTime.Today.ToShortDateString() },
-            { "PreparedBy", "John Doe" }
+            { "CustomerName", "John Doe" },
+            { "Date", DateTime.Today.ToString("yyyy-MM-dd") },
+            { "Amount", "1234.56" }
         };
 
-        FillFieldsInBatch(pdfFiles, outputDirectory, fields);
+        // Process each PDF in parallel
+        Parallel.ForEach(inputFiles, inputPath =>
+        {
+            try
+            {
+                // Ensure the source file exists
+                if (!File.Exists(inputPath))
+                {
+                    Console.Error.WriteLine($"File not found: {inputPath}");
+                    return;
+                }
 
-        Console.WriteLine("Batch fill completed.");
+                // Determine output file path
+                string outputPath = Path.Combine(
+                    outputDirectory,
+                    Path.GetFileNameWithoutExtension(inputPath) + "_filled.pdf");
+
+                // Load, fill, and save the document
+                using (Document doc = new Document(inputPath))
+                {
+                    // Disable automatic recalculation for better performance
+                    doc.Form.AutoRecalculate = false;
+
+                    // Fill each specified field if it exists in the document
+                    foreach (var kvp in fieldValues)
+                    {
+                        string fieldName = kvp.Key;
+                        string fieldValue = kvp.Value;
+
+                        if (doc.Form.HasField(fieldName))
+                        {
+                            // The indexer may return a WidgetAnnotation in some versions;
+                            // cast to Field to access the Value property safely.
+                            if (doc.Form[fieldName] is Field field)
+                            {
+                                field.Value = fieldValue;
+                            }
+                        }
+                    }
+
+                    // Save the modified PDF
+                    doc.Save(outputPath);
+                }
+
+                Console.WriteLine($"Processed: {inputPath} -> {outputPath}");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
+            }
+        });
     }
 }

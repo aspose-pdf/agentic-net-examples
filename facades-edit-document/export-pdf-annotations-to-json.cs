@@ -1,65 +1,48 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
+using System.Text;
 using System.Text.Json;
-using System.Xml.Linq;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class ExportAnnotationsToJson
+class Program
 {
     static void Main()
     {
-        // Input PDF file containing annotations
         const string inputPdfPath = "input.pdf";
-        // Output JSON file that will hold the exported annotation data
         const string outputJsonPath = "annotations.json";
 
-        // Ensure the input file exists before proceeding
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Use PdfAnnotationEditor (Facade) to work with PDF annotations
+        // Load the PDF document and bind it to the annotation editor.
+        using (Document pdfDoc = new Document(inputPdfPath))
         using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            // Bind the PDF document to the editor
-            editor.BindPdf(inputPdfPath);
+            editor.BindPdf(pdfDoc);
 
-            // Export all annotations to XFDF using an in‑memory stream
+            // Export all annotations to an XFDF stream (XML format).
             using (MemoryStream xfdfStream = new MemoryStream())
             {
                 editor.ExportAnnotationsToXfdf(xfdfStream);
-                xfdfStream.Position = 0; // Reset stream for reading
+                xfdfStream.Position = 0; // Reset for reading.
 
-                // Load the XFDF XML
-                XDocument xfdfDoc = XDocument.Load(xfdfStream);
+                // Read the XFDF content as a UTF‑8 string.
+                string xfdfContent = Encoding.UTF8.GetString(xfdfStream.ToArray());
 
-                // Prepare a simple list of dictionaries to hold annotation data
-                var annotations = new List<Dictionary<string, string>>();
+                // Wrap the XFDF XML inside a simple JSON object.
+                string json = JsonSerializer.Serialize(new { xfdf = xfdfContent }, new JsonSerializerOptions { WriteIndented = true });
 
-                // XFDF structure: <xfdf><annots><...annotation elements.../></annots></xfdf>
-                foreach (var annotElement in xfdfDoc.Descendants("annots").Elements())
-                {
-                    var dict = new Dictionary<string, string>();
-                    foreach (var child in annotElement.Elements())
-                    {
-                        // Store each child element's name and value
-                        dict[child.Name.LocalName] = child.Value;
-                    }
-                    annotations.Add(dict);
-                }
-
-                // Serialize the annotation list to formatted JSON
-                string json = JsonSerializer.Serialize(
-                    annotations,
-                    new JsonSerializerOptions { WriteIndented = true });
-
-                // Write the JSON to the output file
-                File.WriteAllText(outputJsonPath, json);
-                Console.WriteLine($"Annotations exported to JSON: {outputJsonPath}");
+                // Write the JSON to the output file.
+                File.WriteAllText(outputJsonPath, json, Encoding.UTF8);
             }
+
+            // Save the (unchanged) PDF if needed; here we only export annotations.
         }
+
+        Console.WriteLine($"Annotations exported to JSON file: {outputJsonPath}");
     }
 }

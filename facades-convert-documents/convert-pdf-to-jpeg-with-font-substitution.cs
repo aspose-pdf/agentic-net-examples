@@ -1,20 +1,25 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging;          // ImageFormat enum
-using Aspose.Pdf;                     // Document, PdfSaveOptions
-using Aspose.Pdf.Facades;             // PdfConverter
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
+using System.Drawing.Imaging;
 
-class Program
+class PdfToJpegConverter
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";          // source PDF
-        const string outputDir      = "Images";            // folder for JPEGs
-        const string fallbackFont   = "Arial";             // font used when original is missing
+        // Input PDF file
+        const string inputPdf = "input.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        // Directory where JPEG images will be saved
+        const string outputDir = "JpegPages";
+
+        // Font to use when the original PDF references a missing font
+        const string substituteFont = "Arial";
+
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
@@ -22,36 +27,39 @@ class Program
         Directory.CreateDirectory(outputDir);
 
         // Load the PDF document
-        using (Document doc = new Document(inputPdfPath))
+        using (Document doc = new Document(inputPdf))
         {
-            // Apply custom font substitution by saving to a memory stream
-            // with a default font name for any missing fonts.
-            using (MemoryStream tempPdf = new MemoryStream())
+            // Configure font substitution: use the specified default font for any missing fonts
+            PdfSaveOptions saveOptions = new PdfSaveOptions
             {
-                PdfSaveOptions saveOptions = new PdfSaveOptions();
-                saveOptions.DefaultFontName = fallbackFont;   // rule: set default font for missing fonts
-                doc.Save(tempPdf, saveOptions);
-                tempPdf.Position = 0; // reset stream for reading
+                DefaultFontName = substituteFont
+            };
 
-                // Convert each page of the (font‑substituted) PDF to JPEG images
-                PdfConverter converter = new PdfConverter();
-                converter.BindPdf(tempPdf);
-                converter.DoConvert();
+            // Save the document to a memory stream with the substitution applied
+            using (MemoryStream pdfStream = new MemoryStream())
+            {
+                doc.Save(pdfStream, saveOptions);
+                pdfStream.Position = 0; // Reset stream position for reading
 
-                int pageIndex = 1;
-                while (converter.HasNextImage())
+                // Initialize the PDF converter facade
+                using (PdfConverter converter = new PdfConverter())
                 {
-                    string outFile = Path.Combine(outputDir, $"page_{pageIndex}.jpg");
-                    // GetNextImage with JPEG format (default quality)
-                    converter.GetNextImage(outFile, ImageFormat.Jpeg);
-                    pageIndex++;
-                }
+                    // Bind the in‑memory PDF (with substituted fonts) to the converter
+                    converter.BindPdf(pdfStream);
+                    converter.DoConvert();
 
-                // Release resources held by the converter
-                converter.Close();
+                    int pageNumber = 1;
+                    // Iterate through all pages and save each as a JPEG image
+                    while (converter.HasNextImage())
+                    {
+                        string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.jpg");
+                        converter.GetNextImage(outputPath, ImageFormat.Jpeg);
+                        pageNumber++;
+                    }
+                }
             }
         }
 
-        Console.WriteLine("PDF has been converted to JPEG images.");
+        Console.WriteLine("Conversion completed successfully.");
     }
 }

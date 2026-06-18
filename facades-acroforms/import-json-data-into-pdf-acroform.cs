@@ -9,10 +9,10 @@ class Program
     // Sample data class to be serialized to JSON
     public class FormData
     {
-        public string FirstName { get; set; }
-        public string LastName  { get; set; }
-        public bool   Subscribe { get; set; }
-        public int    Age       { get; set; }
+        public string FullName { get; set; }
+        public string Email { get; set; }
+        public bool Subscribe { get; set; }
+        // Add more properties matching the PDF form field names
     }
 
     static void Main()
@@ -22,36 +22,36 @@ class Program
 
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Create an instance of the Facades Form class and bind the source PDF
-        using (Aspose.Pdf.Facades.Form form = new Aspose.Pdf.Facades.Form())
+        // 1. Create a Form facade bound to the source PDF
+        Form form = new Form(inputPdfPath);
+
+        // 2. Prepare the object that holds the data to import
+        FormData data = new FormData
         {
-            form.BindPdf(inputPdfPath);   // load the PDF to be filled
+            FullName = "John Doe",
+            Email    = "john.doe@example.com",
+            Subscribe = true
+        };
 
-            // Prepare the object that holds the form values
-            var data = new FormData
-            {
-                FirstName = "John",
-                LastName  = "Doe",
-                Subscribe = true,
-                Age       = 30
-            };
-
-            // Serialize the object to JSON and write it into a memory stream
+        // 3. Serialize the object to JSON and write it into a memory stream
+        using (MemoryStream jsonStream = new MemoryStream())
+        {
+            // Serialize with System.Text.Json (you can use any JSON serializer)
             string jsonString = JsonSerializer.Serialize(data);
             byte[] jsonBytes = Encoding.UTF8.GetBytes(jsonString);
-            using (MemoryStream jsonStream = new MemoryStream(jsonBytes))
-            {
-                // Import the JSON data into the PDF form fields
-                form.ImportJson(jsonStream);
-            }
+            jsonStream.Write(jsonBytes, 0, jsonBytes.Length);
+            jsonStream.Position = 0; // Reset stream position for reading
 
-            // Save the updated PDF to the output file
-            form.Save(outputPdfPath);
+            // 4. Import the JSON data into the PDF form fields
+            form.ImportJson(jsonStream);
         }
+
+        // 5. Save the modified PDF to the desired output file
+        form.Save(outputPdfPath);
 
         Console.WriteLine($"Form data imported and saved to '{outputPdfPath}'.");
     }

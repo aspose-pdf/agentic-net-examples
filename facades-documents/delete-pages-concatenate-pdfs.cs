@@ -6,58 +6,55 @@ class Program
 {
     static void Main()
     {
-        // Input PDF files
-        const string sourcePdf      = "source.pdf";        // PDF from which pages will be deleted
-        const string secondPdf      = "second.pdf";        // PDF to concatenate after deletion
-        const string tempDeletedPdf = "source_deleted.pdf";// Intermediate file after page deletion
-        const string outputPdf      = "merged.pdf";        // Final concatenated result
+        // Input files
+        const string originalPdf = "original.pdf";      // PDF from which pages will be removed
+        const string secondPdf   = "second.pdf";        // PDF to concatenate after deletion
+        // Temporary file after page deletion
+        const string editedPdf   = "edited_temp.pdf";
+        // Final output after concatenation
+        const string finalPdf    = "final_output.pdf";
 
-        // Pages to delete (1‑based indexing). Adjust as needed.
+        // Pages to delete (1‑based indexing). Example: delete pages 2 and 3.
         int[] pagesToDelete = new int[] { 2, 3 };
 
-        // Verify that the required files exist
-        if (!File.Exists(sourcePdf))
+        // Verify source files exist
+        if (!File.Exists(originalPdf))
         {
-            Console.Error.WriteLine($"Error: File not found – {sourcePdf}");
+            Console.Error.WriteLine($"File not found: {originalPdf}");
             return;
         }
         if (!File.Exists(secondPdf))
         {
-            Console.Error.WriteLine($"Error: File not found – {secondPdf}");
+            Console.Error.WriteLine($"File not found: {secondPdf}");
             return;
         }
 
         try
         {
-            // Create the PdfFileEditor instance (does NOT implement IDisposable)
+            // Create the PdfFileEditor facade (does NOT implement IDisposable)
             PdfFileEditor editor = new PdfFileEditor();
 
-            // OPTIONAL: close streams automatically after each operation
-            editor.CloseConcatenatedStreams = true;
-
-            // 1) Delete the specified pages from the first PDF.
-            // The Delete method writes the result to tempDeletedPdf.
-            bool deleteSuccess = editor.Delete(sourcePdf, pagesToDelete, tempDeletedPdf);
+            // Delete specified pages from the original PDF and save to a temporary file
+            bool deleteSuccess = editor.Delete(originalPdf, pagesToDelete, editedPdf);
             if (!deleteSuccess)
             {
-                Console.Error.WriteLine("Error: Page deletion failed.");
+                Console.Error.WriteLine("Page deletion failed.");
                 return;
             }
 
-            // 2) Concatenate the edited PDF with the second PDF.
-            // The Concatenate method creates the final merged PDF.
-            bool concatSuccess = editor.Concatenate(tempDeletedPdf, secondPdf, outputPdf);
+            // Concatenate the edited PDF with the second PDF into the final output file
+            bool concatSuccess = editor.Concatenate(editedPdf, secondPdf, finalPdf);
             if (!concatSuccess)
             {
-                Console.Error.WriteLine("Error: Concatenation failed.");
+                Console.Error.WriteLine("Concatenation failed.");
                 return;
             }
 
-            Console.WriteLine($"Success: Pages deleted and PDFs concatenated. Output saved to '{outputPdf}'.");
+            Console.WriteLine($"Successfully created '{finalPdf}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Exception: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

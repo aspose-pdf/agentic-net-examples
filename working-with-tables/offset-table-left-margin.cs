@@ -1,44 +1,64 @@
 using System;
-using System.IO;
+using System.Runtime.InteropServices;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // Needed for TextFragment
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-
-        if (!File.Exists(inputPath))
+        // Create a new PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
-        }
+            // Add a blank page (pages are 1‑based)
+            Page page = doc.Pages.Add();
 
-        // Load the existing PDF inside a using block (ensures proper disposal)
-        using (Document doc = new Document(inputPath))
-        {
-            // Create a new table
+            // Create a table instance
             Table table = new Table();
 
-            // Set the left offset by configuring the MarginInfo.Left property (value in points)
-            table.Margin = new MarginInfo();
-            table.Margin.Left = 50; // offset 50 points from the left margin
+            // Offset the table from the left margin by 50 points
+            // Table.Margin is a read‑only MarginInfo object; set its Left property directly
+            table.Margin.Left = 50;
 
-            // Optional: add a simple row and cell for demonstration
-            Row row = table.Rows.Add();
-            Cell cell = row.Cells.Add();
-            cell.Paragraphs.Add(new TextFragment("Sample cell"));
+            // (Optional) Add a simple row with two cells for demonstration
+            table.ColumnWidths = "200 200"; // two columns, each 200 points wide
+            Row row = new Row();
+            table.Rows.Add(row);
+            row.Cells.Add("Cell 1");
+            row.Cells.Add("Cell 2");
 
-            // Add the table to the first page
-            Page page = doc.Pages[1];
+            // Add the table to the page's paragraph collection
             page.Paragraphs.Add(table);
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            // Guard Document.Save on non‑Windows platforms where libgdiplus may be missing
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                doc.Save("offset_table.pdf");
+            }
+            else
+            {
+                try
+                {
+                    doc.Save("offset_table.pdf");
+                }
+                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
+                {
+                    Console.WriteLine("GDI+ (libgdiplus) is not available on this platform; PDF not saved.");
+                }
+            }
         }
 
-        Console.WriteLine($"Table offset applied and saved to '{outputPath}'.");
+        Console.WriteLine("PDF with offset table saved as 'offset_table.pdf'.");
+    }
+
+    // Helper to detect a nested DllNotFoundException (e.g., missing libgdiplus)
+    private static bool ContainsDllNotFound(Exception? ex)
+    {
+        while (ex != null)
+        {
+            if (ex is DllNotFoundException)
+                return true;
+            ex = ex.InnerException;
+        }
+        return false;
     }
 }

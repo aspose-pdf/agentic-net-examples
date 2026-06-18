@@ -1,39 +1,40 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
+        // Verify that the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // PdfFileStamp is a facade that handles loading and saving internally.
-        // It does not implement IDisposable, so we do not wrap it in a using block.
-        // Use BindPdf to load the source PDF, AddPageNumber to add the stamp,
-        // then Save the result and finally close the facade.
-        PdfFileStamp fileStamp = new PdfFileStamp();
+        // Create a text stamp that uses the {page_number} placeholder.
+        // Aspose.Pdf automatically replaces {page_number} (and {page_count}) with the
+        // appropriate values for each page when the stamp is applied.
+        TextStamp pageNumberStamp = new TextStamp("Page {page_number}");
+        pageNumberStamp.HorizontalAlignment = HorizontalAlignment.Center;
+        pageNumberStamp.VerticalAlignment   = VerticalAlignment.Bottom;
+        pageNumberStamp.BottomMargin = 20; // 20 points from the bottom edge
+        pageNumberStamp.TextState.FontSize = 12;
+        pageNumberStamp.TextState.Font = FontRepository.FindFont("Arial");
+        pageNumberStamp.TextState.ForegroundColor = Color.Black;
 
-        // Load the source PDF.
-        fileStamp.BindPdf(inputPath);
-
-        // Add a page number stamp.
-        // Aspose.Pdf uses the '#' character as a placeholder for the current page number.
-        // The requested {page_number} placeholder is therefore expressed as "#".
-        fileStamp.AddPageNumber("Page #");
-
-        // Write the stamped PDF to the output file.
-        fileStamp.Save(outputPath);
-
-        // Release resources.
-        fileStamp.Close();
+        // Load the PDF document, apply the stamp to every page, and save.
+        Document pdfDocument = new Document(inputPath);
+        foreach (Page page in pdfDocument.Pages)
+        {
+            page.AddStamp(pageNumberStamp);
+        }
+        pdfDocument.Save(outputPath);
 
         Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
     }

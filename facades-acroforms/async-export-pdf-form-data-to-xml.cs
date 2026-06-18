@@ -2,75 +2,81 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades; // Form class resides here
 
-class FormDataExporter
+namespace AsposePdfApi
 {
-    // Asynchronously exports form fields from a PDF to an XML file.
-    // The operation is performed on a background thread to keep the UI responsive.
-    public static async Task ExportFormDataToXmlAsync(
-        string pdfFilePath,
-        string xmlOutputPath,
-        CancellationToken cancellationToken = default)
+    public static class FormExportHelper
     {
-        if (string.IsNullOrWhiteSpace(pdfFilePath))
-            throw new ArgumentException("PDF file path must be provided.", nameof(pdfFilePath));
-
-        if (string.IsNullOrWhiteSpace(xmlOutputPath))
-            throw new ArgumentException("XML output path must be provided.", nameof(xmlOutputPath));
-
-        if (!File.Exists(pdfFilePath))
-            throw new FileNotFoundException("Input PDF file not found.", pdfFilePath);
-
-        // Run the blocking ExportXml call on a thread‑pool thread.
-        await Task.Run(() =>
+        /// <summary>
+        /// Asynchronously exports the form fields of a PDF document to an XML file.
+        /// The operation runs on a background thread to keep the UI responsive.
+        /// </summary>
+        /// <param name="pdfPath">Path to the source PDF containing the form.</param>
+        /// <param name="xmlOutputPath">Path where the exported XML will be saved.</param>
+        /// <param name="cancellationToken">Optional token to cancel the operation.</param>
+        public static async Task ExportFormDataToXmlAsync(
+            string pdfPath,
+            string xmlOutputPath,
+            CancellationToken cancellationToken = default)
         {
-            // Respect cancellation before starting the operation.
-            cancellationToken.ThrowIfCancellationRequested();
+            if (string.IsNullOrWhiteSpace(pdfPath))
+                throw new ArgumentException("PDF path must be provided.", nameof(pdfPath));
 
-            // Form implements IDisposable via SaveableFacade, so use using.
-            using (Form form = new Form(pdfFilePath))
+            if (string.IsNullOrWhiteSpace(xmlOutputPath))
+                throw new ArgumentException("Output XML path must be provided.", nameof(xmlOutputPath));
+
+            // Ensure the PDF file exists before proceeding.
+            if (!File.Exists(pdfPath))
+                throw new FileNotFoundException($"PDF file not found: {pdfPath}");
+
+            // Create the Form facade for the specified PDF.
+            // The Form class implements IDisposable, so we use a regular using block for deterministic cleanup.
+            using (Form form = new Form(pdfPath))
+            // Open the output stream with asynchronous options.
+            await using (FileStream outputStream = new FileStream(
+                xmlOutputPath,
+                FileMode.Create,
+                FileAccess.Write,
+                FileShare.None,
+                bufferSize: 4096,
+                useAsync: true))
             {
-                // Create the output stream for the XML file.
-                using (FileStream outputStream = new FileStream(
-                    xmlOutputPath,
-                    FileMode.Create,
-                    FileAccess.Write,
-                    FileShare.None,
-                    bufferSize: 4096,
-                    useAsync: false)) // ExportXml is synchronous; use false here.
+                // The ExportXml method is synchronous; wrap it in Task.Run to avoid blocking the UI thread.
+                await Task.Run(() =>
                 {
+                    // Respect cancellation requests before the export starts.
+                    cancellationToken.ThrowIfCancellationRequested();
+
                     form.ExportXml(outputStream);
+                }, cancellationToken).ConfigureAwait(false);
+            }
+        }
+    }
+
+    // Dummy entry point to satisfy the compiler when building as an executable.
+    // In a real library project this class can be removed or the project type changed to a class library.
+    internal class Program
+    {
+        private static async Task Main(string[] args)
+        {
+            // Example usage – can be removed or replaced with real UI code.
+            if (args.Length == 2)
+            {
+                try
+                {
+                    await FormExportHelper.ExportFormDataToXmlAsync(args[0], args[1]);
+                    Console.WriteLine("Export completed successfully.");
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"Export failed: {ex.Message}");
                 }
             }
-        }, cancellationToken).ConfigureAwait(false);
-    }
-}
-
-// Example usage in an async context (e.g., UI event handler).
-// Note: The Main method is declared async for demonstration purposes.
-class Program
-{
-    static async Task Main(string[] args)
-    {
-        const string inputPdf = "PdfForm.pdf";
-        const string outputXml = "export.xml";
-
-        try
-        {
-            // Optionally create a CancellationTokenSource to allow cancellation.
-            using CancellationTokenSource cts = new CancellationTokenSource();
-
-            await FormDataExporter.ExportFormDataToXmlAsync(inputPdf, outputXml, cts.Token);
-            Console.WriteLine($"Form data exported successfully to '{outputXml}'.");
-        }
-        catch (OperationCanceledException)
-        {
-            Console.WriteLine("Export operation was canceled.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during export: {ex.Message}");
+            else
+            {
+                Console.WriteLine("Usage: AsposePdfApi <pdfPath> <xmlOutputPath>");
+            }
         }
     }
 }

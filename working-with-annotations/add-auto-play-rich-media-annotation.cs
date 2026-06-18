@@ -7,57 +7,52 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // source PDF
-        const string outputPdf = "output_richmedia.pdf"; // result PDF
-        const string mediaFile = "sample.mp4";         // video/audio to embed
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string mediaPath = "sample.mp4";
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-
-        if (!File.Exists(mediaFile))
+        if (!File.Exists(mediaPath))
         {
-            Console.Error.WriteLine($"Media file not found: {mediaFile}");
+            Console.Error.WriteLine($"Media file not found: {mediaPath}");
             return;
         }
 
-        // Load the existing PDF document
+        // Load the PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPdf))
         {
-            // Choose the page where the annotation will be placed (first page in this example)
+            // Select the first page (Aspose.Pdf uses 1‑based indexing)
             Page page = doc.Pages[1];
 
-            // Define the rectangle for the annotation (coordinates are in points)
+            // Define the annotation rectangle (left, bottom, right, top)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 400, 800);
 
-            // Create the RichMediaAnnotation
-            RichMediaAnnotation richMedia = new RichMediaAnnotation(page, rect)
+            // Create a RichMediaAnnotation on the page
+            RichMediaAnnotation rich = new RichMediaAnnotation(page, rect)
             {
-                // Set the activation event to "PageVisible" so it plays automatically
-                ActivateOn = RichMediaAnnotation.ActivationEvent.PageVisible,
-                // Optional: give the annotation a name and tooltip
-                Name = "AutoPlayMedia",
-                Contents = "Embedded video that plays when the page becomes visible."
+                // Specify that the content is a video
+                Type = RichMediaAnnotation.ContentType.Video,
+                // Activate automatically when the page becomes visible
+                ActivateOn = RichMediaAnnotation.ActivationEvent.PageVisible
             };
 
-            // Embed the media content (video/audio) into the annotation
-            using (FileStream mediaStream = File.OpenRead(mediaFile))
+            // Embed the video file into the annotation
+            using (FileStream mediaStream = File.OpenRead(mediaPath))
             {
-                // The first argument is the name of the stream inside the PDF
-                richMedia.SetContent(Path.GetFileName(mediaFile), mediaStream);
+                rich.SetContent(Path.GetFileName(mediaPath), mediaStream);
             }
 
-            // Optionally set a poster image (preview) – omitted here
+            // Add the annotation to the page's annotation collection
+            page.Annotations.Add(rich);
 
-            // Add the annotation to the page
-            page.Annotations.Add(richMedia);
-
-            // Save the modified PDF
+            // Save the modified PDF (lifecycle rule: save within using block)
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"RichMediaAnnotation added and saved to '{outputPdf}'.");
+        Console.WriteLine($"Rich media annotation added and saved to '{outputPdf}'.");
     }
 }

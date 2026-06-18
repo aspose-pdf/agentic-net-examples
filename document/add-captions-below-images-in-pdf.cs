@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_captions.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_with_captions.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,44 +16,40 @@ class Program
             return;
         }
 
-        // Open the PDF document inside a using block for proper disposal
+        // Open the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            int imageIndex = 1; // Counter for generating unique captions
-
-            // Iterate over all pages (1‑based indexing)
-            foreach (Page page in doc.Pages)
+            // Iterate through all pages (1‑based indexing)
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
+                Page page = doc.Pages[pageNum];
+                int imageIndex = 0;
+
                 // Iterate over all images on the current page
                 foreach (XImage img in page.Resources.Images)
                 {
-                    // Simple positioning: place each caption a fixed distance from the bottom,
-                    // offsetting each subsequent caption to avoid overlap.
-                    float captionX = 50;                     // left margin
-                    float captionY = 20 * imageIndex;        // vertical position
-                    float captionWidth = 200;
-                    float captionHeight = 15;
-
-                    // Create a styled text fragment for the caption
-                    TextFragment captionFragment = new TextFragment($"Image {imageIndex} caption");
-                    captionFragment.TextState.Font = FontRepository.FindFont("Helvetica");
-                    captionFragment.TextState.FontSize = 10;
-                    captionFragment.TextState.ForegroundColor = Aspose.Pdf.Color.DarkGray;
-
-                    // Build a paragraph and set its rectangle and formatting
-                    TextParagraph paragraph = new TextParagraph
-                    {
-                        Rectangle = new Aspose.Pdf.Rectangle(captionX, captionY, captionX + captionWidth, captionY + captionHeight),
-                        HorizontalAlignment = HorizontalAlignment.Center
-                    };
-                    paragraph.FormattingOptions.WrapMode = TextFormattingOptions.WordWrapMode.ByWords;
-                    paragraph.AppendLine(captionFragment);
-
-                    // Append the paragraph to the current page
-                    TextBuilder builder = new TextBuilder(page);
-                    builder.AppendParagraph(paragraph);
-
                     imageIndex++;
+
+                    // Create a styled text paragraph to serve as the caption
+                    TextParagraph caption = new TextParagraph();
+
+                    // Position the caption near the bottom left of the page.
+                    // Adjust the rectangle as needed for your layout.
+                    caption.Rectangle = new Aspose.Pdf.Rectangle(50, 50, 250, 70);
+
+                    // Enable word wrapping
+                    caption.FormattingOptions.WrapMode = TextFormattingOptions.WordWrapMode.ByWords;
+
+                    // Center the caption horizontally within the rectangle
+                    caption.HorizontalAlignment = HorizontalAlignment.Center;
+
+                    // Add the caption text (you can customize the text as required)
+                    string captionText = $"Image {imageIndex} on page {pageNum}";
+                    caption.AppendLine(captionText);
+
+                    // Append the paragraph to the page using TextBuilder
+                    TextBuilder builder = new TextBuilder(page);
+                    builder.AppendParagraph(caption);
                 }
             }
 

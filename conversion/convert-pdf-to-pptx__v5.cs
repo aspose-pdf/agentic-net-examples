@@ -1,27 +1,33 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Core Aspose.Pdf namespace provides Document and SaveFormat
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPptxPath = "output.pptx";
+        // Input PDF and output PPTX paths
+        const string pdfPath = "input.pdf";
+        const string pptxPath = "output.pptx";
 
-        if (!File.Exists(inputPdfPath))
+        // -------------------------------------------------
+        // 1. Validate input PDF existence
+        // -------------------------------------------------
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        // ---------- Convert PDF to PPTX ----------
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // -------------------------------------------------
+        // 2. Convert PDF to PPTX using Aspose.Pdf only
+        // -------------------------------------------------
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            // Aspose.Pdf can directly save a PDF as PPTX; no Aspose.Slides assembly is required.
-            pdfDoc.Save(outputPptxPath, SaveFormat.Pptx);
+            // Directly save as PPTX – no separate PptxSaveOptions class is required
+            pdfDoc.Save(pptxPath, SaveFormat.Pptx);
         }
 
-        Console.WriteLine($"PDF successfully converted to PPTX and saved as '{outputPptxPath}'.");
+        Console.WriteLine($"Conversion complete. PPTX saved to '{pptxPath}'.");
     }
 }

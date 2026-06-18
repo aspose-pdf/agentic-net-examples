@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace contains Document, DocSaveOptions, etc.
+using Aspose.Pdf;
 
 class Program
 {
@@ -15,28 +15,27 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use Document constructor)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document pdfDocument = new Document(inputPdfPath))
         {
             // Set custom metadata properties
-            pdfDocument.Info.Title = "Custom Document Title";
             pdfDocument.Info.Author = "John Doe";
+            pdfDocument.Info.Title = "Converted Document";
 
             // Configure DOCX save options
             DocSaveOptions saveOptions = new DocSaveOptions
             {
-                // Export as DOCX
+                // Specify DOCX output format (correct enum value)
                 Format = DocSaveOptions.DocFormat.DocX,
-                // Use Flow mode for better editability (optional)
-                Mode = DocSaveOptions.RecognitionMode.Flow,
-                // Enable bullet recognition (optional)
+                // Enable bullet detection (optional)
                 RecognizeBullets = true
+                // Note: The 'Mode' property was removed in recent versions and is therefore omitted.
             };
 
-            // Save the document as DOCX (lifecycle rule: use Document.Save with SaveOptions)
+            // Save the PDF as DOCX using the specified options
             pdfDocument.Save(outputDocxPath, saveOptions);
         }
 
-        Console.WriteLine($"PDF successfully converted to DOCX with metadata at '{outputDocxPath}'.");
+        Console.WriteLine($"PDF successfully converted to DOCX: {outputDocxPath}");
     }
 }

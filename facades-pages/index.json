@@ -1,175 +1,62 @@
 {
   "category": "facades-pages",
-  "nuget_version": "26.4.0",
-  "last_updated": "2026-05-08T09:38:43Z",
+  "nuget_version": "26.5.0",
+  "last_updated": "2026-06-15T09:35:09Z",
   "examples": {
-    "save-modified-pdf-to-memorystream": {
-      "title": "Save Modified PDF to MemoryStream Using PdfPageEditor",
-      "filename": "save-modified-pdf-to-memorystream.cs",
-      "description": "Demonstrates loading a PDF with PdfPageEditor, applying a simple modification, and saving the result directly to a MemoryStream for further processing without writing to disk.",
-      "tags": [
-        "pdf",
-        "memorystream",
-        "aspose.pdf",
-        "page-editor",
-        "in-memory"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save",
-        "Aspose.Pdf.Facades.PdfPageEditor.Close",
-        "Aspose.Pdf.Facades.PdfPageEditor.Zoom"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "rotate-specific-pdf-pages": {
-      "title": "Rotate Specific PDF Pages Using PdfPageEditor",
-      "filename": "rotate-specific-pdf-pages.cs",
-      "description": "Shows how to rotate pages 3, 5, and 7 of a PDF by 180 degrees using the Aspose.Pdf.Facades.PdfPageEditor facade.",
+    "rotate-pdf-pages-using-pdfpageeditor": {
+      "title": "Rotate PDF Pages Using PdfPageEditor",
+      "filename": "rotate-pdf-pages-using-pdfpageeditor.cs",
+      "description": "Demonstrates loading a PDF, rotating all pages by 90 degrees with PdfPageEditor, and saving the edited document.",
       "tags": [
         "pdf",
         "rotation",
-        "pages",
         "aspose",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.PageRotations",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "set-page-zoom-to-150-percent": {
-      "title": "Set Page Zoom to 150% Using PdfPageEditor",
-      "filename": "set-page-zoom-to-150-percent.cs",
-      "description": "Shows how to adjust the zoom level of a specific PDF page (page 3) to 150% with Aspose.Pdf.Facades PdfPageEditor.",
-      "tags": [
-        "zoom",
-        "pdf",
         "page-editing",
-        "facades",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "PdfPageEditor.BindPdf",
-        "PdfPageEditor.ProcessPages",
-        "PdfPageEditor.Zoom",
-        "PdfPageEditor.ApplyChanges",
-        "PdfPageEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "rotate-all-pages-pdf-pageditor": {
-      "title": "Rotate All Pages of a PDF Using PdfPageEditor",
-      "filename": "rotate-all-pages-pdf-pageditor.cs",
-      "description": "Demonstrates loading a PDF with PdfPageEditor, rotating every page 90° clockwise, and saving the edited document.",
-      "tags": [
-        "pdf",
-        "rotation",
-        "page-editor",
-        "aspose-pdf",
         "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.Rotation",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "rotate-specific-pdf-page": {
-      "title": "Rotate Specific PDF Page Using PdfPageEditor",
-      "filename": "rotate-specific-pdf-page.cs",
-      "description": "Demonstrates how to rotate page 4 of a PDF document by 180 degrees using the Aspose.Pdf.Facades.PdfPageEditor class.",
-      "tags": [
-        "rotation",
-        "pdf",
-        "page-editor",
-        "Aspose.Pdf",
-        "C#"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "PdfPageEditor.BindPdf",
-        "PdfPageEditor.ProcessPages",
-        "PdfPageEditor.Rotation",
-        "PdfPageEditor.ApplyChanges",
-        "PdfPageEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "zoom-even-pages-pdf": {
-      "title": "Zoom Even Pages of PDF Using PdfPageEditor",
-      "filename": "zoom-even-pages-pdf.cs",
-      "description": "Demonstrates applying a 1.2x zoom factor to all even‑numbered pages of a PDF with Aspose.Pdf.Facades.PdfPageEditor.",
-      "tags": [
-        "pdf",
-        "zoom",
-        "even-pages",
-        "aspose-pdf",
-        "facade"
       ],
       "apis_used": [
         "PdfPageEditor",
         "PdfPageEditor.BindPdf",
-        "PdfPageEditor.GetPages",
-        "PdfPageEditor.ProcessPages",
-        "PdfPageEditor.Zoom",
+        "PdfPageEditor.Rotation",
         "PdfPageEditor.ApplyChanges",
         "PdfPageEditor.Save"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "edit-pdf-pages-in-memory": {
-      "title": "Edit PDF Pages In-Memory with PdfPageEditor",
-      "filename": "edit-pdf-pages-in-memory.cs",
-      "description": "Shows how to load a PDF from a MemoryStream into PdfPageEditor, rotate a page, and save the edited PDF back to a stream or file without using intermediate files.",
+    "rotate-pdf-page-using-pdfpageeditor-memory-stream": {
+      "title": "Rotate PDF Page Using PdfPageEditor from Memory Stream",
+      "filename": "rotate-pdf-page-using-pdfpageeditor-memory-stream.cs",
+      "description": "Demonstrates loading a PDF from a memory stream, rotating the first page with PdfPageEditor, and saving the edited document.",
       "tags": [
         "pdf",
-        "in-memory",
+        "memory-stream",
         "page-rotation",
         "aspose-pdf",
-        "facade"
+        "pdfpageeditor"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
         "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save"
+        "Aspose.Pdf.Facades.PdfPageEditor.Save",
+        "Aspose.Pdf.Facades.PdfPageEditor.Rotation",
+        "Aspose.Pdf.Facades.PdfPageEditor.ProcessPages"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "edit-pdf-pages-zoom-rotation": {
-      "title": "Edit PDF Pages with Zoom and Rotation using PdfPageEditor",
-      "filename": "edit-pdf-pages-zoom-rotation.cs",
-      "description": "Demonstrates loading a PDF, setting a zoom factor and rotating all pages, applying the changes, and saving the edited document to a new file with Aspose.Pdf.Facades.PdfPageEditor.",
+    "resize-rotate-pdf-pages": {
+      "title": "Resize and Rotate PDF Pages with PdfPageEditor",
+      "filename": "resize-rotate-pdf-pages.cs",
+      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfPageEditor to change page size (zoom) and rotate all pages, then save the edited PDF to a new file.",
       "tags": [
         "pdf",
         "page-editing",
-        "zoom",
         "rotation",
+        "zoom",
         "aspose-pdf"
       ],
       "apis_used": [
@@ -181,13 +68,34 @@
         "PdfPageEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "save-modified-pdf-to-memorystream": {
+      "title": "Save Modified PDF to MemoryStream Using PdfPageEditor",
+      "filename": "save-modified-pdf-to-memorystream.cs",
+      "description": "Demonstrates how to bind a PDF, modify its zoom factor with PdfPageEditor, and save the resulting document directly into a MemoryStream for further processing without disk I/O.",
+      "tags": [
+        "pdf",
+        "memorystream",
+        "page-editor",
+        "aspose.pdf",
+        "save"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.Zoom",
+        "PdfPageEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
     "rotate-page-2-pdf-90-degrees": {
       "title": "Rotate Page 2 of a PDF by 90 Degrees",
       "filename": "rotate-page-2-pdf-90-degrees.cs",
-      "description": "Demonstrates how to rotate the second page of a PDF document using Aspose.Pdf.Facades.PdfPageEditor and the PageRotations dictionary, then save the modified file.",
+      "description": "Demonstrates how to rotate a specific page in a PDF using Aspose.Pdf.Facades.PdfPageEditor by setting the PageRotations dictionary and applying the changes.",
       "tags": [
         "pdf",
         "rotation",
@@ -203,36 +111,80 @@
         "PdfPageEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "retrieve-pdf-page-size": {
+    "rotate-specific-pdf-pages": {
+      "title": "Rotate Specific PDF Pages Using PdfPageEditor",
+      "filename": "rotate-specific-pdf-pages.cs",
+      "description": "Demonstrates how to rotate selected pages (3, 5, and 7) of a PDF by 180 degrees using the PdfPageEditor facade and multiple PageRotations entries.",
+      "tags": [
+        "pdf",
+        "rotation",
+        "pages",
+        "aspose",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.PageRotations",
+        "PdfPageEditor.ApplyChanges",
+        "PdfPageEditor.Save",
+        "PdfPageEditor.Close"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "rotate-page-four-180-degrees": {
+      "title": "Rotate Specific PDF Page Using PdfPageEditor",
+      "filename": "rotate-page-four-180-degrees.cs",
+      "description": "Demonstrates how to rotate page 4 of a PDF document by 180 degrees using Aspose.Pdf's PdfPageEditor facade and save the result.",
+      "tags": [
+        "pdf",
+        "rotation",
+        "page-editor",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.ProcessPages",
+        "PdfPageEditor.Rotation",
+        "PdfPageEditor.ApplyChanges",
+        "PdfPageEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "retrieve-pdf-page-size-with-pdfpageeditor": {
       "title": "Retrieve PDF Page Size with PdfPageEditor",
-      "filename": "retrieve-pdf-page-size.cs",
-      "description": "Demonstrates how to bind a PDF, obtain the dimensions of the second page using PdfPageEditor.GetPageSize, and log the width and height.",
+      "filename": "retrieve-pdf-page-size-with-pdfpageeditor.cs",
+      "description": "Demonstrates how to open a PDF using the PdfPageEditor facade and obtain the width and height of page two via GetPageSize for logging purposes.",
       "tags": [
         "pdf",
         "page-size",
-        "aspose",
         "facade",
-        "csharp"
+        "Aspose.Pdf",
+        "C#"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfPageEditor",
         "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
         "Aspose.Pdf.Facades.PdfPageEditor.GetPageSize",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Pages.Add",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.PageSize"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "get-page-rotation": {
-      "title": "Get Rotation Angle of a PDF Page",
-      "filename": "get-page-rotation.cs",
-      "description": "Demonstrates how to load a PDF with PdfPageEditor and retrieve the rotation angle of page 4.",
+    "retrieve-page-rotation-pdf-page-editor": {
+      "title": "Retrieve Page Rotation Using PdfPageEditor",
+      "filename": "retrieve-page-rotation-pdf-page-editor.cs",
+      "description": "Demonstrates how to load a PDF with PdfPageEditor and obtain the rotation angle of a specific page (page 4) using GetPageRotation.",
       "tags": [
         "pdf",
         "rotation",
@@ -246,18 +198,38 @@
         "Aspose.Pdf.Facades.PdfPageEditor.GetPageRotation"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "resize-page-to-letter-size": {
-      "title": "Resize Specific PDF Page to Letter Size with PdfPageEditor",
-      "filename": "resize-page-to-letter-size.cs",
-      "description": "Shows how to change the size of a single page (page 6) in a PDF to Letter dimensions using Aspose.Pdf.Facades.PdfPageEditor.",
+    "set-page-size-a4": {
+      "title": "Set Page Size to A4 for Multiple Pages",
+      "filename": "set-page-size-a4.cs",
+      "description": "Creates a sample PDF, adds pages, and sets each page's size to A4.",
+      "tags": [
+        "pages",
+        "pagesize",
+        "a4",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PageCollection.Add",
+        "Aspose.Pdf.Page.SetPageSize",
+        "Aspose.Pdf.PageSize.A4"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "resize-specific-pdf-page-to-letter": {
+      "title": "Resize Specific PDF Page to Letter Size",
+      "filename": "resize-specific-pdf-page-to-letter.cs",
+      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfPageEditor to change the size of a single page (page 6) to the Letter format and save the result.",
       "tags": [
         "pdf",
-        "page-resize",
-        "letter-size",
-        "aspose",
+        "page-size",
+        "letter",
+        "aspose-pdf",
         "facade"
       ],
       "apis_used": [
@@ -266,63 +238,113 @@
         "PdfPageEditor.ProcessPages",
         "PdfPageEditor.PageSize",
         "PdfPageEditor.ApplyChanges",
-        "PdfPageEditor.Save",
-        "PageSize"
+        "PdfPageEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "set-page-transition-fade-2-sec": {
-      "title": "Set Page Transition to Fade with 2‑Second Duration",
-      "filename": "set-page-transition-fade-2-sec.cs",
-      "description": "Shows how to use Aspose.Pdf.Facades.PdfPageEditor to apply a fade transition lasting two seconds to the first page of a PDF document.",
+    "zoom-page-3-to-150-percent": {
+      "title": "Zoom Page 3 to 150% Using PdfPageEditor",
+      "filename": "zoom-page-3-to-150-percent.cs",
+      "description": "Shows how to apply a 150% zoom (1.5 factor) to a specific page of a PDF using Aspose.Pdf.Facades.PdfPageEditor.",
       "tags": [
-        "page transition",
-        "fade",
-        "pdf editing",
-        "Aspose.Pdf",
-        "PdfPageEditor"
+        "zoom",
+        "pdf",
+        "page-editor",
+        "aspose",
+        "csharp"
       ],
       "apis_used": [
-        "PdfPageEditor",
+        "Aspose.Pdf.Facades.PdfPageEditor",
         "PdfPageEditor.BindPdf",
+        "PdfPageEditor.ProcessPages",
+        "PdfPageEditor.Zoom",
         "PdfPageEditor.ApplyChanges",
-        "PdfPageEditor.Save",
-        "PdfPageEditor.TransitionType",
-        "PdfPageEditor.TransitionDuration"
+        "PdfPageEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "apply-zoom-to-even-pages": {
+      "title": "Apply Zoom to Even Pages in PDF",
+      "filename": "apply-zoom-to-even-pages.cs",
+      "description": "Shows how to set a 1.2 zoom factor on all even‑numbered pages of a PDF using Aspose.Pdf.Facades.PdfPageEditor.",
+      "tags": [
+        "pdf",
+        "zoom",
+        "even-pages",
+        "Aspose.Pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.GetPages",
+        "PdfPageEditor.ProcessPages",
+        "PdfPageEditor.Zoom",
+        "PdfPageEditor.ApplyChanges",
+        "PdfPageEditor.Save",
+        "PdfPageEditor.Close"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "set-fade-transition-on-first-pdf-page": {
+      "title": "Set Fade Transition on First PDF Page",
+      "filename": "set-fade-transition-on-first-pdf-page.cs",
+      "description": "Demonstrates applying a Fade page transition with a 2‑second duration to the first page of a PDF using Aspose.Pdf.Facades.PdfPageEditor.",
+      "tags": [
+        "pdf",
+        "transition",
+        "fade",
+        "aspose",
+        "facades"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.ProcessPages",
+        "PdfPageEditor.TransitionType",
+        "PdfPageEditor.TransitionDuration",
+        "PdfPageEditor.ApplyChanges",
+        "PdfPageEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
     "apply-dissolve-transition-to-pdf-page": {
       "title": "Apply Dissolve Transition to a Specific PDF Page",
       "filename": "apply-dissolve-transition-to-pdf-page.cs",
-      "description": "Demonstrates how to set a Dissolve page transition with a three‑second duration on page 5 of a PDF using Aspose.Pdf.Facades.",
+      "description": "Demonstrates how to set a dissolve page transition with a three‑second duration on page 5 of a PDF using Aspose.Pdf.",
       "tags": [
-        "pdf",
-        "transition",
+        "page-transition",
+        "pdf-editing",
         "dissolve",
-        "page-editing",
-        "aspose-pdf"
+        "Aspose.Pdf",
+        "C#"
       ],
       "apis_used": [
+        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfPageEditor",
         "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save",
+        "Aspose.Pdf.Facades.PdfPageEditor.ProcessPages",
         "Aspose.Pdf.Facades.PdfPageEditor.TransitionType",
-        "Aspose.Pdf.Facades.PdfPageEditor.TransitionDuration"
+        "Aspose.Pdf.Facades.PdfPageEditor.TransitionDuration",
+        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "set-display-duration-page-five": {
+    "set-display-duration-for-pdf-page": {
       "title": "Set Display Duration for a Specific PDF Page",
-      "filename": "set-display-duration-page-five.cs",
-      "description": "Demonstrates how to set the display duration of page 5 in a PDF to five seconds using Aspose.Pdf's PdfPageEditor.",
+      "filename": "set-display-duration-for-pdf-page.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfPageEditor to set the display duration of page 5 to five seconds for a PDF slideshow.",
       "tags": [
         "display-duration",
         "pdf-page",
@@ -331,20 +353,44 @@
         "PdfPageEditor"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfPageEditor",
-        "Document.Save",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.ProcessPages",
+        "PdfPageEditor.DisplayDuration",
         "PdfPageEditor.ApplyChanges",
-        "PdfPageEditor.DisplayDuration"
+        "PdfPageEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
     "left-align-page-two": {
-      "title": "Left Align Content of Page Two in PDF",
+      "title": "Left Align Page Two in PDF",
       "filename": "left-align-page-two.cs",
-      "description": "Shows how to left‑justify the horizontal content of the second page of a PDF using Aspose.Pdf's PdfPageEditor facade.",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfPageEditor to left‑justify the content of the second page of a PDF document and save the modified file.",
+      "tags": [
+        "pdf",
+        "alignment",
+        "page-editor",
+        "aspose-pdf",
+        "facades"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.ProcessPages",
+        "PdfPageEditor.HorizontalAlignment",
+        "PdfPageEditor.ApplyChanges",
+        "PdfPageEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "align-page-3-vertically-to-top": {
+      "title": "Align Page 3 Vertically to Top",
+      "filename": "align-page-3-vertically-to-top.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfPageEditor to align the content of a specific PDF page (page 3) to the top of the page.",
       "tags": [
         "pdf",
         "alignment",
@@ -353,30 +399,8 @@
         "csharp"
       ],
       "apis_used": [
-        "PdfPageEditor",
-        "PdfPageEditor.BindPdf",
-        "PdfPageEditor.ProcessPages",
-        "PdfPageEditor.HorizontalAlignment",
-        "PdfPageEditor.ApplyChanges",
-        "PdfPageEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "vertically-align-page3-top": {
-      "title": "Vertically Align Page 3 to Top Using PdfPageEditor",
-      "filename": "vertically-align-page3-top.cs",
-      "description": "Demonstrates how to align the original content of the third page of a PDF to the top of the page using Aspose.Pdf's PdfPageEditor facade.",
-      "tags": [
-        "pdf",
-        "alignment",
-        "vertical",
-        "facade",
-        "aspnet"
-      ],
-      "apis_used": [
-        "PdfPageEditor",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfPageEditor",
         "PdfPageEditor.BindPdf",
         "PdfPageEditor.ProcessPages",
         "PdfPageEditor.VerticalAlignmentType",
@@ -384,18 +408,18 @@
         "PdfPageEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "resize-pdf-contents-10-percent-margins": {
+    "resize-pdf-page-contents-10-percent-margins": {
       "title": "Resize PDF Page Contents with 10% Margins",
-      "filename": "resize-pdf-contents-10-percent-margins.cs",
-      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfFileEditor to resize the contents of all pages in a PDF by applying a 10% margin on each side.",
+      "filename": "resize-pdf-page-contents-10-percent-margins.cs",
+      "description": "Demonstrates using Aspose.Pdf.Facades PdfFileEditor to resize the contents of all pages in a PDF by applying a 10% margin on each side.",
       "tags": [
         "pdf",
         "resize",
-        "contents",
         "margin",
+        "Aspose.Pdf",
         "facade"
       ],
       "apis_used": [
@@ -406,34 +430,36 @@
         "Aspose.Pdf.Document"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "resize-specific-pdf-pages-with-custom-margins": {
-      "title": "Resize Specific PDF Pages with Custom Margins",
-      "filename": "resize-specific-pdf-pages-with-custom-margins.cs",
-      "description": "Demonstrates how to resize the contents of selected PDF pages (pages 2 and 4) by applying custom left and right margins using Aspose.Pdf.Facades.PdfFileEditor.",
+    "resize-pdf-page-contents-custom-margins": {
+      "title": "Resize PDF Page Contents with Custom Margins",
+      "filename": "resize-pdf-page-contents-custom-margins.cs",
+      "description": "Demonstrates how to resize the contents of specific PDF pages (pages 2 and 4) by setting custom left and right margins using Aspose.Pdf.Facades.PdfFileEditor.ContentsResizeParameters.",
       "tags": [
         "pdf",
         "resize",
         "margins",
-        "facades",
-        "c#"
+        "pages",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileEditor",
         "Aspose.Pdf.Facades.PdfFileEditor.ContentsResizeParameters",
-        "Aspose.Pdf.Facades.PdfFileEditor.ContentsResizeParameters.Margins",
-        "Aspose.Pdf.Facades.PdfFileEditor.ResizeContents"
+        "Aspose.Pdf.Facades.PdfFileEditor.ContentsResizeValue",
+        "Aspose.Pdf.Facades.PdfFileEditor.ResizeContents",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "rotate-first-page-of-pdfs": {
-      "title": "Rotate First Page of PDFs in a Folder",
-      "filename": "rotate-first-page-of-pdfs.cs",
-      "description": "Shows how to batch‑process a directory of PDF files, rotating the first page of each document by 90 degrees using Aspose.Pdf.Facades.PdfPageEditor.",
+    "batch-rotate-first-page-pdf": {
+      "title": "Batch Rotate First Page of PDF Documents",
+      "filename": "batch-rotate-first-page-pdf.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfPageEditor to rotate the first page of each PDF in a folder by 90 degrees and save the modified files to an output directory.",
       "tags": [
         "pdf",
         "rotation",
@@ -444,154 +470,154 @@
       "apis_used": [
         "PdfPageEditor",
         "PdfPageEditor.BindPdf",
-        "PdfPageEditor.Rotation",
         "PdfPageEditor.ProcessPages",
+        "PdfPageEditor.Rotation",
         "PdfPageEditor.ApplyChanges",
         "PdfPageEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
     "batch-convert-pdfs-to-a4": {
       "title": "Batch Convert PDFs to A4 Page Size",
       "filename": "batch-convert-pdfs-to-a4.cs",
-      "description": "Demonstrates how to resize multiple PDF documents to A4 dimensions using Aspose.Pdf's PdfFileEditor.",
+      "description": "Shows how to process all PDF files in a directory and resize each document to A4 dimensions using Aspose.Pdf's PdfPageEditor facade.",
       "tags": [
         "pdf",
-        "resize",
-        "a4",
         "batch",
-        "aspose"
+        "a4",
+        "page-size",
+        "facade"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.ResizeContents",
-        "Aspose.Pdf.PageSize",
-        "Aspose.Pdf.PageSize.A4"
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfPageEditor.Save",
+        "Aspose.Pdf.Facades.PdfPageEditor.PageSize",
+        "Aspose.Pdf.Devices.PageSize"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
     "rotate-resize-page3-to-letter": {
       "title": "Rotate and Resize Page 3 to Letter Size",
       "filename": "rotate-resize-page3-to-letter.cs",
-      "description": "Shows how to rotate the third page of a PDF by 90 degrees and change its dimensions to Letter size in a single operation using Aspose.Pdf's PdfPageEditor.",
+      "description": "Shows how to rotate page 3 by 90° and change its dimensions to Letter (612 × 792 points) using the PdfPageEditor facade.",
       "tags": [
         "rotation",
         "page-size",
-        "PdfPageEditor",
-        "Aspose.Pdf",
-        "letter"
+        "letter",
+        "pdf-page-editor",
+        "facade"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save",
-        "Aspose.Pdf.Facades.PdfPageEditor.Rotation",
-        "Aspose.Pdf.Facades.PdfPageEditor.PageSize"
+        "PdfPageEditor",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.ApplyChanges",
+        "PdfPageEditor.Save",
+        "PageSize",
+        "Rotation"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "apply-zoom-to-selected-pdf-pages": {
-      "title": "Apply Zoom to Selected PDF Pages",
-      "filename": "apply-zoom-to-selected-pdf-pages.cs",
-      "description": "Shows how to select non‑consecutive pages using PdfPageEditor.ProcessPages and apply a common zoom factor to those pages.",
+    "zoom-selected-non-consecutive-pdf-pages": {
+      "title": "Zoom Selected Non-Consecutive PDF Pages",
+      "filename": "zoom-selected-non-consecutive-pdf-pages.cs",
+      "description": "Loads a PDF, selects specific non‑consecutive pages using PdfPageEditor.ProcessPages, applies a common zoom factor to those pages, and saves the modified document.",
       "tags": [
         "pdf",
         "zoom",
         "pages",
-        "Aspose.Pdf",
-        "facade"
+        "aspose-pdf",
+        "csharp"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
         "Aspose.Pdf.Facades.PdfPageEditor.ProcessPages",
         "Aspose.Pdf.Facades.PdfPageEditor.Zoom",
         "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
         "Aspose.Pdf.Facades.PdfPageEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
     "set-transition-duration-for-page-range": {
       "title": "Set Transition Duration for a Range of PDF Pages",
       "filename": "set-transition-duration-for-page-range.cs",
-      "description": "Shows how to define a page range with the Pages collection and set each page's transition duration to one second using the PdfPageEditor facade.",
+      "description": "Shows how to specify a range of pages with PdfPageEditor and set each page's transition duration to one second.",
       "tags": [
         "pdf",
         "transition",
         "pages",
-        "facade",
-        "aspose"
+        "aspose",
+        "csharp"
       ],
       "apis_used": [
+        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
         "Aspose.Pdf.Facades.PdfPageEditor.ProcessPages",
         "Aspose.Pdf.Facades.PdfPageEditor.TransitionDuration",
         "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
         "Aspose.Pdf.Facades.PdfPageEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "validate-rotate-pdf-pages": {
-      "title": "Validate and Apply Rotation to PDF Pages",
-      "filename": "validate-rotate-pdf-pages.cs",
-      "description": "Demonstrates how to validate a rotation angle (0, 90, 180, 270) and apply it to all pages of a PDF using Aspose.Pdf.Facades.PdfPageEditor.",
+    "rotate-pdf-pages-with-validation": {
+      "title": "Rotate PDF Pages with Validation",
+      "filename": "rotate-pdf-pages-with-validation.cs",
+      "description": "Demonstrates how to rotate all pages of a PDF using Aspose.Pdf.Facades.PdfPageEditor after validating that the rotation angle is one of the allowed values (0, 90, 180, 270).",
       "tags": [
         "pdf",
         "rotation",
         "validation",
         "aspose",
-        "facades"
+        "facade"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfPageEditor",
+        "PdfPageEditor",
         "PdfPageEditor.BindPdf",
         "PdfPageEditor.Rotation",
-        "PdfPageEditor.Save",
-        "PdfPageEditor.Close"
+        "PdfPageEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
     "handle-invalid-page-rotation": {
       "title": "Handle Invalid Page Rotation with PdfPageEditor",
       "filename": "handle-invalid-page-rotation.cs",
-      "description": "Demonstrates catching InvalidValueFormatException when assigning an unsupported rotation value to a PDF page using Aspose.Pdf's PdfPageEditor and falling back to a valid rotation.",
+      "description": "Demonstrates how to set page rotation using the PdfPageEditor facade and safely handle invalid rotation values by catching InvalidValueFormatException and applying a fallback.",
       "tags": [
         "pdf",
         "rotation",
         "exception-handling",
         "facade",
-        "Aspose.Pdf"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfPageEditor",
         "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfPageEditor.Rotation",
         "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
         "Aspose.Pdf.Facades.PdfPageEditor.Save",
         "Aspose.Pdf.InvalidValueFormatException"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
     "create-contentsresizeparameters-with-uniform-margins": {
       "title": "Create ContentsResizeParameters with Uniform Margins",
       "filename": "create-contentsresizeparameters-with-uniform-margins.cs",
-      "description": "Shows how to instantiate a ContentsResizeParameters object with 5‑point absolute margins on all sides using the static Margins method.",
+      "description": "Demonstrates how to instantiate a ContentsResizeParameters object with a 5‑point absolute margin on all sides, ready to be used with PdfFileEditor methods such as ResizeContents or AddMargins.",
       "tags": [
         "contents-resize",
         "margins",
@@ -607,132 +633,131 @@
         "Aspose.Pdf.Facades.PdfFileEditor.AddMargins"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "resize-pdf-contents-uniform-15-percent-margins": {
-      "title": "Resize PDF Contents with Uniform 15% Margins",
-      "filename": "resize-pdf-contents-uniform-15-percent-margins.cs",
-      "description": "Shows how to create a ContentsResizeParameters object with 15 % margins on all sides and use PdfFileEditor to resize the contents of a PDF file.",
+    "create-contentsresizeparameters-15-percent-margins": {
+      "title": "Create ContentsResizeParameters with Uniform 15% Margins",
+      "filename": "create-contentsresizeparameters-15-percent-margins.cs",
+      "description": "Demonstrates how to configure a ContentsResizeParameters object with 15% margins on all sides using the static MarginsPercent method, ready for use with PdfFileEditor.",
       "tags": [
         "pdf",
         "resize",
         "margins",
         "aspose",
-        "facade"
+        "facades"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfFileEditor",
         "Aspose.Pdf.Facades.PdfFileEditor.ContentsResizeParameters",
         "Aspose.Pdf.Facades.PdfFileEditor.ContentsResizeParameters.MarginsPercent",
         "Aspose.Pdf.Facades.PdfFileEditor.ResizeContents"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
     "apply-different-zoom-levels-to-pdf-pages": {
       "title": "Apply Different Zoom Levels to PDF Pages",
       "filename": "apply-different-zoom-levels-to-pdf-pages.cs",
-      "description": "Shows how to iterate through each page of a PDF and set a specific zoom factor using the PdfPageEditor facade.",
+      "description": "Shows how to iterate through each page of a PDF and set a distinct zoom factor using the PdfPageEditor facade.",
       "tags": [
         "pdf",
         "zoom",
         "page-editing",
-        "aspose-pdf",
+        "aspose",
         "facade"
       ],
       "apis_used": [
+        "PdfPageEditor",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.GetPages",
+        "PdfPageEditor.ProcessPages",
+        "PdfPageEditor.Zoom",
+        "PdfPageEditor.ApplyChanges",
+        "PdfPageEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "apply-fade-transition-to-all-pdf-pages": {
+      "title": "Apply Fade Transition to All PDF Pages",
+      "filename": "apply-fade-transition-to-all-pdf-pages.cs",
+      "description": "Shows how to set a dissolve (fade) transition for every page in a PDF document using Aspose.Pdf's PdfPageEditor.",
+      "tags": [
+        "fade transition",
+        "pdf",
+        "Aspose.Pdf",
+        "page editor",
+        "slideshow"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "PdfPageEditor.TransitionType",
+        "PdfPageEditor.TransitionDuration",
+        "PdfPageEditor.ApplyChanges",
+        "Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "assign-page-transitions-based-on-content-type": {
+      "title": "Assign Page Transitions Based on Content Type",
+      "filename": "assign-page-transitions-based-on-content-type.cs",
+      "description": "Shows how to examine each PDF page for images and apply distinct page transition effects using Aspose.Pdf.Facades.PdfPageEditor.",
+      "tags": [
+        "pdf",
+        "page-transitions",
+        "content-detection",
+        "aspose",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfPageEditor",
         "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.GetPages",
+        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
+        "Aspose.Pdf.Facades.PdfPageEditor.Save",
+        "Aspose.Pdf.Facades.PdfPageEditor.TransitionType",
+        "Aspose.Pdf.Facades.PdfPageEditor.TransitionDuration"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "set-per-page-display-duration-by-word-count": {
+      "title": "Set Per-Page Display Duration Based on Word Count",
+      "filename": "set-per-page-display-duration-by-word-count.cs",
+      "description": "Extracts text from each PDF page, calculates the word count, and assigns a display duration proportional to the count using PdfPageEditor.",
+      "tags": [
+        "pdf",
+        "display-duration",
+        "text-extraction",
+        "page-editor",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.Text.TextAbsorber",
+        "Aspose.Pdf.Text.TextExtractionOptions",
         "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
         "Aspose.Pdf.Facades.PdfPageEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "apply-fade-transition-to-all-pdf-pages": {
-      "title": "Apply Fade (Dissolve) Transition to All PDF Pages",
-      "filename": "apply-fade-transition-to-all-pdf-pages.cs",
-      "description": "Shows how to set a dissolve (fade) page transition for every page in a PDF using the PdfPageEditor facade.",
-      "tags": [
-        "pdf",
-        "page-transition",
-        "fade",
-        "aspose",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "PdfPageEditor.BindPdf",
-        "PdfPageEditor.TransitionType",
-        "PdfPageEditor.TransitionDuration",
-        "PdfPageEditor.ApplyChanges",
-        "PdfPageEditor.Save",
-        "PdfPageEditor.Close"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "apply-conditional-page-transitions": {
-      "title": "Apply Conditional Page Transitions in PDF",
-      "filename": "apply-conditional-page-transitions.cs",
-      "description": "Demonstrates how to assign different page transition effects to each PDF page based on simple content heuristics (e.g., presence of images) using Aspose.Pdf facades.",
-      "tags": [
-        "pdf",
-        "page-transitions",
-        "aspose",
-        "facade",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Page",
-        "PdfPageEditor.BLINDH",
-        "PdfPageEditor.TBWIPE",
-        "PdfPageEditor.ApplyChanges",
-        "Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "set-per-page-display-duration-based-on-word-count": {
-      "title": "Set Per‑Page Display Duration Based on Word Count",
-      "filename": "set-per-page-display-duration-based-on-word-count.cs",
-      "description": "Shows how to calculate a display duration for each PDF page proportional to its word count and apply the duration using the PdfPageEditor facade.",
-      "tags": [
-        "pdf",
-        "display-duration",
-        "word-count",
-        "facade",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.TextAbsorber",
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.DisplayDuration"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
     "edit-pdf-in-memory-using-pdfpageeditor": {
       "title": "Edit PDF In-Memory Using PdfPageEditor",
       "filename": "edit-pdf-in-memory-using-pdfpageeditor.cs",
-      "description": "Demonstrates how to load a PDF from a byte array, modify page zoom and rotation with PdfPageEditor, and save the result back to a byte array using only in‑memory streams.",
+      "description": "Demonstrates how to load a PDF into a MemoryStream, modify page size and rotation with PdfPageEditor, and save the edited document back to another MemoryStream entirely in memory.",
       "tags": [
         "pdf",
-        "memory",
+        "memory-stream",
         "page-editor",
         "zoom",
         "rotation"
@@ -742,16 +767,17 @@
         "PdfPageEditor.BindPdf",
         "PdfPageEditor.Zoom",
         "PdfPageEditor.Rotation",
+        "PdfPageEditor.ApplyChanges",
         "PdfPageEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "chain-page-rotation-size-zoom": {
-      "title": "Chain Page Rotation, Size, and Zoom Modifications",
-      "filename": "chain-page-rotation-size-zoom.cs",
-      "description": "Shows how to apply multiple page property changes—rotation, page size, and zoom—sequentially using PdfPageEditor and save the modified PDF.",
+    "modify-page-rotation-size-zoom": {
+      "title": "Modify Page Rotation, Size, and Zoom Using PdfPageEditor",
+      "filename": "modify-page-rotation-size-zoom.cs",
+      "description": "Demonstrates chaining multiple page property changes—rotation, page size, zoom, and origin shift—using Aspose.Pdf's PdfPageEditor and saving the edited PDF.",
       "tags": [
         "pdf",
         "page-editing",
@@ -760,156 +786,161 @@
         "zoom"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.Rotation",
-        "Aspose.Pdf.Facades.PdfPageEditor.PageSize",
-        "Aspose.Pdf.Facades.PdfPageEditor.Zoom",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save"
+        "PdfPageEditor",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.Rotation",
+        "PdfPageEditor.PageSize",
+        "PdfPageEditor.Zoom",
+        "PdfPageEditor.MovePosition",
+        "PdfPageEditor.ApplyChanges",
+        "PdfPageEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "reset-rotation-of-pdf-page": {
+    "reset-rotation-page-six": {
       "title": "Reset Rotation of a Specific PDF Page",
-      "filename": "reset-rotation-of-pdf-page.cs",
-      "description": "Shows how to reset the rotation of page 6 in a PDF document to 0 degrees using Aspose.Pdf's PdfPageEditor facade.",
+      "filename": "reset-rotation-page-six.cs",
+      "description": "Demonstrates how to reset the rotation of page 6 in a PDF to its original orientation using Aspose.Pdf.Facades.",
+      "tags": [
+        "rotation",
+        "pdf",
+        "page",
+        "aspose",
+        "facade"
+      ],
+      "apis_used": [
+        "PdfPageEditor",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.ProcessPages",
+        "PdfPageEditor.Rotation",
+        "PdfPageEditor.ApplyChanges",
+        "PdfPageEditor.Save",
+        "PdfPageEditor.Close"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "revert-page-size-of-pdf-page": {
+      "title": "Revert Page Size of a Specific PDF Page",
+      "filename": "revert-page-size-of-pdf-page.cs",
+      "description": "Demonstrates how to store the original dimensions of page 8, modify its size, and then revert it back using the Aspose.Pdf.Facades.PdfPageEditor facade.",
       "tags": [
         "pdf",
+        "page-size",
+        "aspose-pdf",
+        "facade",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.GetPageSize",
+        "PdfPageEditor.ProcessPages",
+        "PdfPageEditor.PageSize",
+        "PdfPageEditor.ApplyChanges",
+        "PdfPageEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "audit-pdf-page-size-rotation": {
+      "title": "Audit PDF Page Size and Rotation Before and After Editing",
+      "filename": "audit-pdf-page-size-rotation.cs",
+      "description": "Shows how to log each PDF page's width, height, and rotation, apply a rotation and size change using PdfPageEditor, and then log the updated values for audit purposes.",
+      "tags": [
+        "pdf",
+        "audit",
+        "page-size",
         "rotation",
-        "page-editing",
-        "aspose",
-        "c#"
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfPageEditor",
         "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfPageEditor.GetPageSize",
+        "Aspose.Pdf.Facades.PdfPageEditor.GetPageRotation",
         "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
         "Aspose.Pdf.Facades.PdfPageEditor.Save",
-        "Aspose.Pdf.Facades.PdfPageEditor.Close"
+        "Aspose.Pdf.PageSize"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "restore-original-page-size": {
-      "title": "Restore Original Size of Page 8 in a PDF",
-      "filename": "restore-original-page-size.cs",
-      "description": "Demonstrates how to capture a PDF page's original dimensions, modify the page size, and then revert it back using Aspose.Pdf and the PdfPageEditor facade.",
+    "safely-retrieve-pdf-page-size": {
+      "title": "Safely Retrieve PDF Page Size with Error Handling",
+      "filename": "safely-retrieve-pdf-page-size.cs",
+      "description": "Demonstrates binding a PDF with PdfPageEditor, obtaining page dimensions via GetPageSize, and using try‑catch to gracefully handle requests for non‑existent page numbers.",
       "tags": [
         "pdf",
         "page-size",
+        "error-handling",
         "aspose",
-        "csharp",
         "facade"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfPageEditor",
         "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
         "Aspose.Pdf.Facades.PdfPageEditor.GetPageSize",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page.SetPageSize",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.PageSize"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "log-pdf-page-dimensions-rotation": {
-      "title": "Log PDF Page Dimensions and Rotation Before and After Editing",
-      "filename": "log-pdf-page-dimensions-rotation.cs",
-      "description": "Demonstrates how to capture page width, height, and rotation values of a PDF before and after applying a rotation edit, and writes the audit information to a text file.",
+    "apply-left-horizontal-alignment-to-pdf-pages": {
+      "title": "Apply Left Horizontal Alignment to All PDF Pages",
+      "filename": "apply-left-horizontal-alignment-to-pdf-pages.cs",
+      "description": "Demonstrates how to use PdfPageEditor to set a uniform left‑justified horizontal alignment for all pages in a PDF and save the result.",
       "tags": [
         "pdf",
-        "audit",
-        "page-rotation",
-        "dimensions",
-        "facades"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileInfo",
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfFileInfo.GetPageWidth",
-        "Aspose.Pdf.Facades.PdfFileInfo.GetPageHeight",
-        "Aspose.Pdf.Facades.PdfFileInfo.GetPageRotation",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "safely-get-pdf-page-size": {
-      "title": "Safely Retrieve PDF Page Sizes with Error Handling",
-      "filename": "safely-get-pdf-page-size.cs",
-      "description": "Demonstrates binding a PDF with PdfPageEditor, retrieving each page's dimensions, and using try‑catch to handle requests for pages that do not exist.",
-      "tags": [
-        "pdf",
-        "page-size",
-        "error-handling",
-        "aspose-pdf",
+        "alignment",
+        "pages",
+        "aspose",
         "facade"
       ],
       "apis_used": [
-        "PdfPageEditor",
-        "PdfPageEditor.BindPdf",
-        "PdfPageEditor.GetPageSize"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "set-horizontal-alignment-for-pdf-pages": {
-      "title": "Set Horizontal Alignment for All PDF Pages",
-      "filename": "set-horizontal-alignment-for-pdf-pages.cs",
-      "description": "Shows how to use Aspose.Pdf.Facades.PdfPageEditor to apply a left‑justified horizontal alignment to every page in a PDF and save the modified document.",
-      "tags": [
-        "horizontal-alignment",
-        "pdf-page-editor",
-        "aspose-pdf",
-        "left-justify",
-        "page-layout"
-      ],
-      "apis_used": [
         "Aspose.Pdf.Facades.PdfPageEditor",
-        "PdfPageEditor.BindPdf",
-        "PdfPageEditor.HorizontalAlignment",
-        "PdfPageEditor.ApplyChanges",
-        "PdfPageEditor.Save"
+        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfPageEditor.HorizontalAlignment",
+        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
+        "Aspose.Pdf.Facades.PdfPageEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
     "apply-vertical-alignment-to-selected-pdf-pages": {
       "title": "Apply Vertical Alignment to Selected PDF Pages",
       "filename": "apply-vertical-alignment-to-selected-pdf-pages.cs",
-      "description": "Shows how to use Aspose.Pdf.Facades.PdfPageEditor to set top vertical alignment on specific pages of a PDF and save the modified document.",
+      "description": "Demonstrates how to align the content of specific PDF pages to the top using Aspose.Pdf's PdfPageEditor and the VerticalAlignment property.",
       "tags": [
         "vertical-alignment",
-        "pdf-page-editor",
-        "aspose-pdf",
-        "csharp",
-        "pages"
+        "pdf",
+        "pages",
+        "Aspose.Pdf",
+        "page-editor"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfPageEditor",
+        "PdfPageEditor.BindPdf",
         "PdfPageEditor.ProcessPages",
         "PdfPageEditor.VerticalAlignmentType",
         "PdfPageEditor.ApplyChanges",
         "PdfPageEditor.Save"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
     "apply-boxout-transition-to-pdf-page": {
       "title": "Apply BoxOut Transition to PDF Page",
       "filename": "apply-boxout-transition-to-pdf-page.cs",
-      "description": "Demonstrates how to set a BoxOut page transition with a three‑second duration on a specific page using Aspose.Pdf.",
+      "description": "Shows how to set a BoxOut page transition with a 3‑second duration on the second page of a PDF using Aspose.Pdf.Facades.",
       "tags": [
         "pdf",
         "page-transition",
@@ -918,26 +949,28 @@
         "csharp"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Document.Save"
+        "PdfPageEditor",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.ProcessPages",
+        "PdfPageEditor.TransitionType",
+        "PdfPageEditor.TransitionDuration",
+        "PdfPageEditor.ApplyChanges",
+        "PdfPageEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "set-cover-page-transition": {
-      "title": "Set Cover Page Transition on PDF Page",
-      "filename": "set-cover-page-transition.cs",
-      "description": "Demonstrates how to apply a Cover transition with a 1‑second duration to page 4 of a PDF using Aspose.Pdf.Facades.",
+    "set-cover-transition-on-pdf-page": {
+      "title": "Set Cover Transition on Specific PDF Page",
+      "filename": "set-cover-transition-on-pdf-page.cs",
+      "description": "Demonstrates how to apply a Cover page transition with a 1‑second duration to page 4 of a PDF using Aspose.Pdf.",
       "tags": [
-        "page-transition",
         "pdf",
-        "Aspose.Pdf",
+        "transition",
         "cover",
-        "editor"
+        "page-editing",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -946,39 +979,39 @@
         "PdfPageEditor.TransitionType",
         "PdfPageEditor.TransitionDuration",
         "PdfPageEditor.ApplyChanges",
-        "PdfPageEditor.Save"
+        "Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "set-zoom-of-page-five": {
+    "set-zoom-of-specific-pdf-page": {
       "title": "Set Zoom of Specific PDF Page",
-      "filename": "set-zoom-of-page-five.cs",
-      "description": "Demonstrates how to change the zoom level of page 5 in a PDF to 75 % using Aspose.Pdf.Facades. The example loads a PDF, applies the zoom setting, and saves the result.",
+      "filename": "set-zoom-of-specific-pdf-page.cs",
+      "description": "Shows how to set the zoom level of page 5 in a PDF to 75 % using Aspose.Pdf.Facades PdfPageEditor.",
       "tags": [
         "pdf",
         "zoom",
         "page-editing",
         "aspose",
-        "facades"
+        "facade"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.ProcessPages",
-        "Aspose.Pdf.Facades.PdfPageEditor.Zoom",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save"
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.ProcessPages",
+        "PdfPageEditor.Zoom",
+        "PdfPageEditor.ApplyChanges",
+        "PdfPageEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "set-zoom-of-page-to-double-magnification": {
-      "title": "Set Zoom of Specific PDF Page to Double Magnification",
-      "filename": "set-zoom-of-page-to-double-magnification.cs",
-      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfPageEditor to set a 2.0 zoom factor (200 % magnification) on page 7 of a PDF and save the result.",
+    "set-zoom-on-pdf-page-7": {
+      "title": "Set Zoom on PDF Page 7",
+      "filename": "set-zoom-on-pdf-page-7.cs",
+      "description": "Shows how to apply a 2.0 (200%) zoom factor to page 7 of a PDF using Aspose.Pdf.Facades.PdfPageEditor.",
       "tags": [
         "zoom",
         "pdf",
@@ -987,44 +1020,44 @@
         "facade"
       ],
       "apis_used": [
+        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.ProcessPages",
-        "Aspose.Pdf.Facades.PdfPageEditor.Zoom",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save"
+        "PdfPageEditor.ProcessPages",
+        "PdfPageEditor.Zoom",
+        "PdfPageEditor.ApplyChanges",
+        "Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "resize-pdf-page-contents-by-percentage": {
-      "title": "Resize PDF Page Contents by Percentage",
-      "filename": "resize-pdf-page-contents-by-percentage.cs",
-      "description": "Demonstrates how to shrink the contents of all pages in a PDF by 5% using Aspose.Pdf's PdfFileEditor, effectively adding a uniform negative margin.",
+    "resize-pdf-page-contents-5-percent": {
+      "title": "Resize PDF Page Contents Uniformly by 5%",
+      "filename": "resize-pdf-page-contents-5-percent.cs",
+      "description": "Demonstrates how to shrink all page contents of a PDF uniformly by 5% using the PdfFileEditor facade's ResizeContentsPct method.",
       "tags": [
         "pdf",
         "resize",
         "contents",
-        "margin",
-        "aspose"
+        "aspose-pdf",
+        "facade"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileEditor",
         "Aspose.Pdf.Facades.PdfFileEditor.ResizeContentsPct"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
     "add-20-percent-margins-to-pdf-pages": {
       "title": "Add 20% Margins to PDF Pages",
       "filename": "add-20-percent-margins-to-pdf-pages.cs",
-      "description": "Demonstrates how to add a 20% whitespace margin around each page of a PDF for printing using Aspose.Pdf.Facades.PdfFileEditor.",
+      "description": "Shows how to add a 20 % margin on all four sides of every page in a PDF document using Aspose.Pdf's PdfFileEditor.",
       "tags": [
         "pdf",
         "margin",
-        "printing",
+        "add-margins",
         "aspose-pdf",
         "facade"
       ],
@@ -1033,42 +1066,42 @@
         "Aspose.Pdf.Facades.PdfFileEditor.AddMarginsPct"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "convert-pdf-page-orientation-to-landscape": {
-      "title": "Convert PDF Page Orientation to Landscape (A4)",
-      "filename": "convert-pdf-page-orientation-to-landscape.cs",
-      "description": "Shows how to change a PDF's page orientation from portrait to landscape by setting the PageSize to A4 landscape dimensions using Aspose.Pdf.Facades.PdfPageEditor.",
+    "change-pdf-page-orientation-to-landscape": {
+      "title": "Change PDF Page Orientation to Landscape (A4)",
+      "filename": "change-pdf-page-orientation-to-landscape.cs",
+      "description": "Demonstrates how to use Aspose.Pdf's PdfPageEditor facade to convert a PDF page from portrait to A4 landscape by setting a new PageSize and saving the result.",
       "tags": [
         "pdf",
         "orientation",
         "landscape",
-        "Aspose.Pdf",
-        "PdfPageEditor"
+        "page-size",
+        "Aspose.Pdf"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.PageSize",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save",
-        "Aspose.Pdf.PageSize"
+        "PdfPageEditor",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.PageSize",
+        "PdfPageEditor.ApplyChanges",
+        "PdfPageEditor.Save",
+        "PageSize"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
     "convert-pdf-portrait-to-landscape": {
       "title": "Convert PDF Page from Portrait to Landscape",
       "filename": "convert-pdf-portrait-to-landscape.cs",
-      "description": "Shows how to change a PDF page's orientation from portrait to landscape by swapping the width and height via the PageSize property and rotating the page so the content remains upright.",
+      "description": "Shows how to change a PDF page's orientation from portrait to landscape by swapping the PageSize dimensions and rotating the content using the PdfPageEditor facade.",
       "tags": [
         "pdf",
-        "portrait",
+        "orientation",
         "landscape",
-        "rotation",
-        "pages"
+        "page-size",
+        "rotation"
       ],
       "apis_used": [
         "PdfPageEditor",
@@ -1078,1032 +1111,112 @@
         "PdfPageEditor.Rotation",
         "PdfPageEditor.ApplyChanges",
         "PdfPageEditor.Save",
-        "PdfPageEditor.GetPageRotation"
+        "PageSize"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "rotate-pdf-pages-preserve-transitions": {
-      "title": "Rotate PDF Pages While Preserving Transitions",
-      "filename": "rotate-pdf-pages-preserve-transitions.cs",
-      "description": "Demonstrates how to rotate all pages of a PDF by 180 degrees using PdfPageEditor without affecting any existing page transition settings.",
+    "rotate-pdf-page-180-preserve-transition": {
+      "title": "Rotate PDF Page 180° While Preserving Transition",
+      "filename": "rotate-pdf-page-180-preserve-transition.cs",
+      "description": "Demonstrates how to rotate a specific PDF page by 180 degrees using PdfPageEditor while keeping any existing transition effect on that page.",
       "tags": [
+        "pdf",
         "rotation",
-        "pdf",
         "transition",
-        "pages",
-        "aspose-pdf"
+        "facade",
+        "aspose"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "PdfPageEditor.BindPdf",
-        "PdfPageEditor.Rotation",
-        "PdfPageEditor.ApplyChanges",
-        "PdfPageEditor.Save",
-        "PdfPageEditor.Close"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "resize-pdf-contents-rotate-pages": {
-      "title": "Resize PDF Page Contents and Rotate Pages by 90 Degrees",
-      "filename": "resize-pdf-contents-rotate-pages.cs",
-      "description": "The example adds 10% margins to the content of all PDF pages, then rotates each page 90 degrees, producing a new PDF with the adjusted layout.",
-      "tags": [
-        "pdf",
-        "resize",
-        "rotate",
-        "aspose.pdf",
-        "facades"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.ResizeContents",
-        "Aspose.Pdf.Facades.PdfFileEditor.ContentsResizeParameters",
-        "Aspose.Pdf.Facades.PdfFileEditor.ContentsResizeValue",
         "Aspose.Pdf.Facades.PdfPageEditor",
         "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfPageEditor.PageRotations",
         "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
         "Aspose.Pdf.Facades.PdfPageEditor.Save"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "save-pdf-incremental-update": {
-      "title": "Save PDF with Incremental Update Using Aspose.Pdf",
-      "filename": "save-pdf-incremental-update.cs",
-      "description": "Demonstrates adding a text annotation to a PDF and saving the changes using incremental update mode to preserve the original file structure, then writing the updated document to a new file via the Facades API.",
+    "rotate-pdf-pages-after-resizing-contents": {
+      "title": "Rotate PDF Pages After Resizing Contents",
+      "filename": "rotate-pdf-pages-after-resizing-contents.cs",
+      "description": "Demonstrates how to swap a PDF page's width and height to resize its contents and then rotate each page by 90 degrees using Aspose.Pdf Facades.",
+      "tags": [
+        "pdf",
+        "rotation",
+        "resize",
+        "facades",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Facades.PdfFileEditor.ResizeContents",
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.Facades.PdfPageEditor.Rotation",
+        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "incremental-update-pdf-annotation": {
+      "title": "Incrementally Update PDF with Text Annotation",
+      "filename": "incremental-update-pdf-annotation.cs",
+      "description": "Demonstrates opening a PDF via a read/write stream, adding a text annotation, and saving the changes as an incremental update, then using the PdfFileInfo facade to rewrite the file.",
       "tags": [
         "incremental-update",
         "annotation",
-        "pdf-modification",
+        "facade",
         "Aspose.Pdf",
-        "facades"
+        "document-modification"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Annotations.TextAnnotation",
         "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Facades.PdfFileInfo",
-        "Aspose.Pdf.Facades.PdfFileInfo.SaveNewInfo",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.PdfFileInfo",
+        "Aspose.Pdf.Document.Save()",
+        "Aspose.Pdf.PdfFileInfo.SaveNewInfo()"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "edit-pdf-save-new-file-using-pdfpageeditor": {
-      "title": "Edit PDF and Save as New File Using PdfPageEditor",
-      "filename": "edit-pdf-save-new-file-using-pdfpageeditor.cs",
-      "description": "Demonstrates loading an existing PDF with PdfPageEditor, applying a modification (zoom), and saving the edited document to a separate file while keeping the original unchanged.",
+    "edit-pdf-save-new-with-backup": {
+      "title": "Edit PDF and Save as New File While Keeping Original Backup",
+      "filename": "edit-pdf-save-new-with-backup.cs",
+      "description": "Demonstrates how to create a backup of an existing PDF, edit its content using Aspose.Pdf's PdfContentEditor, and save the modified document to a separate file, leaving the original unchanged.",
       "tags": [
         "pdf",
         "edit",
-        "save-as",
-        "aspose",
-        "pdfpageeditor"
+        "backup",
+        "replace-text",
+        "aspose-pdf"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.Zoom",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save"
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.ReplaceText",
+        "PdfContentEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "set-page-display-duration-for-pdf-slideshow": {
-      "title": "Set Page Display Duration for PDF Slideshow",
-      "filename": "set-page-display-duration-for-pdf-slideshow.cs",
-      "description": "Demonstrates how to assign a uniform display duration to each page of a PDF, enabling a timed slideshow using Aspose.Pdf's PdfPageEditor facade.",
+    "set-display-duration-for-pdf-pages": {
+      "title": "Set Display Duration for PDF Pages (Slideshow)",
+      "filename": "set-display-duration-for-pdf-pages.cs",
+      "description": "Shows how to assign a display duration to each page of a PDF using PdfPageEditor to create a timed slideshow presentation.",
       "tags": [
         "pdf",
         "slideshow",
         "display-duration",
-        "aspose.pdf",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.DisplayDuration",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "apply-split-transition-to-pdf-page": {
-      "title": "Apply Split Transition to PDF Page",
-      "filename": "apply-split-transition-to-pdf-page.cs",
-      "description": "Shows how to set a split page transition lasting two seconds on page three of a PDF using Aspose.Pdf.",
-      "tags": [
-        "pdf",
-        "transition",
-        "split",
-        "page-editing",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.SPLITHIN",
-        "Aspose.Pdf.Facades.PdfPageEditor.TransitionType",
-        "Aspose.Pdf.Facades.PdfPageEditor.TransitionDuration",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "disable-page-transition-animation": {
-      "title": "Disable Page Transition Animation on a Specific PDF Page",
-      "filename": "disable-page-transition-animation.cs",
-      "description": "Shows how to set the transition duration to zero for page 6 of a PDF using Aspose.Pdf's PdfPageEditor, thereby disabling the page transition animation.",
-      "tags": [
-        "pdf",
-        "transition",
-        "page-editing",
-        "aspose",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.TransitionDuration",
-        "Aspose.Pdf.Facades.PdfPageEditor.ProcessPages",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "apply-sequential-page-transitions": {
-      "title": "Apply Sequential Page Transitions to PDF",
-      "filename": "apply-sequential-page-transitions.cs",
-      "description": "Shows how to assign different transition effects to each page of a PDF by using Aspose.Pdf's PdfPageEditor facade and saving the result.",
-      "tags": [
-        "page-transitions",
-        "pdf-editing",
-        "aspose-pdf",
-        "facade",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.TransitionType",
-        "Aspose.Pdf.Facades.PdfPageEditor.TransitionDuration",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "set-pdf-page-zoom-to-100": {
-      "title": "Set PDF Page Zoom to 100% Using PdfPageEditor",
-      "filename": "set-pdf-page-zoom-to-100.cs",
-      "description": "Demonstrates how to set the zoom level of all pages in a PDF to 1.0 (100%) using Aspose.Pdf.Facades.PdfPageEditor.",
-      "tags": [
-        "pdf",
-        "zoom",
-        "pages",
-        "aspose",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.Zoom",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "apply-zoom-to-odd-pdf-pages": {
-      "title": "Apply Zoom to Odd Pages in a PDF",
-      "filename": "apply-zoom-to-odd-pdf-pages.cs",
-      "description": "Shows how to set a 1.2 zoom factor on all odd‑numbered pages of a PDF using Aspose.Pdf.Facades.PdfPageEditor.",
-      "tags": [
-        "zoom",
-        "odd-pages",
-        "pdf",
-        "aspose.pdf",
-        "page-editing"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "PdfPageEditor.BindPdf",
-        "PdfPageEditor.Zoom",
-        "PdfPageEditor.ApplyChanges",
-        "PdfPageEditor.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "set-zoom-for-even-pages": {
-      "title": "Set Zoom for Even Pages in PDF",
-      "filename": "set-zoom-for-even-pages.cs",
-      "description": "Shows how to apply a zoom factor of 0.8 to all even‑numbered pages of a PDF using Aspose.Pdf.Facades.PdfPageEditor.",
-      "tags": [
-        "pdf",
-        "zoom",
-        "even-pages",
-        "Aspose.Pdf",
-        "facades"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "PdfPageEditor.BindPdf",
-        "PdfPageEditor.GetPages",
-        "PdfPageEditor.ProcessPages",
-        "PdfPageEditor.Zoom",
-        "PdfPageEditor.ApplyChanges",
-        "PdfPageEditor.Save",
-        "PdfPageEditor.Close"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "resize-pdf-pages-3-6-to-us-letter": {
-      "title": "Resize PDF Pages 3-6 to US Letter Size",
-      "filename": "resize-pdf-pages-3-6-to-us-letter.cs",
-      "description": "Demonstrates how to use Aspose.Pdf's PdfPageEditor to change the size of specific pages (3‑6) to US Letter dimensions and save the modified document.",
-      "tags": [
-        "pdf",
-        "page-size",
-        "us-letter",
-        "aspose",
-        "c#"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save",
-        "Aspose.Pdf.PageSize",
-        "Aspose.Pdf.Page.SetPageSize",
-        "Aspose.Pdf.Document"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "resize-last-page-to-a5": {
-      "title": "Resize Last PDF Page to A5 for Booklet",
-      "filename": "resize-last-page-to-a5.cs",
-      "description": "Shows how to change the size of the final page of a PDF to A5 using Aspose.Pdf's PdfPageEditor, enabling a compact booklet layout.",
-      "tags": [
-        "pdf",
-        "page-size",
-        "booklet",
-        "Aspose.Pdf",
-        "C#"
-      ],
-      "apis_used": [
-        "PdfPageEditor",
-        "PdfPageEditor.BindPdf",
-        "PdfPageEditor.GetPages",
-        "PdfPageEditor.ProcessPages",
-        "PdfPageEditor.PageSize",
-        "PdfPageEditor.ApplyChanges",
-        "PdfPageEditor.Save",
-        "PdfPageEditor.Close"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "rotate-every-third-page-270-degrees": {
-      "title": "Rotate Every Third PDF Page by 270 Degrees",
-      "filename": "rotate-every-third-page-270-degrees.cs",
-      "description": "Shows how to use Aspose.Pdf.Facades.PdfPageEditor to rotate every third page of a PDF by 270° to achieve alternating landscape orientation.",
-      "tags": [
-        "pdf-rotation",
-        "page-editing",
-        "landscape",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "PdfPageEditor.BindPdf",
-        "PdfPageEditor.GetPages",
-        "PdfPageEditor.PageRotations",
-        "PdfPageEditor.ApplyChanges",
-        "PdfPageEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "retrieve-page-size-after-rotation": {
-      "title": "Retrieve Page Size After Rotating a PDF Page",
-      "filename": "retrieve-page-size-after-rotation.cs",
-      "description": "Shows how to rotate a PDF page using PdfPageEditor and then obtain the updated page dimensions to verify the new orientation.",
-      "tags": [
-        "pdf-rotation",
-        "page-size",
-        "aspose-pdf",
-        "pdf-facade",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.GetPageRotation",
-        "Aspose.Pdf.Facades.PdfPageEditor.GetPageSize",
-        "Aspose.Pdf.Facades.PdfPageEditor.PageRotations"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "retrieve-verify-page-rotation-after-resize": {
-      "title": "Retrieve and Verify Page Rotation After Resizing PDF",
-      "filename": "retrieve-verify-page-rotation-after-resize.cs",
-      "description": "Demonstrates how to get a PDF page's rotation, change the page size using PdfPageEditor, and confirm that the rotation value stays the same after saving the document.",
-      "tags": [
-        "pdf",
-        "rotation",
-        "pagesize",
-        "aspose.pdf",
-        "verification"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.GetPageRotation",
-        "Aspose.Pdf.Facades.PdfPageEditor.PageSize",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save",
-        "Aspose.Pdf.PageSize"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "apply-custom-page-transitions": {
-      "title": "Apply Custom Page Transitions Based on Index",
-      "filename": "apply-custom-page-transitions.cs",
-      "description": "Shows how to assign different transition effects to each PDF page by iterating through pages with PdfPageEditor and saving the modified document.",
-      "tags": [
-        "pdf",
-        "page-transition",
-        "aspose-pdf",
-        "facade",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "PdfPageEditor.ProcessPages",
-        "PdfPageEditor.TransitionType",
-        "PdfPageEditor.TransitionDuration",
-        "PdfPageEditor.ApplyChanges",
-        "PdfPageEditor.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "set-incremental-display-duration-for-pdf-pages": {
-      "title": "Set Incremental Display Duration for PDF Pages",
-      "filename": "set-incremental-display-duration-for-pdf-pages.cs",
-      "description": "Demonstrates how to assign a display duration to each PDF page, increasing by one second for each subsequent page using Aspose.Pdf's PdfPageEditor.",
-      "tags": [
-        "display-duration",
-        "pdf-pages",
-        "aspose-pdf",
-        "page-editor",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "center-content-horizontally-page2": {
-      "title": "Center Content Horizontally on Specific PDF Page",
-      "filename": "center-content-horizontally-page2.cs",
-      "description": "Shows how to use Aspose.Pdf's PdfPageEditor to horizontally center the existing content on page 2 of a PDF document.",
-      "tags": [
-        "pdf",
-        "alignment",
-        "horizontal-center",
         "page-editing",
         "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.ProcessPages",
-        "Aspose.Pdf.Facades.PdfPageEditor.HorizontalAlignment",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "vertically-center-content-page-three": {
-      "title": "Vertically Center Content on Specific PDF Page",
-      "filename": "vertically-center-content-page-three.cs",
-      "description": "Shows how to use Aspose.Pdf.Facades.PdfPageEditor to align the existing content of page 3 to the vertical middle of the page and save the modified PDF.",
-      "tags": [
-        "pdf",
-        "alignment",
-        "vertical-center",
-        "page-editor",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.ProcessPages",
-        "Aspose.Pdf.Facades.PdfPageEditor.VerticalAlignmentType",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "set-horizontal-alignment-and-zoom-for-page": {
-      "title": "Set Horizontal Alignment and Zoom for a Specific PDF Page",
-      "filename": "set-horizontal-alignment-and-zoom-for-page.cs",
-      "description": "Demonstrates how to center‑align content and apply a zoom factor to a single page of a PDF using Aspose.Pdf.Facades.PdfPageEditor.",
-      "tags": [
-        "pdf",
-        "alignment",
-        "zoom",
-        "page-editor",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "PdfPageEditor.BindPdf",
-        "PdfPageEditor.ApplyChanges",
-        "Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "add-10-percent-margins-to-pdf-pages": {
-      "title": "Add 10% Margins to All PDF Pages",
-      "filename": "add-10-percent-margins-to-pdf-pages.cs",
-      "description": "Demonstrates using Aspose.Pdf.Facades.PdfFileEditor to add a 10% margin on every side of each page in a PDF, producing a resized document ready for printing.",
-      "tags": [
-        "pdf",
-        "margins",
-        "resize",
-        "aspose",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.AddMarginsPct"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "batch-set-fade-transition-pdf": {
-      "title": "Batch Set Fade Transition for PDF Pages",
-      "filename": "batch-set-fade-transition-pdf.cs",
-      "description": "Demonstrates how to apply a fade (dissolve) transition with a two‑second duration to all pages of a PDF, creating a slideshow effect using Aspose.Pdf.",
-      "tags": [
-        "pdf",
-        "transition",
-        "fade",
-        "slideshow",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.TransitionType",
-        "Aspose.Pdf.Facades.PdfPageEditor.TransitionDuration",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "rotate-pdf-pages-from-stream": {
-      "title": "Rotate PDF Pages from a Stream and Save Back",
-      "filename": "rotate-pdf-pages-from-stream.cs",
-      "description": "Shows how to load a PDF from a memory/network stream, rotate all pages by 90°, and overwrite the same stream using Aspose.Pdf.Facades.PdfPageEditor.",
-      "tags": [
-        "pdf",
-        "rotation",
-        "stream",
-        "aspose.pdf",
-        "page-editor"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save",
-        "Aspose.Pdf.Facades.PdfPageEditor.Rotation"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "resize-pdf-pages-from-byte-array": {
-      "title": "Resize PDF Pages from Byte Array using PdfPageEditor",
-      "filename": "resize-pdf-pages-from-byte-array.cs",
-      "description": "Shows how to load a PDF from a byte array, change all pages to a specific size (A4) with PdfPageEditor, and save the modified document to a file.",
-      "tags": [
-        "pdf",
-        "page-size",
-        "byte-array",
-        "Aspose.Pdf",
-        "PdfPageEditor"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save",
-        "Aspose.Pdf.Facades.PageSize"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "properly-dispose-pdfpageeditor-after-editing": {
-      "title": "Properly Dispose PdfPageEditor After Editing",
-      "filename": "properly-dispose-pdfpageeditor-after-editing.cs",
-      "description": "Demonstrates binding a PDF to PdfPageEditor, applying rotation and zoom, saving the edited file, and correctly disposing the editor to release file handles and unmanaged resources.",
-      "tags": [
-        "pdf",
-        "page-editor",
-        "dispose",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.Rotation",
-        "Aspose.Pdf.Facades.PdfPageEditor.Zoom",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save",
-        "Aspose.Pdf.Facades.PdfPageEditor.Close"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "set-custom-page-size-pdfpageeditor": {
-      "title": "Set Custom Page Size Using PdfPageEditor",
-      "filename": "set-custom-page-size-pdfpageeditor.cs",
-      "description": "Shows how to change a PDF's page dimensions to non‑standard sizes by specifying custom width and height values with PdfPageEditor.",
-      "tags": [
-        "page-size",
-        "custom-dimensions",
-        "pdf",
-        "aspose-pdf",
-        "pdfpageeditor"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.PageSize",
-        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "rotate-pdf-pages-using-pdfpageeditor": {
-      "title": "Rotate PDF Pages Using PdfPageEditor",
-      "filename": "rotate-pdf-pages-using-pdfpageeditor.cs",
-      "description": "Shows how to rotate all pages of a PDF by setting the Rotation property of PdfPageEditor and saving the modified document.",
-      "tags": [
-        "pdf",
-        "rotate",
-        "aspose-pdf",
-        "pdfpageeditor",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "PdfPageEditor.BindPdf",
-        "PdfPageEditor.Rotation",
-        "PdfPageEditor.ApplyChanges",
-        "PdfPageEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "set-page-transition-effects": {
-      "title": "Set Page Transition Effects in PDF",
-      "filename": "set-page-transition-effects.cs",
-      "description": "Shows how to apply Fade, BoxOut, and Cover transitions to individual PDF pages using Aspose.Pdf's PdfPageEditor.",
-      "tags": [
-        "pdf",
-        "page-transition",
-        "aspose",
-        "facade",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.ProcessPages",
-        "Aspose.Pdf.Facades.PdfPageEditor.TransitionType",
-        "Aspose.Pdf.Facades.PdfPageEditor.TransitionDuration",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "set-pdf-page-zoom": {
-      "title": "Set PDF Page Zoom Using PdfPageEditor",
-      "filename": "set-pdf-page-zoom.cs",
-      "description": "Shows how to apply a double‑precision zoom factor to a PDF document with Aspose.Pdf.Facades.PdfPageEditor for high‑resolution output.",
-      "tags": [
-        "zoom",
-        "pdf",
-        "facade",
-        "Aspose.Pdf",
-        "high-resolution"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "PdfPageEditor.BindPdf",
-        "PdfPageEditor.Zoom",
-        "PdfPageEditor.ApplyChanges",
-        "PdfPageEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "set-slide-display-duration-pdf": {
-      "title": "Set Slide Display Duration for PDF Presentation",
-      "filename": "set-slide-display-duration-pdf.cs",
-      "description": "Demonstrates how to set a per-page display duration and optional transition effect for a PDF used as a presentation using Aspose.Pdf's PdfPageEditor facade.",
-      "tags": [
-        "display-duration",
-        "pdf-presentation",
-        "transition",
-        "pdfpageeditor",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.DisplayDuration",
-        "Aspose.Pdf.Facades.PdfPageEditor.TransitionType",
-        "Aspose.Pdf.Facades.PdfPageEditor.TransitionDuration"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "set-page-alignment-with-pdfpageeditor": {
-      "title": "Set Page Alignment with PdfPageEditor",
-      "filename": "set-page-alignment-with-pdfpageeditor.cs",
-      "description": "Demonstrates how to change the horizontal alignment of PDF pages using the PdfPageEditor facade.",
-      "tags": [
-        "pdf",
-        "alignment",
-        "pdfpageeditor",
-        "horizontal",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.HorizontalAlignment",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "resize-pdf-contents-uniform-margins": {
-      "title": "Resize PDF Page Contents with Uniform Margins",
-      "filename": "resize-pdf-contents-uniform-margins.cs",
-      "description": "Shows how to uniformly resize the contents of all pages in a PDF by applying percentage‑based margins using Aspose.Pdf.Facades.PdfFileEditor.",
-      "tags": [
-        "pdf",
-        "resize",
-        "margin",
-        "facade",
-        "contents"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.ContentsResizeParameters",
-        "Aspose.Pdf.Facades.PdfFileEditor.ContentsResizeParameters.MarginsPercent",
-        "Aspose.Pdf.Facades.PdfFileEditor.ResizeContents"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "resize-pdf-contents-asymmetric-margins": {
-      "title": "Resize PDF Contents with Asymmetric Margins",
-      "filename": "resize-pdf-contents-asymmetric-margins.cs",
-      "description": "Shows how to use Aspose.Pdf's PdfFileEditor to resize page contents by applying different left, right, top, and bottom margins, with fallback PDF creation if the source file is missing.",
-      "tags": [
-        "pdf",
-        "resize",
-        "margins",
-        "asymmetric",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.ContentsResizeParameters",
-        "Aspose.Pdf.Facades.PdfFileEditor.ContentsResizeValue",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextFragment"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "resize-pdf-contents-top-bottom-margins": {
-      "title": "Resize PDF Page Contents with Different Top and Bottom Margins",
-      "filename": "resize-pdf-contents-top-bottom-margins.cs",
-      "description": "Shows how to use PdfFileEditor.ContentsResizeParameters to set left/right margins and distinct top and bottom margins while resizing the contents of PDF pages.",
-      "tags": [
-        "pdf",
-        "resize",
-        "margins",
-        "contents",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.ContentsResizeParameters",
-        "Aspose.Pdf.Facades.PdfFileEditor.ContentsResizeValue",
-        "Aspose.Pdf.Facades.PdfFileEditor.ResizeContents"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "rotate-pdf-page-restore-orientation": {
-      "title": "Rotate PDF Page and Restore Original Orientation",
-      "filename": "rotate-pdf-page-restore-orientation.cs",
-      "description": "Demonstrates how to rotate a specific PDF page using PdfPageEditor, save the rotated document, then reset the page to its original rotation and save the restored version.",
-      "tags": [
-        "pdf",
-        "rotation",
-        "page",
-        "facade",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.GetPageRotation",
-        "Aspose.Pdf.Facades.PdfPageEditor.PageRotations",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "change-pdf-page-size-and-undo": {
-      "title": "Change PDF Page Size and Undo to Original",
-      "filename": "change-pdf-page-size-and-undo.cs",
-      "description": "Shows how to set a custom page size for a PDF page, save the modified file, then revert to the original dimensions to test undo functionality.",
-      "tags": [
-        "page-size",
-        "pdf-editing",
-        "undo",
-        "Aspose.Pdf",
-        "PdfPageEditor"
-      ],
-      "apis_used": [
-        "PdfPageEditor",
-        "PdfPageEditor.BindPdf",
-        "PdfPageEditor.GetPageSize",
-        "PdfPageEditor.PageSize",
-        "PdfPageEditor.ApplyChanges",
-        "PdfPageEditor.Save",
-        "PageSize"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "log-pdf-page-modifications": {
-      "title": "Log PDF Page Property Modifications with PdfPageEditor",
-      "filename": "log-pdf-page-modifications.cs",
-      "description": "Shows how to change various page properties using Aspose.Pdf.Facades.PdfPageEditor and record each modification to a log file for audit and debugging.",
-      "tags": [
-        "pdf",
-        "page-modification",
-        "logging",
-        "aspose-pdf",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save",
-        "Aspose.Pdf.Facades.PdfPageEditor.Zoom",
-        "Aspose.Pdf.Facades.PdfPageEditor.Rotation",
-        "Aspose.Pdf.Facades.PdfPageEditor.PageSize"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "report-pdf-page-properties-before-after-edits": {
-      "title": "Report PDF Page Properties Before and After Edits",
-      "filename": "report-pdf-page-properties-before-after-edits.cs",
-      "description": "Loads a PDF, prints each page's size, rotation, and zoom, applies rotation, zoom, and page size changes, then prints the updated values and saves the edited document.",
-      "tags": [
-        "pdf",
-        "page-properties",
-        "rotation",
-        "zoom",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.PageSize",
-        "Aspose.Pdf.Facades.PdfPageEditor.GetPageSize",
-        "Aspose.Pdf.Facades.PdfPageEditor.GetPageRotation",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "rotate-pages-encrypted-pdf": {
-      "title": "Rotate Pages of Encrypted PDF using PdfPageEditor",
-      "filename": "rotate-pages-encrypted-pdf.cs",
-      "description": "Demonstrates opening an encrypted PDF by supplying a password, rotating all pages 90 degrees with PdfPageEditor, and saving the edited document.",
-      "tags": [
-        "encrypted-pdf",
-        "page-rotation",
-        "pdf-editing",
-        "Aspose.Pdf",
-        "PdfPageEditor"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.Rotation",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "modify-signed-pdf-pages": {
-      "title": "Modify Pages in a Signed PDF While Preserving Signature",
-      "filename": "modify-signed-pdf-pages.cs",
-      "description": "Demonstrates how to rotate and resize a specific page of a digitally signed PDF using PdfPageEditor, applying changes as an incremental update so the existing signature stays valid.",
-      "tags": [
-        "pdf",
-        "pages",
-        "signature",
-        "Aspose.Pdf",
-        "PdfPageEditor"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "resize-pdf-pages-preserve-annotations": {
-      "title": "Resize PDF Pages While Preserving Annotations",
-      "filename": "resize-pdf-pages-preserve-annotations.cs",
-      "description": "Demonstrates how to change the page size of a PDF (e.g., to A4) using Aspose.Pdf's PdfPageEditor while keeping all existing content, annotations, form fields, and links functional.",
-      "tags": [
-        "pdf",
-        "resize",
-        "annotations",
-        "Aspose.Pdf",
-        "PdfPageEditor"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.PageSize",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "rotate-pdf-pages-preserve-form-fields": {
-      "title": "Rotate PDF Pages While Preserving Form Fields",
-      "filename": "rotate-pdf-pages-preserve-form-fields.cs",
-      "description": "Shows how to rotate all pages of a PDF by 90 degrees using PdfPageEditor, ensuring that existing form fields remain usable after the orientation change.",
-      "tags": [
-        "pdf-rotation",
-        "form-fields",
-        "page-editor",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "PdfPageEditor.BindPdf",
-        "PdfPageEditor.Rotation",
-        "PdfPageEditor.ApplyChanges",
-        "Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "apply-transition-to-odd-pages": {
-      "title": "Apply Transition to Odd Pages in PDF",
-      "filename": "apply-transition-to-odd-pages.cs",
-      "description": "Shows how to add a page transition effect only to odd‑numbered pages of a PDF using Aspose.Pdf's PdfPageEditor.",
-      "tags": [
-        "pdf",
-        "transition",
-        "odd-pages",
-        "Aspose.Pdf",
-        "page-editor"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.ProcessPages",
-        "Aspose.Pdf.Facades.PdfPageEditor.TransitionType",
-        "Aspose.Pdf.Facades.PdfPageEditor.TransitionDuration",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "set-display-duration-even-pages": {
-      "title": "Set Display Duration for Even Pages in PDF",
-      "filename": "set-display-duration-even-pages.cs",
-      "description": "Shows how to use Aspose.Pdf.Facades.PdfPageEditor to assign a custom display duration only to even‑numbered pages of a PDF document.",
-      "tags": [
-        "pdf",
-        "display-duration",
-        "even-pages",
-        "aspose.pdf",
-        "facades"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfPageEditor",
@@ -2115,204 +1228,1097 @@
         "Aspose.Pdf.Facades.PdfPageEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "apply-split-transition-to-pdf-page": {
+      "title": "Apply Split Transition to PDF Page",
+      "filename": "apply-split-transition-to-pdf-page.cs",
+      "description": "Demonstrates how to set a split page transition with a two‑second duration on a specific PDF page using Aspose.Pdf.Facades.",
+      "tags": [
+        "pdf",
+        "transition",
+        "split",
+        "aspose",
+        "page-editor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.Facades.PdfPageEditor.SPLITHIN",
+        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
+        "Aspose.Pdf.Facades.PdfPageEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "disable-page-transition-animation": {
+      "title": "Disable Page Transition Animation on a Specific PDF Page",
+      "filename": "disable-page-transition-animation.cs",
+      "description": "Shows how to set the transition duration to zero for page 6 of a PDF using PdfPageEditor, which disables the page transition animation.",
+      "tags": [
+        "pdf",
+        "transition",
+        "page-editor",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "apply-sequential-page-transitions": {
+      "title": "Apply Sequential Page Transitions to PDF",
+      "filename": "apply-sequential-page-transitions.cs",
+      "description": "Shows how to assign different transition effects to each page of a PDF using Aspose.Pdf.Facades.PdfPageEditor and save the result.",
+      "tags": [
+        "pdf",
+        "page-transitions",
+        "aspose-pdf",
+        "csharp",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
+        "Aspose.Pdf.Facades.PdfPageEditor.TransitionType",
+        "Aspose.Pdf.Facades.PdfPageEditor.TransitionDuration"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "set-pdf-page-zoom-to-100-percent": {
+      "title": "Set PDF Page Zoom to 100% Using PdfPageEditor",
+      "filename": "set-pdf-page-zoom-to-100-percent.cs",
+      "description": "Demonstrates how to set the zoom coefficient to 1.0 (100% scaling) for all pages of a PDF using Aspose.Pdf.Facades.PdfPageEditor.",
+      "tags": [
+        "pdf",
+        "zoom",
+        "page-editing",
+        "aspose",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.Zoom",
+        "PdfPageEditor.ApplyChanges",
+        "PdfPageEditor.Save",
+        "PdfPageEditor.Close"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "zoom-odd-pages-pdf": {
+      "title": "Zoom Odd Pages in PDF using PdfPageEditor",
+      "filename": "zoom-odd-pages-pdf.cs",
+      "description": "Shows how to apply a 1.2 zoom factor to all odd‑numbered pages of a PDF document with Aspose.Pdf.Facades.PdfPageEditor.",
+      "tags": [
+        "pdf",
+        "zoom",
+        "odd-pages",
+        "aspose",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.GetPages",
+        "PdfPageEditor.ProcessPages",
+        "PdfPageEditor.Zoom",
+        "PdfPageEditor.ApplyChanges",
+        "PdfPageEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "zoom-even-pages-pdf": {
+      "title": "Zoom Even PDF Pages to 80% Size",
+      "filename": "zoom-even-pages-pdf.cs",
+      "description": "Demonstrates how to use Aspose.Pdf's PdfPageEditor facade to apply a 0.8 zoom factor to all even‑numbered pages in a PDF and save the result.",
+      "tags": [
+        "pdf",
+        "zoom",
+        "even-pages",
+        "Aspose.Pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "PdfPageEditor",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.GetPages",
+        "PdfPageEditor.ProcessPages",
+        "PdfPageEditor.Zoom",
+        "PdfPageEditor.ApplyChanges",
+        "PdfPageEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "set-specific-pdf-pages-to-us-letter-size": {
+      "title": "Set Specific PDF Pages to US Letter Size",
+      "filename": "set-specific-pdf-pages-to-us-letter-size.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, resize pages 3‑6 to US Letter dimensions, and save the modified document.",
+      "tags": [
+        "pdf",
+        "page-size",
+        "us-letter",
+        "aspose",
+        "c#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Page.SetPageSize",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "resize-last-pdf-page-to-a5": {
+      "title": "Resize Last PDF Page to A5 Using PdfPageEditor",
+      "filename": "resize-last-pdf-page-to-a5.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfPageEditor to change the size of the final page of a PDF to A5, creating a compact booklet format.",
+      "tags": [
+        "pdf",
+        "page-size",
+        "aspose",
+        "booklet",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.GetPages",
+        "PdfPageEditor.ProcessPages",
+        "PdfPageEditor.PageSize",
+        "PdfPageEditor.ApplyChanges",
+        "PdfPageEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "rotate-every-third-pdf-page-to-landscape": {
+      "title": "Rotate Every Third PDF Page to Landscape",
+      "filename": "rotate-every-third-pdf-page-to-landscape.cs",
+      "description": "Shows how to rotate every third page of a PDF by 270° using PdfPageEditor, creating an alternating landscape orientation.",
+      "tags": [
+        "pdf",
+        "rotation",
+        "pages",
+        "facade",
+        "landscape"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.GetPages",
+        "PdfPageEditor.ProcessPages",
+        "PdfPageEditor.Rotation",
+        "PdfPageEditor.ApplyChanges",
+        "PdfPageEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "retrieve-rotated-page-size": {
+      "title": "Retrieve Rotated Page Size with PdfPageEditor",
+      "filename": "retrieve-rotated-page-size.cs",
+      "description": "Shows how to rotate a PDF page using PdfPageEditor and then obtain the effective page dimensions, adjusting for the new orientation.",
+      "tags": [
+        "pdf",
+        "rotation",
+        "pagesize",
+        "aspose.pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.Facades.PdfPageEditor.Rotation",
+        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
+        "Aspose.Pdf.Facades.PdfPageEditor.GetPageSize",
+        "Aspose.Pdf.Facades.PdfPageEditor.GetPageRotation",
+        "Aspose.Pdf.Facades.PdfPageEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "retrieve-page-rotation-after-resize": {
+      "title": "Retrieve Page Rotation After Resizing PDF",
+      "filename": "retrieve-page-rotation-after-resize.cs",
+      "description": "Shows how to obtain a PDF page's rotation, change the page size with PdfPageEditor, and verify that the rotation value stays the same after the resize.",
+      "tags": [
+        "pdf",
+        "page-rotation",
+        "resize",
+        "facade",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfPageEditor.GetPageRotation",
+        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
+        "Aspose.Pdf.Facades.PdfPageEditor.Save",
+        "Aspose.Pdf.PageSize"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "apply-custom-page-transitions": {
+      "title": "Apply Custom Page Transitions Based on Index",
+      "filename": "apply-custom-page-transitions.cs",
+      "description": "Demonstrates how to load a PDF, iterate through its pages, and assign a different transition effect to each page using Aspose.Pdf's PdfPageEditor facade.",
+      "tags": [
+        "pdf",
+        "page-transition",
+        "aspose-pdf",
+        "csharp",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfPageEditor.ProcessPages",
+        "Aspose.Pdf.Facades.PdfPageEditor.TransitionType",
+        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
+        "Aspose.Pdf.Facades.PdfPageEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "set-per-page-display-duration": {
+      "title": "Set Per‑Page Display Duration in PDF",
+      "filename": "set-per-page-display-duration.cs",
+      "description": "Shows how to assign a different display duration to each page of a PDF using Aspose.Pdf's PdfPageEditor, increasing the duration by one second for each subsequent page.",
+      "tags": [
+        "pdf",
+        "display-duration",
+        "page-editing",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.Facades.PdfPageEditor.ProcessPages",
+        "Aspose.Pdf.Facades.PdfPageEditor.DisplayDuration",
+        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
+        "Aspose.Pdf.Facades.PdfPageEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "center-content-horizontally-page2": {
+      "title": "Center Content Horizontally on Specific PDF Page",
+      "filename": "center-content-horizontally-page2.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfPageEditor to center the existing content horizontally on page 2 of a PDF document.",
+      "tags": [
+        "pdf",
+        "alignment",
+        "page-editing",
+        "csharp",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.ProcessPages",
+        "PdfPageEditor.HorizontalAlignment",
+        "PdfPageEditor.ApplyChanges",
+        "PdfPageEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "vertically-center-content-page-three": {
+      "title": "Vertically Center Content on Specific PDF Page",
+      "filename": "vertically-center-content-page-three.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfPageEditor to vertically align the content of page 3 to the middle and save the updated PDF.",
+      "tags": [
+        "pdf",
+        "vertical-alignment",
+        "page-editor",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.ProcessPages",
+        "PdfPageEditor.VerticalAlignment",
+        "PdfPageEditor.ApplyChanges"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "set-horizontal-alignment-and-zoom-on-page": {
+      "title": "Set Horizontal Alignment and Zoom on a Specific PDF Page",
+      "filename": "set-horizontal-alignment-and-zoom-on-page.cs",
+      "description": "Demonstrates how to use Aspose.Pdf's PdfPageEditor facade to center‑align content and apply a zoom factor to a single page (page 4) of a PDF document.",
+      "tags": [
+        "pdf",
+        "alignment",
+        "zoom",
+        "page-editor",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "add-10-percent-margins-to-pdf-pages": {
+      "title": "Add 10% Margins to All PDF Pages",
+      "filename": "add-10-percent-margins-to-pdf-pages.cs",
+      "description": "Demonstrates how to add a 10 % margin on all four sides of every page in a PDF using Aspose.Pdf's PdfFileEditor, effectively resizing the contents for printing.",
+      "tags": [
+        "pdf",
+        "margin",
+        "resize",
+        "facade",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.AddMarginsPct"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "batch-set-fade-transition-pdf-slideshow": {
+      "title": "Batch Set Fade Transition for PDF Slideshow",
+      "filename": "batch-set-fade-transition-pdf-slideshow.cs",
+      "description": "Demonstrates how to apply a 2‑second fade (dissolve) transition to every page of a 200‑page PDF using Aspose.Pdf's PdfPageEditor facade.",
+      "tags": [
+        "pdf",
+        "transition",
+        "slideshow",
+        "fade",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.Facades.PdfPageEditor.TransitionType",
+        "Aspose.Pdf.Facades.PdfPageEditor.TransitionDuration",
+        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "resize-pdf-pages-using-pdfpageeditor": {
+      "title": "Resize PDF Pages Using PdfPageEditor",
+      "filename": "resize-pdf-pages-using-pdfpageeditor.cs",
+      "description": "Shows how to load a PDF from a byte array, change its page size (e.g., to A4 landscape) with PdfPageEditor, and save the modified document to a new file.",
+      "tags": [
+        "pdf",
+        "page-size",
+        "resize",
+        "memory-stream",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfPageEditor.PageSize",
+        "Aspose.Pdf.Facades.PdfPageEditor.Zoom",
+        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
+        "Aspose.Pdf.Facades.PdfPageEditor.Save",
+        "Aspose.Pdf.PageSize"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "dispose-pdfpageeditor-after-editing": {
+      "title": "Proper Disposal of PdfPageEditor After Page Rotation",
+      "filename": "dispose-pdfpageeditor-after-editing.cs",
+      "description": "Demonstrates loading a PDF, rotating all pages using PdfPageEditor, saving the result, and correctly disposing the editor and document to release file handles.",
+      "tags": [
+        "pdf",
+        "page-editor",
+        "disposal",
+        "rotation",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
+        "Aspose.Pdf.Facades.PdfPageEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "set-custom-page-size-with-pdfpageeditor": {
+      "title": "Set Custom Page Size with PdfPageEditor",
+      "filename": "set-custom-page-size-with-pdfpageeditor.cs",
+      "description": "Demonstrates how to change a PDF's page dimensions to non‑standard values using Aspose.Pdf's PdfPageEditor facade.",
+      "tags": [
+        "pdf",
+        "page-size",
+        "custom-dimensions",
+        "aspose",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.Facades.PageSize",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.ApplyChanges",
+        "PdfPageEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "rotate-pdf-pages-using-pdfpageeditor__v2": {
+      "title": "Rotate PDF Pages Using PdfPageEditor",
+      "filename": "rotate-pdf-pages-using-pdfpageeditor__v2.cs",
+      "description": "Shows how to rotate all pages of a PDF by setting the Rotation property of PdfPageEditor and saving the modified document.",
+      "tags": [
+        "pdf",
+        "rotation",
+        "pdfpageeditor",
+        "csharp",
+        "aspose"
+      ],
+      "apis_used": [
+        "PdfPageEditor",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.Rotation",
+        "PdfPageEditor.ApplyChanges",
+        "PdfPageEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "set-page-transition-effects": {
+      "title": "Set Page Transition Effects in PDF using Aspose.Pdf",
+      "filename": "set-page-transition-effects.cs",
+      "description": "Demonstrates how to apply fade, box‑out, and cover transitions to individual PDF pages using the PdfPageEditor facade.",
+      "tags": [
+        "pdf",
+        "transition",
+        "page",
+        "aspose",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "PdfPageEditor.DISSOLVE",
+        "PdfPageEditor.OUTBOX",
+        "PdfPageEditor.INBOX",
+        "PdfPageEditor.ApplyChanges",
+        "PdfPageEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "set-pdf-page-zoom-using-pdfpageeditor": {
+      "title": "Set PDF Page Zoom Using PdfPageEditor",
+      "filename": "set-pdf-page-zoom-using-pdfpageeditor.cs",
+      "description": "Shows how to apply a precise zoom factor to a PDF document by using Aspose.Pdf.Facades.PdfPageEditor to modify page scaling.",
+      "tags": [
+        "pdf",
+        "zoom",
+        "facade",
+        "Aspose.Pdf",
+        "C#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.Zoom",
+        "PdfPageEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "set-slide-display-duration": {
+      "title": "Set Slide Display Duration for PDF Pages",
+      "filename": "set-slide-display-duration.cs",
+      "description": "Shows how to assign an integer display duration (in seconds) to individual PDF pages using PdfPageEditor, enabling timed slide transitions.",
+      "tags": [
+        "pdf",
+        "display-duration",
+        "slides",
+        "Aspose.Pdf",
+        "PdfPageEditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.Facades.PdfPageEditor.ProcessPages",
+        "Aspose.Pdf.Facades.PdfPageEditor.DisplayDuration",
+        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "set-page-content-horizontal-alignment": {
+      "title": "Set Page Content Horizontal Alignment in PDF",
+      "filename": "set-page-content-horizontal-alignment.cs",
+      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfPageEditor to change the horizontal alignment (left, center, right) of all page content in a PDF and save the modified document.",
+      "tags": [
+        "pdf",
+        "alignment",
+        "aspose.pdf",
+        "facades",
+        "horizontal"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.HorizontalAlignment",
+        "PdfPageEditor.ApplyChanges",
+        "PdfPageEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "resize-pdf-contents-uniform-margins": {
+      "title": "Resize PDF Page Contents with Uniform Margins",
+      "filename": "resize-pdf-contents-uniform-margins.cs",
+      "description": "Demonstrates using PdfFileEditor.ResizeContents together with ContentsResizeParameters.MarginsPercent to apply equal margins to every page of a PDF document.",
+      "tags": [
+        "pdf",
+        "resize",
+        "margin",
+        "Aspose.Pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.ResizeContents",
+        "Aspose.Pdf.Facades.PdfFileEditor.ContentsResizeParameters",
+        "Aspose.Pdf.Facades.PdfFileEditor.ContentsResizeParameters.MarginsPercent"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "resize-pdf-contents-asymmetric-margins": {
+      "title": "Resize PDF Page Contents with Asymmetric Margins",
+      "filename": "resize-pdf-contents-asymmetric-margins.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades to resize the contents of selected PDF pages by specifying different left, right, top, and bottom margins.",
+      "tags": [
+        "pdf",
+        "resize",
+        "margins",
+        "asymmetric",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.ResizeContents",
+        "Aspose.Pdf.Facades.PdfFileEditor.ContentsResizeParameters",
+        "Aspose.Pdf.Facades.PdfFileEditor.ContentsResizeValue",
+        "Aspose.Pdf.Facades.PdfFileEditor.ContentsResizeValue.Percents"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "resize-pdf-contents-top-bottom-margins": {
+      "title": "Resize PDF Page Contents with Top and Bottom Margins",
+      "filename": "resize-pdf-contents-top-bottom-margins.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades to resize the contents of a PDF document, applying different top and bottom margins while leaving left and right margins automatic.",
+      "tags": [
+        "pdf",
+        "resize",
+        "margins",
+        "Aspose.Pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "PdfFileEditor",
+        "PdfFileEditor.ContentsResizeParameters",
+        "PdfFileEditor.ContentsResizeValue",
+        "PdfFileEditor.ContentsResizeValue.Percents",
+        "PdfFileEditor.ResizeContents"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "rotate-pdf-page-reset-orientation": {
+      "title": "Rotate PDF Page and Reset Orientation",
+      "filename": "rotate-pdf-page-reset-orientation.cs",
+      "description": "Demonstrates rotating a PDF page using PdfPageEditor, saving the rotated file, then restoring the original rotation to show reversible changes.",
+      "tags": [
+        "pdf",
+        "rotation",
+        "page-editor",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfPageEditor.GetPageRotation",
+        "Aspose.Pdf.Facades.PdfPageEditor.Rotation",
+        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
+        "Aspose.Pdf.Facades.PdfPageEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "resize-pdf-page-size-and-revert": {
+      "title": "Resize PDF Page Size and Revert to Original",
+      "filename": "resize-pdf-page-size-and-revert.cs",
+      "description": "Demonstrates how to change the page size of a PDF to custom dimensions using PdfPageEditor, then restore the original size to verify undo functionality.",
+      "tags": [
+        "pdf",
+        "page-size",
+        "resize",
+        "undo",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "PdfPageEditor",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.GetPageSize",
+        "PdfPageEditor.PageSize",
+        "PdfPageEditor.ApplyChanges",
+        "PdfPageEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "log-pdf-page-property-modifications": {
+      "title": "Log PDF Page Property Modifications with PdfPageEditor",
+      "filename": "log-pdf-page-property-modifications.cs",
+      "description": "Demonstrates how to modify PDF page properties such as zoom, rotation, size, display duration, and transition using the PdfPageEditor facade, while logging each change to a text file for audit and debugging.",
+      "tags": [
+        "pdf",
+        "page-modification",
+        "logging",
+        "aspose-pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "PdfPageEditor",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.Zoom",
+        "PdfPageEditor.Rotation",
+        "PdfPageEditor.PageSize",
+        "PdfPageEditor.ApplyChanges",
+        "PdfPageEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "generate-page-properties-report-before-after-edit": {
+      "title": "Generate Page Properties Report Before and After PDF Edit",
+      "filename": "generate-page-properties-report-before-after-edit.cs",
+      "description": "The example captures original page dimensions and rotation, applies a 90° rotation and 50% zoom using PdfPageEditor, then records the new properties and prints a side‑by‑side comparison.",
+      "tags": [
+        "pdf",
+        "page-properties",
+        "rotation",
+        "zoom",
+        "comparison"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileInfo",
+        "Aspose.Pdf.Facades.PdfFileInfo.GetPageWidth",
+        "Aspose.Pdf.Facades.PdfFileInfo.GetPageHeight",
+        "Aspose.Pdf.Facades.PdfFileInfo.GetPageRotation",
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
+        "Aspose.Pdf.Facades.PdfPageEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "rotate-pages-encrypted-pdf": {
+      "title": "Rotate Pages of an Encrypted PDF using PdfPageEditor",
+      "filename": "rotate-pages-encrypted-pdf.cs",
+      "description": "Demonstrates how to open an encrypted PDF by supplying a password, rotate all its pages with PdfPageEditor, and save the result.",
+      "tags": [
+        "encrypted-pdf",
+        "page-rotation",
+        "pdf-editor",
+        "Aspose.Pdf",
+        "password"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "PdfPageEditor.Rotation",
+        "PdfPageEditor.ApplyChanges",
+        "PdfPageEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "edit-signed-pdf-pages-preserve-signatures": {
+      "title": "Edit Pages of a Digitally Signed PDF While Preserving Signatures",
+      "filename": "edit-signed-pdf-pages-preserve-signatures.cs",
+      "description": "Loads a digitally signed PDF, checks for existing signatures, and uses PdfPageEditor to rotate, resize, and process selected pages, saving the document incrementally so the original signatures remain valid.",
+      "tags": [
+        "pdf",
+        "digital-signature",
+        "page-editing",
+        "incremental-update",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfFileSignature",
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.PageSize",
+        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
+        "Aspose.Pdf.Facades.PdfPageEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "resize-pdf-pages-preserve-annotations": {
+      "title": "Resize PDF Pages While Preserving Annotations",
+      "filename": "resize-pdf-pages-preserve-annotations.cs",
+      "description": "Shows how to change the page size of a PDF using Aspose.Pdf.Facades.PdfPageEditor, ensuring that all existing annotations and interactive elements remain functional after resizing.",
+      "tags": [
+        "pdf",
+        "page-size",
+        "annotations",
+        "Aspose.Pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.PageSize",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.ApplyChanges",
+        "Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "preserve-form-fields-while-rotating-pdf-pages": {
+      "title": "Preserve Form Fields While Rotating PDF Pages",
+      "filename": "preserve-form-fields-while-rotating-pdf-pages.cs",
+      "description": "Shows how to keep AcroForm fields functional after rotating PDF pages by exporting the fields to FDF, rotating the pages, and re‑importing the fields.",
+      "tags": [
+        "pdf",
+        "form-fields",
+        "rotation",
+        "fdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.Form.ExportFdf",
+        "Aspose.Pdf.Facades.Form.ImportFdf",
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.Facades.PdfPageEditor.Rotation",
+        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "apply-transitions-to-odd-pages": {
+      "title": "Apply Transitions to Odd Pages in PDF",
+      "filename": "apply-transitions-to-odd-pages.cs",
+      "description": "Shows how to add a page transition effect (e.g., dissolve) only to odd‑numbered pages of a PDF using Aspose.Pdf's PdfPageEditor.",
+      "tags": [
+        "pdf",
+        "page-transition",
+        "odd-pages",
+        "aspose.pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.Facades.PdfPageEditor.ProcessPages",
+        "Aspose.Pdf.Facades.PdfPageEditor.TransitionType",
+        "Aspose.Pdf.Facades.PdfPageEditor.TransitionDuration",
+        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "set-display-duration-even-pages": {
+      "title": "Set Display Duration for Even Pages in PDF",
+      "filename": "set-display-duration-even-pages.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfPageEditor to assign a custom display duration to even‑numbered pages of a PDF document.",
+      "tags": [
+        "pdf",
+        "display-duration",
+        "even-pages",
+        "Aspose.Pdf",
+        "PdfPageEditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.Facades.PdfPageEditor.ProcessPages",
+        "Aspose.Pdf.Facades.PdfPageEditor.DisplayDuration",
+        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
     "zoom-pdf-pages-with-images": {
       "title": "Zoom PDF Pages Containing Images",
       "filename": "zoom-pdf-pages-with-images.cs",
-      "description": "Shows how to detect pages that have image objects in a PDF and apply a zoom factor only to those pages using Aspose.Pdf.",
+      "description": "Shows how to detect pages that contain images in a PDF and apply a zoom factor only to those pages using Aspose.Pdf.",
       "tags": [
+        "pdf",
         "zoom",
         "image-detection",
-        "pdf",
         "page-editing",
-        "Aspose.Pdf"
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.ImagePlacementAbsorber",
-        "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
         "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
         "Aspose.Pdf.Facades.PdfPageEditor.ProcessPages",
         "Aspose.Pdf.Facades.PdfPageEditor.Zoom",
         "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "resize-contents-only-on-text-pages": {
-      "title": "Resize PDF Contents Only on Pages Containing Text",
-      "filename": "resize-contents-only-on-text-pages.cs",
-      "description": "The example loads a PDF, detects which pages contain any text using TextAbsorber, and then resizes the contents of only those pages with specified margin percentages via PdfFileEditor.",
+    "resize-contents-only-on-pages-with-text": {
+      "title": "Resize Contents of Pages Containing Text",
+      "filename": "resize-contents-only-on-pages-with-text.cs",
+      "description": "The example scans a PDF to find pages that contain any text and then resizes the contents of only those pages using PdfFileEditor.ResizeContents. If no text is found, the original file is copied unchanged.",
       "tags": [
         "pdf",
         "resize",
         "text-detection",
         "Aspose.Pdf",
-        "facade"
+        "page-manipulation"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextAbsorber",
         "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.ContentsResizeParameters",
-        "Aspose.Pdf.Facades.PdfFileEditor.ContentsResizeValue",
-        "Aspose.Pdf.Facades.PdfFileEditor.ResizeContents"
+        "Aspose.Pdf.Facades.PdfFileEditor.ResizeContents",
+        "Aspose.Pdf.Page.Accept"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
     "apply-rotation-zoom-transition-to-pdf-pages": {
-      "title": "Apply Rotation, Zoom, and Transition Effects to PDF Pages",
+      "title": "Apply Rotation, Zoom, and Transition to PDF Pages",
       "filename": "apply-rotation-zoom-transition-to-pdf-pages.cs",
-      "description": "Demonstrates how to rotate, zoom and add slide transition effects to all pages of a PDF using Aspose.Pdf's PdfPageEditor facade.",
+      "description": "Demonstrates using PdfPageEditor to rotate, zoom, and add a transition effect to all pages of a PDF, then save the modified document.",
       "tags": [
+        "pdf",
         "rotation",
         "zoom",
         "transition",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
+        "Aspose.Pdf.Facades.PdfPageEditor.Save",
+        "Aspose.Pdf.Facades.PdfPageEditor.Rotation",
+        "Aspose.Pdf.Facades.PdfPageEditor.Zoom",
+        "Aspose.Pdf.Facades.PdfPageEditor.TransitionType",
+        "Aspose.Pdf.Facades.PdfPageEditor.DisplayDuration"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "set-custom-a4-landscape-page-size": {
+      "title": "Set Custom A4 Landscape Page Size",
+      "filename": "set-custom-a4-landscape-page-size.cs",
+      "description": "Shows how to change a PDF's page dimensions to A4 landscape using Aspose.Pdf.Facades.PdfPageEditor and the PageSize class.",
+      "tags": [
+        "page-size",
+        "landscape",
         "pdf",
+        "Aspose.Pdf",
         "facade"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfPageEditor",
         "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfPageEditor.PageSize",
         "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "set-pdf-pages-a4-landscape": {
-      "title": "Set PDF Pages to A4 Landscape Size",
-      "filename": "set-pdf-pages-a4-landscape.cs",
-      "description": "Shows how to change each page of a PDF to A4 landscape dimensions by adjusting the Width, Height, and IsLandscape properties and then saving the document.",
-      "tags": [
-        "pdf",
-        "page-size",
-        "landscape",
-        "a4",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.PageInfo",
-        "Aspose.Pdf.PageSize",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.PageSize"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "set-pdf-page-size-to-custom-letter": {
-      "title": "Set PDF Page Size to Custom Letter Portrait",
-      "filename": "set-pdf-page-size-to-custom-letter.cs",
-      "description": "Shows how to change the page size of an existing PDF to the standard Letter portrait dimensions using Aspose.Pdf.Facades.PdfPageEditor.",
+    "set-pdf-page-size-to-letter-portrait": {
+      "title": "Set PDF Page Size to Letter Portrait Using PdfPageEditor",
+      "filename": "set-pdf-page-size-to-letter-portrait.cs",
+      "description": "Shows how to resize all pages of a PDF to the standard Letter portrait dimensions (8.5×11 inches) with Aspose.Pdf.Facades.PdfPageEditor.",
       "tags": [
         "page-size",
         "letter",
         "pdf",
-        "facades",
-        "aspose-pdf"
+        "facade",
+        "csharp"
       ],
       "apis_used": [
-        "PdfPageEditor",
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.PageSize",
         "PdfPageEditor.BindPdf",
-        "PdfPageEditor.PageSize",
         "PdfPageEditor.ApplyChanges",
-        "PdfPageEditor.Save",
-        "PageSize"
+        "PdfPageEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "rotate-landscape-pdf-pages": {
-      "title": "Rotate Landscape PDF Pages to Portrait",
-      "filename": "rotate-landscape-pdf-pages.cs",
-      "description": "Detects pages whose width exceeds height (landscape) and rotates them 90° to portrait orientation using Aspose.Pdf's PdfPageEditor facade.",
+    "rotate-landscape-pages-based-on-metadata": {
+      "title": "Rotate Landscape Pages Based on PDF Metadata",
+      "filename": "rotate-landscape-pages-based-on-metadata.cs",
+      "description": "Demonstrates how to read a custom PDF metadata entry that lists page numbers, then rotate those pages to landscape orientation using Aspose.Pdf facades.",
       "tags": [
-        "rotation",
-        "landscape",
         "pdf",
-        "pages",
-        "facade"
+        "rotation",
+        "metadata",
+        "aspose",
+        "page-editor"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Facades.PdfFileInfo",
         "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.Facades.PdfFileInfo.GetMetaInfo",
         "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
         "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
         "Aspose.Pdf.Facades.PdfPageEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "set-pdf-page-transition-duration-by-title-length": {
-      "title": "Set PDF Page Transition Duration Based on Title Length",
-      "filename": "set-pdf-page-transition-duration-by-title-length.cs",
-      "description": "Loads a PDF, iterates through each page, creates a placeholder title, calculates a transition duration from the title length, and applies a page transition using Aspose.Pdf's PdfPageEditor.",
+    "set-page-transition-duration-based-on-title-length": {
+      "title": "Set Page Transition Duration Based on Title Length",
+      "filename": "set-page-transition-duration-based-on-title-length.cs",
+      "description": "Shows how to assign a PDF page transition duration that varies with the length of each page's title using Aspose.Pdf's PdfPageEditor.",
       "tags": [
         "pdf",
         "page-transition",
-        "aspose-pdf",
-        "facade",
-        "csharp"
+        "aspose",
+        "csharp",
+        "duration"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Page",
-        "PdfPageEditor.TransitionDuration",
-        "PdfPageEditor.TransitionType",
-        "PdfPageEditor.ApplyChanges",
-        "Document.Save"
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Facades.PdfPageEditor.ProcessPages",
+        "Aspose.Pdf.Facades.PdfPageEditor.TransitionType",
+        "Aspose.Pdf.Facades.PdfPageEditor.TransitionDuration",
+        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "adjust-page-zoom-based-on-word-count": {
-      "title": "Adjust Page Zoom Based on Word Count",
-      "filename": "adjust-page-zoom-based-on-word-count.cs",
-      "description": "Shows how to extract text from each PDF page, count its words, and apply a higher zoom factor to pages with fewer words using Aspose.Pdf.",
+    "adjust-pdf-zoom-by-word-count": {
+      "title": "Adjust PDF Page Zoom Based on Word Count",
+      "filename": "adjust-pdf-zoom-by-word-count.cs",
+      "description": "Demonstrates how to analyze each PDF page's word count and apply a per‑page zoom level, giving higher zoom to pages with fewer words for better readability.",
       "tags": [
         "pdf",
         "zoom",
         "word-count",
-        "page-editing",
-        "aspose"
+        "page-processing",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfPageEditor",
         "Aspose.Pdf.Text.TextAbsorber",
+        "Aspose.Pdf.Facades.PdfPageEditor",
         "Aspose.Pdf.Page.Accept",
+        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
         "Aspose.Pdf.Facades.PdfPageEditor.Zoom",
         "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
         "Aspose.Pdf.Facades.PdfPageEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
     "batch-change-pdf-page-size": {
-      "title": "Batch Change PDF Page Size Based on File Name",
+      "title": "Batch Change PDF Page Size Using PdfPageEditor",
       "filename": "batch-change-pdf-page-size.cs",
-      "description": "Demonstrates how to process a folder of PDFs, determine a target page size from each file name, and apply the new size to all pages using Aspose.Pdf facades.",
+      "description": "Shows how to iterate through PDFs in a folder and assign a specific page size to each document using Aspose.Pdf's PdfPageEditor facade.",
       "tags": [
         "pdf",
         "page-size",
         "batch-processing",
-        "aspose-pdf",
+        "aspose",
         "facade"
       ],
       "apis_used": [
@@ -2321,45 +2327,45 @@
         "PdfPageEditor.PageSize",
         "PdfPageEditor.ApplyChanges",
         "PdfPageEditor.Save",
-        "PageSize"
+        "PageSize",
+        "PageSize.A4"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
     "extract-rotate-selected-pdf-pages": {
       "title": "Extract and Rotate Selected PDF Pages",
       "filename": "extract-rotate-selected-pdf-pages.cs",
-      "description": "Shows how to extract specific pages from a PDF, rotate them, and save the modified pages as a new PDF using Aspose.Pdf's PdfPageEditor facade.",
+      "description": "Demonstrates how to extract specific pages from a PDF, rotate those pages, and save the result as a new PDF using Aspose.Pdf.Facades.",
       "tags": [
         "pdf",
-        "page-extraction",
-        "rotation",
-        "aspose",
+        "extract",
+        "rotate",
+        "pages",
         "facade"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.Extract",
         "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.ProcessPages",
         "Aspose.Pdf.Facades.PdfPageEditor.Rotation",
         "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
         "Aspose.Pdf.Facades.PdfPageEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
     "merge-pdfs-with-aligned-margins": {
       "title": "Merge PDFs with Aligned Margins",
       "filename": "merge-pdfs-with-aligned-margins.cs",
-      "description": "Shows how to add uniform margins to multiple PDF files and then concatenate them into a single PDF using Aspose.Pdf.Facades.",
+      "description": "Shows how to add uniform margins to multiple PDF files and then concatenate them into a single document using Aspose.Pdf.Facades.",
       "tags": [
         "pdf",
-        "merge",
         "margin",
+        "merge",
         "concatenate",
-        "aspose-pdf"
+        "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileEditor",
@@ -2367,88 +2373,91 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "resize-pdf-pages-and-split-into-chapters": {
-      "title": "Resize PDF Pages and Split into Chapters",
-      "filename": "resize-pdf-pages-and-split-into-chapters.cs",
-      "description": "Demonstrates how to uniformly resize all pages of a PDF and then split the resized document into separate chapter files using Aspose.Pdf.Facades.",
+    "resize-pdf-and-split-into-chapters": {
+      "title": "Resize PDF Pages to A4 and Split into Chapter Files",
+      "filename": "resize-pdf-and-split-into-chapters.cs",
+      "description": "Demonstrates how to resize all pages of a PDF to a uniform A4 size using PdfPageEditor, then split the resized document into separate one‑page PDFs representing individual chapters.",
       "tags": [
-        "pdf",
-        "resize",
-        "split",
+        "pdf-resize",
+        "pdf-split",
         "chapters",
-        "facade"
+        "aspose-pdf",
+        "page-editor"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.ResizeContents",
-        "Aspose.Pdf.Facades.PdfFileEditor.SplitToPages"
+        "PdfPageEditor",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.PageSize",
+        "PdfPageEditor.Zoom",
+        "PdfPageEditor.Save",
+        "PdfFileEditor",
+        "PdfFileEditor.SplitToPages"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
     "create-pdf-slideshow-with-page-transitions": {
-      "title": "Create PDF Slideshow with Page Transitions",
+      "title": "Create PDF Slideshow with Page Transitions and Durations",
       "filename": "create-pdf-slideshow-with-page-transitions.cs",
-      "description": "Shows how to use Aspose.Pdf's PdfPageEditor to assign transition effects and display durations to each page, producing a PDF that plays as a slideshow.",
+      "description": "Shows how to use Aspose.Pdf's PdfPageEditor to assign transition effects and display times to individual pages and then save the document as a slideshow PDF.",
       "tags": [
         "pdf",
         "slideshow",
         "page-transitions",
         "aspose.pdf",
-        "facade"
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.TransitionType",
-        "Aspose.Pdf.Facades.PdfPageEditor.TransitionDuration",
-        "Aspose.Pdf.Facades.PdfPageEditor.DisplayDuration",
-        "Aspose.Pdf.Document.Save"
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.ApplyChanges",
+        "PdfPageEditor.TransitionType",
+        "Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
     "set-boxout-transition-zoom-page": {
-      "title": "Set BoxOut Transition and Zoom on PDF Page",
+      "title": "Set BoxOut Transition with Zoom on a Specific PDF Page",
       "filename": "set-boxout-transition-zoom-page.cs",
-      "description": "Shows how to apply a BoxOut page transition with a 1.3× zoom factor to page 2 of a PDF using Aspose.Pdf.Facades.",
+      "description": "Demonstrates how to apply a BoxOut page transition and a 1.3× zoom effect to page two of a PDF using Aspose.Pdf.Facades.PdfPageEditor.",
       "tags": [
-        "page-transition",
-        "zoom",
         "pdf",
-        "Aspose.Pdf",
-        "PdfPageEditor"
+        "transition",
+        "zoom",
+        "page-editor",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfPageEditor",
         "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save",
+        "Aspose.Pdf.Facades.PdfPageEditor.ProcessPages",
         "Aspose.Pdf.Facades.PdfPageEditor.TransitionType",
-        "Aspose.Pdf.Facades.PdfPageEditor.Zoom"
+        "Aspose.Pdf.Facades.PdfPageEditor.Zoom",
+        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
+        "Aspose.Pdf.Facades.PdfPageEditor.Save"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "center-page-content-set-display-duration": {
-      "title": "Center Page Content and Set Display Duration on Specific PDF Page",
-      "filename": "center-page-content-set-display-duration.cs",
-      "description": "Demonstrates how to center the content of page 5 horizontally and set its display duration to 4 seconds using Aspose.Pdf's PdfPageEditor facade.",
+    "center-page-alignment-set-display-duration": {
+      "title": "Center Page Content and Set Display Duration",
+      "filename": "center-page-alignment-set-display-duration.cs",
+      "description": "Demonstrates how to center the content of a specific PDF page and set its slide‑show display duration using Aspose.Pdf.Facades.",
       "tags": [
         "pdf",
         "page-alignment",
         "display-duration",
         "aspose-pdf",
-        "facade"
+        "facades"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -2460,19 +2469,19 @@
         "Aspose.Pdf.Facades.PdfPageEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
     "add-5-percent-margins-and-print-pdf": {
-      "title": "Add 5% Margins and Print PDF with Auto‑Resize",
+      "title": "Add 5% Margins to PDF Pages and Print",
       "filename": "add-5-percent-margins-and-print-pdf.cs",
-      "description": "The example adds a 5 % margin to all pages of a PDF using PdfFileEditor, then prints the modified document with auto‑resize to fit the printable area.",
+      "description": "The example demonstrates how to add a uniform 5 % margin to every page of a PDF using PdfFileEditor, then print the modified document with PdfViewer while automatically resizing and rotating to fit the printable area.",
       "tags": [
         "pdf",
         "margin",
-        "print",
-        "autosize",
-        "Aspose.Pdf"
+        "printing",
+        "aspose-pdf",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileEditor",
@@ -2482,65 +2491,67 @@
         "Aspose.Pdf.Facades.PdfViewer.PrintDocument"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "apply-15-percent-margins-booklet": {
-      "title": "Apply 15% Margins for Booklet Layout",
-      "filename": "apply-15-percent-margins-booklet.cs",
-      "description": "Demonstrates how to add 15 % margins to selected or all pages of a PDF using Aspose.Pdf.Facades, preparing the document for booklet printing.",
+    "create-booklet-pdf-with-15-percent-margins": {
+      "title": "Create Booklet PDF with 15% Page Margins",
+      "filename": "create-booklet-pdf-with-15-percent-margins.cs",
+      "description": "Shows how to add a 15 % margin to selected pages and then convert the PDF into a booklet layout using Aspose.Pdf.",
       "tags": [
-        "margins",
         "booklet",
+        "margins",
         "pdf",
-        "Aspose.Pdf",
-        "page-resize"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.AddMarginsPct"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
-      "status": "verified"
-    },
-    "rotate-pdf-pages-to-landscape-brochure": {
-      "title": "Rotate PDF Pages to Landscape for Brochure Printing",
-      "filename": "rotate-pdf-pages-to-landscape-brochure.cs",
-      "description": "Shows how to rotate all pages of a PDF to landscape orientation and set the page size to A4 for brochure printing using Aspose.Pdf's PdfPageEditor.",
-      "tags": [
-        "pdf",
-        "rotation",
-        "brochure",
-        "page-size",
-        "aspose"
+        "aspose",
+        "c#"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Facades.PdfPageEditor.Rotation",
-        "Aspose.Pdf.Facades.PdfPageEditor.PageSize"
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.AddMarginsPct",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet",
+        "Aspose.Pdf.Document.Pages"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "resize-pdf-pages-to-a3": {
-      "title": "Resize PDF Pages to A3 Size",
-      "filename": "resize-pdf-pages-to-a3.cs",
-      "description": "Shows how to change the size of all pages in a PDF to A3 using Aspose.Pdf's PdfPageEditor facade.",
+    "rotate-pdf-pages-to-landscape": {
+      "title": "Rotate PDF Pages to Landscape for Brochure Printing",
+      "filename": "rotate-pdf-pages-to-landscape.cs",
+      "description": "Shows how to rotate every page of a PDF 90° clockwise and set the page size to A4 landscape using the Aspose.Pdf.Facades.PdfPageEditor facade.",
+      "tags": [
+        "pdf",
+        "rotation",
+        "landscape",
+        "brochure",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfPageEditor.Rotation",
+        "Aspose.Pdf.Facades.PdfPageEditor.PageSize",
+        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
+        "Aspose.Pdf.Facades.PdfPageEditor.Save",
+        "Aspose.Pdf.Facades.PdfPageEditor.Close"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T09:35:09Z",
+      "status": "verified"
+    },
+    "change-pdf-page-size-to-a3": {
+      "title": "Change PDF Page Size to A3 Using PdfPageEditor",
+      "filename": "change-pdf-page-size-to-a3.cs",
+      "description": "Demonstrates how to resize all pages of an existing PDF to A3 dimensions using the Aspose.Pdf.Facades.PdfPageEditor facade.",
       "tags": [
         "pdf",
         "page-size",
         "a3",
         "aspose",
-        "facades"
+        "facade"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfPageEditor",
         "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
         "Aspose.Pdf.Facades.PdfPageEditor.PageSize",
@@ -2548,13 +2559,13 @@
         "Aspose.Pdf.Facades.PdfPageEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "set-pdf-page-zoom-preview-final": {
-      "title": "Set PDF Page Zoom for Preview and Final Output",
-      "filename": "set-pdf-page-zoom-preview-final.cs",
-      "description": "Shows how to generate two PDF versions with different zoom levels (50% preview and 100% final) using Aspose.Pdf.Facades.PdfPageEditor.",
+    "set-pdf-zoom-preview-final": {
+      "title": "Set PDF Zoom for Preview and Final Output",
+      "filename": "set-pdf-zoom-preview-final.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfPageEditor to apply different zoom levels (50% for preview, 100% for final) to a PDF and save the results as separate files.",
       "tags": [
         "pdf",
         "zoom",
@@ -2566,40 +2577,39 @@
         "Aspose.Pdf.Facades.PdfPageEditor",
         "PdfPageEditor.BindPdf",
         "PdfPageEditor.Zoom",
+        "PdfPageEditor.ApplyChanges",
         "PdfPageEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "adjust-pdf-page-properties-from-json": {
-      "title": "Adjust PDF Page Properties from JSON Configuration",
-      "filename": "adjust-pdf-page-properties-from-json.cs",
-      "description": "Demonstrates reading a JSON file and applying rotation, zoom, alignment, size, and transition settings to selected PDF pages using Aspose.Pdf's PdfPageEditor facade.",
+    "apply-page-settings-from-json": {
+      "title": "Apply Page Settings from JSON Configuration to PDFs",
+      "filename": "apply-page-settings-from-json.cs",
+      "description": "Demonstrates how to read a JSON file and programmatically adjust rotation, size, and zoom of selected PDF pages using Aspose.Pdf.",
       "tags": [
-        "pdf",
-        "page-adjustment",
-        "json",
-        "aspose",
-        "facade"
+        "page-rotation",
+        "page-size",
+        "pdf-processing",
+        "json-config",
+        "aspose-pdf"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save",
-        "Aspose.Pdf.Facades.HorizontalAlignment",
-        "Aspose.Pdf.Facades.VerticalAlignmentType",
-        "Aspose.Pdf.Facades.PageSize"
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.PageInfo",
+        "Aspose.Pdf.Rotation",
+        "Aspose.Pdf.Facades.PdfPageEditor"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
     "hybrid-content-resize-mixed-margins": {
-      "title": "Hybrid Content Resize with Mixed Percent and Unit Margins",
+      "title": "Hybrid Content Resize with Mixed Percentage and Absolute Margins",
       "filename": "hybrid-content-resize-mixed-margins.cs",
-      "description": "Shows how to create a ContentsResizeParameters object that combines percentage‑based and absolute margins, then apply it to resize specific PDF pages using Aspose.Pdf.",
+      "description": "Shows how to create a ContentsResizeParameters object that combines percentage‑based and absolute margins and apply it to all pages of a PDF using PdfFileEditor.",
       "tags": [
         "pdf",
         "resize",
@@ -2614,37 +2624,37 @@
         "Aspose.Pdf.Facades.PdfFileEditor.ResizeContents"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
     "apply-page-transitions-by-index": {
-      "title": "Apply Page Transitions Based on Page Index",
+      "title": "Apply Page Transition Effects Based on Page Index",
       "filename": "apply-page-transitions-by-index.cs",
-      "description": "Demonstrates how to set different PDF page transition effects using PdfPageEditor, selecting the transition type with a modulo‑3 pattern over the pages.",
+      "description": "Shows how to assign different transition types to each PDF page using Aspose.Pdf's PdfPageEditor, cycling through three transitions with a modulo‑3 index.",
       "tags": [
         "pdf",
         "page-transition",
         "aspose-pdf",
-        "facade",
-        "csharp"
+        "csharp",
+        "loop"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
         "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
         "Aspose.Pdf.Facades.PdfPageEditor.TransitionType",
-        "Aspose.Pdf.Facades.PdfPageEditor.BLINDH",
-        "Aspose.Pdf.Facades.PdfPageEditor.BLINDV",
-        "Aspose.Pdf.Facades.PdfPageEditor.BTWIPE"
+        "Aspose.Pdf.Facades.PdfPageEditor.TransitionDuration",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     },
-    "apply-rotation-size-zoom-to-pdf-pages": {
-      "title": "Apply Rotation, Size, and Zoom to PDF Pages",
-      "filename": "apply-rotation-size-zoom-to-pdf-pages.cs",
-      "description": "Demonstrates how to use Aspose.Pdf's PdfPageEditor facade to rotate pages, set custom page dimensions, and apply a zoom factor before saving the modified PDF.",
+    "rotate-resize-zoom-pdf-pages": {
+      "title": "Rotate, Resize, and Zoom PDF Pages with PdfPageEditor",
+      "filename": "rotate-resize-zoom-pdf-pages.cs",
+      "description": "Demonstrates how to use Aspose.Pdf's PdfPageEditor to rotate pages, set a custom page size, apply a zoom factor, and save the edited PDF.",
       "tags": [
         "pdf",
         "rotation",
@@ -2653,15 +2663,16 @@
         "facade"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfPageEditor",
-        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfPageEditor.ApplyChanges",
-        "Aspose.Pdf.Facades.PdfPageEditor.Save",
-        "Aspose.Pdf.Facades.PdfPageEditor.Close",
-        "Aspose.Pdf.PageSize"
+        "PdfPageEditor",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.ApplyChanges",
+        "PdfPageEditor.Save",
+        "PdfPageEditor.Rotation",
+        "PdfPageEditor.Zoom",
+        "PageSize"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-08T09:38:43Z",
+      "generated_at": "2026-06-15T09:35:09Z",
       "status": "verified"
     }
   }

@@ -1,21 +1,22 @@
 using System;
+using System.Globalization;
 using System.IO;
 using System.Text.Json;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
-
-class ThemeConfig
-{
-    public required string Color { get; set; }      // Hex string, e.g. "#FFAA00"
-    public required double Opacity { get; set; }    // 0.0 to 1.0
-}
 
 class Program
 {
+    // Simple class to deserialize theme configuration
+    private class ThemeConfig
+    {
+        public required string OverlayColor { get; set; }   // Hex string, e.g. "#FFAA00"
+        public double Opacity { get; set; } = 1.0;          // 0.0 – 1.0 (used for alpha channel)
+    }
+
     static void Main()
     {
         const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output.pdf";
+        const string outputPdfPath = "output_overlay.pdf";
         const string themeConfigPath = "theme.json";
 
         if (!File.Exists(inputPdfPath))
@@ -23,77 +24,84 @@ class Program
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
+
         if (!File.Exists(themeConfigPath))
         {
-            Console.Error.WriteLine($"Theme config not found: {themeConfigPath}");
+            Console.Error.WriteLine($"Theme configuration not found: {themeConfigPath}");
             return;
         }
 
         // Load theme configuration
-        ThemeConfig theme = JsonSerializer.Deserialize<ThemeConfig>(File.ReadAllText(themeConfigPath))!;
-        if (theme == null || string.IsNullOrWhiteSpace(theme.Color))
+        ThemeConfig config;
+        try
         {
-            Console.Error.WriteLine("Invalid theme configuration.");
+            string json = File.ReadAllText(themeConfigPath);
+            config = JsonSerializer.Deserialize<ThemeConfig>(json) ?? throw new InvalidDataException("Deserialized config is null.");
+            if (string.IsNullOrWhiteSpace(config.OverlayColor))
+                throw new InvalidDataException("OverlayColor is missing in theme configuration.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to read theme configuration: {ex.Message}");
             return;
         }
 
-        // Parse hex color to Aspose.Pdf.Color (RGB) and also retrieve the raw R,G,B bytes
-        var (baseColor, r, g, b) = ParseHexColor(theme.Color);
-
-        // Ensure opacity is within 0..1 and compute alpha byte
-        double opacity = Math.Max(0.0, Math.Min(1.0, theme.Opacity));
-        int alpha = (int)Math.Round(opacity * 255);
-        // Create a color that includes the alpha channel for transparency
-        Aspose.Pdf.Color overlayColor = Aspose.Pdf.Color.FromArgb(alpha, r, g, b);
-
-        // Load the source PDF
-        using (Document srcDoc = new Document(inputPdfPath))
+        // Convert hex color to Aspose.Pdf.Color (including opacity)
+        Aspose.Pdf.Color overlayColor;
+        try
         {
-            // Apply the overlay to each page of the source document
-            foreach (Page page in srcDoc.Pages)
+            overlayColor = ParseHexToColor(config.OverlayColor, config.Opacity);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Invalid color value in configuration: {ex.Message}");
+            return;
+        }
+
+        // Load the PDF, apply overlay, and save
+        using (Document doc = new Document(inputPdfPath))
+        {
+            foreach (Page page in doc.Pages)
             {
-                // Create a Graph that covers the whole page
-                Graph graph = new Graph(page.MediaBox.Width, page.MediaBox.Height);
-
-                // Create a rectangle shape that fills the page
-                var rect = new Aspose.Pdf.Drawing.Rectangle(
-                    0f,
-                    0f,
-                    (float)page.MediaBox.Width,
-                    (float)page.MediaBox.Height);
-
-                rect.GraphInfo = new GraphInfo
-                {
-                    FillColor = overlayColor,
-                    Color = overlayColor // outline (optional)
-                };
-
-                graph.Shapes.Add(rect);
-
-                // Insert the graph as the first paragraph so it appears behind existing content
-                page.Paragraphs.Insert(0, graph);
+                page.Background = overlayColor;
             }
 
-            // Save the modified PDF
-            srcDoc.Save(outputPdfPath);
+            doc.Save(outputPdfPath);
         }
 
         Console.WriteLine($"Overlay applied and saved to '{outputPdfPath}'.");
     }
 
-    // Helper: converts "#RRGGBB" or "RRGGBB" to Aspose.Pdf.Color (RGB, no alpha)
-    // Returns the Aspose.Pdf.Color together with the integer R,G,B components (0‑255)
-    static (Aspose.Pdf.Color color, int r, int g, int b) ParseHexColor(string hex)
+    /// <summary>
+    /// Parses a hex color string ("#RRGGBB" or "RRGGBB") and applies the supplied opacity (0‑1) to create an Aspose.Pdf.Color.
+    /// </summary>
+    private static Aspose.Pdf.Color ParseHexToColor(string hex, double opacity)
     {
-        string clean = hex.TrimStart('#');
-        if (clean.Length != 6)
-            throw new ArgumentException("Color must be in RRGGBB format.");
+        if (string.IsNullOrWhiteSpace(hex))
+            throw new ArgumentException("Hex color string cannot be null or empty.");
 
-        int r = Convert.ToInt32(clean.Substring(0, 2), 16);
-        int g = Convert.ToInt32(clean.Substring(2, 2), 16);
-        int b = Convert.ToInt32(clean.Substring(4, 2), 16);
-        // Aspose.Pdf.Color.FromRgb expects values in the range 0‑1
-        Aspose.Pdf.Color aspColor = Aspose.Pdf.Color.FromRgb(r / 255.0, g / 255.0, b / 255.0);
-        return (aspColor, r, g, b);
+        // Remove leading '#'
+        hex = hex.TrimStart('#');
+
+        if (hex.Length != 6 && hex.Length != 8)
+            throw new ArgumentException("Hex color must be 6 (RRGGBB) or 8 (AARRGGBB) characters long.");
+
+        // If 8 characters, the first two are alpha – we will combine with opacity parameter.
+        int a = 255;
+        int startIdx = 0;
+        if (hex.Length == 8)
+        {
+            a = int.Parse(hex.Substring(0, 2), NumberStyles.HexNumber);
+            startIdx = 2;
+        }
+
+        int r = int.Parse(hex.Substring(startIdx, 2), NumberStyles.HexNumber);
+        int g = int.Parse(hex.Substring(startIdx + 2, 2), NumberStyles.HexNumber);
+        int b = int.Parse(hex.Substring(startIdx + 4, 2), NumberStyles.HexNumber);
+
+        // Apply opacity (0‑1) to alpha channel
+        a = (int)Math.Round(a * Math.Clamp(opacity, 0.0, 1.0));
+
+        return Aspose.Pdf.Color.FromArgb(a, r, g, b);
     }
 }

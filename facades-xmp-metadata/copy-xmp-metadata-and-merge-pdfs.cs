@@ -9,8 +9,9 @@ class Program
     {
         const string sourcePdfPath = "source.pdf";   // PDF to copy XMP metadata from
         const string targetPdfPath = "target.pdf";   // PDF that will receive the metadata
-        const string outputPdfPath = "merged_output.pdf";
+        const string outputPdfPath = "merged.pdf";   // Final merged PDF
 
+        // Validate input files
         if (!File.Exists(sourcePdfPath))
         {
             Console.Error.WriteLine($"Source file not found: {sourcePdfPath}");
@@ -24,29 +25,40 @@ class Program
 
         try
         {
-            // ----- Extract XMP metadata from source PDF -----
-            byte[] xmpBytes;
+            // ---------- Extract XMP metadata from the source PDF ----------
+            byte[] xmpData;
             using (PdfXmpMetadata xmp = new PdfXmpMetadata())
             {
                 xmp.BindPdf(sourcePdfPath);
-                xmpBytes = xmp.GetXmpMetadata(); // returns the whole XMP packet as byte[]
+                xmpData = xmp.GetXmpMetadata(); // returns byte[]
             }
 
-            // ----- Load target PDF, apply XMP metadata, then merge pages -----
+            // ---------- Apply the extracted XMP metadata to the target PDF ----------
             using (Document targetDoc = new Document(targetPdfPath))
-            using (Document sourceDoc = new Document(sourcePdfPath))
             {
-                // Apply extracted XMP metadata to the target document
-                using (MemoryStream xmpStream = new MemoryStream(xmpBytes))
+                using (MemoryStream ms = new MemoryStream(xmpData))
                 {
-                    targetDoc.SetXmpMetadata(xmpStream);
+                    targetDoc.SetXmpMetadata(ms);
                 }
 
-                // Merge pages from source into target (pages are 1‑based, Add works with collections)
-                targetDoc.Pages.Add(sourceDoc.Pages);
+                // Save the modified target to a temporary file (required for Facades concatenation)
+                string tempTargetPath = Path.Combine(Path.GetTempPath(),
+                    $"temp_target_{Guid.NewGuid():N}.pdf");
+                targetDoc.Save(tempTargetPath);
 
-                // Save the merged document with the transferred metadata
-                targetDoc.Save(outputPdfPath);
+                // ---------- Merge the modified target with the source PDF ----------
+                PdfFileEditor editor = new PdfFileEditor();
+                bool success = editor.Concatenate(tempTargetPath, sourcePdfPath, outputPdfPath);
+                if (!success)
+                {
+                    Console.Error.WriteLine("Merging failed.");
+                }
+
+                // Clean up temporary file
+                if (File.Exists(tempTargetPath))
+                {
+                    File.Delete(tempTargetPath);
+                }
             }
 
             Console.WriteLine($"Merged PDF saved to '{outputPdfPath}'.");

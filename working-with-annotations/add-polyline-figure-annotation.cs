@@ -8,18 +8,18 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "polyline_annotated.pdf";
+        const string outputPath = "output_with_polyline.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the existing PDF (document lifecycle handled via using)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Choose the page where the annotation will be placed (first page in this example)
+            // Get the first page (1‑based indexing)
             Page page = doc.Pages[1];
 
             // Define the annotation rectangle (position and size on the page)
@@ -27,7 +27,6 @@ class Program
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 400, 200);
 
             // Define the polyline vertices (points are in page coordinate space)
-            // Points are defined as Aspose.Pdf.Point
             Aspose.Pdf.Point[] vertices = new Aspose.Pdf.Point[]
             {
                 new Aspose.Pdf.Point(120, 520),
@@ -41,18 +40,17 @@ class Program
             {
                 // Optional visual properties
                 Color = Aspose.Pdf.Color.Blue,          // Stroke color of the polyline
-                Opacity = 0.8,                          // Semi‑transparent
-                Contents = "Custom diagram polyline",   // Tooltip text
-                Title = "Diagram Polyline"              // Title shown in the annotation popup
+                Contents = "Custom polyline diagram",   // Tooltip text
+                Opacity = 0.8f                          // Semi‑transparent
             };
 
             // Add the annotation to the page's annotation collection
             page.Annotations.Add(polyline);
 
-            // Save the modified PDF (document lifecycle handled via using)
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PolyLine annotation added and saved to '{outputPath}'.");
+        Console.WriteLine($"Polyline annotation added and saved to '{outputPath}'.");
     }
 }

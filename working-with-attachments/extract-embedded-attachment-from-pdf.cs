@@ -6,13 +6,19 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";               // source PDF
-        const string attachmentName = "myfile.txt";       // name of the embedded file to extract
+        // Input PDF containing the attachment
+        const string pdfPath = "input.pdf";
+
+        // Name of the embedded attachment to extract
+        const string attachmentName = "example.txt";
+
+        // Directory where the extracted file will be saved
         const string outputDirectory = "ExtractedAttachments";
 
+        // Validate input PDF existence
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
@@ -21,24 +27,29 @@ class Program
 
         try
         {
-            // Load the PDF document (lifecycle: using → dispose)
+            // Load the PDF document (using statement ensures proper disposal)
             using (Document doc = new Document(pdfPath))
             {
                 // Locate the embedded file by its name
                 FileSpecification fileSpec = doc.EmbeddedFiles.FindByName(attachmentName);
-                if (fileSpec == null || fileSpec.Contents == null)
+
+                if (fileSpec == null)
                 {
-                    Console.WriteLine($"Attachment '{attachmentName}' not found in the document.");
+                    Console.WriteLine($"Attachment \"{attachmentName}\" not found in the PDF.");
                     return;
                 }
 
-                // Build the full path for the extracted file
-                string outputPath = Path.Combine(outputDirectory, attachmentName);
+                // Determine the full path for the extracted file
+                string outputPath = Path.Combine(outputDirectory,
+                                                string.IsNullOrEmpty(fileSpec.Name)
+                                                    ? attachmentName
+                                                    : fileSpec.Name);
 
-                // Save the embedded file to the target directory using the Contents stream
-                using (FileStream outStream = File.Create(outputPath))
+                // Save the embedded file to the target location using the Contents stream
+                using (Stream source = fileSpec.Contents)
+                using (FileStream destination = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
                 {
-                    fileSpec.Contents.CopyTo(outStream);
+                    source.CopyTo(destination);
                 }
 
                 Console.WriteLine($"Attachment saved to: {outputPath}");
@@ -46,7 +57,7 @@ class Program
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error extracting attachment: {ex.Message}");
         }
     }
 }

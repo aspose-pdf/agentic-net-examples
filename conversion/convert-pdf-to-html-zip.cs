@@ -3,53 +3,59 @@ using System.IO;
 using System.IO.Compression;
 using Aspose.Pdf;
 
-class Program
+class PdfToHtmlZipper
 {
     static void Main()
     {
-        // Input PDF file
-        const string inputPdfPath = "input.pdf";
+        // Input PDF file path
+        const string pdfPath = "input.pdf";
 
-        // Verify the source file exists
-        if (!File.Exists(inputPdfPath))
+        // Verify the input file exists
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {pdfPath}");
             return;
         }
 
-        // Folder that will hold the generated HTML pages and assets
-        string htmlOutputFolder = Path.Combine(Path.GetDirectoryName(inputPdfPath) ?? "", "html_output");
-        Directory.CreateDirectory(htmlOutputFolder);
+        // Directory where HTML pages and assets will be generated
+        string htmlOutputDir = Path.Combine(Path.GetDirectoryName(pdfPath) ?? "", "html_output");
+        Directory.CreateDirectory(htmlOutputDir);
 
-        // Base HTML file name (Aspose.Pdf will create additional files when SplitIntoPages is true)
-        string baseHtmlPath = Path.Combine(htmlOutputFolder, "document.html");
+        // Base HTML file name (Aspose will create additional files when SplitIntoPages = true)
+        string baseHtmlPath = Path.Combine(htmlOutputDir, "index.html");
 
-        // Configure HTML conversion options
+        // Configure HTML save options
         HtmlSaveOptions htmlOptions = new HtmlSaveOptions
         {
             // Generate one HTML file per PDF page
             SplitIntoPages = true,
 
-            // Save raster images as external PNG files referenced via SVG wrappers
-            RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsExternalPngFilesReferencedViaSvg
+            // Example: embed raster images as external PNG files referenced via SVG
+            RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsExternalPngFilesReferencedViaSvg,
+
+            // Optional: set a title for the generated HTML pages
+            Title = "Converted PDF to HTML"
         };
 
-        // Convert PDF to HTML
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF and save as HTML using the configured options
+        using (Document pdfDocument = new Document(pdfPath))
         {
-            pdfDoc.Save(baseHtmlPath, htmlOptions);
+            pdfDocument.Save(baseHtmlPath, htmlOptions);
         }
 
         // Path for the resulting ZIP archive
-        string zipPath = Path.Combine(Path.GetDirectoryName(inputPdfPath) ?? "", "html_archive.zip");
+        string zipPath = Path.Combine(Path.GetDirectoryName(pdfPath) ?? "", "html_archive.zip");
 
-        // Create ZIP archive containing all HTML pages and assets
+        // If a previous archive exists, delete it
         if (File.Exists(zipPath))
         {
             File.Delete(zipPath);
         }
-        ZipFile.CreateFromDirectory(htmlOutputFolder, zipPath, CompressionLevel.Optimal, includeBaseDirectory: false);
 
-        Console.WriteLine($"HTML pages and assets have been zipped to: {zipPath}");
+        // Create a ZIP archive containing all files from the HTML output directory
+        ZipFile.CreateFromDirectory(htmlOutputDir, zipPath, CompressionLevel.Optimal, includeBaseDirectory: false);
+
+        Console.WriteLine($"HTML conversion completed. Files are in: {htmlOutputDir}");
+        Console.WriteLine($"ZIP archive created at: {zipPath}");
     }
 }

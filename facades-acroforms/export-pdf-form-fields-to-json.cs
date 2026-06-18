@@ -1,59 +1,65 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using System.Text.Json;
+using Newtonsoft.Json;
 
-class Program
+namespace AsposePdfFormJsonExample
 {
-    static void Main()
+    // Represents a single form field exported as JSON.
+    public class FormField
     {
-        const string inputPdf = "input.pdf";
-        const string jsonPath = "formData.json";
+        public string Name { get; set; }
+        public string Value { get; set; }
+    }
 
-        if (!File.Exists(inputPdf))
+    class Program
+    {
+        static void Main()
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
-            return;
-        }
+            const string pdfPath = "input_form.pdf";
 
-        // Export all form fields to a JSON file (indented for readability)
-        using (Form form = new Form(inputPdf))
-        {
-            using (FileStream fs = new FileStream(jsonPath, FileMode.Create, FileAccess.Write))
+            if (!File.Exists(pdfPath))
             {
-                form.ExportJson(fs, indented: true);
+                Console.Error.WriteLine($"File not found: {pdfPath}");
+                return;
             }
-        }
 
-        // Verify the exported JSON structure by reading it back
-        try
-        {
-            string jsonContent = File.ReadAllText(jsonPath);
-            using (JsonDocument doc = JsonDocument.Parse(jsonContent))
+            // Export form fields to JSON using Aspose.Pdf.Facades.Form.
+            // The Form class can be instantiated directly with the PDF file path.
+            Form form = new Form(pdfPath);
+
+            // Use a memory stream to capture the JSON output.
+            using (MemoryStream jsonStream = new MemoryStream())
             {
+                // ExportJson writes the fields as indented JSON by default.
+                form.ExportJson(jsonStream, indented: true);
+
+                // Reset the stream position before reading.
+                jsonStream.Position = 0;
+
+                // Read the JSON text.
+                string jsonText;
+                using (StreamReader reader = new StreamReader(jsonStream))
+                {
+                    jsonText = reader.ReadToEnd();
+                }
+
+                // Deserialize the JSON into a strongly‑typed list of FormField objects.
+                // The JSON format produced by ExportJson is an array of objects with
+                // "Name" and "Value" properties, which matches the FormField class.
+                List<FormField> fields = JsonConvert.DeserializeObject<List<FormField>>(jsonText);
+
+                // Example processing: display each field name and its value.
                 Console.WriteLine("Exported form fields:");
-                if (doc.RootElement.ValueKind == JsonValueKind.Array)
+                foreach (FormField field in fields)
                 {
-                    foreach (JsonElement element in doc.RootElement.EnumerateArray())
-                    {
-                        string name = element.GetProperty("Name").GetString();
-                        JsonElement valueElem = element.GetProperty("Value");
-                        string value = valueElem.ValueKind == JsonValueKind.String
-                            ? valueElem.GetString()
-                            : valueElem.ToString();
-
-                        Console.WriteLine($"  {name}: {value}");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Unexpected JSON format – root element is not an array.");
+                    Console.WriteLine($"  {field.Name}: {field.Value}");
                 }
             }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error reading JSON: {ex.Message}");
+
+            // No explicit save operation is required here because we only exported data.
         }
     }
 }

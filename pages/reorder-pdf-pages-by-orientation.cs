@@ -1,13 +1,13 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "reordered.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,40 +16,38 @@ class Program
             return;
         }
 
-        // Load source PDF
-        using (Document srcDoc = new Document(inputPath))
+        // Load the source PDF
+        using (Document src = new Document(inputPath))
         {
-            // Create an empty target PDF
-            using (Document targetDoc = new Document())
+            // Separate pages into landscape and portrait collections
+            List<Page> landscapePages = new List<Page>();
+            List<Page> portraitPages = new List<Page>();
+
+            for (int i = 1; i <= src.Pages.Count; i++) // 1‑based indexing
             {
-                List<int> landscapePages = new List<int>();
-                List<int> portraitPages  = new List<int>();
+                Page page = src.Pages[i];
+                // PageInfo.IsLandscape indicates orientation
+                if (page.PageInfo != null && page.PageInfo.IsLandscape)
+                    landscapePages.Add(page);
+                else
+                    portraitPages.Add(page);
+            }
 
-                // Classify pages (1‑based indexing)
-                for (int i = 1; i <= srcDoc.Pages.Count; i++)
+            // Create a new PDF and add pages in the desired order
+            using (Document dest = new Document())
+            {
+                foreach (Page p in landscapePages)
                 {
-                    Page page = srcDoc.Pages[i];
-                    if (page.PageInfo.IsLandscape)
-                        landscapePages.Add(i);
-                    else
-                        portraitPages.Add(i);
+                    dest.Pages.Add(p);
                 }
 
-                // Append landscape pages first
-                foreach (int idx in landscapePages)
+                foreach (Page p in portraitPages)
                 {
-                    // Add moves the page from srcDoc to targetDoc
-                    targetDoc.Pages.Add(srcDoc.Pages[idx]);
+                    dest.Pages.Add(p);
                 }
 
-                // Then append portrait pages
-                foreach (int idx in portraitPages)
-                {
-                    targetDoc.Pages.Add(srcDoc.Pages[idx]);
-                }
-
-                // Save the reordered PDF
-                targetDoc.Save(outputPath);
+                // Save the reordered document
+                dest.Save(outputPath);
             }
         }
 

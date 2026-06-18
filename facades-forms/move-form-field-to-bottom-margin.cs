@@ -1,7 +1,8 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Forms;
+using Aspose.Pdf.Facades; // Facades namespace included as requested
 
 class Program
 {
@@ -11,44 +12,53 @@ class Program
         const string outputPath = "output.pdf";
         const string fieldName = "FooterNote";
 
+        // Desired margins (points). Adjust as needed.
+        const float bottomMargin = 20f;   // distance from bottom edge
+        const float leftMargin = 50f;     // distance from left edge
+        const float rightMargin = 50f;    // distance from right edge
+        const float fieldHeight = 15f;    // approximate height of the field
+
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the source document to obtain page dimensions.
-        using (Document srcDoc = new Document(inputPath))
+        // Load the PDF document inside a using block for proper disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Initialize FormEditor with the loaded Document instance.
-            using (FormEditor formEditor = new FormEditor(srcDoc))
+            // Retrieve the form field by name. The indexer returns a WidgetAnnotation, so cast to Field.
+            Field field = doc.Form[fieldName] as Field;
+            if (field == null)
             {
-                // Iterate through all pages (1‑based indexing).
-                for (int pageNum = 1; pageNum <= srcDoc.Pages.Count; pageNum++)
-                {
-                    Page page = srcDoc.Pages[pageNum];
-
-                    // Retrieve page size (points; 1 inch = 72 points).
-                    float pageWidth = (float)page.PageInfo.Width;
-                    float pageHeight = (float)page.PageInfo.Height;
-
-                    // Define desired field size.
-                    const float fieldWidth = 120f;
-                    const float fieldHeight = 20f; // retained for possible future use
-
-                    // Calculate coordinates: centered horizontally, 20 points above bottom edge.
-                    float left = (pageWidth - fieldWidth) / 2f;
-                    float bottom = 20f; // distance from bottom edge
-
-                    // Move (copy) the field to the new location on the same page.
-                    formEditor.CopyInnerField(fieldName, fieldName, pageNum, left, bottom);
-                }
-
-                // Persist changes to the output PDF.
-                formEditor.Save(outputPath);
+                Console.Error.WriteLine($"Field '{fieldName}' not found in the document.");
+                return;
             }
+
+            // Iterate through all pages (1‑based indexing)
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            {
+                Page page = doc.Pages[pageNum];
+                // PageInfo.Width is double – cast to float for our calculations.
+                float pageWidth = (float)page.PageInfo.Width;
+
+                // Calculate rectangle positioned in the bottom margin
+                float llx = leftMargin;                         // lower‑left X
+                float lly = bottomMargin;                       // lower‑left Y
+                float urx = pageWidth - rightMargin;            // upper‑right X
+                float ury = bottomMargin + fieldHeight;         // upper‑right Y
+
+                // Fully qualified rectangle to avoid ambiguity (Aspose.Pdf.Rectangle expects double values).
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
+
+                // Set the field appearance on the current page
+                doc.Form.AddFieldAppearance(field, pageNum, rect);
+            }
+
+            // Save the modified document
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Field \"{fieldName}\" moved to bottom margin of each page. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Field '{fieldName}' moved to bottom margin and saved as '{outputPath}'.");
     }
 }

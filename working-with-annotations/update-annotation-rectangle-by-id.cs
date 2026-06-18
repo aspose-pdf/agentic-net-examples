@@ -7,9 +7,15 @@ class Program
 {
     static void Main()
     {
+        // Input PDF, output PDF, target annotation Id and new rectangle coordinates
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string annotationId = "MyAnnotationId"; // the Name of the annotation to modify
+        const string outputPath = "modified.pdf";
+        const string annotationId = "MyAnnotationId"; // the Name of the annotation
+        // New rectangle: lower‑left x/y and upper‑right x/y
+        const double llx = 100;
+        const double lly = 500;
+        const double urx = 300;
+        const double ury = 700;
 
         if (!File.Exists(inputPath))
         {
@@ -17,42 +23,37 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document (using block ensures proper disposal)
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPath))
+            // Iterate through all pages to locate the annotation by its Name (Id)
+            Annotation targetAnnotation = null;
+            for (int i = 1; i <= doc.Pages.Count; i++) // 1‑based indexing
             {
-                // Iterate through all pages (1‑based indexing)
-                for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+                Page page = doc.Pages[i];
+                // FindByName returns null if not found on this page
+                Annotation ann = page.Annotations.FindByName(annotationId);
+                if (ann != null)
                 {
-                    Page page = doc.Pages[pageNum];
-
-                    // Try to find the annotation by its Name (used as Id)
-                    Annotation ann = page.Annotations.FindByName(annotationId);
-                    if (ann != null)
-                    {
-                        // Create a new rectangle with desired coordinates
-                        // (llx, lly, urx, ury) in user space units
-                        Aspose.Pdf.Rectangle newRect = new Aspose.Pdf.Rectangle(100, 500, 300, 600);
-
-                        // Update the annotation rectangle
-                        ann.Rect = newRect;
-
-                        // If you need to consider page rotation when setting the rectangle,
-                        // you can also use the GetRectangle method with true/false as needed.
-                        // Example: var actualRect = ann.GetRectangle(true);
-                    }
+                    targetAnnotation = ann;
+                    break;
                 }
-
-                // Save the modified PDF
-                doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Annotation '{annotationId}' rectangle updated and saved to '{outputPath}'.");
+            if (targetAnnotation == null)
+            {
+                Console.Error.WriteLine($"Annotation with Id '{annotationId}' not found.");
+                return;
+            }
+
+            // Update the rectangle of the found annotation.
+            // Fully qualify Rectangle to avoid ambiguity with System.Drawing.
+            targetAnnotation.Rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
+
+            // Save the modified PDF.
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Annotation '{annotationId}' rectangle updated and saved to '{outputPath}'.");
     }
 }

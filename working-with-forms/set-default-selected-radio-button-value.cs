@@ -7,39 +7,40 @@ class Program
 {
     static void Main()
     {
-        // Paths
-        const string outputPath = "radio_form.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output.pdf";
 
-        // Create a new PDF document
-        using (Document doc = new Document())
+        if (!File.Exists(inputPdf))
         {
-            // Add a page to host the radio button field
-            Page page = doc.Pages.Add();
-
-            // Define rectangles for each option (position and size)
-            Aspose.Pdf.Rectangle rectCash   = new Aspose.Pdf.Rectangle(100, 700, 120, 720);
-            Aspose.Pdf.Rectangle rectCredit = new Aspose.Pdf.Rectangle(100, 660, 120, 680);
-            Aspose.Pdf.Rectangle rectCheck  = new Aspose.Pdf.Rectangle(100, 620, 120, 640);
-
-            // Create a radio button field on the page (page‑aware constructor)
-            RadioButtonField radio = new RadioButtonField(page);
-            radio.PartialName = "PaymentMethod";
-
-            // Add the options (the first option is created by AddOption as well)
-            radio.AddOption("Cash",   rectCash);
-            radio.AddOption("Credit", rectCredit);
-            radio.AddOption("Check",  rectCheck);
-
-            // Set the default selected value to "Credit"
-            radio.Value = "Credit"; // matches the export value of the option
-
-            // Add the radio button field to the document's form collection
-            doc.Form.Add(radio);
-
-            // Save the PDF
-            doc.Save(outputPath);
+            Console.Error.WriteLine($"File not found: {inputPdf}");
+            return;
         }
 
-        Console.WriteLine($"PDF with radio button saved to '{outputPath}'.");
+        // Load the PDF document
+        using (Document doc = new Document(inputPdf))
+        {
+            // Access the form fields collection
+            Form form = doc.Form;
+
+            // Retrieve the radio button field by its full name
+            RadioButtonField paymentMethod = form["PaymentMethod"] as RadioButtonField;
+            if (paymentMethod == null)
+            {
+                Console.Error.WriteLine("Radio button field 'PaymentMethod' not found.");
+                return;
+            }
+
+            // Set the default selected value to the option named "Credit"
+            // The Value property accepts the export value (option name) directly.
+            paymentMethod.Value = "Credit";
+
+            // Alternatively, you could set the Selected index if you know it:
+            // paymentMethod.Selected = 2; // example index (1‑based)
+
+            // Save the modified PDF
+            doc.Save(outputPdf);
+        }
+
+        Console.WriteLine($"PDF saved with default payment method set to 'Credit' at '{outputPdf}'.");
     }
 }

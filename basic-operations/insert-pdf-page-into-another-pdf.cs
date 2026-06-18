@@ -1,51 +1,63 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // Core Aspose.Pdf namespace
 
 class Program
 {
     static void Main()
     {
-        const string sourcePath = "source.pdf";   // PDF containing the page to insert
-        const string targetPath = "target.pdf";   // PDF into which the page will be inserted
-        const string outputPath = "merged.pdf";   // Resulting PDF
-        const int insertPosition = 2;             // 1‑based position in target where the page will be placed
+        // Paths to the PDFs
+        const string targetPdfPath = "target.pdf";   // PDF into which the page will be inserted
+        const string sourcePdfPath = "source.pdf";   // PDF containing the page to insert
+        const string outputPdfPath = "merged.pdf";   // Resulting PDF
 
-        if (!File.Exists(sourcePath))
+        // Validate input files
+        if (!File.Exists(targetPdfPath))
         {
-            Console.Error.WriteLine($"Source file not found: {sourcePath}");
+            Console.Error.WriteLine($"Target file not found: {targetPdfPath}");
             return;
         }
-        if (!File.Exists(targetPath))
+        if (!File.Exists(sourcePdfPath))
         {
-            Console.Error.WriteLine($"Target file not found: {targetPath}");
+            Console.Error.WriteLine($"Source file not found: {sourcePdfPath}");
             return;
         }
+
+        // 1‑based page numbers (Aspose.Pdf uses 1‑based indexing)
+        int sourcePageNumber = 1;   // page from source PDF to insert
+        int insertPosition   = 2;   // position in target PDF where the page will be placed
 
         try
         {
             // Load both documents inside using blocks for deterministic disposal
-            using (Document sourceDoc = new Document(sourcePath))
-            using (Document targetDoc = new Document(targetPath))
+            using (Document targetDoc = new Document(targetPdfPath))
+            using (Document sourceDoc = new Document(sourcePdfPath))
             {
-                // Validate the insert position (must be between 1 and Pages.Count + 1)
-                int maxPosition = targetDoc.Pages.Count + 1;
-                if (insertPosition < 1 || insertPosition > maxPosition)
+                // Ensure the requested pages exist
+                if (sourcePageNumber < 1 || sourcePageNumber > sourceDoc.Pages.Count)
                 {
-                    Console.Error.WriteLine($"Insert position {insertPosition} is out of range. Valid range: 1‑{maxPosition}.");
+                    Console.Error.WriteLine("Source page number out of range.");
+                    return;
+                }
+                if (insertPosition < 1 || insertPosition > targetDoc.Pages.Count + 1)
+                {
+                    Console.Error.WriteLine("Insert position out of range.");
                     return;
                 }
 
-                // Directly insert the page from the source document.
-                // This moves the page from sourceDoc to targetDoc; sourceDoc can be disposed afterwards.
-                Page pageToInsert = sourceDoc.Pages[1];
+                // Retrieve the page from the source document
+                Page pageToInsert = sourceDoc.Pages[sourcePageNumber];
+
+                // Insert the page into the target document at the specified position
+                // This overload inserts an existing Page object.
                 targetDoc.Pages.Insert(insertPosition, pageToInsert);
 
-                // Save the modified target document
-                targetDoc.Save(outputPath);
+                // Save the modified document
+                targetDoc.Save(outputPdfPath);
             }
 
-            Console.WriteLine($"Page inserted successfully. Output saved to '{outputPath}'.");
+            Console.WriteLine($"Page {sourcePageNumber} from '{sourcePdfPath}' inserted at position {insertPosition} in '{targetPdfPath}'.");
+            Console.WriteLine($"Result saved as '{outputPdfPath}'.");
         }
         catch (Exception ex)
         {

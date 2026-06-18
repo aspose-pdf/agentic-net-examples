@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string wordPath = "sample.docx";   // input Word document
-        const string outputPdf = "portfolio.pdf"; // output PDF Portfolio
+        const string wordPath   = "sample.docx";      // Word document to embed
+        const string outputPath = "portfolio.pdf";    // Resulting PDF portfolio
 
         if (!File.Exists(wordPath))
         {
@@ -15,27 +15,23 @@ class Program
             return;
         }
 
-        // Create a new PDF document
+        // Create a new PDF document (empty portfolio)
         using (Document pdfDoc = new Document())
         {
-            // Ensure the document has a collection (portfolio) initialized
-            if (pdfDoc.Collection == null)
-                pdfDoc.Collection = new Collection();
+            // Adding a blank page avoids edge‑case issues
+            pdfDoc.Pages.Add();
 
-            // Create a FileSpecification for the Word document
-            var fileSpec = new FileSpecification(Path.GetFileName(wordPath), "Embedded Word document")
-            {
-                // Load the file bytes into the specification
-                Contents = new MemoryStream(File.ReadAllBytes(wordPath))
-            };
+            // Create a FileSpecification for the Word document using the recommended pattern
+            var fileSpec = new FileSpecification(Path.GetFileName(wordPath), "Embedded Word document");
+            fileSpec.Contents = new MemoryStream(File.ReadAllBytes(wordPath));
 
-            // Add the file specification to the PDF portfolio collection
-            pdfDoc.Collection.Add(fileSpec);
+            // Add the file to the PDF's embedded files collection (portfolio)
+            pdfDoc.EmbeddedFiles.Add(fileSpec);
 
-            // Save the PDF Portfolio
-            pdfDoc.Save(outputPdf);
+            // Save the PDF portfolio
+            pdfDoc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF Portfolio created: {outputPdf}");
+        Console.WriteLine($"PDF portfolio created at '{outputPath}'.");
     }
 }

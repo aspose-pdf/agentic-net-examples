@@ -6,33 +6,26 @@ class Program
 {
     static void Main()
     {
-        // Use the directory of the executing assembly as the base data directory.
-        // This avoids the placeholder "YOUR_DATA_DIRECTORY" that caused the runtime error.
-        string dataDir = AppDomain.CurrentDomain.BaseDirectory;
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pptx";
 
-        // Input PDF file path.
-        string pdfFile = Path.Combine(dataDir, "input.pdf");
-
-        // Verify that the source PDF exists before attempting conversion.
-        if (!File.Exists(pdfFile))
+        // Verify that the source PDF exists.
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Error: PDF file not found at '{pdfFile}'.");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Output PPTX file path.
-        string pptxFile = Path.Combine(dataDir, "output.pptx");
-
-        // Load the PDF document and convert it to PPTX using default options.
-        using (Document pdfDocument = new Document(pdfFile))
+        // Load the PDF document inside a using block for deterministic disposal.
+        using (Document pdfDoc = new Document(inputPath))
         {
             // Initialize default PPTX save options.
             PptxSaveOptions saveOptions = new PptxSaveOptions();
 
-            // Save the document as PPTX.
-            pdfDocument.Save(pptxFile, saveOptions);
+            // Save the document as PPTX using the explicit save options.
+            pdfDoc.Save(outputPath, saveOptions);
         }
 
-        Console.WriteLine($"PDF successfully converted to PPTX: {pptxFile}");
+        Console.WriteLine($"PDF successfully converted to PPTX: {outputPath}");
     }
 }

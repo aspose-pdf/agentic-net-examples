@@ -3,33 +3,39 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class Program
+class RemoveAttachmentsExample
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output_no_attachments.pdf";
 
-        // Verify that the source file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // PdfContentEditor implements IDisposable, so wrap it in a using block
-        using (PdfContentEditor editor = new PdfContentEditor())
+        try
         {
-            // Load the PDF document into the editor
-            editor.BindPdf(inputPath);
+            // PdfContentEditor implements IDisposable via SaveableFacade, so use a using block.
+            using (PdfContentEditor editor = new PdfContentEditor())
+            {
+                // Bind the source PDF file.
+                editor.BindPdf(inputPath);
 
-            // Remove all embedded attachments from the document
-            editor.DeleteAttachments();
+                // Delete all embedded attachments.
+                editor.DeleteAttachments();
 
-            // Persist the changes to a new file
-            editor.Save(outputPath);
+                // Save the modified PDF.
+                editor.Save(outputPath);
+            }
+
+            Console.WriteLine($"Attachments removed. Output saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"All attachments removed. Output saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

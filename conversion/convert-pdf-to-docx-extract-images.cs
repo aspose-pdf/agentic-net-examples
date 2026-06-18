@@ -1,14 +1,14 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Core Aspose.Pdf namespace (Document, Page, XImage, DocSaveOptions, etc.)
 
-class PdfToDocxAndImageExtractor
+class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";   // source PDF
-        const string outputDocxPath = "output.docx"; // converted DOCX
-        const string imagesDir = "ExtractedImages"; // folder for images
+        const string inputPdfPath   = "input.pdf";          // source PDF
+        const string outputDocxPath = "output.docx";        // converted DOCX
+        const string imagesOutputDir = "ExtractedImages";   // folder for images
 
         // Verify input file exists
         if (!File.Exists(inputPdfPath))
@@ -18,52 +18,66 @@ class PdfToDocxAndImageExtractor
         }
 
         // Ensure the images output directory exists
-        Directory.CreateDirectory(imagesDir);
+        Directory.CreateDirectory(imagesOutputDir);
 
-        // Load the PDF inside a using block (deterministic disposal)
-        using (Document pdfDoc = new Document(inputPdfPath))
+        try
         {
-            // ---------- Convert PDF to DOCX ----------
-            var docSaveOptions = new DocSaveOptions
+            // Load the PDF document (using statement ensures proper disposal)
+            using (Document pdfDocument = new Document(inputPdfPath))
             {
-                // Export as DOCX (correct enum value – capital X)
-                Format = DocSaveOptions.DocFormat.DocX
-                // The "Mode" property was removed in recent versions; the default flow
-                // recognition mode provides the best editability.
-            };
-
-            // Save the document as DOCX – must pass SaveOptions for non‑PDF formats
-            pdfDoc.Save(outputDocxPath, docSaveOptions);
-            Console.WriteLine($"PDF converted to DOCX: {outputDocxPath}");
-
-            // ---------- Extract embedded images ----------
-            int imageCounter = 1; // simple sequential naming
-
-            // Pages are 1‑based in Aspose.Pdf
-            for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
-            {
-                Page page = pdfDoc.Pages[pageIndex];
-
-                // XImageCollection is not a dictionary; iterate directly
-                foreach (XImage img in page.Resources.Images)
+                // ---------- Convert PDF to DOCX ----------
+                // Configure DOCX save options
+                DocSaveOptions docSaveOptions = new DocSaveOptions
                 {
-                    // Build a unique file name for each extracted image
-                    string imagePath = Path.Combine(
-                        imagesDir,
-                        $"image_{imageCounter:D4}.png"); // PNG is a safe default
+                    // Choose DOCX format
+                    Format = DocSaveOptions.DocFormat.DocX,
+                    // Use Flow recognition for better editability (optional)
+                    Mode = DocSaveOptions.RecognitionMode.Flow,
+                    // Enable bullet recognition (optional)
+                    RecognizeBullets = true
+                };
 
-                    // Save the image to the file system via a stream
-                    using (FileStream fs = new FileStream(imagePath, FileMode.Create, FileAccess.Write))
+                // Save the document as DOCX
+                pdfDocument.Save(outputDocxPath, docSaveOptions);
+                Console.WriteLine($"PDF converted to DOCX: {outputDocxPath}");
+
+                // ---------- Extract embedded images ----------
+                int imageCounter = 1; // global counter for unique filenames
+
+                // Pages are 1‑based in Aspose.Pdf
+                for (int pageIndex = 1; pageIndex <= pdfDocument.Pages.Count; pageIndex++)
+                {
+                    Page page = pdfDocument.Pages[pageIndex];
+
+                    // Iterate over all images defined in the page resources
+                    foreach (XImage img in page.Resources.Images)
                     {
-                        img.Save(fs);
-                    }
+                        // Build a unique file name preserving the original image format if possible
+                        string extension = Path.GetExtension(img.Name);
+                        if (string.IsNullOrEmpty(extension))
+                        {
+                            // Default to .png when extension is unknown
+                            extension = ".png";
+                        }
 
-                    Console.WriteLine($"Extracted image #{imageCounter} to: {imagePath}");
-                    imageCounter++;
+                        string imageFileName = $"image_{pageIndex}_{imageCounter}{extension}";
+                        string imagePath = Path.Combine(imagesOutputDir, imageFileName);
+
+                        // XImage.Save overload expects a Stream, so write via FileStream
+                        using (FileStream fs = new FileStream(imagePath, FileMode.Create, FileAccess.Write))
+                        {
+                            img.Save(fs);
+                        }
+
+                        Console.WriteLine($"Extracted image: {imagePath}");
+                        imageCounter++;
+                    }
                 }
             }
         }
-
-        Console.WriteLine("Processing completed.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

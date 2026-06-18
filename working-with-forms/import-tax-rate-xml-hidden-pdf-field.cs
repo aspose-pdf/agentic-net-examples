@@ -13,51 +13,71 @@ class Program
         const string outputPath = "output.pdf";
 
         // Verify input files exist
-        if (!File.Exists(pdfPath) || !File.Exists(xmlPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine("Required input files are missing.");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(pdfPath))
+        if (!File.Exists(xmlPath))
         {
-            // The Form object is always instantiated for a Document; no need to create it manually.
-
-            // Load and parse the XML file containing tax rates
-            XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.Load(xmlPath);
-
-            // Example XML structure:
-            // <TaxRates>
-            //     <Rate>0.07</Rate>
-            // </TaxRates>
-            XmlNode rateNode = xmlDoc.SelectSingleNode("//TaxRates/Rate");
-            string taxRate = rateNode?.InnerText ?? "0";
-
-            // Attempt to locate an existing hidden field named "TaxRateHidden"
-            var existingField = doc.Form["TaxRateHidden"] as TextBoxField;
-            if (existingField != null)
-            {
-                // Update the field's value with the tax rate from XML
-                existingField.Value = taxRate;
-            }
-            else
-            {
-                // Create a new hidden text box field on the first page.
-                // A rectangle with zero size makes the field invisible in the layout.
-                var hiddenField = new TextBoxField(doc.Pages[1], new Aspose.Pdf.Rectangle(0, 0, 0, 0))
-                {
-                    PartialName = "TaxRateHidden",
-                    Value = taxRate
-                };
-                doc.Form.Add(hiddenField);
-            }
-
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.Error.WriteLine($"XML not found: {xmlPath}");
+            return;
         }
 
-        Console.WriteLine($"PDF with imported tax rate saved to '{outputPath}'.");
+        // Load tax rate from the XML file
+        string taxRate = string.Empty;
+        try
+        {
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(xmlPath);
+            // Expected XML format: <TaxRates><Rate>0.07</Rate></TaxRates>
+            XmlNode rateNode = xmlDoc.SelectSingleNode("//Rate");
+            if (rateNode != null)
+                taxRate = rateNode.InnerText.Trim();
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error reading XML: {ex.Message}");
+            return;
+        }
+
+        // Load PDF, set (or create) hidden field, and save
+        try
+        {
+            using (Document doc = new Document(pdfPath))
+            {
+                // Try to find an existing field named "TaxRate"
+                if (doc.Form != null && doc.Form["TaxRate"] != null)
+                {
+                    // The indexer returns a Field; cast to TextBoxField to access the Value property
+                    if (doc.Form["TaxRate"] is TextBoxField existingField)
+                    {
+                        existingField.Value = taxRate;
+                    }
+                }
+                else
+                {
+                    // Create a new hidden text box field on the first page
+                    Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(0, 0, 0, 0);
+                    TextBoxField hiddenField = new TextBoxField(doc.Pages[1], rect)
+                    {
+                        PartialName = "TaxRate",
+                        Value = taxRate
+                        // No Export property in current API; using a zero‑size rectangle makes the field effectively hidden
+                    };
+                    doc.Form.Add(hiddenField);
+                }
+
+                // Save the updated PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"PDF saved with tax rate '{taxRate}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
+        }
     }
 }

@@ -15,10 +15,10 @@ class Program
             return;
         }
 
-        // Load the PDF using FormEditor
+        // Initialize FormEditor and bind the PDF file
         using (FormEditor editor = new FormEditor())
         {
-            editor.BindPdf(inputPath); // initialize the facade with the PDF file
+            editor.BindPdf(inputPath);
 
             // Access the underlying Document object
             Document doc = editor.Document;
@@ -27,7 +27,7 @@ class Program
             Form form = new Form(doc);
             string[] fieldNames = form.FieldNames;
 
-            Console.WriteLine("Form field names:");
+            // Display each field name on the console
             foreach (string name in fieldNames)
             {
                 Console.WriteLine(name);

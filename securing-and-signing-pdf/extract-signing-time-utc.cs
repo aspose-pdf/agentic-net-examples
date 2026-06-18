@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq; // Needed for Count() extension method
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -7,59 +8,54 @@ class Program
 {
     static void Main()
     {
-        // Path to the signed PDF document
-        const string inputPdf = "signed_document.pdf";
+        const string inputPath = "signed.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document (using block ensures proper disposal)
+        using (Document doc = new Document(inputPath))
         {
-            // Ensure the document contains at least one signature field
-            if (doc.Form == null || doc.Form.Fields == null)
+            // Ensure the document contains a form with fields
+            if (doc.Form == null || doc.Form.Fields == null || doc.Form.Fields.Count() == 0)
             {
                 Console.WriteLine("No form fields found in the document.");
                 return;
             }
 
-            SignatureField sigField = null;
-            // Iterate over form fields and pick the first SignatureField
+            bool signatureFound = false;
+            // Iterate over all fields and process those that are signature fields
             foreach (Field field in doc.Form.Fields)
             {
-                if (field is SignatureField sField)
+                if (field is SignatureField sigField)
                 {
-                    sigField = sField;
-                    break; // use the first signature field found
+                    // Retrieve the underlying Signature object (may be null if not signed yet)
+                    Signature signature = sigField.Signature;
+                    if (signature == null)
+                    {
+                        Console.WriteLine($"Signature field '{sigField.PartialName}' is present but not signed.");
+                        continue;
+                    }
+
+                    // The Date property holds the signing time (usually in local time)
+                    DateTime signingTimeLocal = signature.Date;
+                    // Convert the signing time to UTC
+                    DateTime signingTimeUtc = signingTimeLocal.ToUniversalTime();
+
+                    Console.WriteLine($"Signature field: {sigField.PartialName}");
+                    Console.WriteLine($"Signing time (local): {signingTimeLocal:O}");
+                    Console.WriteLine($"Signing time (UTC)  : {signingTimeUtc:O}");
+                    signatureFound = true;
                 }
             }
 
-            if (sigField == null)
+            if (!signatureFound)
             {
                 Console.WriteLine("No digital signatures found in the document.");
-                return;
             }
-
-            // The Signature object associated with the field
-            Signature signature = sigField.Signature;
-            if (signature == null)
-            {
-                Console.WriteLine("Signature data is missing for the field.");
-                return;
-            }
-
-            // Extract the signing time (local time as stored in the PDF)
-            DateTime signingTimeLocal = signature.Date;
-
-            // Convert the signing time to UTC
-            DateTime signingTimeUtc = signingTimeLocal.ToUniversalTime();
-
-            // Output the result
-            Console.WriteLine($"Signing time (local): {signingTimeLocal:O}");
-            Console.WriteLine($"Signing time (UTC)  : {signingTimeUtc:O}");
         }
     }
 }

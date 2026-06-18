@@ -1,69 +1,53 @@
 using System;
 using System.IO;
 using System.Globalization;
-using System.Drawing; // for Rectangle
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Forms;
-using Aspose.Pdf; // for SignatureCustomAppearance
+using System.Drawing;
+using Aspose.Pdf.Facades;          // PdfFileSignature facade
+using Aspose.Pdf.Forms;           // PKCS7 signature and SignatureCustomAppearance
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "signed_french.pdf";
-        const string certificate = "certificate.pfx";
-        const string certPassword = "password";
+        const string inputPdf   = "input.pdf";
+        const string outputPdf  = "signed_french.pdf";
+        const string certPath   = "certificate.pfx";
+        const string certPass   = "password";
 
-        if (!File.Exists(inputPdf))
+        // Verify required files exist
+        if (!File.Exists(inputPdf) || !File.Exists(certPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(certificate))
-        {
-            Console.Error.WriteLine($"Certificate file not found: {certificate}");
+            Console.Error.WriteLine("Input PDF or certificate file not found.");
             return;
         }
 
-        using (PdfFileSignature pdfSign = new PdfFileSignature())
-        {
-            // Bind the source PDF
-            pdfSign.BindPdf(inputPdf);
+        // Initialize the signature facade and bind the source PDF
+        PdfFileSignature pdfSign = new PdfFileSignature();
+        pdfSign.BindPdf(inputPdf);
 
-            // Load the signing certificate
-            pdfSign.SetCertificate(certificate, certPassword);
+        // OPTIONAL: set a graphic image for the signature appearance
+        // pdfSign.SignatureAppearance = "signature_image.png";
 
-            // Create PKCS#1 signature object
-            PKCS1 pkcs1 = new PKCS1(certificate, certPassword)
-            {
-                Reason = "Document approved",
-                ContactInfo = "contact@example.com",
-                Location = "Paris"
-            };
+        // Create a PKCS7 signature object with certificate (PKCS7 is the correct class for digital signatures)
+        PKCS7 signature = new PKCS7(certPath, certPass);
+        signature.Reason      = "Document signé";          // Reason text
+        signature.ContactInfo = "contact@example.com";    // Contact information (use ContactInfo, not Contact)
+        signature.Location    = "Paris";                  // Location text
 
-            // Set French locale for the signature appearance caption
-            pkcs1.CustomAppearance = new SignatureCustomAppearance
-            {
-                Culture = new CultureInfo("fr-FR")
-            };
+        // Configure custom appearance to use French locale
+        SignatureCustomAppearance customAppearance = new SignatureCustomAppearance();
+        customAppearance.Culture = new CultureInfo("fr-FR"); // French (France)
+        signature.CustomAppearance = customAppearance;       // Apply to signature
 
-            // The Sign overload expects System.Drawing.Rectangle, not Aspose.Pdf.Rectangle
-            System.Drawing.Rectangle rect = new System.Drawing.Rectangle(100, 100, 200, 100);
+        // Define the visible rectangle for the signature (System.Drawing.Rectangle)
+        Rectangle rect = new Rectangle(100, 100, 200, 100);
 
-            // Sign page 1 with visible signature using the overload that takes positional arguments
-            pdfSign.Sign(
-                1,                     // page number (1‑based)
-                "Document approved", // reason
-                "contact@example.com", // contact info
-                "Paris",               // location
-                true,                   // visible signature flag
-                rect,                   // signature rectangle
-                pkcs1);                 // PKCS#1 signature object
+        // Sign page 1 (1‑based indexing), make it visible, using the custom signature
+        pdfSign.Sign(page: 1, visible: true, annotRect: rect, sig: signature);
 
-            // Save the signed PDF
-            pdfSign.Save(outputPdf);
-        }
+        // Save the signed PDF to the output file
+        pdfSign.Save(outputPdf);
+        pdfSign.Close();
 
         Console.WriteLine($"Signed PDF saved to '{outputPdf}'.");
     }

@@ -6,32 +6,34 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputDocxPath = "output.docx";
+        const string inputPdf  = "input.pdf";
+        const string outputDocx = "output.docx";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document pdfDocument = new Document(inputPdfPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDocument = new Document(inputPdf))
         {
             // Configure DOCX save options with enhanced recognition for tables/graphics
-            var saveOptions = new DocSaveOptions
+            DocSaveOptions saveOptions = new DocSaveOptions
             {
-                // Output format – use the correct enum value (DocX)
+                // Output format DOCX
                 Format = DocSaveOptions.DocFormat.DocX,
-                // Optional tweaks for better results
-                RecognizeBullets = true,
-                RelativeHorizontalProximity = 2.5f
+                // Use the enhanced flow mode that supports table recognition
+                Mode = DocSaveOptions.RecognitionMode.EnhancedFlow
+                // Additional options can be set here if needed, e.g.:
+                // RecognizeBullets = true,
+                // RelativeHorizontalProximity = 2.5f
             };
 
             // Save the PDF as DOCX using the specified options
-            pdfDocument.Save(outputDocxPath, saveOptions);
+            pdfDocument.Save(outputDocx, saveOptions);
         }
 
-        Console.WriteLine($"Conversion completed: '{outputDocxPath}'");
+        Console.WriteLine($"Conversion completed: '{outputDocx}'");
     }
 }

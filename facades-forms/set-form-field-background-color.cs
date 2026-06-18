@@ -1,39 +1,41 @@
 using System;
-using System.Drawing;
-using Aspose.Pdf.Facades;
+using System.IO;
+using Aspose.Pdf;               // for Document
+using Aspose.Pdf.Facades;       // for FormEditor, FormFieldFacade
+using Aspose.Pdf.Annotations;   // for AnnotationFlags
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
+        const string inputPdf = "input.pdf";
         const string outputPdf = "output.pdf";
 
-        // Ensure the input file exists
-        if (!System.IO.File.Exists(inputPdf))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Create a FormEditor, bind the PDF, set the background color for the "Status" field,
-        // apply the changes, and save the result.
-        using (FormEditor editor = new FormEditor())
+        // Load the PDF document first – FormEditor expects a Document instance
+        using (Document pdfDoc = new Document(inputPdf))
+        using (FormEditor editor = new FormEditor(pdfDoc))
         {
-            // Load the PDF document into the editor
-            editor.BindPdf(inputPdf);
-
-            // Configure visual appearance via FormFieldFacade
+            // Define visual attributes for the field via a facade
             editor.Facade = new FormFieldFacade();
-            editor.Facade.BackgroundColor = Color.LightGreen; // light green background
+            // Fully qualify the Color type to avoid ambiguity with Aspose.Pdf.Color
+            editor.Facade.BackgroundColor = System.Drawing.Color.LightGreen;
 
-            // Apply the facade settings to the specific field named "Status"
+            // Apply the visual changes to the field named "Status"
             editor.DecorateField("Status");
+
+            // No annotation flags should be changed – pass 0 (no flags)
+            editor.SetFieldAppearance("Status", (AnnotationFlags)0);
 
             // Save the modified PDF
             editor.Save(outputPdf);
         }
 
-        Console.WriteLine($"Field \"Status\" background set to light green. Saved to '{outputPdf}'.");
+        Console.WriteLine($"Field 'Status' background set to light green. Saved as {outputPdf}");
     }
 }

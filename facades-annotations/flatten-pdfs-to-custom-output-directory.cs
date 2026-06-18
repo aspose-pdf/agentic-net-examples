@@ -1,56 +1,50 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                 // Core PDF API
-using Aspose.Pdf.Facades;        // Facades namespace (required by task)
+using Aspose.Pdf; // Core API for PDF manipulation
 
 class Program
 {
     static void Main(string[] args)
     {
-        // Input directory containing PDFs to be flattened
-        const string inputDirectory = "InputPdfs";
+        // Allow the input and output directories to be supplied via command‑line arguments.
+        // If not provided, fall back to sensible defaults.
+        const string defaultInputDirectory = @"C:\InputPdfs";
+        const string defaultOutputDirectory = @"C:\FlattenedPdfs";
 
-        // Determine the output directory – use the first command‑line argument if supplied,
-        // otherwise fall back to the default "FlattenedPdfs".
-        string outputDirectory = args.Length > 0 && !string.IsNullOrWhiteSpace(args[0])
-                                 ? args[0]
-                                 : "FlattenedPdfs";
+        string inputDirectory = args.Length > 0 && !string.IsNullOrWhiteSpace(args[0])
+            ? args[0]
+            : defaultInputDirectory;
+        string outputDirectory = args.Length > 1 && !string.IsNullOrWhiteSpace(args[1])
+            ? args[1]
+            : defaultOutputDirectory;
 
-        // Verify that the input directory exists
+        // Ensure the input directory exists before proceeding.
         if (!Directory.Exists(inputDirectory))
         {
-            Console.WriteLine($"Input directory '{inputDirectory}' does not exist. Nothing to process.");
+            Console.Error.WriteLine($"Input directory does not exist: {inputDirectory}");
             return;
         }
 
-        // Ensure the output directory exists
+        // Ensure the output directory exists (creates it if necessary).
         Directory.CreateDirectory(outputDirectory);
 
-        // Optional: instantiate a PdfFileEditor (facade) to satisfy the requirement.
-        // It is not needed for flattening but demonstrates usage of the Facades API.
-        PdfFileEditor pdfEditor = new PdfFileEditor();
-
-        // Process each PDF file in the input directory
+        // Process each PDF file in the input directory.
         foreach (string inputFilePath in Directory.GetFiles(inputDirectory, "*.pdf"))
         {
-            // Load the PDF document
+            // Determine the output file path (same file name, different folder).
+            string outputFilePath = Path.Combine(outputDirectory, Path.GetFileName(inputFilePath));
+
+            // Load, flatten, and save the PDF using Aspose.Pdf core API.
             using (Document pdfDocument = new Document(inputFilePath))
             {
-                // Remove all form fields and replace them with their appearance values
+                // Remove form fields and annotations, placing their values directly on the page.
                 pdfDocument.Flatten();
 
-                // Build the output file path preserving the original file name
-                string fileName   = System.IO.Path.GetFileName(inputFilePath);
-                string outputPath = System.IO.Path.Combine(outputDirectory, fileName);
-
-                // Save the flattened PDF to the custom output directory
-                pdfDocument.Save(outputPath);
-
-                Console.WriteLine($"Flattened PDF saved to: {outputPath}");
+                // Save the flattened PDF to the custom output directory.
+                pdfDocument.Save(outputFilePath);
             }
-        }
 
-        // PdfFileEditor does not implement IDisposable, so no explicit Dispose call is required.
-        // If you need to release resources, simply let the object go out of scope.
+            Console.WriteLine($"Flattened PDF saved to: {outputFilePath}");
+        }
     }
 }

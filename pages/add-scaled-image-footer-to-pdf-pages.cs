@@ -6,14 +6,13 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
         const string footerImagePath = "footer.png";
-        const double scaleFactor = 0.5; // Scale the image to 50% of page width
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
@@ -23,35 +22,30 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: wrap in using)
+        // Load the PDF document (lifecycle rule: using for disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing)
+            // Add the footer image to each page
             foreach (Page page in doc.Pages)
             {
-                // Get page dimensions
-                double pageWidth  = page.Rect.Width;
-                double pageHeight = page.Rect.Height;
+                // Desired footer height (points)
+                double footerHeight = 50;
 
-                // Compute desired image width (scaled) and a proportional height.
-                // Since we don't have the original image dimensions without loading it,
-                // we set the image width to the scaled page width and a fixed footer height.
-                double footerHeight = 50; // points; adjust as needed
+                // Page width (points)
+                double pageWidth = page.Rect.Width;
 
-                // Define rectangle positioned at the bottom of the page
-                // (origin is lower‑left corner)
+                // Define rectangle at the bottom of the page
                 Aspose.Pdf.Rectangle footerRect = new Aspose.Pdf.Rectangle(
-                    0,                     // llx
-                    0,                     // lly (bottom of page)
-                    pageWidth,             // urx (full page width)
-                    footerHeight);         // ury
+                    0,               // left (llx)
+                    0,               // bottom (lly)
+                    pageWidth,       // right (urx)
+                    footerHeight);   // top (ury)
 
-                // Add the image to the page within the rectangle.
-                // The AddImage method scales the image to fit the rectangle while preserving aspect ratio.
+                // Add the image; it will be scaled proportionally to fit the rectangle
                 page.AddImage(footerImagePath, footerRect);
             }
 
-            // Save the modified PDF (lifecycle rule: use Save inside using)
+            // Save the modified PDF (lifecycle rule: using ensures proper disposal)
             doc.Save(outputPath);
         }
 

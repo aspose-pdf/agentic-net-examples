@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string tempPath = "temp_inserted.pdf";
+        const string tempPath = "temp_reordered.pdf";
         const string outputPath = "reordered.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,20 +17,32 @@ class Program
             return;
         }
 
-        // Get the total number of pages (1‑based indexing)
-        int lastPage;
+        // Get total number of pages (1‑based indexing)
+        int pageCount;
         using (Document doc = new Document(inputPath))
         {
-            lastPage = doc.Pages.Count;
+            pageCount = doc.Pages.Count;
         }
 
-        // Insert the last page at the beginning, creating an intermediate file
+        // Insert the last page at the beginning of the document
         PdfFileEditor editor = new PdfFileEditor();
-        editor.Insert(inputPath, 1, inputPath, lastPage, lastPage, tempPath);
+        bool insertOk = editor.Insert(inputPath, 0, inputPath, pageCount, pageCount, tempPath);
+        if (!insertOk)
+        {
+            Console.Error.WriteLine("Failed to insert the last page at the beginning.");
+            return;
+        }
 
-        // Delete the original last page (now positioned after the inserted page)
-        int[] pagesToDelete = new int[] { lastPage + 1 };
-        editor.Delete(tempPath, pagesToDelete, outputPath);
+        // After insertion the original last page is now at position pageCount + 1
+        bool deleteOk = editor.Delete(tempPath, new int[] { pageCount + 1 }, outputPath);
+        if (!deleteOk)
+        {
+            Console.Error.WriteLine("Failed to delete the original last page.");
+            return;
+        }
+
+        // Remove the temporary file
+        try { File.Delete(tempPath); } catch { }
 
         Console.WriteLine($"Reordered PDF saved to '{outputPath}'.");
     }

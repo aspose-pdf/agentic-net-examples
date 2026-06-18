@@ -9,37 +9,35 @@ public static class PdfEncryptionHelper
     /// and returns the encrypted PDF as a byte array.
     /// </summary>
     /// <param name="pdfBytes">The original PDF content.</param>
-    /// <param name="userPassword">Password required to open the PDF.</param>
-    /// <param name="ownerPassword">Owner password (can be the same as userPassword).</param>
+    /// <param name="userPassword">The password required to open the encrypted PDF.</param>
     /// <returns>Encrypted PDF bytes.</returns>
-    public static byte[] EncryptPdf(byte[] pdfBytes, string userPassword, string ownerPassword)
+    public static byte[] EncryptPdf(byte[] pdfBytes, string userPassword)
     {
         // Load the PDF from the input byte array using a MemoryStream.
         using (MemoryStream inputStream = new MemoryStream(pdfBytes))
-        using (Document document = new Document(inputStream))
+        using (Document doc = new Document(inputStream))
         {
-            // Define desired permissions (example: allow printing only).
-            Permissions permissions = Permissions.PrintDocument;
+            // Define desired permissions (example: allow printing and content extraction).
+            Permissions permissions = Permissions.PrintDocument | Permissions.ExtractContent;
 
-            // Encrypt the document with AES-256 algorithm.
-            document.Encrypt(userPassword, ownerPassword, permissions, CryptoAlgorithm.AESx256);
+            // Encrypt the document. Owner password is left empty (can be set to a different value if needed).
+            doc.Encrypt(userPassword, string.Empty, permissions, CryptoAlgorithm.AESx256);
 
-            // Save the encrypted PDF into a MemoryStream and return its byte array.
+            // Save the encrypted PDF to an output MemoryStream.
             using (MemoryStream outputStream = new MemoryStream())
             {
-                document.Save(outputStream);
+                doc.Save(outputStream);
                 return outputStream.ToArray();
             }
         }
     }
 }
 
-// Entry point required for a console‑type project.
+// Added entry point to satisfy the compiler for an executable project.
 public class Program
 {
     public static void Main(string[] args)
     {
-        // No operation needed – the class library functionality is accessed via PdfEncryptionHelper.
-        // This method exists solely to satisfy the compiler's requirement for a static Main entry point.
+        // No operation – the library functionality is exposed via PdfEncryptionHelper.
     }
 }

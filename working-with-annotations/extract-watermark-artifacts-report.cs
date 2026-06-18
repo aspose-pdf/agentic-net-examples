@@ -1,70 +1,56 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Drawing; // Needed for Point type
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string reportPath   = "watermark_report.txt";
+        const string inputPath = "input.pdf";
+        const string reportPath = "watermark_report.txt";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // List to hold report lines
-        List<string> reportLines = new List<string>();
-        reportLines.Add("Watermark Artifacts Report");
-        reportLines.Add($"Source PDF: {inputPdfPath}");
-        reportLines.Add($"Generated on: {DateTime.Now}");
-        reportLines.Add(string.Empty);
-        reportLines.Add("Page\tPosition (X,Y)\tOpacity");
-
-        // Open the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdfPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Create or overwrite the report file
+            using (StreamWriter writer = new StreamWriter(reportPath, false))
             {
-                Page page = doc.Pages[pageIndex];
+                writer.WriteLine("Watermark Artifacts Report");
+                writer.WriteLine($"Source PDF: {inputPath}");
+                writer.WriteLine($"Generated on: {DateTime.Now}");
+                writer.WriteLine();
 
-                // Iterate through all artifacts on the page
-                foreach (Artifact artifact in page.Artifacts)
+                int pageNumber = 1;
+                foreach (Page page in doc.Pages)
                 {
-                    // Filter only WatermarkArtifact instances
-                    if (artifact is WatermarkArtifact watermark)
+                    // Iterate over all artifacts on the current page
+                    foreach (Artifact artifact in page.Artifacts)
                     {
-                        // Position may be null if not explicitly set; handle gracefully
-                        string positionText = "N/A";
-                        if (watermark.Position != null)
+                        // Filter only WatermarkArtifact instances
+                        if (artifact is WatermarkArtifact watermark)
                         {
-                            // Position is an Aspose.Pdf.Point (X, Y)
-                            positionText = $"{watermark.Position.X},{watermark.Position.Y}";
+                            // Retrieve position (may be null if not explicitly set)
+                            var pos = watermark.Position; // Position is a Point
+                            string posInfo = pos != null
+                                ? $"X={pos.X}, Y={pos.Y}"
+                                : "Not set";
+
+                            // Opacity is a value between 0 and 1
+                            writer.WriteLine($"Page {pageNumber}: Opacity={watermark.Opacity}, Position={posInfo}");
                         }
-
-                        // Opacity is a double in the range 0..1
-                        string opacityText = watermark.Opacity.ToString("0.##");
-
-                        reportLines.Add($"{pageIndex}\t{positionText}\t{opacityText}");
                     }
+                    pageNumber++;
                 }
             }
         }
 
-        // Write the report to a text file
-        try
-        {
-            File.WriteAllLines(reportPath, reportLines);
-            Console.WriteLine($"Watermark report generated: {reportPath}");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Failed to write report: {ex.Message}");
-        }
+        Console.WriteLine($"Watermark report saved to '{reportPath}'.");
     }
 }

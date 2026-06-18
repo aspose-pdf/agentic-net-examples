@@ -1,61 +1,71 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
-    // Simple record representing a bookmark entry from the database
-    class BookmarkRecord
-    {
-        public string Title { get; set; }
-        public int PageNumber { get; set; }
-    }
-
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "output_with_bookmarks.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output_bookmarked.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Simulate fetching bookmark data from a database.
-        // Replace this with actual DB access code as needed.
-        List<BookmarkRecord> records = GetBookmarkRecordsFromDatabase();
+        // Simulated database query result.
+        // Replace this stub with actual DB access code (e.g., ADO.NET, Dapper, EF).
+        List<(string Title, int PageNumber)> dbBookmarks = GetBookmarksFromDatabase();
 
-        // Use the PdfBookmarkEditor facade to add bookmarks.
-        using (Aspose.Pdf.Facades.PdfBookmarkEditor editor = new Aspose.Pdf.Facades.PdfBookmarkEditor())
+        // Bind the PDF and import bookmarks.
+        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
         {
-            // Bind the existing PDF file.
-            editor.BindPdf(inputPdfPath);
+            editor.BindPdf(inputPdf);
 
-            // Create a bookmark for each record.
-            foreach (BookmarkRecord rec in records)
+            // Optional: remove existing bookmarks before adding new ones.
+            // editor.DeleteBookmarks();
+
+            foreach (var (title, page) in dbBookmarks)
             {
-                // The method creates a simple "GoTo" bookmark pointing to the specified page.
-                editor.CreateBookmarkOfPage(rec.Title, rec.PageNumber);
+                // Aspose.Pdf uses 1‑based page indexing; validate page number.
+                if (page < 1)
+                {
+                    Console.WriteLine($"Skipping invalid page number {page} for title \"{title}\"");
+                    continue;
+                }
+
+                // Create a Bookmark instance for each record.
+                Bookmark bm = new Bookmark
+                {
+                    Title = title,
+                    PageNumber = page,
+                    Action = "GoTo" // Navigate to the specified page.
+                };
+
+                // Add the bookmark to the document.
+                editor.CreateBookmarks(bm);
             }
 
-            // Save the modified PDF with the new bookmarks.
-            editor.Save(outputPdfPath);
+            // Save the modified PDF.
+            editor.Save(outputPdf);
         }
 
-        Console.WriteLine($"Bookmarks imported successfully. Output saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Bookmarks imported and saved to '{outputPdf}'.");
     }
 
-    // Placeholder for actual database retrieval logic.
-    static List<BookmarkRecord> GetBookmarkRecordsFromDatabase()
+    // Placeholder method – replace with real data access logic.
+    static List<(string Title, int PageNumber)> GetBookmarksFromDatabase()
     {
-        // Example static data; replace with real query results.
-        return new List<BookmarkRecord>
+        // Example static data.
+        return new List<(string, int)>
         {
-            new BookmarkRecord { Title = "Chapter 1", PageNumber = 1 },
-            new BookmarkRecord { Title = "Chapter 2", PageNumber = 5 },
-            new BookmarkRecord { Title = "Appendix",   PageNumber = 12 }
+            ("Chapter 1", 1),
+            ("Section 2.1", 5),
+            ("Appendix", 12)
         };
     }
 }

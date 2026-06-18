@@ -7,34 +7,31 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file
         const string inputPath = "input.pdf";
-        // Output PDF file with applied vertical alignment
         const string outputPath = "aligned_output.pdf";
-
-        // Pages to which the vertical alignment will be applied (1‑based indexing)
-        int[] targetPages = new int[] { 1, 2, 3 }; // adjust as needed
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the source document and edit its pages using PdfPageEditor
-        using (Document doc = new Document(inputPath))
-        using (PdfPageEditor editor = new PdfPageEditor(doc))
+        // Initialize the page editor and bind the source PDF
+        using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // Specify the pages to be processed
-            editor.ProcessPages = targetPages;
+            editor.BindPdf(inputPath);
 
-            // Apply top vertical alignment to the original content on the result pages
-            editor.VerticalAlignmentType = VerticalAlignment.Top;
+            // Specify which pages to modify (example: pages 1, 2, and 3)
+            editor.ProcessPages = new int[] { 1, 2, 3 };
 
-            // Apply the changes to the selected pages
+            // Align the original content to the top of the result pages
+            // The VerticalAlignment enum resides in the Aspose.Pdf namespace, not Facades.
+            editor.VerticalAlignmentType = Aspose.Pdf.VerticalAlignment.Top;
+
+            // Apply the alignment changes
             editor.ApplyChanges();
 
-            // Save the edited document
+            // Save the modified PDF
             editor.Save(outputPath);
         }
 

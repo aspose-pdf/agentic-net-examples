@@ -1,47 +1,47 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_even_duration.pdf";
-        const int duration = 5; // seconds for even pages
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+        const int    evenPageDurationSeconds = 5; // duration for even‑numbered pages
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Use PdfPageEditor to modify page display duration
-        using (PdfPageEditor editor = new PdfPageEditor())
+        // Load the PDF document (lifecycle rule: use Document constructor)
+        using (Document doc = new Document(inputPath))
         {
-            // Bind the source PDF
-            editor.BindPdf(inputPath);
+            // Create a PdfPageEditor facade bound to the loaded document
+            PdfPageEditor editor = new PdfPageEditor(doc);
 
-            // Total number of pages in the document
-            int totalPages = editor.GetPages();
+            // Collect all even‑numbered page indices (1‑based indexing)
+            List<int> evenPages = new List<int>();
+            for (int i = 2; i <= doc.Pages.Count; i += 2)
+                evenPages.Add(i);
 
-            // Apply duration only to even‑numbered pages
-            for (int pageNum = 2; pageNum <= totalPages; pageNum += 2)
-            {
-                // Specify which page to edit – ProcessPages expects an int[]
-                editor.ProcessPages = new int[] { pageNum };
+            // Specify which pages the editor should affect
+            editor.ProcessPages = evenPages.ToArray();
 
-                // Set the desired display duration (in seconds)
-                editor.DisplayDuration = duration;
+            // Set the display duration (in seconds) for the selected pages
+            editor.DisplayDuration = evenPageDurationSeconds;
 
-                // Apply the change to the specified page
-                editor.ApplyChanges();
-            }
+            // Apply the changes to the document
+            editor.ApplyChanges();
 
-            // Save the modified PDF
-            editor.Save(outputPath);
+            // Save the modified PDF (lifecycle rule: use Document.Save)
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with even‑page durations to '{outputPath}'.");
+        Console.WriteLine($"Even‑page durations set and saved to '{outputPath}'.");
     }
 }

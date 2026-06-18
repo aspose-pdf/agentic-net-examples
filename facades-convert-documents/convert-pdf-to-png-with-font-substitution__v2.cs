@@ -1,59 +1,69 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 using Aspose.Pdf.Devices;
-using Aspose.Pdf.Text;
 
-class Program
+class PdfToPngConverter
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputDir = "PngImages";
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "PngPages";
+        const string defaultFont = "Arial"; // fallback font for missing fonts
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
         // Ensure output directory exists
-        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(outputFolder);
 
-        // Register font substitution: replace missing Helvetica with Times New Roman
-        FontRepository.Substitutions.Add(new SimpleFontSubstitution("Helvetica", "Times New Roman"));
-
-        // Load the PDF document (wrapped in using for proper disposal)
-        using (Document doc = new Document(inputPdf))
+        // Step 1: Load the source PDF
+        using (Document srcDoc = new Document(inputPdfPath))
         {
-            // Set up rendering options (optional: enable font hinting for better quality)
-            RenderingOptions renderOpts = new RenderingOptions
+            // Step 2: Save a temporary PDF with font substitution enabled
+            // PdfSaveOptions.DefaultFontName is used for missing fonts
+            PdfSaveOptions saveOpts = new PdfSaveOptions
             {
-                UseFontHinting = true
+                DefaultFontName = defaultFont
             };
 
-            // Define resolution for PNG output (e.g., 300 DPI)
-            Resolution resolution = new Resolution(300);
+            string tempPdfPath = Path.Combine(outputFolder, "temp_substituted.pdf");
+            srcDoc.Save(tempPdfPath, saveOpts);
 
-            // Create a PNG device with the specified resolution and rendering options
-            PngDevice pngDevice = new PngDevice(resolution)
+            // Step 3: Load the temporary PDF into PdfConverter
+            using (PdfConverter converter = new PdfConverter())
             {
-                RenderingOptions = renderOpts
-            };
+                // Bind the PDF file (the one with substituted fonts)
+                converter.BindPdf(tempPdfPath);
 
-            // Iterate over all pages (1‑based indexing)
-            for (int pageNumber = 1; pageNumber <= doc.Pages.Count; pageNumber++)
-            {
-                string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
+                // Set resolution using the Resolution object (DPI)
+                converter.Resolution = new Resolution(150);
 
-                // Save each page as a PNG image
-                using (FileStream imageStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                // Prepare for conversion
+                converter.DoConvert();
+
+                int pageNumber = 1;
+                while (converter.HasNextImage())
                 {
-                    pngDevice.Process(doc.Pages[pageNumber], imageStream);
+                    string outFile = Path.Combine(outputFolder, $"page_{pageNumber}.png");
+                    // Save the next page; format is inferred from the file extension
+                    converter.GetNextImage(outFile);
+                    Console.WriteLine($"Saved page {pageNumber} → {outFile}");
+                    pageNumber++;
                 }
 
-                Console.WriteLine($"Saved page {pageNumber} as PNG → '{outputPath}'");
+                // Release resources used by the converter
+                converter.Close();
             }
+
+            // Clean up the temporary PDF
+            try { File.Delete(tempPdfPath); } catch { /* ignore cleanup errors */ }
         }
+
+        Console.WriteLine("PDF to PNG conversion completed.");
     }
 }

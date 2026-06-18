@@ -1,9 +1,7 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
@@ -14,63 +12,55 @@ class Program
         // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a page to the document
+            // Add a page
             Page page = doc.Pages.Add();
 
-            // -------------------------------------------------
-            // 1. Create a checkbox that will control visibility
-            // -------------------------------------------------
-            // Position: (50, 750) lower‑left, (70, 770) upper‑right
-            Aspose.Pdf.Rectangle checkboxRect = new Aspose.Pdf.Rectangle(50, 750, 70, 770);
-            CheckboxField showSectionChk = new CheckboxField(page, checkboxRect)
+            // -----------------------------------------------------------------
+            // 1. Add a checkbox that will control the visibility of a section
+            // -----------------------------------------------------------------
+            // Position: left=100, bottom=700, right=120, top=720
+            var checkboxRect = new Aspose.Pdf.Rectangle(100, 700, 120, 720);
+            var checkBox = new CheckboxField(page, checkboxRect)
             {
-                Name = "showSection",          // field name used in JavaScript
-                PartialName = "showSection",
+                PartialName = "showDetails",   // field name used in JavaScript
                 ExportValue = "Yes",           // value when checked
-                Checked = false                // initially unchecked
+                Color = Aspose.Pdf.Color.Blue
             };
+            // Border must be set after the field instance exists (cannot reference the variable inside its own initializer)
+            checkBox.Border = new Border(checkBox) { Width = 1 };
+            doc.Form.Add(checkBox);
 
-            // JavaScript to toggle the visibility of the conditional field
-            // The target field is named "conditionalText"
-            string toggleJs = @"
-if (event.target.checked) {
-    this.getField('conditionalText').display = display.visible;
-} else {
-    this.getField('conditionalText').display = display.hidden;
-}";
-            showSectionChk.OnActivated = new JavascriptAction(toggleJs);
-
-            // Add the checkbox to the form
-            doc.Form.Add(showSectionChk);
-
-            // -------------------------------------------------
-            // 2. Create a text field that appears conditionally
-            // -------------------------------------------------
-            // Position: (50, 700) lower‑left, (300, 730) upper‑right
-            Aspose.Pdf.Rectangle textRect = new Aspose.Pdf.Rectangle(50, 700, 300, 730);
-            TextBoxField conditionalText = new TextBoxField(page, textRect)
+            // -----------------------------------------------------------------
+            // 2. Add a text field that will be shown/hidden based on the checkbox
+            // -----------------------------------------------------------------
+            // Position: left=100, bottom=650, right=300, top=680
+            var textRect = new Aspose.Pdf.Rectangle(100, 650, 300, 680);
+            var detailsField = new TextBoxField(page, textRect)
             {
-                Name = "conditionalText",
-                PartialName = "conditionalText",
-                Contents = "Enter additional information here..."
-                // No direct Display property used – visibility will be controlled via JavaScript
+                PartialName = "details",
+                Color = Aspose.Pdf.Color.LightGray
             };
+            detailsField.Border = new Border(detailsField) { Width = 1 };
+            // Initially hide the field (set the Hidden flag). The Flags property expects an AnnotationFlags enum, not an int.
+            detailsField.Flags = AnnotationFlags.Hidden;
+            doc.Form.Add(detailsField);
 
-            // Add the text field to the form
-            doc.Form.Add(conditionalText);
+            // -----------------------------------------------------------------
+            // 3. Attach JavaScript to the checkbox to toggle visibility
+            // -----------------------------------------------------------------
+            string js = @"
+if (event.target.value == 'Yes') {
+    this.getField('details').display = display.visible;
+} else {
+    this.getField('details').display = display.hidden;
+}";
+            // Use a valid action property. OnCalculate is invoked when the field value changes.
+            checkBox.Actions.OnCalculate = new JavascriptAction(js);
 
-            // -------------------------------------------------
-            // 3. Hide the conditional field on document open (initial state)
-            // -------------------------------------------------
-            string initJs = "this.getField('conditionalText').display = display.hidden;";
-            page.Actions.OnOpen = new JavascriptAction(initJs);
-
-            // -------------------------------------------------
-            // 4. Save the PDF
-            // -------------------------------------------------
+            // Save the PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with conditional section saved to '{outputPath}'.");
+        Console.WriteLine($"PDF form with conditional section saved to '{outputPath}'.");
     }
 }

@@ -8,72 +8,59 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // source PDF containing popup annotation
-        const string outputPdf = "popup_extracted.pdf"; // PDF that will contain the extracted popup text
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "popup_extracted.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the source document (lifecycle rule: wrap in using)
-        using (Document srcDoc = new Document(inputPdf))
+        // Load the source PDF
+        using (Document srcDoc = new Document(inputPdfPath))
         {
-            // Variable to hold the first found popup annotation (if any)
-            PopupAnnotation popup = null;
-
             // Iterate through all pages (1‑based indexing)
             for (int pageIdx = 1; pageIdx <= srcDoc.Pages.Count; pageIdx++)
             {
                 Page page = srcDoc.Pages[pageIdx];
 
-                // Iterate through annotations on the page (1‑based indexing)
+                // Iterate through annotations on the page
                 for (int annIdx = 1; annIdx <= page.Annotations.Count; annIdx++)
                 {
                     Annotation ann = page.Annotations[annIdx];
 
-                    // Check whether the annotation is a PopupAnnotation
-                    if (ann is PopupAnnotation pa)
+                    // Check if the annotation is a PopupAnnotation
+                    if (ann is PopupAnnotation popup)
                     {
-                        popup = pa;
-                        break; // stop searching after the first popup is found
+                        // Retrieve the popup's text content
+                        string popupText = popup.Contents ?? string.Empty;
+
+                        // Create a new PDF to hold the popup content
+                        using (Document newDoc = new Document())
+                        {
+                            // Add a blank page
+                            Page newPage = newDoc.Pages.Add();
+
+                            // Add the popup text as a TextFragment
+                            TextFragment tf = new TextFragment(popupText)
+                            {
+                                // Position the text near the top-left of the page
+                                Position = new Position(50, 800)
+                            };
+                            newPage.Paragraphs.Add(tf);
+
+                            // Save the new PDF
+                            newDoc.Save(outputPdfPath);
+                        }
+
+                        Console.WriteLine($"Popup annotation extracted and saved to '{outputPdfPath}'.");
+                        return; // Assuming only one popup is needed
                     }
                 }
-
-                if (popup != null) break;
             }
 
-            if (popup == null)
-            {
-                Console.WriteLine("No popup annotation found in the document.");
-                return;
-            }
-
-            // Create a new PDF document to hold the extracted popup content
-            using (Document outDoc = new Document())
-            {
-                // Add a blank page
-                Page outPage = outDoc.Pages.Add();
-
-                // Prepare the text to be saved – use the popup's Contents property
-                string popupText = popup.Contents ?? string.Empty;
-
-                // Create a TextFragment with the popup text
-                TextFragment tf = new TextFragment(popupText)
-                {
-                    // Optional formatting
-                    TextState = { FontSize = 12, Font = FontRepository.FindFont("Helvetica") }
-                };
-
-                // Add the text fragment to the page's paragraphs collection
-                outPage.Paragraphs.Add(tf);
-
-                // Save the new PDF (lifecycle rule: use Document.Save)
-                outDoc.Save(outputPdf);
-            }
-
-            Console.WriteLine($"Popup annotation extracted and saved to '{outputPdf}'.");
+            Console.WriteLine("No PopupAnnotation found in the document.");
         }
     }
 }

@@ -1,39 +1,42 @@
 using System;
 using System.IO;
+using System.Xml;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using System.Xml;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputXml = "xfa_data.xml";
+        const string inputPdfPath  = "input.pdf";   // PDF containing XFA form
+        const string outputXmlPath = "xfa_data.xml"; // Destination XML file
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Verify that the PDF contains an XFA form
-            if (doc.Form.HasXfa)
-            {
-                // Retrieve the XFA data package as an XmlDocument
-                XmlDocument xfaXml = doc.Form.XFA.XDP;
+            // Access the form object
+            Form pdfForm = pdfDoc.Form;
 
-                // Save the XML representation to a file
-                xfaXml.Save(outputXml);
-                Console.WriteLine($"XFA data saved to '{outputXml}'.");
-            }
-            else
+            // Verify that the document actually contains an XFA form
+            if (!pdfForm.HasXfa)
             {
                 Console.WriteLine("The PDF does not contain an XFA form.");
+                return;
             }
+
+            // Retrieve the XFA data package (XDP) as an XmlDocument
+            XmlDocument xfaXml = pdfForm.XFA.XDP;
+
+            // Save the XML to the specified file
+            xfaXml.Save(outputXmlPath);
+
+            Console.WriteLine($"XFA data extracted and saved to '{outputXmlPath}'.");
         }
     }
 }

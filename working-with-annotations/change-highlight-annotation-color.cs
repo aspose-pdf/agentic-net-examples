@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_custom_highlight.pdf";
+        const string outputPath = "highlight_color_changed.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,7 +16,7 @@ class Program
             return;
         }
 
-        // Load the PDF document (using statement ensures proper disposal)
+        // Load the PDF document (using the standard load constructor)
         using (Document doc = new Document(inputPath))
         {
             // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
@@ -24,7 +24,7 @@ class Program
             {
                 Page page = doc.Pages[i];
 
-                // Iterate through annotations on the page
+                // Iterate through all annotations on the page
                 for (int j = 1; j <= page.Annotations.Count; j++)
                 {
                     Annotation ann = page.Annotations[j];
@@ -32,22 +32,23 @@ class Program
                     // Process only HighlightAnnotation instances
                     if (ann is HighlightAnnotation highlight)
                     {
-                        // Retrieve the appearance dictionary (read‑only property)
-                        // The appearance streams are automatically regenerated when the
-                        // annotation's visual properties change, so we modify the color.
-                        // Custom shade: a light orange (RGB 255,200,100)
-                        highlight.Color = Aspose.Pdf.Color.FromRgb(1.0, 0.78, 0.39);
+                        // Retrieve the appearance dictionary (read‑only, for inspection only)
+                        var appearanceDict = highlight.Appearance;
+                        // (The appearance stream can be inspected via appearanceDict if needed)
 
-                        // Force regeneration of the appearance stream (optional)
-                        // Setting the color is sufficient; the library updates the stream.
+                        // Replace the annotation color with a custom shade (e.g., a light orange)
+                        highlight.Color = Aspose.Pdf.Color.FromRgb(1.0, 0.6, 0.2); // RGB values are 0‑1
+
+                        // Optionally force regeneration of the appearance stream
+                        // (Setting the color updates the normal appearance automatically)
                     }
                 }
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (standard save, no SaveOptions needed for PDF output)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

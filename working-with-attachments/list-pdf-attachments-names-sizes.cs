@@ -14,10 +14,8 @@ class Program
             return;
         }
 
-        // Load the PDF document (using rule for disposal)
         using (Document doc = new Document(pdfPath))
         {
-            // Access the embedded files collection (attachments)
             EmbeddedFileCollection attachments = doc.EmbeddedFiles;
 
             if (attachments == null || attachments.Count == 0)
@@ -26,19 +24,35 @@ class Program
                 return;
             }
 
-            // Iterate over the attachment keys and display name and size
-            foreach (string key in attachments.Keys)
+            Console.WriteLine("Attachments found:");
+
+            // EmbeddedFileCollection is 1‑based, iterate by index
+            for (int i = 1; i <= attachments.Count; i++)
             {
-                // Retrieve the file specification for the current key
-                FileSpecification fileSpec = attachments.FindByName(key);
+                FileSpecification spec = attachments[i];
+                string name = spec.Name ?? $"Attachment_{i}";
+                long size = 0;
 
-                // Size in bytes – use Params.Size (Data property does not exist)
-                long size = fileSpec?.Params?.Size ?? 0;
+                // Preferred way: use Params.Size (int, not nullable)
+                if (spec.Params != null)
+                {
+                    size = spec.Params.Size;
+                }
+                // Fallback: read the Contents stream to determine size
+                else if (spec.Contents != null)
+                {
+                    // Ensure the stream is at the beginning
+                    if (spec.Contents.CanSeek)
+                        spec.Contents.Position = 0;
 
-                // Use the specification's Name if available, otherwise fall back to the key
-                string name = fileSpec?.Name ?? key;
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        spec.Contents.CopyTo(ms);
+                        size = ms.Length;
+                    }
+                }
 
-                Console.WriteLine($"Attachment: {name}, Size: {size} bytes");
+                Console.WriteLine($"- Name: {name}, Size: {size} bytes");
             }
         }
     }

@@ -1,66 +1,41 @@
 using System;
-using System.Runtime.InteropServices;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text;   // required for TextFragment, TextState, Position
 
 class Program
 {
     static void Main()
     {
-        // Create a new PDF document
-        using (Document doc = new Document())
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+
+        if (!File.Exists(inputPath))
         {
-            // Add a blank page
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Create a text fragment with the desired content
-            TextFragment fragment = new TextFragment("Hello, Aspose.Pdf!");
+        // Load the existing PDF document
+        using (Document doc = new Document(inputPath))
+        {
+            // Create a TextFragment with the desired text
+            TextFragment fragment = new TextFragment("Background highlighted text");
 
-            // Set the background color of the text via TextState
+            // Set the background color via TextState before adding to the page
             fragment.TextState.BackgroundColor = Aspose.Pdf.Color.Yellow;
 
-            // Optionally set other text properties (font, size, foreground color)
-            fragment.TextState.Font = FontRepository.FindFont("Helvetica");
-            fragment.TextState.FontSize = 14;
-            fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+            // Optionally set the position on the page (coordinates in points)
+            fragment.Position = new Position(100, 700); // X=100, Y=700
 
-            // Add the text fragment to the page
+            // Add the fragment to the first page
+            Page page = doc.Pages[1];
             page.Paragraphs.Add(fragment);
 
-            // Save the PDF – guard against missing GDI+ (libgdiplus) on non‑Windows platforms
-            string outputPath = "output.pdf";
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                doc.Save(outputPath);
-                Console.WriteLine($"PDF saved to '{outputPath}'.");
-            }
-            else
-            {
-                try
-                {
-                    doc.Save(outputPath);
-                    Console.WriteLine($"PDF saved to '{outputPath}'. (non‑Windows platform, GDI+ may be required for some features)");
-                }
-                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
-                {
-                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. " +
-                                      "The PDF was created in memory but could not be saved to disk.");
-                }
-            }
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine("PDF creation process completed.");
-    }
-
-    // Helper that walks the inner‑exception chain looking for a DllNotFoundException
-    private static bool ContainsDllNotFound(Exception? ex)
-    {
-        while (ex != null)
-        {
-            if (ex is DllNotFoundException)
-                return true;
-            ex = ex.InnerException;
-        }
-        return false;
+        Console.WriteLine($"PDF saved with background-colored text to '{outputPath}'.");
     }
 }

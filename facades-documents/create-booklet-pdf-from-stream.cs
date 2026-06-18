@@ -2,45 +2,43 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-namespace AsposePdfApi
+public static class BookletCreator
 {
-    public static class BookletCreator
+    /// <summary>
+    /// Creates a booklet PDF from the provided input PDF stream.
+    /// </summary>
+    /// <param name="inputPdfStream">Stream containing the source PDF.</param>
+    /// <returns>MemoryStream with the booklet PDF.</returns>
+    public static MemoryStream CreateBooklet(Stream inputPdfStream)
     {
-        /// <summary>
-        /// Creates a booklet PDF from the provided input PDF stream.
-        /// The result is returned as a MemoryStream.
-        /// </summary>
-        /// <param name="inputPdfStream">Stream containing the source PDF.</param>
-        /// <returns>MemoryStream with the booklet PDF.</returns>
-        public static MemoryStream CreateBookletPdf(Stream inputPdfStream)
-        {
-            // Ensure the input stream is positioned at the beginning.
-            if (inputPdfStream.CanSeek)
-                inputPdfStream.Position = 0;
+        if (inputPdfStream == null) throw new ArgumentNullException(nameof(inputPdfStream));
 
-            // Output stream that will hold the booklet PDF.
-            MemoryStream outputStream = new MemoryStream();
+        // Ensure the input stream is positioned at the beginning.
+        if (inputPdfStream.CanSeek)
+            inputPdfStream.Position = 0;
 
-            // PdfFileEditor does NOT implement IDisposable; instantiate directly.
-            PdfFileEditor editor = new PdfFileEditor();
+        // Output stream that will hold the booklet PDF.
+        MemoryStream outputStream = new MemoryStream();
 
-            // Use the MakeBooklet overload that works with streams.
-            editor.MakeBooklet(inputPdfStream, outputStream);
+        // PdfFileEditor does not implement IDisposable; instantiate directly.
+        PdfFileEditor editor = new PdfFileEditor();
 
-            // Reset the output stream position so callers can read from the start.
-            if (outputStream.CanSeek)
-                outputStream.Position = 0;
+        // Perform the booklet conversion. Use the overload that accepts streams.
+        editor.MakeBooklet(inputPdfStream, outputStream);
 
-            return outputStream;
-        }
+        // Reset the output stream position for reading by the caller.
+        if (outputStream.CanSeek)
+            outputStream.Position = 0;
+
+        return outputStream;
     }
+}
 
-    // Dummy entry point to satisfy the console‑app requirement of the project.
-    internal class Program
+// Dummy entry point to satisfy the compiler when the project is built as an executable.
+public static class Program
+{
+    public static void Main(string[] args)
     {
-        private static void Main(string[] args)
-        {
-            // No operation – placeholder for entry point.
-        }
+        // No operation – the library functionality is exposed via BookletCreator.
     }
 }

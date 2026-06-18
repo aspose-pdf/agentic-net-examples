@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
@@ -14,13 +15,14 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document within a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Get the total number of AcroForm fields
+            // Retrieve the total number of AcroForm fields
             int fieldCount = doc.Form.Count;
 
-            Console.WriteLine($"Total AcroForm fields: {fieldCount}");
+            // Output the count to the console
+            Console.WriteLine($"AcroForm field count: {fieldCount}");
         }
     }
 }

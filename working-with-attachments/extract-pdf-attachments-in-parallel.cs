@@ -1,74 +1,83 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Aspose.Pdf;
+using Aspose.Pdf;   // Core Aspose.Pdf namespace
 
 class Program
 {
+    // Extracts all embedded file attachments from the given PDF files in parallel.
+    // Each PDF gets its own sub‑folder under the outputRoot directory.
     static void Main()
     {
-        // Directory containing the source PDFs
-        string inputDirectory = "InputPdfs";
-        // Directory where extracted attachments will be saved
-        string outputDirectory = "ExtractedAttachments";
+        // Example input PDF files – replace with your actual paths.
+        string[] pdfFiles = {
+            @"C:\Docs\Sample1.pdf",
+            @"C:\Docs\Sample2.pdf",
+            @"C:\Docs\Sample3.pdf"
+        };
 
-        // Ensure the output folder exists
-        Directory.CreateDirectory(outputDirectory);
+        // Directory where extracted attachments will be saved.
+        string outputRoot = @"C:\ExtractedAttachments";
 
-        // Verify the input directory exists; if not, inform the user and exit gracefully
-        if (!Directory.Exists(inputDirectory))
-        {
-            Console.Error.WriteLine($"Input directory '{inputDirectory}' does not exist. No PDFs to process.");
-            return;
-        }
+        // Ensure the root output directory exists.
+        Directory.CreateDirectory(outputRoot);
 
-        // Get all PDF files in the input directory
-        string[] pdfFiles = Directory.GetFiles(inputDirectory, "*.pdf");
+        // Run extraction concurrently.
+        ExtractAttachmentsParallel(pdfFiles, outputRoot);
+    }
 
-        if (pdfFiles.Length == 0)
-        {
-            Console.WriteLine("No PDF files found in the input directory.");
-            return;
-        }
-
-        // Process each PDF in parallel
-        Parallel.ForEach(pdfFiles, pdfPath =>
+    static void ExtractAttachmentsParallel(string[] pdfPaths, string outputRoot)
+    {
+        // Parallel.ForEach will schedule a separate task for each PDF file.
+        Parallel.ForEach(pdfPaths, pdfPath =>
         {
             try
             {
-                // Load the PDF document (lifecycle rule: wrap in using)
+                if (!File.Exists(pdfPath))
+                {
+                    Console.Error.WriteLine($"File not found: {pdfPath}");
+                    return;
+                }
+
+                // Create a sub‑folder named after the PDF (without extension) to avoid name clashes.
+                string pdfName = Path.GetFileNameWithoutExtension(pdfPath);
+                string pdfOutputDir = Path.Combine(outputRoot, pdfName);
+                Directory.CreateDirectory(pdfOutputDir);
+
+                // Load the PDF document inside a using block for deterministic disposal.
                 using (Document doc = new Document(pdfPath))
                 {
-                    // If the document has no embedded files, skip it
-                    if (doc.EmbeddedFiles == null || doc.EmbeddedFiles.Count == 0)
-                        return;
-
-                    // Iterate over each embedded file using dynamic to avoid compile‑time dependency on the concrete type
-                    foreach (dynamic attachment in doc.EmbeddedFiles)
+                    // The EmbeddedFiles collection holds all attached files.
+                    // It uses 1‑based indexing (consistent with Aspose.Pdf page collections).
+                    for (int i = 1; i <= doc.EmbeddedFiles.Count; i++)
                     {
-                        // Build a safe attachment name (fallback to "attachment" if name is missing)
-                        string safeAttachmentName = string.IsNullOrWhiteSpace((string)attachment.Name)
-                            ? "attachment"
-                            : (string)attachment.Name;
+                        // Each entry is a FileSpecification representing an attachment.
+                        FileSpecification attachment = doc.EmbeddedFiles[i];
 
-                        // Build a unique file name to avoid collisions: <pdfFileName>_<attachmentName>
-                        string pdfBaseName = Path.GetFileNameWithoutExtension(pdfPath);
-                        string outputPath = Path.Combine(
-                            outputDirectory,
-                            $"{pdfBaseName}_{safeAttachmentName}");
+                        // Determine a safe file name for the extracted attachment.
+                        string attachmentName = !string.IsNullOrEmpty(attachment.Name)
+                            ? attachment.Name
+                            : $"attachment_{i}";
 
-                        // Save the attachment to disk
-                        attachment.Save(outputPath);
+                        string outputPath = Path.Combine(pdfOutputDir, attachmentName);
+
+                        // Write the attachment's content stream to disk.
+                        using (FileStream outputStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                        {
+                            // The Contents property is a Stream containing the file data.
+                            attachment.Contents.CopyTo(outputStream);
+                        }
+
+                        // Optional: output some metadata for verification.
+                        Console.WriteLine($"Extracted '{attachmentName}' from '{pdfPath}' to '{outputPath}'.");
                     }
                 }
             }
             catch (Exception ex)
             {
-                // Log any errors but continue processing other files
+                // Log any errors but continue processing other files.
                 Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         });
-
-        Console.WriteLine("Attachment extraction completed.");
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -9,7 +10,7 @@ class Program
     {
         const string inputPath  = "input.pdf";          // existing PDF with a ListBox field
         const string outputPath = "output.pdf";         // PDF after selection is set
-        const string listBoxName = "MyListBox";         // name of the ListBox field in the PDF
+        const string listBoxName = "MyListBox";         // full name of the ListBox field
         const int desiredIndex = 2;                     // index of the option to select (1‑based)
 
         if (!File.Exists(inputPath))
@@ -18,23 +19,37 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the ListBox field by its name from the form collection
-            // The Form collection returns a generic Field; cast it to ListBoxField
-            if (doc.Form[listBoxName] is ListBoxField listBox)
+            ListBoxField listBox = null;
+
+            // Locate the ListBox field by its full name
+            foreach (Page page in doc.Pages)
             {
-                // Set the selected option index (items are numbered from 1)
-                listBox.Selected = desiredIndex;
-                Console.WriteLine($"ListBox '{listBoxName}' selection set to index {desiredIndex}.");
+                foreach (Annotation ann in page.Annotations)
+                {
+                    if (ann is ListBoxField lb && lb.FullName == listBoxName)
+                    {
+                        listBox = lb;
+                        break;
+                    }
+                }
+                if (listBox != null) break;
             }
-            else
+
+            if (listBox == null)
             {
                 Console.Error.WriteLine($"ListBox field '{listBoxName}' not found.");
             }
+            else
+            {
+                // Set the selected option (items are numbered from 1)
+                listBox.Selected = desiredIndex;
+                Console.WriteLine($"ListBox '{listBoxName}' set to option index {desiredIndex}.");
+            }
 
-            // Save the modified document
+            // Save the modified PDF (lifecycle rule: Save inside using block)
             doc.Save(outputPath);
         }
 

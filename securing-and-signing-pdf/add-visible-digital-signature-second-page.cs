@@ -7,75 +7,62 @@ class Program
 {
     static void Main()
     {
-        // Input PDF, output PDF, and signing certificate (PFX) paths
-        const string inputPdf   = "input.pdf";
-        const string outputPdf  = "signed_output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "signed_output.pdf";
         const string pfxPath    = "certificate.pfx";
-        const string pfxPassword = "pfxPassword";
+        const string pfxPassword = "password";
 
-        // Verify that required files exist
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath) || !File.Exists(pfxPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(pfxPath))
-        {
-            Console.Error.WriteLine($"Certificate file not found: {pfxPath}");
+            Console.Error.WriteLine("Input PDF or certificate file not found.");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least two pages
+            // Verify that a second page exists (pages are 1‑based)
             if (doc.Pages.Count < 2)
             {
-                Console.Error.WriteLine("The document does not contain a second page.");
+                Console.Error.WriteLine("The document has fewer than two pages.");
                 return;
             }
 
-            // Get the second page (Aspose.Pdf uses 1‑based indexing)
-            Page secondPage = doc.Pages[2];
+            // Get the second page
+            Page page2 = doc.Pages[2];
 
-            // Define the size of the visible signature field (e.g., 150x50 points)
-            const double fieldWidth  = 150;
-            const double fieldHeight = 50;
+            // Define a rectangle for the visible signature field
+            // Position: bottom‑right corner with a 20‑point margin
+            double fieldWidth  = 150; // width of the signature field
+            double fieldHeight = 50;  // height of the signature field
+            double llx = page2.PageInfo.Width - fieldWidth - 20; // lower‑left X
+            double lly = 20;                                   // lower‑left Y
+            double urx = page2.PageInfo.Width - 20;            // upper‑right X
+            double ury = lly + fieldHeight;                    // upper‑right Y
 
-            // Position the field at the bottom‑right corner of the page
-            // Bottom‑right coordinates: (URX - fieldWidth, LLY) to (URX, LLY + fieldHeight)
-            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(
-                secondPage.Rect.URX - fieldWidth,   // lower‑left X
-                secondPage.Rect.LLY,                // lower‑left Y
-                secondPage.Rect.URX,                // upper‑right X
-                secondPage.Rect.LLY + fieldHeight   // upper‑right Y
-            );
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
 
-            // Create a signature field on the document
-            SignatureField sigField = new SignatureField(doc, sigRect)
+            // Create the signature field on the second page
+            SignatureField sigField = new SignatureField(page2, rect);
+            // Add the field to the page's annotation collection
+            page2.Annotations.Add(sigField);
+
+            // Load the certificate (PFX) and create a concrete PKCS7 signature object
+            using (FileStream pfxStream = File.OpenRead(pfxPath))
             {
-                // Optional: set a name for the field (useful for later reference)
-                Name = "VisibleSignature"
-            };
+                PKCS7 pkcs7 = new PKCS7(pfxStream, pfxPassword);
+                // Optional: set additional signature properties
+                pkcs7.Reason   = "Document approved";
+                pkcs7.Location = "Head Office";
 
-            // Add the signature field to the document's form
-            doc.Form.Add(sigField);
-
-            // Create a concrete PKCS7 signature object (Signature is abstract)
-            PKCS7 pkcs7 = new PKCS7(pfxPath, pfxPassword)
-            {
-                Reason      = "Document approved",
-                Location    = "Office",
-                ContactInfo = "contact@example.com"
-            };
-
-            // Sign the document using the created signature field
-            sigField.Sign(pkcs7);
+                // Apply the digital signature using the field
+                sigField.Sign(pkcs7);
+            }
 
             // Save the signed PDF
-            doc.Save(outputPdf);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Signed PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Signed PDF saved to '{outputPath}'.");
     }
 }

@@ -1,42 +1,58 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations; // FdfReader resides here
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath   = "input.pdf";      // source PDF
-        const string fdfPath   = "annotations.fdf"; // FDF containing annotations
-        const string outputPath = "output.pdf";    // result PDF
+        // Paths to the source PDF and the FDF file containing annotations.
+        const string pdfPath = "input.pdf";
+        const string fdfPath = "annotations.fdf";
+        const string outputPath = "output_with_annotations.pdf";
 
-        // Verify input files exist
+        // Verify that both files exist before proceeding.
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
+
         if (!File.Exists(fdfPath))
         {
             Console.Error.WriteLine($"FDF file not found: {fdfPath}");
             return;
         }
 
-        // Load the PDF document (using ensures proper disposal)
-        using (Document doc = new Document(pdfPath))
+        // Load the PDF document inside a using block to ensure proper disposal.
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            // Open the FDF stream
+            // Open the FDF file as a stream and import its annotations into the PDF.
             using (FileStream fdfStream = File.OpenRead(fdfPath))
             {
-                // Import annotations; page numbers embedded in the FDF are honored
-                Aspose.Pdf.Annotations.FdfReader.ReadAnnotations(fdfStream, doc);
+                // The static FdfReader reads all annotations from the stream and
+                // attaches them to the appropriate pages inside the document.
+                FdfReader.ReadAnnotations(fdfStream, pdfDoc);
             }
 
-            // Save the PDF with the newly imported annotations
-            doc.Save(outputPath);
+            // OPTIONAL: Verify that annotations have been placed on the expected pages.
+            // This loop prints each annotation's type together with the page number
+            // it resides on. The page number is taken from the Page object (1‑based).
+            foreach (Page page in pdfDoc.Pages)
+            {
+                foreach (Annotation annotation in page.Annotations)
+                {
+                    Console.WriteLine(
+                        $"Annotation of type {annotation.AnnotationType} " +
+                        $"found on page {page.Number}");
+                }
+            }
+
+            // Save the modified PDF with the imported annotations.
+            pdfDoc.Save(outputPath);
         }
 
-        Console.WriteLine($"Annotations imported and saved to '{outputPath}'.");
+        Console.WriteLine($"Annotations imported and PDF saved to '{outputPath}'.");
     }
 }

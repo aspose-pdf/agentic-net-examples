@@ -1,63 +1,86 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;                     // Core PDF API
+using Aspose.Pdf.Text;               // For HtmlSaveOptions enums
 
 class Program
 {
     static void Main()
     {
-        // Paths for input PDF, output HTML and the custom CSS file
-        const string pdfPath = "input.pdf";
-        const string htmlPath = "output.html";
-        const string customCssPath = "custom.css";
+        // Paths – adjust as needed
+        const string pdfPath      = "input.pdf";
+        const string htmlPath     = "output.html";
+        const string customCssPath = "custom.css";   // Your CSS file
 
-        // Verify that required files exist
+        // Verify source files exist
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
-
         if (!File.Exists(customCssPath))
         {
-            Console.Error.WriteLine($"Custom CSS file not found: {customCssPath}");
+            Console.Error.WriteLine($"Custom CSS not found: {customCssPath}");
             return;
         }
 
-        // Convert PDF to HTML using HtmlSaveOptions
-        using (Document pdfDoc = new Document(pdfPath))
+        try
         {
-            HtmlSaveOptions htmlOpts = new HtmlSaveOptions
+            // Load the PDF document (lifecycle rule: wrap in using)
+            using (Document pdfDoc = new Document(pdfPath))
             {
-                // Embed all resources into the generated HTML file
-                PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
-                // Rasterize images and store them as external PNG files referenced via SVG
-                RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsExternalPngFilesReferencedViaSvg,
-                // Define the resolution for rasterized images (dpi)
-                ImageResolution = 150,
-                // Produce a single HTML file instead of splitting into multiple pages
-                SplitIntoPages = false
-            };
+                // Configure HTML conversion options (creation rule)
+                HtmlSaveOptions htmlOpts = new HtmlSaveOptions
+                {
+                    // Example: embed raster images into SVG to keep a single HTML file
+                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg,
+                    // Optional: generate a single HTML page (default)
+                    SplitIntoPages = false
+                };
 
-            pdfDoc.Save(htmlPath, htmlOpts);
+                // Perform conversion – must pass HtmlSaveOptions for non‑PDF output
+                try
+                {
+                    pdfDoc.Save(htmlPath, htmlOpts);
+                }
+                catch (TypeInitializationException)
+                {
+                    // HTML conversion requires GDI+ (Windows only)
+                    Console.WriteLine("HTML conversion requires Windows (GDI+). Operation skipped.");
+                    return;
+                }
+            }
+
+            // At this point the HTML file exists. Insert a reference to the custom CSS.
+            string htmlContent = File.ReadAllText(htmlPath);
+
+            // Find the <head> tag (case‑insensitive) and inject the <link> after it.
+            // Simple approach – replace first occurrence of "<head>".
+            const string headTag = "<head>";
+            int headIndex = htmlContent.IndexOf(headTag, StringComparison.OrdinalIgnoreCase);
+            if (headIndex >= 0)
+            {
+                int insertPos = headIndex + headTag.Length;
+                string linkTag = $"\n<link rel=\"stylesheet\" type=\"text/css\" href=\"{Path.GetFileName(customCssPath)}\" />\n";
+                htmlContent = htmlContent.Insert(insertPos, linkTag);
+                File.WriteAllText(htmlPath, htmlContent);
+                Console.WriteLine($"HTML saved to '{htmlPath}' with custom CSS linked.");
+            }
+            else
+            {
+                // Fallback: prepend the link at the beginning of the file
+                string linkTag = $"<link rel=\"stylesheet\" type=\"text/css\" href=\"{Path.GetFileName(customCssPath)}\" />\n";
+                File.WriteAllText(htmlPath, linkTag + htmlContent);
+                Console.WriteLine($"HTML saved to '{htmlPath}'. <head> tag not found; CSS link added at file start.");
+            }
+
+            // Optionally copy the custom CSS file to the same directory as the HTML output
+            string destCssPath = Path.Combine(Path.GetDirectoryName(htmlPath) ?? "", Path.GetFileName(customCssPath));
+            File.Copy(customCssPath, destCssPath, overwrite: true);
         }
-
-        // Insert a reference to the custom CSS file into the generated HTML
-        string htmlContent = File.ReadAllText(htmlPath);
-        int headCloseIdx = htmlContent.IndexOf("</head>", StringComparison.OrdinalIgnoreCase);
-        if (headCloseIdx != -1)
+        catch (Exception ex)
         {
-            string linkTag = $"<link rel=\"stylesheet\" type=\"text/css\" href=\"{Path.GetFileName(customCssPath)}\" />\n";
-            htmlContent = htmlContent.Insert(headCloseIdx, linkTag);
-            File.WriteAllText(htmlPath, htmlContent);
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
-
-        // Copy the custom CSS file to the same directory as the HTML output
-        string destCssPath = Path.Combine(Path.GetDirectoryName(htmlPath) ?? string.Empty,
-                                          Path.GetFileName(customCssPath));
-        File.Copy(customCssPath, destCssPath, overwrite: true);
-
-        Console.WriteLine($"PDF successfully converted to HTML: {htmlPath}");
-        Console.WriteLine($"Custom CSS applied and copied to: {destCssPath}");
     }
 }

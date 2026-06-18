@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        // Input PDF files to be merged
+        // Input PDF files
         const string firstPdf  = "first.pdf";
         const string secondPdf = "second.pdf";
 
@@ -15,44 +15,52 @@ class Program
         const string alignedSecond = "second_aligned.pdf";
 
         // Final merged output
-        const string mergedPdf = "merged.pdf";
+        const string mergedOutput = "merged_aligned.pdf";
 
-        // Desired margins (in default space units, points)
-        double leftMargin   = 20.0;
-        double bottomMargin = 20.0;
-        double rightMargin  = 20.0;
-        double topMargin    = 20.0;
+        // Desired margins (in default PDF units, i.e., points)
+        // Adjust these values as needed to achieve consistent layout
+        double leftMargin   = 36;   // 0.5 inch
+        double bottomMargin = 36;
+        double rightMargin  = 36;
+        double topMargin    = 36;
 
-        // Ensure input files exist
-        if (!File.Exists(firstPdf) || !File.Exists(secondPdf))
-        {
-            Console.Error.WriteLine("One or both input PDF files were not found.");
-            return;
-        }
-
-        // Create a PdfFileEditor instance (does NOT implement IDisposable)
-        PdfFileEditor editor = new PdfFileEditor();
-
-        // Align margins for the first PDF (apply to all pages by passing null for page numbers)
-        editor.AddMargins(firstPdf, alignedFirst, null, leftMargin, bottomMargin, rightMargin, topMargin);
-
-        // Align margins for the second PDF
-        editor.AddMargins(secondPdf, alignedSecond, null, leftMargin, bottomMargin, rightMargin, topMargin);
-
-        // Concatenate the two aligned PDFs into the final document
-        editor.Concatenate(new string[] { alignedFirst, alignedSecond }, mergedPdf);
-
-        // Optional: clean up temporary aligned files
         try
         {
-            File.Delete(alignedFirst);
-            File.Delete(alignedSecond);
+            // -----------------------------------------------------------------
+            // Step 1: Align margins of the first PDF
+            // -----------------------------------------------------------------
+            PdfFileEditor editor1 = new PdfFileEditor();
+            // AddMargins(string inputFile, string outputFile, int[] pages,
+            //            double left, double bottom, double right, double top)
+            // Passing null for pages applies the margins to all pages.
+            editor1.AddMargins(firstPdf, alignedFirst, null,
+                               leftMargin, bottomMargin, rightMargin, topMargin);
+
+            // -----------------------------------------------------------------
+            // Step 2: Align margins of the second PDF
+            // -----------------------------------------------------------------
+            PdfFileEditor editor2 = new PdfFileEditor();
+            editor2.AddMargins(secondPdf, alignedSecond, null,
+                               leftMargin, bottomMargin, rightMargin, topMargin);
+
+            // -----------------------------------------------------------------
+            // Step 3: Concatenate the two aligned PDFs into a single document
+            // -----------------------------------------------------------------
+            PdfFileEditor merger = new PdfFileEditor();
+            // Concatenate(string[] inputFiles, string outputFile)
+            merger.Concatenate(new string[] { alignedFirst, alignedSecond }, mergedOutput);
+
+            Console.WriteLine($"Merged PDF with aligned margins saved to '{mergedOutput}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Cleanup warning: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
-
-        Console.WriteLine($"Merged PDF created at '{mergedPdf}'.");
+        finally
+        {
+            // Optional cleanup of temporary files
+            try { if (File.Exists(alignedFirst))  File.Delete(alignedFirst);  } catch { }
+            try { if (File.Exists(alignedSecond)) File.Delete(alignedSecond); } catch { }
+        }
     }
 }

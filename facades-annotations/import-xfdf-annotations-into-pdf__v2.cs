@@ -7,46 +7,44 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath   = "input.pdf";      // source PDF file
-        const string xfdfPath  = "annotations.xfdf"; // XFDF data file
-        const string outputPath = "output.pdf";    // result PDF with imported annotations
+        // Paths to the source PDF and XFDF data.
+        const string pdfInputPath  = "source.pdf";
+        const string xfdfInputPath = "annotations.xfdf";
+        const string pdfOutputPath = "output.pdf";
 
-        // Validate input files
-        if (!File.Exists(pdfPath))
+        // Validate input files exist.
+        if (!File.Exists(pdfInputPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfInputPath}");
             return;
         }
-        if (!File.Exists(xfdfPath))
+        if (!File.Exists(xfdfInputPath))
         {
-            Console.Error.WriteLine($"XFDF file not found: {xfdfPath}");
+            Console.Error.WriteLine($"XFDF file not found: {xfdfInputPath}");
             return;
         }
 
-        try
+        // Open the PDF file as a read‑only stream.
+        using (FileStream pdfStream = File.OpenRead(pdfInputPath))
+        // Create the annotation editor facade.
+        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            // Open the PDF file as a stream (no temporary files)
-            using (FileStream pdfStream = File.OpenRead(pdfPath))
-            // Open the XFDF data as a stream
-            using (FileStream xfdfStream = File.OpenRead(xfdfPath))
-            // Initialize the annotation editor facade
-            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+            // Bind the PDF stream to the editor.
+            editor.BindPdf(pdfStream);
+
+            // Open the XFDF data as a stream and import all annotations.
+            using (FileStream xfdfStream = File.OpenRead(xfdfInputPath))
             {
-                // Bind the PDF stream to the editor
-                editor.BindPdf(pdfStream);
-
-                // Import all annotations from the XFDF stream
                 editor.ImportAnnotationsFromXfdf(xfdfStream);
-
-                // Save the modified PDF to the output file
-                editor.Save(outputPath);
             }
 
-            Console.WriteLine($"Annotations imported successfully. Output saved to '{outputPath}'.");
+            // Save the modified PDF to the output file via a write stream.
+            using (FileStream outStream = new FileStream(pdfOutputPath, FileMode.Create, FileAccess.Write))
+            {
+                editor.Save(outStream);
+            }
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Annotations imported and saved to '{pdfOutputPath}'.");
     }
 }

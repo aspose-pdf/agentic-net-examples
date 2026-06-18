@@ -6,59 +6,57 @@ class Program
 {
     static void Main()
     {
-        // Local PDF file containing images to extract
-        const string inputPdfPath = @"C:\Docs\sample.pdf";
+        // Local PDF file to extract images from
+        const string inputPdf = @"C:\Docs\sample.pdf";
 
-        // Network share UNC path where images will be saved
-        // Ensure the path starts with double backslashes and does not end with a backslash
-        const string uncBasePath = @"\\ServerName\SharedFolder\ExtractedImages";
+        // UNC network share where images will be saved
+        const string uncBase = @"\\Server\Share\Images";
 
-        // Validate input file existence
-        if (!File.Exists(inputPdfPath))
+        // Verify source PDF exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Ensure the UNC directory exists; create it if necessary
+        // Ensure the UNC destination directory exists
+        if (!Directory.Exists(uncBase))
+        {
+            Directory.CreateDirectory(uncBase);
+        }
+
         try
         {
-            Directory.CreateDirectory(uncBasePath);
+            // CREATE — PdfExtractor instance (disposable)
+            using (PdfExtractor extractor = new PdfExtractor())
+            {
+                // LOAD — bind the PDF document
+                extractor.BindPdf(inputPdf);
+
+                // EXTRACT images from the PDF
+                extractor.ExtractImage();
+
+                int imageIndex = 1;
+                // Iterate through all extracted images
+                while (extractor.HasNextImage())
+                {
+                    // Build a unique file name for each image
+                    string fileName = $"image-{imageIndex}.jpg";
+
+                    // Combine UNC base path with file name (ensures proper UNC formatting)
+                    string destPath = Path.Combine(uncBase, fileName);
+
+                    // SAVE — write the image to the UNC location
+                    extractor.GetNextImage(destPath);
+
+                    Console.WriteLine($"Saved image {imageIndex} to {destPath}");
+                    imageIndex++;
+                }
+            }
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Failed to create UNC directory '{uncBasePath}': {ex.Message}");
-            return;
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
-
-        // Use PdfExtractor (facade) to extract images
-        using (PdfExtractor extractor = new PdfExtractor())
-        {
-            // Bind the source PDF document
-            extractor.BindPdf(inputPdfPath);
-
-            // Extract all images from the document
-            extractor.ExtractImage();
-
-            int imageIndex = 1;
-            // Loop through each extracted image
-            while (extractor.HasNextImage())
-            {
-                // Build a file name for each image (e.g., image-1.jpg)
-                // PdfExtractor.GetNextImage defaults to JPEG format if no format is specified
-                string fileName = $"image-{imageIndex}.jpg";
-
-                // Combine UNC base path with file name
-                string outputPath = Path.Combine(uncBasePath, fileName);
-
-                // Save the current image to the UNC location
-                extractor.GetNextImage(outputPath);
-
-                Console.WriteLine($"Saved image {imageIndex} to '{outputPath}'");
-                imageIndex++;
-            }
-        }
-
-        Console.WriteLine("Image extraction completed.");
     }
 }

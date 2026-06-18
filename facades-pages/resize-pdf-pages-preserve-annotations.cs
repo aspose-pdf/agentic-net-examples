@@ -16,24 +16,25 @@ class Program
             return;
         }
 
-        // Load the source PDF inside a using block for deterministic disposal
+        // Load the source PDF
         using (Document doc = new Document(inputPath))
         {
-            // Initialize PdfPageEditor with the loaded document
-            using (PdfPageEditor editor = new PdfPageEditor(doc))
+            // Initialize the page editor facade
+            using (PdfPageEditor editor = new PdfPageEditor())
             {
-                // Set the desired page size (e.g., A4). This changes the page dimensions
-                // while keeping existing content, annotations, form fields, links, etc.
-                editor.PageSize = Aspose.Pdf.PageSize.A4;
+                // Bind the loaded document to the editor
+                editor.BindPdf(doc);
 
-                // Process all pages (null means all pages). Adjust if you need a subset.
-                editor.ProcessPages = null;
+                // Define the new page size (e.g., A4: 595 x 842 points)
+                // You can also use any custom dimensions.
+                editor.PageSize = new PageSize(595, 842);
 
-                // Apply the changes to the document
+                // Apply the changes – this resizes pages while preserving
+                // all existing annotations and interactive elements.
                 editor.ApplyChanges();
             }
 
-            // Save the modified document. No SaveOptions needed because we keep PDF format.
+            // Save the modified document
             doc.Save(outputPath);
         }
 

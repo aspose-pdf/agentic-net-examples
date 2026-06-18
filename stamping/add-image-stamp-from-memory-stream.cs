@@ -2,44 +2,42 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class Program
+namespace AddImageStampFromMemoryStreamExample
 {
-    static void Main()
+    class Program
     {
-        const string outputPdfPath = "output.pdf";
-
-        // A 1x1 pixel PNG image encoded in Base64 (transparent). Replace with your own image if needed.
-        const string base64Png = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+XK6cAAAAASUVORK5CYII=";
-        byte[] imageBytes = Convert.FromBase64String(base64Png);
-
-        // Create a PDF document in memory (no external file required)
-        using (Document pdfDoc = new Document())
+        static void Main(string[] args)
         {
-            // Add a single blank page so we have something to stamp onto
-            pdfDoc.Pages.Add();
-
-            // Create an ImageStamp directly from the memory stream
-            using (MemoryStream imageStream = new MemoryStream(imageBytes))
+            // Step 1: Create a sample PDF file (self‑contained example)
+            using (Document sampleDoc = new Document())
             {
-                ImageStamp stamp = new ImageStamp(imageStream)
-                {
-                    Background = false,               // place on top of page content
-                    Opacity = 0.5,                    // 50% transparent
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-
-                // Apply the stamp to each page in the document
-                foreach (Page page in pdfDoc.Pages)
-                {
-                    page.AddStamp(stamp);
-                }
+                sampleDoc.Pages.Add();
+                sampleDoc.Save("input.pdf");
             }
 
-            // Save the stamped PDF to disk
-            pdfDoc.Save(outputPdfPath);
-        }
+            // Step 2: Load the PDF we just created
+            using (Document pdfDoc = new Document("input.pdf"))
+            {
+                // Prepare a tiny PNG image in a memory stream (1x1 pixel transparent PNG)
+                string base64Png = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+X9WcAAAAASUVORK5CYII=";
+                byte[] imageBytes = Convert.FromBase64String(base64Png);
+                using (MemoryStream imageStream = new MemoryStream(imageBytes))
+                {
+                    // Create an ImageStamp from the memory stream
+                    ImageStamp imageStamp = new ImageStamp(imageStream);
+                    // Optional: set size and alignment of the stamp
+                    imageStamp.Width = 100;
+                    imageStamp.Height = 100;
+                    imageStamp.HorizontalAlignment = HorizontalAlignment.Center;
+                    imageStamp.VerticalAlignment = VerticalAlignment.Center;
 
-        Console.WriteLine($"Image stamp applied and saved to '{outputPdfPath}'.");
+                    // Add the stamp to the first page (page indexing is 1‑based)
+                    pdfDoc.Pages[1].AddStamp(imageStamp);
+                }
+
+                // Save the resulting PDF
+                pdfDoc.Save("output.pdf");
+            }
+        }
     }
 }

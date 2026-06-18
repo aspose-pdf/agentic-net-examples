@@ -2,47 +2,50 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class Program
+class PdfToHtmlConverter
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputHtml = "output.html";
+        // Input PDF file path
+        const string inputPdfPath = "input.pdf";
 
-        if (!File.Exists(inputPdf))
+        // Output HTML file path (single HTML file containing all pages)
+        const string outputHtmlPath = "output.html";
+
+        // Verify that the source PDF exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Error: File not found – {inputPdfPath}");
             return;
         }
 
         try
         {
             // Load the PDF document
-            using (Document pdfDoc = new Document(inputPdf))
+            using (Document pdfDocument = new Document(inputPdfPath))
             {
                 // Configure HTML save options
-                HtmlSaveOptions htmlOpts = new HtmlSaveOptions
+                HtmlSaveOptions htmlOptions = new HtmlSaveOptions
                 {
-                    // Embed all resources (fonts, images, CSS) into the single HTML file
+                    // Embed all resources (images, CSS, fonts) into the single HTML file
                     PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
-                    // Save raster images as PNG embedded in SVG for better compatibility
-                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
+
+                    // Preserve original fonts by embedding them (WOFF format by default)
+                    FontSavingMode = HtmlSaveOptions.FontSavingModes.AlwaysSaveAsWOFF,
+
+                    // Ensure the result is a single HTML page (default behavior)
+                    SplitIntoPages = false
                 };
 
-                // Save as a single‑page HTML preserving formatting and fonts
-                pdfDoc.Save(outputHtml, htmlOpts);
+                // Save the PDF as a single-page HTML file
+                pdfDocument.Save(outputHtmlPath, htmlOptions);
             }
 
-            Console.WriteLine($"PDF successfully converted to HTML: {outputHtml}");
-        }
-        catch (TypeInitializationException)
-        {
-            // HTML conversion relies on GDI+ and is Windows‑only
-            Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
+            Console.WriteLine($"PDF successfully converted to HTML: '{outputHtmlPath}'");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
         }
     }
 }

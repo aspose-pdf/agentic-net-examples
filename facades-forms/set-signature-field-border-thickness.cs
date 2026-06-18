@@ -1,9 +1,8 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -21,31 +20,21 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Create a FormEditor facade for the document
-            FormEditor formEditor = new FormEditor(doc);
-
-            // Example of using SetFieldAttribute (required by the task)
-            // Here we set the field as read‑only; you can choose any PropertyFlag you need.
-            formEditor.SetFieldAttribute("Signature", PropertyFlag.ReadOnly);
-
-            // Retrieve the signature field from the document's form collection
-            Field? signatureField = doc.Form["Signature"] as Field;
-
-            if (signatureField != null)
+            // Retrieve the signature field by its partial name
+            SignatureField sigField = doc.Form["Signature"] as SignatureField;
+            if (sigField == null)
             {
-                // Set a custom border thickness of 2 points
-                // Border constructor requires the parent annotation (the field itself)
-                signatureField.Border = new Border(signatureField) { Width = 2 };
-            }
-            else
-            {
-                Console.Error.WriteLine("Signature field not found.");
+                Console.Error.WriteLine("Signature field 'Signature' not found.");
+                return;
             }
 
-            // Save the modified PDF
+            // Set custom border thickness (2 points)
+            sigField.Border.Width = 2;
+
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Document saved with updated border to '{outputPath}'.");
     }
 }

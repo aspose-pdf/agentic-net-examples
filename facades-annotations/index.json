@@ -1,12 +1,139 @@
 {
   "category": "facades-annotations",
-  "nuget_version": "26.4.0",
-  "last_updated": "2026-05-05T06:12:51Z",
+  "nuget_version": "26.5.0",
+  "last_updated": "2026-06-15T08:54:28Z",
   "examples": {
+    "remove-all-annotations-from-pdf": {
+      "title": "Remove All Annotations from a PDF",
+      "filename": "remove-all-annotations-from-pdf.cs",
+      "description": "Demonstrates how to bind a PDF file with PdfAnnotationEditor, delete every annotation in the document, and save the cleaned PDF to a new file.",
+      "tags": [
+        "pdf",
+        "annotations",
+        "delete",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "PdfAnnotationEditor.BindPdf",
+        "PdfAnnotationEditor.DeleteAnnotations",
+        "PdfAnnotationEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "delete-all-annotations-from-pdfs": {
+      "title": "Delete All Annotations from PDFs in a Folder",
+      "filename": "delete-all-annotations-from-pdfs.cs",
+      "description": "Demonstrates iterating over PDF files in a directory, binding each with PdfAnnotationEditor, removing all annotations, and overwriting the original files.",
+      "tags": [
+        "pdf",
+        "annotations",
+        "batch-processing",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "PdfAnnotationEditor",
+        "PdfAnnotationEditor.BindPdf",
+        "PdfAnnotationEditor.DeleteAnnotations",
+        "PdfAnnotationEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "delete-text-annotations-from-pdf": {
+      "title": "Delete Text Annotations from PDF",
+      "filename": "delete-text-annotations-from-pdf.cs",
+      "description": "Shows how to remove only text (sticky note) annotations from a PDF using Aspose.Pdf.Facades.PdfAnnotationEditor.",
+      "tags": [
+        "annotations",
+        "delete",
+        "text",
+        "pdf",
+        "Aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "remove-link-annotations-from-pdf-pages": {
+      "title": "Remove Link Annotations from Specific PDF Pages",
+      "filename": "remove-link-annotations-from-pdf-pages.cs",
+      "description": "Shows how to delete all link annotations on pages 3 through 7 of a PDF using the PdfAnnotationEditor facade.",
+      "tags": [
+        "annotations",
+        "link",
+        "pdf",
+        "delete",
+        "pages"
+      ],
+      "apis_used": [
+        "PdfAnnotationEditor",
+        "PdfAnnotationEditor.BindPdf",
+        "PdfAnnotationEditor.ExtractAnnotations",
+        "PdfAnnotationEditor.DeleteAnnotation",
+        "PdfAnnotationEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "delete-named-annotation": {
+      "title": "Delete a Named Annotation from PDF",
+      "filename": "delete-named-annotation.cs",
+      "description": "Shows how to remove a specific annotation identified by its name from a PDF document using Aspose.Pdf.Facades.PdfAnnotationEditor.",
+      "tags": [
+        "annotation",
+        "delete",
+        "pdf",
+        "Aspose.Pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotation",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "delete-pdf-annotation-by-name": {
+      "title": "Delete PDF Annotation by Name",
+      "filename": "delete-pdf-annotation-by-name.cs",
+      "description": "Shows how to remove a specific annotation from a PDF using Aspose.Pdf.Facades PdfAnnotationEditor by passing the annotation name stored in a variable.",
+      "tags": [
+        "annotation",
+        "delete",
+        "pdf",
+        "facades",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotation",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
     "export-pdf-annotations-to-xfdf": {
       "title": "Export PDF Annotations to XFDF",
       "filename": "export-pdf-annotations-to-xfdf.cs",
-      "description": "Demonstrates loading a PDF with PdfAnnotationEditor and exporting all its annotations to an XFDF file using a file stream.",
+      "description": "Demonstrates binding a PDF with PdfAnnotationEditor and exporting all its annotations to an XFDF file via a file stream.",
       "tags": [
         "annotations",
         "xfdf",
@@ -17,16 +144,17 @@
       "apis_used": [
         "Aspose.Pdf.Facades.PdfAnnotationEditor",
         "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExportAnnotationsToXfdf"
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExportAnnotationsToXfdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Close"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     },
     "export-pdf-annotations-to-xfdf__v2": {
       "title": "Export PDF Annotations to XFDF Memory Stream",
       "filename": "export-pdf-annotations-to-xfdf__v2.cs",
-      "description": "Demonstrates how to export selected annotation types from specific PDF pages into an XFDF format using a memory stream for further processing.",
+      "description": "Demonstrates how to export annotations from specific PDF pages to XFDF format using a MemoryStream with Aspose.Pdf.",
       "tags": [
         "annotations",
         "xfdf",
@@ -41,310 +169,23 @@
         "Aspose.Pdf.Annotations.AnnotationType"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     },
-    "update-annotation-modified-date": {
-      "title": "Update Annotation Modified Date in PDF",
-      "filename": "update-annotation-modified-date.cs",
-      "description": "Shows how to create a PDF in memory, add a TextAnnotation, set its Modified property to DateTime.Now, and apply the change with PdfAnnotationEditor.ModifyAnnotations.",
-      "tags": [
-        "annotation",
-        "modified-date",
-        "pdf",
-        "Aspose.Pdf",
-        "in-memory"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Annotations.TextAnnotation",
-        "Aspose.Pdf.Color",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ModifyAnnotations"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "delete-annotation-with-error-handling": {
-      "title": "Delete Annotation with Error Handling in PDF",
-      "filename": "delete-annotation-with-error-handling.cs",
-      "description": "Demonstrates how to delete a specific annotation from a PDF using Aspose.Pdf.Facades and gracefully handle the case where the annotation does not exist.",
-      "tags": [
-        "annotation",
-        "delete",
-        "error-handling",
-        "pdf",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotation",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
-        "Aspose.Pdf.PdfException"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "set-all-annotation-open-flags": {
-      "title": "Set All Annotation Open Flags to True",
-      "filename": "set-all-annotation-open-flags.cs",
-      "description": "Demonstrates loading a PDF with Aspose.Pdf, iterating through each page and its annotations, and setting the Open property of TextAnnotation and PopupAnnotation to true before saving the document.",
-      "tags": [
-        "annotations",
-        "open-flag",
-        "pdf",
-        "aspose",
-        "iteration"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Annotations.Annotation",
-        "Aspose.Pdf.Annotations.TextAnnotation",
-        "Aspose.Pdf.Annotations.PopupAnnotation",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "remove-all-annotations-from-pdf": {
-      "title": "Remove All Annotations from a PDF with PdfAnnotationEditor",
-      "filename": "remove-all-annotations-from-pdf.cs",
-      "description": "Creates a PDF with two text annotations, uses PdfAnnotationEditor.DeleteAnnotations to delete them, and validates the removal with a unit test.",
-      "tags": [
-        "annotations",
-        "pdf",
-        "delete",
-        "unit-test",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Annotations.TextAnnotation",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Color"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "delete-all-annotations-from-pdf": {
-      "title": "Delete All Annotations from a PDF using PdfAnnotationEditor",
-      "filename": "delete-all-annotations-from-pdf.cs",
-      "description": "Demonstrates how to bind a PDF to the PdfAnnotationEditor facade, remove every annotation, and save the cleaned document to a new file.",
-      "tags": [
-        "pdf",
-        "annotations",
-        "delete",
-        "aspose",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "batch-remove-pdf-annotations-summary": {
-      "title": "Batch Remove Annotations from PDFs and Generate Summary Report",
-      "filename": "batch-remove-pdf-annotations-summary.cs",
-      "description": "The example iterates through PDF files in a folder, counts and deletes all annotations using Aspose.Pdf.Facades.PdfAnnotationEditor, saves the cleaned PDFs, and prints a summary of removed annotations per file.",
-      "tags": [
-        "annotations",
-        "pdf",
-        "batch-processing",
-        "summary",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "flatten-pdf-annotations-log-size-reduction": {
-      "title": "Flatten PDF Annotations and Log Size Reduction",
-      "filename": "flatten-pdf-annotations-log-size-reduction.cs",
-      "description": "Shows how to flatten all annotations in a PDF with Aspose.Pdf.Facades, then record and display the original and reduced file sizes for audit purposes.",
-      "tags": [
-        "flatten",
-        "annotations",
-        "size-reduction",
-        "audit",
-        "pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.FlatteningAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Close"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "diagnostic-annotation-workflow": {
-      "title": "Diagnostic Annotation Workflow with Verbose Logging",
-      "filename": "diagnostic-annotation-workflow.cs",
-      "description": "Demonstrates how to use Aspose.Pdf's PdfAnnotationEditor facade to log each step of an annotation manipulation workflow, including loading, exporting, deleting, and saving a PDF.",
-      "tags": [
-        "annotations",
-        "logging",
-        "pdf",
-        "facade",
-        "diagnostics"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExportAnnotationsToXfdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "extract-pdf-annotations-to-json-log": {
-      "title": "Extract PDF Annotations and Write to JSON Audit Log",
-      "filename": "extract-pdf-annotations-to-json-log.cs",
-      "description": "The example loads a PDF, extracts all annotations using the PdfAnnotationEditor facade, gathers key properties, serializes them to JSON, and writes the result to an audit log file.",
-      "tags": [
-        "annotations",
-        "json",
-        "audit",
-        "pdf",
-        "extraction"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExtractAnnotations",
-        "Aspose.Pdf.Annotations.Annotation",
-        "Aspose.Pdf.Annotations.MarkupAnnotation",
-        "Aspose.Pdf.Annotations.TextAnnotation",
-        "Aspose.Pdf.Annotations.PopupAnnotation"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "list-annotation-names-pdf": {
-      "title": "List Annotation Names in a PDF using PdfAnnotationEditor",
-      "filename": "list-annotation-names-pdf.cs",
-      "description": "Shows how to bind a PDF with PdfAnnotationEditor, extract all annotations, and write each annotation's Name to the console for debugging.",
-      "tags": [
-        "pdf",
-        "annotations",
-        "extract",
-        "debugging",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExtractAnnotations",
-        "Aspose.Pdf.Annotations.Annotation",
-        "Aspose.Pdf.Annotations.Annotation.Name"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "flatten-pdf-annotations-verify-removal": {
-      "title": "Flatten PDF Annotations and Verify Removal",
-      "filename": "flatten-pdf-annotations-verify-removal.cs",
-      "description": "The example flattens all annotations in a PDF using PdfAnnotationEditor and then iterates through each page to confirm that no annotation objects remain.",
-      "tags": [
-        "flatten",
-        "annotations",
-        "validation",
-        "pdf",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.FlatteningAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Page.Annotations"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "benchmark-deleteannotations-vs-deleteannotation": {
-      "title": "Benchmark DeleteAnnotations vs DeleteAnnotation",
-      "filename": "benchmark-deleteannotations-vs-deleteannotation.cs",
-      "description": "Shows how to measure and compare the performance of deleting all annotations at once with DeleteAnnotations() versus removing a single annotation with DeleteAnnotation(string) using Aspose.Pdf.",
-      "tags": [
-        "annotations",
-        "benchmark",
-        "delete",
-        "pdf",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotation",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
-        "Aspose.Pdf.Annotations.AnnotationCollection"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "export-highlight-annotations-to-xfdf": {
-      "title": "Export Highlight Annotations to XFDF",
-      "filename": "export-highlight-annotations-to-xfdf.cs",
-      "description": "Demonstrates how to filter only Highlight annotations from a PDF and export them to an XFDF file using the PdfAnnotationEditor overload that accepts page range and annotation types.",
-      "tags": [
-        "annotations",
-        "export",
-        "xfdf",
-        "highlight",
-        "pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExportAnnotationsXfdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Close",
-        "Aspose.Pdf.Annotations.AnnotationType"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
+    "filter-exported-annotations-by-type-highlight-and-write-them-to-an-xfdf-file-using-exportannotations-overload": {
+      "title": "Filter Exported Annotations By Type Highlight And Write Them To An Xfdf File Using Exportannotations Overload",
+      "filename": "filter-exported-annotations-by-type-highlight-and-write-them-to-an-xfdf-file-using-exportannotations-overload.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     },
     "import-xfdf-annotations-into-pdf": {
       "title": "Import XFDF Annotations into PDF",
       "filename": "import-xfdf-annotations-into-pdf.cs",
-      "description": "Shows how to bind a PDF with PdfAnnotationEditor, import annotations from an XFDF file, and save the updated document.",
+      "description": "Shows how to bind a PDF with PdfAnnotationEditor, import annotations from an XFDF file, and save the updated PDF.",
       "tags": [
         "xfdf",
         "annotations",
@@ -355,180 +196,246 @@
       "apis_used": [
         "Aspose.Pdf.Facades.PdfAnnotationEditor",
         "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ImportAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ImportAnnotationsFromXfdf",
         "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     },
-    "import-xfdf-annotations-to-selected-pages": {
-      "title": "Import XFDF Annotations onto Selected PDF Pages",
-      "filename": "import-xfdf-annotations-to-selected-pages.cs",
-      "description": "Exports annotations from a source PDF for a specified page range into a temporary XFDF file and then imports those annotations into a target PDF, showing how to transfer page‑specific annotations using Aspose.Pdf.",
+    "import-xfdf-annotations-to-specific-pdf-pages": {
+      "title": "Import XFDF Annotations to Specific PDF Pages",
+      "filename": "import-xfdf-annotations-to-specific-pdf-pages.cs",
+      "description": "Shows how to import annotations from an XFDF file into a PDF and keep them only on a defined page range by removing annotations outside that range.",
       "tags": [
         "xfdf",
         "annotations",
+        "pdf",
         "page-range",
-        "export",
-        "import"
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfAnnotationEditor",
         "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExportAnnotationsXfdf",
         "Aspose.Pdf.Facades.PdfAnnotationEditor.ImportAnnotationsFromXfdf",
         "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
-        "Aspose.Pdf.Annotations.AnnotationType"
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Close",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Page.Annotations",
+        "Aspose.Pdf.AnnotationCollection.Delete"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     },
-    "set-readonly-flag-on-pdf-annotations": {
-      "title": "Set Read‑Only Flag on PDF Annotations",
-      "filename": "set-readonly-flag-on-pdf-annotations.cs",
-      "description": "Demonstrates how to apply the ReadOnly annotation flag using the PdfAnnotationEditor facade and save the updated PDF.",
-      "tags": [
-        "annotation",
-        "readonly",
-        "pdf",
-        "facade",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ModifyAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
-        "Aspose.Pdf.Annotations.TextAnnotation",
-        "Aspose.Pdf.Annotations.AnnotationFlags"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "batch-update-annotation-author": {
-      "title": "Batch Update Annotation Author in Multiple PDFs",
-      "filename": "batch-update-annotation-author.cs",
-      "description": "Shows how to loop through PDF files in a directory and use PdfAnnotationEditor.ModifyAnnotationsAuthor to replace the author of all annotations, saving the modified PDFs to an output folder.",
+    "preserve-existing-annotations-while-importing": {
+      "title": "Preserve Existing Annotations While Importing New Ones",
+      "filename": "preserve-existing-annotations-while-importing.cs",
+      "description": "Demonstrates importing annotations from multiple source PDFs into a target PDF without overwriting the annotations already present, using PdfAnnotationEditor.",
       "tags": [
         "annotations",
-        "author",
-        "batch-processing",
+        "import",
+        "preserve",
         "pdf",
-        "Aspose.Pdf"
+        "Aspose"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ModifyAnnotationsAuthor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
-        "Aspose.Pdf.Document.Pages.Count"
+        "PdfAnnotationEditor",
+        "PdfAnnotationEditor.BindPdf",
+        "PdfAnnotationEditor.ImportAnnotations",
+        "PdfAnnotationEditor.Save",
+        "PdfAnnotationEditor.OverwriteExistingAnnotations"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     },
-    "modify-pdf-annotation-authors-retry": {
-      "title": "Modify PDF Annotation Authors with Retry and Exponential Backoff",
-      "filename": "modify-pdf-annotation-authors-retry.cs",
-      "description": "Demonstrates using PdfAnnotationEditor to change annotation authors in a PDF and applying an exponential backoff retry policy for transient I/O errors.",
+    "flatten-pdf-annotations": {
+      "title": "Flatten PDF Annotations to Non-Editable Content",
+      "filename": "flatten-pdf-annotations.cs",
+      "description": "Shows how to flatten all annotations in a PDF using the PdfAnnotationEditor facade and save the resulting document as a non‑editable PDF.",
       "tags": [
+        "flatten",
         "annotations",
-        "retry",
-        "exponential-backoff",
-        "pdf",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ModifyAnnotationsAuthor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Close"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "delete-pdf-annotations-by-color": {
-      "title": "Delete PDF Annotations by Color",
-      "filename": "delete-pdf-annotations-by-color.cs",
-      "description": "Shows how to remove annotations from a PDF whose Color property matches a specific RGB value using the Aspose.Pdf facade API.",
-      "tags": [
-        "annotations",
-        "color",
         "pdf",
         "Aspose.Pdf",
         "facade"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Annotations.AnnotationCollection",
-        "Aspose.Pdf.Annotations.Annotation",
-        "Aspose.Pdf.Color"
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.FlatteningAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     },
-    "merge-multiple-xfdf-files-into-pdf": {
-      "title": "Merge Multiple XFDF Files and Import into PDF",
-      "filename": "merge-multiple-xfdf-files-into-pdf.cs",
-      "description": "Demonstrates how to combine several XFDF annotation/field files into a single XFDF stream and then import the merged data into an existing PDF document using Aspose.Pdf.",
+    "flatten-annotations-first-five-pages": {
+      "title": "Flatten Annotations on First Five PDF Pages",
+      "filename": "flatten-annotations-first-five-pages.cs",
+      "description": "Shows how to flatten all annotations on the first five pages of a PDF document using Aspose.Pdf's PdfAnnotationEditor.",
       "tags": [
-        "xfdf",
+        "flatten",
         "annotations",
         "pdf",
-        "merge",
-        "import"
+        "pages",
+        "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.XfdfReader.ReadAnnotations",
-        "Aspose.Pdf.Facades.XfdfReader.ReadFields",
-        "Aspose.Pdf.Document.ExportAnnotationsToXfdf",
         "Aspose.Pdf.Facades.PdfAnnotationEditor",
         "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ImportAnnotationsFromXfdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.FlatteningAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "modify-annotation-author-on-page": {
+      "title": "Modify Annotation Author on Specific PDF Page",
+      "filename": "modify-annotation-author-on-page.cs",
+      "description": "Shows how to change the author of annotations on a given page of a PDF using the PdfAnnotationEditor facade.",
+      "tags": [
+        "annotations",
+        "author",
+        "pdf",
+        "Aspose.Pdf",
+        "modify"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ModifyAnnotationsAuthor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "modify-annotation-subject-color": {
+      "title": "Modify Annotation Subject and Color in PDF",
+      "filename": "modify-annotation-subject-color.cs",
+      "description": "Demonstrates changing the subject and color of an existing PDF annotation by creating a new TextAnnotation and applying it with PdfAnnotationEditor.ModifyAnnotations.",
+      "tags": [
+        "annotation",
+        "modify",
+        "pdf",
+        "textannotation",
+        "color"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ModifyAnnotations",
         "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     },
-    "delete-annotations-by-author": {
-      "title": "Delete Annotations by Author Using PdfAnnotationEditor",
-      "filename": "delete-annotations-by-author.cs",
-      "description": "Shows how to filter and remove PDF annotations whose author (Title) matches a specific name by using the PdfAnnotationEditor facade.",
+    "set-annotation-open-flag": {
+      "title": "Set Annotation Open Flag for All PDF Annotations",
+      "filename": "set-annotation-open-flag.cs",
+      "description": "Shows how to iterate through every page and annotation in a PDF using Aspose.Pdf Facade API, set the Open flag on text and popup annotations to true, and save the updated document.",
       "tags": [
         "annotations",
-        "delete",
-        "author-filter",
+        "open-flag",
         "pdf",
+        "facade",
+        "iteration"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.PopupAnnotation"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "update-annotation-modified-date": {
+      "title": "Update Annotation Modified Date in PDF",
+      "filename": "update-annotation-modified-date.cs",
+      "description": "Shows how to set the Modified property of existing PDF annotations to the current system time using PdfAnnotationEditor.ModifyAnnotations.",
+      "tags": [
+        "annotation",
+        "modified-date",
+        "pdf",
+        "Aspose.Pdf",
         "facade"
       ],
       "apis_used": [
-        "PdfAnnotationEditor",
-        "Document",
-        "Page",
-        "MarkupAnnotation",
-        "TextAnnotation",
-        "PdfAnnotationEditor.BindPdf",
-        "PdfAnnotationEditor.DeleteAnnotation",
-        "PdfAnnotationEditor.Save"
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ModifyAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "apply-read-only-flag-to-pdf-annotations": {
+      "title": "Apply Read‑Only Flag to PDF Annotations",
+      "filename": "apply-read-only-flag-to-pdf-annotations.cs",
+      "description": "Demonstrates setting the ReadOnly flag on a TextAnnotation template and applying it to existing annotations on a page using PdfAnnotationEditor.",
+      "tags": [
+        "read-only",
+        "annotation",
+        "pdf",
+        "Aspose.Pdf",
+        "modify"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.AnnotationFlags",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ModifyAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "batch-update-annotation-author": {
+      "title": "Batch Update Annotation Author Across Multiple PDFs",
+      "filename": "batch-update-annotation-author.cs",
+      "description": "Shows how to iterate over PDF files, use PdfAnnotationEditor to replace the author of every annotation with a new author, and save the modified PDFs to an output folder.",
+      "tags": [
+        "annotations",
+        "author",
+        "batch",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ModifyAnnotationsAuthor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     },
     "export-pdf-annotations-to-xfdf__v3": {
       "title": "Export PDF Annotations to XFDF Using MemoryStream",
       "filename": "export-pdf-annotations-to-xfdf__v3.cs",
-      "description": "Shows how to bind a PDF from a byte array, export all its annotations to XFDF, and obtain the XFDF data as a byte array using Aspose.Pdf.Facades.",
+      "description": "Shows how to bind a PDF from a byte array via MemoryStream, export all annotations to an XFDF stream, and return the XFDF data as a byte array.",
       "tags": [
         "pdf",
         "annotations",
@@ -542,631 +449,19 @@
         "Aspose.Pdf.Facades.PdfAnnotationEditor.ExportAnnotationsToXfdf"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     },
-    "flatten-pdfs-to-custom-output-directory": {
-      "title": "Flatten PDFs and Save to Custom Output Directory",
-      "filename": "flatten-pdfs-to-custom-output-directory.cs",
-      "description": "Demonstrates how to flatten form fields in PDF files and write the flattened PDFs to a user‑specified output folder using Aspose.Pdf.",
+    "import-xfdf-annotations-into-pdf__v2": {
+      "title": "Import XFDF Annotations into PDF from Streams",
+      "filename": "import-xfdf-annotations-into-pdf__v2.cs",
+      "description": "Shows how to load a PDF and XFDF data from streams, import the annotations using PdfAnnotationEditor, and save the updated PDF without creating temporary files.",
       "tags": [
-        "pdf",
-        "flatten",
-        "output-directory",
-        "aspose-pdf",
-        "facades"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Flatten",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Facades.PdfFileEditor"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "log-pdf-annotation-deletions": {
-      "title": "Log PDF Annotation Deletions",
-      "filename": "log-pdf-annotation-deletions.cs",
-      "description": "Demonstrates how to iterate through all PDF pages, collect annotation details, log each deletion (name, type, page) to a file, and remove the annotations using Aspose.Pdf.",
-      "tags": [
-        "annotations",
-        "pdf",
-        "logging",
-        "deletion",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotation",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
-        "Aspose.Pdf.Page.Annotations",
-        "Aspose.Pdf.Annotations.Annotation.AnnotationType"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "delete-text-annotations-export-xfdf": {
-      "title": "Delete Text Annotations and Export Remaining to XFDF",
-      "filename": "delete-text-annotations-export-xfdf.cs",
-      "description": "Shows how to remove all annotations of a specific type (e.g., Text) from a PDF using PdfAnnotationEditor and then export the remaining annotations to an XFDF file.",
-      "tags": [
-        "annotations",
-        "delete",
         "xfdf",
-        "pdf",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExportAnnotationsToXfdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Close"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "export-import-pdf-annotations-xfdf": {
-      "title": "Export and Import PDF Annotations via XFDF",
-      "filename": "export-import-pdf-annotations-xfdf.cs",
-      "description": "Shows how to export all annotations from a source PDF to an XFDF file and then import that XFDF into another PDF to duplicate the annotation layout.",
-      "tags": [
         "annotations",
-        "xfdf",
-        "export",
-        "import",
-        "pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExportAnnotationsToXfdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ImportAnnotationsFromXfdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "prevent-flattening-of-signed-pdfs": {
-      "title": "Prevent Flattening of Signed PDFs",
-      "filename": "prevent-flattening-of-signed-pdfs.cs",
-      "description": "Demonstrates how to detect digital signatures in a PDF with Aspose.Pdf.Facades.PdfFileSignature and conditionally flatten the document only when no signatures are present, preserving signature validity.",
-      "tags": [
         "pdf",
-        "digital-signature",
-        "flatten",
-        "facade",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfFileSignature",
-        "Aspose.Pdf.Facades.PdfFileSignature.BindPdf",
-        "Aspose.Pdf.Facades.PdfFileSignature.ContainsSignature",
-        "Aspose.Pdf.Document.Flatten",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "delete-pdf-annotations-with-retry": {
-      "title": "Delete PDF Annotations with Retry Mechanism",
-      "filename": "delete-pdf-annotations-with-retry.cs",
-      "description": "Demonstrates how to remove all annotations from a PDF using Aspose.Pdf.Facades.PdfAnnotationEditor and implement a retry loop that rebinds the document if the first attempt fails.",
-      "tags": [
-        "annotations",
-        "retry",
-        "pdf",
-        "aspose",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "remove-all-annotations-from-pdf__v2": {
-      "title": "Remove All Annotations from a PDF",
-      "filename": "remove-all-annotations-from-pdf__v2.cs",
-      "description": "Shows how to bind a PDF to PdfAnnotationEditor, delete every annotation, and save the cleaned document using streams.",
-      "tags": [
-        "pdf",
-        "annotations",
-        "remove",
-        "aspose",
-        "csharp"
-      ],
-      "apis_used": [
-        "PdfAnnotationEditor",
-        "PdfAnnotationEditor.BindPdf",
-        "PdfAnnotationEditor.DeleteAnnotations",
-        "PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "delete-annotations-from-pdf-using-config": {
-      "title": "Delete Specific Annotation Types from PDF Using Configuration",
-      "filename": "delete-annotations-from-pdf-using-config.cs",
-      "description": "Shows how to generate a JSON config of annotation types, load it, and remove those annotations from a PDF using Aspose.Pdf.Facades.PdfAnnotationEditor.",
-      "tags": [
-        "pdf",
-        "annotations",
-        "configuration",
-        "json",
+        "stream",
         "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "batch-export-delete-pdf-annotations-xfdf": {
-      "title": "Batch Export and Delete PDF Annotations with XFDF Archiving",
-      "filename": "batch-export-delete-pdf-annotations-xfdf.cs",
-      "description": "Demonstrates iterating over PDF files, exporting all annotations to XFDF using PdfAnnotationEditor, deleting the annotations from the PDFs, and moving the XFDF files to an archive folder.",
-      "tags": [
-        "annotations",
-        "xfdf",
-        "batch-processing",
-        "pdf",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExportAnnotationsToXfdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "delete-text-annotations-from-pdf": {
-      "title": "Delete Text Annotations from PDF",
-      "filename": "delete-text-annotations-from-pdf.cs",
-      "description": "Shows how to remove only text (sticky note) annotations from a PDF by using PdfAnnotationEditor.DeleteAnnotations with the type name \"Text\".",
-      "tags": [
-        "pdf",
-        "annotations",
-        "delete",
-        "text",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Close"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "add-custom-annotation-with-flags": {
-      "title": "Add Custom Annotation with Flags to PDF",
-      "filename": "add-custom-annotation-with-flags.cs",
-      "description": "Demonstrates creating a TextAnnotation, setting custom annotation flags, and applying it to a PDF using PdfAnnotationEditor.ModifyAnnotations.",
-      "tags": [
-        "annotation",
-        "custom-flags",
-        "pdf",
-        "Aspose.Pdf",
-        "text-annotation"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ModifyAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
-        "Aspose.Pdf.Annotations.TextAnnotation",
-        "Aspose.Pdf.Annotations.AnnotationFlags",
-        "Aspose.Pdf.Rectangle"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "flatten-pdf-annotations": {
-      "title": "Flatten PDF Annotations to Non‑Editable Visual Elements",
-      "filename": "flatten-pdf-annotations.cs",
-      "description": "Demonstrates how to use Aspose.Pdf's PdfAnnotationEditor to flatten all annotations in a PDF, converting them into static visual content and saving the result.",
-      "tags": [
-        "flatten",
-        "annotations",
-        "pdf",
-        "Aspose.Pdf",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.FlatteningAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "annotation-summary-report": {
-      "title": "Generate Annotation Summary Report for PDFs",
-      "filename": "annotation-summary-report.cs",
-      "description": "Shows how to load PDF files, extract all annotations with PdfAnnotationEditor, count them by type, and print a summary for each document.",
-      "tags": [
-        "annotations",
-        "pdf",
-        "summary",
-        "aspose",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExtractAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Close",
-        "Aspose.Pdf.Annotations.Annotation"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "import-xfdf-data-and-cleanup-temp-file": {
-      "title": "Import XFDF Data into PDF and Delete Temporary File",
-      "filename": "import-xfdf-data-and-cleanup-temp-file.cs",
-      "description": "Demonstrates how to import XFDF form data into a PDF using Aspose.Pdf, save the updated document, and delete the temporary XFDF file after a successful operation.",
-      "tags": [
-        "xfdf",
-        "form",
-        "import",
-        "cleanup",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.Form",
-        "Aspose.Pdf.Facades.Form.ImportXfdf",
-        "Aspose.Pdf.Facades.Form.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "async-pdf-annotation-operations": {
-      "title": "Asynchronous PDF Annotation Operations",
-      "filename": "async-pdf-annotation-operations.cs",
-      "description": "Demonstrates how to perform common PDF annotation tasks (flatten, delete, import, export) asynchronously by wrapping Aspose.Pdf.Facades.PdfAnnotationEditor calls in Task.Run.",
-      "tags": [
-        "pdf",
-        "annotations",
-        "async",
-        "aspose",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.FlatteningAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ImportAnnotationsFromFdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExportAnnotationsToXfdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "clone-modify-text-annotation": {
-      "title": "Clone and Modify a Text Annotation in PDF",
-      "filename": "clone-modify-text-annotation.cs",
-      "description": "Demonstrates how to clone the first TextAnnotation on a PDF page, change its properties such as title, contents and color, and add the cloned annotation back to the same page using Aspose.Pdf.",
-      "tags": [
-        "annotation",
-        "clone",
-        "text-annotation",
-        "pdf",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Annotations.TextAnnotation",
-        "Aspose.Pdf.Drawing.Color"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "delete-and-flatten-pdf-annotations": {
-      "title": "Delete and Flatten PDF Annotations",
-      "filename": "delete-and-flatten-pdf-annotations.cs",
-      "description": "Demonstrates using Aspose.Pdf.Facades.PdfAnnotationEditor to remove all annotations from a PDF, flatten any remaining ones, and save the cleaned document.",
-      "tags": [
-        "annotations",
-        "flatten",
-        "pdf",
-        "Aspose.Pdf",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "PdfAnnotationEditor.BindPdf",
-        "PdfAnnotationEditor.DeleteAnnotations",
-        "PdfAnnotationEditor.FlatteningAnnotations",
-        "PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "batch-delete-stamp-annotations": {
-      "title": "Batch Delete Stamp Annotations from PDFs",
-      "filename": "batch-delete-stamp-annotations.cs",
-      "description": "Shows how to iterate over PDF files in a directory and remove all stamp annotations using Aspose.Pdf's PdfAnnotationEditor.",
-      "tags": [
-        "pdf",
-        "annotations",
-        "batch-processing",
-        "stamp",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "pdf-annotation-helper-delete-flatten-xfdf": {
-      "title": "PDF Annotation Helper for Deleting, Flattening and XFDF Operations",
-      "filename": "pdf-annotation-helper-delete-flatten-xfdf.cs",
-      "description": "Shows a static helper class that uses Aspose.Pdf.Facades.PdfAnnotationEditor to bind a PDF, delete or flatten annotations (optionally by type or page range), and export or import annotations via XFDF streams.",
-      "tags": [
-        "pdf",
-        "annotations",
-        "delete",
-        "flatten",
-        "xfdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.FlatteningAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExportAnnotationsToXfdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ImportAnnotationFromXfdf",
-        "Aspose.Pdf.Annotations.AnnotationType"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "remove-link-annotations-pdf-pages-3-7": {
-      "title": "Delete Link Annotations from PDF Pages 3‑7",
-      "filename": "remove-link-annotations-pdf-pages-3-7.cs",
-      "description": "Demonstrates how to bind a PDF with PdfAnnotationEditor, delete link annotations (intended for pages 3 through 7), and save the modified document.",
-      "tags": [
-        "annotations",
-        "link",
-        "delete",
-        "pdf",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Close"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "delete-specific-annotation": {
-      "title": "Delete a Specific Annotation from a PDF",
-      "filename": "delete-specific-annotation.cs",
-      "description": "Demonstrates how to bind a PDF, remove an annotation identified by its name, and save the updated document using Aspose.Pdf.Facades.",
-      "tags": [
-        "annotation",
-        "delete",
-        "pdf",
-        "Aspose.Pdf",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotation",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "batch-delete-pdf-annotations-progress-bar": {
-      "title": "Batch Delete PDF Annotations with Progress Bar",
-      "filename": "batch-delete-pdf-annotations-progress-bar.cs",
-      "description": "Demonstrates iterating over PDFs in a folder, removing all annotations using PdfAnnotationEditor, saving the cleaned files, and showing a console progress bar indicating the processing percentage.",
-      "tags": [
-        "pdf",
-        "annotations",
-        "batch-processing",
-        "progress-bar",
-        "aspose"
-      ],
-      "apis_used": [
-        "PdfAnnotationEditor",
-        "PdfAnnotationEditor.BindPdf",
-        "PdfAnnotationEditor.DeleteAnnotations",
-        "PdfAnnotationEditor.Save",
-        "PdfAnnotationEditor.Dispose"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "flatten-annotations-first-five-pages": {
-      "title": "Flatten Annotations on First Five PDF Pages",
-      "filename": "flatten-annotations-first-five-pages.cs",
-      "description": "Shows how to use PdfAnnotationEditor to flatten all annotations on pages 1‑5 of a PDF document and save the result.",
-      "tags": [
-        "flatten",
-        "annotations",
-        "pdf",
-        "pages",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "PdfAnnotationEditor.BindPdf",
-        "PdfAnnotationEditor.FlatteningAnnotations",
-        "PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "modify-annotation-author-on-pdf-page": {
-      "title": "Modify Annotation Author on Specific PDF Page",
-      "filename": "modify-annotation-author-on-pdf-page.cs",
-      "description": "Shows how to change the author of annotations on a given PDF page using Aspose.Pdf.Facades.PdfAnnotationEditor.",
-      "tags": [
-        "annotations",
-        "author",
-        "pdf",
-        "Aspose.Pdf",
-        "PdfAnnotationEditor"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ModifyAnnotationsAuthor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "flatten-annotations-in-pdfs-on-network-share": {
-      "title": "Flatten Annotations in PDFs on a Network Share",
-      "filename": "flatten-annotations-in-pdfs-on-network-share.cs",
-      "description": "Shows how to enumerate PDF files in a network folder and use Aspose.Pdf.Facades.PdfAnnotationEditor to flatten all annotations, overwriting each original file.",
-      "tags": [
-        "pdf",
-        "annotations",
-        "flatten",
-        "network-share",
-        "batch"
-      ],
-      "apis_used": [
-        "PdfAnnotationEditor",
-        "PdfAnnotationEditor.BindPdf",
-        "PdfAnnotationEditor.FlatteningAnnotations",
-        "PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "delete-pdf-annotation-by-name": {
-      "title": "Delete PDF Annotation by Name",
-      "filename": "delete-pdf-annotation-by-name.cs",
-      "description": "Shows how to remove a specific annotation from a PDF document by passing its name to the DeleteAnnotation method of PdfAnnotationEditor.",
-      "tags": [
-        "annotation",
-        "delete",
-        "pdf",
-        "Aspose.Pdf",
-        "PdfAnnotationEditor"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "PdfAnnotationEditor.BindPdf",
-        "PdfAnnotationEditor.DeleteAnnotation",
-        "PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "validate-exported-xfdf-against-schema": {
-      "title": "Validate Exported XFDF Against Schema",
-      "filename": "validate-exported-xfdf-against-schema.cs",
-      "description": "Exports PDF annotations or form fields to an XFDF file using the Form facade and then validates the generated XFDF against the official XFDF XSD schema.",
-      "tags": [
-        "xfdf",
-        "validation",
-        "annotations",
-        "schema",
-        "export"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.Form",
-        "Aspose.Pdf.Facades.Form.ExportXfdf",
-        "Aspose.Pdf.Facades.Form.Dispose"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "delete-all-annotations-verify-count": {
-      "title": "Delete All Annotations and Verify Count",
-      "filename": "delete-all-annotations-verify-count.cs",
-      "description": "The example loads a PDF, counts existing annotations, removes all annotations using PdfAnnotationEditor, saves the result, and then recounts to confirm that no annotations remain.",
-      "tags": [
-        "annotations",
-        "delete",
-        "pdf",
-        "verification",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
-        "Aspose.Pdf.AnnotationCollection"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "batch-import-xfdf-annotations-into-pdfs": {
-      "title": "Batch Import XFDF Annotations into PDFs",
-      "filename": "batch-import-xfdf-annotations-into-pdfs.cs",
-      "description": "Shows how to scan a folder for PDF files, locate matching XFDF files by name, import the annotations using PdfAnnotationEditor, and save the updated PDFs to an output directory.",
-      "tags": [
-        "xfdf",
-        "annotations",
-        "batch",
-        "pdf",
-        "facade"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfAnnotationEditor",
@@ -1174,128 +469,477 @@
         "PdfAnnotationEditor.ImportAnnotationsFromXfdf",
         "PdfAnnotationEditor.Save"
       ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "delete-flatten-annotations-pdf": {
+      "title": "Delete and Flatten Annotations in a PDF",
+      "filename": "delete-flatten-annotations-pdf.cs",
+      "description": "Demonstrates loading a PDF, removing all annotations, flattening any remaining ones, and saving the processed document using Aspose.Pdf's PdfAnnotationEditor.",
+      "tags": [
+        "annotations",
+        "flatten",
+        "delete",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "PdfAnnotationEditor.BindPdf",
+        "PdfAnnotationEditor.DeleteAnnotations",
+        "PdfAnnotationEditor.FlatteningAnnotations",
+        "PdfAnnotationEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "validate-exported-xfdf-against-schema": {
+      "title": "Validate Exported XFDF Against Schema",
+      "filename": "validate-exported-xfdf-against-schema.cs",
+      "description": "Exports PDF annotations to an XFDF file using Aspose.Pdf and validates the generated XFDF against the XFDF XSD schema, reporting any validation errors.",
+      "tags": [
+        "xfdf",
+        "validation",
+        "annotations",
+        "pdf",
+        "schema"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.ExportAnnotationsToXfdf"
+      ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "delete-all-annotations-and-verify-count": {
+      "title": "Delete All Annotations and Verify Count",
+      "filename": "delete-all-annotations-and-verify-count.cs",
+      "description": "The example binds a PDF to a PdfAnnotationEditor, counts the total annotations, removes all annotations with DeleteAnnotations, and then verifies the count after deletion.",
+      "tags": [
+        "annotations",
+        "delete",
+        "pdf",
+        "Aspose.Pdf",
+        "annotation-editor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page.Annotations"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "extract-pdf-annotation-details": {
+      "title": "Extract PDF Annotation Details to Custom DTO",
+      "filename": "extract-pdf-annotation-details.cs",
+      "description": "Shows how to use PdfAnnotationEditor to read all annotations from a PDF, retrieve their name, type, and rectangle, and store the data in a custom C# object.",
+      "tags": [
+        "annotations",
+        "extraction",
+        "pdf",
+        "Aspose.Pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExtractAnnotations",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "audit-pdf-annotations-to-json": {
+      "title": "Audit PDF Annotations and Log to JSON",
+      "filename": "audit-pdf-annotations-to-json.cs",
+      "description": "Extracts annotation properties from a PDF using PdfAnnotationEditor, serializes the data to indented JSON, and writes it to a log file for auditing purposes.",
+      "tags": [
+        "annotations",
+        "json",
+        "audit",
+        "pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "PdfAnnotationEditor",
+        "Document",
+        "Page",
+        "Annotation",
+        "MarkupAnnotation",
+        "TextAnnotation",
+        "PopupAnnotation"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "delete-annotation-with-error-handling": {
+      "title": "Delete Annotation with Error Handling",
+      "filename": "delete-annotation-with-error-handling.cs",
+      "description": "Demonstrates loading a PDF, attempting to delete a non‑existent annotation using PdfAnnotationEditor, and handling any resulting exceptions gracefully.",
+      "tags": [
+        "annotation",
+        "delete",
+        "error-handling",
+        "pdf",
+        "Aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotation",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
+        "Aspose.Pdf.PdfException"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "delete-annotations-by-author": {
+      "title": "Delete Annotations by Author Using PdfAnnotationEditor",
+      "filename": "delete-annotations-by-author.cs",
+      "description": "Shows how to filter PDF annotations by the author (Title) and remove them using the PdfAnnotationEditor facade.",
+      "tags": [
+        "annotations",
+        "delete",
+        "author",
+        "pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Annotations.AnnotationCollection",
+        "Aspose.Pdf.Annotations.MarkupAnnotation",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotation",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "remove-annotations-by-color": {
+      "title": "Remove Annotations Matching a Specific RGB Color",
+      "filename": "remove-annotations-by-color.cs",
+      "description": "Demonstrates how to load a PDF, iterate through its pages, and delete any annotation whose Color property matches a given RGB value, then save the updated document.",
+      "tags": [
+        "annotations",
+        "color-filter",
+        "pdf",
+        "Aspose.Pdf",
+        "delete"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Color.FromRgb",
+        "Aspose.Pdf.Page.Annotations",
+        "Aspose.Pdf.Page.Annotations.Delete",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "export-import-pdf-annotations-xfdf": {
+      "title": "Export and Import PDF Annotations via XFDF",
+      "filename": "export-import-pdf-annotations-xfdf.cs",
+      "description": "Demonstrates exporting annotations from a source PDF to an XFDF file and importing that XFDF into another PDF to replicate the annotation layout.",
+      "tags": [
+        "annotations",
+        "xfdf",
+        "pdf",
+        "export",
+        "import"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "PdfAnnotationEditor.BindPdf",
+        "PdfAnnotationEditor.ExportAnnotationsToXfdf",
+        "PdfAnnotationEditor.ImportAnnotationsFromXfdf",
+        "PdfAnnotationEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "batch-flatten-pdf-annotations": {
+      "title": "Batch Flatten PDF Annotations in a Folder",
+      "filename": "batch-flatten-pdf-annotations.cs",
+      "description": "Shows how to iterate over all PDF files in a directory, flatten their annotations using Aspose.Pdf.Facades.PdfAnnotationEditor, and save the flattened copies with a \"_flattened\" suffix.",
+      "tags": [
+        "pdf",
+        "annotations",
+        "flatten",
+        "batch",
+        "aspose"
+      ],
+      "apis_used": [
+        "PdfAnnotationEditor",
+        "PdfAnnotationEditor.BindPdf",
+        "PdfAnnotationEditor.FlatteningAnnotations",
+        "PdfAnnotationEditor.Save",
+        "PdfAnnotationEditor.Close"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "batch-delete-stamp-annotations": {
+      "title": "Batch Delete Stamp Annotations from PDFs",
+      "filename": "batch-delete-stamp-annotations.cs",
+      "description": "Shows how to iterate through PDF files in a directory and remove all stamp annotations using Aspose.Pdf.Facades.PdfAnnotationEditor.",
+      "tags": [
+        "pdf",
+        "annotations",
+        "batch",
+        "stamp",
+        "Aspose"
+      ],
+      "apis_used": [
+        "PdfAnnotationEditor",
+        "PdfAnnotationEditor.BindPdf",
+        "PdfAnnotationEditor.DeleteAnnotations",
+        "PdfAnnotationEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     },
     "import-xfdf-annotations-into-multiple-pdfs": {
       "title": "Import XFDF Annotations into Multiple PDFs",
       "filename": "import-xfdf-annotations-into-multiple-pdfs.cs",
-      "description": "Shows how to import a single XFDF file containing reviewer comments into several PDF documents, creating new PDFs that include the same annotations.",
+      "description": "Demonstrates how to import a single XFDF file containing reviewer comments and apply those annotations to several PDF documents, saving the annotated versions.",
       "tags": [
         "xfdf",
         "annotations",
-        "pdf",
         "batch",
-        "aspose"
+        "pdf",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfAnnotationEditor",
         "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
         "Aspose.Pdf.Facades.PdfAnnotationEditor.ImportAnnotationsFromXfdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Dispose"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "parallel-delete-pdf-annotations": {
+      "title": "Parallel Deletion of Annotations from PDFs",
+      "filename": "parallel-delete-pdf-annotations.cs",
+      "description": "Shows how to remove all annotations from a collection of PDF files concurrently using Aspose.Pdf.Facades.PdfAnnotationEditor with Parallel.ForEach.",
+      "tags": [
+        "pdf",
+        "annotations",
+        "parallel",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
         "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     },
-    "extract-annotation-rectangles-to-pdf": {
-      "title": "Extract Annotation Rectangles and Visualize as PDF Pages",
-      "filename": "extract-annotation-rectangles-to-pdf.cs",
-      "description": "Reads a source PDF, extracts the rectangle of each annotation, and creates a new PDF where each page visualizes one annotation rectangle in red for easy inspection.",
+    "measure-flatten-annotations-performance": {
+      "title": "Measure Time to Flatten PDF Annotations",
+      "filename": "measure-flatten-annotations-performance.cs",
+      "description": "Loads a 500‑page PDF, flattens all annotations using PdfAnnotationEditor, saves the flattened file, and reports the elapsed time to assess performance impact.",
       "tags": [
+        "flatten",
         "annotations",
-        "rectangle",
-        "visualization",
+        "performance",
         "pdf",
-        "Aspose.Pdf"
+        "aspose-pdf"
       ],
       "apis_used": [
-        "Aspose.Pdf.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Page.SetPageSize",
-        "Aspose.Pdf.Annotations.Annotation.Rect",
-        "Aspose.Pdf.Drawing.Rectangle",
-        "Aspose.Pdf.Drawing.Graph",
-        "Aspose.Pdf.Drawing.GraphInfo",
-        "Aspose.Pdf.Color"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "modify-pdf-annotation-subject-color": {
-      "title": "Modify PDF Annotation Subject and Color",
-      "filename": "modify-pdf-annotation-subject-color.cs",
-      "description": "Demonstrates how to change the subject and color of a specific PDF annotation by creating a new TextAnnotation and applying it with the PdfAnnotationEditor.ModifyAnnotations method.",
-      "tags": [
-        "annotation",
-        "modify",
-        "pdf",
-        "color",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
         "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Annotations.TextAnnotation",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ModifyAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.FlatteningAnnotations",
         "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     },
-    "add-custom-metadata-to-pdf-annotation": {
-      "title": "Add Custom Metadata to PDF Annotation",
-      "filename": "add-custom-metadata-to-pdf-annotation.cs",
-      "description": "Demonstrates how to add a text annotation to a PDF page and embed custom metadata by storing a JSON string in the annotation's Subject property using the PdfAnnotationEditor facade.",
+    "list-annotation-names-in-pdf": {
+      "title": "List Annotation Names in PDF",
+      "filename": "list-annotation-names-in-pdf.cs",
+      "description": "Shows how to load a PDF, use PdfAnnotationEditor to extract all annotations, and print each annotation's name (or indicate missing) to the console for debugging.",
       "tags": [
-        "annotation",
-        "metadata",
+        "annotations",
         "pdf",
-        "facade",
-        "custom-data"
+        "aspose",
+        "extraction",
+        "debugging"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Annotations.TextAnnotation",
         "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Rectangle"
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExtractAnnotations",
+        "Aspose.Pdf.Annotations.Annotation"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     },
-    "log-annotation-modification-timestamps": {
-      "title": "Log Annotation Modification Timestamps in PDF",
-      "filename": "log-annotation-modification-timestamps.cs",
-      "description": "Demonstrates how to load a PDF with PdfAnnotationEditor, iterate through all annotations, update their Modified timestamp, and save the changes. Useful for tracking when each annotation was last edited.",
+    "delete-all-annotations-from-pdf": {
+      "title": "Delete All Annotations from PDF using PdfAnnotationEditor",
+      "filename": "delete-all-annotations-from-pdf.cs",
+      "description": "Demonstrates creating a PDF with a text annotation, removing all annotations with PdfAnnotationEditor.DeleteAnnotations, and verifying the removal via a unit test.",
+      "tags": [
+        "pdf",
+        "annotations",
+        "delete",
+        "unit-test",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "retry-annotation-deletion-pdf": {
+      "title": "Retry Annotation Deletion with PdfAnnotationEditor",
+      "filename": "retry-annotation-deletion-pdf.cs",
+      "description": "Demonstrates how to delete all annotations from a PDF using Aspose.Pdf's PdfAnnotationEditor with a retry mechanism that rebinds the document if the first attempt fails.",
       "tags": [
         "annotations",
-        "timestamp",
+        "retry",
         "pdf",
         "Aspose.Pdf",
-        "modification"
+        "error-handling"
       ],
       "apis_used": [
         "PdfAnnotationEditor",
         "PdfAnnotationEditor.BindPdf",
+        "PdfAnnotationEditor.DeleteAnnotations",
         "PdfAnnotationEditor.Save",
-        "Document",
-        "Page",
-        "Annotation.Modified"
+        "PdfAnnotationEditor.Close"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "delete-pdf-annotations-with-logging": {
+      "title": "Delete PDF Annotations and Log Details",
+      "filename": "delete-pdf-annotations-with-logging.cs",
+      "description": "Shows how to traverse each page of a PDF, delete every annotation, and write the annotation's name, type, and page number to a CSV log file using Aspose.Pdf.",
+      "tags": [
+        "annotations",
+        "deletion",
+        "logging",
+        "pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.AnnotationCollection",
+        "Aspose.Pdf.Annotations.Annotation"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "delete-specific-annotation-types-from-pdf": {
+      "title": "Delete Specific Annotation Types from PDF Using Configuration",
+      "filename": "delete-specific-annotation-types-from-pdf.cs",
+      "description": "Shows how to read a JSON file that lists annotation types and delete only those annotations from a PDF using Aspose.Pdf's PdfAnnotationEditor.",
+      "tags": [
+        "annotations",
+        "pdf",
+        "configuration",
+        "delete",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Close"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "remove-all-annotations-from-pdf__v2": {
+      "title": "Remove All Annotations from PDF",
+      "filename": "remove-all-annotations-from-pdf__v2.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf.Facades, delete every annotation, and save the cleaned document.",
+      "tags": [
+        "annotations",
+        "pdf",
+        "remove",
+        "facade",
+        "console"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Close"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "batch-delete-pdf-annotations-with-progress": {
+      "title": "Batch Delete PDF Annotations with Progress",
+      "filename": "batch-delete-pdf-annotations-with-progress.cs",
+      "description": "Demonstrates how to delete all annotations from multiple PDF files using Aspose.Pdf.Facades and shows a simple progress percentage for each processed file.",
+      "tags": [
+        "pdf",
+        "annotations",
+        "batch",
+        "progress",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     },
     "batch-flatten-pdf-annotations-cancellation": {
       "title": "Batch Flatten PDF Annotations with Cancellation Support",
       "filename": "batch-flatten-pdf-annotations-cancellation.cs",
-      "description": "Demonstrates how to process a batch of PDF files, flatten their annotations using Aspose.Pdf, and support user‑initiated cancellation via a CancellationToken.",
+      "description": "Demonstrates how to flatten all annotations in multiple PDF files using Aspose.Pdf while supporting cancellation via a CancellationToken.",
       "tags": [
         "pdf",
         "annotations",
@@ -1306,18 +950,424 @@
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.FlatteningAnnotations"
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.FlatteningAnnotations",
+        "Aspose.Pdf.Document.SaveAsync"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     },
-    "export-pdf-annotations-to-pretty-xfdf": {
+    "get-pdf-annotation-names-by-author": {
+      "title": "Retrieve PDF Annotation Names by Author",
+      "filename": "get-pdf-annotation-names-by-author.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, iterate through its pages and annotations, and return the titles of markup annotations whose author (Subject) matches a given string.",
+      "tags": [
+        "pdf",
+        "annotations",
+        "author",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.MarkupAnnotation",
+        "Aspose.Pdf.Document.Pages"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "copy-annotations-to-multiple-pdfs": {
+      "title": "Copy Annotations from Template PDF to Multiple PDFs",
+      "filename": "copy-annotations-to-multiple-pdfs.cs",
+      "description": "Shows how to export annotations from a source PDF to an XFDF byte array and import them into several target PDFs using Aspose.Pdf.Facades.PdfAnnotationEditor.",
+      "tags": [
+        "annotations",
+        "xfdf",
+        "pdf",
+        "copy",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExportAnnotationsToXfdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ImportAnnotationsFromXfdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "flatten-pdf-annotations-verify": {
+      "title": "Flatten PDF Annotations and Verify Removal",
+      "filename": "flatten-pdf-annotations-verify.cs",
+      "description": "Shows how to flatten all annotations in a PDF using Aspose.Pdf.Facades and then confirm that no annotation objects remain by inspecting each page's annotation collection.",
+      "tags": [
+        "flatten",
+        "annotations",
+        "verification",
+        "pdf",
+        "facades"
+      ],
+      "apis_used": [
+        "PdfAnnotationEditor",
+        "PdfAnnotationEditor.BindPdf",
+        "PdfAnnotationEditor.FlatteningAnnotations",
+        "PdfAnnotationEditor.Save",
+        "Document",
+        "Document.Pages",
+        "Page.Annotations"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "pdf-annotation-removal-report": {
+      "title": "PDF Annotation Removal and Summary Report",
+      "filename": "pdf-annotation-removal-report.cs",
+      "description": "Demonstrates how to delete all annotations from multiple PDF files using Aspose.Pdf.Facades and generate a summary of removed annotations per file.",
+      "tags": [
+        "annotations",
+        "pdf",
+        "batch",
+        "report",
+        "aspose"
+      ],
+      "apis_used": [
+        "PdfAnnotationEditor",
+        "PdfAnnotationEditor.BindPdf",
+        "PdfAnnotationEditor.DeleteAnnotations",
+        "PdfAnnotationEditor.Save",
+        "Page",
+        "Page.Annotations"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "pdf-annotation-helper-bind-delete-flatten-save": {
+      "title": "PDF Annotation Helper for Binding, Deleting, Flattening, and Saving",
+      "filename": "pdf-annotation-helper-bind-delete-flatten-save.cs",
+      "description": "Shows a reusable helper class that uses Aspose.Pdf.Facades to bind to a PDF, delete annotations (all or by type), flatten remaining annotations, and save the updated document.",
+      "tags": [
+        "pdf",
+        "annotations",
+        "aspose",
+        "facade",
+        "helper"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.FlatteningAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "remove-all-annotations-from-pdf__v3": {
+      "title": "Remove All Annotations from a PDF",
+      "filename": "remove-all-annotations-from-pdf__v3.cs",
+      "description": "Shows how to bind a PDF stream to Aspose.Pdf.Facades.PdfAnnotationEditor, delete every annotation, and save the cleaned PDF back to a stream or file.",
+      "tags": [
+        "pdf",
+        "annotations",
+        "remove",
+        "aspose",
+        "stream"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "async-process-pdf-annotations": {
+      "title": "Asynchronously Process PDF Annotations with PdfAnnotationEditor",
+      "filename": "async-process-pdf-annotations.cs",
+      "description": "Demonstrates how to perform annotation operations on a PDF (bind, delete, import, flatten, save) using Aspose.Pdf's PdfAnnotationEditor wrapped in Task.Run for non‑blocking asynchronous execution.",
+      "tags": [
+        "pdf",
+        "annotations",
+        "async",
+        "Aspose.Pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ImportAnnotationsFromXfdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.FlatteningAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "delete-pdf-annotations": {
+      "title": "Delete All Annotations from PDFs",
+      "filename": "delete-pdf-annotations.cs",
+      "description": "Shows how to remove every annotation from PDF files in a specified folder using Aspose.Pdf's PdfAnnotationEditor and save the cleaned PDFs.",
+      "tags": [
+        "pdf",
+        "annotations",
+        "delete",
+        "batch",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "PdfAnnotationEditor.BindPdf",
+        "PdfAnnotationEditor.DeleteAnnotations",
+        "PdfAnnotationEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "log-annotation-modification-timestamp": {
+      "title": "Log Annotation Modification Timestamp in PDF",
+      "filename": "log-annotation-modification-timestamp.cs",
+      "description": "Demonstrates setting the Modified property on a TextAnnotation template and applying it to all existing annotations, while logging the timestamp of the change.",
+      "tags": [
+        "annotations",
+        "timestamp",
+        "modify",
+        "pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ModifyAnnotations",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Page"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "delete-selected-annotations": {
+      "title": "Delete Selected Annotation Types from PDF",
+      "filename": "delete-selected-annotations.cs",
+      "description": "Creates a sample PDF with various annotations, then deletes specified annotation types using PdfAnnotationEditor.",
+      "tags": [
+        "annotations",
+        "delete",
+        "pdf",
+        "Aspose.Pdf",
+        "sample"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.HighlightAnnotation",
+        "Aspose.Pdf.Annotations.UnderlineAnnotation",
+        "Aspose.Pdf.Annotations.SquareAnnotation",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "backup-pdf-delete-all-annotations": {
+      "title": "Backup PDF and Delete All Annotations",
+      "filename": "backup-pdf-delete-all-annotations.cs",
+      "description": "Demonstrates creating a backup copy of a PDF file and then removing all annotations using Aspose.Pdf.Facades.PdfAnnotationEditor, saving the cleaned document.",
+      "tags": [
+        "pdf",
+        "backup",
+        "annotations",
+        "delete",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "PdfAnnotationEditor",
+        "PdfAnnotationEditor.BindPdf",
+        "PdfAnnotationEditor.DeleteAnnotations",
+        "PdfAnnotationEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "delete-annotation-by-name": {
+      "title": "Delete PDF Annotations by Name",
+      "filename": "delete-annotation-by-name.cs",
+      "description": "Shows how to delete a PDF annotation by its name using a string literal and a variable.",
+      "tags": [
+        "annotation",
+        "delete",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotation"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "benchmark-deleteannotations-vs-deleteannotation": {
+      "title": "Benchmark DeleteAnnotations vs DeleteAnnotation for PDF Annotations",
+      "filename": "benchmark-deleteannotations-vs-deleteannotation.cs",
+      "description": "Demonstrates how to measure the performance of removing all annotations with DeleteAnnotations versus removing a single annotation by name with DeleteAnnotation using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "annotations",
+        "benchmark",
+        "performance",
+        "delete"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotation",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Annotations.Annotation"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "flatten-pdf-annotations-log-size-reduction": {
+      "title": "Flatten PDF Annotations and Log Size Reduction",
+      "filename": "flatten-pdf-annotations-log-size-reduction.cs",
+      "description": "Demonstrates how to flatten all annotations in a PDF using Aspose.Pdf.Facades and log the original and reduced file sizes for audit purposes.",
+      "tags": [
+        "pdf",
+        "annotations",
+        "flatten",
+        "size-reduction",
+        "audit"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.FlatteningAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Close"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "extract-annotation-rectangles": {
+      "title": "Extract Annotation Rectangles and Visualize as PDF Pages",
+      "filename": "extract-annotation-rectangles.cs",
+      "description": "Demonstrates how to read all annotations in a PDF, extract their rectangle bounds, and create a new PDF where each page visualizes one annotation rectangle with optional descriptive text.",
+      "tags": [
+        "annotations",
+        "pdf",
+        "extraction",
+        "visualization",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Close",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation.Rect",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Text.TextFragment"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "add-custom-annotation-flags": {
+      "title": "Add Custom Annotation Flags to PDF Annotations",
+      "filename": "add-custom-annotation-flags.cs",
+      "description": "Shows how to set custom annotation flags such as Print and Locked on a TextAnnotation and apply the changes to all pages using PdfAnnotationEditor.",
+      "tags": [
+        "annotations",
+        "custom-flags",
+        "pdf",
+        "Aspose.Pdf",
+        "PdfAnnotationEditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.AnnotationFlags",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ModifyAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "flatten-annotations-network-share": {
+      "title": "Flatten Annotations in PDFs on a Network Share",
+      "filename": "flatten-annotations-network-share.cs",
+      "description": "Shows how to enumerate PDF files on a UNC/network share and use Aspose.Pdf.Facades.PdfAnnotationEditor to flatten all annotations, overwriting each original document.",
+      "tags": [
+        "pdf",
+        "annotations",
+        "flatten",
+        "network-share",
+        "batch"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.FlatteningAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Close"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "flatten-pdf-annotations-verify__v2": {
+      "title": "Flatten PDF Annotations and Verify Removal",
+      "filename": "flatten-pdf-annotations-verify__v2.cs",
+      "description": "Demonstrates how to flatten all annotations in a PDF using the PdfAnnotationEditor facade and then validates that no annotation objects remain by scanning each page's annotation collection.",
+      "tags": [
+        "annotations",
+        "flattening",
+        "validation",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.FlatteningAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.AnnotationCollection"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "export-pdf-annotations-pretty-xfdf": {
       "title": "Export PDF Annotations to Pretty‑Printed XFDF",
-      "filename": "export-pdf-annotations-to-pretty-xfdf.cs",
-      "description": "Demonstrates how to export annotations from a PDF to an XFDF file and format the XML with indentation for easier manual editing.",
+      "filename": "export-pdf-annotations-pretty-xfdf.cs",
+      "description": "Demonstrates binding a PDF, exporting its annotations to XFDF, and saving the XML with indentation for easier manual editing.",
       "tags": [
         "annotations",
         "xfdf",
@@ -1326,400 +1376,42 @@
         "pdf"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExportAnnotationsToXfdf"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "delete-annotations-from-pdfs-in-parallel": {
-      "title": "Delete All Annotations from PDFs in Parallel",
-      "filename": "delete-annotations-from-pdfs-in-parallel.cs",
-      "description": "Shows how to use Aspose.Pdf.Facades.PdfAnnotationEditor together with Parallel.ForEach to remove all annotations from a batch of PDF files concurrently while preserving the original folder structure.",
-      "tags": [
-        "pdf",
-        "annotations",
-        "parallel",
-        "aspose",
-        "batch-processing"
-      ],
-      "apis_used": [
-        "PdfAnnotationEditor",
-        "PdfAnnotationEditor.BindPdf",
-        "PdfAnnotationEditor.DeleteAnnotations",
-        "PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "backup-pdf-and-flatten-form-fields": {
-      "title": "Backup PDF and Flatten Form Fields",
-      "filename": "backup-pdf-and-flatten-form-fields.cs",
-      "description": "Demonstrates how to create a backup of a PDF before flattening its form fields using Aspose.Pdf.Facades, then saves the flattened document to a new file.",
-      "tags": [
-        "pdf",
-        "backup",
-        "flatten",
-        "form-fields",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.Form",
-        "Aspose.Pdf.Facades.Form.FlattenAllFields",
-        "Aspose.Pdf.Facades.Form.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "modify-pdf-annotation-subject": {
-      "title": "Modify PDF Annotation Subject Using PdfAnnotationEditor",
-      "filename": "modify-pdf-annotation-subject.cs",
-      "description": "Demonstrates creating a PDF with a text annotation, then using PdfAnnotationEditor.ModifyAnnotations to update the annotation's Subject property and verifying the change in a unit test.",
-      "tags": [
-        "pdf",
-        "annotation",
-        "modify",
-        "unit-test",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Annotations.TextAnnotation",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "PdfAnnotationEditor.BindPdf",
-        "PdfAnnotationEditor.ModifyAnnotations",
-        "PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "get-annotation-count-per-pdf-page": {
-      "title": "Get Annotation Count Per PDF Page",
-      "filename": "get-annotation-count-per-pdf-page.cs",
-      "description": "Shows how to use Aspose.Pdf's PdfAnnotationEditor facade to load a PDF, iterate through its pages, and count the annotations on each page, returning a dictionary of page numbers to counts.",
-      "tags": [
-        "annotations",
-        "pdf",
-        "reporting",
-        "Aspose.Pdf",
-        "page-count"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Document",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Page.Annotations",
-        "Aspose.Pdf.AnnotationCollection.Count"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "extract-pdf-annotation-details": {
-      "title": "Extract PDF Annotation Details into Custom DTO",
-      "filename": "extract-pdf-annotation-details.cs",
-      "description": "Demonstrates how to use Aspose.Pdf to iterate through a PDF, read each annotation's name, type, and rectangle, and store the information in a custom C# object.",
-      "tags": [
-        "annotations",
-        "extraction",
-        "Aspose.Pdf",
-        "facade",
-        "C#"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Annotations.Annotation",
-        "Aspose.Pdf.Rectangle"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "measure-flatten-annotations-performance": {
-      "title": "Measure Flatten Annotations Performance on PDF",
-      "filename": "measure-flatten-annotations-performance.cs",
-      "description": "Demonstrates how to flatten all annotations in a PDF using Aspose.Pdf.Facades and measures the time taken to assess performance impact.",
-      "tags": [
-        "flatten",
-        "annotations",
-        "performance",
-        "pdf",
-        "Aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "PdfAnnotationEditor.BindPdf",
-        "PdfAnnotationEditor.FlatteningAnnotations",
-        "PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "flatten-pdf-add-custom-metadata": {
-      "title": "Flatten PDF and Tag with Custom Metadata",
-      "filename": "flatten-pdf-add-custom-metadata.cs",
-      "description": "Demonstrates how to flatten a PDF (remove interactive form fields while preserving appearance) and then add a custom metadata entry that records the flattening date.",
-      "tags": [
-        "flatten",
-        "metadata",
-        "pdf",
-        "Aspose",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Flatten",
-        "Aspose.Pdf.Facades.PdfFileInfo",
-        "Aspose.Pdf.Facades.PdfFileInfo.SetMetaInfo",
-        "Aspose.Pdf.Facades.PdfFileInfo.SaveNewInfo"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "flatten-pdf-annotations-verbose": {
-      "title": "Flatten PDF Annotations with Optional Verbose Logging",
-      "filename": "flatten-pdf-annotations-verbose.cs",
-      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfAnnotationEditor to bind a PDF, flatten all its annotations, and save the result, with a command‑line flag for verbose logging.",
-      "tags": [
-        "pdf",
-        "annotations",
-        "flatten",
-        "verbose",
-        "command-line"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "PdfAnnotationEditor.BindPdf",
-        "PdfAnnotationEditor.FlatteningAnnotations",
-        "PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "remove-old-annotations-from-pdf": {
-      "title": "Remove Old Annotations from PDF",
-      "filename": "remove-old-annotations-from-pdf.cs",
-      "description": "Shows how to batch‑remove PDF annotations that are older than a specified number of days using Aspose.Pdf's annotation editor.",
-      "tags": [
-        "annotations",
-        "cleanup",
-        "pdf",
-        "aspose",
-        "batch"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Annotations.AnnotationCollection",
-        "Aspose.Pdf.Annotations.AnnotationCollection.Delete",
-        "Aspose.Pdf.Annotations.MarkupAnnotation"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "export-pdf-annotations-to-csv": {
-      "title": "Export PDF Annotations with Page Numbers to CSV",
-      "filename": "export-pdf-annotations-to-csv.cs",
-      "description": "Shows how to load a PDF using Aspose.Pdf, iterate through each page's annotations, retrieve a readable name, and write the page number and annotation name to a CSV file.",
-      "tags": [
-        "annotations",
-        "csv",
-        "aspose-pdf",
-        "page-numbers",
-        "export"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Annotations.Annotation",
-        "Aspose.Pdf.Annotations.MarkupAnnotation",
-        "Aspose.Pdf.Annotation.AnnotationType"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "flatten-pdf-annotations-log-file-sizes": {
-      "title": "Flatten PDF Annotations and Log File Sizes",
-      "filename": "flatten-pdf-annotations-log-file-sizes.cs",
-      "description": "Demonstrates how to flatten all annotations in a PDF using Aspose.Pdf.Facades.PdfAnnotationEditor and log the original and flattened file sizes for audit tracking.",
-      "tags": [
-        "annotation",
-        "flatten",
-        "audit",
-        "filesize",
-        "pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "PdfAnnotationEditor.BindPdf",
-        "PdfAnnotationEditor.FlatteningAnnotations",
-        "PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "export-pdf-annotations-to-xfdf-with-custom-namespace": {
-      "title": "Export PDF Annotations to XFDF with Custom Namespace",
-      "filename": "export-pdf-annotations-to-xfdf-with-custom-namespace.cs",
-      "description": "Demonstrates how to export all annotations from a PDF to an XFDF file and replace the default XFDF namespace with a custom one using Aspose.Pdf.",
-      "tags": [
-        "annotations",
-        "xfdf",
-        "custom-namespace",
-        "export",
-        "pdf"
-      ],
-      "apis_used": [
         "PdfAnnotationEditor",
         "PdfAnnotationEditor.BindPdf",
         "PdfAnnotationEditor.ExportAnnotationsToXfdf"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     },
-    "copy-annotations-to-multiple-pdfs": {
-      "title": "Copy Annotations from Template PDF to Multiple PDFs",
-      "filename": "copy-annotations-to-multiple-pdfs.cs",
-      "description": "Shows how to export annotations from a template PDF to an XFDF stream and import them into several target PDFs, saving each annotated document.",
-      "tags": [
-        "annotations",
-        "xfdf",
-        "pdf",
-        "batch-processing",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExportAnnotationsToXfdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ImportAnnotationsFromXfdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "get-annotation-names-by-author": {
-      "title": "Get Annotation Names by Author from PDF",
-      "filename": "get-annotation-names-by-author.cs",
-      "description": "Shows how to open a PDF with Aspose.Pdf, iterate through pages and annotations, and return the names of markup annotations whose Title matches a given author.",
-      "tags": [
-        "annotations",
-        "author",
-        "pdf",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Annotations.Annotation",
-        "Aspose.Pdf.Annotations.MarkupAnnotation"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "rename-pdf-annotation-names-prefix": {
-      "title": "Rename PDF Annotation Names with Standard Prefix",
-      "filename": "rename-pdf-annotation-names-prefix.cs",
-      "description": "Shows how to batch rename annotation names in a PDF by adding a standardized prefix using Aspose.Pdf's PdfAnnotationEditor facade.",
-      "tags": [
-        "annotations",
-        "rename",
-        "pdf",
-        "batch",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Annotations.Annotation",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "backup-pdf-and-delete-annotations": {
-      "title": "Backup Original PDF and Delete Annotations",
-      "filename": "backup-pdf-and-delete-annotations.cs",
-      "description": "Creates a backup of the source PDF, then removes all annotations using PdfAnnotationEditor and saves the modified document.",
-      "tags": [
-        "pdf",
-        "backup",
-        "annotations",
-        "delete",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Dispose"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "count-pdf-annotation-types": {
-      "title": "Count PDF Annotation Types",
-      "filename": "count-pdf-annotation-types.cs",
-      "description": "Shows how to load a PDF, extract all annotations with PdfAnnotationEditor, and return a dictionary mapping each AnnotationType to its occurrence count.",
+    "pdf-annotation-helper": {
+      "title": "PdfAnnotationHelper Wrapper for Simplified Annotation Operations",
+      "filename": "pdf-annotation-helper.cs",
+      "description": "Demonstrates a custom wrapper around Aspose.Pdf.Facades.PdfAnnotationEditor providing simple methods to delete, flatten, and save PDF annotations.",
       "tags": [
         "pdf",
         "annotations",
-        "count",
+        "wrapper",
         "aspose",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExtractAnnotations",
-        "Aspose.Pdf.Annotations.Annotation"
+        "Aspose.Pdf.Facades.PdfAnnotationEditor"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     },
-    "pdf-annotation-utility-delete-flatten-export": {
-      "title": "PDF Annotation Utility: Delete, Flatten, Export",
-      "filename": "pdf-annotation-utility-delete-flatten-export.cs",
-      "description": "Demonstrates a command‑line tool that uses Aspose.Pdf.Facades to delete specific pages, flatten annotations, and export annotations to an XFDF file.",
+    "pdf-annotation-utility": {
+      "title": "PDF Annotation Operations Command‑Line Utility",
+      "filename": "pdf-annotation-utility.cs",
+      "description": "Shows a console application that can delete pages, flatten all annotations, or export annotations to an XFDF file using Aspose.Pdf.Facades.",
       "tags": [
         "pdf",
         "annotations",
-        "command-line",
         "delete-pages",
+        "flatten",
         "export-xfdf"
       ],
       "apis_used": [
@@ -1732,313 +1424,134 @@
         "PdfAnnotationEditor.ExportAnnotationsToXfdf"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     },
-    "flatten-pdf-annotations-preserve-appearance": {
-      "title": "Flatten PDF Annotations While Preserving Appearance",
-      "filename": "flatten-pdf-annotations-preserve-appearance.cs",
-      "description": "Demonstrates loading a PDF, flattening all annotations into static graphics while keeping their visual appearance, and saving the modified document using Aspose.Pdf.",
-      "tags": [
-        "flatten",
-        "annotations",
-        "pdf",
-        "appearance",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.FlatteningAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "export-pdf-annotations-form-fields-xfdf-diagnostics": {
-      "title": "Export PDF Annotations and Form Fields to XFDF with Diagnostic Logging",
-      "filename": "export-pdf-annotations-form-fields-xfdf-diagnostics.cs",
-      "description": "Demonstrates exporting PDF annotations and form field data to XFDF using Aspose.Pdf.Facades and writing the generated XFDF content to a diagnostic log file for troubleshooting.",
+    "export-annotations-to-xfdf-empty-pdf": {
+      "title": "Export Annotations to XFDF for a PDF with No Annotations",
+      "filename": "export-annotations-to-xfdf-empty-pdf.cs",
+      "description": "Demonstrates how to use Aspose.Pdf to export annotations from a PDF that contains no annotations, producing a minimal valid XFDF document.",
       "tags": [
         "xfdf",
         "annotations",
-        "form-fields",
-        "diagnostics",
+        "export",
+        "pdf",
         "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
         "Aspose.Pdf.Facades.PdfAnnotationEditor.ExportAnnotationsToXfdf",
-        "Aspose.Pdf.Facades.Form",
-        "Aspose.Pdf.Facades.Form.ExportXfdf"
+        "Aspose.Pdf.Document.Pages.Add"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     },
-    "batch-delete-pdf-annotations-by-type": {
-      "title": "Batch Delete PDF Annotations While Retaining Specified Types",
-      "filename": "batch-delete-pdf-annotations-by-type.cs",
-      "description": "Shows how to load a JSON configuration that lists annotation types to keep, iterate through each page of a PDF, and delete all other annotations using Aspose.Pdf.",
+    "merge-multiple-xfdf-files-into-pdf": {
+      "title": "Merge Multiple XFDF Files and Import into PDF",
+      "filename": "merge-multiple-xfdf-files-into-pdf.cs",
+      "description": "Demonstrates how to combine several XFDF annotation files into a single XFDF stream using PdfAnnotationEditor and then import the merged data into a target PDF with the Form facade.",
       "tags": [
-        "pdf",
+        "xfdf",
         "annotations",
-        "batch-delete",
-        "configuration",
-        "aspnet"
+        "merge",
+        "pdf",
+        "import"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ImportAnnotationsFromXfdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExportAnnotationsToXfdf",
+        "Aspose.Pdf.Facades.Form",
+        "Aspose.Pdf.Facades.Form.ImportXfdf"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "diagnostic-annotation-workflow": {
+      "title": "Diagnostic Annotation Workflow with Logging",
+      "filename": "diagnostic-annotation-workflow.cs",
+      "description": "Demonstrates creating a PdfAnnotationEditor, adding text and link annotations, flattening them, and saving the PDF while logging each step to a verbose log file.",
+      "tags": [
+        "annotations",
+        "logging",
+        "pdf",
+        "flattening",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.GoToURIAction",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Page.Annotations.Add"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "get-annotation-count-per-pdf-page": {
+      "title": "Get Annotation Count per PDF Page",
+      "filename": "get-annotation-count-per-pdf-page.cs",
+      "description": "Demonstrates opening a PDF with Aspose.Pdf, iterating through its pages, and retrieving the number of annotations on each page for reporting.",
+      "tags": [
+        "annotations",
+        "pdf",
+        "reporting",
+        "aspose-pdf",
+        "page-count"
+      ],
+      "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Annotations.AnnotationCollection",
-        "Aspose.Pdf.Annotations.AnnotationCollection.Delete",
-        "Aspose.Pdf.Annotations.Annotation.AnnotationType"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "skip-flatten-readonly-annotations-batch": {
-      "title": "Skip Flattening Read‑Only Annotations During Batch PDF Processing",
-      "filename": "skip-flatten-readonly-annotations-batch.cs",
-      "description": "Demonstrates batch processing of PDF files, iterating through pages and annotations, and conditionally flattening them while skipping annotations marked as read‑only based on a configuration flag.",
-      "tags": [
-        "pdf",
-        "annotations",
-        "flatten",
-        "read-only",
-        "batch"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Annotations.Annotation",
-        "Aspose.Pdf.Annotations.AnnotationFlags",
-        "Aspose.Pdf.Annotations.Annotation.Flatten",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "merge-annotation-layers": {
-      "title": "Merge Annotation Layers from Multiple PDFs",
-      "filename": "merge-annotation-layers.cs",
-      "description": "Shows how to import annotation layers from several source PDFs into a base PDF and save the combined result using Aspose.Pdf's PdfAnnotationEditor.",
-      "tags": [
-        "annotations",
-        "pdf",
-        "merge",
-        "Aspose.Pdf",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ImportAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "compile-pdf-annotations-summary": {
-      "title": "Compile PDF Text Annotations into a Summary Document",
-      "filename": "compile-pdf-annotations-summary.cs",
-      "description": "Demonstrates how to extract text (comment) annotations from an existing PDF using PdfAnnotationEditor and generate a new PDF that lists each annotation with its page number.",
-      "tags": [
-        "annotations",
-        "pdf",
-        "summary",
-        "extraction",
-        "text"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExtractAnnotations",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.FontRepository.FindFont"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "delete-pdf-annotations-by-name": {
-      "title": "Delete PDF Annotations by Name (Literal and Variable)",
-      "filename": "delete-pdf-annotations-by-name.cs",
-      "description": "Demonstrates removing a specific annotation from a PDF using Aspose.Pdf by supplying its name as a string literal or via a variable.",
-      "tags": [
-        "annotation",
-        "delete",
-        "pdf",
-        "Aspose.Pdf",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotation",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Annotations.TextAnnotation",
-        "Aspose.Pdf.Rectangle"
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Page.Annotations"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     },
-    "monitor-folder-flatten-pdf-annotations": {
-      "title": "Monitor Folder and Flatten PDF Annotations",
-      "filename": "monitor-folder-flatten-pdf-annotations.cs",
-      "description": "Demonstrates a background service that watches a directory for new PDF files and uses Aspose.Pdf to flatten all annotations, saving the result with a suffix.",
-      "tags": [
-        "pdf",
-        "annotations",
-        "flatten",
-        "filesystemwatcher",
-        "background-service"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.FlatteningAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "test-export-annotations-unbound-editor": {
-      "title": "Test ExportAnnotationsXfdf Throws Exception on Unbound PdfAnnotationEditor",
-      "filename": "test-export-annotations-unbound-editor.cs",
-      "description": "Demonstrates how ExportAnnotationsXfdf raises an exception when called on a PdfAnnotationEditor that hasn't been bound to a PDF document.",
-      "tags": [
-        "pdf",
-        "annotations",
-        "exception",
-        "testing",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExportAnnotationsXfdf"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "delete-all-annotations-from-pdfs": {
-      "title": "Delete All Annotations from PDFs in a Folder",
-      "filename": "delete-all-annotations-from-pdfs.cs",
-      "description": "Demonstrates how to bind each PDF file in a directory, remove all annotations with PdfAnnotationEditor, and overwrite the original files.",
-      "tags": [
-        "pdf",
-        "annotations",
-        "batch",
-        "Aspose.Pdf",
-        "delete"
-      ],
-      "apis_used": [
-        "PdfAnnotationEditor",
-        "PdfAnnotationEditor.BindPdf",
-        "PdfAnnotationEditor.DeleteAnnotations",
-        "PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "export-annotations-empty-xfdf": {
-      "title": "Export Annotations Generates Empty XFDF When No Annotations",
-      "filename": "export-annotations-empty-xfdf.cs",
-      "description": "Shows how to use PdfAnnotationEditor to export PDF annotations to XFDF and verify that a PDF without annotations produces a valid, empty XFDF document.",
-      "tags": [
-        "pdf",
-        "annotations",
-        "xfdf",
-        "unit-test",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExportAnnotationsToXfdf",
-        "Aspose.Pdf.Page"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "clone-recolor-annotation-to-another-page": {
-      "title": "Clone and Recolor PDF Annotation to Another Page",
-      "filename": "clone-recolor-annotation-to-another-page.cs",
-      "description": "Shows how to clone an existing annotation, change its color, and add the cloned annotation to a different page in a PDF using Aspose.Pdf.",
+    "clone-modify-pdf-annotation": {
+      "title": "Clone and Modify PDF Annotation",
+      "filename": "clone-modify-pdf-annotation.cs",
+      "description": "Shows how to clone an existing annotation, adjust its properties (color, contents, title, etc.), and add the cloned annotation back to the same page using Aspose.Pdf.",
       "tags": [
         "annotation",
         "clone",
-        "color",
         "pdf",
+        "modify",
         "Aspose.Pdf"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Annotations.Annotation",
         "Aspose.Pdf.Annotations.TextAnnotation",
-        "Aspose.Pdf.Annotations.MarkupAnnotation",
-        "Aspose.Pdf.Color",
-        "Aspose.Pdf.Rectangle"
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.StampAnnotation",
+        "Aspose.Pdf.Annotations.AnnotationCollection.Add",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     },
-    "import-annotations-preserve-existing": {
-      "title": "Import Annotations While Preserving Existing Ones",
-      "filename": "import-annotations-preserve-existing.cs",
-      "description": "Demonstrates how to import annotations from multiple source PDFs into a target PDF without removing the annotations that already exist in the target document.",
-      "tags": [
-        "annotations",
-        "import",
-        "pdf",
-        "preserve",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ImportAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
-        "Aspose.Pdf.Annotations.AnnotationType"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "import-xfdf-annotations-into-pdf__v2": {
-      "title": "Import XFDF Annotations into PDF from Streams",
-      "filename": "import-xfdf-annotations-into-pdf__v2.cs",
-      "description": "Shows how to load a PDF and an XFDF file as streams, bind the PDF to PdfAnnotationEditor, import annotations from the XFDF stream, and save the updated PDF without using temporary files.",
+    "batch-import-xfdf-annotations-into-matching-pdfs": {
+      "title": "Batch Import XFDF Annotations into Matching PDFs",
+      "filename": "batch-import-xfdf-annotations-into-matching-pdfs.cs",
+      "description": "Demonstrates how to iterate through a folder of PDFs, locate matching XFDF files by name, and import their annotations into the PDFs using Aspose.Pdf's PdfAnnotationEditor.",
       "tags": [
         "xfdf",
         "annotations",
+        "batch",
         "pdf",
-        "stream",
-        "aspose-pdf"
+        "facade"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfAnnotationEditor",
@@ -2046,257 +1559,438 @@
         "Aspose.Pdf.Facades.PdfAnnotationEditor.ImportAnnotationsFromXfdf",
         "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     },
-    "batch-flatten-pdf-annotations": {
-      "title": "Batch Flatten PDF Annotations in a Folder",
-      "filename": "batch-flatten-pdf-annotations.cs",
-      "description": "Shows how to iterate over all PDF files in a directory and use Aspose.Pdf.Facades.PdfAnnotationEditor to flatten their annotations, saving the results with a \"_flattened\" suffix.",
+    "concurrent-import-delete-pdf": {
+      "title": "Concurrent Import and Delete Operations on a PDF",
+      "filename": "concurrent-import-delete-pdf.cs",
+      "description": "Demonstrates how to safely perform simultaneous page import and delete operations on the same PDF using Aspose.Pdf's PdfFileEditor with thread synchronization.",
       "tags": [
         "pdf",
+        "concurrency",
+        "import",
+        "delete",
+        "thread-safety"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.TryAppend",
+        "Aspose.Pdf.Facades.PdfFileEditor.TryDelete",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "backup-pdf-flatten-form-fields": {
+      "title": "Backup PDF and Flatten Form Fields",
+      "filename": "backup-pdf-flatten-form-fields.cs",
+      "description": "Shows how to create a backup copy of a PDF before flattening all form fields using Aspose.Pdf's Form facade.",
+      "tags": [
+        "pdf-backup",
+        "flatten-forms",
+        "aspose-pdf",
+        "csharp",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.Form",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Facades.Form.FlattenAllFields"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "count-pdf-annotation-types": {
+      "title": "Count PDF Annotation Types",
+      "filename": "count-pdf-annotation-types.cs",
+      "description": "Demonstrates how to use PdfAnnotationEditor to extract all annotations from a PDF and return a dictionary with the occurrence count for each annotation type.",
+      "tags": [
+        "annotations",
+        "pdf",
+        "count",
+        "Aspose.Pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExtractAnnotations",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.Annotation.AnnotationType"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "batch-flatten-annotations-skip-readonly": {
+      "title": "Batch Flatten Annotations Skipping Read‑Only",
+      "filename": "batch-flatten-annotations-skip-readonly.cs",
+      "description": "Demonstrates iterating through all pages of a PDF, flattening each annotation except those marked as read‑only, and saving the modified document using Aspose.Pdf.",
+      "tags": [
         "annotations",
         "flatten",
+        "read‑only",
+        "batch-processing",
+        "pdf"
+      ],
+      "apis_used": [
+        "PdfAnnotationEditor",
+        "PdfAnnotationEditor.BindPdf",
+        "PdfAnnotationEditor.Save",
+        "Document",
+        "Page",
+        "Annotation",
+        "Annotation.Flatten",
+        "AnnotationFlags"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "annotation-operations-logging": {
+      "title": "Log Annotation Operations with Aspose PDF",
+      "filename": "annotation-operations-logging.cs",
+      "description": "Demonstrates how to wrap Aspose.Pdf annotation actions (add, modify, delete, import, save) with a simple logging interceptor that measures execution time using Stopwatch.",
+      "tags": [
+        "annotations",
+        "logging",
+        "performance",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.Rectangle",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ModifyAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ImportAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "delete-annotations-export-xfdf": {
+      "title": "Delete Specific Annotations and Export Remaining to XFDF",
+      "filename": "delete-annotations-export-xfdf.cs",
+      "description": "Shows how to remove all annotations of a given type from a PDF using PdfAnnotationEditor and then export the remaining annotations to an XFDF file.",
+      "tags": [
+        "annotations",
+        "delete",
+        "xfdf",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExportAnnotationsToXfdf"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "modify-pdf-annotations-retry-backoff": {
+      "title": "Modify PDF Annotations with Retry and Exponential Backoff",
+      "filename": "modify-pdf-annotations-retry-backoff.cs",
+      "description": "Demonstrates how to modify all annotations in a PDF using Aspose.Pdf while handling transient I/O errors with a retry policy that employs exponential backoff.",
+      "tags": [
+        "annotations",
+        "retry",
+        "exponential-backoff",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "advanced",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "list-pdf-annotations-to-csv": {
+      "title": "List PDF Annotations with Page Numbers to CSV",
+      "filename": "list-pdf-annotations-to-csv.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades to iterate through a PDF's annotation collection, retrieve each annotation's name and its page number, and write the results to a CSV file.",
+      "tags": [
+        "annotations",
+        "csv",
+        "pdf",
+        "facade",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Close",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "remove-old-pdf-annotations": {
+      "title": "Remove Old Annotations from PDF",
+      "filename": "remove-old-pdf-annotations.cs",
+      "description": "Demonstrates how to iterate through PDF pages, find annotations older than a specified number of days, and delete them using Aspose.Pdf's Facades API.",
+      "tags": [
+        "annotations",
+        "cleanup",
+        "pdf",
         "batch",
         "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfAnnotationEditor",
         "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.FlatteningAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "log-annotation-operation-durations": {
-      "title": "Log Annotation Operation Durations in PDF",
-      "filename": "log-annotation-operation-durations.cs",
-      "description": "Demonstrates how to add, modify, and delete a text annotation in a PDF while measuring each operation's execution time using Stopwatch for performance logging.",
-      "tags": [
-        "annotation",
-        "performance",
-        "logging",
-        "pdf",
-        "stopwatch"
-      ],
-      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Annotations.TextAnnotation",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Color"
+        "Aspose.Pdf.Annotations.AnnotationCollection",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.AnnotationCollection.Delete"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     },
-    "health-check-pdfannotationeditor-bind": {
-      "title": "Health Check: Bind PdfAnnotationEditor to PDF",
-      "filename": "health-check-pdfannotationeditor-bind.cs",
-      "description": "Demonstrates a simple health check that loads a PDF and binds it to Aspose.Pdf.Facades.PdfAnnotationEditor to verify that the binding succeeds without errors.",
+    "check-duplicate-annotation-names": {
+      "title": "Check for Duplicate Annotation Names in a PDF",
+      "filename": "check-duplicate-annotation-names.cs",
+      "description": "Shows how to iterate through all annotations in a PDF, identify annotation names that appear more than once, and log the pages where the duplicates occur.",
       "tags": [
+        "annotations",
+        "duplicate",
         "pdf",
-        "annotation",
-        "health-check",
-        "aspose",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Document"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "validate-pdf-integrity-after-annotations": {
-      "title": "Validate PDF Integrity After Adding Annotations",
-      "filename": "validate-pdf-integrity-after-annotations.cs",
-      "description": "Shows how to add a text annotation to a PDF, save the modified file, and validate its integrity by detecting corrupted objects using Aspose.Pdf.",
-      "tags": [
-        "pdf",
-        "annotation",
         "validation",
-        "integrity",
         "aspose"
       ],
       "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Annotations.TextAnnotation",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.PdfFormat",
-        "Aspose.Pdf.Document.Validate",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Page.Annotations.Add"
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     },
-    "remove-all-annotations-from-pdf__v3": {
-      "title": "Remove All Annotations from a PDF",
-      "filename": "remove-all-annotations-from-pdf__v3.cs",
-      "description": "Shows how to load a PDF, delete every annotation using the PdfAnnotationEditor facade, and save the cleaned file.",
+    "extract-pdf-annotations-summary": {
+      "title": "Extract PDF Annotations and Create a Summary Document",
+      "filename": "extract-pdf-annotations-summary.cs",
+      "description": "Demonstrates using Aspose.Pdf's PdfAnnotationEditor facade to extract all annotation contents from a PDF and compile them into a new summary PDF file.",
       "tags": [
         "annotations",
         "pdf",
-        "remove",
-        "aspose",
+        "summary",
+        "extraction",
         "facade"
       ],
       "apis_used": [
-        "PdfAnnotationEditor",
-        "PdfAnnotationEditor.BindPdf",
-        "PdfAnnotationEditor.DeleteAnnotations",
-        "PdfAnnotationEditor.Save",
-        "PdfAnnotationEditor.Close"
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     },
-    "remove-all-annotations-from-pdfs": {
-      "title": "Remove All Annotations from PDFs in a Folder",
-      "filename": "remove-all-annotations-from-pdfs.cs",
-      "description": "Shows how to use Aspose.Pdf.Facades.PdfAnnotationEditor to delete every annotation from each PDF file in a given directory and save the cleaned documents.",
+    "flatten-pdf-annotations__v2": {
+      "title": "Flatten PDF Annotations While Preserving Appearance",
+      "filename": "flatten-pdf-annotations__v2.cs",
+      "description": "Demonstrates how to use the PdfAnnotationEditor facade to flatten all annotations in a PDF, keeping their visual appearance but removing interactive features, and then save the result.",
       "tags": [
         "pdf",
-        "annotations",
-        "batch",
-        "aspose",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "flatten-pdf-annotations-verify": {
-      "title": "Flatten PDF Annotations and Verify Removal",
-      "filename": "flatten-pdf-annotations-verify.cs",
-      "description": "Demonstrates how to flatten all annotations in a PDF using Aspose.Pdf.Facades and then scans each page to ensure no annotation objects remain.",
-      "tags": [
         "annotations",
         "flatten",
-        "validation",
-        "pdf",
-        "aspose"
+        "Aspose.Pdf",
+        "facade"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfAnnotationEditor",
         "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
         "Aspose.Pdf.Facades.PdfAnnotationEditor.FlatteningAnnotations",
         "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Page.Annotations"
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Close"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     },
-    "batch-delete-annotations-azure-blob": {
-      "title": "Batch Delete Annotations from PDFs in Azure Blob Storage",
-      "filename": "batch-delete-annotations-azure-blob.cs",
-      "description": "Demonstrates how to stream PDF blobs from Azure Blob Storage, use Aspose.Pdf.Facades.PdfAnnotationEditor to delete all annotations, and upload the processed PDFs back to a target container.",
-      "tags": [
-        "azure-blob-storage",
-        "pdf-annotations",
-        "batch-processing",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "PdfAnnotationEditor",
-        "PdfAnnotationEditor.BindPdf",
-        "PdfAnnotationEditor.DeleteAnnotations",
-        "PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "export-annotations-to-xfdf-gzip": {
-      "title": "Export PDF Annotations to XFDF and Compress with GZip",
-      "filename": "export-annotations-to-xfdf-gzip.cs",
-      "description": "Shows how to export all annotations from a PDF to XFDF using PdfAnnotationEditor and then compress the XFDF output with GZip for efficient storage.",
+    "merge-annotation-layers": {
+      "title": "Merge Annotation Layers from Multiple PDFs",
+      "filename": "merge-annotation-layers.cs",
+      "description": "Demonstrates how to combine annotation layers from several PDF documents into a single PDF using Aspose.Pdf's PdfAnnotationEditor facade.",
       "tags": [
         "annotations",
-        "xfdf",
-        "gzip",
-        "export",
+        "pdf",
+        "merge",
+        "facade",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ImportAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "pdfannotationeditor-binding-health-check": {
+      "title": "PdfAnnotationEditor Binding Health Check",
+      "filename": "pdfannotationeditor-binding-health-check.cs",
+      "description": "Creates a minimal PDF and uses PdfAnnotationEditor to bind to it, confirming that the facade can open a PDF without errors.",
+      "tags": [
+        "pdf",
+        "health-check",
+        "annotation",
+        "aspose",
         "facade"
       ],
       "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages.Add",
+        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.Facades.PdfAnnotationEditor",
         "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExportAnnotationsToXfdf"
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Document"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     },
-    "concurrent-delete-import-annotations": {
-      "title": "Concurrent Delete Pages and Import Annotations in PDF",
-      "filename": "concurrent-delete-import-annotations.cs",
-      "description": "Demonstrates running page deletion and annotation import on the same PDF simultaneously using Aspose.Pdf.Facades to verify thread safety.",
+    "export-delete-archive-annotations": {
+      "title": "Export Annotations to XFDF, Delete Them, and Archive XFDF",
+      "filename": "export-delete-archive-annotations.cs",
+      "description": "Creates a PDF with a sample annotation, exports all annotations to an XFDF file, removes the annotations from the PDF, and archives the XFDF file.",
+      "tags": [
+        "annotations",
+        "xfdf",
+        "export",
+        "delete",
+        "archive"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "flatten-pdfs-to-custom-output-directory": {
+      "title": "Flatten PDFs and Save to Custom Output Directory",
+      "filename": "flatten-pdfs-to-custom-output-directory.cs",
+      "description": "The example demonstrates loading PDF files from an input folder, flattening their form fields and annotations, and saving the flattened PDFs to a user‑specified output directory.",
       "tags": [
         "pdf",
-        "concurrency",
-        "delete-pages",
+        "flatten",
+        "output-directory",
+        "aspose-pdf",
+        "command-line"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Flatten",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "log-file-sizes-before-after-annotation-flattening": {
+      "title": "Log File Sizes Before and After Annotation Flattening",
+      "filename": "log-file-sizes-before-after-annotation-flattening.cs",
+      "description": "Loads a PDF, flattens all annotations using Aspose.Pdf.Facades.PdfAnnotationEditor, and logs the original and new file sizes for audit tracking.",
+      "tags": [
+        "annotation",
+        "flattening",
+        "audit",
+        "filesize",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.FlatteningAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Close"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "modify-annotation-subject": {
+      "title": "Modify Annotation Subject in PDF",
+      "filename": "modify-annotation-subject.cs",
+      "description": "Demonstrates creating a PDF with a text annotation, using PdfAnnotationEditor to update the annotation's Subject property, and verifying the change with a unit test.",
+      "tags": [
         "annotations",
+        "pdf",
+        "modify",
+        "unit-test",
+        "Aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ModifyAnnotations",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "batch-delete-pdf-annotations-retain-types": {
+      "title": "Batch Delete PDF Annotations While Retaining Specified Types",
+      "filename": "batch-delete-pdf-annotations-retain-types.cs",
+      "description": "Demonstrates how to delete all annotations from a PDF except those listed in a JSON configuration file, using Aspose.Pdf's Facades API.",
+      "tags": [
+        "pdf",
+        "annotations",
+        "batch-deletion",
+        "configuration",
         "aspose"
       ],
       "apis_used": [
-        "PdfFileEditor",
-        "PdfFileEditor.TryDelete",
-        "PdfAnnotationEditor",
-        "PdfAnnotationEditor.BindPdf",
-        "PdfAnnotationEditor.ImportAnnotationsFromXfdf",
-        "PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
-      "status": "verified"
-    },
-    "check-duplicate-annotation-names": {
-      "title": "Check Duplicate Annotation Names in PDF",
-      "filename": "check-duplicate-annotation-names.cs",
-      "description": "Shows how to traverse all pages and annotations in a PDF, collect annotation names, and log any duplicates with the pages they appear on.",
-      "tags": [
-        "annotations",
-        "duplicate",
-        "pdf",
-        "validation",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
         "Aspose.Pdf.Facades.PdfAnnotationEditor",
         "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Annotations.AnnotationCollection",
-        "Aspose.Pdf.Annotations.Annotation.Name"
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
+        "Aspose.Pdf.Annotations.AnnotationType"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     },
     "flatten-pdf-annotations-from-stream": {
-      "title": "Flatten PDF Annotations from Stream",
+      "title": "Flatten PDF Annotations from a Stream",
       "filename": "flatten-pdf-annotations-from-stream.cs",
-      "description": "Shows how to flatten all annotations in a PDF provided as a stream and return the modified PDF as a MemoryStream, avoiding any file system access.",
+      "description": "Shows how to flatten all annotations in a PDF supplied as a stream and return the modified document as a MemoryStream, avoiding any disk I/O.",
       "tags": [
         "pdf",
         "annotations",
@@ -2311,19 +2005,219 @@
         "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-05-05T06:12:51Z",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     },
-    "extract-group-annotations-by-author": {
+    "flatten-pdf-add-flattened-date-metadata": {
+      "title": "Flatten PDF and Tag with Flattened Date Metadata",
+      "filename": "flatten-pdf-add-flattened-date-metadata.cs",
+      "description": "Loads a PDF, flattens all form fields into static content, adds a custom metadata entry with the current UTC date, and saves the updated document.",
+      "tags": [
+        "pdf-flattening",
+        "metadata",
+        "custom-metadata",
+        "aspose-pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Flatten",
+        "Aspose.Pdf.Facades.PdfFileInfo",
+        "Aspose.Pdf.Facades.PdfFileInfo.SetMetaInfo",
+        "Aspose.Pdf.Facades.PdfFileInfo.SaveNewInfo"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "export-pdf-annotations-to-xfdf-and-log": {
+      "title": "Export PDF Annotations to XFDF and Log Content",
+      "filename": "export-pdf-annotations-to-xfdf-and-log.cs",
+      "description": "Demonstrates exporting PDF annotations to an XFDF file using PdfAnnotationEditor and writing the XFDF content to a log file for diagnostic purposes.",
+      "tags": [
+        "annotations",
+        "xfdf",
+        "export",
+        "logging",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExportAnnotationsToXfdf"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "clone-text-annotation-change-color": {
+      "title": "Clone Text Annotation and Change Its Color",
+      "filename": "clone-text-annotation-change-color.cs",
+      "description": "Demonstrates how to clone a text annotation from one page, modify its color, and add it to another page in the same PDF using Aspose.Pdf.",
+      "tags": [
+        "annotation",
+        "clone",
+        "color",
+        "pdf",
+        "Aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExtractAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.AnnotationType",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "batch-process-pdfs-azure-blob-pdfannotationeditor": {
+      "title": "Batch Process PDFs from Azure Blob Storage with PdfAnnotationEditor",
+      "filename": "batch-process-pdfs-azure-blob-pdfannotationeditor.cs",
+      "description": "The example enumerates PDF blobs in an Azure Blob container, streams each PDF into Aspose.Pdf.Facades.PdfAnnotationEditor to modify annotations, and uploads the edited PDF to another container.",
+      "tags": [
+        "azure-blob-storage",
+        "pdf-annotation",
+        "batch-processing",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAllAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.SaveToStream"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "annotation-summary-report": {
+      "title": "Generate PDF Annotation Summary Report",
+      "filename": "annotation-summary-report.cs",
+      "description": "The example loads one or more PDF files, extracts all annotations using the PdfAnnotationEditor facade, counts them by type, and writes a concise text report.",
+      "tags": [
+        "annotations",
+        "summary",
+        "pdf",
+        "report",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExtractAnnotations",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.Annotation.AnnotationType",
+        "Aspose.Pdf.Annotations.AnnotationType"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "conditional-pdf-flattening-based-on-digital-signatures": {
+      "title": "Conditional PDF Flattening Based on Digital Signatures",
+      "filename": "conditional-pdf-flattening-based-on-digital-signatures.cs",
+      "description": "The example checks a PDF for existing digital signatures using the PdfFileSignature facade and only flattens form fields and annotations when no signatures are present, preserving signature validity.",
+      "tags": [
+        "pdf",
+        "flatten",
+        "digital-signature",
+        "aspose",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Flatten",
+        "Aspose.Pdf.Facades.PdfFileSignature",
+        "Aspose.Pdf.Facades.PdfFileSignature.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileSignature.ContainsSignature",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "rename-pdf-annotation-names": {
+      "title": "Rename PDF Annotation Names with Standard Prefix",
+      "filename": "rename-pdf-annotation-names.cs",
+      "description": "Shows how to open a PDF with Aspose.Pdf, iterate through all pages and annotations, rename each annotation's Name using a standardized prefix, and save the modified document.",
+      "tags": [
+        "annotations",
+        "rename",
+        "pdf",
+        "batch",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Annotations"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "manage-pdf-annotations-verbose": {
+      "title": "Manage PDF Annotations with Verbose Logging",
+      "filename": "manage-pdf-annotations-verbose.cs",
+      "description": "Demonstrates how to bind a PDF, export, delete, flatten, and import annotations using Aspose.Pdf.Facades with an optional --verbose flag for detailed operation logging.",
+      "tags": [
+        "annotations",
+        "pdf",
+        "export",
+        "import",
+        "verbose"
+      ],
+      "apis_used": [
+        "PdfAnnotationEditor",
+        "PdfAnnotationEditor.BindPdf",
+        "PdfAnnotationEditor.ExportAnnotationsToXfdf",
+        "PdfAnnotationEditor.DeleteAnnotations",
+        "PdfAnnotationEditor.FlatteningAnnotations",
+        "PdfAnnotationEditor.ImportAnnotationsFromXfdf",
+        "PdfAnnotationEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "test-export-annotations-unbound-pdfannotationeditor": {
+      "title": "Test ExportAnnotations throws on unbound PdfAnnotationEditor",
+      "filename": "test-export-annotations-unbound-pdfannotationeditor.cs",
+      "description": "Demonstrates how to verify that calling ExportAnnotationsToXfdf on a PdfAnnotationEditor that is not bound to any PDF document results in an exception.",
+      "tags": [
+        "pdf",
+        "annotations",
+        "exception",
+        "testing",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExportAnnotationsToXfdf"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "extract-group-pdf-annotations-by-author": {
       "title": "Extract and Group PDF Annotations by Author",
-      "filename": "extract-group-annotations-by-author.cs",
-      "description": "Demonstrates how to extract all annotations from a PDF, group them by the author (Title property) and print a concise report.",
+      "filename": "extract-group-pdf-annotations-by-author.cs",
+      "description": "Shows how to use Aspose.Pdf's PdfAnnotationEditor to extract annotations from a PDF, read the author (Title) from markup annotations, and group the annotations by author for reporting.",
       "tags": [
         "annotations",
         "author",
         "grouping",
         "pdf",
-        "aspose-pdf"
+        "facade"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfAnnotationEditor",
@@ -2331,35 +2225,114 @@
         "Aspose.Pdf.Facades.PdfAnnotationEditor.ExtractAnnotations",
         "Aspose.Pdf.Annotations.Annotation",
         "Aspose.Pdf.Annotations.MarkupAnnotation",
-        "Aspose.Pdf.Annotations.AnnotationType"
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages.Count"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     },
-    "pdf-annotation-helper-wrapper": {
-      "title": "PDF Annotation Helper Wrapper for Common Tasks",
-      "filename": "pdf-annotation-helper-wrapper.cs",
-      "description": "Shows a wrapper class that abstracts Aspose.Pdf.Facades.PdfAnnotationEditor to perform common annotation operations such as delete, flatten, export, import, redact, and modify annotation metadata.",
+    "export-pdf-annotations-to-xfdf-custom-namespace": {
+      "title": "Export PDF Annotations to XFDF with Custom Namespace",
+      "filename": "export-pdf-annotations-to-xfdf-custom-namespace.cs",
+      "description": "Shows how to export PDF annotations to an XFDF file and replace the default XML namespace with a custom one to satisfy enterprise XML standards.",
+      "tags": [
+        "xfdf",
+        "annotations",
+        "custom-namespace",
+        "export",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExportAnnotationsToXfdf"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "folder-watcher-flatten-annotations": {
+      "title": "Folder Watcher to Flatten PDF Annotations",
+      "filename": "folder-watcher-flatten-annotations.cs",
+      "description": "Monitors a directory for newly added PDF files and flattens all their annotations using Aspose.Pdf.",
       "tags": [
         "pdf",
-        "annotations",
-        "wrapper",
-        "aspose",
-        "csharp"
+        "annotation",
+        "flatten",
+        "watcher",
+        "background"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.FlatteningAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExportAnnotationsToXfdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ImportAnnotationsFromFdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.RedactArea",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ModifyAnnotationsAuthor"
+        "Aspose.Pdf.Document",
+        "System.IO.FileSystemWatcher"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-05-05T06:12:51Z",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "validate-pdf-integrity-after-annotation-modifications": {
+      "title": "Validate PDF Integrity After Annotation Modifications",
+      "filename": "validate-pdf-integrity-after-annotation-modifications.cs",
+      "description": "Demonstrates how to validate a PDF for corrupted objects after performing annotation changes using Aspose.Pdf's Document and PdfAnnotationEditor.",
+      "tags": [
+        "pdf-validation",
+        "annotations",
+        "integrity",
+        "aspose-pdf",
+        "document"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Document.Validate",
+        "Aspose.Pdf.PdfFormat",
+        "Aspose.Pdf.ObjectReferenceCorruptedException"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "export-pdf-annotations-to-xfdf-gzip": {
+      "title": "Export PDF Annotations to XFDF and GZip Compress",
+      "filename": "export-pdf-annotations-to-xfdf-gzip.cs",
+      "description": "Demonstrates how to export all annotations from a PDF to XFDF format using Aspose.Pdf and then compress the resulting XFDF data with GZip for efficient storage.",
+      "tags": [
+        "annotations",
+        "xfdf",
+        "gzip",
+        "export",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExportAnnotationsToXfdf"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-15T08:54:28Z",
+      "status": "verified"
+    },
+    "import-xfdf-into-pdf-and-cleanup": {
+      "title": "Import XFDF Data into PDF and Clean Up Temporary File",
+      "filename": "import-xfdf-into-pdf-and-cleanup.cs",
+      "description": "Demonstrates how to import field values from an XFDF file into a PDF using the Form facade and then delete the temporary XFDF file after a successful import.",
+      "tags": [
+        "xfdf",
+        "form",
+        "import",
+        "cleanup",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.Form",
+        "Aspose.Pdf.Facades.Form.ImportXfdf",
+        "Aspose.Pdf.Facades.Form.Save",
+        "Aspose.Pdf.Facades.Form.Dispose"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-15T08:54:28Z",
       "status": "verified"
     }
   }

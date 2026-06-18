@@ -8,9 +8,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string newNoteText = "Updated note content goes here.";
+        const string newNoteText = "This is the updated note.";
 
         if (!File.Exists(inputPath))
         {
@@ -18,35 +18,40 @@ class Program
             return;
         }
 
-        // Load the PDF document (using rule: always wrap Document in a using block)
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Access the tagged content API
-            ITaggedContent tagged = doc.TaggedContent;
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
+            {
+                // Access the tagged content API
+                ITaggedContent tagged = doc.TaggedContent;
 
-            // Find the first existing NoteElement in the structure tree (recursive search)
-            NoteElement existingNote = null;
-            var notes = tagged.RootElement.FindElements<NoteElement>(true);
-            if (notes != null && notes.Count > 0)
-                existingNote = notes[0];
+                // Get the root structure element (no cast needed)
+                StructureElement root = tagged.RootElement;
 
-            // Remove the existing note if it was found
-            if (existingNote != null)
-                existingNote.Remove(); // removes the element from the structure tree and the document
+                // Locate any existing NoteElement(s) and remove them from the structure
+                var existingNotes = root.FindElements<NoteElement>(true);
+                foreach (var note in existingNotes)
+                {
+                    note.Remove(); // removes the element and its references
+                }
 
-            // Create a new NoteElement via the factory method
-            NoteElement newNote = tagged.CreateNoteElement();
+                // Create a new NoteElement and set its text
+                NoteElement newNote = tagged.CreateNoteElement();
+                newNote.SetText(newNoteText);
 
-            // Set the note's text content
-            newNote.SetText(newNoteText);
+                // Append the new note to the root of the structure tree
+                root.AppendChild(newNote);
 
-            // Append the new note to the root element (or any other appropriate parent)
-            tagged.RootElement.AppendChild(newNote); // AppendChild with one argument (bool defaults)
+                // Save the modified PDF
+                doc.Save(outputPath);
+            }
 
-            // Save the modified PDF (rule: Document.Save inside using)
-            doc.Save(outputPath);
+            Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Note replaced and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

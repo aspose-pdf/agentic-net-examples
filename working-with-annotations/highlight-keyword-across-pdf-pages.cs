@@ -4,13 +4,13 @@ using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Text;
 
-class Program
+class HighlightKeyword
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "highlighted_output.pdf";
-        const string keyword    = "yourKeyword"; // replace with the word to highlight
+        const string keyword = "Aspose";
 
         if (!File.Exists(inputPath))
         {
@@ -18,41 +18,34 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
             // Iterate through each page and search for the keyword on that page.
-            // This approach avoids the need for a non‑existent TextFragment.PageNumber property.
+            // This approach avoids the need for the non‑existent TextFragment.PageNumber property.
             for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
                 Page page = doc.Pages[pageIndex];
 
-                // Search for all occurrences of the keyword on the current page.
+                // Search for the keyword on the current page only.
                 TextFragmentAbsorber absorber = new TextFragmentAbsorber(keyword);
                 page.Accept(absorber);
 
-                // Iterate over each found text fragment on this page.
+                // Apply a highlight annotation to every found fragment on this page.
                 foreach (TextFragment fragment in absorber.TextFragments)
                 {
-                    // The fragment provides its bounding rectangle (Aspose.Pdf.Rectangle)
-                    Aspose.Pdf.Rectangle rect = fragment.Rectangle;
-
-                    // Create a highlight annotation on the identified page and rectangle
-                    HighlightAnnotation highlight = new HighlightAnnotation(page, rect)
+                    HighlightAnnotation highlight = new HighlightAnnotation(page, fragment.Rectangle)
                     {
-                        // Set the highlight color (use Aspose.Pdf.Color to avoid ambiguity)
-                        Color = Aspose.Pdf.Color.Yellow
+                        Color = Aspose.Pdf.Color.Yellow // optional: set highlight colour
                     };
-
-                    // Add the annotation to the page's annotation collection
                     page.Annotations.Add(highlight);
                 }
             }
 
-            // Save the modified document (lifecycle rule: use Document.Save)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Keyword highlights applied and saved to '{outputPath}'.");
+        Console.WriteLine($"Keyword highlights saved to '{outputPath}'.");
     }
 }

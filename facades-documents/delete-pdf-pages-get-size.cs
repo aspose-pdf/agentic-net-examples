@@ -2,55 +2,57 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-public static class PdfUtility
+namespace AsposePdfApi
 {
-    /// <summary>
-    /// Deletes the specified pages from a PDF file using Aspose.Pdf.Facades and returns the size (in bytes) of the resulting file.
-    /// </summary>
-    /// <param name="pdfPath">Full path to the source PDF file.</param>
-    /// <param name="pagesToDelete">Array of page numbers to delete (1‑based indexing).</param>
-    /// <returns>File size of the PDF after deletion, in bytes.</returns>
-    public static long DeletePagesAndGetSize(string pdfPath, int[] pagesToDelete)
+    public static class PdfUtilities
     {
-        if (string.IsNullOrWhiteSpace(pdfPath))
-            throw new ArgumentException("PDF path must be provided.", nameof(pdfPath));
+        /// <summary>
+        /// Deletes the specified pages from a PDF file and returns the size (in bytes) of the resulting PDF.
+        /// </summary>
+        /// <param name="pdfPath">Full path to the source PDF file.</param>
+        /// <param name="pagesToDelete">Array of page numbers to delete (1‑based indexing).</param>
+        /// <returns>File size of the PDF after deletion, in bytes.</returns>
+        public static long DeletePagesAndGetSize(string pdfPath, int[] pagesToDelete)
+        {
+            if (string.IsNullOrEmpty(pdfPath))
+                throw new ArgumentException("PDF path must be provided.", nameof(pdfPath));
 
-        if (!File.Exists(pdfPath))
-            throw new FileNotFoundException("Input PDF not found.", pdfPath);
+            if (!File.Exists(pdfPath))
+                throw new FileNotFoundException("Input PDF not found.", pdfPath);
 
-        if (pagesToDelete == null || pagesToDelete.Length == 0)
-            throw new ArgumentException("At least one page number must be specified.", nameof(pagesToDelete));
+            if (pagesToDelete == null || pagesToDelete.Length == 0)
+                throw new ArgumentException("At least one page number must be specified.", nameof(pagesToDelete));
 
-        // Create a temporary output file path in the same directory
-        string outputPath = Path.Combine(
-            Path.GetDirectoryName(pdfPath) ?? string.Empty,
-            Path.GetFileNameWithoutExtension(pdfPath) + "_deleted.pdf");
+            // Create a temporary output file path in the same directory.
+            string directory = Path.GetDirectoryName(pdfPath) ?? string.Empty; // Guard against null
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
+            string tempOutputPath = Path.Combine(directory, $"{fileNameWithoutExt}_deleted_{Guid.NewGuid()}.pdf");
 
-        // Use PdfFileEditor to delete pages; this method saves the result to outputPath
-        PdfFileEditor editor = new PdfFileEditor();
-        bool success = editor.Delete(pdfPath, pagesToDelete, outputPath);
+            // Use PdfFileEditor to delete the pages.
+            PdfFileEditor editor = new PdfFileEditor();
+            bool success = editor.Delete(pdfPath, pagesToDelete, tempOutputPath);
 
-        if (!success)
-            throw new InvalidOperationException("Failed to delete pages from the PDF.");
+            if (!success)
+                throw new InvalidOperationException("Failed to delete pages from the PDF.");
 
-        // Return the size of the resulting file
-        FileInfo info = new FileInfo(outputPath);
-        return info.Length;
+            // Get the size of the resulting PDF.
+            FileInfo info = new FileInfo(tempOutputPath);
+            long sizeInBytes = info.Length;
+
+            // Replace the original file with the new one (optional).
+            File.Delete(pdfPath);
+            File.Move(tempOutputPath, pdfPath);
+
+            return sizeInBytes;
+        }
     }
-}
 
-// A minimal entry point is required for a console‑type project.
-public class Program
-{
-    public static void Main(string[] args)
+    // Minimal entry point to satisfy the compiler for a console‑type project.
+    internal class Program
     {
-        // Optional demonstration (commented out to keep the method side‑effect free).
-        // if (args.Length >= 2)
-        // {
-        //     string pdfPath = args[0];
-        //     int[] pages = args[1].Split(',').Select(int.Parse).ToArray();
-        //     long size = PdfUtility.DeletePagesAndGetSize(pdfPath, pages);
-        //     Console.WriteLine($"Resulting file size: {size} bytes");
-        // }
+        static void Main(string[] args)
+        {
+            // No operation – the library methods can be called from other code or tests.
+        }
     }
 }

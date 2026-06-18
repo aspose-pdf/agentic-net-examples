@@ -3,74 +3,69 @@ using System.Diagnostics;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // Added namespace for Annotation
 
 class AnnotationDeletionBenchmark
 {
     static void Main()
     {
-        // Paths – replace with actual files when running the benchmark
-        const string sourcePdf = "source_with_annotations.pdf";
-        const string deleteAllOutput = "deleted_all.pdf";
-        const string deleteOneOutput = "deleted_one.pdf";
+        const string sourcePdf = "sample_with_annotations.pdf";
+        const string allDeletedPdf = "all_deleted.pdf";
+        const string singleDeletedPdf = "single_deleted.pdf";
 
         if (!File.Exists(sourcePdf))
         {
-            Console.Error.WriteLine($"Source PDF not found: {sourcePdf}");
+            Console.Error.WriteLine($"Source file not found: {sourcePdf}");
             return;
         }
 
-        // -----------------------------------------------------------------
-        // Benchmark: DeleteAnnotations() – removes all annotations at once
-        // -----------------------------------------------------------------
-        using (PdfAnnotationEditor editorAll = new PdfAnnotationEditor())
+        // ------------------------------------------------------------
+        // Obtain the name of the first annotation (used for single delete)
+        // ------------------------------------------------------------
+        string firstAnnotationName;
+        using (Document doc = new Document(sourcePdf))
         {
-            // Load the PDF into the facade
-            editorAll.BindPdf(sourcePdf);
-
-            // Measure the deletion time
-            Stopwatch swAll = Stopwatch.StartNew();
-            editorAll.DeleteAnnotations();               // deletes all annotations
-            swAll.Stop();
-
-            // Save the modified PDF
-            editorAll.Save(deleteAllOutput);
-
-            Console.WriteLine($"DeleteAnnotations() removed all annotations in {swAll.ElapsedMilliseconds} ms.");
-        }
-
-        // -----------------------------------------------------------------
-        // Benchmark: DeleteAnnotation(string) – removes a single annotation by name
-        // -----------------------------------------------------------------
-        // First obtain the name of an existing annotation (any annotation will do)
-        string annotationName;
-        using (PdfAnnotationEditor tempEditor = new PdfAnnotationEditor())
-        {
-            tempEditor.BindPdf(sourcePdf);
-            // Access the first page's annotation collection
-            AnnotationCollection annColl = tempEditor.Document.Pages[1].Annotations;
-            if (annColl.Count == 0)
+            // Assume at least one page and one annotation exist
+            if (doc.Pages.Count == 0 || doc.Pages[1].Annotations.Count == 0)
             {
-                Console.Error.WriteLine("No annotations found in the source PDF.");
+                Console.Error.WriteLine("The PDF does not contain any annotations to benchmark.");
                 return;
             }
-            // Retrieve the name of the first annotation
-            annotationName = annColl[1].Name; // Annotations collection is 1‑based
+
+            // Annotations are 1‑based indexed
+            Annotation firstAnnotation = doc.Pages[1].Annotations[1];
+            firstAnnotationName = firstAnnotation.Name;
         }
 
-        using (PdfAnnotationEditor editorOne = new PdfAnnotationEditor())
+        // ------------------------------------------------------------
+        // Benchmark DeleteAnnotations (remove all annotations)
+        // ------------------------------------------------------------
+        Stopwatch swAll = Stopwatch.StartNew();
+
+        // Use PdfAnnotationEditor to delete all annotations
+        using (PdfAnnotationEditor editorAll = new PdfAnnotationEditor())
         {
-            editorOne.BindPdf(sourcePdf);
-
-            // Measure the deletion time for a single annotation
-            Stopwatch swOne = Stopwatch.StartNew();
-            editorOne.DeleteAnnotation(annotationName);   // deletes the specific annotation
-            swOne.Stop();
-
-            // Save the modified PDF
-            editorOne.Save(deleteOneOutput);
-
-            Console.WriteLine($"DeleteAnnotation(\"{annotationName}\") removed one annotation in {swOne.ElapsedMilliseconds} ms.");
+            editorAll.BindPdf(sourcePdf);
+            editorAll.DeleteAnnotations();               // delete all annotations
+            editorAll.Save(allDeletedPdf);               // save result
         }
+
+        swAll.Stop();
+        Console.WriteLine($"DeleteAnnotations (all) elapsed: {swAll.ElapsedMilliseconds} ms");
+
+        // ------------------------------------------------------------
+        // Benchmark DeleteAnnotation (remove a single annotation by name)
+        // ------------------------------------------------------------
+        Stopwatch swSingle = Stopwatch.StartNew();
+
+        using (PdfAnnotationEditor editorSingle = new PdfAnnotationEditor())
+        {
+            editorSingle.BindPdf(sourcePdf);
+            editorSingle.DeleteAnnotation(firstAnnotationName); // delete one annotation
+            editorSingle.Save(singleDeletedPdf);                // save result
+        }
+
+        swSingle.Stop();
+        Console.WriteLine($"DeleteAnnotation (single) elapsed: {swSingle.ElapsedMilliseconds} ms");
     }
 }

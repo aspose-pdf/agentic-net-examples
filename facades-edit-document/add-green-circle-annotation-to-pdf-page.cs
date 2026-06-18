@@ -1,14 +1,15 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using System.Drawing; // Rectangle and Color are defined here
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_circle.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,29 +17,46 @@ class Program
             return;
         }
 
-        // Initialize the facade that works with PDF annotations
-        PdfContentEditor editor = new PdfContentEditor();
+        // Use PdfAnnotationEditor (a Facades class) to bind, modify, and save the PDF.
+        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        {
+            // Load the PDF document.
+            editor.BindPdf(inputPath);
 
-        // Load the existing PDF document
-        editor.BindPdf(inputPath);
+            // Access the underlying Document object.
+            Document doc = editor.Document;
 
-        // Define the annotation rectangle (position and size)
-        // Rectangle(x, y, width, height) – coordinates are in points
-        Rectangle rect = new Rectangle(100, 500, 200, 200);
+            // Ensure the document has at least six pages.
+            if (doc.Pages.Count < 6)
+            {
+                Console.Error.WriteLine("The document does not contain page 6.");
+                return;
+            }
 
-        // Create a circle annotation on page 2
-        // Parameters: rect, contents, fill color, square (false = circle), page number, border width
-        editor.CreateSquareCircle(
-            rect,
-            "Circle annotation",          // annotation contents
-            Color.Green,                  // fill color (green)
-            false,                        // false => circle shape
-            2,                            // page number (1‑based indexing)
-            3);                           // border width in points
+            // Page six (Aspose.Pdf uses 1‑based indexing).
+            Page page = doc.Pages[6];
 
-        // Save the modified PDF
-        editor.Save(outputPath);
+            // Define the rectangle that will surround the diagram.
+            // Adjust the coordinates (llx, lly, urx, ury) as needed.
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 400, 800);
 
-        Console.WriteLine($"Circle annotation added to page 2 and saved as '{outputPath}'.");
+            // Create a circle annotation on the specified page and rectangle.
+            CircleAnnotation circle = new CircleAnnotation(page, rect)
+            {
+                // Set the outline (stroke) color to green.
+                Color = Aspose.Pdf.Color.Green
+            };
+
+            // Set a thick border (e.g., 5 points).
+            circle.Border = new Border(circle) { Width = 5 };
+
+            // Add the annotation to the page.
+            page.Annotations.Add(circle);
+
+            // Save the modified PDF using the Facades editor.
+            editor.Save(outputPath);
+        }
+
+        Console.WriteLine($"Circle annotation added and saved to '{outputPath}'.");
     }
 }

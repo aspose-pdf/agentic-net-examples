@@ -12,25 +12,22 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // PdfContentEditor is a Facades class used to modify viewer preferences.
+        // PdfContentEditor works directly with file paths; no need for a Document instance.
         PdfContentEditor editor = new PdfContentEditor();
 
         // Bind the source PDF.
         editor.BindPdf(inputPath);
 
-        // Set the HideMenubar flag using the ViewerPreference constant.
+        // Apply the HideMenubar viewer preference.
         editor.ChangeViewerPreference(ViewerPreference.HideMenubar);
 
         // Save the modified PDF.
         editor.Save(outputPath);
 
-        // Release resources held by the editor.
-        editor.Close();
-
-        Console.WriteLine($"PDF saved with HideMenubar enabled: '{outputPath}'.");
+        Console.WriteLine($"Viewer preference applied. Output saved to '{outputPath}'.");
     }
 }

@@ -1,65 +1,78 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
+using System.Drawing.Imaging;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class Program
+class ImageExtractorWithManifest
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";                 // source PDF
-        const string imagesDirPath  = "ExtractedImages";           // folder for images
-        const string csvManifestPath = "image_manifest.csv";       // CSV output
+        const string inputPdfPath = "input.pdf";
+        const string imagesFolder = "ExtractedImages";
+        const string csvManifestPath = "manifest.csv";
 
-        // Verify input file exists
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure the images output directory exists
-        Directory.CreateDirectory(imagesDirPath);
+        Directory.CreateDirectory(imagesFolder);
 
-        // Open the PDF document (1‑based page indexing)
+        // List to hold CSV rows: FileName,PageNumber,Width,Height
+        List<string> csvRows = new List<string>();
+        csvRows.Add("FileName,PageNumber,Width,Height");
+
+        // Load the PDF document (lifecycle rule: use using)
         using (Document doc = new Document(inputPdfPath))
+        // Initialize the PdfExtractor (facade)
+        using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Prepare CSV writer
-            using (StreamWriter csvWriter = new StreamWriter(csvManifestPath, false))
+            // Bind the document to the extractor
+            extractor.BindPdf(doc);
+
+            int globalImageIndex = 1;
+
+            // Iterate over each page (Aspose.Pdf uses 1‑based indexing)
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
-                // Write CSV header
-                csvWriter.WriteLine("FileName,PageNumber,Width,Height");
+                // Restrict extraction to the current page
+                extractor.StartPage = pageNum;
+                extractor.EndPage   = pageNum;
 
-                // Iterate over each page
-                foreach (Page page in doc.Pages)
+                // Perform the extraction for this page
+                extractor.ExtractImage();
+
+                // Retrieve all images found on this page
+                while (extractor.HasNextImage())
                 {
-                    int pageNumber = page.Number; // 1‑based page number
+                    // Build a unique file name that includes the page number
+                    string imageFileName = $"image_{pageNum}_{globalImageIndex}.png";
+                    string imagePath = Path.Combine(imagesFolder, imageFileName);
 
-                    int imageIndex = 1; // counter per page
+                    // Save the image (PNG format)
+                    extractor.GetNextImage(imagePath, ImageFormat.Png);
 
-                    // Iterate over all images on the current page
-                    foreach (XImage img in page.Resources.Images)
+                    // Determine image dimensions using System.Drawing.Image (fully qualified)
+                    using (System.Drawing.Image img = System.Drawing.Image.FromFile(imagePath))
                     {
-                        // Build a unique file name for the extracted image
-                        string fileName = $"page{pageNumber}_img{imageIndex}.png";
-                        string filePath = Path.Combine(imagesDirPath, fileName);
+                        int width  = img.Width;
+                        int height = img.Height;
 
-                        // Save the image to disk.
-                        // XImage provides a Save method that accepts a Stream.
-                        using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
-                        {
-                            img.Save(fs);
-                        }
-
-                        // Write a line to the CSV manifest
-                        csvWriter.WriteLine($"{fileName},{pageNumber},{img.Width},{img.Height}");
-
-                        imageIndex++;
+                        // Add a row to the CSV manifest
+                        csvRows.Add($"{imageFileName},{pageNum},{width},{height}");
                     }
+
+                    globalImageIndex++;
                 }
             }
         }
 
-        Console.WriteLine($"Image extraction complete. Manifest saved to '{csvManifestPath}'.");
+        // Write the CSV manifest
+        File.WriteAllLines(csvManifestPath, csvRows);
+        Console.WriteLine($"Extraction complete. Images saved to '{imagesFolder}'.");
+        Console.WriteLine($"CSV manifest written to '{csvManifestPath}'.");
     }
 }

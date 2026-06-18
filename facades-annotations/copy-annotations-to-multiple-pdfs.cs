@@ -1,80 +1,57 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Path to the PDF that contains the source annotations (relative to the executable folder)
-        const string templateFileName = "template.pdf";
-        string templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, templateFileName);
+        // Paths
+        const string templatePath = "template.pdf";               // PDF containing the source annotations
+        string[] targetPaths = { "target1.pdf", "target2.pdf" };   // PDFs that will receive the annotations
 
-        // Verify that the template PDF exists
+        // Verify template exists
         if (!File.Exists(templatePath))
         {
-            Console.WriteLine($"Error: Template PDF not found at '{templatePath}'.");
+            Console.Error.WriteLine($"Template file not found: {templatePath}");
             return;
         }
 
-        // Paths of the PDFs that should receive the copied annotations (relative to the executable folder)
-        string[] targetFileNames = { "target1.pdf", "target2.pdf", "target3.pdf" };
-        // Use a nullable array to make the intent explicit and silence CS8604 warnings
-        string?[] targetPaths = new string?[targetFileNames.Length];
-        for (int i = 0; i < targetFileNames.Length; i++)
+        // Export annotations from the template to an in‑memory XFDF byte array
+        byte[] xfdfBytes;
+        using (var xfdfStream = new MemoryStream())
+        using (var templateDoc = new Document(templatePath))
+        using (var exporter = new PdfAnnotationEditor())
         {
-            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, targetFileNames[i]);
-            if (!File.Exists(path))
-            {
-                Console.WriteLine($"Warning: Target PDF not found at '{path}'. It will be skipped.");
-                targetPaths[i] = null; // mark as missing
-            }
-            else
-            {
-                targetPaths[i] = path;
-            }
+            exporter.BindPdf(templateDoc);
+            exporter.ExportAnnotationsToXfdf(xfdfStream);
+            // Capture the XFDF data for reuse
+            xfdfBytes = xfdfStream.ToArray();
         }
 
-        // Directory where the annotated PDFs will be saved
-        const string outputDirName = "Output";
-        string outputDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, outputDirName);
-        Directory.CreateDirectory(outputDir);
-
-        // Export all annotations from the template PDF into an in‑memory XFDF stream
-        using (MemoryStream xfdfStream = new MemoryStream())
+        // Process each target PDF
+        foreach (string targetPath in targetPaths)
         {
-            using (PdfAnnotationEditor templateEditor = new PdfAnnotationEditor())
+            if (!File.Exists(targetPath))
             {
-                templateEditor.BindPdf(templatePath);
-                templateEditor.ExportAnnotationsToXfdf(xfdfStream);
+                Console.Error.WriteLine($"Target file not found: {targetPath}");
+                continue;
             }
 
-            // Prepare the stream for reading
-            xfdfStream.Position = 0;
-
-            // Iterate over each target PDF, import the annotations, and save the result
-            foreach (string? targetPath in targetPaths)
+            // Load target document and import the previously exported annotations
+            using (var targetDoc = new Document(targetPath))
+            using (var importer = new PdfAnnotationEditor())
+            using (var importStream = new MemoryStream(xfdfBytes))
             {
-                if (string.IsNullOrEmpty(targetPath) || !File.Exists(targetPath))
-                    continue; // skip missing files
+                importer.BindPdf(targetDoc);
+                importer.ImportAnnotationsFromXfdf(importStream);
 
-                string fileName = Path.GetFileNameWithoutExtension(targetPath);
-                string outputPath = Path.Combine(outputDir, fileName + "_annotated.pdf");
-
-                using (PdfAnnotationEditor targetEditor = new PdfAnnotationEditor())
-                {
-                    targetEditor.BindPdf(targetPath);
-                    // Import the previously exported annotations
-                    targetEditor.ImportAnnotationsFromXfdf(xfdfStream);
-                    // Save the modified document
-                    targetEditor.Save(outputPath);
-                }
-
-                // Reset stream position for the next target PDF
-                xfdfStream.Position = 0;
+                // Save the modified document (overwrites the original)
+                importer.Save(targetPath);
             }
+
+            Console.WriteLine($"Annotations copied to: {targetPath}");
         }
-
-        Console.WriteLine("Annotations have been copied to all existing target PDFs.");
     }
 }

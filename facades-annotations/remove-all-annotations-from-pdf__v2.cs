@@ -2,57 +2,49 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-namespace PdfProcessingConsole
+class Program
 {
-    class Program
+    static void Main(string[] args)
     {
-        /// <summary>
-        /// Removes all annotations from a PDF file.
-        /// Usage: PdfProcessingConsole.exe <inputPdfPath> <outputPdfPath>
-        /// </summary>
-        static void Main(string[] args)
+        // Expect exactly two arguments: input PDF path and output PDF path
+        if (args.Length != 2)
         {
-            if (args.Length != 2)
-            {
-                Console.WriteLine("Usage: PdfProcessingConsole.exe <inputPdfPath> <outputPdfPath>");
-                return;
-            }
+            Console.Error.WriteLine("Usage: RemoveAnnotations <input.pdf> <output.pdf>");
+            return;
+        }
 
-            string inputPath = args[0];
-            string outputPath = args[1];
+        string inputPath = args[0];
+        string outputPath = args[1];
 
-            if (!File.Exists(inputPath))
-            {
-                Console.WriteLine($"Input file not found: {inputPath}");
-                return;
-            }
+        // Verify that the input file exists
+        if (!File.Exists(inputPath))
+        {
+            Console.Error.WriteLine($"Error: Input file not found: {inputPath}");
+            return;
+        }
 
-            try
-            {
-                // Load the PDF into a memory stream (optional, but mirrors the original API design)
-                using (MemoryStream inputStream = new MemoryStream(File.ReadAllBytes(inputPath)))
-                {
-                    // Bind the PDF to the annotation editor and delete all annotations
-                    using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-                    {
-                        editor.BindPdf(inputStream);
-                        editor.DeleteAnnotations();
+        try
+        {
+            // Initialize the annotation editor facade
+            PdfAnnotationEditor editor = new PdfAnnotationEditor();
 
-                        // Save the cleaned PDF to the output file
-                        using (MemoryStream outputStream = new MemoryStream())
-                        {
-                            editor.Save(outputStream);
-                            File.WriteAllBytes(outputPath, outputStream.ToArray());
-                        }
-                    }
-                }
+            // Bind the PDF document to the editor
+            editor.BindPdf(inputPath);
 
-                Console.WriteLine($"Annotations removed successfully. Clean PDF saved to: {outputPath}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-            }
+            // Delete all annotations in the document
+            editor.DeleteAnnotations();
+
+            // Save the modified PDF to the specified output path
+            editor.Save(outputPath);
+
+            // Release resources associated with the bound document
+            editor.Close();
+
+            Console.WriteLine($"All annotations removed. Output saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
         }
     }
 }

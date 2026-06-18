@@ -1,54 +1,81 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;   // for TextFragment
-using Aspose.Pdf.LogicalStructure; // not required for core Table, but kept for completeness
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
     static void Main()
     {
-        // Input and output PDF paths
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_mincolwidth.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const float minColumnWidth = 50f; // Minimum width in points
 
-        // Ensure the input file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the existing PDF document
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Create a new table and set a minimum column width (in points)
-            Table table = new Table
-            {
-                // DefaultColumnWidth is applied to any column that does not have an explicit width.
-                // Setting it to 50 points ensures no column becomes narrower than 50 points.
-                DefaultColumnWidth = "50"
-            };
+            // Access tagged content (creates a tagged structure if not present)
+            ITaggedContent tagged = doc.TaggedContent;
+            tagged.SetLanguage("en-US");
+            tagged.SetTitle("PDF with Minimum Column Width");
 
-            // Optionally define explicit widths for each column.
-            // The widths are space‑separated; here we define three columns.
-            table.ColumnWidths = "50 70 90";
+            // Root element of the tagged structure
+            StructureElement root = tagged.RootElement;
 
-            // Add a header row
-            Row header = table.Rows.Add();
-            header.Cells.Add(new Cell { Paragraphs = { new TextFragment("Header 1") } });
-            header.Cells.Add(new Cell { Paragraphs = { new TextFragment("Header 2") } });
-            header.Cells.Add(new Cell { Paragraphs = { new TextFragment("Header 3") } });
+            // Create a table element
+            TableElement table = tagged.CreateTableElement();
 
-            // Add a data row
-            Row data = table.Rows.Add();
-            data.Cells.Add(new Cell { Paragraphs = { new TextFragment("Data A") } });
-            data.Cells.Add(new Cell { Paragraphs = { new TextFragment("Data B") } });
-            data.Cells.Add(new Cell { Paragraphs = { new TextFragment("Data C") } });
+            // Set the default column width to enforce a minimum width (points)
+            table.DefaultColumnWidth = minColumnWidth.ToString();
 
-            // Insert the table into the first page of the document
-            Page firstPage = doc.Pages[1]; // 1‑based indexing
-            firstPage.Paragraphs.Add(table);
+            // Optionally define explicit column widths (three columns as an example)
+            table.ColumnWidths = "100 100 100";
+
+            // Attach the table to the document structure
+            root.AppendChild(table);
+
+            // ----- Header row -----
+            TableTHeadElement thead = tagged.CreateTableTHeadElement();
+            table.AppendChild(thead);
+            TableTRElement headerRow = tagged.CreateTableTRElement();
+            thead.AppendChild(headerRow);
+
+            TableTHElement th1 = tagged.CreateTableTHElement();
+            th1.SetText("Column 1");
+            headerRow.AppendChild(th1);
+
+            TableTHElement th2 = tagged.CreateTableTHElement();
+            th2.SetText("Column 2");
+            headerRow.AppendChild(th2);
+
+            TableTHElement th3 = tagged.CreateTableTHElement();
+            th3.SetText("Column 3");
+            headerRow.AppendChild(th3);
+
+            // ----- Body row -----
+            TableTBodyElement tbody = tagged.CreateTableTBodyElement();
+            table.AppendChild(tbody);
+            TableTRElement bodyRow = tagged.CreateTableTRElement();
+            tbody.AppendChild(bodyRow);
+
+            TableTDElement td1 = tagged.CreateTableTDElement();
+            td1.SetText("Data 1");
+            bodyRow.AppendChild(td1);
+
+            TableTDElement td2 = tagged.CreateTableTDElement();
+            td2.SetText("Data 2");
+            bodyRow.AppendChild(td2);
+
+            TableTDElement td3 = tagged.CreateTableTDElement();
+            td3.SetText("Data 3");
+            bodyRow.AppendChild(td3);
 
             // Save the modified PDF
             doc.Save(outputPath);

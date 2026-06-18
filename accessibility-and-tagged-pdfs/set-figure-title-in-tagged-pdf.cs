@@ -8,40 +8,42 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_figure_title.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF and work with its tagged content
+        // Load the existing PDF document
         using (Document doc = new Document(inputPath))
         {
             // Access the tagged content API
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Get the root element of the structure tree (no cast needed)
+            // Optional: set document language and title for accessibility
+            tagged.SetLanguage("en-US");
+            tagged.SetTitle("Accessible PDF with Figure Title");
+
+            // Get the root structure element of the tagged PDF
             StructureElement root = tagged.RootElement;
 
-            // Create a new figure element
+            // Create a figure element and assign a concise title
             FigureElement figure = tagged.CreateFigureElement();
+            figure.Title = "Figure 1: Sales Overview";
 
-            // Set a concise description using the Title property
-            figure.Title = "Figure 1: Sales growth chart";
+            // Optional: provide alternative text for the figure
+            figure.AlternativeText = "Bar chart showing quarterly sales.";
 
-            // Optionally set alternative text for accessibility
-            figure.AlternativeText = "Bar chart showing quarterly sales growth";
-
-            // Append the figure to the document's structure tree
+            // Append the figure element to the document's structure tree
             root.AppendChild(figure);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with figure title to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

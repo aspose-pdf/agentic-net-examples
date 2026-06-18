@@ -1,33 +1,44 @@
 using System;
-using Aspose.Pdf;
+using System.IO;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string sourcePdf = "input.pdf";
+        const string outputPdf = "output.pdf";
 
-        if (!System.IO.File.Exists(inputPath))
+        if (!File.Exists(sourcePdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {sourcePdf}");
             return;
         }
 
-        // FormEditor loads the source PDF and prepares the destination file.
-        using (FormEditor formEditor = new FormEditor(inputPath, outputPath))
+        // Initialize FormEditor with source and destination files
+        using (FormEditor formEditor = new FormEditor(sourcePdf, outputPdf))
         {
-            // Add a submit button named "SubmitForm" on page 1.
-            // Button label: "Submit"
-            // Submission URL: https://api.example.com/submit
-            // Position: lower‑left (100, 500), upper‑right (200, 550)
-            formEditor.AddSubmitBtn("SubmitForm", 1, "Submit", "https://api.example.com/submit", 100, 500, 200, 550);
+            // Define button position (lower‑left and upper‑right corners)
+            float llx = 50f;   // lower‑left X
+            float lly = 750f;  // lower‑left Y
+            float urx = 150f;  // upper‑right X
+            float ury = 800f;  // upper‑right Y
 
-            // Save the modified PDF.
+            // Add a submit button named "SubmitForm" on page 1
+            formEditor.AddSubmitBtn(
+                fieldName: "SubmitForm",
+                page: 1,
+                label: "Submit",
+                url: "https://api.example.com/submit",
+                llx: llx,
+                lly: lly,
+                urx: urx,
+                ury: ury);
+
+            // Persist changes to the output PDF
             formEditor.Save();
         }
 
-        Console.WriteLine($"Submit button added and saved to '{outputPath}'.");
+        Console.WriteLine($"Submit button added and saved to '{outputPdf}'.");
     }
 }

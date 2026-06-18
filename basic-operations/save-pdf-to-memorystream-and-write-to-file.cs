@@ -1,41 +1,52 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Aspose.Pdf namespace contains Document and related classes
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        // Input PDF file path
+        const string inputPath = "input.pdf";
 
-        // Verify the source file exists
+        // Output PDF file path (the file that will receive the data from the memory stream)
+        const string outputPath = "output_from_memory.pdf";
+
+        // Verify that the input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (wrapped in using for deterministic disposal)
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Create a memory stream to hold the PDF data
-            using (MemoryStream memory = new MemoryStream())
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPath))
             {
-                // Save the document into the memory stream (PDF format by default)
-                doc.Save(memory);
-
-                // Reset the stream position before reading its contents
-                memory.Position = 0;
-
-                // Write the memory stream to a physical file
-                using (FileStream file = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                // Create a memory stream to hold the PDF data
+                using (MemoryStream ms = new MemoryStream())
                 {
-                    memory.CopyTo(file);
+                    // Save the document into the memory stream (PDF format is implied)
+                    pdfDoc.Save(ms);
+
+                    // Reset the stream position to the beginning before reading
+                    ms.Position = 0;
+
+                    // Write the contents of the memory stream to the output file
+                    // Using FileStream ensures the file is created/written correctly
+                    using (FileStream fileStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                    {
+                        ms.CopyTo(fileStream);
+                    }
                 }
             }
-        }
 
-        Console.WriteLine($"PDF successfully saved to '{outputPath}' via MemoryStream.");
+            Console.WriteLine($"PDF successfully saved to memory and written to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

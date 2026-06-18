@@ -1,89 +1,81 @@
 using System;
 using System.IO;
+using System.Drawing;                     // Required for System.Drawing.Rectangle
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Forms; // for FieldType, PKCS1
+using Aspose.Pdf.Facades;                // PdfFileSignature, FormEditor
+using Aspose.Pdf.Forms;                  // FieldType, PKCS1
 
 class Program
 {
     static void Main()
     {
-        // Input and output files
+        // Input PDF, output PDF, certificate path and password
         const string inputPdf   = "input.pdf";
         const string outputPdf  = "signed_output.pdf";
-        const string certFile   = "certificate.pfx";
+        const string certPath   = "certificate.pfx";
         const string certPass   = "password";
-        const string appearance = "signature_appearance.png";
 
-        // Verify that required files exist
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(certFile))
+        if (!File.Exists(certPath))
         {
-            Console.Error.WriteLine($"Certificate file not found: {certFile}");
-            return;
-        }
-        if (!File.Exists(appearance))
-        {
-            Console.Error.WriteLine($"Signature appearance image not found: {appearance}");
+            Console.Error.WriteLine($"Certificate file not found: {certPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+        try
         {
-            // Add a signature field named "DigitalSignature" on page 1
-            // Rectangle coordinates: lower‑left (100,100), upper‑right (200,150)
-            using (FormEditor formEditor = new FormEditor(doc))
+            // ------------------------------------------------------------
+            // 1. Add a signature field named "DigitalSignature" to page 1
+            // ------------------------------------------------------------
+            // Load the source PDF into a Document instance (required by older FormEditor overloads).
+            Document srcDoc = new Document(inputPdf);
+            FormEditor formEditor = new FormEditor(srcDoc);
+            // Parameters: field type, field name, page number (1‑based), llx, lly, urx, ury
+            formEditor.AddField(FieldType.Signature, "DigitalSignature", 1, 100f, 100f, 250f, 150f);
+            // Save the document that now contains the empty signature field.
+            formEditor.Save(outputPdf);
+
+            // ------------------------------------------------------------
+            // 2. Sign the newly added field using a PKCS#1 signature
+            // ------------------------------------------------------------
+            // Load the PDF that contains the signature field.
+            Document docToSign = new Document(outputPdf);
+            PdfFileSignature pdfSigner = new PdfFileSignature();
+            pdfSigner.BindPdf(docToSign);
+
+            // Create the PKCS#1 signature object.
+            PKCS1 pkcs1Signature = new PKCS1(certPath, certPass)
             {
-                bool fieldAdded = formEditor.AddField(
-                    FieldType.Signature,          // field type
-                    "DigitalSignature",          // field name
-                    1,                           // page number (1‑based)
-                    100f, 100f,                  // llx, lly
-                    200f, 150f);                 // urx, ury
-
-                if (!fieldAdded)
-                {
-                    Console.Error.WriteLine("Failed to add signature field.");
-                    return;
-                }
-
-                // Persist the added field into the document
-                formEditor.Save();
-            }
-
-            // Prepare the signature object (PKCS1)
-            PKCS1 pkcs1Signature = new PKCS1(certFile, certPass)
-            {
-                Reason      = "Document approved",
-                ContactInfo = "contact@example.com",
-                Location    = "Office"
+                Reason      = "Document approval",
+                ContactInfo = "john.doe@example.com",
+                Location    = "New York"
             };
 
-            // Sign the document using the newly created field
-            using (PdfFileSignature pdfSigner = new PdfFileSignature())
-            {
-                // Bind the in‑memory document to the signer
-                pdfSigner.BindPdf(doc);
+            // Define the visible rectangle for the signature appearance.
+            // Rectangle constructor: (x, y, width, height)
+            System.Drawing.Rectangle rect = new System.Drawing.Rectangle(100, 100, 150, 50);
 
-                // Set visual appearance (image) for the signature
-                pdfSigner.SignatureAppearance = appearance;
+            // Use the overload that matches the library version: (int pageNumber, string reason,
+            // string contactInfo, string location, bool isVisible, Rectangle rectangle, PKCS1 pkcs1)
+            pdfSigner.Sign(
+                1,
+                pkcs1Signature.Reason,
+                pkcs1Signature.ContactInfo,
+                pkcs1Signature.Location,
+                true,
+                rect,
+                pkcs1Signature);
 
-                // Set the certificate (required for signing)
-                pdfSigner.SetCertificate(certFile, certPass);
-
-                // Sign the field by its name
-                pdfSigner.Sign("DigitalSignature", pkcs1Signature);
-
-                // Save the signed PDF
-                pdfSigner.Save(outputPdf);
-            }
-
-            Console.WriteLine($"Signed PDF saved to '{outputPdf}'.");
+            // Save the signed PDF (overwrites the same file).
+            pdfSigner.Save(outputPdf);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

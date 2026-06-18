@@ -7,49 +7,43 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";          // source PDF
-        const string outputPdf = "rotated_stamp.pdf"; // result PDF
-        const string stampImg = "stamp.png";          // image to use as stamp
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string stampImage = "stamp.jpg";
 
-        // Verify required files exist.
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdf) || !File.Exists(stampImage))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(stampImg))
-        {
-            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
+            Console.Error.WriteLine("Input PDF or stamp image not found.");
             return;
         }
 
-        // Load the PDF document first – PdfFileStamp expects a Document, not a file path.
+        // Load the source PDF
         using (Document doc = new Document(inputPdf))
         {
-            // Initialise PdfFileStamp with the loaded Document.
-            using (PdfFileStamp fileStamp = new PdfFileStamp(doc))
+            // Initialize the PdfFileStamp facade and bind the document
+            using (PdfFileStamp fileStamp = new PdfFileStamp())
             {
-                // Fully qualify the ambiguous Stamp type.
+                fileStamp.BindPdf(doc);
+
+                // Create a stamp, bind the image, and rotate it 90 degrees clockwise
                 Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
+                stamp.BindImage(stampImage);
+                stamp.Rotation = 90f; // clockwise rotation
 
-                // Bind the image that will be stamped onto each page.
-                stamp.BindImage(stampImg);
+                // Optional: set position and size of the stamp
+                stamp.SetOrigin(100, 100);
+                stamp.SetImageSize(200, 200);
+                stamp.IsBackground = false; // place on top of page content
 
-                // Rotate the stamp 90 degrees clockwise to match the underlying image orientation.
-                stamp.Rotation = 90f; // degrees
-
-                // Optional visual tweaks.
-                stamp.Opacity = 0.8f;          // semi‑transparent
-                stamp.IsBackground = false;   // place stamp above page content
-
-                // Add the configured stamp to the PDF (applies to all pages).
+                // Add the stamp to the PDF
                 fileStamp.AddStamp(stamp);
-
-                // Write the output file.
-                fileStamp.Save(outputPdf);
+                fileStamp.Close(); // finalize stamping
             }
+
+            // Save the modified PDF
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Stamp applied with 90° rotation. Output saved to '{outputPdf}'.");
+        Console.WriteLine($"Stamp rotated and saved to '{outputPdf}'.");
     }
 }

@@ -16,29 +16,27 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a PdfPageEditor bound to the loaded document
-            using (PdfPageEditor editor = new PdfPageEditor(doc))
+            // Initialize the PdfPageEditor facade and bind the loaded document
+            using (PdfPageEditor editor = new PdfPageEditor())
             {
-                // Target only page 3 (1‑based indexing)
+                editor.BindPdf(doc);
+
+                // Apply vertical middle alignment only to page 3
                 editor.ProcessPages = new int[] { 3 };
+                // Correct enum member – use Center instead of non‑existent Middle
+                editor.VerticalAlignmentType = VerticalAlignment.Center;
 
-                // Align the original content vertically to the middle of the page
-                editor.VerticalAlignmentType = VerticalAlignment.Center; // middle alignment
-
-                // (Optional) you can also set horizontal alignment if needed
-                // editor.HorizontalAlignment = HorizontalAlignment.Center;
-
-                // Apply the changes to the selected page(s)
+                // Apply the changes to the document
                 editor.ApplyChanges();
-
-                // Save the modified document
-                editor.Save(outputPath);
             }
+
+            // Save the modified document (PDF format)
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Page 3 content vertically centered and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with vertically centered content on page 3: '{outputPath}'.");
     }
 }

@@ -6,25 +6,24 @@ class Program
 {
     static void Main()
     {
-        const string psPath = "input.ps";
-        const string pdfPath = "output.pdf";
+        const string psFilePath = "input.ps";
+        const string pdfFilePath = "output.pdf";
 
-        if (!File.Exists(psPath))
+        // Verify the source PostScript file exists.
+        if (!File.Exists(psFilePath))
         {
-            Console.Error.WriteLine($"File not found: {psPath}");
+            Console.Error.WriteLine($"Source file not found: {psFilePath}");
             return;
         }
 
-        // Load the PostScript file using the appropriate load options.
-        PsLoadOptions loadOptions = new PsLoadOptions();
-
-        // Wrap the Document in a using block for deterministic disposal.
-        using (Document pdfDoc = new Document(psPath, loadOptions))
+        // Load the PostScript file with default PsLoadOptions.
+        // The Document constructor with a LoadOptions instance performs the conversion.
+        using (Document pdfDocument = new Document(psFilePath, new PsLoadOptions()))
         {
-            // Save the loaded document as PDF using default settings.
-            pdfDoc.Save(pdfPath);
+            // Save the resulting PDF using default settings.
+            pdfDocument.Save(pdfFilePath);
         }
 
-        Console.WriteLine($"Successfully converted '{psPath}' to PDF at '{pdfPath}'.");
+        Console.WriteLine($"PostScript file successfully converted to PDF: {pdfFilePath}");
     }
 }

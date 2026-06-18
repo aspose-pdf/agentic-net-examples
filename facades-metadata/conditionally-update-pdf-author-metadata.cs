@@ -6,9 +6,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string newAuthor = "John Doe";
+        const string newAuthor  = "John Doe";
 
         if (!File.Exists(inputPath))
         {
@@ -16,22 +16,23 @@ class Program
             return;
         }
 
-        // Load PDF metadata using the Facades API
+        // Load PDF metadata using the Facade class.
         using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
         {
-            // Update Author only if it is empty or null
-            if (string.IsNullOrEmpty(pdfInfo.Author))
+            // Update only when the Author field is empty or whitespace.
+            if (string.IsNullOrWhiteSpace(pdfInfo.Author))
             {
                 pdfInfo.Author = newAuthor;
-                // Save the updated metadata to a new file
+
+                // Save the updated metadata to a new file.
                 bool success = pdfInfo.SaveNewInfo(outputPath);
                 Console.WriteLine(success
                     ? $"Author set and saved to '{outputPath}'."
-                    : "Failed to save updated PDF.");
+                    : "Failed to save the updated PDF.");
             }
             else
             {
-                Console.WriteLine($"Author already set to '{pdfInfo.Author}'. No changes made.");
+                Console.WriteLine($"Existing Author: '{pdfInfo.Author}'. No changes applied.");
             }
         }
     }

@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "annotated.pdf";
+        const string outputPath = "annotated_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -24,25 +24,25 @@ class Program
             {
                 Page page = doc.Pages[i];
 
-                // Define the annotation rectangle (left, bottom, right, top)
-                // Fully qualify to avoid ambiguity with System.Drawing.Rectangle
+                // Define the annotation rectangle (position and size)
+                // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
                 Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-                // Create a text annotation on the current page
+                // Create a TextAnnotation on the current page
                 TextAnnotation annotation = new TextAnnotation(page, rect)
                 {
                     Title    = $"Page {i} Note",
-                    Contents = $"This is a note on page {i}.",
-                    Open     = true,                     // Open the popup by default
-                    Icon     = TextIcon.Note,            // Standard note icon
-                    Color    = Aspose.Pdf.Color.Yellow   // Background color of the annotation
+                    Contents = $"This is a text annotation on page {i}.",
+                    Color    = Aspose.Pdf.Color.Yellow, // Background color of the annotation icon
+                    Open     = true,                     // Open the annotation by default
+                    Icon     = TextIcon.Note               // Choose an appropriate icon
                 };
 
                 // Add the annotation to the page's annotation collection
                 page.Annotations.Add(annotation);
             }
 
-            // Save the modified document (document-disposal-with-using rule)
+            // Save the modified document (lifecycle rule: use provided save method)
             doc.Save(outputPath);
         }
 

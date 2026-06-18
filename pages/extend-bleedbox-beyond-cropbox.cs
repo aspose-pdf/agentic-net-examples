@@ -18,27 +18,27 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Process each page (example uses first page; adjust as needed)
+            // Iterate through all pages (1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Get the existing CropBox
-                Aspose.Pdf.Rectangle crop = page.CropBox;
+                // Get the current CropBox
+                Aspose.Pdf.Rectangle cropBox = page.CropBox;
 
-                // Extend 5 points on each side to create the BleedBox
-                Aspose.Pdf.Rectangle bleed = new Aspose.Pdf.Rectangle(
-                    crop.LLX - 5,   // left
-                    crop.LLY - 5,   // bottom
-                    crop.URX + 5,   // right
-                    crop.URY + 5    // top
+                // Create a new BleedBox that extends 5 points beyond each side of the CropBox
+                Aspose.Pdf.Rectangle bleedBox = new Aspose.Pdf.Rectangle(
+                    cropBox.LLX - 5,   // left
+                    cropBox.LLY - 5,   // bottom
+                    cropBox.URX + 5,   // right
+                    cropBox.URY + 5    // top
                 );
 
-                // Assign the new BleedBox
-                page.BleedBox = bleed;
+                // Assign the BleedBox to the page
+                page.BleedBox = bleedBox;
             }
 
-            // Save the modified PDF
+            // Save the modified document
             doc.Save(outputPath);
         }
 

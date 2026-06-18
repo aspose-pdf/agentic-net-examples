@@ -6,42 +6,77 @@ class Program
 {
     static void Main()
     {
-        // Define the input PDF files to be merged and the output file name.
-        string[] inputFiles = { "file1.pdf", "file2.pdf", "file3.pdf" };
-        string outputFile = "merged.pdf";
+        // Example input files – replace with actual paths
+        string[] inputFiles = {
+            "file1.pdf",
+            "file2.pdf",
+            "file3.pdf"
+        };
 
-        // Verify that all input files exist before attempting concatenation.
-        foreach (string file in inputFiles)
+        string finalOutput = "merged_output.pdf";
+
+        // Validate input files existence
+        foreach (var f in inputFiles)
         {
-            if (!File.Exists(file))
+            if (!File.Exists(f))
             {
-                Console.Error.WriteLine($"Input file not found: {file}");
+                Console.Error.WriteLine($"Input file not found: {f}");
                 return;
             }
         }
 
-        // Log the start of the merge operation and list all files involved.
-        Console.WriteLine("Starting multi‑file merge using Aspose.Pdf.Facades.PdfFileEditor.");
-        Console.WriteLine("Input files:");
-        foreach (string file in inputFiles)
+        // If only one file, just copy it to the destination
+        if (inputFiles.Length == 1)
         {
-            Console.WriteLine($"  {file}");
+            File.Copy(inputFiles[0], finalOutput, true);
+            Console.WriteLine($"Single file copied to '{finalOutput}'.");
+            return;
         }
-        Console.WriteLine($"Output file: {outputFile}");
 
-        // Create the PdfFileEditor instance and perform the concatenation.
+        // Initialize the first source as the current result
+        string currentResult = inputFiles[0];
+        string tempResult = null;
+
+        // Create a PdfFileEditor instance (does not implement IDisposable)
         PdfFileEditor editor = new PdfFileEditor();
-        bool result = editor.Concatenate(inputFiles, outputFile);
 
-        // Log the result of the operation.
-        if (result)
+        // Perform pairwise concatenations, logging each step
+        for (int i = 1; i < inputFiles.Length; i++)
         {
-            Console.WriteLine($"Merge completed successfully. Output saved to '{outputFile}'.");
+            string nextInput = inputFiles[i];
+
+            // Determine the output file for this step
+            bool isLastStep = (i == inputFiles.Length - 1);
+            string stepOutput = isLastStep ? finalOutput : Path.GetTempFileName();
+
+            // Log the operation
+            Console.WriteLine($"Concatenating '{currentResult}' + '{nextInput}' => '{stepOutput}'");
+
+            // Perform concatenation of two PDFs
+            bool success = editor.Concatenate(currentResult, nextInput, stepOutput);
+            if (!success)
+            {
+                Console.Error.WriteLine($"Failed to concatenate '{currentResult}' and '{nextInput}'.");
+                return;
+            }
+
+            // Clean up previous temporary file if it was not the original first input
+            if (tempResult != null && File.Exists(tempResult))
+            {
+                File.Delete(tempResult);
+            }
+
+            // Prepare for next iteration
+            tempResult = stepOutput;
+            currentResult = stepOutput;
         }
-        else
+
+        // Cleanup any leftover temporary file (should be none if final step wrote to finalOutput)
+        if (tempResult != null && !tempResult.Equals(finalOutput, StringComparison.OrdinalIgnoreCase) && File.Exists(tempResult))
         {
-            Console.Error.WriteLine("Merge failed.");
-            Console.Error.WriteLine($"Conversion log: {editor.ConversionLog}");
+            File.Delete(tempResult);
         }
+
+        Console.WriteLine($"All files merged successfully into '{finalOutput}'.");
     }
 }

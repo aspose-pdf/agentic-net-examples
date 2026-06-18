@@ -1,34 +1,35 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // All SaveOptions, including DocSaveOptions, are in this namespace
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.doc";
+        const string inputPdfPath  = "input.pdf";
+        const string outputDocPath = "output.doc";
 
-        if (!File.Exists(inputPath))
+        // Verify the source file exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document pdfDoc = new Document(inputPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
-            // Create save options for DOC format; default recognition settings are used
-            DocSaveOptions saveOptions = new DocSaveOptions
+            // Configure DOC save options – only the format is required for a basic conversion
+            DocSaveOptions docOptions = new DocSaveOptions
             {
-                // Explicitly set the output format to .doc
                 Format = DocSaveOptions.DocFormat.Doc
+                // All other settings remain at their defaults (default recognition mode, etc.)
             };
 
-            // Save the document as DOC using the save options
-            pdfDoc.Save(outputPath, saveOptions);
+            // Save as DOC using the explicit SaveOptions (required for non‑PDF output)
+            pdfDocument.Save(outputDocPath, docOptions);
         }
 
-        Console.WriteLine($"PDF successfully converted to DOC: {outputPath}");
+        Console.WriteLine($"PDF successfully converted to DOC: {outputDocPath}");
     }
 }

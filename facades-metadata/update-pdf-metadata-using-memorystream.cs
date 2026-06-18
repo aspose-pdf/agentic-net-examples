@@ -6,34 +6,36 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF file into a memory stream
-        byte[] pdfBytes = File.ReadAllBytes(inputPath);
-        using (MemoryStream memory = new MemoryStream(pdfBytes))
+        // Load the PDF into a memory stream
+        using (FileStream fileStream = File.OpenRead(inputPdfPath))
+        using (MemoryStream memoryStream = new MemoryStream())
         {
-            // Initialize the PdfFileInfo facade with the stream
-            using (PdfFileInfo fileInfo = new PdfFileInfo(memory))
+            fileStream.CopyTo(memoryStream);
+            memoryStream.Position = 0; // reset for reading
+
+            // Initialize PdfFileInfo with the memory stream
+            using (PdfFileInfo pdfInfo = new PdfFileInfo(memoryStream))
             {
-                // Modify metadata properties
-                fileInfo.Title    = "New Document Title";
-                fileInfo.Author   = "John Doe";
-                fileInfo.Subject  = "Sample Subject";
-                fileInfo.Keywords = "Aspose, PDF, Metadata";
-                fileInfo.Creator  = "My Application";
+                // Modify metadata
+                pdfInfo.Title  = "Updated Title";
+                pdfInfo.Author = "John Doe";
+                pdfInfo.Subject = "Sample Subject";
+                pdfInfo.Keywords = "Aspose, PDF, Metadata";
 
                 // Save the updated PDF to a new file
-                bool saved = fileInfo.SaveNewInfo(outputPath);
-                Console.WriteLine(saved
-                    ? $"Metadata updated and saved to '{outputPath}'."
-                    : "Failed to save the updated PDF.");
+                bool success = pdfInfo.SaveNewInfo(outputPdfPath);
+                Console.WriteLine(success
+                    ? $"Metadata updated and saved to '{outputPdfPath}'."
+                    : "Failed to save updated PDF.");
             }
         }
     }

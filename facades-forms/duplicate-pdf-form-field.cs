@@ -1,36 +1,30 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the source PDF document
-        using (Document srcDoc = new Document(inputPdf))
+        // FormEditor works with a source PDF and a destination PDF.
+        // Here we copy the field within the same document, saving the result to a new file.
+        using (FormEditor formEditor = new FormEditor(inputPath, outputPath))
         {
-            // Initialize FormEditor with the loaded document
-            using (FormEditor formEditor = new FormEditor(srcDoc))
-            {
-                // Copy the existing field "Signature" to a new field "SignatureCopy"
-                // Page number -1 indicates the same page as the original field.
-                formEditor.CopyInnerField("Signature", "SignatureCopy", -1);
-
-                // Save the modified document to the output path
-                formEditor.Save(outputPdf);
-            }
+            // Duplicate the field named "Signature" as "SignatureCopy" on the same page.
+            // pageNum = -1 means the new field will be placed on the original page.
+            formEditor.CopyInnerField("Signature", "SignatureCopy", -1);
+            formEditor.Save();
         }
 
-        Console.WriteLine($"Field duplicated successfully: '{outputPdf}'.");
+        Console.WriteLine($"Duplicated field saved to '{outputPath}'.");
     }
 }

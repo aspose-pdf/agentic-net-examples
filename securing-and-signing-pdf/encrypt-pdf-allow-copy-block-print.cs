@@ -6,16 +6,11 @@ class Program
 {
     static void Main()
     {
-        // Input PDF to encrypt
         const string inputPath = "input.pdf";
-        // Output encrypted PDF
         const string outputPath = "encrypted.pdf";
-
-        // Passwords (can be empty strings if not needed)
         const string userPassword = "user123";
         const string ownerPassword = "owner123";
 
-        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
@@ -27,7 +22,7 @@ class Program
             // Load the PDF document
             using (Document doc = new Document(inputPath))
             {
-                // Set permissions: allow content extraction (copying) but do NOT include PrintDocument
+                // Allow copying (content extraction) but block printing
                 Permissions perms = Permissions.ExtractContent;
 
                 // Encrypt using AES-256 algorithm

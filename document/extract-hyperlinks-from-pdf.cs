@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -8,48 +8,46 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";      // source PDF
-        const string outputTxtPath = "hyperlinks.txt"; // output plain‑text list
+        const string inputPath  = "input.pdf";
+        const string outputPath = "hyperlinks.txt";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
-        using (Document doc = new Document(inputPdfPath))
+        var extractedLinks = new List<string>();
+
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Collect all hyperlink URLs found in the document
-            List<string> links = new List<string>();
-
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            // Pages are 1‑based in Aspose.Pdf
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                Page page = doc.Pages[pageNum];
+                Page page = doc.Pages[pageIndex];
 
-                // Iterate over annotations on the current page
-                for (int annIdx = 1; annIdx <= page.Annotations.Count; annIdx++)
+                // Annotations collection is also 1‑based
+                for (int annIndex = 1; annIndex <= page.Annotations.Count; annIndex++)
                 {
-                    Annotation ann = page.Annotations[annIdx];
+                    Annotation annotation = page.Annotations[annIndex];
 
-                    // We are interested only in LinkAnnotation objects
-                    if (ann is LinkAnnotation link)
+                    // We are interested only in link annotations
+                    if (annotation is LinkAnnotation link)
                     {
-                        // The hyperlink is stored in the Action property.
-                        // For external URLs the Action is a GoToURIAction.
-                        if (link.Action is GoToURIAction uriAction && !string.IsNullOrEmpty(uriAction.URI))
+                        // External hyperlinks are represented by GoToURIAction
+                        if (link.Action is GoToURIAction uriAction)
                         {
-                            links.Add(uriAction.URI);
+                            extractedLinks.Add(uriAction.URI);
                         }
+                        // Internal destinations can be handled here if needed
                     }
                 }
             }
-
-            // Write the collected URLs to a plain‑text file (one URL per line)
-            File.WriteAllLines(outputTxtPath, links);
         }
 
-        Console.WriteLine($"Extracted {File.ReadAllLines(outputTxtPath).Length} hyperlink(s) to '{outputTxtPath}'.");
+        // Export the list of URLs to a plain‑text file (one URL per line)
+        File.WriteAllLines(outputPath, extractedLinks);
+        Console.WriteLine($"Extracted {extractedLinks.Count} hyperlink(s) to '{outputPath}'.");
     }
 }

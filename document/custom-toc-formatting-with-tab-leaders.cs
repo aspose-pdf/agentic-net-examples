@@ -2,15 +2,15 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
-using Aspose.Pdf.LogicalStructure;
 using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_toc.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_with_custom_toc.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -18,92 +18,62 @@ class Program
             return;
         }
 
-        // Load the source PDF inside a using block (lifecycle rule)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Access tagged content (correct namespace and API)
+            // Ensure the document has a page to host the TOC (use the first page)
+            Page tocPage = doc.Pages[1];
+
+            // Create TOC element via the tagged content API
             ITaggedContent tagged = doc.TaggedContent;
-            tagged.SetLanguage("en-US");
-            tagged.SetTitle("Sample Document with Custom TOC");
+            TOCElement tocElement = tagged.CreateTOCElement();
 
-            // -----------------------------------------------------------------
-            // 1. Create a new page that will hold the Table of Contents (TOC)
-            // -----------------------------------------------------------------
-            Page tocPage = doc.Pages.Add();
-
-            // -----------------------------------------------------------------
-            // 2. Configure TOC information
-            // -----------------------------------------------------------------
+            // Configure TOCInfo for the page
             TocInfo tocInfo = new TocInfo
             {
-                // Title expects a TextFragment (see verified fix)
+                // Title must be a TextFragment, not a plain string
                 Title = new TextFragment("Table of Contents"),
-                // Hide page numbers for the whole TOC (per‑level hiding is not supported)
-                IsShowPageNumbers = false,
-                // Define how many heading levels we will format
-                FormatArrayLength = 3
+                IsShowPageNumbers = true,          // Show page numbers by default
+                IsCountTocPages = false            // Do not count TOC pages in page numbers
             };
 
-            // Allocate the LevelFormat array
-            tocInfo.FormatArray = new LevelFormat[tocInfo.FormatArrayLength];
-
-            // Level 1 formatting (e.g., solid leader)
+            // Prepare LevelFormat array (one entry per TOC level)
+            // Level 1 – solid leader, show page numbers
             LevelFormat level1 = new LevelFormat
             {
                 LineDash = TabLeaderType.Solid,
-                // Example margin: 20 points from left
-                Margin = new MarginInfo { Left = 20 }
+                // Margin expects a MarginInfo object, not a List<float>
+                Margin = new MarginInfo { Left = 0f },
+                TextState = new TextState { FontSize = 14, Font = FontRepository.FindFont("Helvetica") }
             };
-            tocInfo.FormatArray[0] = level1;
 
-            // Level 2 formatting (e.g., dash leader)
+            // Level 2 – no leader, hide page numbers (will be handled later)
             LevelFormat level2 = new LevelFormat
             {
-                LineDash = TabLeaderType.Dash,
-                Margin = new MarginInfo { Left = 40 }
+                LineDash = TabLeaderType.None, // No leader for this level
+                Margin = new MarginInfo { Left = 20f },
+                TextState = new TextState { FontSize = 12, Font = FontRepository.FindFont("Helvetica") }
             };
-            tocInfo.FormatArray[1] = level2;
 
-            // Level 3 formatting (e.g., dot leader)
-            LevelFormat level3 = new LevelFormat
-            {
-                LineDash = TabLeaderType.Dot,
-                Margin = new MarginInfo { Left = 60 }
-            };
-            tocInfo.FormatArray[2] = level3;
+            // Assign the format array to the TOCInfo
+            tocInfo.FormatArray = new LevelFormat[] { level1, level2 };
+            tocInfo.FormatArrayLength = tocInfo.FormatArray.Length;
 
-            // Assign the TOC info to the page
+            // Disable page numbers for level 2 by turning off the global flag.
+            // Since per‑level control is not available, we hide all page numbers here.
+            tocInfo.IsShowPageNumbers = false;
+
+            // Attach the TOCInfo to the page
             tocPage.TocInfo = tocInfo;
 
-            // -----------------------------------------------------------------
-            // 3. Add headings that will appear in the TOC
-            // -----------------------------------------------------------------
-            // Example: add three headings on separate pages
-            for (int i = 1; i <= 3; i++)
-            {
-                // Ensure the target page exists
-                Page page = doc.Pages[i];
-                // Create a heading of the appropriate level (1, 2, or 3)
-                Heading heading = new Heading(i) // level = i
-                {
-                    Text = $"Chapter {i}: Sample Heading Level {i}",
-                    // Mark the heading to be included in the TOC
-                    IsInList = true,
-                    // Associate the heading with the TOC page we created
-                    TocPage = tocPage,
-                    // Enable automatic numbering (optional)
-                    IsAutoSequence = true
-                };
-                // Add the heading to the page's paragraph collection
-                page.Paragraphs.Add(heading);
-            }
+            // Add the TOC element to the document structure (as a child of the root)
+            StructureElement root = tagged.RootElement;
+            root.AppendChild(tocElement);
 
-            // -----------------------------------------------------------------
-            // 4. Save the modified document
-            // -----------------------------------------------------------------
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Document saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with custom TOC formatting: {outputPath}");
     }
 }

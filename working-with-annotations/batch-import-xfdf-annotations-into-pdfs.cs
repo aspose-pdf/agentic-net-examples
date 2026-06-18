@@ -7,51 +7,54 @@ class BatchXfdfImporter
     static void Main()
     {
         // Folder containing PDF files and their matching XFDF files
-        const string inputFolder = @"C:\Docs\Input";
-        // Folder where PDFs with imported annotations will be saved
-        const string outputFolder = @"C:\Docs\Output";
+        const string inputFolder = @"C:\InputFiles";
+        // Folder where annotated PDFs will be saved
+        const string outputFolder = @"C:\OutputFiles";
 
         if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Input folder does not exist: {inputFolder}");
             return;
         }
 
         Directory.CreateDirectory(outputFolder);
 
-        // Process each PDF file in the input folder
-        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
-        {
-            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
-            string xfdfPath = Path.Combine(inputFolder, fileNameWithoutExt + ".xfdf");
+        // Get all PDF files in the input folder
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
 
-            // If there is no corresponding XFDF file, skip this PDF
+        foreach (string pdfPath in pdfFiles)
+        {
+            // Determine matching XFDF file (same file name, .xfdf extension)
+            string baseName = Path.GetFileNameWithoutExtension(pdfPath);
+            string xfdfPath = Path.Combine(inputFolder, baseName + ".xfdf");
+
             if (!File.Exists(xfdfPath))
             {
-                Console.WriteLine($"No XFDF for '{pdfPath}'. Skipping.");
+                Console.WriteLine($"No XFDF found for '{baseName}'. Skipping.");
                 continue;
             }
 
-            string outputPdfPath = Path.Combine(outputFolder, fileNameWithoutExt + "_annotated.pdf");
-
+            // Load the PDF, import annotations from XFDF, and save the result
             try
             {
-                // Load the PDF document
                 using (Document pdfDoc = new Document(pdfPath))
                 {
-                    // Import annotations from the XFDF file
+                    // Import annotations from the XFDF file; existing content is preserved
                     pdfDoc.ImportAnnotationsFromXfdf(xfdfPath);
 
-                    // Save the updated PDF (original content is preserved)
-                    pdfDoc.Save(outputPdfPath);
+                    // Save annotated PDF to the output folder (preserve original name)
+                    string outputPath = Path.Combine(outputFolder, baseName + "_annotated.pdf");
+                    pdfDoc.Save(outputPath);
                 }
 
-                Console.WriteLine($"Annotations imported: '{pdfPath}' -> '{outputPdfPath}'");
+                Console.WriteLine($"Annotated PDF saved: {baseName}_annotated.pdf");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{baseName}': {ex.Message}");
             }
         }
+
+        Console.WriteLine("Batch import completed.");
     }
 }

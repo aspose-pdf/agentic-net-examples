@@ -15,14 +15,14 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Get the AcroForm object
+            // Access the AcroForm associated with the document
             Form form = doc.Form;
 
-            // Check if the document contains any form fields
-            if (form.Count == 0)
+            // If the document has no form or no fields, report it
+            if (form == null || form.Count == 0)
             {
                 Console.WriteLine("No form fields found in the document.");
                 return;
@@ -30,13 +30,21 @@ class Program
 
             Console.WriteLine("Form field names:");
 
-            // Enumerate all fields and output their names
+            // Enumerate the lowest‑level fields via the Fields property
             foreach (Field field in form.Fields)
             {
-                // Prefer the short Name; fall back to FullName if Name is empty
-                string fieldName = !string.IsNullOrEmpty(field.Name) ? field.Name : field.FullName;
+                // Prefer the fully qualified name; fall back to the simple name
+                string fieldName = !string.IsNullOrEmpty(field.FullName) ? field.FullName : field.Name;
                 Console.WriteLine($"- {fieldName}");
             }
+
+            // Alternative enumeration using the form's enumerator (commented out)
+            // var enumerator = form.GetEnumerator();
+            // while (enumerator.MoveNext())
+            // {
+            //     var widget = enumerator.Current;
+            //     Console.WriteLine(widget.FullName);
+            // }
         }
     }
 }

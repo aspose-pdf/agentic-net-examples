@@ -11,7 +11,7 @@ class Program
     /// <param name="inputPdf">Path to the source PDF.</param>
     /// <param name="outputPdf">Path where the modified PDF will be saved.</param>
     /// <param name="fieldName">Fully qualified name of the radio button field.</param>
-    /// <param name="optionName">Export value of the option to select.</param>
+    /// <param name="optionName">The option value to select.</param>
     static void SelectRadioButton(string inputPdf, string outputPdf, string fieldName, string optionName)
     {
         if (!File.Exists(inputPdf))
@@ -20,34 +20,25 @@ class Program
             return;
         }
 
-        // Wrap Document in a using block for deterministic disposal.
+        // Wrap Document in a using block for deterministic disposal (lifecycle rule)
         using (Document doc = new Document(inputPdf))
         {
-            // The Form indexer returns a WidgetAnnotation; cast it to a Forms.Field.
-            Field field = doc.Form[fieldName] as Field;
-            if (field == null)
+            // Retrieve the radio button field from the form collection
+            // The Form property holds all interactive form fields.
+            RadioButtonField radioField = doc.Form[fieldName] as RadioButtonField;
+
+            if (radioField == null)
             {
-                Console.Error.WriteLine($"Field '{fieldName}' not found or is not a form field in the PDF.");
+                Console.Error.WriteLine($"Radio button field '{fieldName}' not found.");
                 return;
             }
 
-            // Ensure the field is a RadioButtonField.
-            if (field is RadioButtonField radioButton)
-            {
-                // Set the value to the desired option name.
-                // The option name must match one of the defined export values.
-                radioButton.Value = optionName;
+            // Set the desired option.
+            // The Value property accepts the export value of the option.
+            // Alternatively, you could set radioField.Selected (1‑based index).
+            radioField.Value = optionName;
 
-                // Optionally, you can control the NoToggleToOff behavior:
-                // radioButton.NoToggleToOff = true; // keep exactly one option selected
-            }
-            else
-            {
-                Console.Error.WriteLine($"Field '{fieldName}' is not a RadioButtonField.");
-                return;
-            }
-
-            // Save the modified document.
+            // Save the modified document (lifecycle rule)
             doc.Save(outputPdf);
         }
 
@@ -57,11 +48,11 @@ class Program
     static void Main()
     {
         // Example usage:
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string radioField = "myRadioGroup";   // replace with actual field name
-        const string option     = "Option2";        // replace with the desired option value
+        const string inputPath  = "form.pdf";
+        const string outputPath = "form_updated.pdf";
+        const string fieldName  = "myRadioGroup";   // replace with actual field name
+        const string optionName = "Option2";        // replace with the option you want to select
 
-        SelectRadioButton(inputPath, outputPath, radioField, option);
+        SelectRadioButton(inputPath, outputPath, fieldName, optionName);
     }
 }

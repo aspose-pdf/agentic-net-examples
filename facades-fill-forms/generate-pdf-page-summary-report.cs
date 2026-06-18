@@ -2,65 +2,75 @@ using System;
 using System.Data;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";          // source PDF
-        const string outputReport = "report.txt";    // summary report file
+        const string inputPdf = "input.pdf";
+        const string reportPath = "summary_report.txt";
 
-        // Ensure the source PDF exists – create a minimal one if it does not.
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            // Create a one‑page blank PDF so the rest of the logic can run.
-            using (Document blank = new Document())
-            {
-                blank.Pages.Add();
-                blank.Save(pdfPath);
-            }
+            Console.Error.WriteLine($"File not found: {inputPdf}");
+            return;
         }
 
-        // Example DataTable containing an identifier for each row.
-        // In a real scenario this would be populated from a database.
-        DataTable table = new DataTable();
-        table.Columns.Add("Id", typeof(string));
-
-        // Load the PDF document inside a using block for deterministic disposal.
-        using (Document doc = new Document(pdfPath))
+        // Load the PDF document
+        using (Document doc = new Document(inputPdf))
         {
-            int pageCount = doc.Pages.Count; // 1‑based page count
+            // Example DataTable containing row identifiers (replace with real data as needed)
+            DataTable dt = GetSampleDataTable();
 
-            // Ensure the DataTable has a row for each PDF page.
-            for (int i = 0; i < pageCount; i++)
-            {
-                DataRow row = table.NewRow();
-                row["Id"] = $"Row_{i + 1}";
-                table.Rows.Add(row);
-            }
-
-            // Instantiate a Facade class (PdfExtractor) to satisfy the requirement
-            // of using Aspose.Pdf.Facades. No extraction is performed here.
-            PdfExtractor extractor = new PdfExtractor();
-            extractor.BindPdf(doc);
-            // (Optional) configure extractor if needed:
-            // extractor.StartPage = 1;
-            // extractor.EndPage = pageCount;
-
-            // Write the summary report: PageNumber ↔ DataTable Row Identifier
-            using (StreamWriter writer = new StreamWriter(outputReport))
+            using (StreamWriter writer = new StreamWriter(reportPath))
             {
                 writer.WriteLine("PageNumber\tRowIdentifier");
-                for (int i = 1; i <= pageCount; i++) // 1‑based indexing per rule
+
+                // Pages are 1‑based in Aspose.Pdf
+                for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    // Guard against possible null values in the DataTable.
-                    string rowId = table.Rows[i - 1]["Id"]?.ToString() ?? string.Empty;
-                    writer.WriteLine($"{i}\t{rowId}");
+                    Page page = doc.Pages[i];
+
+                    // Extract tables from the current page
+                    TableAbsorber absorber = new TableAbsorber();
+                    absorber.Visit(page);
+
+                    string identifier = "N/A";
+
+                    if (absorber.TableList.Count > 0)
+                    {
+                        // Assume the identifier is in the first cell of the first row
+                        var firstCell = absorber.TableList[0].RowList[0].CellList[0];
+                        if (firstCell.TextFragments.Count > 0)
+                        {
+                            identifier = firstCell.TextFragments[0].Text.Trim();
+                        }
+                    }
+
+                    // Optional: match the extracted identifier with a DataTable row
+                    DataRow[] matchingRows = dt.Select($"Id = '{identifier}'");
+                    if (matchingRows.Length > 0)
+                    {
+                        identifier = matchingRows[0]["Id"].ToString();
+                    }
+
+                    writer.WriteLine($"{i}\t{identifier}");
                 }
             }
-        }
 
-        Console.WriteLine($"Summary report generated at '{outputReport}'.");
+            Console.WriteLine($"Summary report saved to '{reportPath}'.");
+        }
+    }
+
+    // Creates a sample DataTable with an Id column (replace with actual data source)
+    static DataTable GetSampleDataTable()
+    {
+        DataTable table = new DataTable();
+        table.Columns.Add("Id", typeof(string));
+        table.Rows.Add("A001");
+        table.Rows.Add("A002");
+        table.Rows.Add("A003");
+        return table;
     }
 }

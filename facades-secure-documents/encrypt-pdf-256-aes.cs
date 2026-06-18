@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -19,42 +18,24 @@ class Program
             return;
         }
 
-        // Initialize the security facade and bind the source PDF
-        PdfFileSecurity security = new PdfFileSecurity();
-        security.BindPdf(inputPath);
+        // Initialize the security facade with source and destination files
+        PdfFileSecurity fileSecurity = new PdfFileSecurity(inputPath, outputPath);
 
-        // Encrypt using 256‑bit AES; allow printing as an example privilege
-        security.EncryptFile(userPassword, ownerPassword, DocumentPrivilege.Print, KeySize.x256);
+        // Encrypt using 256‑bit AES. DocumentPrivilege.Print is used as an example privilege.
+        bool encrypted = fileSecurity.EncryptFile(
+            userPassword,
+            ownerPassword,
+            DocumentPrivilege.Print,
+            KeySize.x256,
+            Algorithm.AES);
 
-        // Save the encrypted PDF; guard against missing GDI+ on non‑Windows platforms
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (encrypted)
         {
-            security.Save(outputPath);
+            Console.WriteLine($"PDF encrypted successfully and saved to '{outputPath}'.");
         }
         else
         {
-            try
-            {
-                security.Save(outputPath);
-            }
-            catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
-            {
-                Console.WriteLine("GDI+ (libgdiplus) is not available on this platform; cannot save PDF.");
-            }
+            Console.Error.WriteLine("Encryption failed.");
         }
-
-        Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
-    }
-
-    // Helper to detect nested DllNotFoundException
-    static bool ContainsDllNotFound(Exception ex)
-    {
-        while (ex != null)
-        {
-            if (ex is DllNotFoundException)
-                return true;
-            ex = ex.InnerException;
-        }
-        return false;
     }
 }

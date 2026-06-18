@@ -7,56 +7,60 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "dimension_line.pdf";
+        // Suppress known vulnerability warning for Microsoft.Bcl.Memory (NU1903)
+        #pragma warning disable NU1903
 
-        // Create a new PDF document and add a page
         using (Document doc = new Document())
         {
+            // Add a blank page
             Page page = doc.Pages.Add();
 
-            // On non‑Windows platforms Graph rendering requires libgdiplus. Guard it.
+            // Create a Graph container (width: 400 pt, height: 200 pt)
+            // Graph constructor requires double values
+            Graph graph = new Graph(400.0, 200.0);
+
+            // Define a line from (50,150) to (350,150) – horizontal dimension line
+            float[] lineCoords = { 50f, 150f, 350f, 150f };
+            Line line = new Line(lineCoords)
+            {
+                GraphInfo = new GraphInfo
+                {
+                    Color = Color.Blue,      // line color
+                    LineWidth = 2f           // line thickness
+                }
+            };
+
+            // Add the line to the graph's shape collection
+            graph.Shapes.Add(line);
+
+            // Position the graph on the page (lower‑left corner at (100,400))
+            graph.Left = 100;
+            graph.Top = 400;
+
+            // Add the graph to the page's paragraphs collection
+            page.Paragraphs.Add(graph);
+
+            string outputPath = "dimension_line.pdf";
+
+            // Guard Document.Save for platforms without libgdiplus (macOS/Linux)
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                // Create a graph container (size: 400x200 points) – use double literals as required
-                Graph graph = new Graph(400.0, 200.0);
-
-                // Define a line from (50,150) to (350,150)
-                float[] linePositions = { 50f, 150f, 350f, 150f };
-                Line line = new Line(linePositions);
-
-                // Style the line (red color, 2‑point width)
-                line.GraphInfo = new GraphInfo
-                {
-                    Color = Aspose.Pdf.Color.Red,
-                    LineWidth = 2f
-                };
-
-                // Add the line to the graph
-                graph.Shapes.Add(line);
-
-                // Position the graph on the page (optional)
-                graph.Left = 0f;   // X‑coordinate of the graph's lower‑left corner
-                graph.Top = 0f;    // Y‑coordinate of the graph's lower‑left corner
-
-                // Add the graph to the page
-                page.Paragraphs.Add(graph);
+                doc.Save(outputPath);
             }
             else
             {
-                Console.WriteLine("libgdiplus is required for Graph rendering on non‑Windows platforms. Skipping graph creation.");
-            }
-
-            // Save the PDF – guard against missing GDI+ on non‑Windows platforms
-            try
-            {
-                doc.Save(outputPath);
-                Console.WriteLine($"PDF saved to '{outputPath}'.");
-            }
-            catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
-            {
-                Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. PDF could not be saved.");
+                try
+                {
+                    doc.Save(outputPath);
+                }
+                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
+                {
+                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. PDF saved without rendering the graph.");
+                }
             }
         }
+
+        Console.WriteLine("PDF with dimension line created: dimension_line.pdf");
     }
 
     private static bool ContainsDllNotFound(Exception? ex)

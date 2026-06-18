@@ -6,12 +6,12 @@ class Program
 {
     static void Main()
     {
-        // Input and output PDF paths
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "reordered.pdf";
 
-        // Define the new page order (1‑based indexes)
-        int[] newOrder = { 3, 1, 2 }; // example: page 3 becomes first, then 1, then 2
+        // Define the desired page order (1‑based indexes).
+        // Adjust this array to match the required sequence.
+        int[] newOrder = new int[] { 3, 1, 2 };
 
         if (!File.Exists(inputPath))
         {
@@ -19,32 +19,33 @@ class Program
             return;
         }
 
-        // Load source document (wrapped in using for deterministic disposal)
-        using (Document srcDoc = new Document(inputPath))
+        // Load the source PDF inside a using block (document‑disposal rule).
+        using (Document src = new Document(inputPath))
         {
-            // Copy all source pages into an array to avoid mutating the collection while reordering
-            Page[] allPages = new Page[srcDoc.Pages.Count];
-            srcDoc.Pages.CopyTo(allPages, 0);
-
-            // Create a new empty document to hold the reordered pages
-            using (Document dstDoc = new Document())
+            // Validate that every index in the sequence is within the document range.
+            foreach (int idx in newOrder)
             {
-                // Add pages to the new document according to the custom sequence
-                foreach (int pageNumber in newOrder)
+                if (idx < 1 || idx > src.Pages.Count)
                 {
-                    // Validate the requested page number (pages are 1‑based)
-                    if (pageNumber < 1 || pageNumber > allPages.Length)
-                    {
-                        Console.Error.WriteLine($"Invalid page index {pageNumber} – skipping.");
-                        continue;
-                    }
+                    Console.Error.WriteLine($"Invalid page index {idx}. Document contains {src.Pages.Count} pages.");
+                    return;
+                }
+            }
 
-                    // Add the corresponding page (array is 0‑based, so subtract 1)
-                    dstDoc.Pages.Add(allPages[pageNumber - 1]);
+            // Create an empty target PDF (also inside a using block).
+            using (Document dst = new Document())
+            {
+                // Copy pages from the source to the target in the specified order.
+                // PageCollection uses 1‑based indexing, so we can use the indices directly.
+                foreach (int idx in newOrder)
+                {
+                    // Add the page from the source document to the destination.
+                    // The page is moved from src to dst; src is no longer needed after this.
+                    dst.Pages.Add(src.Pages[idx]);
                 }
 
-                // Save the reordered PDF (using the standard Save method)
-                dstDoc.Save(outputPath);
+                // Save the reordered document (standard Save method).
+                dst.Save(outputPath);
             }
         }
 

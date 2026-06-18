@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -19,18 +19,27 @@ class Program
         // Load the existing PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Initialize FormEditor with the loaded document
-            FormEditor formEditor = new FormEditor(doc);
+            // Bind a FormEditor to the document for form manipulation
+            using (FormEditor formEditor = new FormEditor(doc))
+            {
+                // Add a push button named "ResetForm" on page 1
+                // Coordinates are supplied as floats (left, bottom, right, top)
+                formEditor.AddField(
+                    FieldType.PushButton,
+                    "ResetForm",
+                    1,
+                    100f,
+                    500f,
+                    200f,
+                    540f);
 
-            // Add a push button named "ResetForm" on page 1
-            // (llx, lly) = lower‑left corner, (urx, ury) = upper‑right corner
-            formEditor.AddField(FieldType.PushButton, "ResetForm", 1, 50, 750, 150, 800);
+                // Attach JavaScript that clears all form fields when the button is clicked
+                // The PDF JavaScript method resetForm() resets the entire form
+                formEditor.AddFieldScript("ResetForm", "this.resetForm();");
 
-            // Attach JavaScript that clears all form fields when the button is clicked
-            formEditor.AddFieldScript("ResetForm", "this.resetForm();");
-
-            // Save the modified PDF (using FormEditor’s Save method)
-            formEditor.Save(outputPath);
+                // Save the modified PDF
+                formEditor.Save(outputPath);
+            }
         }
 
         Console.WriteLine($"PDF with ResetForm button saved to '{outputPath}'.");

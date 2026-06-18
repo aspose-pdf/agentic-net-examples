@@ -7,7 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -18,23 +19,31 @@ class Program
         // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the form object (contains all form fields in the document)
-            Form form = doc.Form;
-
-            // Iterate through all pages (1‑based indexing)
+            // Pages are 1‑based in Aspose.Pdf
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Count of fields in the whole document (Aspose.Pdf does not provide per‑page field count directly)
-                // For monitoring purposes we log this count for each page iteration.
-                int fieldCount = form.Count;
+                // Count the form fields present on the current page
+                int fieldCount = page.FieldsInTabOrder?.Count ?? 0;
+                Console.WriteLine($"Page {i}: {fieldCount} form field(s) found.");
 
-                Console.WriteLine($"Page {i}: extracted {fieldCount} form field(s).");
+                // Log each field's name and value (if any)
+                foreach (Field field in page.FieldsInTabOrder)
+                {
+                    string name  = field.FullName;
+                    string value = field.Value?.ToString() ?? string.Empty;
+                    Console.WriteLine($"  Field '{name}' = '{value}'");
+                }
             }
 
-            // No modifications are made, so just save (optional – here we keep the original file)
-            // doc.Save("output.pdf"); // Uncomment if you need to save a copy
+            // Optional: flatten the document to make fields non‑interactive
+            doc.Flatten();
+
+            // Save the processed document
+            doc.Save(outputPath);
         }
+
+        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

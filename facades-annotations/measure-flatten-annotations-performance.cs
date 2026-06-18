@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input_500_pages.pdf";
+        const string inputPath = "input500.pdf";
         const string outputPath = "flattened_output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,18 +16,16 @@ class Program
             return;
         }
 
-        // Start timing
         Stopwatch sw = Stopwatch.StartNew();
 
-        // Use PdfAnnotationEditor facade to flatten annotations
+        // Load PDF, flatten all annotations, and save
         using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            editor.BindPdf(inputPath);                 // Load the PDF
-            editor.FlatteningAnnotations();            // Flatten all annotations
-            editor.Save(outputPath);                   // Save the result
+            editor.BindPdf(inputPath);               // load
+            editor.FlatteningAnnotations();          // flatten all annotations
+            editor.Save(outputPath);                  // save
         }
 
-        // Stop timing
         sw.Stop();
         Console.WriteLine($"Flattening completed in {sw.Elapsed.TotalSeconds:F2} seconds.");
     }

@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
 
@@ -8,66 +7,49 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "RoundedRectangle.pdf";
+        // Input and output PDF file paths
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Create a new PDF document and add a page
-        using (Document doc = new Document())
+        // Ensure the input file exists
+        if (!File.Exists(inputPath))
         {
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
+        }
 
-            // Define the size of the drawing canvas (graph)
-            // Here we use the same size as the page for simplicity
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Access the first page (Aspose.Pdf uses 1‑based indexing)
+            Page page = doc.Pages[1];
+
+            // Create a Graph container sized to the page dimensions
             Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
-            page.Paragraphs.Add(graph);
 
-            // Create a rectangle shape with rounded corners
-            // Constructor parameters: left, bottom, width, height (float values)
-            var rectShape = new Aspose.Pdf.Drawing.Rectangle(100f, 500f, 200f, 100f)
-            {
-                RoundedCornerRadius = 20f // radius of the corners
-            };
+            // Define a rectangle shape with rounded corners
+            // Constructor parameters: left, bottom, width, height (all float values)
+            var roundedRect = new Aspose.Pdf.Drawing.Rectangle(100f, 500f, 200f, 100f);
+            roundedRect.RoundedCornerRadius = 15f; // radius of the corners
 
-            // Set solid fill color (e.g., LightGray) and stroke
-            rectShape.GraphInfo = new GraphInfo
+            // Set visual appearance via GraphInfo (fill color, border color, line width)
+            roundedRect.GraphInfo = new GraphInfo
             {
-                FillColor = Aspose.Pdf.Color.LightGray,
-                Color = Aspose.Pdf.Color.Black, // stroke color (optional)
-                LineWidth = 1f
+                FillColor = Aspose.Pdf.Color.LightGray, // solid fill
+                Color = Aspose.Pdf.Color.Black,        // border color
+                LineWidth = 2f                         // border thickness
             };
 
             // Add the rectangle shape to the graph
-            graph.Shapes.Add(rectShape);
+            graph.Shapes.Add(roundedRect);
 
-            // Save the PDF document – guard against missing GDI+ on non‑Windows platforms
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                doc.Save(outputPath);
-                Console.WriteLine($"PDF with rounded rectangle saved to '{outputPath}'.");
-            }
-            else
-            {
-                try
-                {
-                    doc.Save(outputPath);
-                    Console.WriteLine($"PDF with rounded rectangle saved to '{outputPath}'.");
-                }
-                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
-                {
-                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. " +
-                                      "The PDF was generated but could not be saved using Graph rendering.");
-                }
-            }
-        }
-    }
+            // Add the graph to the page's paragraph collection
+            page.Paragraphs.Add(graph);
 
-    private static bool ContainsDllNotFound(Exception? ex)
-    {
-        while (ex != null)
-        {
-            if (ex is DllNotFoundException)
-                return true;
-            ex = ex.InnerException;
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        return false;
+
+        Console.WriteLine($"Rounded rectangle added and saved to '{outputPath}'.");
     }
 }

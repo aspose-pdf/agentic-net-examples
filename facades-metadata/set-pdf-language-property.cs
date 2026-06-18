@@ -1,6 +1,8 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Tagged;
 
 class Program
 {
@@ -18,12 +20,16 @@ class Program
         // Load the PDF using the PdfFileInfo facade
         using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
         {
-            // Set the language identifier (stored as a custom meta entry "Lang")
-            pdfInfo.SetMetaInfo("Lang", "en-US");
+            // Access the underlying Document object
+            Document doc = pdfInfo.Document;
 
-            // Save the updated PDF to a new file
-            bool saved = pdfInfo.SaveNewInfo(outputPath);
-            Console.WriteLine(saved
+            // Set the document language via the tagged content API
+            ITaggedContent tagged = doc.TaggedContent;
+            tagged.SetLanguage("en-US");
+
+            // Save the updated PDF using the facade
+            bool success = pdfInfo.SaveNewInfo(outputPath);
+            Console.WriteLine(success
                 ? $"Language set to 'en-US' and saved to '{outputPath}'."
                 : "Failed to save the updated PDF.");
         }

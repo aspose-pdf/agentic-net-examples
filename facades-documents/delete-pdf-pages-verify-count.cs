@@ -1,64 +1,58 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        // Pages to delete (1‑based indexing). Adjust as needed.
-        int[] pagesToDelete = new int[] { 2 };
+        const string inputPath  = "input.pdf";          // original PDF
+        const string outputPath = "output_deleted.pdf"; // PDF after deletion
+        int[] pagesToDelete = new int[] { 2, 3 };       // pages to remove (1‑based)
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
+        // ---------- Delete pages using PdfFileEditor (facade) ----------
+        PdfFileEditor editor = new PdfFileEditor();
+        bool deleteResult = editor.TryDelete(inputPath, pagesToDelete, outputPath);
+        if (!deleteResult)
         {
-            // Get page count before deletion.
-            int beforeCount;
-            using (Document srcDoc = new Document(inputPath))
-            {
-                beforeCount = srcDoc.Pages.Count;
-            }
-
-            // Perform deletion using PdfFileEditor (no using block as it is not IDisposable).
-            var editor = new PdfFileEditor();
-            bool deleteResult = editor.TryDelete(inputPath, pagesToDelete, outputPath);
-            if (!deleteResult)
-            {
-                Console.Error.WriteLine("Delete operation failed.");
-                return;
-            }
-
-            // Get page count after deletion.
-            int afterCount;
-            using (Document outDoc = new Document(outputPath))
-            {
-                afterCount = outDoc.Pages.Count;
-            }
-
-            // Validate the page count reduction.
-            Console.WriteLine($"Pages before delete: {beforeCount}");
-            Console.WriteLine($"Pages after  delete: {afterCount}");
-
-            if (afterCount == beforeCount - pagesToDelete.Length)
-            {
-                Console.WriteLine("Delete operation reduced page count as expected.");
-            }
-            else
-            {
-                Console.WriteLine("Unexpected page count after delete.");
-            }
+            Console.Error.WriteLine("Page deletion failed.");
+            return;
         }
-        catch (Exception ex)
+
+        // ---------- Get page counts before and after deletion ----------
+        int beforeCount;
+        int afterCount;
+
+        // PdfViewer provides PageCount property; it implements IDisposable.
+        using (PdfViewer viewerBefore = new PdfViewer())
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            viewerBefore.BindPdf(inputPath);
+            beforeCount = viewerBefore.PageCount;
+        }
+
+        using (PdfViewer viewerAfter = new PdfViewer())
+        {
+            viewerAfter.BindPdf(outputPath);
+            afterCount = viewerAfter.PageCount;
+        }
+
+        // ---------- Validate that the count decreased ----------
+        Console.WriteLine($"Pages before deletion: {beforeCount}");
+        Console.WriteLine($"Pages after deletion : {afterCount}");
+
+        if (afterCount < beforeCount)
+        {
+            Console.WriteLine("Delete operation successful: page count reduced.");
+        }
+        else
+        {
+            Console.WriteLine("Delete operation failed: page count not reduced.");
         }
     }
 }

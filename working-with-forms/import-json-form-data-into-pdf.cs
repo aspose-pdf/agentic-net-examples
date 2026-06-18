@@ -9,14 +9,15 @@ class Program
     {
         // Paths to the input PDF and the output PDF
         const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "filled_output.pdf";
+        const string outputPdfPath = "output_filled.pdf";
 
-        // JSON string containing form field values (example format)
+        // JSON string containing form field values.
+        // The JSON keys must match the full names of the form fields.
         string jsonData = @"{
-            \""FirstName\"": \""John\"",
-            \""LastName\"":  \""Doe\"",
-            \""Age\"":        30,
-            \""Subscribe\"": true
+            ""FirstName"": ""John"",
+            ""LastName"": ""Doe"",
+            ""Email"": ""john.doe@example.com"",
+            ""AgreeTerms"": true
         }";
 
         // Ensure the input file exists
@@ -26,27 +27,21 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block (ensures proper disposal)
-        using (Document pdfDocument = new Document(inputPdfPath))
+        // Load the PDF document, import JSON data into its form fields, and save the result.
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Convert the JSON string to a memory stream (UTF-8 encoding)
+            // Convert the JSON string to a UTF‑8 memory stream.
             using (MemoryStream jsonStream = new MemoryStream(Encoding.UTF8.GetBytes(jsonData)))
             {
-                // Import form field values from the JSON stream into the PDF form
-                // The method returns a collection of FieldSerializationResult which can be inspected if needed
-                var importResults = pdfDocument.Form.ImportFromJson(jsonStream);
-
-                // Optional: log import results – use ToString() because specific properties may vary between versions
-                foreach (var result in importResults)
-                {
-                    Console.WriteLine(result.ToString());
-                }
+                // Import the form field values from the JSON stream.
+                // This matches fields by their full names.
+                pdfDoc.Form.ImportFromJson(jsonStream);
             }
 
-            // Save the updated PDF (standard PDF output)
-            pdfDocument.Save(outputPdfPath);
+            // Save the updated PDF.
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Form data imported and PDF saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Form data imported and saved to '{outputPdfPath}'.");
     }
 }

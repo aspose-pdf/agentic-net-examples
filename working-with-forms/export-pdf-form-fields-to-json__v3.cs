@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -7,31 +8,32 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string jsonOutput = "form_schema.json";
+        const string inputPath = "input.pdf";
 
-        // Verify the source PDF exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        using (Document doc = new Document(inputPath))
         {
-            // Configure JSON export options (optional)
-            ExportFieldsToJsonOptions options = new ExportFieldsToJsonOptions
+            // MemoryStream will hold the JSON output
+            using (MemoryStream jsonStream = new MemoryStream())
             {
-                WriteIndented = true,          // Produce readable, indented JSON
-                ExportPasswordValue = false    // Do not include password field values
-            };
+                // Export all form fields to JSON (writes to the provided stream)
+                doc.Form.ExportToJson(jsonStream);
 
-            // Export all form field definitions to a JSON file
-            // This overload writes directly to the specified file path
-            doc.Form.ExportToJson(jsonOutput, options);
+                // Reset stream position to read from the beginning
+                jsonStream.Position = 0;
+
+                // Convert the stream content to a UTF-8 string
+                string json = new StreamReader(jsonStream, Encoding.UTF8).ReadToEnd();
+
+                // Output the JSON string (could be returned, saved, etc.)
+                Console.WriteLine(json);
+            }
         }
-
-        Console.WriteLine($"Form field definitions exported to '{jsonOutput}'.");
     }
 }

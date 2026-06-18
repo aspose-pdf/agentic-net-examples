@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // FontRepository, TextState, Color
 
 class Program
 {
@@ -9,7 +9,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output_with_header.pdf";
-        const string headerText = "Confidential Document";
+        const string headerText = "My Document Header";
 
         if (!File.Exists(inputPath))
         {
@@ -17,33 +17,34 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (wrapped in using for deterministic disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Loop through all pages (1‑based indexing)
+            // Loop through all pages (Aspose.Pdf uses 1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Create a new header/footer container
-                HeaderFooter header = new HeaderFooter();
+                // Create a TextFragment that will act as the header
+                TextFragment header = new TextFragment(headerText)
+                {
+                    // Center the text horizontally
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    // Position the text near the top of the page (Y coordinate is measured from the bottom)
+                    Position = new Position(0, page.PageInfo.Height - 20)
+                };
 
-                // Create a text fragment for the header
-                TextFragment tf = new TextFragment(headerText);
-                tf.TextState.Font = FontRepository.FindFont("Helvetica");
-                tf.TextState.FontSize = 12;
-                tf.TextState.FontStyle = FontStyles.Bold;
-                tf.TextState.ForegroundColor = Color.Black;
-                tf.Position = new Position(0, page.PageInfo.Height - 20); // optional positioning
+                // Configure the visual appearance of the header text
+                // TextState is read‑only; modify its members instead of assigning a new instance
+                header.TextState.Font = FontRepository.FindFont("Helvetica");
+                header.TextState.FontSize = 12;
+                header.TextState.ForegroundColor = Color.Gray;
 
-                // Add the fragment to the header's paragraph collection
-                header.Paragraphs.Add(tf);
-
-                // Assign the header to the page
-                page.Header = header;
+                // Add the header fragment to the page's paragraph collection
+                page.Paragraphs.Add(header);
             }
 
-            // Save the modified document
+            // Save the modified PDF (output format is PDF, no SaveOptions needed)
             doc.Save(outputPath);
         }
 

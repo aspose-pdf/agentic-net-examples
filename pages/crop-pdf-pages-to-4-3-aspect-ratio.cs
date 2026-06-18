@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_cropped.pdf";
+        const string outputPath = "cropped_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,52 +15,49 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF document (lifecycle rule: use Document constructor)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+            // Iterate over all pages (page indexing is 1‑based)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Original page dimensions from MediaBox
+                // Original page size from MediaBox (always defined)
                 Aspose.Pdf.Rectangle mediaBox = page.MediaBox;
-                double origWidth  = mediaBox.URX - mediaBox.LLX;
-                double origHeight = mediaBox.URY - mediaBox.LLY;
+                double origWidth  = mediaBox.Width;
+                double origHeight = mediaBox.Height;
 
-                const double targetRatio = 4.0 / 3.0;               // Desired 4:3 aspect ratio
-                double currentRatio = origWidth / origHeight;
+                // Desired aspect ratio 4:3 (width : height)
+                const double targetRatio = 4.0 / 3.0;
+                double origRatio = origWidth / origHeight;
 
-                double newWidth  = origWidth;
-                double newHeight = origHeight;
-                double left   = mediaBox.LLX;
-                double bottom = mediaBox.LLY;
+                double newWidth, newHeight;
 
-                if (currentRatio > targetRatio)
+                if (origRatio > targetRatio)
                 {
-                    // Page is too wide – shrink width, keep full height
-                    newWidth = origHeight * targetRatio;
-                    left = mediaBox.LLX + (origWidth - newWidth) / 2.0;
+                    // Page is too wide – keep height, reduce width
+                    newHeight = origHeight;
+                    newWidth  = origHeight * targetRatio;
                 }
-                else if (currentRatio < targetRatio)
+                else
                 {
-                    // Page is too tall – shrink height, keep full width
+                    // Page is too tall – keep width, reduce height
+                    newWidth  = origWidth;
                     newHeight = origWidth / targetRatio;
-                    bottom = mediaBox.LLY + (origHeight - newHeight) / 2.0;
                 }
 
-                // Create a new crop rectangle (left, bottom, right, top)
-                Aspose.Pdf.Rectangle cropRect = new Aspose.Pdf.Rectangle(
-                    left,
-                    bottom,
-                    left + newWidth,
-                    bottom + newHeight);
+                // Center the crop box
+                double llx = mediaBox.LLX + (origWidth  - newWidth)  / 2.0;
+                double lly = mediaBox.LLY + (origHeight - newHeight) / 2.0;
+                double urx = llx + newWidth;
+                double ury = lly + newHeight;
 
-                // Apply the crop box to the page
-                page.CropBox = cropRect;
+                // Set the CropBox (lifecycle rule: use property setter)
+                page.CropBox = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
             }
 
-            // Save the modified document (PDF format)
+            // Save the modified PDF (lifecycle rule: use Document.Save)
             doc.Save(outputPath);
         }
 

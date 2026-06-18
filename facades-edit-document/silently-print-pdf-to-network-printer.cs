@@ -1,47 +1,45 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;               // PdfViewer
-using Aspose.Pdf.Printing;             // PrinterSettings, PageSettings
-using Aspose.Pdf.Devices;               // Margins (optional)
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Printing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";                     // PDF to print
-        const string networkPrinter = @"\\192.168.1.100\printer";    // UNC path to the network printer
+        const string pdfPath = "input.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        // Verify the PDF file exists
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Initialize the viewer and bind the PDF document
+        // Initialize the PdfViewer facade and bind the PDF document
         using (PdfViewer viewer = new PdfViewer())
         {
-            viewer.BindPdf(inputPdfPath);
+            viewer.BindPdf(pdfPath);
 
-            // Optional: adjust viewer settings for silent printing
-            viewer.AutoResize = true;          // fit content to page if needed
-            viewer.AutoRotate = true;          // rotate pages automatically
-            viewer.PrintPageDialog = false;    // suppress the print dialog
+            // Configure viewer for silent printing
+            viewer.AutoResize = true;      // fit to printable area
+            viewer.AutoRotate = true;      // rotate pages if needed
+            viewer.PrintPageDialog = false; // suppress the print dialog
 
-            // Obtain default printer settings and point them to the network printer
-            PrinterSettings printerSettings = viewer.GetDefaultPrinterSettings();
-            printerSettings.PrinterName = networkPrinter;   // specify the target printer
+            // Set up printer settings for the network printer
+            PrinterSettings printerSettings = new PrinterSettings();
+            // Adjust the printer name/URI as required by your environment.
+            // Example using a UNC path to a shared printer:
+            printerSettings.PrinterName = @"\\192.168.1.100\Printer";
 
-            // Optional: set number of copies, duplex mode, etc.
-            // printerSettings.Copies = 1;
-            // printerSettings.Duplex = Duplex.Simplex;
-
-            // Print the document silently using the configured printer settings
+            // Send the document to the printer silently
             viewer.PrintDocumentWithSettings(printerSettings);
 
-            // Close the viewer (also disposes internal resources)
+            // Close the viewer (optional, as the using block will dispose it)
             viewer.Close();
         }
 
-        Console.WriteLine("Print job submitted successfully.");
+        Console.WriteLine("Print job dispatched to the network printer.");
     }
 }

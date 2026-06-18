@@ -8,7 +8,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";   // PDF containing a TextBoxField named "txtInput" and a BarcodeField named "qrField"
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,57 +17,41 @@ class Program
             return;
         }
 
-        // Open the PDF document
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // -------------------------------------------------
-            // 1. Create a text box field (the source field)
-            // -------------------------------------------------
-            // Position and size of the text field
-            Aspose.Pdf.Rectangle txtRect = new Aspose.Pdf.Rectangle(100, 700, 300, 730);
-            TextBoxField txtField = new TextBoxField(doc, txtRect);
-            txtField.Name = "txtSource";
-            txtField.PartialName = "txtSource";
-            // Optional visual settings
-            txtField.Border = new Border(txtField) { Width = 1 };
-            txtField.Color = Aspose.Pdf.Color.LightGray;
-            // Add the text field to the first page
-            doc.Pages[1].Annotations.Add(txtField);
+            // Retrieve the text box field (the source of the data)
+            TextBoxField txtField = doc.Form["txtInput"] as TextBoxField;
+            // Retrieve the barcode field that will display the QR code
+            BarcodeField qrField = doc.Form["qrField"] as BarcodeField;
 
-            // -------------------------------------------------
-            // 2. Create a QR code barcode field (the target field)
-            // -------------------------------------------------
-            // Position and size of the QR code field
-            Aspose.Pdf.Rectangle qrRect = new Aspose.Pdf.Rectangle(350, 650, 500, 800);
-            BarcodeField qrField = new BarcodeField(doc, qrRect);
-            qrField.Name = "qrCode";
-            qrField.PartialName = "qrCode";
-            // Make the field read‑only; its value will be set by JavaScript
-            qrField.ReadOnly = true;
-            // Optional visual settings
-            qrField.Border = new Border(qrField) { Width = 1 };
-            qrField.Color = Aspose.Pdf.Color.LightGray;
-            // Add the barcode field to the first page
-            doc.Pages[1].Annotations.Add(qrField);
+            if (txtField == null || qrField == null)
+            {
+                Console.Error.WriteLine("Required fields not found in the PDF form.");
+                return;
+            }
 
-            // -------------------------------------------------
-            // 3. Attach JavaScript to the text field so that
-            //    the QR code updates whenever the text changes.
-            // -------------------------------------------------
-            // The JavaScript runs on each character modification.
-            // It copies the current value of the text field into the QR code field.
-            string js = "this.getField('qrCode').value = this.value;";
-            txtField.Actions.OnModifyCharacter = new JavascriptAction(js);
+            // NOTE: BarcodeField.Symbology is read‑only. The QR code symbology must be
+            // pre‑configured in the PDF template. We only need to ensure the field can be
+            // updated by JavaScript.
+            qrField.ReadOnly = false;
 
-            // -------------------------------------------------
-            // 4. Ensure automatic recalculation (optional but safe)
-            // -------------------------------------------------
+            // Attach JavaScript to the text field: whenever a character is modified,
+            // set the barcode field's value to the current text field value.
+            // The JavaScript runs inside the PDF viewer and updates the QR code automatically.
+            txtField.Actions.OnModifyCharacter = new JavascriptAction(
+                "var txt = event.value; " +                     // current text box value
+                "var qr = this.getField('qrField'); " +        // reference to the barcode field
+                "qr.value = txt; " +                           // update barcode field value
+                "qr.recalculate();");                          // trigger barcode regeneration
+
+            // Optionally enable automatic recalculation for the whole form (default is true)
             doc.Form.AutoRecalculate = true;
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'. QR code will update automatically when the text field changes.");
     }
 }

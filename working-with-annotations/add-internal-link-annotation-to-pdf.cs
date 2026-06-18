@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "linked_output.pdf";
+        const string outputPath = "output_with_link.pdf";
         const int   targetPage = 3;               // page to navigate to (1‑based)
 
         if (!File.Exists(inputPath))
@@ -17,7 +17,7 @@ class Program
             return;
         }
 
-        // Load the PDF (using rule for document disposal)
+        // Load the PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPath))
         {
             // Ensure the target page exists
@@ -27,29 +27,29 @@ class Program
                 return;
             }
 
-            // Choose the page where the link annotation will be placed (e.g., first page)
-            Page sourcePage = doc.Pages[1];
+            // Choose the page where the link annotation will be placed
+            Page page = doc.Pages[1]; // first page (1‑based indexing)
 
-            // Define the clickable rectangle (coordinates are in points)
-            Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            // Define the rectangle area for the link annotation
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
             // Create the link annotation
-            LinkAnnotation link = new LinkAnnotation(sourcePage, linkRect)
+            LinkAnnotation link = new LinkAnnotation(page, rect)
             {
-                Color = Aspose.Pdf.Color.Blue,          // visual border color
-                Contents = $"Go to page {targetPage}"   // tooltip text
+                Color = Aspose.Pdf.Color.Blue,   // visual cue for the link
+                Contents = $"Go to page {targetPage}"
             };
 
-            // Set the action to jump to the target page within the same document
+            // Set the action to navigate to the target page within the same document
             link.Action = new GoToAction(doc.Pages[targetPage]);
 
             // Add the annotation to the page
-            sourcePage.Annotations.Add(link);
+            page.Annotations.Add(link);
 
-            // Save the modified PDF (using rule for document disposal)
+            // Save the modified PDF (lifecycle rule: use Document.Save)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with internal link saved to '{outputPath}'.");
+        Console.WriteLine($"Link annotation added. Saved to '{outputPath}'.");
     }
 }

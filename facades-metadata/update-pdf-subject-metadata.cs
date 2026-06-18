@@ -1,36 +1,32 @@
 using System;
+using System.IO;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string newSubject = "Report on Quarterly Sales";
+        const string inputPdf  = "input.pdf";   // source PDF
+        const string outputPdf = "output.pdf";  // PDF with updated Subject
+        const string newSubject = "Report for Q3 2026";
 
-        // Ensure the input file exists
-        if (!System.IO.File.Exists(inputPdf))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF metadata using PdfFileInfo, update the Subject, and save the changes
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPdf))
+        // Initialize PdfFileInfo facade with the source file
+        using (PdfFileInfo info = new PdfFileInfo(inputPdf))
         {
-            // Set the Subject property to reflect the document's purpose
-            pdfInfo.Subject = newSubject;
+            // Update the Subject metadata
+            info.Subject = newSubject;
 
-            // Save the updated metadata into a new PDF file
-            bool success = pdfInfo.SaveNewInfo(outputPdf);
-            if (!success)
-            {
-                Console.Error.WriteLine("Failed to save updated PDF metadata.");
-                return;
-            }
+            // Save the updated information into a new PDF file
+            bool success = info.SaveNewInfo(outputPdf);
+            Console.WriteLine(success
+                ? $"Subject updated and saved to '{outputPdf}'."
+                : $"Failed to save updated PDF to '{outputPdf}'.");
         }
-
-        Console.WriteLine($"Subject updated and saved to '{outputPdf}'.");
     }
 }

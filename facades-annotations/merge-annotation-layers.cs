@@ -3,69 +3,74 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-public static class AnnotationMerger
+namespace AsposePdfApi
 {
-    /// <summary>
-    /// Merges annotation layers from multiple source PDFs into a single target PDF.
-    /// The target PDF (basePdfPath) is used as the base document; all annotations
-    /// from the source PDFs (annotationPdfPaths) are imported and saved to outputPath.
-    /// </summary>
-    /// <param name="basePdfPath">Path to the PDF that will receive the merged annotations.</param>
-    /// <param name="annotationPdfPaths">Array of PDF file paths whose annotations will be merged.</param>
-    /// <param name="outputPath">Path where the resulting PDF with combined annotations will be saved.</param>
-    public static void MergeAnnotationLayers(string basePdfPath, string[] annotationPdfPaths, string outputPath)
+    public static class AnnotationMerger
     {
-        // Validate input parameters
-        if (string.IsNullOrEmpty(basePdfPath))
-            throw new ArgumentException("Base PDF path must be provided.", nameof(basePdfPath));
-        if (annotationPdfPaths == null || annotationPdfPaths.Length == 0)
-            throw new ArgumentException("At least one source PDF path must be provided.", nameof(annotationPdfPaths));
-        if (string.IsNullOrEmpty(outputPath))
-            throw new ArgumentException("Output PDF path must be provided.", nameof(outputPath));
-
-        // Ensure the base PDF exists
-        if (!File.Exists(basePdfPath))
-            throw new FileNotFoundException($"Base PDF not found: {basePdfPath}");
-
-        // Ensure all source PDFs exist
-        foreach (var src in annotationPdfPaths)
+        /// <summary>
+        /// Merges annotation layers from multiple source PDFs into a target PDF.
+        /// The resulting PDF contains the original content of <paramref name="targetPdfPath"/>
+        /// plus all annotations from the files listed in <paramref name="sourcePdfPaths"/>.
+        /// </summary>
+        /// <param name="targetPdfPath">Path to the PDF that will receive the annotations.</param>
+        /// <param name="sourcePdfPaths">Array of PDF file paths whose annotations will be merged.</param>
+        /// <param name="outputPdfPath">Path where the merged PDF will be saved.</param>
+        public static void MergeAnnotationLayers(string targetPdfPath, string[] sourcePdfPaths, string outputPdfPath)
         {
-            if (!File.Exists(src))
-                throw new FileNotFoundException($"Source PDF not found: {src}");
+            // Validate input files
+            if (!File.Exists(targetPdfPath))
+                throw new FileNotFoundException($"Target PDF not found: {targetPdfPath}");
+
+            foreach (var src in sourcePdfPaths)
+            {
+                if (!File.Exists(src))
+                    throw new FileNotFoundException($"Source PDF not found: {src}");
+            }
+
+            // Initialize the PdfAnnotationEditor facade
+            PdfAnnotationEditor editor = new PdfAnnotationEditor();
+
+            // Bind the target PDF to the editor
+            editor.BindPdf(targetPdfPath);
+
+            // Import all annotations from the source PDFs
+            // This overload imports every annotation type from each source file
+            editor.ImportAnnotations(sourcePdfPaths);
+
+            // Save the combined document to the specified output path
+            editor.Save(outputPdfPath);
         }
-
-        // Use PdfAnnotationEditor to import annotations.
-        // The editor does not implement IDisposable, so we manage it manually.
-        PdfAnnotationEditor editor = new PdfAnnotationEditor();
-
-        // Bind the base PDF document to the editor.
-        editor.BindPdf(basePdfPath);
-
-        // Import all annotations from the source PDFs.
-        // This overload imports all annotation types.
-        editor.ImportAnnotations(annotationPdfPaths);
-
-        // Save the merged document to the specified output path.
-        editor.Save(outputPath);
     }
-}
 
-public class Program
-{
-    /// <summary>
-    /// Entry point required for a console‑type project. The method is intentionally minimal;
-    /// it can be extended to parse command‑line arguments or to invoke the merger.
-    /// </summary>
-    public static void Main(string[] args)
+    class Program
     {
-        // Example placeholder – no operation performed.
-        // Uncomment and adapt the following lines for a real run:
-        // if (args.Length >= 3)
-        // {
-        //     string basePdf = args[0];
-        //     string[] sources = args[1].Split(';'); // semi‑colon separated list
-        //     string output = args[2];
-        //     AnnotationMerger.MergeAnnotationLayers(basePdf, sources, output);
-        // }
+        /// <summary>
+        /// Entry point required for a console application.
+        /// Demonstrates how to call <see cref="AnnotationMerger.MergeAnnotationLayers"/>.
+        /// </summary>
+        static void Main(string[] args)
+        {
+            // Expected arguments: targetPdfPath outputPdfPath sourcePdfPath1 [sourcePdfPath2 ...]
+            if (args.Length < 3)
+            {
+                Console.WriteLine("Usage: <targetPdfPath> <outputPdfPath> <sourcePdfPath1> [sourcePdfPath2] ...");
+                return;
+            }
+
+            string targetPdfPath = args[0];
+            string outputPdfPath = args[1];
+            // C# 8 range operator to get the remaining arguments as source PDFs
+            string[] sourcePdfPaths = args[2..];
+
+            try
+            {
+                AnnotationMerger.MergeAnnotationLayers(targetPdfPath, sourcePdfPaths, outputPdfPath);
+                Console.WriteLine("Annotation layers merged successfully.");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error merging annotations: {ex.Message}");
+            }
+        }
     }
 }

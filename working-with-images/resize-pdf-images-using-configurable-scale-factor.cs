@@ -7,76 +7,67 @@ class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output.pdf";
+        // Load configuration from appsettings.json using System.Text.Json (no external config packages required)
         const string configPath = "appsettings.json";
+        if (!File.Exists(configPath))
+        {
+            Console.Error.WriteLine($"Configuration file not found: {configPath}");
+            return;
+        }
 
-        // ---------------------------------------------------------------------
-        // 1. Read scaling factor from appsettings.json (default = 1.0 – no scaling)
-        // ---------------------------------------------------------------------
-        double scaleFactor = 1.0;
-        if (File.Exists(configPath))
+        double scaleFactor;
+        try
         {
             string json = File.ReadAllText(configPath);
             using JsonDocument doc = JsonDocument.Parse(json);
-            if (doc.RootElement.TryGetProperty("ImageScaleFactor", out JsonElement factorElem) &&
-                factorElem.TryGetDouble(out double factor))
+            JsonElement root = doc.RootElement;
+            if (root.TryGetProperty("ImageScaleFactor", out JsonElement factorElem) && factorElem.TryGetDouble(out double factor))
             {
                 scaleFactor = factor;
             }
-        }
-
-        // ---------------------------------------------------------------
-        // 2. Ensure the input PDF exists – create a minimal placeholder if it does not.
-        // ---------------------------------------------------------------
-        if (!File.Exists(inputPdfPath))
-        {
-            CreatePlaceholderPdf(inputPdfPath);
-            Console.WriteLine($"Placeholder PDF created at '{inputPdfPath}'.");
-        }
-
-        // ---------------------------------------------------------------
-        // 3. Load the PDF, resize any images, and save the result.
-        // ---------------------------------------------------------------
-        using (Document pdfDoc = new Document(inputPdfPath))
-        {
-            // Aspose.Pdf uses 1‑based page indexing.
-            for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
+            else
             {
-                Page page = pdfDoc.Pages[pageIndex];
+                Console.Error.WriteLine("ImageScaleFactor not found or invalid in configuration.");
+                return;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to read configuration: {ex.Message}");
+            return;
+        }
 
-                // Iterate over all paragraph elements on the page.
-                for (int i = 0; i < page.Paragraphs.Count; i++)
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output_resized.pdf";
+
+        if (!File.Exists(inputPdf))
+        {
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            return;
+        }
+
+        // Load the PDF, modify images, and save
+        using (Document doc = new Document(inputPdf))
+        {
+            // Iterate over all pages
+            foreach (Page page in doc.Pages)
+            {
+                // Iterate over all paragraphs on the page
+                for (int i = 1; i <= page.Paragraphs.Count; i++)
                 {
-                    // Identify Image objects (Aspose.Pdf.Image).
-                    if (page.Paragraphs[i] is Aspose.Pdf.Image img)
+                    // Check if the paragraph is an Image
+                    if (page.Paragraphs[i] is Image img)
                     {
-                        // Apply the scaling factor read from configuration.
+                        // Apply the scaling factor (ImageScale scales both width and height proportionally)
                         img.ImageScale = scaleFactor;
                     }
                 }
             }
 
-            pdfDoc.Save(outputPdfPath);
+            // Save the modified PDF (format inferred from file extension)
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Images resized with factor {scaleFactor} and saved to '{outputPdfPath}'.");
-    }
-
-    /// <summary>
-    /// Creates a very small PDF containing a single blank page. This method is used only
-    /// when the expected input file does not exist, preventing a FileNotFoundException at runtime.
-    /// </summary>
-    /// <param name="path">Full path where the placeholder PDF should be saved.</param>
-    private static void CreatePlaceholderPdf(string path)
-    {
-        // Create a new empty document.
-        using (Document doc = new Document())
-        {
-            // Add a single blank page (default size A4).
-            doc.Pages.Add();
-            doc.Save(path);
-        }
+        Console.WriteLine($"Images resized with factor {scaleFactor} and saved to '{outputPdf}'.");
     }
 }

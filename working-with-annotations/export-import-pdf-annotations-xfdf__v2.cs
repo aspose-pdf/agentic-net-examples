@@ -6,10 +6,11 @@ class Program
 {
     static void Main()
     {
-        // Paths for source PDF (with annotations), destination PDF, and temporary XFDF file
-        const string sourcePdfPath = "source_with_annotations.pdf";
+        // Paths for source PDF, destination PDF and temporary XFDF file
+        const string sourcePdfPath = "source.pdf";
         const string targetPdfPath = "target.pdf";
-        const string xfdfPath       = "annotations.xfdf";
+        const string xfdfPath      = "annotations.xfdf";
+        const string outputPdfPath = "target_with_comments.pdf";
 
         // Verify source files exist
         if (!File.Exists(sourcePdfPath))
@@ -30,30 +31,31 @@ class Program
             {
                 // Export all annotations to an XFDF file
                 sourceDoc.ExportAnnotationsToXfdf(xfdfPath);
-                Console.WriteLine($"Annotations exported to XFDF: {xfdfPath}");
             }
 
             // ---------- Import annotations into the target PDF ----------
             using (Document targetDoc = new Document(targetPdfPath))
             {
-                // Import annotations from the previously created XFDF file
+                // Import the previously exported XFDF file
                 targetDoc.ImportAnnotationsFromXfdf(xfdfPath);
 
-                // Save the updated PDF (you may choose a different output name)
-                const string outputPdfPath = "target_with_imported_annotations.pdf";
+                // Save the updated PDF with copied comments
                 targetDoc.Save(outputPdfPath);
-                Console.WriteLine($"Annotations imported and saved to: {outputPdfPath}");
             }
 
-            // Optional: clean up the temporary XFDF file
-            if (File.Exists(xfdfPath))
-            {
-                File.Delete(xfdfPath);
-            }
+            Console.WriteLine($"Annotations exported from '{sourcePdfPath}' and imported into '{outputPdfPath}'.");
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine($"Error: {ex.Message}");
+        }
+        finally
+        {
+            // Clean up the temporary XFDF file
+            if (File.Exists(xfdfPath))
+            {
+                try { File.Delete(xfdfPath); } catch { /* ignore cleanup errors */ }
+            }
         }
     }
 }

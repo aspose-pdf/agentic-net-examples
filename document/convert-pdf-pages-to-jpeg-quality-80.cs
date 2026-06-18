@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices;
-using Aspose.Pdf.Optimization;
+using Aspose.Pdf.Devices;          // JpegDevice
+using Aspose.Pdf.Optimization;    // OptimizationOptions, ImageCompressionOptions
 
 class Program
 {
@@ -21,30 +21,32 @@ class Program
         // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Load PDF document inside a using block (lifecycle rule)
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document
+        using (Document pdfDoc = new Document(inputPath))
         {
-            // -----------------------------------------------------------------
-            // Apply JPEG compression (quality 80) to images *inside* the PDF.
-            // Use the modern OptimizationOptions API (Document.OptimizationOptions is obsolete).
-            // -----------------------------------------------------------------
+            // ------------------------------------------------------------
+            // Configure JPEG compression for images *inside* the PDF using
+            // the modern OptimizationOptions API (Document.OptimizationOptions
+            // is obsolete).
+            // ------------------------------------------------------------
             OptimizationOptions opt = new OptimizationOptions();
             opt.ImageCompressionOptions.CompressImages = true;
-            opt.ImageCompressionOptions.ImageQuality = 80; // JPEG quality for embedded images
-            doc.OptimizeResources(opt);
+            opt.ImageCompressionOptions.ImageQuality = 80; // 0‑100
+            // Apply the optimization with the configured options.
+            pdfDoc.OptimizeResources(opt);
 
-            // Create JpegDevice with JPEG quality 80 for the output images.
-            JpegDevice jpegDevice = new JpegDevice(80);
+            // Create a JpegDevice with 300 DPI resolution and quality 80 for
+            // page‑to‑image conversion.
+            Resolution resolution = new Resolution(300);
+            JpegDevice jpegDevice = new JpegDevice(resolution, 80);
 
-            // Pages are 1‑based (global rule)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Convert each page to a JPEG file
+            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
             {
-                string outputPath = Path.Combine(outputDir, $"page_{pageIndex}.jpeg");
-
-                // Save each page as JPEG using the device
-                using (FileStream outStream = new FileStream(outputPath, FileMode.Create))
+                string outPath = Path.Combine(outputDir, $"page_{pageNum}.jpeg");
+                using (FileStream outStream = new FileStream(outPath, FileMode.Create))
                 {
-                    jpegDevice.Process(doc.Pages[pageIndex], outStream);
+                    jpegDevice.Process(pdfDoc.Pages[pageNum], outStream);
                 }
             }
         }

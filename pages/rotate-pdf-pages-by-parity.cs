@@ -1,13 +1,13 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Document, Page, Rotation
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "rotated_output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_rotated.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,26 +15,18 @@ class Program
             return;
         }
 
-        // Load the PDF document (using rule for loading)
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based (rule: page-indexing-one-based)
+            // Pages are 1‑based; iterate accordingly
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Set rotation based on page number parity
-                if (i % 2 == 0) // even pages
-                {
-                    page.Rotate = Rotation.None;            // no rotation
-                }
-                else // odd pages
-                {
-                    page.Rotate = Rotation.on90;            // rotate 90°
-                }
+                // Even‑numbered pages → rotate 90°, odd‑numbered pages → no rotation
+                page.Rotate = (i % 2 == 0) ? Rotation.on90 : Rotation.None;
             }
 
-            // Save the modified PDF (using rule for saving)
+            // Save the modified document as PDF
             doc.Save(outputPath);
         }
 

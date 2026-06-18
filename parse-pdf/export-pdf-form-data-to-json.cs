@@ -1,7 +1,7 @@
 using System;
 using System.IO;
+using System.Text;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 
 class Program
 {
@@ -18,22 +18,21 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // MemoryStream will hold the JSON output
+            // Use a memory stream to capture the JSON output
             using (MemoryStream jsonStream = new MemoryStream())
             {
-                // Export all form fields to JSON (writes to the provided stream)
+                // Export all form fields to JSON and write to the stream
                 doc.Form.ExportToJson(jsonStream);
 
-                // Reset stream position to read from the beginning
+                // Reset stream position before reading
                 jsonStream.Position = 0;
 
-                // Read the JSON string from the stream
-                using (StreamReader reader = new StreamReader(jsonStream))
-                {
-                    string json = reader.ReadToEnd();
-                    Console.WriteLine("Exported form data as JSON:");
-                    Console.WriteLine(json);
-                }
+                // Convert the JSON bytes to a string
+                string json = new StreamReader(jsonStream, Encoding.UTF8).ReadToEnd();
+
+                // Output the JSON string
+                Console.WriteLine("Exported Form Data (JSON):");
+                Console.WriteLine(json);
             }
         }
     }

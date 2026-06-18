@@ -1,6 +1,9 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+
+// Suppress known NuGet vulnerability warning (NU1903) for Microsoft.Bcl.Memory.
+#pragma warning disable NU1903
 
 class Program
 {
@@ -17,46 +20,30 @@ class Program
             return;
         }
 
-        // Load PDF meta‑information to check encryption status
-        using (PdfFileInfo fileInfo = new PdfFileInfo(inputPath))
+        // Load the document to inspect its encryption status.
+        // Aspose.Pdf's Document class provides the IsEncrypted property.
+        using (Document doc = new Document(inputPath))
         {
-            bool isEncrypted = fileInfo.IsEncrypted;
+            bool isEncrypted = doc.IsEncrypted;
             Console.WriteLine($"IsEncrypted: {isEncrypted}");
 
             if (!isEncrypted)
             {
-                // PDF is not encrypted – encrypt it using PdfFileSecurity
-                using (PdfFileSecurity security = new PdfFileSecurity())
-                {
-                    // Initialize the facade with the source PDF
-                    security.BindPdf(inputPath);
-
-                    // Encrypt with user and owner passwords, allow printing only
-                    security.EncryptFile(userPassword, ownerPassword, DocumentPrivilege.Print, KeySize.x128);
-
-                    // Save the encrypted PDF
-                    security.Save(outputPath);
-                }
+                // Encrypt the PDF (example: allow printing only)
+                Permissions perms = Permissions.PrintDocument; // choose required permissions
+                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+                doc.Save(outputPath);
+                Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
             }
             else
             {
-                // PDF is already encrypted – attempt to decrypt it
-                using (PdfFileSecurity security = new PdfFileSecurity())
-                {
-                    security.BindPdf(inputPath);
-
-                    // Decrypt using the owner password (fallback to user password if needed)
-                    bool success = security.DecryptFile(ownerPassword);
-                    if (success)
-                    {
-                        security.Save(outputPath);
-                    }
-                    else
-                    {
-                        Console.Error.WriteLine("Decryption failed.");
-                    }
-                }
+                // Decrypt the PDF using the owner password.
+                // Reload the document with the owner password to gain full access.
+                Document encryptedDoc = new Document(inputPath, ownerPassword);
+                encryptedDoc.Save(outputPath);
+                Console.WriteLine($"Decrypted PDF saved to '{outputPath}'.");
             }
         }
     }
 }
+#pragma warning restore NU1903

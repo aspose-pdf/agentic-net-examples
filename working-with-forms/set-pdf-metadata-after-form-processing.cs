@@ -1,47 +1,48 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "filled_form.pdf";
-        const string outputPdf = "filled_form_with_metadata.pdf";
+        const string inputPath  = "form_filled.pdf";
+        const string outputPath = "final_with_metadata.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF that contains the processed form fields
-        using (Document doc = new Document(inputPdf))
+        try
         {
-            // -------------------------------------------------
-            // Form processing placeholder (e.g., fill fields)
-            // -------------------------------------------------
-            // Example: set a text field value
-            // Form form = doc.Form;
-            // if (form != null && form["Name"] != null)
-            // {
-            //     form["Name"].Value = "John Doe";
-            // }
+            // Load the PDF that contains form fields
+            using (Document doc = new Document(inputPath))
+            {
+                // OPTIONAL: process the form (e.g., flatten fields)
+                if (doc.Form != null)
+                {
+                    doc.Form.Flatten();
+                }
 
-            // Set standard document metadata (author and title)
-            doc.Info.Author = "Acme Corp.";
-            doc.Info.Title  = "Customer Information Form";
+                // Set standard metadata properties
+                doc.Info.Author = "John Doe";
+                doc.Info.Title  = "Processed Form Document";
 
-            // Optionally, set tagged‑content metadata as well
-            // The TaggedContent property returns a TaggedContent instance; no interface is required.
-            var tagged = doc.TaggedContent;
-            tagged.SetTitle("Customer Information Form");
-            tagged.SetLanguage("en-US");
+                // Alternative way to set the title (both are valid)
+                doc.SetTitle("Processed Form Document");
 
-            // Save the updated PDF
-            doc.Save(outputPdf);
+                // Save the updated PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Document saved with metadata to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF saved with metadata to '{outputPdf}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

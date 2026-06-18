@@ -6,23 +6,39 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputXml = "bookmarks.xml";
+        // Input PDF containing the bookmarks
+        const string inputPdfPath = "input.pdf";
 
-        if (!File.Exists(inputPdf))
+        // Output XML file that will hold the exported bookmarks
+        const string outputXmlPath = "bookmarks.xml";
+
+        // Verify that the source PDF exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Error: File not found – {inputPdfPath}");
             return;
         }
 
-        // Load the PDF, export its bookmarks to an XML file, then release resources.
-        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
+        try
         {
-            editor.BindPdf(inputPdf);                 // Initialize the facade with the PDF.
-            editor.ExportBookmarksToXML(outputXml);   // Export the complete bookmark list.
-            editor.Close();                           // Optional explicit cleanup.
-        }
+            // Initialize the bookmark editor facade
+            PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor();
 
-        Console.WriteLine($"Bookmarks exported to '{outputXml}'.");
+            // Bind the PDF document to the editor
+            bookmarkEditor.BindPdf(inputPdfPath);
+
+            // Export the complete bookmark hierarchy to an XML file
+            bookmarkEditor.ExportBookmarksToXML(outputXmlPath);
+
+            // Release resources held by the facade
+            bookmarkEditor.Close();
+
+            Console.WriteLine($"Bookmarks successfully exported to '{outputXmlPath}'.");
+        }
+        catch (Exception ex)
+        {
+            // Handle any unexpected errors
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

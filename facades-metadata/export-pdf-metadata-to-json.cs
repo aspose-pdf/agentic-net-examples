@@ -9,66 +9,57 @@ class Program
     static void Main()
     {
         // Folder containing PDF files
-        const string folderPath = "pdfs";
-        // Output JSON file
-        const string outputJson = "metadata.json";
+        const string inputFolder = @"C:\PdfFolder";
+        // Path for the resulting JSON file
+        const string outputJson = @"C:\PdfMetadata\metadata.json";
 
-        if (!Directory.Exists(folderPath))
+        if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"Folder not found: {folderPath}");
+            Console.Error.WriteLine($"Input folder does not exist: {inputFolder}");
             return;
         }
 
+        // Ensure the output directory exists
+        Directory.CreateDirectory(Path.GetDirectoryName(outputJson));
+
+        // Collect metadata for each PDF
         var allMetadata = new List<Dictionary<string, object>>();
 
-        // Iterate over each PDF file in the folder
-        foreach (string pdfFile in Directory.GetFiles(folderPath, "*.pdf"))
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            try
+            // Use PdfFileInfo facade to read PDF metadata
+            using (Aspose.Pdf.Facades.PdfFileInfo info = new Aspose.Pdf.Facades.PdfFileInfo())
             {
-                // Use PdfFileInfo facade to read metadata
-                using (PdfFileInfo info = new PdfFileInfo())
+                info.BindPdf(pdfPath);
+
+                var meta = new Dictionary<string, object>
                 {
-                    info.BindPdf(pdfFile);
+                    ["FileName"]          = Path.GetFileName(pdfPath),
+                    ["Title"]             = info.Title,
+                    ["Author"]            = info.Author,
+                    ["Subject"]           = info.Subject,
+                    ["Keywords"]          = info.Keywords,
+                    ["Creator"]           = info.Creator,
+                    ["Producer"]          = info.Producer,
+                    ["CreationDate"]      = info.CreationDate,
+                    ["ModDate"]           = info.ModDate,
+                    ["NumberOfPages"]     = info.NumberOfPages,
+                    ["IsEncrypted"]       = info.IsEncrypted,
+                    ["HasOpenPassword"]   = info.HasOpenPassword,
+                    ["HasEditPassword"]   = info.HasEditPassword,
+                    ["Header"]            = info.Header,
+                    ["UseStrictValidation"] = info.UseStrictValidation
+                };
 
-                    var meta = new Dictionary<string, object>
-                    {
-                        ["FileName"]        = Path.GetFileName(pdfFile),
-                        ["Title"]           = info.Title,
-                        ["Author"]          = info.Author,
-                        ["Creator"]         = info.Creator,
-                        ["Subject"]         = info.Subject,
-                        ["Keywords"]        = info.Keywords,
-                        ["CreationDate"]    = info.CreationDate,
-                        ["ModDate"]         = info.ModDate,
-                        ["NumberOfPages"]   = info.NumberOfPages,
-                        ["IsEncrypted"]     = info.IsEncrypted,
-                        ["IsPdfFile"]       = info.IsPdfFile,
-                        ["HasOpenPassword"] = info.HasOpenPassword,
-                        ["HasEditPassword"] = info.HasEditPassword,
-                        ["Producer"]        = info.Producer,
-                        ["Header"]          = info.Header
-                    };
-
-                    allMetadata.Add(meta);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Failed to process '{pdfFile}': {ex.Message}");
+                allMetadata.Add(meta);
             }
         }
 
         // Serialize the collected metadata to JSON
-        try
-        {
-            string json = JsonSerializer.Serialize(allMetadata, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(outputJson, json);
-            Console.WriteLine($"Metadata exported to '{outputJson}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error writing JSON file: {ex.Message}");
-        }
+        JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+        string json = JsonSerializer.Serialize(allMetadata, jsonOptions);
+        File.WriteAllText(outputJson, json);
+
+        Console.WriteLine($"Metadata exported to '{outputJson}'.");
     }
 }

@@ -1,58 +1,48 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-namespace AsposePdfApi
+namespace AsposePdfHelper
 {
-    public static class PdfUtility
+    public static class PdfHelper
     {
         /// <summary>
         /// Loads a filled PDF from the specified file path and returns its content as a byte array.
-        /// The method uses Aspose.Pdf.Facades.PdfViewer to avoid writing any intermediate files.
+        /// The method uses Aspose.Pdf.Facades.PdfViewer to avoid writing the PDF to disk.
         /// </summary>
         /// <param name="pdfPath">Full path to the source PDF file.</param>
         /// <returns>Byte array containing the PDF data.</returns>
-        public static byte[] GetPdfBytes(string pdfPath)
+        public static byte[] ConvertPdfToByteArray(string pdfPath)
         {
             if (string.IsNullOrEmpty(pdfPath))
                 throw new ArgumentException("PDF path must be provided.", nameof(pdfPath));
 
             if (!File.Exists(pdfPath))
-                throw new FileNotFoundException("PDF file not found.", pdfPath);
+                throw new FileNotFoundException($"PDF file not found: {pdfPath}");
 
-            // MemoryStream will hold the PDF data in memory.
-            using (MemoryStream outputStream = new MemoryStream())
+            // PdfViewer implements ISaveableFacade and provides BindPdf and Save(Stream) methods.
+            using (PdfViewer viewer = new PdfViewer())
             {
-                // PdfViewer is a facade that can bind a PDF and save it to a stream.
-                using (PdfViewer viewer = new PdfViewer())
+                // Load the PDF into the facade.
+                viewer.BindPdf(pdfPath);
+
+                // Save the PDF directly into a memory stream.
+                using (MemoryStream ms = new MemoryStream())
                 {
-                    // Load the PDF from file.
-                    viewer.BindPdf(pdfPath);
-
-                    // Save the PDF directly into the MemoryStream.
-                    viewer.Save(outputStream);
+                    viewer.Save(ms);
+                    // Return the underlying byte array.
+                    return ms.ToArray();
                 }
-
-                // Ensure the stream position is reset before reading.
-                outputStream.Position = 0;
-
-                // Return the underlying byte array.
-                return outputStream.ToArray();
             }
         }
     }
 
-    // Dummy entry point to satisfy the console‑application requirement.
-    // In a real library project this class would be omitted or the project type changed to Class Library.
-    public class Program
+    // Dummy entry point to satisfy a console‑application project that requires a Main method.
+    internal class Program
     {
-        public static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            // Example usage (can be removed in production).
-            // string path = "filled.pdf";
-            // byte[] pdfBytes = PdfUtility.GetPdfBytes(path);
-            // Console.WriteLine($"PDF size: {pdfBytes.Length} bytes");
+            // Intentionally left blank – the library functionality is accessed via PdfHelper.
         }
     }
 }

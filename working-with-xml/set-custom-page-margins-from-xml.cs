@@ -1,75 +1,104 @@
 using System;
 using System.IO;
 using System.Xml.Linq;
-using Aspose.Pdf; // Core PDF API – MarginInfo is in this namespace
+using System.Collections.Generic;
+using Aspose.Pdf;
 
 class Program
 {
+    // Simple DTO to hold margin settings for a page range
+    class SectionMargin
+    {
+        public int StartPage { get; set; }
+        public int EndPage   { get; set; }
+        public int Top       { get; set; }   // points
+        public int Left      { get; set; }
+        public int Right     { get; set; }
+        public int Bottom    { get; set; }
+    }
+
     static void Main()
     {
-        const string pdfPath   = "input.pdf";      // source PDF
-        const string xmlPath   = "margins.xml";   // XML with per‑section margin definitions
-        const string outputPdf = "output.pdf";    // result PDF
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "output.pdf";
+        const string marginsXmlPath = "margins.xml";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF not found: {inputPdfPath}");
+            return;
+        }
+        if (!File.Exists(marginsXmlPath))
+        {
+            Console.Error.WriteLine($"XML not found: {marginsXmlPath}");
             return;
         }
 
-        if (!File.Exists(xmlPath))
-        {
-            Console.Error.WriteLine($"XML not found: {xmlPath}");
-            return;
-        }
-
-        // Load the XML that defines margins per section.
-        // Expected format:
-        // <Sections>
+        // Parse XML – expected format:
+        // <Margins>
         //   <Section startPage="1" endPage="3">
-        //     <Margins top="10" left="15" bottom="10" right="15"/>
+        //     <Top>20</Top><Left>15</Left><Right>15</Right><Bottom>20</Bottom>
         //   </Section>
         //   ...
-        // </Sections>
-        XDocument xmlDoc = XDocument.Load(xmlPath);
-
-        // Load the PDF document.
-        using (Document pdfDoc = new Document(pdfPath))
+        // </Margins>
+        var sections = new List<SectionMargin>();
+        XDocument xmlDoc = XDocument.Load(marginsXmlPath);
+        foreach (var secElem in xmlDoc.Root.Elements("Section"))
         {
-            // Iterate over each section defined in the XML.
-            foreach (XElement section in xmlDoc.Root?.Elements("Section") ?? Array.Empty<XElement>())
+            var sec = new SectionMargin
             {
-                int startPage = (int)section.Attribute("startPage");
-                int endPage   = (int)section.Attribute("endPage");
-
-                XElement marginsElem = section.Element("Margins");
-                if (marginsElem == null) continue; // skip if no margin info
-
-                double top    = (double)marginsElem.Attribute("top");
-                double left   = (double)marginsElem.Attribute("left");
-                double bottom = (double)marginsElem.Attribute("bottom");
-                double right  = (double)marginsElem.Attribute("right");
-
-                // Build a MarginInfo instance with the required values.
-                MarginInfo marginInfo = new MarginInfo
-                {
-                    Top    = top,
-                    Bottom = bottom,
-                    Left   = left,
-                    Right  = right
-                };
-
-                // Apply the margin to every page in the range (Aspose.Pdf uses 1‑based indexing).
-                for (int pageNum = startPage; pageNum <= endPage && pageNum <= pdfDoc.Pages.Count; pageNum++)
-                {
-                    pdfDoc.Pages[pageNum].PageInfo.Margin = marginInfo;
-                }
-            }
-
-            // Save the modified PDF.
-            pdfDoc.Save(outputPdf);
+                StartPage = (int)secElem.Attribute("startPage"),
+                EndPage   = (int)secElem.Attribute("endPage"),
+                Top       = (int?)secElem.Element("Top")   ?? 0,
+                Left      = (int?)secElem.Element("Left")  ?? 0,
+                Right     = (int?)secElem.Element("Right") ?? 0,
+                Bottom    = (int?)secElem.Element("Bottom")?? 0
+            };
+            sections.Add(sec);
         }
 
-        Console.WriteLine($"PDF saved with custom margins to '{outputPdf}'.");
+        try
+        {
+            // Open PDF – use the lifecycle rule (using block)
+            using (Document pdfDoc = new Document(inputPdfPath))
+            {
+                // Iterate over all pages (1‑based indexing)
+                for (int i = 1; i <= pdfDoc.Pages.Count; i++)
+                {
+                    // Find the first section that covers this page
+                    SectionMargin match = null;
+                    foreach (var sec in sections)
+                    {
+                        if (i >= sec.StartPage && i <= sec.EndPage)
+                        {
+                            match = sec;
+                            break;
+                        }
+                    }
+
+                    if (match != null)
+                    {
+                        // Create and assign a new MarginInfo instance using the correct property names
+                        var marginInfo = new MarginInfo
+                        {
+                            Top    = match.Top,
+                            Bottom = match.Bottom,
+                            Left   = match.Left,
+                            Right  = match.Right
+                        };
+                        pdfDoc.Pages[i].PageInfo.Margin = marginInfo;
+                    }
+                }
+
+                // Save the modified PDF – simple Save (no extra SaveOptions needed for PDF output)
+                pdfDoc.Save(outputPdfPath);
+            }
+
+            Console.WriteLine($"PDF saved with custom margins to '{outputPdfPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"An error occurred: {ex.Message}");
+        }
     }
 }

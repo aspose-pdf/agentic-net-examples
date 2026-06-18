@@ -1,15 +1,15 @@
 using System;
 using System.IO;
 using System.IO.Compression;
-using Aspose.Pdf;
+using Aspose.Pdf; // DocSaveOptions resides in this namespace
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";   // source PDF
-        const string docxPath = "output.docx"; // intermediate DOCX
-        const string zipPath = "output.zip";   // final ZIP archive
+        const string pdfPath = "input.pdf";
+        const string docxPath = "output.docx";
+        const string zipPath = "output_docx.zip";
 
         if (!File.Exists(pdfPath))
         {
@@ -17,36 +17,46 @@ class Program
             return;
         }
 
-        // Convert PDF to DOCX
-        using (Document pdfDocument = new Document(pdfPath))
+        try
         {
-            // Configure DOCX save options
-            var saveOptions = new DocSaveOptions
+            // Load PDF and convert to DOCX
+            using (Document pdfDoc = new Document(pdfPath))
             {
-                // Export as DOCX format (correct enum value)
-                Format = DocSaveOptions.DocFormat.DocX,
-                // Optional: enable bullet recognition
-                RecognizeBullets = true
-            };
+                var saveOptions = new DocSaveOptions
+                {
+                    // Export as DOCX
+                    Format = DocSaveOptions.DocFormat.DocX,
+                    // Use Flow mode for maximum editability
+                    Mode = DocSaveOptions.RecognitionMode.Flow,
+                    // Optional: enable bullet recognition
+                    RecognizeBullets = true
+                };
 
-            pdfDocument.Save(docxPath, saveOptions);
+                pdfDoc.Save(docxPath, saveOptions);
+            }
+
+            // Verify DOCX was created before compressing
+            if (!File.Exists(docxPath))
+            {
+                Console.Error.WriteLine($"Failed to create DOCX: {docxPath}");
+                return;
+            }
+
+            // Compress the DOCX into a ZIP archive
+            using (FileStream zipToCreate = new FileStream(zipPath, FileMode.Create))
+            using (ZipArchive archive = new ZipArchive(zipToCreate, ZipArchiveMode.Create))
+            {
+                // Add the DOCX file to the archive
+                archive.CreateEntryFromFile(docxPath, Path.GetFileName(docxPath), CompressionLevel.Optimal);
+            }
+
+            Console.WriteLine("PDF converted to DOCX and zipped successfully:");
+            Console.WriteLine($"  DOCX: {docxPath}");
+            Console.WriteLine($"  ZIP : {zipPath}");
         }
-
-        // Verify DOCX was created before compressing
-        if (!File.Exists(docxPath))
+        catch (Exception ex)
         {
-            Console.Error.WriteLine($"DOCX conversion failed: {docxPath}");
-            return;
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
-
-        // Compress the DOCX into a ZIP archive
-        using (FileStream zipStream = new FileStream(zipPath, FileMode.Create))
-        using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Update))
-        {
-            // Add the DOCX file to the archive; store it with its file name only
-            archive.CreateEntryFromFile(docxPath, Path.GetFileName(docxPath));
-        }
-
-        Console.WriteLine($"PDF converted to DOCX and zipped successfully:\nDOCX: {docxPath}\nZIP: {zipPath}");
     }
 }

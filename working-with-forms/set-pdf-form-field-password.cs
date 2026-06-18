@@ -7,37 +7,41 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string fieldName = "PasswordField";
-        const string password = "Secret123";
+        const string inputPdf  = "input.pdf";      // PDF containing the password field
+        const string outputPdf = "output.pdf";     // PDF after setting the password
+        const string fieldName = "PasswordField"; // Exact name of the password box field
+        const string newPassword = "Secret123";   // Password to assign to the field
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document (no Facades are used)
+        using (Document doc = new Document(inputPdf))
         {
-            // Retrieve the password field from the form
-            PasswordBoxField pwdField = doc.Form[fieldName] as PasswordBoxField;
+            // Access the form object from the document
+            Form form = doc.Form;
+
+            // Retrieve the field by name and cast it to PasswordBoxField
+            PasswordBoxField pwdField = form[fieldName] as PasswordBoxField;
             if (pwdField == null)
             {
-                Console.Error.WriteLine($"Password field '{fieldName}' not found.");
+                Console.Error.WriteLine($"Password field '{fieldName}' not found or is not a PasswordBoxField.");
                 return;
             }
 
             // Set the password value
-            pwdField.Value = password;
+            pwdField.Value = newPassword;
 
-            // Make the field read‑only to enforce security
+            // Optionally make the field read‑only so the user cannot edit it
             pwdField.ReadOnly = true;
 
-            // Save the updated PDF
-            doc.Save(outputPath);
+            // Save the modified PDF
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Password set and document saved to '{outputPath}'.");
+        Console.WriteLine($"Password field '{fieldName}' updated and saved to '{outputPdf}'.");
     }
 }

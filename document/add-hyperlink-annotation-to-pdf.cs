@@ -2,48 +2,47 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text; // for GoToURIAction resides in Aspose.Pdf.Annotations, but GoToURIAction is in Aspose.Pdf.Annotations namespace
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_link.pdf";
-        const string url        = "https://www.example.com";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string url = "https://www.example.com";
 
+        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Open the PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Choose the page where the hyperlink will be placed (1‑based index)
+            // Get the first page (Aspose.Pdf uses 1‑based indexing)
             Page page = doc.Pages[1];
 
-            // Define the clickable rectangle (left, bottom, right, top)
-            // Fully qualify to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            // Define the clickable area (fully qualified Rectangle to avoid ambiguity)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Create a LinkAnnotation on the specified page and rectangle
-            LinkAnnotation link = new LinkAnnotation(page, linkRect)
-            {
-                // Optional visual appearance
-                Color = Aspose.Pdf.Color.Blue,
-                // Assign a URI action that opens the external website
-                Action = new GoToURIAction(url)
-            };
+            // Create a link annotation on the specified page and rectangle
+            LinkAnnotation link = new LinkAnnotation(page, rect);
+
+            // Set the action to open an external website (hyperlink property is not a string)
+            link.Action = new GoToURIAction(url);
+
+            // Optional: set the annotation border color for visibility
+            link.Color = Aspose.Pdf.Color.Blue;
 
             // Add the annotation to the page's annotation collection
             page.Annotations.Add(link);
 
-            // Save the modified PDF
+            // Save the modified PDF (lifecycle rule: use Document.Save)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Hyperlink added and saved to '{outputPath}'.");
+        Console.WriteLine($"Hyperlink annotation added and saved to '{outputPath}'.");
     }
 }

@@ -1,7 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Xml.Linq;
+using System.Xml;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -9,54 +9,50 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string inputPdf  = "input.pdf";
         const string outputXml = "selected_fields.xml";
-
-        // Names of the form fields you want to export
-        string[] fieldsToExport = { "FirstName", "LastName", "Email" };
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document (wrapped in using for deterministic disposal)
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Build a collection of the selected fields from the document's Form.Fields collection
-            var selectedFieldElements = doc.Form?.Fields
-                ?.OfType<Field>()
-                ?.Where(f => fieldsToExport.Contains(f.PartialName))
-                ?.Select(f =>
-                {
-                    // The value can be null for empty fields – treat it as an empty string
-                    string value = f?.Value?.ToString() ?? string.Empty;
-                    // Create <field name="..."><value>...</value></field>
-                    return new XElement("field",
-                        new XAttribute("name", f.PartialName),
-                        new XElement("value", value)
-                    );
-                })
-                ?.ToList();
-
-            if (selectedFieldElements == null || selectedFieldElements.Count == 0)
+            // List of fully qualified field names to export
+            var fieldsToExport = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             {
-                Console.Error.WriteLine("No matching form fields were found in the PDF.");
-                return;
+                "Customer.Name",
+                "Customer.Email",
+                "Order.Total"
+            };
+
+            // Prepare XML writer
+            using (var writer = XmlWriter.Create(outputXml, new XmlWriterSettings { Indent = true }))
+            {
+                writer.WriteStartDocument();
+                writer.WriteStartElement("FormData");
+
+                // Iterate over all form fields and write only the selected ones
+                foreach (Field field in pdfDoc.Form.Fields)
+                {
+                    // FullName provides the fully qualified name of the field
+                    if (fieldsToExport.Contains(field.FullName))
+                    {
+                        writer.WriteStartElement("Field");
+                        writer.WriteAttributeString("Name", field.FullName);
+                        writer.WriteString(field.Value?.ToString() ?? string.Empty);
+                        writer.WriteEndElement(); // Field
+                    }
+                }
+
+                writer.WriteEndElement(); // FormData
+                writer.WriteEndDocument();
             }
 
-            // Build a new XFDF‑like document containing only the selected fields
-            XDocument filteredXfdf = new XDocument(
-                new XElement("xfdf",
-                    new XElement("fields", selectedFieldElements)
-                )
-            );
-
-            // Save the filtered XML to the requested output file
-            filteredXfdf.Save(outputXml);
+            Console.WriteLine($"Selected fields exported to '{outputXml}'.");
         }
-
-        Console.WriteLine($"Selected form fields exported to '{outputXml}'.");
     }
 }

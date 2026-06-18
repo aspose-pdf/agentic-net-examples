@@ -2,14 +2,13 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "signed_document.pdf";
-        const string outputFolder = "SignatureImages";
+        const string inputPdf = "signed.pdf";
+        const string outputImage = "signature_image.jpg";
 
         if (!File.Exists(inputPdf))
         {
@@ -17,47 +16,42 @@ class Program
             return;
         }
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
-
-        // Load the PDF document (using the standard Document constructor)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPdf))
         {
-            // Iterate through all pages (1‑based indexing)
-            foreach (Page page in doc.Pages)
+            // Locate the first signature field in the form collection
+            SignatureField sigField = null;
+            foreach (Field field in doc.Form)
             {
-                // Iterate through all annotations on the page (1‑based indexing)
-                for (int idx = 1; idx <= page.Annotations.Count; idx++)
+                if (field is SignatureField s)
                 {
-                    Annotation annotation = page.Annotations[idx];
-
-                    // Check if the annotation is a signature field
-                    if (annotation is SignatureField signatureField)
-                    {
-                        // Extract the visual appearance as a JPEG stream
-                        using (Stream imageStream = signatureField.ExtractImage())
-                        {
-                            if (imageStream != null)
-                            {
-                                // Build a unique file name for the extracted image
-                                string fileName = $"Signature_{signatureField.Name}_Page{page.Number}.jpg";
-                                string outputPath = Path.Combine(outputFolder, fileName);
-
-                                // Save the stream to a file
-                                using (FileStream file = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
-                                {
-                                    imageStream.CopyTo(file);
-                                }
-
-                                Console.WriteLine($"Extracted signature image saved to: {outputPath}");
-                            }
-                            else
-                            {
-                                Console.WriteLine($"No image found for signature field '{signatureField.Name}' on page {page.Number}.");
-                            }
-                        }
-                    }
+                    sigField = s;
+                    break;
                 }
+            }
+
+            if (sigField == null)
+            {
+                Console.WriteLine("No signature field found in the document.");
+                return;
+            }
+
+            // Extract the visual appearance of the signature as a JPEG stream
+            using (Stream imgStream = sigField.ExtractImage())
+            {
+                if (imgStream == null)
+                {
+                    Console.WriteLine("Signature field does not contain an image.");
+                    return;
+                }
+
+                // Save the extracted image to a file
+                using (FileStream file = new FileStream(outputImage, FileMode.Create, FileAccess.Write))
+                {
+                    imgStream.CopyTo(file);
+                }
+
+                Console.WriteLine($"Signature image saved to '{outputImage}'.");
             }
         }
     }

@@ -6,37 +6,44 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPath = "input.pdf";
-        // Output folder where each page PDF will be saved
-        const string outputFolder = "SplitPages";
+        // Input PDF file to be split
+        const string inputPdf = "input.pdf";
 
-        // Verify the input file exists
-        if (!File.Exists(inputPath))
+        // Directory where individual page PDFs will be saved
+        const string outputDir = "SplitPages";
+
+        // Ensure the input file exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
+        // Create the output directory if it does not exist
+        Directory.CreateDirectory(outputDir);
 
-        // Template for output files; %NUM% will be replaced with the page number
-        string fileNameTemplate = Path.Combine(outputFolder, "page%NUM%.pdf");
+        // Template for the output files.
+        // %NUM% will be replaced with the page number (1‑based).
+        // Example: c:\temp\SplitPages\page%NUM%.pdf -> page1.pdf, page2.pdf, ...
+        string outputTemplate = Path.Combine(outputDir, "page%NUM%.pdf");
+
+        // PdfFileEditor does NOT implement IDisposable, so do NOT use a using block.
+        PdfFileEditor editor = new PdfFileEditor();
 
         try
         {
-            // PdfFileEditor does NOT implement IDisposable; instantiate directly
-            PdfFileEditor pdfEditor = new PdfFileEditor();
-
-            // Split the PDF into single‑page PDFs using the template
-            pdfEditor.SplitToPages(inputPath, fileNameTemplate);
-
-            Console.WriteLine($"PDF successfully split into individual pages in '{outputFolder}'.");
+            // Split the PDF into single‑page documents and save them using the template.
+            editor.SplitToPages(inputPdf, outputTemplate);
+            Console.WriteLine($"PDF split into individual pages under '{outputDir}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during PDF split: {ex.Message}");
+            Console.Error.WriteLine($"Error during split operation: {ex.Message}");
+        }
+        finally
+        {
+            // No explicit Dispose needed; just release the reference.
+            editor = null;
         }
     }
 }

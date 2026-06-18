@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "highlighted.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,31 +16,26 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Choose the page to add the highlight (first page in this example)
-            Page page = doc.Pages[1]; // 1‑based indexing
-
             // Define the rectangle area for the highlight annotation
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 520);
 
-            // Create the highlight annotation
-            HighlightAnnotation highlight = new HighlightAnnotation(page, rect)
-            {
-                // Set the highlight color to yellow
-                Color = Aspose.Pdf.Color.Yellow,
-                // Set opacity to 80% (0.8)
-                Opacity = 0.8
-            };
+            // Create a HighlightAnnotation on the first page
+            HighlightAnnotation highlight = new HighlightAnnotation(doc.Pages[1], rect);
 
-            // Add the annotation to the page
-            page.Annotations.Add(highlight);
+            // Configure the annotation: yellow color and 80% opacity
+            highlight.Color   = Aspose.Pdf.Color.Yellow; // yellow fill
+            highlight.Opacity = 0.8;                     // 80% opacity
 
-            // Save the modified PDF
+            // Add the annotation to the page's annotation collection
+            doc.Pages[1].Annotations.Add(highlight);
+
+            // Save the modified PDF (lifecycle rule: use Document.Save)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Highlight annotation added and saved to '{outputPath}'.");
+        Console.WriteLine($"Highlighted PDF saved to '{outputPath}'.");
     }
 }

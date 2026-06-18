@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -9,7 +9,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputDir = "TablesCsv";
+        const string outputDir = "ExtractedTables";
 
         if (!File.Exists(inputPath))
         {
@@ -20,61 +20,45 @@ class Program
         // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document (lifecycle rule: use Document constructor and using block)
+        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            // Create a TableAbsorber to find tables in the document
+            TableAbsorber absorber = new TableAbsorber();
+
+            // Extract tables from the entire document
+            absorber.Visit(doc);
+
+            int tableIndex = 0;
+            foreach (var absorbedTable in absorber.TableList)
             {
-                Page page = doc.Pages[pageNum];
+                tableIndex++;
+                string csvFile = Path.Combine(outputDir, $"Table_{tableIndex}.csv");
 
-                // Create a new TableAbsorber for the current page
-                TableAbsorber absorber = new TableAbsorber();
-
-                // Extract tables on this page
-                absorber.Visit(page);
-
-                // Process each extracted table
-                for (int tblIdx = 0; tblIdx < absorber.TableList.Count; tblIdx++)
+                // Write the extracted table to a CSV file
+                using (StreamWriter writer = new StreamWriter(csvFile))
                 {
-                    var absorbedTable = absorber.TableList[tblIdx];
-
-                    // Build a CSV file name that reflects page and table numbers
-                    string csvPath = Path.Combine(outputDir,
-                        $"page{pageNum}_table{tblIdx + 1}.csv");
-
-                    // Write the table content to CSV
-                    using (StreamWriter writer = new StreamWriter(csvPath))
+                    foreach (var row in absorbedTable.RowList)
                     {
-                        foreach (var row in absorbedTable.RowList)
+                        // Build a CSV line by concatenating cell texts
+                        var cellValues = row.CellList.Select(cell =>
                         {
-                            List<string> cellTexts = new List<string>();
+                            // Combine all text fragments inside the cell
+                            string text = string.Concat(cell.TextFragments.Select(tf => tf.Text));
 
-                            foreach (var cell in row.CellList)
+                            // Escape commas and double quotes according to CSV rules
+                            if (text.Contains(',') || text.Contains('\"'))
                             {
-                                // Concatenate all text fragments inside the cell
-                                string cellText = string.Empty;
-                                foreach (var fragment in cell.TextFragments)
-                                {
-                                    cellText += fragment.Text;
-                                }
-
-                                // Escape commas and double quotes according to CSV rules
-                                if (cellText.Contains("\"") || cellText.Contains(","))
-                                {
-                                    cellText = $"\"{cellText.Replace("\"", "\"\"")}\"";
-                                }
-
-                                cellTexts.Add(cellText);
+                                text = $"\"{text.Replace("\"", "\"\"")}\"";
                             }
+                            return text;
+                        });
 
-                            // Join the cell texts with commas and write the line
-                            writer.WriteLine(string.Join(",", cellTexts));
-                        }
+                        writer.WriteLine(string.Join(",", cellValues));
                     }
-
-                    Console.WriteLine($"Extracted table to: {csvPath}");
                 }
+
+                Console.WriteLine($"Table {tableIndex} extracted to: {csvFile}");
             }
         }
     }

@@ -1,47 +1,93 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core PDF API
-using Aspose.Pdf.Forms;        // Access to signature fields (if needed)
-using Aspose.Pdf;               // XmlSaveOptions resides in this namespace
+using System.Xml;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
-class ExportSignatureInfo
+class Program
 {
     static void Main()
     {
-        // Paths – adjust as necessary
-        const string inputPdfPath  = "signed_document.pdf";
-        const string outputXmlPath = "signature_audit.xml";
+        const string inputPdf = "signed.pdf";
+        const string auditXml = "signature_audit.xml";
+        const string fullStructureXml = "full_structure.xml";
 
-        // Ensure the source PDF exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF document (lifecycle rule: use Document constructor)
+        using (Document doc = new Document(inputPdf))
         {
-            // OPTIONAL: If you need to inspect individual signature fields,
-            // you can iterate over them here. The example below simply
-            // demonstrates how to access a signature field's properties.
-            /*
-            foreach (SignatureField sigField in pdfDoc.Form.Signatures)
+            // Create an XML file that contains only the signature information
+            using (XmlWriter writer = XmlWriter.Create(auditXml, new XmlWriterSettings { Indent = true }))
             {
-                Console.WriteLine($"Signature field name: {sigField.PartialName}");
-                Console.WriteLine($"Reason: {sigField.Reason}");
-                Console.WriteLine($"Location: {sigField.Location}");
-                Console.WriteLine($"Date: {sigField.Date}");
-                // Additional properties can be logged as needed.
-            }
-            */
+                writer.WriteStartDocument();
+                writer.WriteStartElement("Signatures");
 
-            // Save the entire PDF structure (including digital signature data)
-            // to an XML file using XmlSaveOptions.
-            XmlSaveOptions xmlOptions = new XmlSaveOptions();
-            pdfDoc.Save(outputXmlPath, xmlOptions);
+                // Iterate over all fields and filter for signature fields
+                foreach (Field field in doc.Form.Fields)
+                {
+                    if (field is SignatureField sigField)
+                    {
+                        writer.WriteStartElement("Signature");
+                        writer.WriteAttributeString("Name", sigField.FullName ?? string.Empty);
+
+                        // The Signature object holds the detailed signature data
+                        var signature = sigField.Signature;
+                        if (signature != null)
+                        {
+                            writer.WriteElementString("Authority", signature.Authority ?? string.Empty);
+                            writer.WriteElementString("Location", signature.Location ?? string.Empty);
+                            writer.WriteElementString("Reason", signature.Reason ?? string.Empty);
+                            writer.WriteElementString("ContactInfo", signature.ContactInfo ?? string.Empty);
+
+                            // The SignDate property is not available in all versions; use a safe fallback
+                            string dateValue = string.Empty;
+                            try
+                            {
+                                // If the property exists, it will be accessed; otherwise an exception is caught
+                                var signDateProp = signature.GetType().GetProperty("SignDate");
+                                if (signDateProp != null)
+                                {
+                                    var value = signDateProp.GetValue(signature) as DateTime?;
+                                    if (value.HasValue)
+                                        dateValue = value.Value.ToString("o");
+                                }
+                            }
+                            catch { /* ignore any reflection errors */ }
+                            writer.WriteElementString("Date", dateValue);
+
+                            var algoInfo = signature.GetSignatureAlgorithmInfo();
+                            writer.WriteElementString("AlgorithmInfo", algoInfo?.ToString() ?? string.Empty);
+                        }
+                        else
+                        {
+                            // No signature applied – write empty placeholders
+                            writer.WriteElementString("Authority", string.Empty);
+                            writer.WriteElementString("Location", string.Empty);
+                            writer.WriteElementString("Reason", string.Empty);
+                            writer.WriteElementString("ContactInfo", string.Empty);
+                            writer.WriteElementString("Date", string.Empty);
+                            writer.WriteElementString("AlgorithmInfo", string.Empty);
+                        }
+
+                        writer.WriteEndElement(); // </Signature>
+                    }
+                }
+
+                writer.WriteEndElement(); // </Signatures>
+                writer.WriteEndDocument();
+            }
+
+            // Optionally, save the entire PDF structure as XML using XmlSaveOptions
+            // (non‑PDF save must use explicit SaveOptions per rule)
+            doc.Save(fullStructureXml, new XmlSaveOptions());
         }
 
-        Console.WriteLine($"Signature information exported to XML: {outputXmlPath}");
+        Console.WriteLine($"Signature audit XML saved to '{auditXml}'.");
+        Console.WriteLine($"Full PDF structure XML saved to '{fullStructureXml}'.");
     }
 }

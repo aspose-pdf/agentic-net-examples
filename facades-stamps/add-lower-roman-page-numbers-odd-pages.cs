@@ -1,8 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -17,40 +17,35 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        Document doc = new Document(inputPath);
-        int pageCount = doc.Pages.Count;
-
-        // Determine odd pages (1‑based indexing)
-        int[] oddPages = Enumerable.Range(1, pageCount)
-                                   .Where(p => p % 2 == 1)
-                                   .ToArray();
-
-        // Create a PageNumberStamp that will render the page number in lower‑roman style.
-        // "#" is the placeholder that Aspose.Pdf replaces with the actual page number.
-        PageNumberStamp pageNumberStamp = new PageNumberStamp()
+        // Determine the odd‑numbered pages (1‑based indexing)
+        int[] oddPages;
+        using (Document tempDoc = new Document(inputPath))
         {
-            Value = "#",
-            NumberingStyle = NumberingStyle.NumeralsRomanLowercase,
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Bottom,
-            YIndent = 20, // distance from the bottom edge
-            TextState =
+            var oddList = new List<int>();
+            for (int i = 1; i <= tempDoc.Pages.Count; i++)
             {
-                Font = FontRepository.FindFont("Helvetica"),
-                FontSize = 12,
-                ForegroundColor = Color.Black
+                if (i % 2 == 1) // odd page
+                    oddList.Add(i);
             }
-        };
-
-        // Apply the stamp only to odd pages.
-        foreach (int pageNum in oddPages)
-        {
-            doc.Pages[pageNum].AddStamp(pageNumberStamp);
+            oddPages = oddList.ToArray();
         }
 
-        // Save the modified PDF.
-        doc.Save(outputPath);
-        Console.WriteLine($"Page numbers added to odd pages (lower‑roman) and saved as '{outputPath}'.");
+        // Initialize the facade, bind the source PDF and configure the stamp
+        PdfFileStamp fileStamp = new PdfFileStamp();
+        fileStamp.BindPdf(inputPath);                                 // load source PDF
+        fileStamp.NumberingStyle = NumberingStyle.NumeralsRomanLowercase; // Lower‑Roman numbering
+
+        // Add a page number stamp only to odd pages. The overload AddPageNumber(string, int)
+        // applies the stamp to the specified page number.
+        foreach (int pageNumber in oddPages)
+        {
+            fileStamp.AddPageNumber("#", pageNumber);
+        }
+
+        // Save the stamped PDF
+        fileStamp.Save(outputPath);
+        fileStamp.Close();
+
+        Console.WriteLine($"Page numbers (lower‑roman) added to odd pages → '{outputPath}'.");
     }
 }

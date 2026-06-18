@@ -16,34 +16,29 @@ class Program
             return;
         }
 
-        // Initialize the PdfPageEditor and bind the source PDF
+        // Initialize the PdfPageEditor facade and bind the source PDF
         using (PdfPageEditor editor = new PdfPageEditor())
         {
             editor.BindPdf(inputPath);
 
-            // Work on the first page (indexing is 1‑based)
-            editor.ProcessPages = new int[] { 1 };
+            // Retrieve the original size of the first page (portrait)
+            var originalSize = editor.GetPageSize(1);
+            Console.WriteLine($"Original size – Width: {originalSize.Width}, Height: {originalSize.Height}");
 
-            // Retrieve the original page size
-            PageSize originalSize = editor.GetPageSize(1);
-            Console.WriteLine($"Original size: {originalSize.Width} x {originalSize.Height}");
-
-            // Swap width and height to obtain a landscape page size
+            // Set the output page size to landscape by swapping width and height
             editor.PageSize = new PageSize(originalSize.Height, originalSize.Width);
 
-            // Rotate the page 90° so the content stays upright
+            // Rotate the page content 90 degrees to match the new orientation
             editor.Rotation = 90;
 
             // Apply the changes to the document
             editor.ApplyChanges();
 
-            // Verify the new dimensions and rotation
-            PageSize newSize = editor.GetPageSize(1);
-            int rotation = editor.GetPageRotation(1);
-            Console.WriteLine($"New size: {newSize.Width} x {newSize.Height}");
-            Console.WriteLine($"Rotation: {rotation} degrees");
+            // Verify the new page dimensions after rotation
+            var newSize = editor.GetPageSize(1);
+            Console.WriteLine($"New size – Width: {newSize.Width}, Height: {newSize.Height}");
 
-            // Save the modified PDF
+            // Save the modified PDF (output will be in landscape orientation)
             editor.Save(outputPath);
         }
 

@@ -1,104 +1,92 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Facades;
 
-class Program
+class AnnotationDiagnostic
 {
     static void Main()
     {
-        // Input PDF, output PDF and log file paths
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output.pdf";
-        const string logFilePath = "annotation_log.txt";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "annotated_output.pdf";
+        const string logPath   = "annotation_workflow.log";
 
-        // Open a StreamWriter for the verbose log
-        using (StreamWriter logWriter = new StreamWriter(logFilePath, false))
+        // Ensure the input file exists
+        if (!File.Exists(inputPdf))
         {
-            void Log(string message) => logWriter.WriteLine($"{DateTime.Now:O} - {message}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            return;
+        }
 
-            Log("=== Annotation workflow started ===");
-
-            // Ensure the input PDF exists – create a minimal one if it does not.
-            if (!File.Exists(inputPdfPath))
+        // Open a log file for verbose output
+        using (var logWriter = new StreamWriter(logPath, false))
+        {
+            try
             {
-                Log($"Input file '{inputPdfPath}' not found. Creating a placeholder PDF.");
-                CreatePlaceholderPdf(inputPdfPath, Log);
-                Log($"Placeholder PDF created at '{inputPdfPath}'.");
-            }
+                logWriter.WriteLine($"[{DateTime.Now}] Starting annotation workflow.");
 
-            // Load the PDF document (lifecycle rule: use using for disposal)
-            using (Document doc = new Document(inputPdfPath))
-            {
-                Log($"Document loaded: '{inputPdfPath}'. Pages = {doc.Pages.Count}");
-
-                // Create the PdfAnnotationEditor facade
-                using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+                // -------------------------------------------------
+                // 1. Create PdfAnnotationEditor instance (creation)
+                // -------------------------------------------------
+                using (var editor = new PdfAnnotationEditor())
                 {
-                    // Bind the loaded document to the editor
-                    editor.BindPdf(doc);
-                    Log("PdfAnnotationEditor bound to document.");
+                    logWriter.WriteLine($"[{DateTime.Now}] PdfAnnotationEditor instance created.");
 
-                    // Export current annotations to a temporary XFDF file (for diagnostic purposes)
-                    string tempXfdfPath = Path.GetTempFileName();
-                    using (FileStream xfdfStream = new FileStream(tempXfdfPath, FileMode.Create, FileAccess.Write))
+                    // -------------------------------------------------
+                    // 2. Bind the PDF document (loading)
+                    // -------------------------------------------------
+                    editor.BindPdf(inputPdf);
+                    logWriter.WriteLine($"[{DateTime.Now}] PDF bound to editor: {inputPdf}");
+
+                    // -------------------------------------------------
+                    // 3. Add a TextAnnotation to the first page
+                    // -------------------------------------------------
+                    Page firstPage = editor.Document.Pages[1]; // 1‑based indexing
+                    var textRect = new Aspose.Pdf.Rectangle(100, 700, 300, 750);
+                    var textAnnotation = new TextAnnotation(firstPage, textRect)
                     {
-                        editor.ExportAnnotationsToXfdf(xfdfStream);
-                    }
-                    Log($"Exported existing annotations to temporary XFDF: '{tempXfdfPath}'.");
+                        Contents = "Diagnostic Text Annotation",
+                        Color    = Aspose.Pdf.Color.Yellow,
+                        // Make the annotation printable but not visible (optional)
+                        Flags    = AnnotationFlags.Print | AnnotationFlags.NoView
+                    };
+                    firstPage.Annotations.Add(textAnnotation);
+                    logWriter.WriteLine($"[{DateTime.Now}] TextAnnotation added (Page 1, Rect {textRect}).");
 
-                    // Count total annotations in the document
-                    int totalAnnotations = 0;
-                    for (int i = 1; i <= doc.Pages.Count; i++)
+                    // -------------------------------------------------
+                    // 4. Add a LinkAnnotation to the same page
+                    // -------------------------------------------------
+                    var linkRect = new Aspose.Pdf.Rectangle(100, 600, 300, 650);
+                    var linkAnnotation = new LinkAnnotation(firstPage, linkRect)
                     {
-                        totalAnnotations += doc.Pages[i].Annotations.Count;
-                    }
-                    Log($"Total annotations before modification: {totalAnnotations}");
+                        Action = new GoToURIAction("https://www.example.com"),
+                        Color  = Aspose.Pdf.Color.Blue,
+                        Contents = "Visit Example.com"
+                    };
+                    firstPage.Annotations.Add(linkAnnotation);
+                    logWriter.WriteLine($"[{DateTime.Now}] LinkAnnotation added (Page 1, Rect {linkRect}).");
 
-                    // Example operation: delete all Text annotations
-                    editor.DeleteAnnotations("Text");
-                    Log("Deleted all Text annotations.");
+                    // -------------------------------------------------
+                    // 5. Flatten all annotations (processing step)
+                    // -------------------------------------------------
+                    editor.FlatteningAnnotations();
+                    logWriter.WriteLine($"[{DateTime.Now}] All annotations flattened.");
 
-                    // Re‑count annotations after deletion
-                    int remainingAnnotations = 0;
-                    for (int i = 1; i <= doc.Pages.Count; i++)
-                    {
-                        remainingAnnotations += doc.Pages[i].Annotations.Count;
-                    }
-                    Log($"Annotations remaining after deletion: {remainingAnnotations}");
-
-                    // Save the modified document using the facade (lifecycle rule: use Save)
-                    editor.Save(outputPdfPath);
-                    Log($"Modified document saved to: '{outputPdfPath}'");
+                    // -------------------------------------------------
+                    // 6. Save the modified PDF (saving)
+                    // -------------------------------------------------
+                    editor.Save(outputPdf);
+                    logWriter.WriteLine($"[{DateTime.Now}] Modified PDF saved to: {outputPdf}");
                 }
 
-                Log("PdfAnnotationEditor disposed.");
+                logWriter.WriteLine($"[{DateTime.Now}] Annotation workflow completed successfully.");
             }
-
-            Log("Document disposed.");
-            Log("=== Annotation workflow completed ===");
-        }
-    }
-
-    /// <summary>
-    /// Creates a minimal placeholder PDF containing a single blank page.
-    /// </summary>
-    /// <param name="path">File path where the PDF will be saved.</param>
-    /// <param name="logAction">Delegate used to write diagnostic messages.</param>
-    private static void CreatePlaceholderPdf(string path, Action<string> logAction)
-    {
-        try
-        {
-            using (Document placeholder = new Document())
+            catch (Exception ex)
             {
-                placeholder.Pages.Add(); // Add a single empty page
-                placeholder.Save(path);
+                logWriter.WriteLine($"[{DateTime.Now}] ERROR: {ex.Message}");
+                Console.Error.WriteLine($"Error: {ex.Message}");
             }
-        }
-        catch (Exception ex)
-        {
-            logAction($"Failed to create placeholder PDF: {ex.Message}");
-            throw;
         }
     }
 }

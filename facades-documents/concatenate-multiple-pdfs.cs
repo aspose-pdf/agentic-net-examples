@@ -1,24 +1,24 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main(string[] args)
     {
-        // Expect at least two input PDF files and one output path
-        if (args.Length < 3)
+        // Expect at least two arguments: one or more input PDFs and one output PDF.
+        if (args.Length < 2)
         {
-            Console.Error.WriteLine("Usage: concat <input1.pdf> <input2.pdf> [<inputN.pdf> ...] <output.pdf>");
+            Console.Error.WriteLine("Usage: <program> <input1.pdf> [<input2.pdf> ...] <output.pdf>");
             return;
         }
 
-        // All arguments except the last one are input files
-        string[] inputFiles = args.Take(args.Length - 1).ToArray();
-        string outputFile = args[args.Length - 1];
+        // The last argument is the output file; all preceding arguments are input files.
+        string outputPath = args[args.Length - 1];
+        string[] inputFiles = new string[args.Length - 1];
+        Array.Copy(args, inputFiles, args.Length - 1);
 
-        // Verify that all input files exist
+        // Verify that each input file exists.
         foreach (string file in inputFiles)
         {
             if (!File.Exists(file))
@@ -30,15 +30,15 @@ class Program
 
         try
         {
-            // PdfFileEditor does NOT implement IDisposable, so do NOT use a using block
+            // PdfFileEditor does NOT implement IDisposable, so do NOT wrap it in a using block.
             PdfFileEditor editor = new PdfFileEditor();
 
-            // Concatenate the input PDFs into the output PDF
-            bool success = editor.Concatenate(inputFiles, outputFile);
+            // Concatenate the input PDFs into the specified output PDF.
+            bool success = editor.Concatenate(inputFiles, outputPath);
 
             if (success)
             {
-                Console.WriteLine($"Successfully concatenated {inputFiles.Length} files into '{outputFile}'.");
+                Console.WriteLine($"Successfully concatenated {inputFiles.Length} files into '{outputPath}'.");
             }
             else
             {

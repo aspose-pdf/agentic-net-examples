@@ -6,29 +6,31 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";      // PDF to which the attachment will be added
-        const string outputPdf  = "output.pdf";     // Resulting PDF with the attachment
-        const string attachment = "Terms.pdf";      // File to attach
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string attachmentPath = "Terms.pdf";
         const string description = "Contract Terms";
 
-        // Verify that source PDF and attachment exist
+        // Verify that the source PDF and attachment exist.
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Source PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(attachment))
+        if (!File.Exists(attachmentPath))
         {
-            Console.Error.WriteLine($"Attachment file not found: {attachment}");
+            Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
             return;
         }
 
-        // Use PdfContentEditor to bind the PDF, add the attachment, and save the result
-        PdfContentEditor editor = new PdfContentEditor();
-        editor.BindPdf(inputPdf);                                   // Load the PDF
-        editor.AddDocumentAttachment(attachment, description);      // Attach the file (no annotation)
-        editor.Save(outputPdf);                                     // Persist changes
+        // Use PdfContentEditor to bind the PDF, add the attachment, and save.
+        using (PdfContentEditor editor = new PdfContentEditor())
+        {
+            editor.BindPdf(inputPdf);                                 // Load the PDF.
+            editor.AddDocumentAttachment(attachmentPath, description); // Add Terms.pdf with description.
+            editor.Save(outputPdf);                                   // Persist changes.
+        }
 
-        Console.WriteLine($"Attachment '{attachment}' added to '{outputPdf}'.");
+        Console.WriteLine($"Attachment added and saved to '{outputPdf}'.");
     }
 }

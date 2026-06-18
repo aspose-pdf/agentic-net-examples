@@ -7,10 +7,10 @@ class Program
 {
     static void Main()
     {
-        const string inputPath   = "input.pdf";      // source PDF
-        const string outputPath  = "output.pdf";     // result PDF
-        const string externalPdf = "external.pdf";   // PDF to open
-        const int    externalPage = 3;               // page number in external PDF (1‑based)
+        const string inputPath = "input.pdf";          // PDF to modify
+        const string outputPath = "output.pdf";        // Resulting PDF
+        const string externalPdfPath = "external.pdf"; // Target PDF file
+        const int externalPageNumber = 3;              // Page to open in target PDF (1‑based)
 
         if (!File.Exists(inputPath))
         {
@@ -18,32 +18,32 @@ class Program
             return;
         }
 
-        // Load the source document (using rule: document-disposal-with-using)
+        // Load the source document (wrapped in using for deterministic disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Ensure we have a page to place the annotation on
+            // Choose the page where the link annotation will appear (first page here)
             Page page = doc.Pages[1];
 
-            // Define the clickable rectangle (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
+            // Define the clickable rectangle (left, bottom, right, top)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
             // Create the link annotation
             LinkAnnotation link = new LinkAnnotation(page, rect)
             {
-                Color    = Aspose.Pdf.Color.Blue,                     // visual border color
-                Contents = $"Open page {externalPage} of external PDF" // tooltip text
+                Color = Aspose.Pdf.Color.Blue, // Visual border color
+                Contents = $"Open page {externalPageNumber} of external PDF"
             };
 
-            // Assign a remote go‑to action that opens the specified page of another PDF
-            link.Action = new GoToRemoteAction(externalPdf, externalPage);
+            // Assign a remote go‑to action that opens the specified page of the external PDF
+            link.Action = new GoToRemoteAction(externalPdfPath, externalPageNumber);
 
-            // Add the annotation to the page
+            // Add the annotation to the page's annotation collection
             page.Annotations.Add(link);
 
-            // Save the modified document (using rule: document-disposal-with-using)
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with link annotation: '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

@@ -2,33 +2,43 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-class Program
+class ExportFormToXfdf
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string xfdfPath = "output.xfdf";
+        // Input PDF containing form fields
+        const string pdfPath = "PdfForm.pdf";
+
+        // Output XFDF file path
+        const string xfdfPath = "export.xfdf";
 
         // Verify the source PDF exists
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"Error: PDF file not found – {pdfPath}");
             return;
         }
 
-        // Initialize the Form facade with the PDF file
-        using (Form form = new Form(pdfPath))
+        try
         {
-            // Export the form fields to an XFDF file
-            using (FileStream xfdfStream = new FileStream(xfdfPath, FileMode.Create, FileAccess.Write))
+            // Initialize the Form facade with the source PDF
+            using (Form form = new Form(pdfPath))
             {
-                form.ExportXfdf(xfdfStream);
+                // Create (or overwrite) the XFDF file stream
+                using (FileStream xfdfStream = new FileStream(xfdfPath, FileMode.Create, FileAccess.Write))
+                {
+                    // Export all form field values to the XFDF stream
+                    form.ExportXfdf(xfdfStream);
+                }
+
+                // No need to call Save on Form; ExportXfdf writes the XFDF file directly
             }
 
-            // Close the facade (optional, using will dispose it)
-            form.Close();
+            Console.WriteLine($"Form data successfully exported to '{xfdfPath}'.");
         }
-
-        Console.WriteLine($"Form fields exported to '{xfdfPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Exception: {ex.Message}");
+        }
     }
 }

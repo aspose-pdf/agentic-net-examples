@@ -8,53 +8,52 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_transitions.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Bind the document to PdfPageEditor (facade for page editing)
-            using (PdfPageEditor editor = new PdfPageEditor(doc))
+            // Create a PdfPageEditor and bind it to the loaded document
+            using (PdfPageEditor editor = new PdfPageEditor())
             {
-                // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+                editor.BindPdf(doc);
+
+                // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
                 for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    // Determine transition type based on page index modulo 3
-                    // Use three different built‑in transition constants
-                    int transitionType;
-                    switch (i % 3)
+                    // Choose a transition type based on page index modulo 3
+                    int transition;
+                    switch ((i - 1) % 3)
                     {
                         case 0:
-                            transitionType = PdfPageEditor.BLINDH;   // Vertical blinds
+                            transition = PdfPageEditor.BLINDH;   // Vertical blinds
                             break;
                         case 1:
-                            transitionType = PdfPageEditor.BLINDV;   // Horizontal blinds
+                            transition = PdfPageEditor.BLINDV;   // Horizontal blinds
                             break;
                         default:
-                            transitionType = PdfPageEditor.BTWIPE;   // Bottom‑Top wipe
+                            transition = PdfPageEditor.BTWIPE;   // Bottom‑Top wipe
                             break;
                     }
 
-                    // Set the transition type for the current page
-                    // (TransitionType is an int property; assign the constant)
-                    editor.TransitionType = transitionType;
-
-                    // Apply the change to the document.
-                    // ApplyChanges writes the current settings to the bound document.
+                    // Apply the transition only to the current page
+                    editor.ProcessPages = new int[] { i };
+                    editor.TransitionType = transition;
+                    editor.TransitionDuration = 2; // optional: 2 seconds per transition
                     editor.ApplyChanges();
                 }
             }
 
-            // Save the modified PDF (lifecycle rule: save inside using block)
+            // Save the modified PDF (PDF format does not require explicit SaveOptions)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with page transitions to '{outputPath}'.");
+        Console.WriteLine($"PDF with page transitions saved to '{outputPath}'.");
     }
 }

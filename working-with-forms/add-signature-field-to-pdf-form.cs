@@ -2,13 +2,14 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "signed_form.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_signed.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -19,32 +20,30 @@ class Program
         // Load the existing PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least one page
-            if (doc.Pages.Count == 0)
-            {
-                Console.Error.WriteLine("The PDF has no pages.");
-                return;
-            }
+            // Define the rectangle where the signature field will appear (llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 100, 300, 200);
 
-            // Define the rectangle where the signature field will appear
-            // (lower‑left‑x, lower‑left‑y, upper‑right‑x, upper‑right‑y)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 100, 300, 150);
+            // Create a signature field on the document (first page by default)
+            SignatureField sigField = new SignatureField(doc, rect);
+            sigField.Name = "Signature1";               // internal field name
+            sigField.AlternateName = "Sign Here";       // tooltip shown in PDF viewers
 
-            // Create a signature field on the first page
-            Page firstPage = doc.Pages[1]; // 1‑based indexing
-            SignatureField signatureField = new SignatureField(firstPage, rect);
+            // Add the signature field to the form
+            doc.Form.Add(sigField);
 
-            // Set a name and tooltip for the field (optional but recommended)
-            signatureField.Name = "Signature1";
-            signatureField.AlternateName = "Sign Here";
+            // Optional: sign the field immediately using a certificate
+            // string pfxPath = "certificate.pfx";
+            // string pfxPassword = "password";
+            // using (FileStream pfxStream = File.OpenRead(pfxPath))
+            // {
+            //     Signature signature = new Signature(pfxStream, pfxPassword);
+            //     sigField.Sign(signature);
+            // }
 
-            // Add the field to the document's form collection
-            doc.Form.Add(signatureField);
-
-            // Save the modified PDF (still PDF format)
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with signature field saved to '{outputPath}'.");
+        Console.WriteLine($"Signature field added and saved to '{outputPath}'.");
     }
 }

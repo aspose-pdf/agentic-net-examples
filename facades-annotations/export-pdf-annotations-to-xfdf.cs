@@ -6,30 +6,34 @@ class Program
 {
     static void Main()
     {
+        // Input PDF file containing annotations
         const string inputPdfPath = "input.pdf";
+        // Output XFDF file that will store the exported annotations
         const string outputXfdfPath = "annotations.xfdf";
 
-        // Verify the source PDF exists
+        // Verify that the source PDF exists
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Error: PDF file not found – {inputPdfPath}");
             return;
         }
 
-        // Initialize the annotation editor facade
+        // Create a PdfAnnotationEditor facade and bind it to the PDF document
         using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            // Load the PDF document into the editor
             editor.BindPdf(inputPdfPath);
 
             // Create the output stream for the XFDF file
-            using (FileStream xfdfStream = new FileStream(outputXfdfPath, FileMode.Create, FileAccess.Write))
+            using (FileStream xfdfStream = File.Create(outputXfdfPath))
             {
-                // Export all annotations to the XFDF stream
+                // Export all annotations from the bound PDF into the XFDF stream
                 editor.ExportAnnotationsToXfdf(xfdfStream);
             }
+
+            // Optionally, you can close the editor explicitly (Dispose will be called by using)
+            editor.Close();
         }
 
-        Console.WriteLine($"All annotations exported to '{outputXfdfPath}'.");
+        Console.WriteLine($"Annotations exported successfully to '{outputXfdfPath}'.");
     }
 }

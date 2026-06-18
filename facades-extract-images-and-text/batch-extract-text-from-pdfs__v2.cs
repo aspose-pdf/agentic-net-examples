@@ -2,41 +2,64 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-class Program
+namespace AsposePdfBatchExtractor
 {
-    static void Main(string[] args)
+    class Program
     {
-        // Resolve input and output directories relative to the executable location.
-        // This makes the script platform‑agnostic (works on Windows, Linux, macOS).
-        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-        string inputDir = Path.Combine(baseDir, "PdfInput");
-        string outputDir = Path.Combine(baseDir, "PdfTextOutput");
-
-        // Ensure the input directory exists; if not, inform the user and exit gracefully.
-        if (!Directory.Exists(inputDir))
+        /// <summary>
+        /// Batch extracts text from all PDF files in a directory using Aspose.Pdf.Facades.PdfExtractor.
+        /// </summary>
+        /// <param name="args">
+        /// args[0] (optional) – Source directory containing PDF files. If omitted, the current working directory is used.
+        /// args[1] (optional) – Output directory for the extracted .txt files. If omitted, a sub‑folder named "ExtractedText" is created under the source directory.
+        /// </param>
+        static void Main(string[] args)
         {
-            Console.Error.WriteLine($"Input directory does not exist: {inputDir}");
-            return;
-        }
+            // Resolve source directory (default: current directory)
+            string sourceDirectory = args.Length > 0 && !string.IsNullOrWhiteSpace(args[0])
+                ? args[0]
+                : Directory.GetCurrentDirectory();
 
-        // Ensure the output directory exists.
-        Directory.CreateDirectory(outputDir);
+            // Resolve output directory (default: <sourceDirectory>\ExtractedText)
+            string outputDirectory = args.Length > 1 && !string.IsNullOrWhiteSpace(args[1])
+                ? args[1]
+                : Path.Combine(sourceDirectory, "ExtractedText");
 
-        // Process each PDF file in the input directory.
-        foreach (string pdfPath in Directory.GetFiles(inputDir, "*.pdf"))
-        {
-            string txtPath = Path.Combine(outputDir, Path.GetFileNameWithoutExtension(pdfPath) + ".txt");
-
-            // Initialize PdfExtractor (uses the default constructor).
-            using (PdfExtractor extractor = new PdfExtractor())
+            // Ensure the output directory exists
+            if (!Directory.Exists(outputDirectory))
             {
-                // Bind the PDF file to the extractor.
-                extractor.BindPdf(pdfPath);
-                // Extract all text from the PDF (Unicode encoding is default).
-                extractor.ExtractText();
-                // Save the extracted text to a .txt file.
-                extractor.GetText(txtPath);
-                // No need to call Close() explicitly – the using statement disposes the extractor.
+                Directory.CreateDirectory(outputDirectory);
+            }
+
+            // Get all PDF files in the source directory (non‑recursive)
+            string[] pdfFiles = Directory.GetFiles(sourceDirectory, "*.pdf", SearchOption.TopDirectoryOnly);
+
+            if (pdfFiles.Length == 0)
+            {
+                Console.WriteLine($"No PDF files found in '{sourceDirectory}'.");
+                return;
+            }
+
+            foreach (string pdfPath in pdfFiles)
+            {
+                string baseName = Path.GetFileNameWithoutExtension(pdfPath);
+                string txtPath = Path.Combine(outputDirectory, baseName + ".txt");
+
+                try
+                {
+                    // Using statement ensures proper disposal of the extractor
+                    using (PdfExtractor extractor = new PdfExtractor())
+                    {
+                        extractor.BindPdf(pdfPath);
+                        extractor.ExtractText();
+                        extractor.GetText(txtPath);
+                    }
+                    Console.WriteLine($"Extracted text from '{Path.GetFileName(pdfPath)}' to '{txtPath}'.");
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"Failed to extract text from '{pdfPath}': {ex.Message}");
+                }
             }
         }
     }

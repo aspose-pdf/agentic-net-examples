@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Facades; // For HorizontalAlignment and VerticalAlignment enums
 
 class Program
 {
@@ -16,19 +16,19 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document (using statement ensures proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over pages using 1‑based indexing
+            // Iterate over all pages (1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Apply page number stamp only on odd pages
+                // Apply stamp only on odd‑numbered pages
                 if (i % 2 == 1)
                 {
-                    // Create a PageNumberStamp; default format "#" will be replaced by the page number
+                    // Create a page number stamp; default format is "#"
                     PageNumberStamp stamp = new PageNumberStamp();
 
-                    // Optional: position the stamp (e.g., bottom‑center)
+                    // Position the stamp at the bottom‑center of the page
                     stamp.HorizontalAlignment = HorizontalAlignment.Center;
                     stamp.VerticalAlignment   = VerticalAlignment.Bottom;
                     stamp.BottomMargin        = 20; // distance from bottom edge
@@ -38,10 +38,10 @@ class Program
                 }
             }
 
-            // Save the modified document as PDF
+            // Save the modified document (PDF format is implicit)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Odd‑page numbers added. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Odd page numbers added. Output saved to '{outputPath}'.");
     }
 }

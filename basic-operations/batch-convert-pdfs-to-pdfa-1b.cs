@@ -2,54 +2,52 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-namespace PdfBatchConverter
+class Program
 {
-    class Program
+    static void Main()
     {
-        static void Main()
+        // Folder containing source PDF files
+        const string inputFolder = "InputPdfs";
+
+        // Folder where PDF/A‑1b files will be written
+        const string outputFolder = "OutputPdfA";
+
+        if (!Directory.Exists(inputFolder))
         {
-            // Folder containing source PDF files
-            const string inputFolder = "input_pdfs";
-            // Folder where PDF/A‑1b files will be written
-            const string outputFolder = "output_pdfa";
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            return;
+        }
 
-            if (!Directory.Exists(inputFolder))
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
+
+        // Get all PDF files in the input folder (non‑recursive)
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+
+        foreach (string inputPath in pdfFiles)
+        {
+            // Build output file name (same base name with a suffix)
+            string baseName = Path.GetFileNameWithoutExtension(inputPath);
+            string outputPath = Path.Combine(outputFolder, $"{baseName}_pdfa1b.pdf");
+
+            try
             {
-                Console.Error.WriteLine($"Input folder not found: {inputFolder}");
-                return;
+                // Load the source PDF
+                using (Document doc = new Document(inputPath))
+                {
+                    // Convert to PDF/A‑1b; errors are written to a log file
+                    string logPath = Path.Combine(outputFolder, $"{baseName}_convert.log");
+                    doc.Convert(logPath, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
+
+                    // Save the converted PDF/A document
+                    doc.Save(outputPath);
+                }
+
+                Console.WriteLine($"Converted: {inputPath} → {outputPath}");
             }
-
-            // Ensure the output directory exists
-            Directory.CreateDirectory(outputFolder);
-
-            // Get all PDF files in the input folder (non‑recursive)
-            string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-
-            foreach (string pdfPath in pdfFiles)
+            catch (Exception ex)
             {
-                // Build output file name (same base name with _pdfa suffix)
-                string baseName = Path.GetFileNameWithoutExtension(pdfPath);
-                string outputPath = Path.Combine(outputFolder, $"{baseName}_pdfa.pdf");
-                // Optional log file for conversion errors
-                string logPath = Path.Combine(outputFolder, $"{baseName}_log.txt");
-
-                try
-                {
-                    // Load the source PDF
-                    using (Document doc = new Document(pdfPath))
-                    {
-                        // Convert to PDF/A‑1b, logging any conversion errors
-                        doc.Convert(logPath, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
-                        // Save the converted document (PDF/A‑1b)
-                        doc.Save(outputPath);
-                    }
-
-                    Console.WriteLine($"Converted: {pdfPath} → {outputPath}");
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
-                }
+                Console.Error.WriteLine($"Failed to convert {inputPath}: {ex.Message}");
             }
         }
     }

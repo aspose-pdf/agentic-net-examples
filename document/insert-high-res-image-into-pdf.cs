@@ -1,55 +1,43 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core Aspose.Pdf namespace
-using Aspose.Pdf.Text;          // Required for text handling (if needed)
+using Aspose.Pdf;
 
 class InsertHighResImage
 {
     static void Main()
     {
-        // Input high‑resolution image file (PNG, JPEG, etc.)
-        const string imagePath = "high_res_image.png";
+        // Paths – adjust as needed
+        const string outputPdfPath = "output.pdf";
+        const string highResImagePath = "high_res_image.jpg";
 
-        // Output PDF file that will contain the image.
-        const string outputPdf = "output_with_image.pdf";
-
-        // Verify that the image file exists.
-        if (!File.Exists(imagePath))
+        // Ensure the image file exists
+        if (!File.Exists(highResImagePath))
         {
-            Console.Error.WriteLine($"Image file not found: {imagePath}");
+            Console.Error.WriteLine($"Image not found: {highResImagePath}");
             return;
         }
 
-        // Create a new PDF document.
+        // Create a new PDF document and add a blank page
         using (Document pdfDoc = new Document())
         {
-            // Add a blank page to the document.
-            Page page = pdfDoc.Pages.Add();
+            pdfDoc.Pages.Add(); // first page is now available (index 1)
 
-            // Define the rectangle where the image will be placed.
-            // Coordinates are in points (1 point = 1/72 inch).
-            // Example: place the image at (100, 500) lower‑left corner
-            // with a width of 400 points and a height of 300 points.
-            double llx = 100;   // lower‑left X
-            double lly = 500;   // lower‑left Y
-            double urx = llx + 400; // upper‑right X (width = 400)
-            double ury = lly + 300; // upper‑right Y (height = 300)
+            // Define absolute coordinates for the image placement.
+            // Rectangle constructor: (llx, lly, urx, ury)
+            // Example places the image at (100, 500) with width 300 and height 200.
+            Aspose.Pdf.Rectangle imageRect = new Aspose.Pdf.Rectangle(100, 500, 400, 700);
 
-            // Fully qualify the Rectangle type to avoid ambiguity.
-            Aspose.Pdf.Rectangle imageRect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
-
-            // Open the image file as a stream.
-            using (FileStream imgStream = File.OpenRead(imagePath))
+            // Open the image as a stream and add it to the page.
+            using (FileStream imgStream = File.OpenRead(highResImagePath))
             {
-                // Add the image to the page at the specified rectangle.
-                // The image will be scaled to fit the rectangle while preserving its resolution.
-                page.AddImage(imgStream, imageRect);
+                // AddImage(stream, rectangle) positions the image using absolute coordinates.
+                pdfDoc.Pages[1].AddImage(imgStream, imageRect);
             }
 
-            // Save the PDF document.
-            pdfDoc.Save(outputPdf);
+            // Save the resulting PDF
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF with high‑resolution image saved to '{outputPdf}'.");
+        Console.WriteLine($"High‑resolution image inserted and saved to '{outputPdfPath}'.");
     }
 }

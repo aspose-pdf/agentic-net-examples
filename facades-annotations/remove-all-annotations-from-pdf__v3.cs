@@ -9,43 +9,44 @@ class Program
         // Expect two arguments: input PDF path and output PDF path
         if (args.Length < 2)
         {
-            Console.Error.WriteLine("Usage: <program> <input.pdf> <output.pdf>");
+            Console.WriteLine("Usage: PdfCleaner <inputPdfPath> <outputPdfPath>");
             return;
         }
 
         string inputPath = args[0];
         string outputPath = args[1];
 
-        // Verify that the input file exists
+        // Validate input file existence
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        try
+        // Process the PDF: remove all annotations and write the cleaned PDF
+        using (FileStream inputStream = File.OpenRead(inputPath))
+        using (MemoryStream outputStream = new MemoryStream())
+        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            // Use PdfAnnotationEditor facade to manipulate annotations
-            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+            // Bind the PDF stream to the editor
+            editor.BindPdf(inputStream);
+
+            // Delete every annotation in the document
+            editor.DeleteAnnotations();
+
+            // Save the cleaned document into the output memory stream
+            editor.Save(outputStream);
+
+            // Reset the position so we can read from the beginning
+            outputStream.Position = 0;
+
+            // Write the cleaned PDF to the target file
+            using (FileStream fileOut = File.Create(outputPath))
             {
-                // Load the PDF document
-                editor.BindPdf(inputPath);
-
-                // Delete all annotations in the document
-                editor.DeleteAnnotations();
-
-                // Save the cleaned PDF to the specified output path
-                editor.Save(outputPath);
-
-                // Optional: explicitly close the facade (Dispose will also close)
-                editor.Close();
+                outputStream.CopyTo(fileOut);
             }
+        }
 
-            Console.WriteLine($"All annotations removed. Output saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"Cleaned PDF saved to: {outputPath}");
     }
 }

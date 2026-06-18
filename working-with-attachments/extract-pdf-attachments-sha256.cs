@@ -7,16 +7,16 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string pdfPath = "input.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF document (wrapped in using for deterministic disposal)
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(pdfPath))
         {
             // Check if the document contains any embedded files (attachments)
             if (doc.EmbeddedFiles == null || doc.EmbeddedFiles.Count == 0)
@@ -27,32 +27,32 @@ class Program
 
             Console.WriteLine($"Found {doc.EmbeddedFiles.Count} attachment(s):");
 
-            // Iterate over each embedded file using reflection (avoids direct dependency on EmbeddedFile type)
+            // Iterate over each embedded file using reflection to avoid direct dependency on the EmbeddedFile type
             foreach (var attachment in doc.EmbeddedFiles)
             {
                 // Retrieve the attachment name via reflection
                 var nameProp = attachment.GetType().GetProperty("Name");
                 string name = nameProp?.GetValue(attachment) as string ?? "<unknown>";
 
-                // Obtain a stream for the embedded file content via reflection
-                var getStreamMethod = attachment.GetType().GetMethod("GetFileStream");
-                if (getStreamMethod == null)
+                // Obtain a stream for the attachment's data via reflection
+                var getFileMethod = attachment.GetType().GetMethod("GetFile", Type.EmptyTypes);
+                if (getFileMethod == null)
                 {
-                    Console.WriteLine($"- Name: {name}\n  Unable to read file stream (method not found).");
+                    Console.WriteLine($"Attachment '{name}' does not expose a GetFile method.");
                     continue;
                 }
 
-                using (Stream fileStream = (Stream)getStreamMethod.Invoke(attachment, null))
+                using (Stream dataStream = (Stream)getFileMethod.Invoke(attachment, null))
+                using (SHA256 sha256 = SHA256.Create())
                 {
-                    // Compute SHA-256 hash
-                    using (SHA256 sha256 = SHA256.Create())
-                    {
-                        byte[] hashBytes = sha256.ComputeHash(fileStream);
-                        string hashHex = BitConverter.ToString(hashBytes).Replace("-", string.Empty).ToLowerInvariant();
+                    // Compute the SHA‑256 hash
+                    byte[] hashBytes = sha256.ComputeHash(dataStream);
 
-                        Console.WriteLine($"- Name: {name}");
-                        Console.WriteLine($"  SHA-256: {hashHex}");
-                    }
+                    // Convert hash to a hexadecimal string
+                    string hashHex = BitConverter.ToString(hashBytes).Replace("-", string.Empty).ToLowerInvariant();
+
+                    Console.WriteLine($"Attachment: {name}");
+                    Console.WriteLine($"SHA‑256: {hashHex}");
                 }
             }
         }

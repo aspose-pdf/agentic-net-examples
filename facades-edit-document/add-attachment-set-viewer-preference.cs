@@ -7,20 +7,22 @@ class Program
     static void Main(string[] args)
     {
         // Expected arguments:
-        // 0 - path to the source PDF
-        // 1 - path to the file to attach
-        // 2 - description for the attachment
-        // 3 - path for the output PDF
-        if (args.Length < 4)
+        // 0 - input PDF file path
+        // 1 - attachment file path
+        // 2 - attachment description
+        // 3 - output PDF file path (optional)
+        if (args.Length < 3)
         {
-            Console.WriteLine("Usage: <inputPdf> <attachmentFile> <description> <outputPdf>");
+            Console.Error.WriteLine("Usage: <inputPdf> <attachmentFile> <description> [outputPdf]");
             return;
         }
 
         string inputPdf = args[0];
         string attachmentFile = args[1];
         string description = args[2];
-        string outputPdf = args[3];
+        string outputPdf = args.Length >= 4 ? args[3] : Path.Combine(
+            Path.GetDirectoryName(inputPdf) ?? string.Empty,
+            Path.GetFileNameWithoutExtension(inputPdf) + "_attached.pdf");
 
         if (!File.Exists(inputPdf))
         {
@@ -36,19 +38,19 @@ class Program
 
         try
         {
-            // PdfContentEditor implements IDisposable, so use a using block.
+            // Use PdfContentEditor facade to modify the PDF
             using (PdfContentEditor editor = new PdfContentEditor())
             {
-                // Load the source PDF.
+                // Bind the source PDF
                 editor.BindPdf(inputPdf);
 
-                // Add the attachment without an annotation.
+                // Add the attachment without a visual annotation
                 editor.AddDocumentAttachment(attachmentFile, description);
 
-                // Set the viewer preference to show attachments pane.
-                editor.ChangeViewerPreference(ViewerPreference.PageModeUseAttachment);
+                // Set viewer preference to show attachment panel on open
+                editor.ChangeViewerPreference(Aspose.Pdf.Facades.ViewerPreference.PageModeUseAttachment);
 
-                // Save the modified PDF.
+                // Save the modified PDF
                 editor.Save(outputPdf);
             }
 

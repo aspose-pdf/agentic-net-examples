@@ -7,34 +7,38 @@ class Program
 {
     static void Main()
     {
-        // Create hybrid resize parameters:
-        // - Left margin: 10% of page width (percentage)
-        // - Right margin: 50 units (absolute)
-        // - Top margin: 5% of page height (percentage)
-        // - Bottom margin: 30 units (absolute)
-        // Contents width and height are left null for automatic calculation.
-        PdfFileEditor.ContentsResizeParameters resizeParams = new PdfFileEditor.ContentsResizeParameters(
-            PdfFileEditor.ContentsResizeValue.Percents(10), // left margin (percent)
-            null,                                          // contents width (auto)
-            PdfFileEditor.ContentsResizeValue.Units(50),   // right margin (units)
-            PdfFileEditor.ContentsResizeValue.Percents(5), // top margin (percent)
-            null,                                          // contents height (auto)
-            PdfFileEditor.ContentsResizeValue.Units(30)    // bottom margin (units)
-        );
+        // Paths to the source PDF and the resulting PDF
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_resized.pdf";
 
-        // Example usage: resize pages 1 and 2 of a PDF using the hybrid parameters.
-        PdfFileEditor editor = new PdfFileEditor();
-        const string sourcePath = "input.pdf";
-        const string destinationPath = "output.pdf";
-
-        if (!File.Exists(sourcePath))
+        // Verify that the source file exists
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source file not found: {sourcePath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Resize contents with the specified hybrid margins.
-        editor.ResizeContents(sourcePath, destinationPath, new int[] { 1, 2 }, resizeParams);
-        Console.WriteLine("Resize operation completed successfully.");
+        // Create hybrid resize parameters:
+        // - Left margin: 10% of page width (percentage)
+        // - Right margin: 20 units (absolute)
+        // - Top margin: 5% of page height (percentage)
+        // - Bottom margin: 15 units (absolute)
+        // - Contents width and height are left as auto (null) so they are calculated automatically.
+        var parameters = new PdfFileEditor.ContentsResizeParameters(
+            PdfFileEditor.ContentsResizeValue.Percents(10),   // left margin (percent)
+            null,                                            // contents width (auto)
+            PdfFileEditor.ContentsResizeValue.Units(20),    // right margin (absolute units)
+            PdfFileEditor.ContentsResizeValue.Percents(5),  // top margin (percent)
+            null,                                            // contents height (auto)
+            PdfFileEditor.ContentsResizeValue.Units(15)     // bottom margin (absolute units)
+        );
+
+        // Use PdfFileEditor to apply the resize to all pages (null page array means all pages)
+        var editor = new PdfFileEditor();
+        bool success = editor.ResizeContents(inputPath, outputPath, null, parameters);
+
+        Console.WriteLine(success
+            ? $"Resize completed successfully. Output saved to '{outputPath}'."
+            : "Resize operation failed.");
     }
 }

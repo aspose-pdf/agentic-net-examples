@@ -16,26 +16,24 @@ class Program
             return;
         }
 
-        // Use PdfPageEditor (Facade) to modify page layout.
+        // Use PdfPageEditor (facade) to edit page layout.
+        // The facade implements IDisposable, so wrap it in a using block.
         using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // Load the source PDF.
+            // Bind the source PDF file.
             editor.BindPdf(inputPath);
 
             // Specify that only page 2 should be processed.
             editor.ProcessPages = new int[] { 2 };
 
-            // Set horizontal alignment to left (default, but set explicitly as requested).
-            editor.HorizontalAlignment = Aspose.Pdf.HorizontalAlignment.Left;
+            // Set horizontal alignment to left (explicitly).
+            editor.HorizontalAlignment = HorizontalAlignment.Left;
 
             // Apply the changes to the document.
             editor.ApplyChanges();
 
             // Save the modified PDF.
             editor.Save(outputPath);
-
-            // Close the facade (optional, as using will dispose it).
-            editor.Close();
         }
 
         Console.WriteLine($"Page 2 aligned left and saved to '{outputPath}'.");

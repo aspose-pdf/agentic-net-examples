@@ -1,85 +1,75 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf;                                 // Core PDF API
+using Aspose.Pdf.Facades;                        // Facades for forms and annotations
 
-class MergeXfdfAndImport
+class MergeXfdfExample
 {
     static void Main()
     {
-        // Input PDF to which the merged XFDF will be applied
-        const string inputPdfPath  = "input.pdf";
+        // Input PDF that will receive the merged XFDF data
+        const string inputPdfPath = "input.pdf";
         // Output PDF after importing merged XFDF
-        const string outputPdfPath = "output.pdf";
+        const string outputPdfPath = "output_merged.pdf";
         // XFDF files to be merged
-        string[] xfdfFiles = { "form1.xfdf", "form2.xfdf", "comments.xfdf" };
+        string[] xfdfFiles = { "data1.xfdf", "data2.xfdf", "data3.xfdf" };
 
-        // Validate input files
+        // Validate files
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
         foreach (var xfdf in xfdfFiles)
         {
             if (!File.Exists(xfdf))
             {
-                Console.Error.WriteLine($"XFDF not found: {xfdf}");
+                Console.Error.WriteLine($"XFDF file not found: {xfdf}");
                 return;
             }
         }
 
         // -----------------------------------------------------------------
-        // Step 1: Merge all XFDF files into a single XFDF stream.
+        // Step 1: Create a temporary PDF document to accumulate all XFDF data
         // -----------------------------------------------------------------
-        // Create a temporary PDF document that will hold the combined
-        // annotations/fields. A blank page is added because some Aspose.Pdf
-        // operations expect at least one page.
-        using (Document tempDoc = new Document())
+        using (Aspose.Pdf.Document tempDoc = new Aspose.Pdf.Document())
         {
-            // Ensure the document has a page (required for annotation handling)
+            // Add a single blank page – required for the annotation editor
             tempDoc.Pages.Add();
 
-            // Import each XFDF file into the temporary document.
-            foreach (string xfdfPath in xfdfFiles)
+            // Bind the temporary document to the annotation editor
+            using (Aspose.Pdf.Facades.PdfAnnotationEditor annotEditor = new Aspose.Pdf.Facades.PdfAnnotationEditor(tempDoc))
             {
-                // Open the XFDF file as a read‑only stream.
-                using (FileStream xfdfStream = File.OpenRead(xfdfPath))
+                // Import each XFDF file into the temporary document
+                foreach (var xfdfPath in xfdfFiles)
                 {
-                    // Import annotations from the XFDF into the document.
-                    // If the XFDF also contains form field values, they are
-                    // imported as well via ReadFields.
-                    XfdfReader.ReadAnnotations(xfdfStream, tempDoc);
-                    // Reset the stream position to reuse it for field import.
-                    xfdfStream.Position = 0;
-                    XfdfReader.ReadFields(xfdfStream, tempDoc);
+                    annotEditor.ImportAnnotationsFromXfdf(xfdfPath);
                 }
-            }
 
-            // Export the merged content to an in‑memory XFDF stream.
-            using (MemoryStream mergedXfdf = new MemoryStream())
-            {
-                tempDoc.ExportAnnotationsToXfdf(mergedXfdf);
-                mergedXfdf.Position = 0; // rewind for reading
-
-                // -----------------------------------------------------------------
-                // Step 2: Import the merged XFDF into the target PDF.
-                // -----------------------------------------------------------------
-                using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+                // Export the combined annotations to an in‑memory XFDF stream
+                using (MemoryStream combinedXfdfStream = new MemoryStream())
                 {
-                    // Bind the existing PDF.
-                    editor.BindPdf(inputPdfPath);
+                    annotEditor.ExportAnnotationsToXfdf(combinedXfdfStream);
+                    combinedXfdfStream.Position = 0; // Reset for reading
 
-                    // Import all annotations and form fields from the merged XFDF.
-                    editor.ImportAnnotationsFromXfdf(mergedXfdf);
+                    // ---------------------------------------------------------
+                    // Step 2: Load the target PDF and import the merged XFDF data
+                    // ---------------------------------------------------------
+                    using (Aspose.Pdf.Document targetDoc = new Aspose.Pdf.Document(inputPdfPath))
+                    {
+                        // Use the Form facade to import field values from XFDF
+                        using (Aspose.Pdf.Facades.Form formFacade = new Aspose.Pdf.Facades.Form(targetDoc))
+                        {
+                            formFacade.ImportXfdf(combinedXfdfStream);
+                        }
 
-                    // Save the resulting PDF.
-                    editor.Save(outputPdfPath);
+                        // Save the resulting PDF
+                        targetDoc.Save(outputPdfPath);
+                    }
                 }
             }
         }
 
-        Console.WriteLine($"Merged XFDF imported successfully. Output saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Merged XFDF imported and saved to '{outputPdfPath}'.");
     }
 }

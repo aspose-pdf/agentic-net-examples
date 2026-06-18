@@ -1,47 +1,47 @@
 using System;
+using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
+        const string pdfPath = "sample.pdf";
 
-        if (!System.IO.File.Exists(pdfPath))
+        if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // ----- Get viewer preferences -----
-        using (PdfContentEditor viewerEditor = new PdfContentEditor())
+        // Load the PDF to read document‑level properties (e.g., PageLayout)
+        using (Document doc = new Document(pdfPath))
         {
+            // Get the page layout setting from the Document object
+            PageLayout layout = doc.PageLayout;
+            Console.WriteLine($"Page Layout: {layout}");
+
+            // Use PdfContentEditor to retrieve viewer preference flags
+            PdfContentEditor viewerEditor = new PdfContentEditor();
             viewerEditor.BindPdf(pdfPath);
-            int prefValue = viewerEditor.GetViewerPreference();
+            int prefFlags = viewerEditor.GetViewerPreference();
 
-            // Determine page layout from ViewerPreference flags
-            string layout = prefValue switch
-            {
-                var v when (v & ViewerPreference.PageLayoutOneColumn) != 0 => "One Column",
-                var v when (v & ViewerPreference.PageLayoutSinglePage) != 0 => "Single Page",
-                var v when (v & ViewerPreference.PageLayoutTwoColumnLeft) != 0 => "Two Column Left",
-                var v when (v & ViewerPreference.PageLayoutTwoColumnRight) != 0 => "Two Column Right",
-                _ => "Unknown"
-            };
+            // Example: check a few common flags
+            if ((prefFlags & ViewerPreference.PageLayoutOneColumn) != 0)
+                Console.WriteLine("Viewer Preference: One Column layout");
+            if ((prefFlags & ViewerPreference.PageLayoutTwoColumnLeft) != 0)
+                Console.WriteLine("Viewer Preference: Two Column Left layout");
+            if ((prefFlags & ViewerPreference.PageLayoutTwoColumnRight) != 0)
+                Console.WriteLine("Viewer Preference: Two Column Right layout");
+            if ((prefFlags & ViewerPreference.PageLayoutSinglePage) != 0)
+                Console.WriteLine("Viewer Preference: Single Page layout");
 
-            Console.WriteLine($"Viewer Preference - Page Layout: {layout}");
-
-            // Log other relevant flags (example: Hide Menubar)
-            bool hideMenubar = (prefValue & ViewerPreference.HideMenubar) != 0;
-            Console.WriteLine($"Viewer Preference - Hide Menubar: {hideMenubar}");
-        }
-
-        // ----- Get current zoom factor (default view zoom) -----
-        using (PdfPageEditor pageEditor = new PdfPageEditor())
-        {
-            pageEditor.BindPdf(pdfPath);
-            float zoomFactor = pageEditor.Zoom; // default is 1.0 (100%)
-            Console.WriteLine($"Current Zoom Factor: {zoomFactor * 100}%");
+            // Use PdfPageEditor to obtain the current zoom coefficient
+            PdfPageEditor zoomEditor = new PdfPageEditor();
+            zoomEditor.BindPdf(pdfPath);
+            float zoom = zoomEditor.Zoom;
+            Console.WriteLine($"Current Zoom: {zoom * 100}%");
         }
     }
 }

@@ -6,28 +6,25 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPdfPath = "input.pdf";
-        // Output XPS file path
-        const string outputXpsPath = "output.xps";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.xps";
 
-        // Verify input file exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Aspose.Pdf.Document pdfDocument = new Aspose.Pdf.Document(inputPdfPath))
+        // Load the PDF document
+        using (Document pdfDoc = new Document(inputPath))
         {
             // Initialize XpsSaveOptions with default settings
-            Aspose.Pdf.XpsSaveOptions xpsOptions = new Aspose.Pdf.XpsSaveOptions();
+            XpsSaveOptions xpsOptions = new XpsSaveOptions();
 
-            // Save the document as XPS using the save options
-            pdfDocument.Save(outputXpsPath, xpsOptions);
+            // Save the document as XPS using the specified options
+            pdfDoc.Save(outputPath, xpsOptions);
         }
 
-        Console.WriteLine($"PDF successfully converted to XPS: {outputXpsPath}");
+        Console.WriteLine($"PDF successfully converted to XPS: {outputPath}");
     }
 }

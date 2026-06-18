@@ -7,7 +7,6 @@ class Program
 {
     static void Main()
     {
-        // Path to the PDF file to be read.
         const string pdfPath = "sample.pdf";
 
         if (!File.Exists(pdfPath))
@@ -16,27 +15,50 @@ class Program
             return;
         }
 
-        // Open the PDF as a read‑only stream.
+        // Open the PDF file as a read‑only stream.
         using (FileStream pdfStream = File.OpenRead(pdfPath))
         {
-            // Load the PDF document from the stream.
+            // Initialize a Document from the stream. No saving is performed.
             using (Document doc = new Document(pdfStream))
             {
-                // Check whether the document contains an AcroForm.
-                if (doc.Form == null || doc.Form.Count == 0)
+                // Check whether the PDF contains an AcroForm.
+                if (doc.Form != null && doc.Form.Count > 0)
                 {
-                    Console.WriteLine("No AcroForm fields found in the document.");
-                    return;
+                    Console.WriteLine($"AcroForm contains {doc.Form.Count} fields:");
+                    foreach (Field field in doc.Form)
+                    {
+                        // Retrieve the field value in a type‑safe way.
+                        string value = GetFieldValue(field);
+                        Console.WriteLine($"- Name: {field.FullName}, Type: {field.GetType().Name}, Value: {value}");
+                    }
                 }
-
-                // Enumerate all form fields and output their names and values.
-                foreach (Field field in doc.Form)
+                else
                 {
-                    string fieldName = field?.FullName ?? "(unnamed)";
-                    string fieldValue = field?.Value?.ToString() ?? "(null)";
-                    Console.WriteLine($"Field: {fieldName}  Value: {fieldValue}");
+                    Console.WriteLine("No AcroForm fields found.");
                 }
             }
+        }
+    }
+
+    // Helper method to extract a readable value from different field types.
+    static string GetFieldValue(Field field)
+    {
+        switch (field)
+        {
+            case TextBoxField txt:
+                return txt.Value;
+            case CheckboxField chk:
+                return chk.Checked ? "Checked" : "Unchecked";
+            case RadioButtonField rad:
+                return rad.Value;
+            case ListBoxField list:
+                return string.Join(", ", list.SelectedItems);
+            case ComboBoxField combo:
+                return combo.Value;
+            case SignatureField sig:
+                return sig.Value != null ? "Signed" : "Unsigned";
+            default:
+                return field.Value?.ToString() ?? string.Empty;
         }
     }
 }

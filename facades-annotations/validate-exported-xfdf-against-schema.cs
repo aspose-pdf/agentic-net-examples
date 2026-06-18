@@ -2,82 +2,93 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
-using Aspose.Pdf.Facades;          // Aspose.Pdf.Facades is required by the task
-using Aspose.Pdf;                  // Core API for PDF handling (used indirectly by Form)
+using System.Xml.Schema;
+using Aspose.Pdf;                     // Core API for PDF handling
+using Aspose.Pdf.Facades;            // Facades API (used for PDF operations if needed)
 
-class XfdfValidator
+class Program
 {
-    // Path to the PDF from which XFDF will be exported
-    private const string PdfPath = "input.pdf";
-
-    // Path where the exported XFDF will be saved
-    private const string XfdfPath = "exported.xfdf";
-
-    // Path to the XFDF schema (XSD) file
-    private const string XfdfSchemaPath = "xfdf.xsd";
-
     static void Main()
     {
-        try
+        const string pdfPath   = "sample.pdf";      // Input PDF with annotations
+        const string xfdfPath  = "exported.xfdf";   // Exported XFDF file
+        const string schemaPath = "xfdf.xsd";       // XFDF schema file (must exist)
+
+        if (!File.Exists(pdfPath))
         {
-            // ------------------------------------------------------------
-            // 1. Export annotations (or form fields) from the PDF to XFDF
-            // ------------------------------------------------------------
-            // Form is a Facade class that works with AcroForm data.
-            // It can export the content of the fields (or annotations) to XFDF.
-            using (Form form = new Form(PdfPath))
-            using (FileStream xfdfStream = new FileStream(XfdfPath, FileMode.Create, FileAccess.Write))
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            return;
+        }
+
+        if (!File.Exists(schemaPath))
+        {
+            Console.Error.WriteLine($"XFDF schema not found: {schemaPath}");
+            return;
+        }
+
+        // 1. Load the PDF document (using the lifecycle rule for disposal)
+        using (Document pdfDoc = new Document(pdfPath))
+        {
+            // 2. Export all annotations to XFDF (core API method, no extra save options needed)
+            pdfDoc.ExportAnnotationsToXfdf(xfdfPath);
+        }
+
+        // 3. Validate the exported XFDF against the XFDF schema
+        bool isValid = ValidateXfdf(xfdfPath, schemaPath, out List<string> errors);
+
+        // 4. Report validation result
+        if (isValid)
+        {
+            Console.WriteLine("XFDF validation succeeded – no errors found.");
+        }
+        else
+        {
+            Console.WriteLine("XFDF validation failed. Errors:");
+            foreach (string err in errors)
+                Console.WriteLine($"  - {err}");
+        }
+    }
+
+    /// <summary>
+    /// Loads an XFDF file into an XmlDocument and validates it against the provided XSD schema.
+    /// Returns true if the document conforms to the schema; otherwise false.
+    /// </summary>
+    static bool ValidateXfdf(string xfdfFile, string schemaFile, out List<string> validationErrors)
+    {
+        // Use a local list to collect errors – we cannot capture an out parameter inside a lambda.
+        List<string> errors = new List<string>();
+
+        // Prepare XML reader settings with the XFDF schema
+        XmlReaderSettings settings = new XmlReaderSettings();
+        settings.ValidationType = ValidationType.Schema;
+        settings.Schemas.Add(null, schemaFile);
+        settings.ValidationEventHandler += (sender, args) =>
+        {
+            // Collect all validation errors (including warnings)
+            errors.Add($"{args.Severity}: {args.Message}");
+        };
+
+        // Create an XmlReader that validates while reading the XFDF file
+        using (FileStream fs = File.OpenRead(xfdfFile))
+        using (XmlReader reader = XmlReader.Create(fs, settings))
+        {
+            try
             {
-                form.ExportXfdf(xfdfStream);
-                // No explicit Save() is needed; ExportXfdf writes directly to the stream.
+                // Parse the entire document; validation occurs via the event handler
+                while (reader.Read()) { }
             }
-
-            // ------------------------------------------------------------
-            // 2. Validate the exported XFDF against the XFDF XSD schema
-            // ------------------------------------------------------------
-            List<string> validationErrors = new List<string>();
-
-            // Configure XML reader settings for schema validation
-            XmlReaderSettings settings = new XmlReaderSettings
+            catch (XmlException ex)
             {
-                ValidationType = ValidationType.Schema,
-                DtdProcessing = DtdProcessing.Prohibit
-            };
-            settings.Schemas.Add(null, XfdfSchemaPath);
-            settings.ValidationEventHandler += (sender, args) =>
-            {
-                // Collect all validation errors (warnings are also captured)
-                validationErrors.Add($"{args.Severity}: {args.Message}");
-            };
-
-            // Parse the XFDF file with the configured settings
-            using (FileStream xfdfFile = new FileStream(XfdfPath, FileMode.Open, FileAccess.Read))
-            using (XmlReader reader = XmlReader.Create(xfdfFile, settings))
-            {
-                // Load the entire document; any schema violations will trigger the event handler
-                XmlDocument doc = new XmlDocument();
-                doc.Load(reader);
-            }
-
-            // ------------------------------------------------------------
-            // 3. Report validation results
-            // ------------------------------------------------------------
-            if (validationErrors.Count == 0)
-            {
-                Console.WriteLine("XFDF validation succeeded. No errors found.");
-            }
-            else
-            {
-                Console.WriteLine("XFDF validation failed with the following errors:");
-                foreach (string err in validationErrors)
-                {
-                    Console.WriteLine(err);
-                }
+                // XML parsing errors (well-formedness) are also reported
+                errors.Add($"XmlException: {ex.Message}");
+                validationErrors = errors;
+                return false;
             }
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
-        }
+
+        // Assign the collected errors to the out parameter
+        validationErrors = errors;
+        // If no errors were collected, the XFDF is valid
+        return errors.Count == 0;
     }
 }

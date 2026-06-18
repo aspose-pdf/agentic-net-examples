@@ -8,48 +8,37 @@ class Program
     {
         try
         {
-            // Simulate an exception to generate a crash report for
-            ThrowDemoException();
+            // Simulate an exception (division by zero)
+            int zero = 0;
+            int _ = 1 / zero;
         }
         catch (Exception ex)
         {
-            // Prepare crash report options
-            CrashReportOptions options = new CrashReportOptions(ex)
-            {
-                // Optional customizations
-                CrashReportDirectory = Directory.GetCurrentDirectory(),
-                CrashReportFilename = "MyCrashReport.html",
-                CustomMessage = "Additional context for the crash."
-            };
+            // Create crash report options based on the caught exception
+            CrashReportOptions options = new CrashReportOptions(ex);
 
-            // Generate the HTML crash report
+            // Optional: specify output directory and filename for the HTML report
+            string outputDir = Path.GetDirectoryName(
+                System.Reflection.Assembly.GetExecutingAssembly().Location);
+            options.CrashReportDirectory = outputDir;
+            options.CrashReportFilename = "MyCrashReport.html";
+
+            // Generate the crash report (HTML format) using the built‑in utility
             PdfException.GenerateCrashReport(options);
 
-            // Build the full path to the generated HTML report (CrashReportPath property does not exist in some versions)
-            string htmlPath = Path.Combine(options.CrashReportDirectory, options.CrashReportFilename);
-            string pdfPath = Path.Combine(options.CrashReportDirectory, "MyCrashReport.pdf");
+            // Path to the generated HTML report
+            string htmlPath = options.CrashReportPath;
 
-            try
-            {
-                // Load HTML (requires HtmlLoadOptions) and save as PDF
-                using (Document doc = new Document(htmlPath, new HtmlLoadOptions()))
-                {
-                    doc.Save(pdfPath); // default format is PDF
-                }
+            // Define the PDF output path (same folder, same base name, .pdf extension)
+            string pdfPath = Path.ChangeExtension(htmlPath, ".pdf");
 
-                Console.WriteLine($"Crash report PDF saved to '{pdfPath}'.");
-            }
-            catch (TypeInitializationException)
+            // Load the HTML report and save it as PDF
+            using (Document doc = new Document(htmlPath, new HtmlLoadOptions()))
             {
-                // HTML conversion relies on GDI+ (Windows only)
-                Console.WriteLine("HTML to PDF conversion requires Windows (GDI+). HTML report saved only.");
+                doc.Save(pdfPath);
             }
+
+            Console.WriteLine($"Crash report PDF created at: {pdfPath}");
         }
-    }
-
-    static void ThrowDemoException()
-    {
-        // Example exception
-        throw new InvalidOperationException("Demo exception for crash report.");
     }
 }

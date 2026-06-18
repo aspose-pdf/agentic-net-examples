@@ -7,63 +7,52 @@ class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string ofdPath       = "source.ofd";   // OFD file containing bookmarks
-        const string targetPdfPath = "target.pdf";   // Existing PDF to receive the bookmarks
-        const string outputPdfPath = "result.pdf";   // PDF with imported bookmarks
+        const string ofdPath = "source.ofd";      // OFD file containing bookmarks
+        const string pdfPath = "target.pdf";      // Existing PDF to receive bookmarks
+        const string outputPath = "output.pdf";   // Resulting PDF with imported bookmarks
 
-        // Validate input files
         if (!File.Exists(ofdPath))
         {
             Console.Error.WriteLine($"OFD file not found: {ofdPath}");
             return;
         }
-        if (!File.Exists(targetPdfPath))
+
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Target PDF not found: {targetPdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        // -----------------------------------------------------------------
-        // 1. Load the OFD file and convert it to an in‑memory PDF document
-        // -----------------------------------------------------------------
+        // Load the OFD file as a PDF document (conversion is handled internally)
         using (Document ofdDoc = new Document(ofdPath, new OfdLoadOptions()))
-        using (MemoryStream pdfFromOfd = new MemoryStream())
         {
-            // Save the converted PDF into a memory stream (no file I/O)
-            ofdDoc.Save(pdfFromOfd);
-            pdfFromOfd.Position = 0; // Reset for reading
-
-            // -------------------------------------------------------------
-            // 2. Export the bookmarks from the temporary PDF to an XML stream
-            // -------------------------------------------------------------
-            using (PdfBookmarkEditor ofdBookmarkEditor = new PdfBookmarkEditor())
+            // Load the target PDF where bookmarks will be added
+            using (Document targetDoc = new Document(pdfPath))
             {
-                ofdBookmarkEditor.BindPdf(pdfFromOfd); // Bind to the in‑memory PDF
+                // Initialize the bookmark editor on the target PDF
+                PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor();
+                bookmarkEditor.BindPdf(targetDoc);
 
-                using (MemoryStream bookmarksXml = new MemoryStream())
+                // Example logic: create a bookmark for each page of the OFD document
+                for (int i = 1; i <= ofdDoc.Pages.Count; i++)
                 {
-                    ofdBookmarkEditor.ExportBookmarksToXML(bookmarksXml);
-                    bookmarksXml.Position = 0; // Reset for reading
-
-                    // ---------------------------------------------------------
-                    // 3. Load the target PDF and import the exported bookmarks
-                    // ---------------------------------------------------------
-                    using (Document targetDoc = new Document(targetPdfPath))
-                    using (PdfBookmarkEditor targetBookmarkEditor = new PdfBookmarkEditor())
+                    // Construct a Bookmark object (Aspose.Pdf.Facades.Bookmark)
+                    Bookmark bm = new Bookmark
                     {
-                        targetBookmarkEditor.BindPdf(targetDoc); // Bind to the target PDF
-                        targetBookmarkEditor.ImportBookmarksWithXML(bookmarksXml); // Import
+                        Title = $"OFD Page {i}",
+                        PageNumber = i,
+                        Action = "GoTo"
+                    };
 
-                        // -------------------------------------------------
-                        // 4. Save the updated PDF with the imported bookmarks
-                        // -------------------------------------------------
-                        targetDoc.Save(outputPdfPath);
-                    }
+                    // Add the bookmark to the target PDF
+                    bookmarkEditor.CreateBookmarks(bm);
                 }
+
+                // Save the updated PDF (standard PDF save)
+                targetDoc.Save(outputPath);
             }
         }
 
-        Console.WriteLine($"Bookmarks imported from '{ofdPath}' and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Bookmarks imported and saved to '{outputPath}'.");
     }
 }

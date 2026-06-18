@@ -1,8 +1,8 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Drawing;
 using Aspose.Pdf.Text;
 using Aspose.Pdf.Forms;
 
@@ -10,8 +10,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "form_template.pdf";   // PDF that contains the form
-        const string outputPdfPath = "form_report.pdf";   // PDF report to be generated
+        const string inputPdfPath = "form_input.pdf";   // PDF containing the AcroForm
+        const string outputPdfPath = "form_report.pdf"; // Generated report
 
         if (!File.Exists(inputPdfPath))
         {
@@ -19,57 +19,52 @@ class Program
             return;
         }
 
-        try
+        // Load the source PDF that contains the form fields
+        using (Document sourceDoc = new Document(inputPdfPath))
         {
-            // Load the source PDF that contains the form fields
-            using (Document sourceDoc = new Document(inputPdfPath))
+            // Initialize FormEditor – required by the task (even if we don't use its GetFormFields method)
+            using (FormEditor formEditor = new FormEditor(sourceDoc))
             {
-                // Bind the document to a FormEditor (required by the task description)
-                FormEditor formEditor = new FormEditor(sourceDoc);
-
-                // Retrieve all form fields from the document
-                var formFields = sourceDoc.Form?.Fields;
+                // Retrieve all field names from the form using the Document.Form collection
+                string[] fieldNames = sourceDoc.Form.Fields
+                                                .Select(f => f.PartialName)
+                                                .ToArray();
 
                 // Create a new PDF document that will hold the report
                 using (Document reportDoc = new Document())
                 {
-                    // Add a blank page to the report document
+                    // Add a page to the report document
                     Page reportPage = reportDoc.Pages.Add();
 
                     // Create a table with three columns: Name, Type, Value
                     Table table = new Table
                     {
-                        ColumnWidths = "150 100 200",
-                        DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f),
-                        DefaultCellPadding = new MarginInfo(5, 5, 5, 5)
+                        // Optional: set column widths (percentage of page width)
+                        ColumnWidths = "30% 20% 50%"
                     };
 
-                    // Add header row
+                    // Add a header row
                     Row header = table.Rows.Add();
-                    header.Cells.Add(new Cell { Paragraphs = { new TextFragment("Field Name") } });
-                    header.Cells.Add(new Cell { Paragraphs = { new TextFragment("Field Type") } });
-                    header.Cells.Add(new Cell { Paragraphs = { new TextFragment("Field Value") } });
+                    AddCell(header, "Field Name", true);
+                    AddCell(header, "Field Type", true);
+                    AddCell(header, "Value", true);
 
-                    // Iterate over each form field and populate the table
-                    if (formFields != null)
+                    // Iterate over each form field name and add a row with its details
+                    foreach (string fieldName in fieldNames)
                     {
-                        foreach (Field field in formFields)
-                        {
-                            // Field name (partial name)
-                            string fieldName = field.PartialName;
+                        // Find the actual field object in the document
+                        var field = sourceDoc.Form.Fields.FirstOrDefault(f => f.PartialName == fieldName);
+                        if (field == null)
+                            continue; // safety check
 
-                            // Field type – use the concrete class name (e.g., TextBoxField, CheckBoxField)
-                            string fieldType = field.GetType().Name;
+                        // Determine the field type (class name) and its current value
+                        string fieldType = field.GetType().Name;
+                        string fieldValue = field.Value?.ToString() ?? string.Empty;
 
-                            // Current value of the field (convert to string, handle nulls)
-                            string fieldValue = field.Value?.ToString() ?? string.Empty;
-
-                            // Add a new row with the collected information
-                            Row row = table.Rows.Add();
-                            row.Cells.Add(new Cell { Paragraphs = { new TextFragment(fieldName) } });
-                            row.Cells.Add(new Cell { Paragraphs = { new TextFragment(fieldType) } });
-                            row.Cells.Add(new Cell { Paragraphs = { new TextFragment(fieldValue) } });
-                        }
+                        Row row = table.Rows.Add();
+                        AddCell(row, fieldName, false);
+                        AddCell(row, fieldType, false);
+                        AddCell(row, fieldValue, false);
                     }
 
                     // Add the table to the page
@@ -78,15 +73,33 @@ class Program
                     // Save the report PDF
                     reportDoc.Save(outputPdfPath);
                 }
-
-                // FormEditor does not implement IDisposable; let GC handle it.
             }
+        }
 
-            Console.WriteLine($"Form fields report generated: {outputPdfPath}");
-        }
-        catch (Exception ex)
+        Console.WriteLine($"Form fields report saved to '{outputPdfPath}'.");
+    }
+
+    // Helper method to add a cell to a table row with optional header styling
+    private static void AddCell(Row row, string text, bool isHeader)
+    {
+        Cell cell = row.Cells.Add();
+        TextFragment fragment = new TextFragment(text);
+        if (isHeader)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            // Header styling: bold font, gray background
+            fragment.TextState.Font = FontRepository.FindFont("Helvetica-Bold");
+            fragment.TextState.FontSize = 12;
+            fragment.TextState.ForegroundColor = Color.Black;
+            cell.BackgroundColor = Color.LightGray;
         }
+        else
+        {
+            // Regular cell styling
+            fragment.TextState.Font = FontRepository.FindFont("Helvetica");
+            fragment.TextState.FontSize = 10;
+            fragment.TextState.ForegroundColor = Color.Black;
+        }
+        cell.Paragraphs.Add(fragment);
+        cell.Margin = new MarginInfo(5, 5, 5, 5);
     }
 }

@@ -17,21 +17,23 @@ class Program
 
         try
         {
-            // PdfFileSignature implements IDisposable, so use a using block.
-            using (PdfFileSignature pdfSignature = new PdfFileSignature())
+            // Initialize the facade for signature operations
+            PdfFileSignature pdfSignature = new PdfFileSignature();
+
+            // Bind the existing signed PDF
+            pdfSignature.BindPdf(inputPath);
+
+            // Remove usage rights if they exist
+            if (pdfSignature.ContainsUsageRights())
             {
-                // Load the signed PDF.
-                pdfSignature.BindPdf(inputPath);
-
-                // Remove usage rights if they exist.
-                if (pdfSignature.ContainsUsageRights())
-                {
-                    pdfSignature.RemoveUsageRights();
-                }
-
-                // Save the modified PDF.
-                pdfSignature.Save(outputPath);
+                pdfSignature.RemoveUsageRights();
             }
+
+            // Save the modified PDF
+            pdfSignature.Save(outputPath);
+
+            // Release resources
+            pdfSignature.Close();
 
             Console.WriteLine($"Usage rights removed. Output saved to '{outputPath}'.");
         }

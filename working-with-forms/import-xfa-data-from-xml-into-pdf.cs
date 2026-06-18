@@ -28,22 +28,22 @@ class Program
         xfaData.Load(xmlPath);
 
         // Load the PDF that contains an XFA form
-        using (Document doc = new Document(pdfPath))
+        using (Document pdfDoc = new Document(pdfPath))
         {
             // Verify that the PDF actually has an XFA form
-            if (!doc.Form.HasXfa)
+            if (!pdfDoc.Form.HasXfa)
             {
                 Console.Error.WriteLine("The PDF does not contain an XFA form.");
                 return;
             }
 
             // Assign the XFA data to the form
-            doc.Form.AssignXfa(xfaData);
+            pdfDoc.Form.AssignXfa(xfaData);
 
             // Save the updated PDF
-            doc.Save(outputPath);
+            pdfDoc.Save(outputPath);
         }
 
-        Console.WriteLine($"XFA data imported successfully. Output saved to '{outputPath}'.");
+        Console.WriteLine($"XFA data imported and saved to '{outputPath}'.");
     }
 }

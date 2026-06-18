@@ -1,56 +1,56 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;          // Facade APIs (PdfConverter)
-using System.Drawing;
-using System.Drawing.Imaging;      // ImageFormat for PNG
+using System.Drawing.Imaging;
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";                 // source PDF
-        const string outputDir = "output_images";             // folder for PNGs
+        const string inputPdf  = "input.pdf";          // source PDF
+        const string outputDir = "Images";             // folder for PNG files
+
+        if (!File.Exists(inputPdf))
+        {
+            Console.Error.WriteLine($"File not found: {inputPdf}");
+            return;
+        }
 
         // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Verify that the input PDF exists before proceeding
-        if (!File.Exists(inputPdf))
+        // Load the PDF document (lifecycle rule: wrap in using)
+        using (Document doc = new Document(inputPdf))
         {
-            Console.WriteLine($"Error: The file '{inputPdf}' was not found.");
-            return;
-        }
+            int pageCount = doc.Pages.Count; // 1‑based page count
 
-        // PdfConverter is a Facade; wrap in using for deterministic disposal
-        using (PdfConverter converter = new PdfConverter())
-        {
-            // Bind the PDF file to the converter
-            converter.BindPdf(inputPdf);
-
-            // Total number of pages (1‑based indexing)
-            int pageCount = converter.PageCount;
-
-            // Process pages in reverse order: last page to first page
-            for (int pageNum = pageCount; pageNum >= 1; pageNum--)
+            // Create a PdfConverter facade (lifecycle rule: wrap in using)
+            using (PdfConverter converter = new PdfConverter())
             {
-                // Restrict conversion to a single page
-                converter.StartPage = pageNum;
-                converter.EndPage   = pageNum;
+                // Bind the PDF document to the converter
+                converter.BindPdf(doc);
 
-                // Prepare the converter for the selected page range
-                converter.DoConvert();
+                // Optional: set resolution (default 150 DPI)
+                // converter.Resolution = new Resolution(300);
 
-                // Build output file name (e.g., page_5.png)
-                string outputPath = Path.Combine(outputDir, $"page_{pageNum}.png");
+                // Process pages in reverse order
+                for (int i = pageCount; i >= 1; i--)
+                {
+                    // Convert a single page: set start and end to the same page
+                    converter.StartPage = i;
+                    converter.EndPage   = i;
 
-                // Suppress the platform‑specific warning for ImageFormat.Png (CA1416)
-#pragma warning disable CA1416 // Validate platform compatibility
-                converter.GetNextImage(outputPath, ImageFormat.Png);
-#pragma warning restore CA1416 // Validate platform compatibility
+                    // Initialise conversion for the selected page
+                    converter.DoConvert();
+
+                    // Build output file name (e.g., image5.png, image4.png, ...)
+                    string outPath = Path.Combine(outputDir, $"image{i}.png");
+
+                    // Save the page as PNG (using System.Drawing.Imaging.ImageFormat.Png)
+                    converter.GetNextImage(outPath, ImageFormat.Png);
+                }
             }
-
-            // Release any resources held by the converter
-            converter.Close();
         }
 
         Console.WriteLine("PDF pages have been converted to PNG images in reverse order.");

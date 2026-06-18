@@ -1,43 +1,65 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
+        // Input and output PDF paths
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string author     = "John Doe";
 
+        // Dynamic author name (could be retrieved from elsewhere)
+        const string author = "John Doe";
+
+        // Verify the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
-        {
-            // Create a text stamp with interpolated content (date and author)
-            string stampText = $"Created on {DateTime.Now:yyyy-MM-dd} by {author}";
-            Aspose.Pdf.TextStamp textStamp = new Aspose.Pdf.TextStamp(stampText);
+        // -----------------------------------------------------------------
+        // Load the PDF using the Facade API (PdfFileStamp)
+        // -----------------------------------------------------------------
+        PdfFileStamp fileStamp = new PdfFileStamp();
+        fileStamp.BindPdf(inputPath);
 
-            // Configure stamp appearance (optional)
-            textStamp.Background = false;                     // draw on top of page content
-            textStamp.Opacity    = 0.7;                       // semi‑transparent
-            textStamp.HorizontalAlignment = HorizontalAlignment.Center;
-            textStamp.VerticalAlignment   = VerticalAlignment.Bottom;
-            textStamp.YIndent = 20;                           // distance from bottom edge
+        // -----------------------------------------------------------------
+        // Build the stamp text with string interpolation (date + author)
+        // -----------------------------------------------------------------
+        string stampText = $"Generated on {DateTime.Now:yyyy-MM-dd HH:mm} by {author}";
 
-            // Add the stamp to the first page (pages are 1‑based)
-            doc.Pages[1].AddStamp(textStamp);
+        // FormattedText constructor requires System.Drawing.Color for the text color
+        Aspose.Pdf.Facades.FormattedText formatted = new Aspose.Pdf.Facades.FormattedText(
+            stampText,                                 // text
+            System.Drawing.Color.DarkGray,             // text color
+            "Helvetica",                               // font name
+            Aspose.Pdf.Facades.EncodingType.Winansi,   // encoding
+            false,                                     // isEmbedded (false = use system font)
+            10);                                       // font size
 
-            // Save the modified PDF
-            doc.Save(outputPath);
-        }
+        // -----------------------------------------------------------------
+        // Create a Stamp, bind the formatted text, and set its position
+        // -----------------------------------------------------------------
+        Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
+        stamp.BindLogo(formatted);          // attach the text to the stamp
+        stamp.SetOrigin(100f, 100f);        // X and Y coordinates on the page
+        stamp.IsBackground = false;        // render on top of page content
 
-        Console.WriteLine($"Stamp added and saved to '{outputPath}'.");
+        // -----------------------------------------------------------------
+        // Add the stamp to the document (applies to all pages by default)
+        // -----------------------------------------------------------------
+        fileStamp.AddStamp(stamp);
+
+        // -----------------------------------------------------------------
+        // Save the stamped PDF and release resources
+        // -----------------------------------------------------------------
+        fileStamp.Save(outputPath);
+        fileStamp.Close();
+
+        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
     }
 }

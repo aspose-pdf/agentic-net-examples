@@ -1,59 +1,89 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 using Aspose.Pdf;
 
-class Program
+namespace BatchPdfEncryption
 {
-    static void Main()
+    // Represents a single encryption job read from the configuration file.
+    public class EncryptionJob
     {
-        // Directory containing source PDFs
-        const string inputDirectory = "input_pdfs";
-        // Directory where encrypted PDFs will be saved
-        const string outputDirectory = "encrypted_pdfs";
+        public string InputPath { get; set; }
+        public string OutputPath { get; set; }
+        public string UserPassword { get; set; }
+        public string OwnerPassword { get; set; }
+    }
 
-        // Passwords to apply to every PDF
-        const string userPassword = "user123";
-        const string ownerPassword = "owner123";
-
-        // Verify input directory exists
-        if (!Directory.Exists(inputDirectory))
+    class Program
+    {
+        static void Main(string[] args)
         {
-            Console.Error.WriteLine($"Input directory not found: {inputDirectory}");
-            return;
-        }
+            // Expect the first argument to be the path of the JSON configuration file.
+            if (args.Length == 0)
+            {
+                Console.Error.WriteLine("Usage: BatchPdfEncryption <config.json>");
+                return;
+            }
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputDirectory);
+            string configFile = args[0];
+            if (!File.Exists(configFile))
+            {
+                Console.Error.WriteLine($"Configuration file not found: {configFile}");
+                return;
+            }
 
-        // Get all PDF files in the input directory (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(inputDirectory, "*.pdf", SearchOption.TopDirectoryOnly);
-
-        foreach (string pdfPath in pdfFiles)
-        {
-            // Build output file name (original name with suffix)
-            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
-            string encryptedPath = Path.Combine(outputDirectory, $"{fileNameWithoutExt}_encrypted.pdf");
-
+            List<EncryptionJob> jobs;
             try
             {
-                // Load the PDF, encrypt it, and save the encrypted copy
-                using (Document doc = new Document(pdfPath))
+                string json = File.ReadAllText(configFile);
+                jobs = JsonSerializer.Deserialize<List<EncryptionJob>>(json);
+                if (jobs == null)
                 {
-                    // Define permissions (adjust as needed)
-                    Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
-
-                    // Encrypt using AES‑256 (preferred algorithm)
-                    doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
-
-                    // Save the encrypted PDF
-                    doc.Save(encryptedPath);
+                    Console.Error.WriteLine("Configuration file is empty or malformed.");
+                    return;
                 }
-
-                Console.WriteLine($"Encrypted: {encryptedPath}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error encrypting '{pdfPath}': {ex.Message}");
+                Console.Error.WriteLine($"Failed to read configuration: {ex.Message}");
+                return;
+            }
+
+            foreach (var job in jobs)
+            {
+                // Basic validation of paths.
+                if (string.IsNullOrWhiteSpace(job.InputPath) ||
+                    string.IsNullOrWhiteSpace(job.OutputPath) ||
+                    string.IsNullOrWhiteSpace(job.UserPassword) ||
+                    string.IsNullOrWhiteSpace(job.OwnerPassword))
+                {
+                    Console.Error.WriteLine("Invalid job definition – missing required fields.");
+                    continue;
+                }
+
+                if (!File.Exists(job.InputPath))
+                {
+                    Console.Error.WriteLine($"Input PDF not found: {job.InputPath}");
+                    continue;
+                }
+
+                try
+                {
+                    // Load the PDF, encrypt it, and save the result.
+                    using (Document doc = new Document(job.InputPath))
+                    {
+                        Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+                        doc.Encrypt(job.UserPassword, job.OwnerPassword, perms, CryptoAlgorithm.AESx256);
+                        doc.Save(job.OutputPath);
+                    }
+
+                    Console.WriteLine($"SUCCESS: Encrypted '{job.InputPath}' -> '{job.OutputPath}'");
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"FAILURE: Could not encrypt '{job.InputPath}'. Error: {ex.Message}");
+                }
             }
         }
     }

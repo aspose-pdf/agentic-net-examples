@@ -7,9 +7,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string annotationName = "nonexistent-annotation-id";
+        const string annotName  = "nonexistent-annotation-id";
 
         if (!File.Exists(inputPath))
         {
@@ -17,36 +17,38 @@ class Program
             return;
         }
 
-        try
+        // PdfAnnotationEditor implements IDisposable via SaveableFacade
+        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
+            try
             {
-                // Initialize the annotation editor with the loaded document
-                PdfAnnotationEditor editor = new PdfAnnotationEditor(doc);
+                // Load the PDF document
+                editor.BindPdf(inputPath);
 
-                try
-                {
-                    // Attempt to delete the annotation; throws if the name does not exist
-                    editor.DeleteAnnotation(annotationName);
-                    Console.WriteLine($"Annotation '{annotationName}' deleted.");
-                }
-                catch (PdfException ex)
-                {
-                    // Handle the case where the annotation is not present
-                    Console.WriteLine($"Failed to delete annotation '{annotationName}': {ex.Message}");
-                }
-
-                // Save the (potentially unchanged) PDF
-                editor.Save(outputPath);
+                // Attempt to delete the annotation by its name (ID)
+                editor.DeleteAnnotation(annotName);
+            }
+            catch (Aspose.Pdf.PdfException ex)
+            {
+                // Aspose.Pdf specific exception – annotation not found or other PDF error
+                Console.Error.WriteLine($"PdfException: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                // Any other unexpected exception
+                Console.Error.WriteLine($"Error: {ex.Message}");
             }
 
-            Console.WriteLine($"Output saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            // Catch any unexpected errors
-            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
+            // Save the (possibly unchanged) document
+            try
+            {
+                editor.Save(outputPath);
+                Console.WriteLine($"Document saved to '{outputPath}'.");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Failed to save document: {ex.Message}");
+            }
         }
     }
 }

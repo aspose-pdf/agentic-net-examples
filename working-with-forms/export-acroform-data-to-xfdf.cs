@@ -6,33 +6,26 @@ class Program
 {
     static void Main()
     {
-        // Path to the source PDF containing AcroForm fields
+        // Local PDF file containing AcroForm fields
         const string inputPdfPath = @"C:\Docs\input.pdf";
 
-        // UNC path on the network share where the XFDF (XML) will be saved
-        const string outputXfdfPath = @"\\fileserver\shared\formdata.xfdf";
+        // Destination UNC path on the network share where the XFDF (XML) will be saved
+        const string outputXfdfPath = @"\\Server\Share\AcroFormData.xfdf";
 
-        // Verify the source PDF exists
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure the target directory on the network share exists
-        string outputDir = Path.GetDirectoryName(outputXfdfPath);
-        if (!Directory.Exists(outputDir))
-        {
-            Directory.CreateDirectory(outputDir);
-        }
-
         try
         {
-            // Load the PDF document
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Load the PDF document (using ensures proper disposal)
+            using (Document pdfDocument = new Document(inputPdfPath))
             {
-                // Export all AcroForm annotations (XFDF) to the specified network location
-                pdfDoc.ExportAnnotationsToXfdf(outputXfdfPath);
+                // Export all AcroForm annotations (field data) to an XFDF file.
+                // XFDF is an XML representation of form data.
+                pdfDocument.ExportAnnotationsToXfdf(outputXfdfPath);
             }
 
             Console.WriteLine($"AcroForm data successfully exported to: {outputXfdfPath}");

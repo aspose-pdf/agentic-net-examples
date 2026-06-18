@@ -1,62 +1,50 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class BatchAttachmentProcessor
 {
     static void Main()
     {
-        // Folder containing source PDFs
-        const string inputFolder = @"C:\InputPdfs";
-        // Folder where processed PDFs will be saved
-        const string outputFolder = @"C:\OutputPdfs";
-        // Path to the file that will be attached to every PDF
-        const string attachmentPath = @"C:\Attachments\sample_attachment.pdf";
-        const string attachmentDescription = "Sample attachment added to all documents";
+        // Input PDF files to process
+        string[] pdfFiles = {
+            "doc1.pdf",
+            "doc2.pdf",
+            "doc3.pdf"
+        };
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
+        // Attachment to add to each PDF
+        const string attachmentPath = "attachment.pdf";
+        const string attachmentDescription = "Sample attachment";
 
-        // Validate attachment exists before processing
+        // Verify attachment exists once
         if (!File.Exists(attachmentPath))
         {
-            Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
+            Console.Error.WriteLine($"Attachment not found: {attachmentPath}");
             return;
         }
 
-        // Get all PDF files in the input folder
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-
-        foreach (string sourcePdfPath in pdfFiles)
+        foreach (string inputPath in pdfFiles)
         {
-            // Determine output file path (same name, different folder)
-            string outputPdfPath = Path.Combine(outputFolder, Path.GetFileName(sourcePdfPath));
-
-            try
+            if (!File.Exists(inputPath))
             {
-                // Load the source PDF using the pure‑managed Document class (no native DLL required)
-                using (Document pdfDocument = new Document(sourcePdfPath))
-                {
-                    // Create a file specification for the attachment
-                    var attachment = new FileSpecification(attachmentPath, attachmentDescription);
-                    // Populate the file contents via a stream (required for EmbeddedFiles collection)
-                    attachment.Contents = new MemoryStream(File.ReadAllBytes(attachmentPath));
-
-                    // Add the attachment to the PDF's EmbeddedFiles collection (Attachments collection is obsolete)
-                    pdfDocument.EmbeddedFiles.Add(attachment);
-
-                    // Save the modified PDF
-                    pdfDocument.Save(outputPdfPath);
-                }
-
-                Console.WriteLine($"Processed: {Path.GetFileName(sourcePdfPath)} → {outputPdfPath}");
+                Console.Error.WriteLine($"PDF not found: {inputPath}");
+                continue;
             }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{sourcePdfPath}': {ex.Message}");
-            }
+
+            // Create output file name (e.g., doc1_attached.pdf)
+            string directory = Path.GetDirectoryName(inputPath);
+            string filenameWithoutExt = Path.GetFileNameWithoutExtension(inputPath);
+            string outputPath = Path.Combine(directory, $"{filenameWithoutExt}_attached.pdf");
+
+            // Use PdfContentEditor to add the attachment
+            PdfContentEditor editor = new PdfContentEditor();
+            editor.BindPdf(inputPath);                                 // Load the PDF
+            editor.AddDocumentAttachment(attachmentPath, attachmentDescription); // Add attachment
+            editor.Save(outputPath);                                   // Save the modified PDF
+            editor.Close();                                            // Release resources
+
+            Console.WriteLine($"Processed '{inputPath}' -> '{outputPath}'");
         }
-
-        Console.WriteLine("Batch attachment processing completed.");
     }
 }

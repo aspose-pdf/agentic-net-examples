@@ -1,59 +1,62 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using Aspose.Pdf.Facades;
 
-class Program
+class AttachmentExtractor
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        // Path to the source PDF file containing attachments
+        const string pdfPath = "input.pdf";
+
+        // Directory where extracted attachments will be saved
         const string outputDir = "Attachments";
 
-        // Verify input PDF exists
-        if (!File.Exists(inputPdf))
+        // Validate input PDF file
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Error: PDF file not found – {pdfPath}");
             return;
         }
 
         // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        try
+        // Use PdfExtractor (facade) to extract attachments
+        using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Create a PdfExtractor and bind the source PDF
-            using (PdfExtractor extractor = new PdfExtractor())
+            // Bind the PDF document to the extractor
+            extractor.BindPdf(pdfPath);
+
+            // Extract all attachments from the bound PDF
+            extractor.ExtractAttachment();
+
+            // Retrieve the list of attachment names
+            IList<string> attachmentNames = extractor.GetAttachNames();
+
+            // Retrieve the attachment data as memory streams
+            MemoryStream[] attachmentStreams = extractor.GetAttachment();
+
+            // Write each attachment to a file in the output directory
+            for (int i = 0; i < attachmentStreams.Length; i++)
             {
-                extractor.BindPdf(inputPdf);
+                string fileName = attachmentNames[i];
+                string outputPath = Path.Combine(outputDir, fileName);
 
-                // Extract all attachments from the PDF
-                extractor.ExtractAttachment();
+                // Ensure the stream is positioned at the beginning
+                attachmentStreams[i].Position = 0;
 
-                // Retrieve attachment names and their corresponding streams
-                IList<string> names = extractor.GetAttachNames();
-                MemoryStream[] streams = extractor.GetAttachment();
-
-                // Write each attachment to the output directory
-                for (int i = 0; i < streams.Length; i++)
+                // Save the stream to a file
+                using (FileStream fileStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
                 {
-                    string fileName = names[i];
-                    string outPath = Path.Combine(outputDir, fileName);
-
-                    using (FileStream fs = new FileStream(outPath, FileMode.Create, FileAccess.Write))
-                    {
-                        MemoryStream ms = streams[i];
-                        ms.Position = 0;               // Reset stream position
-                        ms.CopyTo(fs);                 // Write stream content to file
-                    }
+                    attachmentStreams[i].CopyTo(fileStream);
                 }
-            }
 
-            Console.WriteLine("All attachments extracted successfully.");
+                Console.WriteLine($"Extracted: {fileName} → {outputPath}");
+            }
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine("All attachments have been extracted.");
     }
 }

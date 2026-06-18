@@ -1,71 +1,83 @@
 using System;
 using System.IO;
-using System.Text;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // TableAbsorber resides here
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";               // Path to source PDF
-        const string outputFolder = "ExtractedTables";         // Folder for CSV files
+        const string inputPath = "input.pdf";
+        const string outputDir = "TablesCsv";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDir);
 
-        // Load PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        try
         {
-            // Create TableAbsorber to find tables in the document
-            TableAbsorber absorber = new TableAbsorber();
-
-            // Extract tables from the whole document
-            absorber.Visit(pdfDoc);
-
-            // Iterate over each discovered table
-            for (int tableIndex = 0; tableIndex < absorber.TableList.Count; tableIndex++)
+            // Load the PDF document (wrapped in using for deterministic disposal)
+            using (Document doc = new Document(inputPath))
             {
-                var absorbedTable = absorber.TableList[tableIndex];
-                StringBuilder csvBuilder = new StringBuilder();
+                // Create a TableAbsorber to find tables in the whole document
+                TableAbsorber absorber = new TableAbsorber();
 
-                // Process rows
-                foreach (var row in absorbedTable.RowList)
+                // Extract tables from all pages
+                absorber.Visit(doc);
+
+                // Iterate over each detected table
+                for (int i = 0; i < absorber.TableList.Count; i++)
                 {
-                    var cellValues = new List<string>();
+                    var table = absorber.TableList[i];
+                    string csvPath = Path.Combine(outputDir, $"Table_{i + 1}.csv");
 
-                    // Process cells in the current row
-                    foreach (var cell in row.CellList)
+                    // Write the table data to a CSV file
+                    using (StreamWriter writer = new StreamWriter(csvPath))
                     {
-                        StringBuilder cellTextBuilder = new StringBuilder();
-
-                        // Concatenate all text fragments inside the cell
-                        foreach (var fragment in cell.TextFragments)
+                        // Process each row in the table
+                        for (int r = 0; r < table.RowList.Count; r++)
                         {
-                            cellTextBuilder.Append(fragment.Text);
-                        }
+                            var row = table.RowList[r];
+                            string[] cells = new string[row.CellList.Count];
 
-                        // Escape CSV special characters
-                        string cellText = cellTextBuilder.ToString()
-                                                          .Replace("\"", "\"\""); // escape quotes
-                        cellValues.Add($"\"{cellText}\"");
+                            // Process each cell in the row
+                            for (int c = 0; c < row.CellList.Count; c++)
+                            {
+                                var cell = row.CellList[c];
+                                // Concatenate all text fragments within the cell
+                                string cellText = "";
+                                foreach (var fragment in cell.TextFragments)
+                                {
+                                    cellText += fragment.Text;
+                                }
+
+                                // Escape CSV special characters
+                                cellText = cellText.Replace("\"", "\"\"");
+                                if (cellText.Contains(",") || cellText.Contains("\"") || cellText.Contains("\n"))
+                                {
+                                    cellText = $"\"{cellText}\"";
+                                }
+
+                                cells[c] = cellText;
+                            }
+
+                            // Write the CSV line for the current row
+                            writer.WriteLine(string.Join(",", cells));
+                        }
                     }
 
-                    // Join cell values with commas and add a new line
-                    csvBuilder.AppendLine(string.Join(",", cellValues));
+                    Console.WriteLine($"Exported table {i + 1} to {csvPath}");
                 }
-
-                // Write the CSV content to a file named Table_1.csv, Table_2.csv, etc.
-                string csvPath = Path.Combine(outputFolder, $"Table_{tableIndex + 1}.csv");
-                File.WriteAllText(csvPath, csvBuilder.ToString(), Encoding.UTF8);
-                Console.WriteLine($"Extracted table {tableIndex + 1} to '{csvPath}'.");
             }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

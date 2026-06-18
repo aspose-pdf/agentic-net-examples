@@ -9,11 +9,6 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string text       = "Rotated Text";
-        const float  rotation   = 45f;          // degrees
-        const float  margin     = 20f;          // distance from page edges
-        const float  rectWidth  = 200f;         // width of the text rectangle
-        const float  rectHeight = 50f;          // height of the text rectangle
 
         if (!File.Exists(inputPath))
         {
@@ -21,42 +16,42 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (using rule for disposal)
         using (Document doc = new Document(inputPath))
         {
             // Get the last page (1‑based indexing)
-            Page lastPage = doc.Pages[doc.Pages.Count];
+            int lastPageIndex = doc.Pages.Count;
+            Page lastPage = doc.Pages[lastPageIndex];
 
-            // Determine rectangle positioned at the bottom‑right corner
-            // Page dimensions are accessed via PageInfo (double values)
+            // Page dimensions
             double pageWidth  = lastPage.PageInfo.Width;
             double pageHeight = lastPage.PageInfo.Height;
 
-            // Cast to float because Aspose.Pdf.Rectangle constructor expects float arguments
-            float llx = (float)(pageWidth  - margin - rectWidth);
-            float lly = (float)margin;
-            float urx = (float)(pageWidth  - margin);
-            float ury = (float)(margin + rectHeight);
+            // Define a rectangle at the bottom‑right corner with a margin
+            double margin      = 20;
+            double rectWidth   = 200;
+            double rectHeight  = 50;
+            double llx = pageWidth - margin - rectWidth; // lower‑left X
+            double lly = margin;                         // lower‑left Y
+            double urx = pageWidth - margin;             // upper‑right X
+            double ury = margin + rectHeight;            // upper‑right Y
 
-            // Bottom‑right rectangle (left, bottom, right, top)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
-
-            // Create a TextParagraph, set its rectangle, rotation and content
+            // Create a text paragraph, set its rectangle and rotation
             TextParagraph paragraph = new TextParagraph
             {
-                Rectangle = rect,
-                Rotation  = rotation
+                Rectangle = new Aspose.Pdf.Rectangle(llx, lly, urx, ury),
+                Rotation  = 45 // rotate 45 degrees
             };
-            paragraph.AppendLine(text);
+            paragraph.AppendLine("Rotated Text");
 
-            // Use TextBuilder to append the paragraph to the page
+            // Append the paragraph to the page using TextBuilder
             TextBuilder builder = new TextBuilder(lastPage);
             builder.AppendParagraph(paragraph);
 
-            // Save the modified document
+            // Save the modified PDF (using rule for saving)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Rotated text added and saved to '{outputPath}'.");
+        Console.WriteLine($"Rotated text added to the bottom‑right of the last page and saved as '{outputPath}'.");
     }
 }

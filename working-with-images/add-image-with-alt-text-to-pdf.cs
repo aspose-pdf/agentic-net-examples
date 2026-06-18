@@ -6,48 +6,51 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
+        // Paths for the new PDF, the image to add, and the desired alternative text.
         const string outputPdfPath = "output.pdf";
-        const string imagePath     = "newImage.png";
-        const string altText       = "Description of the newly added image for assistive technologies";
+        const string imagePath     = "image.png";
+        const string altText       = "A scenic mountain landscape with a lake in the foreground.";
 
-        // Verify required files exist
-        if (!File.Exists(inputPdfPath))
-        {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
+        // Ensure the image file exists before proceeding.
         if (!File.Exists(imagePath))
         {
             Console.Error.WriteLine($"Image file not found: {imagePath}");
             return;
         }
 
-        // Load the existing PDF
-        using (Document doc = new Document(inputPdfPath))
+        // Create a new PDF document and add a page.
+        using (Document doc = new Document())
         {
-            // Add the image to the first page
-            Page page = doc.Pages[1];
-            Aspose.Pdf.Image img = new Aspose.Pdf.Image
-            {
-                File = imagePath,
-                // Optional: set explicit size (width/height in points)
-                FixWidth  = 200,
-                FixHeight = 150
-            };
-            page.Paragraphs.Add(img);
+            Page page = doc.Pages.Add();
 
-            // Set alternative text for the newly added image
-            foreach (XImage xImg in page.Resources.Images)
+            // Add the image to the page's resources and obtain its resource name.
+            string imageName;
+            using (FileStream imgStream = File.OpenRead(imagePath))
             {
-                // TrySetAlternativeText returns true if the alt text was applied
-                xImg.TrySetAlternativeText(altText, page);
+                imageName = page.Resources.Images.Add(imgStream);
             }
 
-            // Save the modified PDF
+            // Retrieve the XImage object from the resources collection.
+            XImage xImg = page.Resources.Images[imageName];
+
+            // Set alternative text for the XImage on the page.
+            // Returns true if the alt text was successfully applied.
+            bool altSet = xImg.TrySetAlternativeText(altText, page);
+            if (!altSet)
+            {
+                Console.Error.WriteLine("Failed to set alternative text for the image.");
+            }
+
+            // Add a visual representation of the image to the page.
+            // This uses the high‑level Image class which references the resource we just added.
+            Aspose.Pdf.Image pdfImage = new Aspose.Pdf.Image();
+            pdfImage.File = imagePath;
+            page.Paragraphs.Add(pdfImage);
+
+            // Save the resulting PDF.
             doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF saved with image and alt text: {outputPdfPath}");
+        Console.WriteLine($"PDF with image and alt text saved to '{outputPdfPath}'.");
     }
 }

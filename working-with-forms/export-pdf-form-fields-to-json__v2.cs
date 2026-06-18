@@ -1,35 +1,48 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf;                     // Core PDF API
+using Aspose.Pdf.Forms;               // Access to Form class
 
-class Program
+class ExportFormFieldsToJson
 {
     static void Main()
     {
+        // Input PDF containing AcroForm fields
         const string inputPdfPath = "input.pdf";
-        const string outputJsonPath = "form_fields.json";
 
+        // Output JSON file that will hold the form schema
+        const string outputJsonPath = "form_schema.json";
+
+        // Verify that the source PDF exists
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Error: File not found – {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdfPath))
+        try
         {
-            // Set JSON export options (indent output for readability, do not export password values)
-            ExportFieldsToJsonOptions jsonOptions = new ExportFieldsToJsonOptions
+            // Load the PDF document (using the recommended lifecycle rule)
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                WriteIndented = true,
-                ExportPasswordValue = false
-            };
+                // Prepare export options – enable pretty‑printed (indented) JSON
+                ExportFieldsToJsonOptions jsonOptions = new ExportFieldsToJsonOptions
+                {
+                    WriteIndented = true,
+                    ExportPasswordValue = false   // Do not export password field values
+                };
 
-            // Export all form fields to a JSON file
-            pdfDoc.Form.ExportToJson(outputJsonPath, jsonOptions);
+                // Export the entire form definition to a JSON file
+                // The Form.ExportToJson method writes the JSON representation of all fields
+                pdfDoc.Form.ExportToJson(outputJsonPath, jsonOptions);
+
+                Console.WriteLine($"Form fields exported successfully to '{outputJsonPath}'.");
+            }
         }
-
-        Console.WriteLine($"Form field definitions exported to JSON at: {outputJsonPath}");
+        catch (Exception ex)
+        {
+            // Handle any unexpected errors (e.g., corrupted PDF, I/O issues)
+            Console.Error.WriteLine($"Export failed: {ex.Message}");
+        }
     }
 }

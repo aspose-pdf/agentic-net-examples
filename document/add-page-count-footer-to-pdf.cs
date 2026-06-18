@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_with_footer.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,36 +16,41 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a footer that will be applied to every page
-            HeaderFooter footer = new HeaderFooter();
+            int totalPages = doc.Pages.Count;
 
-            // TextFragment with placeholders:
-            // $p – current page number, $P – total page count
-            TextFragment tf = new TextFragment("Page $p of $P");
-            tf.TextState.Font = FontRepository.FindFont("Helvetica");
-            tf.TextState.FontSize = 12;
-            tf.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
-            tf.HorizontalAlignment = HorizontalAlignment.Center;
-
-            // Add the fragment to the footer
-            footer.Paragraphs.Add(tf);
-
-            // Assign the same footer to all pages
-            foreach (Page page in doc.Pages)
+            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+            for (int i = 1; i <= totalPages; i++)
             {
-                page.Footer = footer;
-            }
+                Page page = doc.Pages[i];
 
-            // Update pagination placeholders in all footers
-            doc.Pages.UpdatePagination();
+                // Build the footer text "Page X of Y"
+                string footerText = $"Page {i} of {totalPages}";
+
+                // Create a TextFragment for the footer
+                TextFragment tf = new TextFragment(footerText)
+                {
+                    // Center the text horizontally on the page
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    // Position the text near the bottom of the page (20 points from the bottom edge)
+                    Position = new Position(page.PageInfo.Width / 2, 20)
+                };
+
+                // Define the visual style of the footer text
+                tf.TextState.Font = FontRepository.FindFont("Helvetica");
+                tf.TextState.FontSize = 10;
+                tf.TextState.ForegroundColor = Color.Gray;
+
+                // Add the footer to the page
+                page.Paragraphs.Add(tf);
+            }
 
             // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with footer: '{outputPath}'");
+        Console.WriteLine($"PDF saved with footer: {outputPath}");
     }
 }

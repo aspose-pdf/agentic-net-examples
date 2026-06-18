@@ -7,17 +7,13 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file path
+        // Input PDF and output PNG paths
         const string pdfPath = "input.pdf";
-        // Output PNG file path
         const string pngPath = "region_output.png";
 
-        // Define the region to extract (coordinates are in points; origin is lower‑left)
-        // Example: rectangle from (100, 200) to (300, 400)
-        Aspose.Pdf.Rectangle region = new Aspose.Pdf.Rectangle(100, 200, 300, 400);
-
-        // Page number to extract (1‑based indexing)
-        const int pageNumber = 1;
+        // Define the rectangle region (coordinates in points, 1 point = 1/72 inch)
+        // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
+        Aspose.Pdf.Rectangle region = new Aspose.Pdf.Rectangle(100, 500, 300, 700);
 
         if (!File.Exists(pdfPath))
         {
@@ -25,44 +21,40 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(pdfPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDocument = new Document(pdfPath))
         {
-            // Validate page number
-            if (pageNumber < 1 || pageNumber > doc.Pages.Count)
+            // Ensure the document has at least one page
+            if (pdfDocument.Pages.Count < 1)
             {
-                Console.Error.WriteLine("Invalid page number.");
+                Console.Error.WriteLine("The PDF does not contain any pages.");
                 return;
             }
 
-            // Preserve original CropBox to restore later
-            Page page = doc.Pages[pageNumber];
+            // Get the first page (or any page you need; pages are 1‑based)
+            Page page = pdfDocument.Pages[1];
+
+            // Preserve the original CropBox so we can restore it later
             Aspose.Pdf.Rectangle originalCropBox = page.CropBox;
 
-            try
+            // Set the CropBox to the desired region – this defines the visible area
+            page.CropBox = region;
+
+            // Create a PNG device (default resolution 150 DPI; you can customize if needed)
+            PngDevice pngDevice = new PngDevice();
+
+            // Convert the cropped page to a PNG image in a memory stream
+            using (MemoryStream pngStream = new MemoryStream())
             {
-                // Set the CropBox to the desired region
-                page.CropBox = region;
-
-                // Create a resolution (e.g., 300 DPI)
-                Resolution resolution = new Resolution(300);
-
-                // Initialize the PNG device with the resolution
-                PngDevice pngDevice = new PngDevice(resolution);
-
-                // Render the cropped page to a PNG file
-                using (FileStream pngStream = new FileStream(pngPath, FileMode.Create))
-                {
-                    pngDevice.Process(page, pngStream);
-                }
-
-                Console.WriteLine($"Region saved as PNG: {pngPath}");
+                pngDevice.Process(page, pngStream);
+                // Write the PNG bytes to the output file
+                File.WriteAllBytes(pngPath, pngStream.ToArray());
             }
-            finally
-            {
-                // Restore the original CropBox so the document remains unchanged
-                page.CropBox = originalCropBox;
-            }
+
+            // Restore the original CropBox (optional, in case the document is used later)
+            page.CropBox = originalCropBox;
         }
+
+        Console.WriteLine($"Region PNG saved to '{pngPath}'.");
     }
 }

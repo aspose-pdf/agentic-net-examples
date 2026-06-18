@@ -7,8 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,30 +15,28 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based in Aspose.Pdf
+            // Iterate through all pages (1‑based indexing)
             for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
                 Page page = doc.Pages[pageIndex];
 
-                // Get all form fields on the current page in tab order
-                var fields = page.FieldsInTabOrder;
+                // Retrieve the list of form fields on the current page in tab order
+                var fieldsOnPage = page.FieldsInTabOrder;
 
-                Console.WriteLine($"Page {pageIndex} contains {fields.Count} form field(s).");
+                // If there are no fields, continue to next page
+                if (fieldsOnPage == null || fieldsOnPage.Count == 0)
+                    continue;
 
-                foreach (Field field in fields)
+                // Output information about each field found on this page
+                foreach (Field field in fieldsOnPage)
                 {
-                    // Example: display field name and its concrete type
-                    Console.WriteLine($"  Field Name: {field.FullName}, Type: {field.GetType().Name}");
+                    // FullName provides the hierarchical name of the field
+                    Console.WriteLine($"Page {pageIndex}: Field = {field.FullName}");
                 }
             }
-
-            // Save the (unchanged) document – required lifecycle step
-            doc.Save(outputPath);
         }
-
-        Console.WriteLine($"Processing complete. Output saved to '{outputPath}'.");
     }
 }

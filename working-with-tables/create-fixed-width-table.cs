@@ -7,32 +7,27 @@ class Program
 {
     static void Main()
     {
-        // Create a new PDF document
+        const string outputPath = "table_fixed_width.pdf";
+
+        // Document lifecycle must be wrapped in a using block for proper disposal
         using (Document doc = new Document())
         {
-            // Add a blank page
+            // Add a new page to the document
             Page page = doc.Pages.Add();
 
-            // Create a table with a fixed total width of 500 points
+            // Create a table instance with a fixed total width of 500 points
             Table table = new Table();
-            table.ColumnWidths = "500";          // defines the total table width
-            table.DefaultColumnWidth = "500";    // default width for columns without explicit width
+            table.ColumnWidths = "500"; // single column width defines the whole table width
 
-            // Add a row with a single cell
+            // Add a single row with one cell containing sample text
             Row row = table.Rows.Add();
             Cell cell = row.Cells.Add();
-            cell.Paragraphs.Add(new TextFragment("Fixed width table cell"));
+            cell.Paragraphs.Add(new TextFragment("This table has a fixed width of 500 points."));
 
-            // Position the table on the page (optional)
-            table.Left = 50;   // 50 points from the left edge
-            table.Top = 750;   // 750 points from the bottom edge
-
-            // Add the table to the page
+            // Insert the table into the page's paragraph collection
             page.Paragraphs.Add(table);
 
-            string outputPath = "FixedWidthTable.pdf";
-
-            // Guard Document.Save against missing GDI+ (libgdiplus) on non‑Windows platforms
+            // Guard Document.Save for platforms that may lack libgdiplus (e.g., macOS/Linux)
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 doc.Save(outputPath);
@@ -47,13 +42,13 @@ class Program
                 }
                 catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
                 {
-                    Console.WriteLine("GDI+ (libgdiplus) is not available on this platform. PDF was not saved.");
+                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. PDF was not saved.");
                 }
             }
         }
     }
 
-    // Helper to detect a nested DllNotFoundException (e.g., missing libgdiplus)
+    // Helper to detect a nested DllNotFoundException caused by missing libgdiplus
     private static bool ContainsDllNotFound(Exception? ex)
     {
         while (ex != null)

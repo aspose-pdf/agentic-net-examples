@@ -13,7 +13,7 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
@@ -22,13 +22,11 @@ class Program
             // Load the PDF document
             using (Document doc = new Document(inputPath))
             {
-                // Define allowed permissions.
-                // Excluding PrintDocument and ExtractContent restricts printing and copying.
-                // Here we allow only content modification as an example.
-                Permissions allowedPermissions = Permissions.ModifyContent;
+                // Restrict all permissions (no printing, no copying, etc.)
+                Permissions perms = (Permissions)0;
 
-                // Encrypt with AES‑256 algorithm
-                doc.Encrypt(userPassword, ownerPassword, allowedPermissions, CryptoAlgorithm.AESx256);
+                // Apply AES‑256 encryption with the specified passwords
+                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
                 // Save the encrypted PDF
                 doc.Save(outputPath);
