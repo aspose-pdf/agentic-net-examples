@@ -158,4 +158,4 @@ All examples use [Aspose.PDF for .NET](https://products.aspose.com/pdf/net/) and
 
 ---
 
-*This repository is maintained by automated code generation. For AI-friendly guidance, see [AGENTS.md](./AGENTS.md). Last updated: 2026-06-18*
+*Maintained by an [agentic example generation workflow](https://metrics.aspose.com/agents/product-families/pdf/) | For AI-friendly guidance, see [AGENTS.md](./AGENTS.md) | Last updated: 2026-06-18*
