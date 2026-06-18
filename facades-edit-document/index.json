@@ -1,0 +1,4824 @@
+{
+  "category": "facades-edit-document",
+  "nuget_version": "26.5.0",
+  "last_updated": "2026-06-18T10:27:32Z",
+  "examples": {
+    "add-red-rectangle-annotation-to-pdf-page": {
+      "title": "Add Red Rectangle Annotation to PDF Page",
+      "filename": "add-red-rectangle-annotation-to-pdf-page.cs",
+      "description": "Demonstrates how to add a red rectangle annotation with a 2 mm border thickness to a specific page of a PDF using Aspose.Pdf.Facades.",
+      "tags": [
+        "annotation",
+        "rectangle",
+        "border",
+        "Aspose.Pdf",
+        "PdfContentEditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateSquareCircle",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-highlight-annotation-to-pdf-page": {
+      "title": "Add Highlight Annotation to PDF Page",
+      "filename": "add-highlight-annotation-to-pdf-page.cs",
+      "description": "Shows how to insert a yellow highlight annotation over a specific text range on page three of a PDF using Aspose.Pdf.Facades.",
+      "tags": [
+        "highlight",
+        "annotation",
+        "pdf",
+        "Aspose.Pdf",
+        "PdfContentEditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateMarkup",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-sticky-note-annotation-to-first-page": {
+      "title": "Add Sticky Note Annotation to First PDF Page",
+      "filename": "add-sticky-note-annotation-to-first-page.cs",
+      "description": "Demonstrates how to place a sticky note (text annotation) on the first page of a PDF using Aspose.Pdf's PdfContentEditor.",
+      "tags": [
+        "sticky-note",
+        "annotation",
+        "pdf",
+        "Aspose.Pdf",
+        "PdfContentEditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateText",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-bookmark-to-pdf-page": {
+      "title": "Add Bookmark to PDF Page with Aspose.Pdf",
+      "filename": "add-bookmark-to-pdf-page.cs",
+      "description": "Shows how to create a bookmark titled \"Project Overview\" that navigates to page five of a PDF using Aspose.Pdf.Facades.",
+      "tags": [
+        "bookmark",
+        "pdf",
+        "aspose",
+        "facade",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfBookmarkEditor",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.CreateBookmarkOfPage",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-chapter-section-bookmarks-pdf": {
+      "title": "Add Chapter and Section Bookmarks to PDF",
+      "filename": "add-chapter-section-bookmarks-pdf.cs",
+      "description": "Demonstrates using Aspose.Pdf.Facades.PdfContentEditor to create a parent bookmark for a chapter and child bookmarks for its sections, then saving the updated PDF.",
+      "tags": [
+        "bookmarks",
+        "pdf",
+        "Aspose.Pdf",
+        "PdfContentEditor",
+        "navigation"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateBookmarksAction",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save",
+        "Aspose.Pdf.Facades.PdfContentEditor.Close"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-javascript-click-action-to-pdf-rectangle": {
+      "title": "Add JavaScript Click Action to PDF Rectangle",
+      "filename": "add-javascript-click-action-to-pdf-rectangle.cs",
+      "description": "Demonstrates how to attach a JavaScript action to a rectangular annotation in a PDF using PdfContentEditor, creating a clickable area that shows an alert when clicked.",
+      "tags": [
+        "javascript",
+        "annotation",
+        "pdf",
+        "click-action",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateJavaScriptLink",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-javascript-action-to-pdf-button": {
+      "title": "Add JavaScript Action to PDF Button",
+      "filename": "add-javascript-action-to-pdf-button.cs",
+      "description": "Shows how to bind an existing PDF, attach a JavaScript calculation script to a push‑button field, and save the document using Aspose.Pdf's FormEditor facade.",
+      "tags": [
+        "javascript",
+        "pdf-form",
+        "button-action",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.FormEditor",
+        "FormEditor.BindPdf",
+        "FormEditor.AddFieldScript",
+        "FormEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "extract-first-image-from-pdf-page": {
+      "title": "Extract First Image from PDF Page as PNG",
+      "filename": "extract-first-image-from-pdf-page.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfExtractor to extract the first image on page 2 of a PDF and save it as a PNG file.",
+      "tags": [
+        "pdf",
+        "image",
+        "extraction",
+        "png",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "extract-images-from-pdf": {
+      "title": "Extract Images from PDF using Aspose.Pdf",
+      "filename": "extract-images-from-pdf.cs",
+      "description": "Shows how to extract all images from a PDF document and save them as PNG files using the Aspose.Pdf Facade PdfExtractor.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "aspose",
+        "facade",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "PdfExtractor.BindPdf",
+        "PdfExtractor.ExtractImage",
+        "PdfExtractor.HasNextImage",
+        "PdfExtractor.GetNextImage"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-image-stamp-to-page-three": {
+      "title": "Add Image Stamp to Bottom‑Right of Page 3",
+      "filename": "add-image-stamp-to-page-three.cs",
+      "description": "Demonstrates how to create an image stamp from a PNG file and place it at the bottom‑right corner of the third page of a PDF using Aspose.Pdf.Facades.",
+      "tags": [
+        "image-stamp",
+        "pdf",
+        "Aspose.Pdf",
+        "page3",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Facades.Stamp",
+        "Aspose.Pdf.Facades.Stamp.BindImage",
+        "Aspose.Pdf.Facades.Stamp.SetImageSize",
+        "Aspose.Pdf.Facades.Stamp.SetOrigin",
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.PdfFileStamp.AddStamp"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-confidential-text-stamp-to-pdf": {
+      "title": "Add Confidential Text Stamp with Transparency to PDF",
+      "filename": "add-confidential-text-stamp-to-pdf.cs",
+      "description": "Demonstrates how to create a red \"Confidential\" text stamp with a semi‑transparent background and apply it to all pages of a PDF using Aspose.Pdf.Facades.",
+      "tags": [
+        "text-stamp",
+        "watermark",
+        "transparency",
+        "Aspose.Pdf",
+        "C#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.PdfFileStamp.BindPdf",
+        "Aspose.Pdf.Facades.FormattedText",
+        "Aspose.Pdf.Facades.Stamp",
+        "Aspose.Pdf.Facades.Stamp.BindLogo",
+        "Aspose.Pdf.Facades.Stamp.Opacity",
+        "Aspose.Pdf.Facades.PdfFileStamp.AddStamp",
+        "Aspose.Pdf.Facades.PdfFileStamp.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "reposition-stamp-left-margin": {
+      "title": "Reposition Stamp on PDF Page to Left Margin",
+      "filename": "reposition-stamp-left-margin.cs",
+      "description": "Shows how to move an existing stamp on page 4 of a PDF so that it aligns 10 mm from the left edge using Aspose.Pdf.Facades.PdfContentEditor.",
+      "tags": [
+        "pdf",
+        "stamp",
+        "move",
+        "margin",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.MoveStamp",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "replace-text-in-pdf": {
+      "title": "Replace Text in PDF Using PdfContentEditor",
+      "filename": "replace-text-in-pdf.cs",
+      "description": "Shows how to replace every occurrence of a specific word in a PDF document with another word using Aspose.Pdf's PdfContentEditor.",
+      "tags": [
+        "pdf",
+        "text-replacement",
+        "aspose",
+        "csharp",
+        "pdf-editing"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.ReplaceText",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "replace-text-with-uuid-on-pdf-page": {
+      "title": "Replace Text on Specific PDF Page with UUID",
+      "filename": "replace-text-with-uuid-on-pdf-page.cs",
+      "description": "Shows how to load a PDF, generate a UUID, and replace the exact case‑sensitive text \"InvoiceNumber\" on page 6 using Aspose.Pdf's PdfContentEditor.",
+      "tags": [
+        "pdf",
+        "text-replacement",
+        "uuid",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.ReplaceText",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "set-pdf-viewer-preference-single-page-zoom-100": {
+      "title": "Set PDF Viewer Preference to Single Page Layout with 100% Zoom",
+      "filename": "set-pdf-viewer-preference-single-page-zoom-100.cs",
+      "description": "Demonstrates how to change a PDF's viewer preference to single‑page layout and set the default zoom to 100 % using Aspose.Pdf.Facades.",
+      "tags": [
+        "viewer-preference",
+        "single-page",
+        "zoom",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.ChangeViewerPreference",
+        "ViewerPreference.PageLayoutSinglePage",
+        "PdfContentEditor.Save",
+        "PdfContentEditor.Close",
+        "PdfPageEditor",
+        "PdfPageEditor.Zoom",
+        "PdfPageEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "read-pdf-viewer-preferences-zoom": {
+      "title": "Read PDF Viewer Preferences and Zoom Settings",
+      "filename": "read-pdf-viewer-preferences-zoom.cs",
+      "description": "Shows how to obtain the current page layout, viewer preference flags, and zoom level from a PDF using Aspose.Pdf classes.",
+      "tags": [
+        "viewer-preferences",
+        "page-layout",
+        "zoom",
+        "Aspose.Pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.GetViewerPreference",
+        "Aspose.Pdf.ViewerPreference",
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.Facades.PdfPageEditor.Zoom"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-document-attachment-to-pdf": {
+      "title": "Add Document Attachment to PDF",
+      "filename": "add-document-attachment-to-pdf.cs",
+      "description": "Demonstrates how to attach an external file (Terms.pdf) to an existing PDF document using Aspose.Pdf.Facades.PdfContentEditor and save the result.",
+      "tags": [
+        "pdf",
+        "attachment",
+        "aspose.pdf",
+        "facade",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.AddDocumentAttachment",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "remove-embedded-attachment-from-pdf": {
+      "title": "Remove Embedded Attachment from PDF",
+      "filename": "remove-embedded-attachment-from-pdf.cs",
+      "description": "Shows how to delete a specific embedded file (attachment) from a PDF document using Aspose.Pdf's PdfContentEditor and Document classes.",
+      "tags": [
+        "pdf",
+        "attachment",
+        "remove",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.Save",
+        "Document",
+        "Document.EmbeddedFiles",
+        "EmbeddedFiles.Delete"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "apply-password-protection-disable-printing": {
+      "title": "Apply Password Protection to PDF (Disable Printing)",
+      "filename": "apply-password-protection-disable-printing.cs",
+      "description": "Shows how to encrypt a PDF with a user password and an owner password while disabling all permissions (such as printing) using Aspose.Pdf.",
+      "tags": [
+        "pdf encryption",
+        "password protection",
+        "disable printing",
+        "Aspose.Pdf",
+        "C#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "set-pdf-permissions-allow-copy-restrict-form-edit": {
+      "title": "Set PDF Permissions to Allow Copying but Restrict Form Editing",
+      "filename": "set-pdf-permissions-allow-copy-restrict-form-edit.cs",
+      "description": "Demonstrates how to use Aspose.Pdf.Facades to modify PDF security privileges, enabling text copying while disabling form field filling and annotation changes.",
+      "tags": [
+        "pdf",
+        "permissions",
+        "security",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "PdfFileSecurity",
+        "DocumentPrivilege",
+        "PdfFileSecurity.BindPdf",
+        "PdfFileSecurity.SetPrivilege",
+        "PdfFileSecurity.Save",
+        "PdfFileSecurity.Close"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-xmp-author-and-title-metadata-to-pdf": {
+      "title": "Add XMP Author and Title Metadata to PDF",
+      "filename": "add-xmp-author-and-title-metadata-to-pdf.cs",
+      "description": "Shows how to bind a PDF file, add XMP metadata fields for author and title, and save the updated document using Aspose.Pdf.Facades.",
+      "tags": [
+        "XMP",
+        "metadata",
+        "author",
+        "title",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "PdfXmpMetadata.BindPdf",
+        "PdfXmpMetadata.Add",
+        "PdfXmpMetadata.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-custom-project-metadata-to-pdf": {
+      "title": "Add Custom Project Metadata to PDF using XMP",
+      "filename": "add-custom-project-metadata-to-pdf.cs",
+      "description": "Demonstrates how to bind a PDF, register a custom XMP namespace, add project identifier and version fields, and save the updated document.",
+      "tags": [
+        "xmp",
+        "metadata",
+        "custom-namespace",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.BindPdf",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.RegisterNamespaceURI",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.Add",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "fill-acroform-text-field": {
+      "title": "Fill AcroForm Text Field Using Aspose.Pdf Form Facade",
+      "filename": "fill-acroform-text-field.cs",
+      "description": "Demonstrates how to open a PDF with an AcroForm, fill a text field named \"CustomerName\" with a value, and save the updated document using the Aspose.Pdf.Facades.Form class.",
+      "tags": [
+        "acroform",
+        "fill-field",
+        "pdf",
+        "aspose-pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.Form",
+        "Aspose.Pdf.Facades.Form.FillField",
+        "Aspose.Pdf.Facades.Form.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "set-checkbox-field-in-pdf-form": {
+      "title": "Set Checkbox Field in PDF Form",
+      "filename": "set-checkbox-field-in-pdf-form.cs",
+      "description": "Shows how to programmatically check a checkbox field in a PDF form using Aspose.Pdf.Facades.",
+      "tags": [
+        "pdf",
+        "checkbox",
+        "form",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.Form",
+        "Aspose.Pdf.Facades.Form.FillField",
+        "Aspose.Pdf.Facades.Form.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "select-express-shipping-method-radio-button": {
+      "title": "Select Express Shipping Method Radio Button in PDF",
+      "filename": "select-express-shipping-method-radio-button.cs",
+      "description": "Shows how to programmatically select the \"Express\" option of a radio button field in a PDF's AcroForm and save the updated document using Aspose.Pdf.Facades.",
+      "tags": [
+        "pdf",
+        "acroform",
+        "radio-button",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.Form",
+        "Aspose.Pdf.Facades.Form.FillField",
+        "Aspose.Pdf.Facades.Form.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "convert-pdf-page-to-high-resolution-png": {
+      "title": "Convert PDF Page to High-Resolution PNG (300 DPI)",
+      "filename": "convert-pdf-page-to-high-resolution-png.cs",
+      "description": "Demonstrates extracting page 7 from a PDF and saving it as a 300 DPI PNG image using the Aspose.Pdf Facades API.",
+      "tags": [
+        "pdf",
+        "png",
+        "conversion",
+        "300dpi",
+        "facades"
+      ],
+      "apis_used": [
+        "PdfConverter",
+        "PdfConverter.BindPdf",
+        "PdfConverter.StartPage",
+        "PdfConverter.EndPage",
+        "Resolution",
+        "PdfConverter.DoConvert",
+        "PdfConverter.GetNextImage"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-multi-page-tiff-lzw": {
+      "title": "Convert PDF to Multi‑Page TIFF with LZW Compression",
+      "filename": "convert-pdf-to-multi-page-tiff-lzw.cs",
+      "description": "Demonstrates how to use Aspose.Pdf to convert an entire PDF document into a multi‑page TIFF file while applying LZW compression.",
+      "tags": [
+        "pdf",
+        "tiff",
+        "conversion",
+        "lzw",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "PdfConverter",
+        "PdfConverter.BindPdf",
+        "PdfConverter.DoConvert",
+        "PdfConverter.SaveAsTIFF",
+        "CompressionType.LZW"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "convert-jpeg-to-pdf": {
+      "title": "Convert JPEG Image to PDF",
+      "filename": "convert-jpeg-to-pdf.cs",
+      "description": "Shows how to create a PDF document with a single page, embed a JPEG image using a file stream, and save the result as a PDF with default margins.",
+      "tags": [
+        "jpeg",
+        "pdf",
+        "image",
+        "conversion",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Image",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "print-pdf-two-copies-landscape": {
+      "title": "Print PDF to Default Printer with Two Copies and Landscape Orientation",
+      "filename": "print-pdf-two-copies-landscape.cs",
+      "description": "Shows how to print a PDF file to the default printer using Aspose.Pdf.Facades.PdfViewer, configuring two copies and landscape page settings.",
+      "tags": [
+        "printing",
+        "pdf",
+        "landscape",
+        "copies",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfViewer",
+        "Aspose.Pdf.Facades.PdfViewer.BindPdf",
+        "Aspose.Pdf.Facades.PdfViewer.PrintDocumentWithSettings",
+        "Aspose.Pdf.Printing.PrinterSettings",
+        "Aspose.Pdf.Printing.PageSettings"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "batch-add-red-rectangle-annotation": {
+      "title": "Batch Add Red Rectangle Annotation to PDFs",
+      "filename": "batch-add-red-rectangle-annotation.cs",
+      "description": "Creates sample PDFs and then iterates through all PDFs in the Input folder, adding a red rectangle annotation to each page.",
+      "tags": [
+        "annotation",
+        "rectangle",
+        "batch",
+        "pdf",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Annotations.SquareAnnotation",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "batch-replace-text-in-pdfs": {
+      "title": "Batch Replace Text in PDF Files",
+      "filename": "batch-replace-text-in-pdfs.cs",
+      "description": "Demonstrates how to iterate through a folder of PDF documents and replace every occurrence of the word \"Confidential\" with \"Public\" using Aspose.Pdf's PdfContentEditor.",
+      "tags": [
+        "pdf",
+        "text-replacement",
+        "batch-processing",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.ReplaceText",
+        "PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "batch-extract-images-from-pdfs": {
+      "title": "Batch Extract Images from PDFs to Subfolders",
+      "filename": "batch-extract-images-from-pdfs.cs",
+      "description": "Shows how to process a folder of PDF files, extract all embedded images using Aspose.Pdf.Facades.PdfExtractor, and save each PDF's images into its own subdirectory.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "batch-processing",
+        "aspose-pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "PdfExtractor.BindPdf",
+        "PdfExtractor.ExtractImage",
+        "PdfExtractor.HasNextImage",
+        "PdfExtractor.GetNextImage"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "batch-add-js-alert-to-rectangle-annotations": {
+      "title": "Batch Add JavaScript Alert to Rectangle Annotations",
+      "filename": "batch-add-js-alert-to-rectangle-annotations.cs",
+      "description": "Shows how to process several PDF files, locate rectangle (square) annotations on each page, and attach the same JavaScript alert action using PdfContentEditor.",
+      "tags": [
+        "javascript",
+        "annotation",
+        "batch",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateJavaScriptLink",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.SquareAnnotation",
+        "Aspose.Pdf.Page"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "batch-set-pdf-viewer-preference-full-screen": {
+      "title": "Batch Set PDF Viewer Preference to Full‑Screen Mode",
+      "filename": "batch-set-pdf-viewer-preference-full-screen.cs",
+      "description": "Shows how to iterate over all PDF files in a directory and use Aspose.Pdf.Facades.PdfContentEditor to set each document's viewer preference to full‑screen mode.",
+      "tags": [
+        "pdf",
+        "viewer-preference",
+        "fullscreen",
+        "batch-processing",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.ChangeViewerPreference",
+        "PdfContentEditor.Save",
+        "ViewerPreference"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "batch-add-password-protection-to-pdfs": {
+      "title": "Batch Add Password Protection to PDFs",
+      "filename": "batch-add-password-protection-to-pdfs.cs",
+      "description": "Shows how to iterate over all PDF files in a folder and apply the same user password to each document using Aspose.Pdf's PdfFileSecurity facade.",
+      "tags": [
+        "pdf",
+        "encryption",
+        "batch",
+        "password-protection",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "PdfFileSecurity",
+        "PdfFileSecurity.BindPdf",
+        "PdfFileSecurity.EncryptFile",
+        "PdfFileSecurity.Save",
+        "PdfFileSecurity.Close",
+        "DocumentPrivilege",
+        "KeySize"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "convert-pdf-pages-to-transparent-png-150-dpi": {
+      "title": "Convert PDF Pages to Transparent PNG Images at 150 DPI",
+      "filename": "convert-pdf-pages-to-transparent-png-150-dpi.cs",
+      "description": "Demonstrates how to batch convert each page of a PDF into a PNG image with a transparent background at 150 DPI using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "png",
+        "conversion",
+        "transparent",
+        "resolution"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.Resolution",
+        "Aspose.Pdf.Devices.PngDevice",
+        "Aspose.Pdf.Devices.PngDevice.Process",
+        "Aspose.Pdf.Devices.PngDevice.TransparentBackground"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "batch-reposition-stamps-top-center": {
+      "title": "Batch Reposition Stamps to Top‑Center of PDF Pages",
+      "filename": "batch-reposition-stamps-top-center.cs",
+      "description": "Demonstrates how to iterate through multiple PDF files, locate existing stamps on each page, and move them to a top‑center position using Aspose.Pdf's content editor.",
+      "tags": [
+        "pdf",
+        "stamp",
+        "batch-processing",
+        "reposition",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.GetStamps",
+        "Aspose.Pdf.Facades.PdfContentEditor.MoveStamp",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-hyperlink-annotation-to-pdf-page": {
+      "title": "Add Hyperlink Annotation to PDF Page",
+      "filename": "add-hyperlink-annotation-to-pdf-page.cs",
+      "description": "Shows how to insert a clickable web link annotation on page 2 of an existing PDF using Aspose.Pdf.Facades.",
+      "tags": [
+        "hyperlink",
+        "annotation",
+        "pdf",
+        "Aspose.Pdf",
+        "C#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateWebLink",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-javascript-calculation-to-pdf-form-field": {
+      "title": "Add JavaScript Calculation to PDF Form Field",
+      "filename": "add-javascript-calculation-to-pdf-form-field.cs",
+      "description": "Shows how to embed a JavaScript calculate action in a PDF form using Aspose.Pdf.Facades so that the Total field updates automatically when the Quantity field changes.",
+      "tags": [
+        "javascript",
+        "pdf",
+        "form",
+        "calculation",
+        "facade"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.AddDocumentAdditionalAction",
+        "PdfContentEditor.Save",
+        "PdfContentEditor.DocumentOpen"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "extract-grayscale-images-from-pdf-page": {
+      "title": "Extract Images from a PDF Page and Convert to Grayscale JPEG",
+      "filename": "extract-grayscale-images-from-pdf-page.cs",
+      "description": "Demonstrates using Aspose.Pdf's PdfExtractor to extract all images from page 5 of a PDF and then converting each image to a grayscale JPEG file.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "grayscale",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.StartPage",
+        "Aspose.Pdf.Facades.PdfExtractor.EndPage",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "center-stamp-on-page-8": {
+      "title": "Center a Stamp on Page 8 of a PDF",
+      "filename": "center-stamp-on-page-8.cs",
+      "description": "Shows how to reposition an existing stamp to the horizontal and vertical center of page 8 using Aspose.Pdf.Facades.",
+      "tags": [
+        "stamp",
+        "center",
+        "pdf",
+        "Aspose.Pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.MoveStamp",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "replace-text-in-pdf-annotations": {
+      "title": "Replace Text in PDF Annotations on Specific Pages",
+      "filename": "replace-text-in-pdf-annotations.cs",
+      "description": "Shows how to locate annotation objects on selected PDF pages and replace a given string within their Contents property using Aspose.Pdf's PdfAnnotationEditor facade.",
+      "tags": [
+        "annotations",
+        "pdf",
+        "text-replace",
+        "pages",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "hide-toolbar-and-menu-bar": {
+      "title": "Hide Toolbar and Menu Bar in PDF Viewer",
+      "filename": "hide-toolbar-and-menu-bar.cs",
+      "description": "Shows how to apply viewer preferences to hide the toolbar and menu bar when a PDF is opened, using Aspose.Pdf.Facades.",
+      "tags": [
+        "viewer-preference",
+        "toolbar",
+        "menubar",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.ChangeViewerPreference",
+        "PdfContentEditor.Save",
+        "ViewerPreference"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-pdf-attachment-to-document": {
+      "title": "Add PDF Attachment to Document",
+      "filename": "add-pdf-attachment-to-document.cs",
+      "description": "Shows how to attach an external PDF file (e.g., an invoice) to an existing PDF using Aspose.Pdf.Facades.PdfContentEditor and save the updated document.",
+      "tags": [
+        "pdf",
+        "attachment",
+        "aspose.pdf",
+        "facade",
+        "document"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.AddDocumentAttachment",
+        "PdfContentEditor.Save",
+        "PdfContentEditor.Close"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "remove-attachments-old-pdf": {
+      "title": "Remove Attachments Ending with _old.pdf from PDF",
+      "filename": "remove-attachments-old-pdf.cs",
+      "description": "Shows how to delete embedded file attachments from a PDF whose filenames end with \"_old.pdf\" using Aspose.Pdf facade classes.",
+      "tags": [
+        "attachments",
+        "delete",
+        "pdf",
+        "facade",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfExtractor",
+        "PdfExtractor.BindPdf",
+        "PdfExtractor.ExtractAttachment",
+        "PdfExtractor.GetAttachNames",
+        "Document.EmbeddedFiles.Delete",
+        "PdfContentEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "encrypt-pdf-128-aes-restrict-permissions": {
+      "title": "Encrypt PDF with 128‑bit AES and Restrict Permissions",
+      "filename": "encrypt-pdf-128-aes-restrict-permissions.cs",
+      "description": "Shows how to secure a PDF using 128‑bit AES encryption with Aspose.Pdf.Facades and forbid all editing and printing privileges.",
+      "tags": [
+        "pdf encryption",
+        "aes",
+        "permissions",
+        "aspose.pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileSecurity",
+        "Aspose.Pdf.DocumentPrivilege",
+        "Aspose.Pdf.KeySize",
+        "Aspose.Pdf.Algorithm",
+        "PdfFileSecurity.EncryptFile"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-custom-xmp-metadata-projectid": {
+      "title": "Add Custom XMP Metadata (ProjectID) to PDF",
+      "filename": "add-custom-xmp-metadata-projectid.cs",
+      "description": "Shows how to bind an existing PDF, add a custom XMP metadata field named ProjectID with the value 12345, and save the updated document using Aspose.Pdf.Facades.",
+      "tags": [
+        "xmp",
+        "metadata",
+        "custom-field",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "PdfXmpMetadata.BindPdf",
+        "PdfXmpMetadata.Add",
+        "PdfXmpMetadata.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-image-stamp-to-page-three__v2": {
+      "title": "Add Image Stamp to Page 3 at 50 mm",
+      "filename": "add-image-stamp-to-page-three__v2.cs",
+      "description": "Demonstrates decoding a Base64‑encoded image, creating a stamp with Aspose.Pdf.Facades, positioning it 50 mm from the bottom‑left on page 3, and saving the updated PDF.",
+      "tags": [
+        "image-stamp",
+        "base64",
+        "pdf-facade",
+        "page-3",
+        "position"
+      ],
+      "apis_used": [
+        "PdfFileStamp",
+        "PdfFileStamp.BindPdf",
+        "Stamp",
+        "Stamp.BindImage",
+        "Stamp.SetOrigin",
+        "PdfFileStamp.AddStamp",
+        "PdfFileStamp.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-multiline-text-stamp-to-pdf": {
+      "title": "Add Multiline Text Stamp to PDF",
+      "filename": "add-multiline-text-stamp-to-pdf.cs",
+      "description": "Demonstrates how to create a multiline text stamp with a custom Arial font, size 14, blue color, and apply it to every page of a PDF using Aspose.Pdf.",
+      "tags": [
+        "text-stamp",
+        "multiline",
+        "font",
+        "Aspose.Pdf",
+        "pdf-edit"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextStamp",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Text.FontRepository",
+        "Aspose.Pdf.Text.Color"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "fill-pdf-form-fields-from-json": {
+      "title": "Fill PDF Form Fields from JSON Data",
+      "filename": "fill-pdf-form-fields-from-json.cs",
+      "description": "Shows how to read a JSON file with field name/value pairs and use Aspose.Pdf.Facades.Form to populate and save a PDF form.",
+      "tags": [
+        "pdf",
+        "form-filling",
+        "json",
+        "aspose.pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.Form",
+        "Aspose.Pdf.Facades.Form.FillField",
+        "Aspose.Pdf.Facades.Form.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "convert-pdf-pages-to-png-transparent": {
+      "title": "Convert PDF Pages 2‑4 to PNG Images with Transparent Background",
+      "filename": "convert-pdf-pages-to-png-transparent.cs",
+      "description": "Demonstrates loading a PDF, selecting pages 2‑4, and rendering each page to a 200 DPI PNG image with a transparent background using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "png",
+        "conversion",
+        "transparent",
+        "dpi"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Resolution",
+        "Aspose.Pdf.Devices.PngDevice",
+        "Aspose.Pdf.Devices.PngDevice.Process",
+        "Aspose.Pdf.PageCollection"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "silently-print-pdf-to-network-printer": {
+      "title": "Silently Print PDF to Network Printer",
+      "filename": "silently-print-pdf-to-network-printer.cs",
+      "description": "Shows how to bind a PDF with Aspose.Pdf's PdfViewer and dispatch it to a network printer silently, without displaying the print dialog.",
+      "tags": [
+        "pdf",
+        "printing",
+        "silent",
+        "network-printer",
+        "aspose.pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfViewer",
+        "Aspose.Pdf.Facades.PdfViewer.BindPdf",
+        "Aspose.Pdf.Facades.PdfViewer.PrintDocumentWithSettings",
+        "Aspose.Pdf.Printing.PrinterSettings",
+        "Aspose.Pdf.Facades.PdfViewer.AutoResize",
+        "Aspose.Pdf.Facades.PdfViewer.AutoRotate"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-dashed-rectangle-annotation-to-pdf-page": {
+      "title": "Add Dashed Rectangle Annotation to PDF Page",
+      "filename": "add-dashed-rectangle-annotation-to-pdf-page.cs",
+      "description": "Demonstrates how to place a square (rectangle) annotation with a dashed border and 50% opacity on page 6 of a PDF using Aspose.Pdf.",
+      "tags": [
+        "annotation",
+        "rectangle",
+        "border",
+        "opacity",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.SquareAnnotation",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Annotations.Dash",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-page-open-javascript-log-page-number": {
+      "title": "Add Page‑Open JavaScript to Log Page Number",
+      "filename": "add-page-open-javascript-log-page-number.cs",
+      "description": "Shows how to attach a JavaScript action to each PDF page that writes the current page number to the console when the page is opened, using Aspose.Pdf.",
+      "tags": [
+        "javascript",
+        "page-open",
+        "pdf",
+        "aspose-pdf",
+        "console"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.Actions",
+        "Aspose.Pdf.Page.Actions.OnOpen",
+        "Aspose.Pdf.JavascriptAction"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "extract-images-create-pdf-catalog": {
+      "title": "Extract Images and Create PDF Catalog with Thumbnails",
+      "filename": "extract-images-create-pdf-catalog.cs",
+      "description": "Demonstrates extracting all images from a PDF using PdfExtractor and building a new PDF that displays each image as a thumbnail on separate pages.",
+      "tags": [
+        "image-extraction",
+        "pdf-catalog",
+        "thumbnail",
+        "Aspose.Pdf",
+        "PdfExtractor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Image",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "replace-dates-pdf-regex": {
+      "title": "Replace Dates in PDF Using Regular Expressions",
+      "filename": "replace-dates-pdf-regex.cs",
+      "description": "Demonstrates how to load a PDF, configure a regular‑expression replace strategy, and reformat dates from MM/DD/YYYY to YYYY‑MM‑DD across all pages.",
+      "tags": [
+        "pdf",
+        "regex",
+        "replace-text",
+        "date-format",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.ReplaceTextStrategy",
+        "Aspose.Pdf.Facades.ReplaceTextStrategy.Scope",
+        "Aspose.Pdf.Facades.PdfContentEditor.ReplaceText",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "set-pdf-viewer-preferences-and-zoom": {
+      "title": "Set PDF Viewer Preferences and Default Zoom",
+      "filename": "set-pdf-viewer-preferences-and-zoom.cs",
+      "description": "Shows how to configure a PDF to open with the thumbnails pane visible, fit the window to the page, and set the default zoom to fit width using Aspose.Pdf.",
+      "tags": [
+        "viewer-preferences",
+        "thumbnails",
+        "default-zoom",
+        "Aspose.Pdf",
+        "PdfContentEditor"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.ChangeViewerPreference",
+        "PdfPageEditor",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.Zoom"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "update-pdf-creator-metadata-xmp": {
+      "title": "Update PDF Creator Metadata Using XMP",
+      "filename": "update-pdf-creator-metadata-xmp.cs",
+      "description": "Shows how to read existing XMP metadata from a PDF, change the dc:creator field, and save the updated metadata to a new PDF file.",
+      "tags": [
+        "XMP",
+        "metadata",
+        "creator",
+        "Aspose.Pdf",
+        "PDF editing"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "PdfXmpMetadata.BindPdf",
+        "PdfXmpMetadata.ContainsKey",
+        "PdfXmpMetadata.Remove",
+        "PdfXmpMetadata.Add",
+        "PdfXmpMetadata.Save",
+        "PdfXmpMetadata.Close"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-encrypted-attachment-to-pdf": {
+      "title": "Add Encrypted Attachment to PDF",
+      "filename": "add-encrypted-attachment-to-pdf.cs",
+      "description": "Demonstrates adding a file attachment with a custom description to a PDF and then encrypting the PDF using AES‑256.",
+      "tags": [
+        "attachment",
+        "encryption",
+        "AES",
+        "PdfContentEditor",
+        "Document"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.AddDocumentAttachment",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.CryptoAlgorithm.AESx256",
+        "Aspose.Pdf.Permissions"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "remove-all-bookmarks-from-pdf": {
+      "title": "Remove All Bookmarks from PDF",
+      "filename": "remove-all-bookmarks-from-pdf.cs",
+      "description": "Demonstrates how to load a PDF with Aspose.Pdf.Facades, delete all existing bookmarks, and save the cleaned document.",
+      "tags": [
+        "bookmarks",
+        "pdf",
+        "remove",
+        "Aspose.Pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfBookmarkEditor",
+        "PdfBookmarkEditor.BindPdf",
+        "PdfBookmarkEditor.DeleteBookmarks",
+        "PdfBookmarkEditor.Save",
+        "PdfBookmarkEditor.Close"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "create-nested-pdf-bookmarks": {
+      "title": "Create Nested PDF Bookmarks (Three Levels Deep)",
+      "filename": "create-nested-pdf-bookmarks.cs",
+      "description": "Demonstrates adding a three‑level hierarchy of bookmarks (section, subsection, sub‑subsection) to an existing PDF using Aspose.Pdf.Facades.",
+      "tags": [
+        "bookmarks",
+        "nested",
+        "pdf",
+        "aspose",
+        "facade"
+      ],
+      "apis_used": [
+        "PdfBookmarkEditor",
+        "PdfBookmarkEditor.BindPdf",
+        "PdfBookmarkEditor.CreateBookmarks",
+        "PdfBookmarkEditor.Save",
+        "Bookmark",
+        "Bookmarks"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-underlined-yellow-text-stamp-page-10": {
+      "title": "Add Underlined Yellow Text Stamp to Page 10",
+      "filename": "add-underlined-yellow-text-stamp-page-10.cs",
+      "description": "Demonstrates how to place a centered, underlined text stamp with a yellow background on the 10th page of a PDF using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "text-stamp",
+        "underline",
+        "background-color",
+        "center-alignment"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextStamp",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.HorizontalAlignment",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-rotated-image-stamp-to-pdf": {
+      "title": "Add Rotated Image Stamp to PDF",
+      "filename": "add-rotated-image-stamp-to-pdf.cs",
+      "description": "Demonstrates how to place an image stamp on a PDF page at specific coordinates, apply a 45‑degree rotation and set 80 % opacity using the Aspose.Pdf Facade API.",
+      "tags": [
+        "image-stamp",
+        "rotation",
+        "opacity",
+        "pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.Stamp",
+        "Stamp.BindImage",
+        "Stamp.SetOrigin",
+        "Stamp.Rotation",
+        "Stamp.Opacity",
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "PdfFileStamp.BindPdf",
+        "PdfFileStamp.AddStamp",
+        "PdfFileStamp.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "populate-pdf-form-fields-from-json": {
+      "title": "Populate PDF Form Fields from JSON Configuration",
+      "filename": "populate-pdf-form-fields-from-json.cs",
+      "description": "Demonstrates loading default field values from a JSON file and using Aspose.Pdf.Facades.Form to fill those fields in a PDF form and save the result.",
+      "tags": [
+        "pdf",
+        "form",
+        "json",
+        "fill",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.Form",
+        "Aspose.Pdf.Facades.Form.FillField",
+        "Aspose.Pdf.Facades.Form.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "convert-pdf-pages-to-24bit-bmp": {
+      "title": "Convert PDF Pages to 24‑bit BMP Images",
+      "filename": "convert-pdf-pages-to-24bit-bmp.cs",
+      "description": "Demonstrates loading a PDF with Aspose.Pdf, iterating its pages, and saving each page as a 24‑bit BMP image using BmpDevice at 300 DPI.",
+      "tags": [
+        "pdf",
+        "bmp",
+        "conversion",
+        "aspose.pdf",
+        "image-export"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.Resolution",
+        "Aspose.Pdf.Devices.BmpDevice",
+        "Aspose.Pdf.Devices.BmpDevice.Process",
+        "Aspose.Pdf.Page"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "print-pdf-duplex-collated-copies": {
+      "title": "Print PDF with Duplex and Collated Copies",
+      "filename": "print-pdf-duplex-collated-copies.cs",
+      "description": "Demonstrates how to print a PDF using Aspose.Pdf's PdfViewer facade with duplex (double‑sided) mode enabled and collated multiple copies.",
+      "tags": [
+        "printing",
+        "duplex",
+        "collate",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfViewer",
+        "Aspose.Pdf.Facades.PdfViewer.BindPdf",
+        "Aspose.Pdf.Printing.PrinterSettings",
+        "Aspose.Pdf.Printing.PageSettings",
+        "Aspose.Pdf.Facades.PdfViewer.PrintDocumentWithSettings"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-rectangle-annotation-light-gray": {
+      "title": "Add Rectangle Annotation with Light Gray Fill to PDF",
+      "filename": "add-rectangle-annotation-light-gray.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfContentEditor to add a rectangle (square) annotation with a light gray fill color and a 1 pt border to an existing PDF document.",
+      "tags": [
+        "annotation",
+        "rectangle",
+        "PdfContentEditor",
+        "Aspose.Pdf",
+        "C#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateSquareCircle",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-javascript-validation-button-to-pdf-form": {
+      "title": "Add JavaScript Validation Button to PDF Form",
+      "filename": "add-javascript-validation-button-to-pdf-form.cs",
+      "description": "Demonstrates how to add a push‑button to a PDF form and attach JavaScript that validates required fields, displaying an alert when a field is missing.",
+      "tags": [
+        "pdf",
+        "javascript",
+        "form-validation",
+        "push-button",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "FormEditor",
+        "FormEditor.BindPdf",
+        "FormEditor.AddField",
+        "FormEditor.SetFieldScript",
+        "FormEditor.Save",
+        "FieldType"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-bookmark-external-url-to-pdf": {
+      "title": "Add Bookmark with External URL to PDF",
+      "filename": "add-bookmark-external-url-to-pdf.cs",
+      "description": "Shows how to create a PDF bookmark that opens an external website (https://example.org) using Aspose.Pdf's PdfContentEditor.",
+      "tags": [
+        "bookmark",
+        "uri",
+        "pdf",
+        "Aspose.Pdf",
+        "PdfContentEditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateBookmarksAction",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "hide-ui-and-disable-page-transitions": {
+      "title": "Hide UI Elements and Disable Page Transitions in PDF",
+      "filename": "hide-ui-and-disable-page-transitions.cs",
+      "description": "Demonstrates how to hide scrollbars, toolbars, and menu bars using viewer preferences and remove any page transition effects from a PDF document with Aspose.Pdf.",
+      "tags": [
+        "viewer-preference",
+        "hide-ui",
+        "disable-transitions",
+        "pdf-editing",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.ChangeViewerPreference",
+        "PdfContentEditor.Save",
+        "PdfPageEditor",
+        "PdfPageEditor.TransitionType",
+        "PdfPageEditor.ApplyChanges"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "extract-pdf-viewer-preferences-to-json": {
+      "title": "Extract PDF Viewer Preferences and Save Layout/Zoom to JSON",
+      "filename": "extract-pdf-viewer-preferences-to-json.cs",
+      "description": "Demonstrates how to read a PDF's viewer preferences (page layout) and current zoom level using Aspose.Pdf facades, then store these settings in a JSON configuration file.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "json",
+        "configuration",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.GetViewerPreference",
+        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfPageEditor.Zoom",
+        "Aspose.Pdf.ViewerPreference"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-attachment-update-moddate": {
+      "title": "Add Attachment and Update Modification Date in PDF",
+      "filename": "add-attachment-update-moddate.cs",
+      "description": "Shows how to attach a file to an existing PDF and set the document's modification date to the current UTC timestamp using Aspose.Pdf.",
+      "tags": [
+        "attachment",
+        "moddate",
+        "pdf",
+        "audit",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.AddDocumentAttachment",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save",
+        "Aspose.Pdf.DocumentInfo.ModDate"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "remove-specific-bookmark-from-pdf": {
+      "title": "Remove Specific Bookmark from PDF",
+      "filename": "remove-specific-bookmark-from-pdf.cs",
+      "description": "Shows how to delete a bookmark with a given title from a PDF document using Aspose.Pdf.Facades.PdfBookmarkEditor.",
+      "tags": [
+        "bookmark",
+        "delete",
+        "pdf",
+        "Aspose",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfBookmarkEditor",
+        "PdfBookmarkEditor.BindPdf",
+        "PdfBookmarkEditor.DeleteBookmarks",
+        "PdfBookmarkEditor.Save",
+        "PdfBookmarkEditor.Close"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "encrypt-pdf-certificate-digital-signature": {
+      "title": "Encrypt PDF with Certificate and Require Digital Signature for Opening",
+      "filename": "encrypt-pdf-certificate-digital-signature.cs",
+      "description": "Demonstrates how to encrypt a PDF using a certificate (AES‑256) and then apply a digital signature that must be present to open the document, using Aspose.Pdf.",
+      "tags": [
+        "encryption",
+        "digital-signature",
+        "certificate",
+        "Aspose.Pdf",
+        "PDF-security"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.CryptoAlgorithm",
+        "Aspose.Pdf.Facades.PdfFileSignature",
+        "Aspose.Pdf.Facades.PdfFileSignature.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileSignature.SetCertificate",
+        "Aspose.Pdf.Facades.PdfFileSignature.Sign",
+        "Aspose.Pdf.Facades.PdfFileSignature.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-text-stamp-with-shadow-to-first-page": {
+      "title": "Add Text Stamp with Shadow to First Page",
+      "filename": "add-text-stamp-with-shadow-to-first-page.cs",
+      "description": "Shows how to create a 12‑point text stamp with a gray shadow effect and place it at the top of page one of a PDF using Aspose.Pdf.Facades.",
+      "tags": [
+        "text-stamp",
+        "shadow",
+        "first-page",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "PdfFileStamp",
+        "Stamp",
+        "FormattedText",
+        "EncodingType",
+        "PdfFileStamp.BindPdf",
+        "Stamp.BindLogo",
+        "Stamp.SetOrigin",
+        "PdfFileStamp.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-image-stamp-from-stream": {
+      "title": "Add Image Stamp from Stream to PDF",
+      "filename": "add-image-stamp-from-stream.cs",
+      "description": "Demonstrates binding an image from a FileStream to a Stamp using Aspose.Pdf.Facades, configuring its appearance, applying it to all pages of a PDF, and saving the result without creating an intermediate image file.",
+      "tags": [
+        "image-stamp",
+        "pdf",
+        "stream",
+        "Aspose.Pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.Stamp",
+        "Aspose.Pdf.Facades.Stamp.BindImage",
+        "Aspose.Pdf.Facades.Stamp.SetOrigin",
+        "Aspose.Pdf.Facades.Stamp.SetImageSize",
+        "Aspose.Pdf.Facades.PdfFileStamp.AddStamp",
+        "Aspose.Pdf.Facades.PdfFileStamp.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-jpeg-150-dpi": {
+      "title": "Convert PDF to JPEG Images with 150 DPI",
+      "filename": "convert-pdf-to-jpeg-150-dpi.cs",
+      "description": "Shows how to load a PDF using Aspose.Pdf, set a 150 DPI resolution, and export each page as a JPEG image.",
+      "tags": [
+        "pdf",
+        "jpeg",
+        "conversion",
+        "resolution",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.JpegDevice",
+        "Aspose.Pdf.Devices.Resolution",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Devices.JpegDevice.Process"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "convert-png-to-multi-page-pdf": {
+      "title": "Convert PNG Images to Multi‑Page PDF",
+      "filename": "convert-png-to-multi-page-pdf.cs",
+      "description": "Shows how to create a PDF where each PNG image is placed on its own page and then merge those pages into a single multi‑page PDF using Aspose.Pdf.",
+      "tags": [
+        "png",
+        "pdf",
+        "image-to-pdf",
+        "concatenate",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Image",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "print-pdf-custom-page-ranges": {
+      "title": "Print PDF with Custom Page Ranges Using PdfViewer",
+      "filename": "print-pdf-custom-page-ranges.cs",
+      "description": "Shows how to print specific page ranges (1‑5 and 8‑10) of a PDF by configuring Aspose.Pdf printing settings and invoking PdfViewer.PrintDocumentWithSettings.",
+      "tags": [
+        "printing",
+        "page-range",
+        "pdf",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfViewer",
+        "Aspose.Pdf.Facades.PdfViewer.PrintDocumentWithSettings",
+        "Aspose.Pdf.Printing.PrinterSettings",
+        "Aspose.Pdf.Printing.PageSettings",
+        "Aspose.Pdf.Printing.PaperSizes",
+        "Aspose.Pdf.Devices.Margins"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-file-attachment-annotation-with-opacity": {
+      "title": "Add File Attachment Annotation with Opacity to PDF Page",
+      "filename": "add-file-attachment-annotation-with-opacity.cs",
+      "description": "Demonstrates how to attach a file to a specific PDF page using Aspose.Pdf and set the annotation's opacity to make it semi‑transparent.",
+      "tags": [
+        "pdf",
+        "annotation",
+        "file-attachment",
+        "opacity",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.Annotations.FileAttachmentAnnotation",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "extract-images-from-pdf-by-page-index": {
+      "title": "Extract Images from PDF with Page and Index Naming",
+      "filename": "extract-images-from-pdf-by-page-index.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfExtractor to extract all images from each page of a PDF and save them as PNG files using a naming pattern that includes the page number and image index.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "aspose",
+        "csharp",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "PdfExtractor.BindPdf",
+        "PdfExtractor.ExtractImage",
+        "PdfExtractor.HasNextImage",
+        "PdfExtractor.GetNextImage",
+        "PdfExtractor.Document",
+        "PdfExtractor.Document.Pages.Count"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "replace-text-preserve-font": {
+      "title": "Replace Text While Preserving Font in PDF",
+      "filename": "replace-text-preserve-font.cs",
+      "description": "Demonstrates how to replace specific text in a PDF using Aspose.Pdf.Facades.PdfContentEditor while keeping the original font style, size, and color on the affected pages.",
+      "tags": [
+        "text-replacement",
+        "pdf-editing",
+        "font-preservation",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.ReplaceText",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-document-attachment-data-relationship": {
+      "title": "Add Document Attachment with Data Relationship to PDF",
+      "filename": "add-document-attachment-data-relationship.cs",
+      "description": "Shows how to attach a file to a PDF using PdfContentEditor and set its AFRelationship to Data for better document organization.",
+      "tags": [
+        "attachment",
+        "AFRelationship",
+        "PdfContentEditor",
+        "Aspose.Pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.AddDocumentAttachment",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.AFRelationship"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-xmp-branding-metadata-to-pdf": {
+      "title": "Add XMP Branding Metadata to PDF",
+      "filename": "add-xmp-branding-metadata-to-pdf.cs",
+      "description": "Shows how to embed corporate branding information such as a logo URL and brand color into a PDF's XMP metadata using Aspose.Pdf.",
+      "tags": [
+        "xmp",
+        "metadata",
+        "branding",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.BindPdf",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.RegisterNamespaceURI",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.Add",
+        "Aspose.Pdf.Facades.PdfXmpMetadata.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-right-aligned-multiline-text-stamp-page-4": {
+      "title": "Add Right-Aligned Multiline Text Stamp to Page 4",
+      "filename": "add-right-aligned-multiline-text-stamp-page-4.cs",
+      "description": "Demonstrates how to create a multiline text stamp, align it to the right, and place it at the bottom of a specific page (page 4) using the PdfFileStamp facade.",
+      "tags": [
+        "text-stamp",
+        "right-align",
+        "multiline",
+        "page-specific",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.TextStamp",
+        "Aspose.Pdf.Facades.PdfFileStamp.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileStamp.Save",
+        "Aspose.Pdf.Page.AddStamp"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-image-stamp-to-pdf-page-two": {
+      "title": "Add Image Stamp from URL to Specific PDF Page",
+      "filename": "add-image-stamp-to-pdf-page-two.cs",
+      "description": "Demonstrates downloading an image from an external URL and applying it as a stamp on page two of a PDF using Aspose.Pdf.Facades.",
+      "tags": [
+        "image-stamp",
+        "pdf",
+        "Aspose.Pdf",
+        "external-image",
+        "page-2"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.Stamp",
+        "PdfFileStamp.BindPdf",
+        "Stamp.BindImage",
+        "Stamp.SetOrigin",
+        "Stamp.SetImageSize",
+        "Stamp.Pages",
+        "PdfFileStamp.AddStamp"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-png-thumbnails-300-dpi": {
+      "title": "Convert PDF Pages to PNG Thumbnails with 300 DPI and Transparent Background",
+      "filename": "convert-pdf-to-png-thumbnails-300-dpi.cs",
+      "description": "Shows how to load a PDF using Aspose.Pdf, set a 300‑DPI resolution, enable a transparent background, and render each page as a PNG file.",
+      "tags": [
+        "pdf",
+        "png",
+        "thumbnail",
+        "resolution",
+        "transparent"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Resolution",
+        "Aspose.Pdf.Devices.PngDevice",
+        "Aspose.Pdf.Devices.PngDevice.Process",
+        "Aspose.Pdf.Page"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "combine-jpeg-images-to-pdf": {
+      "title": "Combine Multiple JPEG Images into a Single PDF",
+      "filename": "combine-jpeg-images-to-pdf.cs",
+      "description": "Shows how to merge several JPEG files into one PDF document, placing each image on a separate full‑page using Aspose.Pdf.",
+      "tags": [
+        "jpeg",
+        "pdf",
+        "image-to-pdf",
+        "Aspose.Pdf",
+        "merge"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfFileMend",
+        "Aspose.Pdf.Facades.PdfFileMend.AddImage",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-dashed-rectangle-annotation-opacity": {
+      "title": "Add Dashed Rectangle Annotation with 75% Opacity",
+      "filename": "add-dashed-rectangle-annotation-opacity.cs",
+      "description": "Loads a PDF, creates a red rectangle annotation on the first page with a custom dash pattern and 75% opacity, then saves the updated document.",
+      "tags": [
+        "annotation",
+        "rectangle",
+        "dash",
+        "opacity",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.SquareAnnotation",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Annotations.Dash"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-confirmation-dialog-to-pdf-submit-button": {
+      "title": "Add Confirmation Dialog to PDF Submit Button",
+      "filename": "add-confirmation-dialog-to-pdf-submit-button.cs",
+      "description": "Demonstrates how to attach JavaScript to a push‑button field in a PDF using Aspose.Pdf.Facades so that a confirmation dialog appears before the form is submitted.",
+      "tags": [
+        "pdf",
+        "javascript",
+        "form",
+        "confirmation",
+        "submit"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.FormEditor",
+        "Aspose.Pdf.Facades.FormEditor.BindPdf",
+        "Aspose.Pdf.Facades.FormEditor.SetSubmitUrl",
+        "Aspose.Pdf.Facades.FormEditor.SetFieldScript",
+        "Aspose.Pdf.Facades.FormEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-help-bookmark-with-url": {
+      "title": "Add Help Bookmark with URL to PDF",
+      "filename": "add-help-bookmark-with-url.cs",
+      "description": "Shows how to create a bookmark named \"Help\" that opens an external documentation URL in a PDF using Aspose.Pdf.Facades.",
+      "tags": [
+        "bookmark",
+        "pdf",
+        "url",
+        "Aspose.Pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfBookmarkEditor",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.CreateBookmarks",
+        "Aspose.Pdf.Facades.PdfBookmarkEditor.Save",
+        "Aspose.Pdf.Facades.Bookmark"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "disable-zoom-controls-viewer-preference": {
+      "title": "Disable Zoom Controls via Viewer Preferences",
+      "filename": "disable-zoom-controls-viewer-preference.cs",
+      "description": "Shows how to use PdfContentEditor to set viewer preferences that hide the toolbar and window UI, disabling zoom controls for a fixed PDF display.",
+      "tags": [
+        "viewer-preference",
+        "disable-zoom",
+        "pdf-editing",
+        "Aspose.Pdf",
+        "PdfContentEditor"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.ChangeViewerPreference",
+        "PdfContentEditor.Save",
+        "ViewerPreference"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-document-attachment-with-creation-date": {
+      "title": "Add Document Attachment with Creation Date to PDF",
+      "filename": "add-document-attachment-with-creation-date.cs",
+      "description": "Demonstrates how to attach a PDF file to an existing PDF, assign a description, and set the attachment's creation date to the current system time using Aspose.Pdf Facades.",
+      "tags": [
+        "attachment",
+        "pdf",
+        "facade",
+        "creation-date",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.AddDocumentAttachment",
+        "Aspose.Pdf.Document.EmbeddedFiles",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.FileParams",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-xmp-metadata-field-to-pdf": {
+      "title": "Add XMP Metadata Field to PDF",
+      "filename": "add-xmp-metadata-field-to-pdf.cs",
+      "description": "Shows how to bind a PDF, add a custom XMP metadata entry (Department = Finance), and save the updated file using Aspose.Pdf.Facades.",
+      "tags": [
+        "XMP",
+        "metadata",
+        "Aspose.Pdf",
+        "PDF",
+        "custom-field"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfXmpMetadata",
+        "PdfXmpMetadata.BindPdf",
+        "PdfXmpMetadata.Add",
+        "PdfXmpMetadata.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-red-bold-text-stamp-to-pdf-page-5": {
+      "title": "Add Red Bold Text Stamp to PDF Page 5",
+      "filename": "add-red-bold-text-stamp-to-pdf-page-5.cs",
+      "description": "Demonstrates how to place a centered, bold, red text stamp on the fifth page of a PDF using Aspose.Pdf.",
+      "tags": [
+        "text-stamp",
+        "pdf",
+        "aspose-pdf",
+        "page-5",
+        "red"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextStamp",
+        "Aspose.Pdf.Text.FontRepository.FindFont",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Drawing.HorizontalAlignment",
+        "Aspose.Pdf.Drawing.VerticalAlignment",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-scaled-image-stamp-from-memory-stream": {
+      "title": "Add Scaled Image Stamp from Memory Stream",
+      "filename": "add-scaled-image-stamp-from-memory-stream.cs",
+      "description": "Demonstrates loading an image into a MemoryStream, creating an ImageStamp, scaling it to 50% with the Zoom property, and adding it to a PDF page using Aspose.Pdf.",
+      "tags": [
+        "image-stamp",
+        "memory-stream",
+        "scaling",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.ImageStamp.Zoom",
+        "Aspose.Pdf.ImageStamp.XIndent",
+        "Aspose.Pdf.ImageStamp.YIndent"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "populate-pdf-acroform-from-xml": {
+      "title": "Populate PDF AcroForm Fields from XML using XPath",
+      "filename": "populate-pdf-acroform-from-xml.cs",
+      "description": "Shows how to load an XML document, locate values with XPath, and fill matching AcroForm fields in a PDF using Aspose.Pdf.",
+      "tags": [
+        "AcroForm",
+        "XML",
+        "XPath",
+        "FormFilling",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.Form",
+        "Aspose.Pdf.Facades.Form.FillField",
+        "Aspose.Pdf.Facades.Form.Save",
+        "Aspose.Pdf.Facades.Form.FieldNames"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-green-circle-annotation-to-pdf": {
+      "title": "Add Green Circle Annotation to PDF Page",
+      "filename": "add-green-circle-annotation-to-pdf.cs",
+      "description": "Demonstrates loading a PDF, using PdfContentEditor to place a circle annotation with a green fill and a 3 pt border on page two, and saving the result.",
+      "tags": [
+        "pdf",
+        "annotation",
+        "circle",
+        "green",
+        "border"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateSquareCircle",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-mouse-enter-javascript-to-pdf-annotation": {
+      "title": "Add Mouse-Enter JavaScript to PDF Annotation",
+      "filename": "add-mouse-enter-javascript-to-pdf-annotation.cs",
+      "description": "Loads a PDF, creates an invisible link annotation, and attaches a JavaScript action that changes the page background color when the mouse enters the annotation area.",
+      "tags": [
+        "javascript",
+        "annotation",
+        "background",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.JavascriptAction",
+        "Aspose.Pdf.Annotations.Border"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-file-attachment-to-pdf": {
+      "title": "Add File Attachment to PDF using PdfContentEditor",
+      "filename": "add-file-attachment-to-pdf.cs",
+      "description": "Demonstrates how to attach an external file to an existing PDF document using Aspose.Pdf.Facades.PdfContentEditor without creating a visual annotation, and then save the result.",
+      "tags": [
+        "pdf",
+        "attachment",
+        "aspose",
+        "facade",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.AddDocumentAttachment",
+        "PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "embed-memory-stream-pdf-attachment": {
+      "title": "Embed Memory Stream as PDF Attachment using PdfContentEditor",
+      "filename": "embed-memory-stream-pdf-attachment.cs",
+      "description": "Demonstrates how to embed a file from a memory stream into an existing PDF as a document attachment using Aspose.Pdf's PdfContentEditor.",
+      "tags": [
+        "pdf",
+        "attachment",
+        "memory-stream",
+        "aspose.pdf",
+        "c#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.AddDocumentAttachment",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "attach-multiple-files-to-pdf": {
+      "title": "Attach Multiple Files to a PDF Using PdfContentEditor",
+      "filename": "attach-multiple-files-to-pdf.cs",
+      "description": "Shows how to loop through a collection of files, attach each one to an existing PDF using Aspose.Pdf.Facades, and save the updated document.",
+      "tags": [
+        "pdf",
+        "attachment",
+        "aspose.pdf",
+        "csharp",
+        "facades"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.AddDocumentAttachment",
+        "PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-document-attachment-with-description": {
+      "title": "Add Document Attachment with Description to PDF",
+      "filename": "add-document-attachment-with-description.cs",
+      "description": "Demonstrates how to attach an external PDF file to an existing PDF and set a descriptive label using Aspose.Pdf.Facades.PdfContentEditor.",
+      "tags": [
+        "attachment",
+        "pdf",
+        "metadata",
+        "Aspose.Pdf",
+        "PdfContentEditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.AddDocumentAttachment",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-document-attachment-to-pdf__v2": {
+      "title": "Add Document Attachment to PDF (No Custom MIME Type)",
+      "filename": "add-document-attachment-to-pdf__v2.cs",
+      "description": "Demonstrates attaching a file to an existing PDF using PdfContentEditor and notes that a custom MIME type cannot be set through this facade.",
+      "tags": [
+        "pdf",
+        "attachment",
+        "aspose",
+        "facade",
+        "mime-type"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.AddDocumentAttachment",
+        "PdfContentEditor.Save",
+        "PdfContentEditor.Close"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "remove-all-attachments-from-pdf": {
+      "title": "Remove All Attachments from PDF",
+      "filename": "remove-all-attachments-from-pdf.cs",
+      "description": "Demonstrates how to delete all embedded attachments from a PDF using Aspose.Pdf's PdfContentEditor and save the modified document.",
+      "tags": [
+        "attachments",
+        "pdf",
+        "delete",
+        "Aspose.Pdf",
+        "PdfContentEditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.DeleteAttachments",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-attachment-to-pdf-preserve-existing": {
+      "title": "Add Attachment to PDF Without Removing Existing Attachments",
+      "filename": "add-attachment-to-pdf-preserve-existing.cs",
+      "description": "Demonstrates how to add a new document attachment to an existing PDF using Aspose.Pdf.Facades.PdfContentEditor while keeping any existing attachments intact.",
+      "tags": [
+        "pdf",
+        "attachment",
+        "add",
+        "preserve",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.AddDocumentAttachment",
+        "PdfContentEditor.Save",
+        "PdfContentEditor.Close"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "refresh-pdf-attachments": {
+      "title": "Remove All Attachments and Add New Files to a PDF",
+      "filename": "refresh-pdf-attachments.cs",
+      "description": "Demonstrates how to clear existing attachments from a PDF and then attach a new set of files using Aspose.Pdf's PdfContentEditor facade.",
+      "tags": [
+        "attachments",
+        "pdf",
+        "Aspose.Pdf",
+        "facade",
+        "edit"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.DeleteAttachments",
+        "PdfContentEditor.AddDocumentAttachment",
+        "PdfContentEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "attach-downloaded-file-to-pdf": {
+      "title": "Attach Downloaded File to PDF Using Aspose.Pdf",
+      "filename": "attach-downloaded-file-to-pdf.cs",
+      "description": "Demonstrates how to download a file into a byte array, wrap it in a MemoryStream, and attach it to an existing PDF document using Aspose.Pdf's PdfContentEditor.",
+      "tags": [
+        "pdf",
+        "attachment",
+        "download",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.AddDocumentAttachment",
+        "PdfContentEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-large-attachment-and-monitor-memory": {
+      "title": "Add Large Attachment to PDF and Monitor Memory Usage",
+      "filename": "add-large-attachment-and-monitor-memory.cs",
+      "description": "Demonstrates how to attach a large file (>10 MB) to a PDF using Aspose.Pdf.Facades and verifies that memory consumption stays within a safe threshold.",
+      "tags": [
+        "attachment",
+        "memory",
+        "pdf",
+        "Aspose.Pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.AddDocumentAttachment",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-attachment-and-verify-name": {
+      "title": "Add Attachment to PDF and Verify Its Name",
+      "filename": "add-attachment-and-verify-name.cs",
+      "description": "Demonstrates how to attach a file to a PDF using PdfContentEditor and then retrieve the attachment's file specification name with PdfExtractor for verification.",
+      "tags": [
+        "attachment",
+        "pdf",
+        "verification",
+        "Aspose.Pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.AddDocumentAttachment",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save",
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.GetAttachmentInfo",
+        "Aspose.Pdf.FileSpecification"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "delete-all-pdf-attachments-verify-count": {
+      "title": "Delete All PDF Attachments and Verify Count",
+      "filename": "delete-all-pdf-attachments-verify-count.cs",
+      "description": "Demonstrates how to remove every embedded attachment from a PDF using PdfContentEditor and then confirm that the attachment count is zero by extracting attachment information with PdfExtractor.",
+      "tags": [
+        "pdf",
+        "attachments",
+        "delete",
+        "verification",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.DeleteAttachments",
+        "PdfContentEditor.Save",
+        "PdfExtractor",
+        "PdfExtractor.BindPdf",
+        "PdfExtractor.ExtractAttachment",
+        "PdfExtractor.GetAttachmentInfo"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-document-attachment-and-list-attachments": {
+      "title": "Add Document Attachment and List Attachments in PDF",
+      "filename": "add-document-attachment-and-list-attachments.cs",
+      "description": "Demonstrates how to add a file as a document attachment to a PDF using PdfContentEditor and then retrieve and list all attachment names with PdfExtractor.",
+      "tags": [
+        "attachment",
+        "pdf",
+        "add",
+        "list",
+        "extractor"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.AddDocumentAttachment",
+        "PdfContentEditor.Save",
+        "PdfExtractor",
+        "PdfExtractor.BindPdf",
+        "PdfExtractor.ExtractAttachment",
+        "PdfExtractor.GetAttachNames"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-unicode-attachment-description": {
+      "title": "Add Unicode Attachment Description to PDF and Verify",
+      "filename": "add-unicode-attachment-description.cs",
+      "description": "Demonstrates adding a file attachment with a Unicode description to a PDF using PdfContentEditor and then extracting the attachment information with PdfExtractor to confirm correct encoding.",
+      "tags": [
+        "attachment",
+        "unicode",
+        "metadata",
+        "pdf",
+        "facades"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.AddDocumentAttachment",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save",
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractAttachment",
+        "Aspose.Pdf.Facades.PdfExtractor.GetAttachmentInfo"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-embedded-file-attachment-to-pdf": {
+      "title": "Add Embedded File Attachment to PDF",
+      "filename": "add-embedded-file-attachment-to-pdf.cs",
+      "description": "Shows how to embed a file as a document attachment in an existing PDF using Aspose.Pdf.Facades.",
+      "tags": [
+        "pdf",
+        "attachment",
+        "embedded-file",
+        "aspose",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.AddDocumentAttachment",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-attachment-md5-checksum-metadata": {
+      "title": "Add Attachment with MD5 Checksum Stored in PDF Metadata",
+      "filename": "add-attachment-md5-checksum-metadata.cs",
+      "description": "Shows how to compute an MD5 checksum for a file, attach the file to a PDF, and store the checksum as custom metadata using Aspose.Pdf Facades.",
+      "tags": [
+        "attachment",
+        "metadata",
+        "checksum",
+        "pdf",
+        "facades"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.AddDocumentAttachment",
+        "PdfContentEditor.Save",
+        "PdfFileInfo",
+        "PdfFileInfo.SetMetaInfo",
+        "PdfFileInfo.SaveNewInfo"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "encrypt-pdf-attachment-and-add-to-pdf": {
+      "title": "Encrypt PDF Attachment and Add to PDF",
+      "filename": "encrypt-pdf-attachment-and-add-to-pdf.cs",
+      "description": "Demonstrates encrypting a PDF file with a password using PdfFileSecurity and attaching the encrypted file to another PDF using PdfContentEditor.",
+      "tags": [
+        "encryption",
+        "attachment",
+        "pdf",
+        "Aspose.Pdf",
+        "security"
+      ],
+      "apis_used": [
+        "PdfFileSecurity",
+        "PdfFileSecurity.BindPdf",
+        "PdfFileSecurity.EncryptFile",
+        "PdfFileSecurity.Save",
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.AddDocumentAttachment",
+        "PdfContentEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-and-verify-document-attachment": {
+      "title": "Add and Verify Document Attachment in PDF",
+      "filename": "add-and-verify-document-attachment.cs",
+      "description": "Demonstrates attaching a file to a PDF with PdfContentEditor, extracting it using PdfExtractor, and comparing the extracted content with the original file.",
+      "tags": [
+        "attachment",
+        "pdf",
+        "extraction",
+        "verification",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.AddDocumentAttachment",
+        "PdfContentEditor.Save",
+        "PdfExtractor",
+        "PdfExtractor.ExtractAttachment",
+        "PdfExtractor.GetAttachNames",
+        "PdfExtractor.GetAttachment"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "enable-centerwindow-viewer-preference": {
+      "title": "Enable CenterWindow Viewer Preference for PDF",
+      "filename": "enable-centerwindow-viewer-preference.cs",
+      "description": "Shows how to set the CenterWindow viewer preference so a PDF opens centered using Aspose.Pdf.Facades.PdfContentEditor.",
+      "tags": [
+        "viewer-preference",
+        "center-window",
+        "pdf",
+        "Aspose.Pdf",
+        "PdfContentEditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.ChangeViewerPreference",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save",
+        "Aspose.Pdf.Facades.ViewerPreference"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "hide-menubar-viewer-preference": {
+      "title": "Hide Menubar Viewer Preference in PDF",
+      "filename": "hide-menubar-viewer-preference.cs",
+      "description": "Demonstrates applying the HideMenubar viewer preference to a PDF using Aspose.Pdf.Facades.PdfContentEditor and saving the modified file.",
+      "tags": [
+        "viewer-preference",
+        "hide-menubar",
+        "pdf-edit",
+        "Aspose.Pdf",
+        "PdfContentEditor"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.ChangeViewerPreference",
+        "PdfContentEditor.Save",
+        "ViewerPreference"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "set-pdf-viewer-preference-full-screen": {
+      "title": "Set PDF Viewer Preference to Full‑Screen Mode",
+      "filename": "set-pdf-viewer-preference-full-screen.cs",
+      "description": "Demonstrates how to enable the full‑screen viewer preference for a PDF using Aspose.Pdf.Facades.PdfContentEditor.",
+      "tags": [
+        "full-screen",
+        "viewer-preference",
+        "pdf",
+        "Aspose.Pdf",
+        "PdfContentEditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.ChangeViewerPreference",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save",
+        "Aspose.Pdf.Facades.ViewerPreference"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "set-pdf-viewer-preference-show-outlines": {
+      "title": "Set PDF Viewer Preference to Show Outlines",
+      "filename": "set-pdf-viewer-preference-show-outlines.cs",
+      "description": "Demonstrates how to configure the PDF viewer preference so that the document outline (bookmarks) panel is displayed by default using Aspose.Pdf.Facades.",
+      "tags": [
+        "viewer-preference",
+        "outlines",
+        "pdf",
+        "Aspose.Pdf",
+        "PdfContentEditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.ChangeViewerPreference",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save",
+        "Aspose.Pdf.Facades.ViewerPreference"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "combine-viewer-preferences": {
+      "title": "Combine Viewer Preferences in PDF",
+      "filename": "combine-viewer-preferences.cs",
+      "description": "Demonstrates loading a PDF with PdfContentEditor, applying multiple viewer preferences (CenterWindow and HideToolbar), and saving the updated document.",
+      "tags": [
+        "viewer-preference",
+        "pdf",
+        "aspose-pdf",
+        "pdf-editing",
+        "facade"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.ChangeViewerPreference",
+        "PdfContentEditor.Save",
+        "ViewerPreference"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "retrieve-pdf-viewer-preferences": {
+      "title": "Retrieve PDF Viewer Preferences with PdfContentEditor",
+      "filename": "retrieve-pdf-viewer-preferences.cs",
+      "description": "Demonstrates how to bind a PDF using PdfContentEditor, obtain the viewer preference flags, and print each enabled flag to the console.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "aspose.pdf",
+        "facade",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.GetViewerPreference",
+        "Aspose.Pdf.Facades.ViewerPreference"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "set-hide-menubar-viewer-preference": {
+      "title": "Set Hide Menubar Viewer Preference in PDF",
+      "filename": "set-hide-menubar-viewer-preference.cs",
+      "description": "Shows how to read the current viewer preferences of a PDF, enable the HideMenubar flag while preserving other settings, and save the modified document using Aspose.Pdf.Facades.",
+      "tags": [
+        "viewer-preference",
+        "hide-menubar",
+        "pdf-editing",
+        "aspose-pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.GetViewerPreference",
+        "PdfContentEditor.ChangeViewerPreference",
+        "PdfContentEditor.Save",
+        "ViewerPreference"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "change-pdf-viewer-preference": {
+      "title": "Change PDF Viewer Preference and Save",
+      "filename": "change-pdf-viewer-preference.cs",
+      "description": "Demonstrates how to load a PDF with PdfContentEditor, modify a viewer preference such as hiding the menu bar, and save the result to a new file.",
+      "tags": [
+        "viewer-preference",
+        "pdf-edit",
+        "aspose-pdf",
+        "facade",
+        "csharp"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.ChangeViewerPreference",
+        "PdfContentEditor.Save",
+        "ViewerPreference"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-text-stamp-export-pdf-memory-stream": {
+      "title": "Add Text Stamp and Export PDF to MemoryStream",
+      "filename": "add-text-stamp-export-pdf-memory-stream.cs",
+      "description": "Shows how to use PdfPageEditor to add a text stamp to each page of a PDF and then save the modified document into a MemoryStream for further processing.",
+      "tags": [
+        "pdf",
+        "text-stamp",
+        "memory-stream",
+        "editing",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "Aspose.Pdf.Facades.PdfPageEditor.Save",
+        "Aspose.Pdf.Text.TextStamp",
+        "Aspose.Pdf.Text.FontRepository.FindFont",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Text.TextState"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "hide-pdf-toolbar-viewer-preference": {
+      "title": "Hide PDF Toolbar Using Viewer Preference",
+      "filename": "hide-pdf-toolbar-viewer-preference.cs",
+      "description": "Shows how to set the HideToolbar viewer preference on a PDF with Aspose.Pdf's PdfContentEditor so the toolbar is hidden when the document opens.",
+      "tags": [
+        "viewer-preference",
+        "hide-toolbar",
+        "pdf",
+        "Aspose.Pdf",
+        "PdfContentEditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.ChangeViewerPreference",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "hide-scrollbars-viewer-preference": {
+      "title": "Hide Scrollbars Viewer Preference in PDF",
+      "filename": "hide-scrollbars-viewer-preference.cs",
+      "description": "Demonstrates how to apply the HideWindowUI viewer preference to a PDF using PdfContentEditor, removing scrollbars and other UI elements for a cleaner display on small‑screen devices.",
+      "tags": [
+        "viewer-preference",
+        "hide-scrollbars",
+        "small-screen",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.ChangeViewerPreference",
+        "PdfContentEditor.Save",
+        "PdfContentEditor.Close",
+        "ViewerPreference"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "enable-displaydoctitle-viewer-preference": {
+      "title": "Enable DisplayDocTitle Viewer Preference in PDF",
+      "filename": "enable-displaydoctitle-viewer-preference.cs",
+      "description": "Demonstrates how to set a PDF document title and enable the DisplayDocTitle viewer preference so the title appears in the window caption using Aspose.Pdf and its Facades API.",
+      "tags": [
+        "pdf",
+        "title",
+        "viewer-preference",
+        "aspose.pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.SetTitle",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.ChangeViewerPreference",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "retrieve-pdf-viewer-preferences-save-xml": {
+      "title": "Retrieve PDF Viewer Preferences and Save as XML",
+      "filename": "retrieve-pdf-viewer-preferences-save-xml.cs",
+      "description": "Shows how to load a PDF with PdfContentEditor, obtain its viewer preference flags, and serialize the value to a simple XML configuration file.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "xml",
+        "facade",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.GetViewerPreference"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "apply-viewer-preferences-from-json": {
+      "title": "Apply Viewer Preferences to PDFs from JSON Configuration",
+      "filename": "apply-viewer-preferences-from-json.cs",
+      "description": "The example reads a JSON file that lists PDF paths and viewer preference names, combines the corresponding ViewerPreference flags, and applies them to each PDF using Aspose.Pdf's facade API.",
+      "tags": [
+        "viewer-preference",
+        "json-config",
+        "pdf-editing",
+        "aspose-pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.ChangeViewerPreference",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save",
+        "Aspose.Pdf.ViewerPreference"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "hide-toolbar-menubar-pdf": {
+      "title": "Hide Toolbar and Menubar for Minimal PDF UI",
+      "filename": "hide-toolbar-menubar-pdf.cs",
+      "description": "Demonstrates how to use Aspose.Pdf's PdfContentEditor to hide the toolbar and menubar in the PDF viewer by setting viewer preferences, resulting in a minimalistic UI.",
+      "tags": [
+        "viewer-preference",
+        "toolbar",
+        "menubar",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.ChangeViewerPreference",
+        "PdfContentEditor.Save",
+        "ViewerPreference"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "retrieve-viewer-preferences-after-edit": {
+      "title": "Retrieve Viewer Preferences After Incremental PDF Edits",
+      "filename": "retrieve-viewer-preferences-after-edit.cs",
+      "description": "The example loads a PDF with PdfContentEditor, changes viewer preferences (hide menu bar and set page mode), reads the current viewer preference value after each change, and saves the modified document.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "edit",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.ChangeViewerPreference",
+        "Aspose.Pdf.Facades.PdfContentEditor.GetViewerPreference",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "set-pdf-viewer-preference-single-page": {
+      "title": "Set PDF Viewer Preference to Single‑Page Layout",
+      "filename": "set-pdf-viewer-preference-single-page.cs",
+      "description": "Demonstrates how to use Aspose.Pdf.Facades PdfContentEditor to change a PDF's viewer preference to single‑page layout and save the modified document.",
+      "tags": [
+        "viewer-preference",
+        "single-page",
+        "pdf",
+        "Aspose.Pdf",
+        "PdfContentEditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.ChangeViewerPreference",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save",
+        "Aspose.Pdf.Facades.PdfContentEditor.Close",
+        "Aspose.Pdf.Facades.ViewerPreference"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "configure-continuous-view-mode-pdf": {
+      "title": "Configure Continuous View Mode for PDF",
+      "filename": "configure-continuous-view-mode-pdf.cs",
+      "description": "Shows how to use Aspose.Pdf's PdfContentEditor facade to set the viewer preference to continuous (single‑column) layout and save the modified PDF.",
+      "tags": [
+        "viewer-preference",
+        "continuous-view",
+        "pdf-editing",
+        "Aspose.Pdf",
+        "PdfContentEditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.ChangeViewerPreference",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save",
+        "Aspose.Pdf.Facades.PdfContentEditor.Close",
+        "Aspose.Pdf.ViewerPreference"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "map-pdf-viewer-preferences-to-ui-toggles": {
+      "title": "Map PDF Viewer Preferences to UI Toggles",
+      "filename": "map-pdf-viewer-preferences-to-ui-toggles.cs",
+      "description": "Demonstrates how to read a PDF's viewer preferences using Aspose.Pdf's PdfContentEditor, map them to UI toggle controls, modify the flags, and save the updated document.",
+      "tags": [
+        "viewer-preferences",
+        "pdf",
+        "facade",
+        "ui-toggle",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.GetViewerPreference",
+        "Aspose.Pdf.Facades.PdfContentEditor.ChangeViewerPreference",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "toggle-fullscreen-viewer-preference": {
+      "title": "Toggle Full‑Screen Viewer Preference in PDF",
+      "filename": "toggle-fullscreen-viewer-preference.cs",
+      "description": "Shows how to enable or disable the Full‑Screen viewer preference of a PDF document using Aspose.Pdf.Facades.",
+      "tags": [
+        "pdf",
+        "fullscreen",
+        "viewer-preference",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.GetViewerPreference",
+        "PdfContentEditor.ChangeViewerPreference",
+        "PdfContentEditor.Save",
+        "Aspose.Pdf.Facades.ViewerPreference"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "decrypt-pdf-set-viewer-preferences": {
+      "title": "Decrypt PDF and Apply Viewer Preferences",
+      "filename": "decrypt-pdf-set-viewer-preferences.cs",
+      "description": "Demonstrates how to decrypt an encrypted PDF using PdfFileSecurity and then modify its viewer preferences (e.g., hide toolbar, no page mode) with PdfContentEditor.",
+      "tags": [
+        "decryption",
+        "viewer-preferences",
+        "pdf",
+        "editing",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "PdfFileSecurity",
+        "PdfFileSecurity.DecryptFile",
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.ChangeViewerPreference",
+        "PdfContentEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "extract-pdf-viewer-preferences-to-xml": {
+      "title": "Extract PDF Viewer Preferences and Export to XML",
+      "filename": "extract-pdf-viewer-preferences-to-xml.cs",
+      "description": "Demonstrates how to read viewer preference flags from a PDF using Aspose.Pdf.Facades and serialize the active settings into an XML document for legacy integration.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "xml",
+        "export",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.GetViewerPreference",
+        "ViewerPreference"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "set-pdf-viewer-preference-hide-navigation": {
+      "title": "Set PDF Viewer Preference to Hide Navigation Panels",
+      "filename": "set-pdf-viewer-preference-hide-navigation.cs",
+      "description": "Demonstrates how to use Aspose.Pdf.Facades to set the PageMode viewer preference to UseNone, which hides all navigation panels when the PDF is opened.",
+      "tags": [
+        "viewer-preference",
+        "navigation",
+        "pdf",
+        "Aspose.Pdf",
+        "PdfContentEditor"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.ChangeViewerPreference",
+        "PdfContentEditor.Save",
+        "PdfContentEditor.Close"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-text-annotation-to-pdf-page": {
+      "title": "Add Text Annotation to PDF Page",
+      "filename": "add-text-annotation-to-pdf-page.cs",
+      "description": "Shows how to insert a custom text (sticky‑note) annotation at coordinates (100,200) on the first page of an existing PDF using Aspose.Pdf.Facades.",
+      "tags": [
+        "annotation",
+        "pdf",
+        "Aspose.Pdf",
+        "PdfContentEditor",
+        "sticky-note"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.CreateText",
+        "PdfContentEditor.Save",
+        "PdfContentEditor.Close"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-clickable-web-link-to-pdf": {
+      "title": "Add Clickable Web Link to PDF",
+      "filename": "add-clickable-web-link-to-pdf.cs",
+      "description": "Shows how to insert a link annotation that opens an external website using the PdfContentEditor facade.",
+      "tags": [
+        "web link",
+        "annotation",
+        "pdf edit",
+        "Aspose.Pdf",
+        "PdfContentEditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateWebLink",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-image-stamp-to-specific-pdf-page": {
+      "title": "Add Image Stamp to Specific PDF Page",
+      "filename": "add-image-stamp-to-specific-pdf-page.cs",
+      "description": "Demonstrates how to create an image‑based stamp with Aspose.Pdf.Facades, configure its appearance, and apply it only to the second page of a PDF document.",
+      "tags": [
+        "stamp",
+        "image",
+        "pdf",
+        "Aspose.Pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.Stamp",
+        "Aspose.Pdf.Facades.Stamp.BindImage",
+        "Aspose.Pdf.Facades.Stamp.SetOrigin",
+        "Aspose.Pdf.Facades.Stamp.SetImageSize",
+        "Aspose.Pdf.Facades.PdfFileStamp.AddStamp",
+        "Aspose.Pdf.Facades.PdfFileStamp.Close"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-free-text-annotation-helvetica": {
+      "title": "Add Free‑Text Annotation with Helvetica Font to PDF",
+      "filename": "add-free-text-annotation-helvetica.cs",
+      "description": "Shows how to insert a free‑text annotation using Helvetica, size 12, blue color on a PDF page via the Aspose.Pdf Facade API.",
+      "tags": [
+        "free-text",
+        "annotation",
+        "pdf",
+        "facade",
+        "appearance"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.DefaultAppearance",
+        "Aspose.Pdf.Annotations.FreeTextAnnotation",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-highlight-annotation-to-pdf-page__v2": {
+      "title": "Add Highlight Annotation to PDF Page",
+      "filename": "add-highlight-annotation-to-pdf-page__v2.cs",
+      "description": "Shows how to place a yellow highlight markup annotation over a specified text rectangle on page three of a PDF using Aspose.Pdf.",
+      "tags": [
+        "highlight",
+        "annotation",
+        "pdf",
+        "Aspose.Pdf",
+        "PdfContentEditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateMarkup",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "underline-phrase-on-pdf-page": {
+      "title": "Underline Specific Phrase on PDF Page",
+      "filename": "underline-phrase-on-pdf-page.cs",
+      "description": "Demonstrates how to locate a given phrase on the fourth page of a PDF and add an underline annotation using Aspose.Pdf.",
+      "tags": [
+        "underline",
+        "annotation",
+        "text-search",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextFragmentAbsorber",
+        "Aspose.Pdf.Text.TextSearchOptions",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateMarkup"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-square-annotation-red-border-transparent-fill": {
+      "title": "Add Square Annotation with Red Border and Transparent Fill",
+      "filename": "add-square-annotation-red-border-transparent-fill.cs",
+      "description": "Shows how to place a square annotation with a red border and a semi‑transparent fill on the fifth page of a PDF using Aspose.Pdf.",
+      "tags": [
+        "square-annotation",
+        "red-border",
+        "transparent-fill",
+        "Aspose.Pdf",
+        "facades"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Annotations.SquareAnnotation",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.AnnotationCollection.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-green-circle-annotation-to-pdf-page": {
+      "title": "Add Green Circle Annotation to PDF Page",
+      "filename": "add-green-circle-annotation-to-pdf-page.cs",
+      "description": "Demonstrates how to load a PDF with PdfAnnotationEditor, create a CircleAnnotation with a thick green outline on page six, and save the modified document.",
+      "tags": [
+        "annotation",
+        "circle",
+        "pdf",
+        "Aspose.Pdf",
+        "facades"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.CircleAnnotation",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-line-annotation-with-arrowheads": {
+      "title": "Add Line Annotation with Arrowheads to PDF",
+      "filename": "add-line-annotation-with-arrowheads.cs",
+      "description": "Demonstrates how to create a line annotation with arrowheads on a PDF page using Aspose.Pdf's PdfContentEditor facade.",
+      "tags": [
+        "line-annotation",
+        "arrowheads",
+        "pdf",
+        "Aspose.Pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateLine",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save",
+        "Aspose.Pdf.Facades.PdfContentEditor.Dispose"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-popup-annotation-to-pdf": {
+      "title": "Add Popup Annotation to PDF with Hover Note",
+      "filename": "add-popup-annotation-to-pdf.cs",
+      "description": "Shows how to create a popup annotation that displays a note on hover using Aspose.Pdf's PdfContentEditor facade.",
+      "tags": [
+        "popup",
+        "annotation",
+        "hover",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreatePopup",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-multiple-text-annotations-to-pdf": {
+      "title": "Add Multiple Text Annotations to PDF in Batch",
+      "filename": "add-multiple-text-annotations-to-pdf.cs",
+      "description": "Demonstrates defining a collection of annotation specifications and adding them to a PDF document using Aspose.Pdf's Document and PdfAnnotationEditor classes within a loop.",
+      "tags": [
+        "annotations",
+        "batch",
+        "pdf",
+        "text-annotation",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "set-annotation-opacity": {
+      "title": "Set Annotation Opacity Using PdfAnnotationEditor",
+      "filename": "set-annotation-opacity.cs",
+      "description": "Demonstrates how to use the PdfAnnotationEditor facade to iterate through all annotations in a PDF and set their opacity to 0.5, making them partially transparent.",
+      "tags": [
+        "annotation",
+        "opacity",
+        "pdf",
+        "facade",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "PdfAnnotationEditor",
+        "PdfAnnotationEditor.BindPdf",
+        "PdfAnnotationEditor.Save",
+        "Page",
+        "MarkupAnnotation"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-stamp-annotation-with-opacity": {
+      "title": "Add Stamp Annotation with Opacity to PDF",
+      "filename": "add-stamp-annotation-with-opacity.cs",
+      "description": "Demonstrates how to create a rubber‑stamp annotation on a PDF page using Aspose.Pdf, set its opacity, color, and contents, and then save the updated document.",
+      "tags": [
+        "annotation",
+        "stamp",
+        "opacity",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Annotations.StampAnnotation",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "rotate-text-annotation-90-degrees": {
+      "title": "Rotate Text Annotation by 90 Degrees",
+      "filename": "rotate-text-annotation-90-degrees.cs",
+      "description": "Shows how to create a text stamp as an annotation, rotate it 90 degrees, and add it to a PDF using Aspose.Pdf.Facades.",
+      "tags": [
+        "rotation",
+        "text-annotation",
+        "stamp",
+        "pdf",
+        "facades"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.PdfFileStamp.BindPdf",
+        "Aspose.Pdf.Facades.Stamp",
+        "Aspose.Pdf.Facades.Stamp.BindLogo",
+        "Aspose.Pdf.Facades.Stamp.Rotation",
+        "Aspose.Pdf.Facades.PdfFileStamp.AddStamp",
+        "Aspose.Pdf.Facades.PdfFileStamp.Save",
+        "Aspose.Pdf.Text.FormattedText"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "create-rubber-stamp-with-custom-appearance": {
+      "title": "Create Rubber Stamp Annotation with Custom Appearance Stream",
+      "filename": "create-rubber-stamp-with-custom-appearance.cs",
+      "description": "Demonstrates how to add a rubber‑stamp annotation to a PDF page using a custom appearance PDF as the graphic stream.",
+      "tags": [
+        "rubber-stamp",
+        "custom-appearance",
+        "annotation",
+        "pdf-editing",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateRubberStamp",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-square-annotation-3pt-border": {
+      "title": "Add Square Annotation with 3‑Point Border",
+      "filename": "add-square-annotation-3pt-border.cs",
+      "description": "Demonstrates using Aspose.Pdf.Facades.PdfContentEditor to add a square annotation with a custom 3‑point border thickness to an existing PDF document.",
+      "tags": [
+        "annotation",
+        "border",
+        "pdf",
+        "Aspose.Pdf",
+        "PdfContentEditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateSquareCircle",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "create-dashed-border-rectangle-annotation": {
+      "title": "Create Dashed Border Rectangle Annotation in PDF",
+      "filename": "create-dashed-border-rectangle-annotation.cs",
+      "description": "Shows how to add a square (rectangle) annotation with a customizable dashed border to a PDF document using Aspose.Pdf.",
+      "tags": [
+        "annotation",
+        "border",
+        "dashed",
+        "pdf",
+        "rectangle"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.SquareAnnotation",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Annotations.BorderStyle",
+        "Aspose.Pdf.Annotations.Dash"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-free-text-annotation-light-gray-background": {
+      "title": "Add Free‑Text Annotation with Light Gray Background",
+      "filename": "add-free-text-annotation-light-gray-background.cs",
+      "description": "Demonstrates how to add a free‑text annotation to a PDF page using PdfContentEditor and set its background color to light gray for improved readability on dark pages.",
+      "tags": [
+        "free-text",
+        "annotation",
+        "background",
+        "pdf",
+        "Aspose"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.CreateFreeText",
+        "PdfContentEditor.Save",
+        "Document",
+        "Page",
+        "FreeTextAnnotation",
+        "Color.LightGray"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "rotate-stamp-annotation-90-degrees": {
+      "title": "Rotate Stamp Image on PDF",
+      "filename": "rotate-stamp-annotation-90-degrees.cs",
+      "description": "Shows how to add an image stamp to a PDF page and rotate it 90 degrees clockwise using Aspose.Pdf.Facades.",
+      "tags": [
+        "stamp",
+        "rotation",
+        "pdf",
+        "image",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.Stamp",
+        "Stamp.BindImage",
+        "Stamp.Rotation",
+        "PdfFileStamp.AddStamp",
+        "PdfFileStamp.Close",
+        "Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-file-attachment-link-annotation": {
+      "title": "Add File Attachment Link Annotation to PDF",
+      "filename": "add-file-attachment-link-annotation.cs",
+      "description": "Shows how to insert a file‑attachment annotation that opens an attached PDF when the user clicks the annotation area, using Aspose.Pdf's PdfContentEditor.",
+      "tags": [
+        "file-attachment",
+        "annotation",
+        "pdf",
+        "Aspose.Pdf",
+        "link"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateFileAttachment",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-javascript-alert-annotation-to-pdf": {
+      "title": "Add JavaScript Alert Annotation to PDF",
+      "filename": "add-javascript-alert-annotation-to-pdf.cs",
+      "description": "Demonstrates how to insert a JavaScript link annotation that displays an alert when activated, using Aspose.Pdf's PdfContentEditor.",
+      "tags": [
+        "javascript",
+        "annotation",
+        "pdf",
+        "aspose",
+        "alert"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.CreateJavaScriptLink",
+        "PdfContentEditor.Save",
+        "PdfContentEditor.Close"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-tooltip-annotation-to-pdf": {
+      "title": "Add Tooltip Annotation to PDF",
+      "filename": "add-tooltip-annotation-to-pdf.cs",
+      "description": "Shows how to create a text annotation with a tooltip on an existing PDF using Aspose.Pdf's PdfContentEditor facade.",
+      "tags": [
+        "tooltip",
+        "annotation",
+        "pdf",
+        "Aspose.Pdf",
+        "PdfContentEditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateText",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-dashed-line-annotation-to-pdf": {
+      "title": "Add Dashed Line Annotation to PDF",
+      "filename": "add-dashed-line-annotation-to-pdf.cs",
+      "description": "Shows how to create a line annotation with a custom dash pattern on a PDF page using Aspose.Pdf.Facades.PdfContentEditor.",
+      "tags": [
+        "line-annotation",
+        "dash-pattern",
+        "pdf-editing",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateLine",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-popup-annotation-with-bullet-point-note": {
+      "title": "Add Popup Annotation with Bullet‑Point Note to PDF",
+      "filename": "add-popup-annotation-with-bullet-point-note.cs",
+      "description": "Shows how to bind an existing PDF and create a collapsed popup annotation that contains a multi‑line bullet‑point comment using Aspose.Pdf.Facades.PdfContentEditor.",
+      "tags": [
+        "popup",
+        "annotation",
+        "bullet-points",
+        "Aspose.Pdf",
+        "pdf-editing"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreatePopup",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "apply-45-degree-rotation-to-text-stamp": {
+      "title": "Apply 45° Rotation to a Text Stamp",
+      "filename": "apply-45-degree-rotation-to-text-stamp.cs",
+      "description": "Shows how to create a text stamp, set a 45‑degree rotation, and add it to a PDF document using Aspose.Pdf.Facades.",
+      "tags": [
+        "stamp",
+        "rotation",
+        "watermark",
+        "pdf",
+        "Aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.Stamp",
+        "Aspose.Pdf.Text.FormattedText",
+        "Aspose.Pdf.Text.EncodingType",
+        "Aspose.Pdf.Facades.PdfFileStamp.AddStamp",
+        "Aspose.Pdf.Facades.PdfFileStamp.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-rtl-text-annotation-to-pdf": {
+      "title": "Add Right-to-Left Text Annotation to PDF",
+      "filename": "add-rtl-text-annotation-to-pdf.cs",
+      "description": "Shows how to bind an existing PDF, create a right-to-left Arabic text annotation with PdfContentEditor, and save the modified document.",
+      "tags": [
+        "annotation",
+        "rtl",
+        "unicode",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateText",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-hyperlink-annotation-to-page": {
+      "title": "Add Hyperlink Annotation to Jump to Another Page",
+      "filename": "add-hyperlink-annotation-to-page.cs",
+      "description": "Shows how to insert a local hyperlink annotation that navigates to a specific page within the same PDF using Aspose.Pdf.Facades.PdfContentEditor.",
+      "tags": [
+        "hyperlink",
+        "annotation",
+        "local-link",
+        "pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateLocalLink",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "set-red-border-color-redaction-annotation": {
+      "title": "Set Red Border Color for Redaction Annotation",
+      "filename": "set-red-border-color-redaction-annotation.cs",
+      "description": "Demonstrates how to add a redaction annotation to a PDF page and set its border color to bright red using Aspose.Pdf's Facade API.",
+      "tags": [
+        "redaction",
+        "annotation",
+        "border-color",
+        "Aspose.Pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.RedactionAnnotation",
+        "Aspose.Pdf.Color.FromRgb"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-html-freetext-annotation": {
+      "title": "Add HTML Free‑Text Annotation to PDF",
+      "filename": "add-html-freetext-annotation.cs",
+      "description": "Demonstrates how to create a free‑text annotation with embedded HTML (rich text) using Aspose.Pdf, set its appearance, border, and opacity, and save the modified document via the PdfContentEditor facade.",
+      "tags": [
+        "free-text",
+        "annotation",
+        "html",
+        "rich-text",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Annotations.FreeTextAnnotation",
+        "Aspose.Pdf.DefaultAppearance",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "custom-annotation-appearance-rubber-stamp": {
+      "title": "Create Custom Annotation Appearance Stream with Rubber Stamp",
+      "filename": "custom-annotation-appearance-rubber-stamp.cs",
+      "description": "Shows how to add a rubber‑stamp annotation to a PDF using a custom appearance stream that draws a vector graphic (a filled red rectangle) via PDF drawing operators.",
+      "tags": [
+        "annotation",
+        "appearance-stream",
+        "rubber-stamp",
+        "vector-graphic",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateRubberStamp",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-text-annotation-with-custom-author": {
+      "title": "Add Text Annotation with Custom Author to PDF",
+      "filename": "add-text-annotation-with-custom-author.cs",
+      "description": "Shows how to insert a sticky‑note (text) annotation into a PDF and then set a custom author (title) for the note using Aspose.Pdf.Facades classes.",
+      "tags": [
+        "annotation",
+        "author",
+        "pdf",
+        "Aspose.Pdf",
+        "facades"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateText",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ModifyAnnotationsAuthor"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-utc-timestamped-annotation": {
+      "title": "Add UTC Timestamped Annotation to PDF",
+      "filename": "add-utc-timestamped-annotation.cs",
+      "description": "Demonstrates how to add a text annotation to a PDF page and set its CreationDate property to the current UTC time using Aspose.Pdf.",
+      "tags": [
+        "annotation",
+        "utc",
+        "timestamp",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "assign-subject-to-pdf-text-annotations": {
+      "title": "Assign Subject to PDF Text Annotations",
+      "filename": "assign-subject-to-pdf-text-annotations.cs",
+      "description": "Demonstrates how to set the Subject property for all TextAnnotations in a PDF using Aspose.Pdf's PdfAnnotationEditor facade.",
+      "tags": [
+        "annotations",
+        "subject",
+        "pdf",
+        "facade",
+        "modify"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.TextAnnotation.Subject",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ModifyAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "lock-pdf-annotation-after-creation": {
+      "title": "Lock PDF Annotation After Creation",
+      "filename": "lock-pdf-annotation-after-creation.cs",
+      "description": "Demonstrates adding a rubber‑stamp annotation to a PDF using the Facades API and then locking the annotation with the core API to prevent further user modifications.",
+      "tags": [
+        "annotation",
+        "lock",
+        "rubber-stamp",
+        "pdf",
+        "facades"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateRubberStamp",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Annotation",
+        "Aspose.Pdf.Annotation.Flags",
+        "Aspose.Pdf.AnnotationFlags.Locked"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "hide-annotations-when-fullscreen-enabled": {
+      "title": "Hide Annotations When FullScreen Viewer Preference Is Enabled",
+      "filename": "hide-annotations-when-fullscreen-enabled.cs",
+      "description": "The example checks if the PDF is set to open in FullScreen mode and, if so, marks all annotations as hidden for a cleaner display, then preserves the FullScreen viewer preference in the saved file.",
+      "tags": [
+        "annotations",
+        "fullscreen",
+        "viewer-preference",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.GetViewerPreference",
+        "Aspose.Pdf.Facades.PdfContentEditor.ChangeViewerPreference",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.AnnotationFlags"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "replace-draft-with-final": {
+      "title": "Replace Text in PDF with Aspose.Pdf",
+      "filename": "replace-draft-with-final.cs",
+      "description": "Shows how to load a PDF, replace every occurrence of the word \"Draft\" with \"Final\" using PdfContentEditor, and save the updated document.",
+      "tags": [
+        "pdf",
+        "text-replacement",
+        "aspose",
+        "csharp",
+        "facades"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.ReplaceText",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "replace-text-on-page-preserve-font": {
+      "title": "Replace Text on Specific PDF Page While Preserving Font",
+      "filename": "replace-text-on-page-preserve-font.cs",
+      "description": "Shows how to locate a text fragment on page 2 of a PDF, capture its original TextState, and replace it with new text while keeping the original font style using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "text-replacement",
+        "font-style",
+        "page-specific",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextFragmentAbsorber",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.ReplaceText"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "replace-text-using-regex-across-pdf-pages": {
+      "title": "Replace Text Using Regular Expression Across PDF Pages",
+      "filename": "replace-text-using-regex-across-pdf-pages.cs",
+      "description": "Demonstrates how to replace text matching a regular expression on all pages of a PDF while preserving the original formatting using Aspose.Pdf Facades.",
+      "tags": [
+        "regex",
+        "text-replacement",
+        "pdf",
+        "facades",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.ReplaceTextStrategy",
+        "Aspose.Pdf.Facades.PdfContentEditor.ReplaceText",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "replace-text-on-specific-pdf-page": {
+      "title": "Replace Text on Specific PDF Page",
+      "filename": "replace-text-on-specific-pdf-page.cs",
+      "description": "Shows how to replace a given string only on page 3 of a PDF document using Aspose.Pdf's PdfContentEditor.",
+      "tags": [
+        "pdf",
+        "text-replacement",
+        "page-specific",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.ReplaceText",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "replace-phrase-bold-style": {
+      "title": "Replace Phrase and Apply Bold Style in PDF",
+      "filename": "replace-phrase-bold-style.cs",
+      "description": "Demonstrates how to replace a specific phrase in a PDF document and apply bold formatting to the new text while preserving the original font size using Aspose.Pdf facades.",
+      "tags": [
+        "pdf",
+        "text-replacement",
+        "bold",
+        "Aspose.Pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.ReplaceText",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Text.FontStyles"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "insert-blank-page-add-header-annotation": {
+      "title": "Insert Blank Page and Add Header Annotation",
+      "filename": "insert-blank-page-add-header-annotation.cs",
+      "description": "Demonstrates how to insert a new blank page at a specific position in a PDF and attach a text annotation that serves as a page header.",
+      "tags": [
+        "insert-page",
+        "annotation",
+        "header",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "delete-page-from-pdf": {
+      "title": "Delete a Specific Page from PDF",
+      "filename": "delete-page-from-pdf.cs",
+      "description": "Shows how to remove page 5 from an existing PDF using Aspose.Pdf.Facades.PdfFileEditor and save the updated document.",
+      "tags": [
+        "pdf",
+        "delete-page",
+        "aspose-pdf",
+        "facades",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.Delete"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "move-last-page-to-beginning": {
+      "title": "Move Last Page to Beginning of PDF",
+      "filename": "move-last-page-to-beginning.cs",
+      "description": "Shows how to reorder a PDF by inserting the last page at the start of the document and then deleting the original duplicate using Aspose.Pdf.Facades.",
+      "tags": [
+        "pdf",
+        "reorder",
+        "pages",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.Insert",
+        "Aspose.Pdf.Facades.PdfFileEditor.Delete"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "annotate-and-merge-pdfs": {
+      "title": "Annotate First PDF and Concatenate with Second PDF",
+      "filename": "annotate-and-merge-pdfs.cs",
+      "description": "The example adds a text annotation to the first PDF, saves it, and then merges this annotated document with a second PDF using Aspose.Pdf.",
+      "tags": [
+        "annotation",
+        "merge",
+        "concatenate",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "split-edited-pdf-into-single-page-files": {
+      "title": "Split Edited PDF into Single-Page Files with Annotations",
+      "filename": "split-edited-pdf-into-single-page-files.cs",
+      "description": "Shows how to split a PDF that contains annotations into separate one‑page PDF files using Aspose.Pdf.Facades.PdfFileEditor.SplitToPages.",
+      "tags": [
+        "pdf",
+        "split",
+        "annotations",
+        "aspose.pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.SplitToPages"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-image-stamp-with-caption": {
+      "title": "Add Image Stamp with Caption to PDF",
+      "filename": "add-image-stamp-with-caption.cs",
+      "description": "Demonstrates how to place an image as a stamp annotation at specific coordinates and add a free‑text caption underneath using Aspose.Pdf.Facades.",
+      "tags": [
+        "pdf",
+        "image",
+        "annotation",
+        "caption",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "PdfFileStamp",
+        "PdfFileStamp.BindPdf",
+        "Stamp.BindImage",
+        "Stamp.SetOrigin",
+        "Stamp.SetImageSize",
+        "PdfFileStamp.AddStamp",
+        "PdfContentEditor",
+        "PdfContentEditor.CreateFreeText"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-image-attachment-and-stamp": {
+      "title": "Add Image Attachment and Stamp Annotation to PDF",
+      "filename": "add-image-attachment-and-stamp.cs",
+      "description": "Demonstrates how to embed an image file as a document attachment and then reference the same image in a stamp annotation on a PDF page using Aspose.Pdf.",
+      "tags": [
+        "attachment",
+        "stamp",
+        "image",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.AddDocumentAttachment",
+        "PdfFileStamp",
+        "PdfFileStamp.AddStamp",
+        "Stamp.BindImage"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-configurable-text-watermark-to-pdfs": {
+      "title": "Add Configurable Text Watermark to PDFs in a Folder",
+      "filename": "add-configurable-text-watermark-to-pdfs.cs",
+      "description": "Shows how to load watermark settings from a JSON file and apply a text watermark to every PDF in a specified directory using Aspose.Pdf.Facades.",
+      "tags": [
+        "watermark",
+        "pdf",
+        "Aspose.Pdf",
+        "configuration",
+        "batch"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.PdfFileStamp.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileStamp.AddStamp",
+        "Aspose.Pdf.Facades.PdfFileStamp.Save",
+        "Aspose.Pdf.Facades.FormattedText",
+        "Aspose.Pdf.Facades.Stamp",
+        "Aspose.Pdf.Facades.EncodingType.Winansi"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "batch-add-annotations-from-json": {
+      "title": "Batch Add Annotations to PDF from JSON",
+      "filename": "batch-add-annotations-from-json.cs",
+      "description": "Demonstrates reading a JSON definition file and programmatically adding various annotation types (text, highlight, square, circle, link) to specific pages of a PDF using Aspose.Pdf.",
+      "tags": [
+        "annotations",
+        "pdf",
+        "json",
+        "batch",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.HighlightAnnotation",
+        "Aspose.Pdf.Annotations.SquareAnnotation",
+        "Aspose.Pdf.Annotations.CircleAnnotation"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-attachment-set-viewer-preferences-and-encrypt-pdf": {
+      "title": "Add Attachment, Set Viewer Preferences, and Encrypt PDF",
+      "filename": "add-attachment-set-viewer-preferences-and-encrypt-pdf.cs",
+      "description": "The example adds a file attachment and custom viewer preferences to an existing PDF, then encrypts the result with a user password using 256‑bit AES.",
+      "tags": [
+        "attachment",
+        "encryption",
+        "viewer-preferences",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.AddDocumentAttachment",
+        "PdfContentEditor.ChangeViewerPreference",
+        "PdfFileSecurity",
+        "PdfFileSecurity.EncryptFile"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "decrypt-edit-reencrypt-protected-pdf": {
+      "title": "Decrypt, Edit, and Re‑encrypt a Password‑Protected PDF",
+      "filename": "decrypt-edit-reencrypt-protected-pdf.cs",
+      "description": "Shows how to open an encrypted PDF with the owner password, modify its content (add a text annotation), and then re‑apply encryption with a user password using AES‑256.",
+      "tags": [
+        "pdf",
+        "encryption",
+        "decryption",
+        "annotation",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.TextAnnotation",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-file-attachment-to-encrypted-pdf": {
+      "title": "Add File Attachment to Encrypted PDF",
+      "filename": "add-file-attachment-to-encrypted-pdf.cs",
+      "description": "Shows how to open a password‑protected PDF, attach a file without a visual annotation, and save the updated document.",
+      "tags": [
+        "pdf",
+        "attachment",
+        "encryption",
+        "Aspose.Pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.AddDocumentAttachment",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "batch-add-attachment-to-pdfs": {
+      "title": "Batch Add Attachment to PDF Documents",
+      "filename": "batch-add-attachment-to-pdfs.cs",
+      "description": "Shows how to process multiple PDF files and add the same document attachment to each using Aspose.Pdf.Facades.PdfContentEditor.",
+      "tags": [
+        "pdf",
+        "attachment",
+        "batch",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.AddDocumentAttachment",
+        "PdfContentEditor.Save",
+        "PdfContentEditor.Close"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "apply-viewer-preferences-to-multiple-pdfs": {
+      "title": "Apply Viewer Preferences to Multiple PDFs",
+      "filename": "apply-viewer-preferences-to-multiple-pdfs.cs",
+      "description": "Demonstrates how to batch‑process a list of PDF files and set identical viewer preferences (hide menu bar, toolbar, and page mode) using Aspose.Pdf.Facades.",
+      "tags": [
+        "viewer-preferences",
+        "batch-processing",
+        "pdf",
+        "aspose-pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.ChangeViewerPreference",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save",
+        "Aspose.Pdf.Facades.ViewerPreference"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "parallel-batch-pdf-rotation": {
+      "title": "Parallel Batch PDF Rotation with PdfPageEditor",
+      "filename": "parallel-batch-pdf-rotation.cs",
+      "description": "Shows how to process multiple PDF files concurrently using Parallel.ForEach and Aspose.Pdf.Facades.PdfPageEditor to rotate all pages and save the edited PDFs.",
+      "tags": [
+        "parallel",
+        "pdf",
+        "batch-processing",
+        "rotation",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfPageEditor",
+        "PdfPageEditor.BindPdf",
+        "PdfPageEditor.Rotation",
+        "PdfPageEditor.ApplyChanges",
+        "PdfPageEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "batch-remove-attachments-add-disclaimer": {
+      "title": "Batch Remove Attachments and Add Disclaimer Annotation to PDFs",
+      "filename": "batch-remove-attachments-add-disclaimer.cs",
+      "description": "Shows how to iterate through a folder of PDF files, delete all embedded attachments, and add a standardized free‑text disclaimer annotation to each document using Aspose.Pdf facades.",
+      "tags": [
+        "pdf",
+        "batch-processing",
+        "attachments",
+        "annotation",
+        "disclaimer"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.DeleteAttachments",
+        "PdfAnnotationEditor",
+        "PdfAnnotationEditor.ModifyAnnotations",
+        "TextAnnotation"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "pdf-attachment-annotation-pipeline": {
+      "title": "Configuration‑Driven PDF Attachment and Annotation Pipeline",
+      "filename": "pdf-attachment-annotation-pipeline.cs",
+      "description": "Shows how to read a JSON configuration and use Aspose.Pdf to add document attachments, set viewer preferences, and place file‑attachment annotations on PDF pages in a sequential pipeline.",
+      "tags": [
+        "pdf",
+        "attachments",
+        "annotations",
+        "configuration",
+        "pipeline"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.AddDocumentAttachment",
+        "Aspose.Pdf.Facades.PdfContentEditor.ChangeViewerPreference",
+        "Aspose.Pdf.Facades.PdfContentEditor.AddFileAttachmentAnnotation",
+        "Aspose.Pdf.ViewerPreference"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-attachment-set-viewer-preference": {
+      "title": "Add Attachment and Set Viewer Preference in PDF",
+      "filename": "add-attachment-set-viewer-preference.cs",
+      "description": "Shows how to attach a file to a PDF and configure the viewer to open the attachment panel automatically using Aspose.Pdf.Facades.",
+      "tags": [
+        "attachment",
+        "viewer-preference",
+        "pdf",
+        "command-line",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.AddDocumentAttachment",
+        "Aspose.Pdf.Facades.PdfContentEditor.ChangeViewerPreference",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save",
+        "Aspose.Pdf.Facades.ViewerPreference.PageModeUseAttachment"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "pdf-folder-watcher": {
+      "title": "Folder Watcher that Adds a Stamp to New PDFs",
+      "filename": "pdf-folder-watcher.cs",
+      "description": "Monitors a folder for newly created PDF files, adds a centered red \"Processed\" text stamp to the first page, and saves a processed copy.",
+      "tags": [
+        "folder-watcher",
+        "pdf",
+        "stamp",
+        "automation",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PdfPageStamp",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.HorizontalAlignment",
+        "Aspose.Pdf.VerticalAlignment",
+        "Aspose.Pdf.FontStyles"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-file-attachment-to-pdf-async": {
+      "title": "Add File Attachment to PDF Asynchronously",
+      "filename": "add-file-attachment-to-pdf-async.cs",
+      "description": "Shows how to attach a file to an existing PDF using Aspose.Pdf.Facades on a background thread with async/await, keeping the UI thread responsive.",
+      "tags": [
+        "pdf",
+        "attachment",
+        "async",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.AddDocumentAttachment",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-large-stream-attachment-to-pdf": {
+      "title": "Add Large Stream Attachment to PDF with Low Memory Usage",
+      "filename": "add-large-stream-attachment-to-pdf.cs",
+      "description": "Demonstrates attaching a large file to an existing PDF using a FileStream so Aspose.Pdf reads the data in chunks, minimizing memory consumption.",
+      "tags": [
+        "pdf",
+        "attachment",
+        "stream",
+        "memory",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.AddDocumentAttachment",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-network-attachment-to-pdf-with-retry": {
+      "title": "Add Network Attachment to PDF with Retry Logic",
+      "filename": "add-network-attachment-to-pdf-with-retry.cs",
+      "description": "Shows how to download a file from a URL using retry logic and attach it to an existing PDF using Aspose.Pdf's PdfContentEditor facade.",
+      "tags": [
+        "pdf",
+        "attachment",
+        "retry",
+        "network",
+        "aspose"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.AddDocumentAttachment",
+        "PdfContentEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "validate-pdf-integrity-after-adding-margins": {
+      "title": "Validate PDF Integrity After Adding Margins",
+      "filename": "validate-pdf-integrity-after-adding-margins.cs",
+      "description": "The example computes SHA‑256 hashes of a PDF before and after applying uniform margins using Aspose.Pdf.Facades, then compares the hashes to verify file integrity.",
+      "tags": [
+        "pdf",
+        "checksum",
+        "integrity",
+        "margins",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.AddMargins"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "compare-pdf-file-sizes": {
+      "title": "Compare PDF File Sizes to Verify Edits",
+      "filename": "compare-pdf-file-sizes.cs",
+      "description": "Shows how to load an original and an edited PDF with Aspose.Pdf.Facades.PdfFileInfo and compare their byte sizes to confirm that changes were applied.",
+      "tags": [
+        "pdf",
+        "file-size",
+        "comparison",
+        "aspose",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileInfo"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "export-pdf-annotations-to-json": {
+      "title": "Export PDF Annotations to JSON (XFDF)",
+      "filename": "export-pdf-annotations-to-json.cs",
+      "description": "Shows how to extract all annotations from a PDF using Aspose.Pdf's PdfAnnotationEditor, export them to XFDF format, and wrap the XML inside a JSON file for external analysis.",
+      "tags": [
+        "annotations",
+        "export",
+        "json",
+        "xfdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ExportAnnotationsToXfdf"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "import-annotations-from-json": {
+      "title": "Import Annotations from JSON and Apply to PDF",
+      "filename": "import-annotations-from-json.cs",
+      "description": "The example reads a JSON file that defines various PDF annotations, parses the data, and uses Aspose.Pdf.Facades.PdfContentEditor to add web links, application links, and free‑text annotations to the specified pages of a PDF.",
+      "tags": [
+        "pdf",
+        "annotations",
+        "json",
+        "aspose",
+        "pdfcontenteditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateWebLink",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateApplicationLink",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateFreeText",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save",
+        "Aspose.Pdf.Facades.PdfContentEditor.Close"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "verify-pdf-attachment-after-save": {
+      "title": "Verify PDF Attachment After Save",
+      "filename": "verify-pdf-attachment-after-save.cs",
+      "description": "Shows how to add a document attachment to a PDF with PdfContentEditor, save the file, and confirm the attachment exists using PdfExtractor in a unit test.",
+      "tags": [
+        "pdf",
+        "attachment",
+        "unit-test",
+        "aspose",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.AddDocumentAttachment",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractAttachment",
+        "Aspose.Pdf.Facades.PdfExtractor.GetAttachNames"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "persist-viewer-preferences-after-edit": {
+      "title": "Persist Viewer Preferences After Editing PDF",
+      "filename": "persist-viewer-preferences-after-edit.cs",
+      "description": "Creates a PDF, applies viewer preferences with PdfContentEditor, saves the edited file, reopens it, and verifies that the preferences are retained using a unit test.",
+      "tags": [
+        "viewer-preferences",
+        "pdf-editing",
+        "unit-test",
+        "aspose-pdf",
+        "nunit"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.ChangeViewerPreference",
+        "Aspose.Pdf.Facades.PdfContentEditor.GetViewerPreference",
+        "Aspose.Pdf.Facades.ViewerPreference"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "verify-text-annotation-position": {
+      "title": "Verify Text Annotation Position in PDF",
+      "filename": "verify-text-annotation-position.cs",
+      "description": "Creates a PDF, adds a TextAnnotation with a specific rectangle, saves and reloads the document, then asserts that the annotation's coordinates match the expected values.",
+      "tags": [
+        "pdf",
+        "annotation",
+        "unit-test",
+        "coordinates",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Load"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "edit-pdf-replace-text-add-link-attachment": {
+      "title": "Edit PDF: Replace Text, Add Web Link, Attach File with Logging",
+      "filename": "edit-pdf-replace-text-add-link-attachment.cs",
+      "description": "Demonstrates using Aspose.Pdf.Facades.PdfContentEditor to bind a PDF, replace text, insert a web‑link annotation, attach an external file, save the edited document, and log each operation with timestamps.",
+      "tags": [
+        "pdf-edit",
+        "text-replacement",
+        "web-link",
+        "attachment",
+        "logging"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.ReplaceText",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateWebLink",
+        "Aspose.Pdf.Facades.PdfContentEditor.AddDocumentAttachment",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save",
+        "Aspose.Pdf.Facades.PdfContentEditor.Close"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "add-document-attachment-with-error-handling": {
+      "title": "Add Document Attachment to PDF with Error Handling",
+      "filename": "add-document-attachment-with-error-handling.cs",
+      "description": "Demonstrates how to attach an external file to a PDF using Aspose.Pdf.Facades.PdfContentEditor while checking for missing source or attachment files and handling errors gracefully.",
+      "tags": [
+        "pdf",
+        "attachment",
+        "error-handling",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.AddDocumentAttachment",
+        "PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "replace-text-pdf-content-editor-disposal": {
+      "title": "Replace Text in PDF Using PdfContentEditor with Proper Disposal",
+      "filename": "replace-text-pdf-content-editor-disposal.cs",
+      "description": "Demonstrates how to bind a PDF document to Aspose.Pdf.Facades.PdfContentEditor, replace text, save the result, and ensure the editor is disposed in a finally block to avoid memory leaks.",
+      "tags": [
+        "pdf",
+        "text-replacement",
+        "resource-management",
+        "aspose-pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.ReplaceText",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save",
+        "Aspose.Pdf.Facades.PdfContentEditor.Close"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "replace-text-pdf-using-pdfcontenteditor": {
+      "title": "Replace Text in PDF Using PdfContentEditor with Automatic Disposal",
+      "filename": "replace-text-pdf-using-pdfcontenteditor.cs",
+      "description": "Demonstrates how to load a PDF, replace all occurrences of a specific text string, and save the result while automatically disposing the PdfContentEditor via a using statement.",
+      "tags": [
+        "pdf",
+        "text-replacement",
+        "using-statement",
+        "aspose-pdf",
+        "disposable"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.ReplaceText",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "merge-pdf-edit-operations-order": {
+      "title": "Merge PDFs with Specified Edit Operations Order",
+      "filename": "merge-pdf-edit-operations-order.cs",
+      "description": "Shows how to create sample PDFs, set the edit operations order, and merge them using Aspose.Pdf.",
+      "tags": [
+        "merge",
+        "editoperationsorder",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.MergeOptions",
+        "Aspose.Pdf.EditOperationsOrder"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    },
+    "pdf-editing-wrapper-aspdf-content-editor": {
+      "title": "PDF Editing Wrapper with Aspose PdfContentEditor",
+      "filename": "pdf-editing-wrapper-aspdf-content-editor.cs",
+      "description": "Demonstrates a wrapper class that encapsulates Aspose.Pdf.Facades.PdfContentEditor to perform common PDF editing tasks such as text replacement, adding attachments, and document actions, and shows its usage in a console application.",
+      "tags": [
+        "pdf",
+        "aspose",
+        "wrapper",
+        "text-replacement",
+        "attachment"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.ReplaceText",
+        "Aspose.Pdf.Facades.PdfContentEditor.AddDocumentAttachment",
+        "Aspose.Pdf.Facades.PdfContentEditor.AddDocumentAdditionalAction",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-06-18T10:27:32Z",
+      "status": "verified"
+    }
+  }
+}
