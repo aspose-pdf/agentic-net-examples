@@ -8,8 +8,8 @@ This repository provides working code examples demonstrating Aspose.PDF for .NET
 
 | Metric | Value |
 |--------|-------|
-| Total examples | 2312 |
-| Categories | 31 |
+| Total examples | 2648 |
+| Categories | 34 |
 | Target framework | net10.0 |
 | Aspose.PDF version | 26.5.0 |
 | Last updated | 2026-06-18 |
@@ -20,7 +20,7 @@ This repository is structured for direct use by AI coding agents and LLM-powered
 
 - **[`AGENTS.md`](./AGENTS.md)** — root-level guide covering API surface, anti-patterns, and category tips
 - **Per-category `AGENTS.md`** — targeted guidance inside each category folder
-- **[`index.json`](./index.json)** — machine-readable manifest of all 2312 examples with metadata
+- **[`index.json`](./index.json)** — machine-readable manifest of all 2648 examples with metadata
 - **MCP-compatible** — integrate with any MCP client (Claude Desktop, Cursor, Continue.dev)
 
 ## Categories
@@ -37,6 +37,9 @@ This repository is structured for direct use by AI coding agents and LLM-powered
 | `facades-bookmarks` | 35 | [AGENTS.md](./facades-bookmarks/AGENTS.md) |
 | `facades-convert-documents` | 40 | [AGENTS.md](./facades-convert-documents/AGENTS.md) |
 | `facades-documents` | 101 | [AGENTS.md](./facades-documents/AGENTS.md) |
+| `facades-edit-document` | 215 | [AGENTS.md](./facades-edit-document/AGENTS.md) |
+| `facades-extract-images-and-text` | 85 | [AGENTS.md](./facades-extract-images-and-text/AGENTS.md) |
+| `facades-fill-forms` | 33 | [AGENTS.md](./facades-fill-forms/AGENTS.md) |
 | `facades-forms` | 88 | [AGENTS.md](./facades-forms/AGENTS.md) |
 | `facades-metadata` | 40 | [AGENTS.md](./facades-metadata/AGENTS.md) |
 | `facades-pages` | 117 | [AGENTS.md](./facades-pages/AGENTS.md) |
@@ -53,7 +56,7 @@ This repository is structured for direct use by AI coding agents and LLM-powered
 | `working-with-annotations` | 157 | [AGENTS.md](./working-with-annotations/AGENTS.md) |
 | `working-with-attachments` | 50 | [AGENTS.md](./working-with-attachments/AGENTS.md) |
 | `working-with-forms` | 233 | [AGENTS.md](./working-with-forms/AGENTS.md) |
-| `working-with-graphs` | 73 | [AGENTS.md](./working-with-graphs/AGENTS.md) |
+| `working-with-graphs` | 76 | [AGENTS.md](./working-with-graphs/AGENTS.md) |
 | `working-with-images` | 70 | [AGENTS.md](./working-with-images/AGENTS.md) |
 | `working-with-tables` | 97 | [AGENTS.md](./working-with-tables/AGENTS.md) |
 | `working-with-text` | 75 | [AGENTS.md](./working-with-text/AGENTS.md) |
