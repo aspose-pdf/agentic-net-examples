@@ -1,74 +1,186 @@
 {
-  "schema_version": "1.0",
-  "name": "Aspose.PDF for .NET -- Agentic Examples",
-  "description": "Compile-validated, runtime-tested C# examples for Aspose.PDF for .NET. Every example is a standalone `dotnet new console` file generated and verified by an AI agent before publishing.",
-  "product": {
-    "name": "Aspose.PDF for .NET",
-    "nuget_package": "Aspose.PDF",
-    "nuget_version": "26.5.0",
-    "target_framework": "net10.0"
-  },
-  "stats": {
-    "categories": 34,
-    "examples": 2648,
-    "last_updated": "2026-06-24"
-  },
+  "name": "Aspose.PDF for .NET Examples Agent",
+  "description": "AI agent that generates, compiles, and validates C# code examples for Aspose.PDF for .NET 26.5.0. 2,648 build-verified examples across 34 categories.",
+  "version": "26.5.0",
+  "url": "https://github.com/aspose-pdf/agentic-net-examples",
+  "api_base_url": "http://faisalabad-examples-mcp.dynabic.com:7002",
+  "mcp_endpoint": "http://faisalabad-examples-mcp.dynabic.com:7002/mcp/agent/generate",
+  "openapi_url": "http://faisalabad-examples-mcp.dynabic.com:7002/openapi.json",
+  "docs_url": "http://faisalabad-examples-mcp.dynabic.com:7002/docs",
   "capabilities": [
     "Generate verified C# code examples for Aspose.PDF for .NET",
     "Browse build-validated examples organised by category (text, tables, forms, security, ...)",
     "Look up category-specific anti-patterns and API surface via per-category AGENTS.md",
     "Programmatically enumerate examples via index.json (root + per category)"
   ],
+  "tools": [
+    {
+      "name": "agent_generate",
+      "description": "Generate + validate-revise-retry C# example via /mcp/agent/generate (server-side retry loop, max_attempts up to 3)"
+    },
+    {
+      "name": "agent_run",
+      "description": "Older agent runner via /mcp/agent/run -- kept for compatibility with clients that haven't migrated to agent/generate"
+    },
+    {
+      "name": "generate",
+      "description": "Single-shot generation via /mcp/generate (no server-side retry) -- the bare endpoint"
+    },
+    {
+      "name": "retrieve",
+      "description": "Retrieve relevant Aspose.PDF API knowledge-base chunks via /mcp/retrieve (embedding + keyword hybrid)"
+    }
+  ],
   "categories": [
-    "accessibility-and-tagged-pdfs",
-    "basic-operations",
-    "compare-pdf",
-    "conversion",
-    "document",
-    "facades-acroforms",
-    "facades-annotations",
-    "facades-bookmarks",
-    "facades-convert-documents",
-    "facades-documents",
-    "facades-edit-document",
-    "facades-extract-images-and-text",
-    "facades-fill-forms",
-    "facades-forms",
-    "facades-metadata",
-    "facades-pages",
-    "facades-secure-documents",
-    "facades-sign-documents",
-    "facades-stamps",
-    "facades-texts-and-images",
-    "facades-xmp-metadata",
-    "graphs-zugferd-operators",
-    "pages",
-    "parse-pdf",
-    "securing-and-signing-pdf",
-    "stamping",
-    "working-with-annotations",
-    "working-with-attachments",
-    "working-with-forms",
-    "working-with-graphs",
-    "working-with-images",
-    "working-with-tables",
-    "working-with-text",
-    "working-with-xml"
+    {
+      "name": "Accessibility and tagged PDFs",
+      "examples": 45
+    },
+    {
+      "name": "Basic operations",
+      "examples": 57
+    },
+    {
+      "name": "Compare PDF",
+      "examples": 29
+    },
+    {
+      "name": "Conversion",
+      "examples": 101
+    },
+    {
+      "name": "Document",
+      "examples": 121
+    },
+    {
+      "name": "Facades AcroForms",
+      "examples": 42
+    },
+    {
+      "name": "Facades annotations",
+      "examples": 106
+    },
+    {
+      "name": "Facades bookmarks",
+      "examples": 35
+    },
+    {
+      "name": "Facades convert documents",
+      "examples": 40
+    },
+    {
+      "name": "Facades documents",
+      "examples": 101
+    },
+    {
+      "name": "Facades edit document",
+      "examples": 215
+    },
+    {
+      "name": "Facades extract images and text",
+      "examples": 85
+    },
+    {
+      "name": "Facades fill forms",
+      "examples": 33
+    },
+    {
+      "name": "Facades forms",
+      "examples": 88
+    },
+    {
+      "name": "Facades metadata",
+      "examples": 40
+    },
+    {
+      "name": "Facades pages",
+      "examples": 117
+    },
+    {
+      "name": "Facades secure documents",
+      "examples": 40
+    },
+    {
+      "name": "Facades sign documents",
+      "examples": 31
+    },
+    {
+      "name": "Facades stamps",
+      "examples": 49
+    },
+    {
+      "name": "Facades texts and images",
+      "examples": 28
+    },
+    {
+      "name": "Facades XMP metadata",
+      "examples": 41
+    },
+    {
+      "name": "Graphs ZUGFeRD operators",
+      "examples": 82
+    },
+    {
+      "name": "Pages",
+      "examples": 100
+    },
+    {
+      "name": "Parse PDF",
+      "examples": 64
+    },
+    {
+      "name": "Securing and signing PDF",
+      "examples": 77
+    },
+    {
+      "name": "Stamping",
+      "examples": 50
+    },
+    {
+      "name": "Working with annotations",
+      "examples": 157
+    },
+    {
+      "name": "Working with attachments",
+      "examples": 50
+    },
+    {
+      "name": "Working with forms",
+      "examples": 233
+    },
+    {
+      "name": "Working with graphs",
+      "examples": 76
+    },
+    {
+      "name": "Working with images",
+      "examples": 70
+    },
+    {
+      "name": "Working with tables",
+      "examples": 97
+    },
+    {
+      "name": "Working with text",
+      "examples": 75
+    },
+    {
+      "name": "Working with XML",
+      "examples": 73
+    }
   ],
-  "documentation": [
-    "https://github.com/aspose-pdf/agentic-net-examples",
-    "https://docs.aspose.com/pdf/net/",
-    "https://reference.aspose.com/pdf/net/"
-  ],
-  "manifests": {
-    "llm_txt": "/llm.txt",
-    "index_json": "/index.json",
-    "agents_md": "/AGENTS.md",
-    "readme": "/README.md"
+  "product": {
+    "name": "Aspose.PDF for .NET",
+    "nuget_package": "Aspose.PDF",
+    "nuget_version": "26.5.0",
+    "target_framework": "net10.0"
   },
-  "connection": {
-    "mcp_endpoint": "https://faisalabad-examples-mcp.dynabic.com:7002/mcp/agent/generate",
-    "auth": "Bearer token (contact maintainers for access)",
-    "metrics": ""
+  "links": {
+    "github": "https://github.com/aspose-pdf/agentic-net-examples",
+    "index": "https://github.com/aspose-pdf/agentic-net-examples/blob/main/index.json",
+    "llm_txt": "https://github.com/aspose-pdf/agentic-net-examples/blob/main/llm.txt",
+    "agents_md": "https://github.com/aspose-pdf/agentic-net-examples/blob/main/AGENTS.md",
+    "documentation": "https://docs.aspose.com/pdf/net/",
+    "api_reference": "https://reference.aspose.com/pdf/net/"
   }
 }
