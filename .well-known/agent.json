@@ -1,0 +1,74 @@
+{
+  "schema_version": "1.0",
+  "name": "Aspose.PDF for .NET -- Agentic Examples",
+  "description": "Compile-validated, runtime-tested C# examples for Aspose.PDF for .NET. Every example is a standalone `dotnet new console` file generated and verified by an AI agent before publishing.",
+  "product": {
+    "name": "Aspose.PDF for .NET",
+    "nuget_package": "Aspose.PDF",
+    "nuget_version": "26.5.0",
+    "target_framework": "net10.0"
+  },
+  "stats": {
+    "categories": 34,
+    "examples": 2648,
+    "last_updated": "2026-06-24"
+  },
+  "capabilities": [
+    "Generate verified C# code examples for Aspose.PDF for .NET",
+    "Browse build-validated examples organised by category (text, tables, forms, security, ...)",
+    "Look up category-specific anti-patterns and API surface via per-category AGENTS.md",
+    "Programmatically enumerate examples via index.json (root + per category)"
+  ],
+  "categories": [
+    "accessibility-and-tagged-pdfs",
+    "basic-operations",
+    "compare-pdf",
+    "conversion",
+    "document",
+    "facades-acroforms",
+    "facades-annotations",
+    "facades-bookmarks",
+    "facades-convert-documents",
+    "facades-documents",
+    "facades-edit-document",
+    "facades-extract-images-and-text",
+    "facades-fill-forms",
+    "facades-forms",
+    "facades-metadata",
+    "facades-pages",
+    "facades-secure-documents",
+    "facades-sign-documents",
+    "facades-stamps",
+    "facades-texts-and-images",
+    "facades-xmp-metadata",
+    "graphs-zugferd-operators",
+    "pages",
+    "parse-pdf",
+    "securing-and-signing-pdf",
+    "stamping",
+    "working-with-annotations",
+    "working-with-attachments",
+    "working-with-forms",
+    "working-with-graphs",
+    "working-with-images",
+    "working-with-tables",
+    "working-with-text",
+    "working-with-xml"
+  ],
+  "documentation": [
+    "https://github.com/aspose-pdf/agentic-net-examples",
+    "https://docs.aspose.com/pdf/net/",
+    "https://reference.aspose.com/pdf/net/"
+  ],
+  "manifests": {
+    "llm_txt": "/llm.txt",
+    "index_json": "/index.json",
+    "agents_md": "/AGENTS.md",
+    "readme": "/README.md"
+  },
+  "connection": {
+    "mcp_endpoint": "https://faisalabad-examples-mcp.dynabic.com:7002/mcp/agent/generate",
+    "auth": "Bearer token (contact maintainers for access)",
+    "metrics": ""
+  }
+}

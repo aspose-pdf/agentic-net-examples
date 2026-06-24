@@ -1,0 +1,252 @@
+# Working with forms
+
+> **Working with forms** in PDF using C# / .NET -- **233** verified, compile-tested examples for **Aspose.PDF for .NET** 26.5.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+
+- Category: `working-with-forms`
+- Examples: 233
+- NuGet: `Aspose.PDF 26.5.0` -- target `net10.0`
+
+## Examples
+
+- [`add-blank-page-to-pdf-form.cs`](./add-blank-page-to-pdf-form.cs) -- Add blank page to pdf form
+- [`add-calculated-total-field-to-pdf-form.cs`](./add-calculated-total-field-to-pdf-form.cs) -- Add calculated total field to pdf form
+- [`add-calculated-total-field-using-javascript.cs`](./add-calculated-total-field-using-javascript.cs) -- Add calculated total field using javascript
+- [`add-checkbox-field-to-pdf-form.cs`](./add-checkbox-field-to-pdf-form.cs) -- Add checkbox field to pdf form
+- [`add-country-dropdown-to-pdf.cs`](./add-country-dropdown-to-pdf.cs) -- Add country dropdown to pdf
+- [`add-current-date-field-to-pdf.cs`](./add-current-date-field-to-pdf.cs) -- Add current date field to pdf
+- [`add-date-field-with-validation.cs`](./add-date-field-with-validation.cs) -- Add date field with validation
+- [`add-date-picker-field-default-current-date.cs`](./add-date-picker-field-default-current-date.cs) -- Add date picker field default current date
+- [`add-date-picker-field-to-pdf.cs`](./add-date-picker-field-to-pdf.cs) -- Add date picker field to pdf
+- [`add-dynamic-date-time-field-to-pdf.cs`](./add-dynamic-date-time-field-to-pdf.cs) -- Add dynamic date time field to pdf
+- [`add-gender-radio-button-group-to-pdf.cs`](./add-gender-radio-button-group-to-pdf.cs) -- Add gender radio button group to pdf
+- [`add-hidden-creation-timestamp-field.cs`](./add-hidden-creation-timestamp-field.cs) -- Add hidden creation timestamp field
+- [`add-hidden-ip-field-to-pdf.cs`](./add-hidden-ip-field-to-pdf.cs) -- Add hidden ip field to pdf
+- [`add-hidden-session-id-field-to-pdf.cs`](./add-hidden-session-id-field-to-pdf.cs) -- Add hidden session id field to pdf
+- [`add-javascript-email-validation-to-pdf-form-field.cs`](./add-javascript-email-validation-to-pdf-form-field.cs) -- Add javascript email validation to pdf form field
+- [`add-javascript-listener-to-pdf-form-field.cs`](./add-javascript-listener-to-pdf-form-field.cs) -- Add javascript listener to pdf form field
+- [`add-javascript-onlostfocus-action-to-pdf-form-field.cs`](./add-javascript-onlostfocus-action-to-pdf-form-field.cs) -- Add javascript onlostfocus action to pdf form field
+- [`add-locale-javascript-to-pdf.cs`](./add-locale-javascript-to-pdf.cs) -- Add locale javascript to pdf
+- [`add-multiline-feedback-text-field.cs`](./add-multiline-feedback-text-field.cs) -- Add multiline feedback text field
+- [`add-new-page-with-signature-acroform-field.cs`](./add-new-page-with-signature-acroform-field.cs) -- Add new page with signature acroform field
+- [`add-paymentmethod-radio-button-group.cs`](./add-paymentmethod-radio-button-group.cs) -- Add paymentmethod radio button group
+- [`add-post-submit-button-to-pdf-form.cs`](./add-post-submit-button-to-pdf-form.cs) -- Add post submit button to pdf form
+- [`add-progress-bar-to-pdf-form.cs`](./add-progress-bar-to-pdf-form.cs) -- Add progress bar to pdf form
+- [`add-reset-button-to-pdf-form.cs`](./add-reset-button-to-pdf-form.cs) -- Add reset button to pdf form
+- [`add-reset-button-to-pdf-form__v2.cs`](./add-reset-button-to-pdf-form__v2.cs) -- Add reset button to pdf form  v2
+- [`add-rich-text-box-field-with-html-formatting.cs`](./add-rich-text-box-field-with-html-formatting.cs) -- Add rich text box field with html formatting
+- [`add-signature-field-to-pdf-form.cs`](./add-signature-field-to-pdf-form.cs) -- Add signature field to pdf form
+- [`add-signature-field-with-image-stamp.cs`](./add-signature-field-with-image-stamp.cs) -- Add signature field with image stamp
+- [`add-submit-button-to-pdf-form.cs`](./add-submit-button-to-pdf-form.cs) -- Add submit button to pdf form
+- [`add-submit-button-with-url-action.cs`](./add-submit-button-with-url-action.cs) -- Add submit button with url action
+- [`add-text-annotation-save-new-pdf.cs`](./add-text-annotation-save-new-pdf.cs) -- Add text annotation save new pdf
+- [`add-tooltip-to-pdf-form-field.cs`](./add-tooltip-to-pdf-form-field.cs) -- Add tooltip to pdf form field
+- [`add-tooltip-to-pdf-submit-button.cs`](./add-tooltip-to-pdf-submit-button.cs) -- Add tooltip to pdf submit button
+- [`apply-background-image-to-pdf-form-field.cs`](./apply-background-image-to-pdf-form-field.cs) -- Apply background image to pdf form field
+- [`apply-custom-font-to-pdf-form-fields.cs`](./apply-custom-font-to-pdf-form-fields.cs) -- Apply custom font to pdf form fields
+- [`assign-branding-image-to-pdf-button-field.cs`](./assign-branding-image-to-pdf-button-field.cs) -- Assign branding image to pdf button field
+- [`async-import-xfdf-form-data-into-pdf.cs`](./async-import-xfdf-form-data-into-pdf.cs) -- Async import xfdf form data into pdf
+- [`auto-update-qr-code-from-text-field.cs`](./auto-update-qr-code-from-text-field.cs) -- Auto update qr code from text field
+- [`batch-apply-custom-font.cs`](./batch-apply-custom-font.cs) -- Batch apply custom font
+- [`batch-convert-pdfs-to-xml.cs`](./batch-convert-pdfs-to-xml.cs) -- Batch convert pdfs to xml
+- [`batch-export-pdf-form-data-to-xml.cs`](./batch-export-pdf-form-data-to-xml.cs) -- Batch export pdf form data to xml
+- [`batch-fill-pdf-fields.cs`](./batch-fill-pdf-fields.cs) -- Batch fill pdf fields
+- [`batch-fill-pdf-templates-from-csv.cs`](./batch-fill-pdf-templates-from-csv.cs) -- Batch fill pdf templates from csv
+- [`batch-generate-pdf-forms.cs`](./batch-generate-pdf-forms.cs) -- Batch generate pdf forms
+- [`batch-set-comments-field-length.cs`](./batch-set-comments-field-length.cs) -- Batch set comments field length
+- [`bulk-fill-pdf-form-skip-missing-fields.cs`](./bulk-fill-pdf-form-skip-missing-fields.cs) -- Bulk fill pdf form skip missing fields
+- [`center-align-textbox-field.cs`](./center-align-textbox-field.cs) -- Center align textbox field
+- [`clear-form-fields-page-5.cs`](./clear-form-fields-page-5.cs) -- Clear form fields page 5
+- [`clone-pdf-form-field-to-another-page.cs`](./clone-pdf-form-field-to-another-page.cs) -- Clone pdf form field to another page
+- [`compare-pdf-form-data-diff-report.cs`](./compare-pdf-form-data-diff-report.cs) -- Compare pdf form data diff report
+- [`conditional-pdf-form-section.cs`](./conditional-pdf-form-section.cs) -- Conditional pdf form section
+- [`conditional-visibility-pdf-form-field.cs`](./conditional-visibility-pdf-form-field.cs) -- Conditional visibility pdf form field
+- [`convert-form-json-to-csv.cs`](./convert-form-json-to-csv.cs) -- Convert form json to csv
+- [`copy-form-field-to-another-page.cs`](./copy-form-field-to-another-page.cs) -- Copy form field to another page
+- [`copy-form-fields-between-pdfs.cs`](./copy-form-fields-between-pdfs.cs) -- Copy form fields between pdfs
+- [`create-acroform-fields-with-tooltips.cs`](./create-acroform-fields-with-tooltips.cs) -- Create acroform fields with tooltips
+- [`create-acroform-text-field-appearance.cs`](./create-acroform-text-field-appearance.cs) -- Create acroform text field appearance
+- [`create-acroform-textbox-relative-position.cs`](./create-acroform-textbox-relative-position.cs) -- Create acroform textbox relative position
+- [`create-code128-barcode-linked-to-text-field.cs`](./create-code128-barcode-linked-to-text-field.cs) -- Create code128 barcode linked to text field
+- [`create-collapsed-bookmark-in-pdf.cs`](./create-collapsed-bookmark-in-pdf.cs) -- Create collapsed bookmark in pdf
+- [`create-collapsible-section-pdf-checkbox.cs`](./create-collapsible-section-pdf-checkbox.cs) -- Create collapsible section pdf checkbox
+- [`create-dynamic-list-box-pdf-form.cs`](./create-dynamic-list-box-pdf-form.cs) -- Create dynamic list box pdf form
+- [`create-flatten-xfa-form-pdf.cs`](./create-flatten-xfa-form-pdf.cs) -- Create flatten xfa form pdf
+- [`create-multi-page-pdf-with-different-acroform-fields.cs`](./create-multi-page-pdf-with-different-acroform-fields.cs) -- Create multi page pdf with different acroform fields
+- [`create-multi-select-listbox-pdf.cs`](./create-multi-select-listbox-pdf.cs) -- Create multi select listbox pdf
+- [`create-multi-select-listbox.cs`](./create-multi-select-listbox.cs) -- Create multi select listbox
+- [`create-password-protected-pdf-form.cs`](./create-password-protected-pdf-form.cs) -- Create password protected pdf form
+- [`create-pdf-absolute-acroform-textbox.cs`](./create-pdf-absolute-acroform-textbox.cs) -- Create pdf absolute acroform textbox
+- [`create-pdf-acroform-open-js.cs`](./create-pdf-acroform-open-js.cs) -- Create pdf acroform open js
+- [`create-pdf-acroform-taborder.cs`](./create-pdf-acroform-taborder.cs) -- Create pdf acroform taborder
+- [`create-pdf-form-auto-backup.cs`](./create-pdf-form-auto-backup.cs) -- Create pdf form auto backup
+- [`create-pdf-form-digital-signature-validation.cs`](./create-pdf-form-digital-signature-validation.cs) -- Create pdf form digital signature validation
+- [`create-pdf-form-fill-json.cs`](./create-pdf-form-fill-json.cs) -- Create pdf form fill json
+- [`create-pdf-form-pdf-only-attachment.cs`](./create-pdf-form-pdf-only-attachment.cs) -- Create pdf form pdf only attachment
+- [`create-pdf-form-qr-code.cs`](./create-pdf-form-qr-code.cs) -- Create pdf form qr code
+- [`create-pdf-form-with-barcode-field.cs`](./create-pdf-form-with-barcode-field.cs) -- Create pdf form with barcode field
+- [`create-pdf-form-with-code128-barcode.cs`](./create-pdf-form-with-code128-barcode.cs) -- Create pdf form with code128 barcode
+- [`create-pdf-tax-calculation-form.cs`](./create-pdf-tax-calculation-form.cs) -- Create pdf tax calculation form
+- [`create-pdf-template-with-form-placeholders.cs`](./create-pdf-template-with-form-placeholders.cs) -- Create pdf template with form placeholders
+- [`create-pdf-with-acroform-and-margins.cs`](./create-pdf-with-acroform-and-margins.cs) -- Create pdf with acroform and margins
+- [`create-pdf-with-acroform-calculation.cs`](./create-pdf-with-acroform-calculation.cs) -- Create pdf with acroform calculation
+- [`create-pdf-with-acroform-text-field.cs`](./create-pdf-with-acroform-text-field.cs) -- Create pdf with acroform text field
+- [`create-pdf-with-dynamic-barcode.cs`](./create-pdf-with-dynamic-barcode.cs) -- Create pdf with dynamic barcode
+- [`create-pdf-with-hidden-guid-tracking-field.cs`](./create-pdf-with-hidden-guid-tracking-field.cs) -- Create pdf with hidden guid tracking field
+- [`create-pdf-with-top-checkbox.cs`](./create-pdf-with-top-checkbox.cs) -- Create pdf with top checkbox
+- [`create-read-only-date-field.cs`](./create-read-only-date-field.cs) -- Create read only date field
+- [`create-required-signature-field-lock-pdf.cs`](./create-required-signature-field-lock-pdf.cs) -- Create required signature field lock pdf
+- [`create-right-aligned-numeric-text-field.cs`](./create-right-aligned-numeric-text-field.cs) -- Create right aligned numeric text field
+- [`create-rtl-textbox-field-in-pdf-form.cs`](./create-rtl-textbox-field-in-pdf-form.cs) -- Create rtl textbox field in pdf form
+- [`custom-numeric-field-validation.cs`](./custom-numeric-field-validation.cs) -- Custom numeric field validation
+- [`delete-form-field-from-pdf.cs`](./delete-form-field-from-pdf.cs) -- Delete form field from pdf
+- [`delete-form-field-from-pdf__v2.cs`](./delete-form-field-from-pdf__v2.cs) -- Delete form field from pdf  v2
+- [`digitally-sign-pdf-with-signature-field.cs`](./digitally-sign-pdf-with-signature-field.cs) -- Digitally sign pdf with signature field
+- [`duplicate-rename-pdf-form-field.cs`](./duplicate-rename-pdf-form-field.cs) -- Duplicate rename pdf form field
+- [`enable-fitwindow-zoom.cs`](./enable-fitwindow-zoom.cs) -- Enable fitwindow zoom
+- [`enable-spell-check-for-pdf-text-field.cs`](./enable-spell-check-for-pdf-text-field.cs) -- Enable spell check for pdf text field
+- [`export-acroform-data-to-xfdf.cs`](./export-acroform-data-to-xfdf.cs) -- Export acroform data to xfdf
+- [`export-acroform-data-to-xml.cs`](./export-acroform-data-to-xml.cs) -- Export acroform data to xml
+- [`export-conditional-visibility-to-xml.cs`](./export-conditional-visibility-to-xml.cs) -- Export conditional visibility to xml
+- [`export-form-data-http-response.cs`](./export-form-data-http-response.cs) -- Export form data http response
+- [`export-form-field-appearance-to-json.cs`](./export-form-field-appearance-to-json.cs) -- Export form field appearance to json
+- [`export-form-field-appearances.cs`](./export-form-field-appearances.cs) -- Export form field appearances
+- [`export-pdf-barcode-fields-to-xml.cs`](./export-pdf-barcode-fields-to-xml.cs) -- Export pdf barcode fields to xml
+- [`export-pdf-conversion-progress-to-xml.cs`](./export-pdf-conversion-progress-to-xml.cs) -- Export pdf conversion progress to xml
+- [`export-pdf-form-data-to-indented-json.cs`](./export-pdf-form-data-to-indented-json.cs) -- Export pdf form data to indented json
+- [`export-pdf-form-data-to-json-gzip.cs`](./export-pdf-form-data-to-json-gzip.cs) -- Export pdf form data to json gzip
+- [`export-pdf-form-data-to-json.cs`](./export-pdf-form-data-to-json.cs) -- Export pdf form data to json
+- [`export-pdf-form-data-to-pretty-json.cs`](./export-pdf-form-data-to-pretty-json.cs) -- Export pdf form data to pretty json
+- [`export-pdf-form-data-to-xfdf-xml.cs`](./export-pdf-form-data-to-xfdf-xml.cs) -- Export pdf form data to xfdf xml
+- [`export-pdf-form-data-to-xml-with-custom-root.cs`](./export-pdf-form-data-to-xml-with-custom-root.cs) -- Export pdf form data to xml with custom root
+- [`export-pdf-form-data-to-xml-xsl-report.cs`](./export-pdf-form-data-to-xml-xsl-report.cs) -- Export pdf form data to xml xsl report
+- [`export-pdf-form-data-to-xml.cs`](./export-pdf-form-data-to-xml.cs) -- Export pdf form data to xml
+- [`export-pdf-form-field-metadata-to-csv.cs`](./export-pdf-form-field-metadata-to-csv.cs) -- Export pdf form field metadata to csv
+- [`export-pdf-form-fields-to-csv.cs`](./export-pdf-form-fields-to-csv.cs) -- Export pdf form fields to csv
+- [`export-pdf-form-fields-to-csv__v2.cs`](./export-pdf-form-fields-to-csv__v2.cs) -- Export pdf form fields to csv  v2
+- [`export-pdf-form-fields-to-json.cs`](./export-pdf-form-fields-to-json.cs) -- Export pdf form fields to json
+- [`export-pdf-form-fields-to-json__v2.cs`](./export-pdf-form-fields-to-json__v2.cs) -- Export pdf form fields to json  v2
+- [`export-pdf-form-fields-to-json__v3.cs`](./export-pdf-form-fields-to-json__v3.cs) -- Export pdf form fields to json  v3
+- [`export-pdf-interaction-log-to-xfdf.cs`](./export-pdf-interaction-log-to-xfdf.cs) -- Export pdf interaction log to xfdf
+- [`export-pdf-signature-info-to-xml.cs`](./export-pdf-signature-info-to-xml.cs) -- Export pdf signature info to xml
+- [`export-selected-pdf-form-fields-to-xml.cs`](./export-selected-pdf-form-fields-to-xml.cs) -- Export selected pdf form fields to xml
+- [`export-tax-field-to-xml.cs`](./export-tax-field-to-xml.cs) -- Export tax field to xml
+- [`export-total-price-to-xml.cs`](./export-total-price-to-xml.cs) -- Export total price to xml
+- [`extract-signature-appearance-image.cs`](./extract-signature-appearance-image.cs) -- Extract signature appearance image
+- [`extract-xfa-form-data-to-xml.cs`](./extract-xfa-form-data-to-xml.cs) -- Extract xfa form data to xml
+- [`fill-pdf-form-and-encrypt.cs`](./fill-pdf-form-and-encrypt.cs) -- Fill pdf form and encrypt
+- [`fill-pdf-form-fields-from-byte-array.cs`](./fill-pdf-form-fields-from-byte-array.cs) -- Fill pdf form fields from byte array
+- [`fill-pdf-text-field.cs`](./fill-pdf-text-field.cs) -- Fill pdf text field
+- [`filter-pdf-form-fields-by-type.cs`](./filter-pdf-form-fields-by-type.cs) -- Filter pdf form fields by type
+- [`flatten-pdf-form-fields.cs`](./flatten-pdf-form-fields.cs) -- Flatten pdf form fields
+- [`flatten-pdf-form-fields__v2.cs`](./flatten-pdf-form-fields__v2.cs) -- Flatten pdf form fields  v2
+- [`flatten-pdf-remove-form-fields.cs`](./flatten-pdf-remove-form-fields.cs) -- Flatten pdf remove form fields
+- [`generate-csv-report-of-filled-pdf-form-fields.cs`](./generate-csv-report-of-filled-pdf-form-fields.cs) -- Generate csv report of filled pdf form fields
+- [`get-character-limit-of-pdf-textbox-field.cs`](./get-character-limit-of-pdf-textbox-field.cs) -- Get character limit of pdf textbox field
+- [`handle-missing-xml-import-when-filling-pdf-form.cs`](./handle-missing-xml-import-when-filling-pdf-form.cs) -- Handle missing xml import when filling pdf form
+- [`hidden-calculation-field-sum.cs`](./hidden-calculation-field-sum.cs) -- Hidden calculation field sum
+- [`hide-pdf-form-field.cs`](./hide-pdf-form-field.cs) -- Hide pdf form field
+- [`highlight-mandatory-text-field-red-border.cs`](./highlight-mandatory-text-field-red-border.cs) -- Highlight mandatory text field red border
+- [`highlight-required-form-fields.cs`](./highlight-required-form-fields.cs) -- Highlight required form fields
+- [`import-acroform-data-from-xml.cs`](./import-acroform-data-from-xml.cs) -- Import acroform data from xml
+- [`import-acroform-fields-from-json.cs`](./import-acroform-fields-from-json.cs) -- Import acroform fields from json
+- [`import-acroform-fields-from-json__v2.cs`](./import-acroform-fields-from-json__v2.cs) -- Import acroform fields from json  v2
+- [`import-compressed-json-form-data.cs`](./import-compressed-json-form-data.cs) -- Import compressed json form data
+- [`import-discount-rates-xml-pdf-invoice.cs`](./import-discount-rates-xml-pdf-invoice.cs) -- Import discount rates xml pdf invoice
+- [`import-form-appearance-json.cs`](./import-form-appearance-json.cs) -- Import form appearance json
+- [`import-form-data-from-an-encrypted-xml-file-after-decrypting-it-with-the-appropriate-key.cs`](./import-form-data-from-an-encrypted-xml-file-after-decrypting-it-with-the-appropriate-key.cs) -- Import form data from an encrypted xml file after decrypting it with the appropriate key
+- [`import-form-data-from-json-api.cs`](./import-form-data-from-json-api.cs) -- Import form data from json api
+- [`import-form-data-from-json.cs`](./import-form-data-from-json.cs) -- Import form data from json
+- [`import-interaction-log-xml-to-reconstruct-pdf.cs`](./import-interaction-log-xml-to-reconstruct-pdf.cs) -- Import interaction log xml to reconstruct pdf
+- [`import-json-form-data-into-pdf.cs`](./import-json-form-data-into-pdf.cs) -- Import json form data into pdf
+- [`import-pdf-form-fields-from-csv.cs`](./import-pdf-form-fields-from-csv.cs) -- Import pdf form fields from csv
+- [`import-tax-rate-xml-hidden-pdf-field.cs`](./import-tax-rate-xml-hidden-pdf-field.cs) -- Import tax rate xml hidden pdf field
+- [`import-visibility-states-from-xfdf.cs`](./import-visibility-states-from-xfdf.cs) -- Import visibility states from xfdf
+- [`import-xfa-data-from-xml-into-pdf.cs`](./import-xfa-data-from-xml-into-pdf.cs) -- Import xfa data from xml into pdf
+- [`import-xfa-form-data-from-xml-string.cs`](./import-xfa-form-data-from-xml-string.cs) -- Import xfa form data from xml string
+- [`import-xfdf-form-data-into-pdf.cs`](./import-xfdf-form-data-into-pdf.cs) -- Import xfdf form data into pdf
+- [`import-xfdf-signature-and-sign-pdf-field.cs`](./import-xfdf-signature-and-sign-pdf-field.cs) -- Import xfdf signature and sign pdf field
+- [`import-xml-data-into-xfa-pdf-form.cs`](./import-xml-data-into-xfa-pdf-form.cs) -- Import xml data into xfa pdf form
+- [`import-xml-form-data-into-pdf.cs`](./import-xml-form-data-into-pdf.cs) -- Import xml form data into pdf
+- [`import-xml-subset-into-pdf-form-fields.cs`](./import-xml-subset-into-pdf-form-fields.cs) -- Import xml subset into pdf form fields
+- [`insert-form-field-at-specific-index.cs`](./insert-form-field-at-specific-index.cs) -- Insert form field at specific index
+- [`list-pdf-form-field-names-types-max-length.cs`](./list-pdf-form-field-names-types-max-length.cs) -- List pdf form field names types max length
+- [`list-pdf-form-field-names.cs`](./list-pdf-form-field-names.cs) -- List pdf form field names
+- [`lock-all-pdf-form-fields.cs`](./lock-all-pdf-form-fields.cs) -- Lock all pdf form fields
+- [`lock-signature-field-after-signing.cs`](./lock-signature-field-after-signing.cs) -- Lock signature field after signing
+- [`log-pdf-form-field-modifications.cs`](./log-pdf-form-field-modifications.cs) -- Log pdf form field modifications
+- [`mark-a-form-field-as-read-only-to-prevent-editing-after-initial-population.cs`](./mark-a-form-field-as-read-only-to-prevent-editing-after-initial-population.cs) -- Mark a form field as read only to prevent editing after initial population
+- [`mark-pdf-form-field-as-required.cs`](./mark-pdf-form-field-as-required.cs) -- Mark pdf form field as required
+- [`merge-pdfs-unique-acroform-fields.cs`](./merge-pdfs-unique-acroform-fields.cs) -- Merge pdfs unique acroform fields
+- [`modify-add-pdf-form-fields.cs`](./modify-add-pdf-form-fields.cs) -- Modify add pdf form fields
+- [`modify-pdf-form-field-value.cs`](./modify-pdf-form-field-value.cs) -- Modify pdf form field value
+- [`multi-page-form-clone.cs`](./multi-page-form-clone.cs) -- Multi page form clone
+- [`multi-select-listbox-max-three.cs`](./multi-select-listbox-max-three.cs) -- Multi select listbox max three
+- [`parallel-batch-fill-pdf-form-fields.cs`](./parallel-batch-fill-pdf-form-fields.cs) -- Parallel batch fill pdf form fields
+- [`pdf-form-language-dropdown.cs`](./pdf-form-language-dropdown.cs) -- Pdf form language dropdown
+- [`populate-combobox-from-db.cs`](./populate-combobox-from-db.cs) -- Populate combobox from db
+- [`populate-currency-value-in-pdf-form.cs`](./populate-currency-value-in-pdf-form.cs) -- Populate currency value in pdf form
+- [`populate-pdf-form-fields-from-dictionary.cs`](./populate-pdf-form-fields-from-dictionary.cs) -- Populate pdf form fields from dictionary
+- [`populate-pdf-form-from-csv.cs`](./populate-pdf-form-from-csv.cs) -- Populate pdf form from csv
+- [`post-pdf-form-data-xml.cs`](./post-pdf-form-data-xml.cs) -- Post pdf form data xml
+- [`read-pdf-form-field-value.cs`](./read-pdf-form-field-value.cs) -- Read pdf form field value
+- [`read-xml-with-fallback-to-xmp-pdfa-defaults.cs`](./read-xml-with-fallback-to-xmp-pdfa-defaults.cs) -- Read xml with fallback to xmp pdfa defaults
+- [`remove-form-field-from-pdf.cs`](./remove-form-field-from-pdf.cs) -- Remove form field from pdf
+- [`remove-form-fields-first-page.cs`](./remove-form-fields-first-page.cs) -- Remove form fields first page
+- [`remove-javascript-actions-from-pdf-form-fields.cs`](./remove-javascript-actions-from-pdf-form-fields.cs) -- Remove javascript actions from pdf form fields
+- [`remove-signature-form-fields.cs`](./remove-signature-form-fields.cs) -- Remove signature form fields
+- [`remove-typewriter-form-elements-page-3.cs`](./remove-typewriter-form-elements-page-3.cs) -- Remove typewriter form elements page 3
+- [`rename-pdf-form-field.cs`](./rename-pdf-form-field.cs) -- Rename pdf form field
+- [`replace-xfa-with-acroform.cs`](./replace-xfa-with-acroform.cs) -- Replace xfa with acroform
+- [`rotate-form-field-label-45-degrees.cs`](./rotate-form-field-label-45-degrees.cs) -- Rotate form field label 45 degrees
+- [`save-pdf-incremental-updates.cs`](./save-pdf-incremental-updates.cs) -- Save pdf incremental updates
+- [`select-listbox-option-in-pdf-form.cs`](./select-listbox-option-in-pdf-form.cs) -- Select listbox option in pdf form
+- [`select-radio-button-in-pdf-form.cs`](./select-radio-button-in-pdf-form.cs) -- Select radio button in pdf form
+- [`set-beveled-border-for-pdf-form-field.cs`](./set-beveled-border-for-pdf-form-field.cs) -- Set beveled border for pdf form field
+- [`set-calculation-order-for-pdf-form-fields.cs`](./set-calculation-order-for-pdf-form-fields.cs) -- Set calculation order for pdf form fields
+- [`set-character-limit-for-pdf-form-field.cs`](./set-character-limit-for-pdf-form-field.cs) -- Set character limit for pdf form field
+- [`set-checkbox-default-checked.cs`](./set-checkbox-default-checked.cs) -- Set checkbox default checked
+- [`set-checkbox-field-in-pdf.cs`](./set-checkbox-field-in-pdf.cs) -- Set checkbox field in pdf
+- [`set-dashed-border-for-pdf-form-field.cs`](./set-dashed-border-for-pdf-form-field.cs) -- Set dashed border for pdf form field
+- [`set-datefield-default-time-on-pdf-load.cs`](./set-datefield-default-time-on-pdf-load.cs) -- Set datefield default time on pdf load
+- [`set-default-appearance-for-pdf-form-field.cs`](./set-default-appearance-for-pdf-form-field.cs) -- Set default appearance for pdf form field
+- [`set-default-selected-item-in-pdf-combo-box.cs`](./set-default-selected-item-in-pdf-combo-box.cs) -- Set default selected item in pdf combo box
+- [`set-default-selected-radio-button-value.cs`](./set-default-selected-radio-button-value.cs) -- Set default selected radio button value
+- [`set-default-value-for-pdf-form-textbox.cs`](./set-default-value-for-pdf-form-textbox.cs) -- Set default value for pdf form textbox
+- [`set-employeeid-field-readonly.cs`](./set-employeeid-field-readonly.cs) -- Set employeeid field readonly
+- [`set-export-value-radio-button-option.cs`](./set-export-value-radio-button-option.cs) -- Set export value radio button option
+- [`set-file-size-limit-for-pdf-form-attachments.cs`](./set-file-size-limit-for-pdf-form-attachments.cs) -- Set file size limit for pdf form attachments
+- [`set-font-size-style-pdf-text-field.cs`](./set-font-size-style-pdf-text-field.cs) -- Set font size style pdf text field
+- [`set-form-field-visible-non-printable.cs`](./set-form-field-visible-non-printable.cs) -- Set form field visible non printable
+- [`set-max-length-for-pdf-password-field.cs`](./set-max-length-for-pdf-password-field.cs) -- Set max length for pdf password field
+- [`set-max-length-pdf-textbox-field.cs`](./set-max-length-pdf-textbox-field.cs) -- Set max length pdf textbox field
+- [`set-noexport-flag-on-pdf-form-fields.cs`](./set-noexport-flag-on-pdf-form-fields.cs) -- Set noexport flag on pdf form fields
+- [`set-pdf-form-field-password.cs`](./set-pdf-form-field-password.cs) -- Set pdf form field password
+- [`set-pdf-metadata-after-form-processing.cs`](./set-pdf-metadata-after-form-processing.cs) -- Set pdf metadata after form processing
+- [`set-text-field-background-color.cs`](./set-text-field-background-color.cs) -- Set text field background color
+- [`set-tooltip-email-form-field.cs`](./set-tooltip-email-form-field.cs) -- Set tooltip email form field
+- [`synchronize-pdf-form-data-xfdf.cs`](./synchronize-pdf-form-data-xfdf.cs) -- Synchronize pdf form data xfdf
+- [`synchronize-xfdf-form-data-across-pdfs.cs`](./synchronize-xfdf-form-data-across-pdfs.cs) -- Synchronize xfdf form data across pdfs
+- [`transfer-pdf-form-data-between-documents.cs`](./transfer-pdf-form-data-between-documents.cs) -- Transfer pdf form data between documents
+- [`transform-imported-xml-using-an-xslt-stylesheet-before-populating-pdf-fields-with-the-result.cs`](./transform-imported-xml-using-an-xslt-stylesheet-before-populating-pdf-fields-with-the-result.cs) -- Transform imported xml using an xslt stylesheet before populating pdf fields with the result
+- [`unflatten-pdf-form-fields.cs`](./unflatten-pdf-form-fields.cs) -- Unflatten pdf form fields
+- [`validate-date-field-format-pdf.cs`](./validate-date-field-format-pdf.cs) -- Validate date field format pdf
+- [`validate-email-field-before-saving-pdf.cs`](./validate-email-field-before-saving-pdf.cs) -- Validate email field before saving pdf
+- [`validate-incorrect-password-prevents-access.cs`](./validate-incorrect-password-prevents-access.cs) -- Validate incorrect password prevents access
+- [`validate-ipv4-address-in-pdf-form.cs`](./validate-ipv4-address-in-pdf-form.cs) -- Validate ipv4 address in pdf form
+- [`validate-numberfield-non-numeric-input.cs`](./validate-numberfield-non-numeric-input.cs) -- Validate numberfield non numeric input
+- [`validate-pdf-file-size-before-submission.cs`](./validate-pdf-file-size-before-submission.cs) -- Validate pdf file size before submission
+- [`validate-required-pdf-form-field.cs`](./validate-required-pdf-form-field.cs) -- Validate required pdf form field
+- [`validate-required-pdf-form-fields-before-export.cs`](./validate-required-pdf-form-fields-before-export.cs) -- Validate required pdf form fields before export
+- [`validate-required-pdf-form-fields.cs`](./validate-required-pdf-form-fields.cs) -- Validate required pdf form fields
+- [`validate-textboxfield-maxlen-truncation.cs`](./validate-textboxfield-maxlen-truncation.cs) -- Validate textboxfield maxlen truncation
+- [`validate-xml-xsd-fill-pdf-xfa.cs`](./validate-xml-xsd-fill-pdf-xfa.cs) -- Validate xml xsd fill pdf xfa
+- [`verify-pdf-form-field-count.cs`](./verify-pdf-form-field-count.cs) -- Verify pdf form field count
+
+## See Also
+
+- [`AGENTS.md`](./AGENTS.md) -- category-specific anti-patterns, API surface, and conventions for AI coding agents
+- [`../AGENTS.md`](../AGENTS.md) -- repository-wide agent guide
+- [`../README.md`](../README.md) -- full category index and project overview
+- [Aspose.PDF for .NET docs](https://docs.aspose.com/pdf/net/)
+
+> Each `.cs` file is a standalone, build-validated console example. Drop into a fresh `dotnet new console` project, add the `Aspose.PDF` NuGet (version above), and run.

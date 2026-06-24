@@ -1,0 +1,234 @@
+# Facades edit document
+
+> **Facades edit document** in PDF using C# / .NET -- **215** verified, compile-tested examples for **Aspose.PDF for .NET** 26.5.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+
+- Category: `facades-edit-document`
+- Examples: 215
+- NuGet: `Aspose.PDF 26.5.0` -- target `net10.0`
+
+## Examples
+
+- [`add-and-verify-document-attachment.cs`](./add-and-verify-document-attachment.cs) -- Add and verify document attachment
+- [`add-attachment-and-verify-name.cs`](./add-attachment-and-verify-name.cs) -- Add attachment and verify name
+- [`add-attachment-md5-checksum-metadata.cs`](./add-attachment-md5-checksum-metadata.cs) -- Add attachment md5 checksum metadata
+- [`add-attachment-set-viewer-preference.cs`](./add-attachment-set-viewer-preference.cs) -- Add attachment set viewer preference
+- [`add-attachment-set-viewer-preferences-and-encrypt-pdf.cs`](./add-attachment-set-viewer-preferences-and-encrypt-pdf.cs) -- Add attachment set viewer preferences and encrypt pdf
+- [`add-attachment-to-pdf-preserve-existing.cs`](./add-attachment-to-pdf-preserve-existing.cs) -- Add attachment to pdf preserve existing
+- [`add-attachment-update-moddate.cs`](./add-attachment-update-moddate.cs) -- Add attachment update moddate
+- [`add-bookmark-external-url-to-pdf.cs`](./add-bookmark-external-url-to-pdf.cs) -- Add bookmark external url to pdf
+- [`add-bookmark-to-pdf-page.cs`](./add-bookmark-to-pdf-page.cs) -- Add bookmark to pdf page
+- [`add-chapter-section-bookmarks-pdf.cs`](./add-chapter-section-bookmarks-pdf.cs) -- Add chapter section bookmarks pdf
+- [`add-clickable-web-link-to-pdf.cs`](./add-clickable-web-link-to-pdf.cs) -- Add clickable web link to pdf
+- [`add-confidential-text-stamp-to-pdf.cs`](./add-confidential-text-stamp-to-pdf.cs) -- Add confidential text stamp to pdf
+- [`add-configurable-text-watermark-to-pdfs.cs`](./add-configurable-text-watermark-to-pdfs.cs) -- Add configurable text watermark to pdfs
+- [`add-confirmation-dialog-to-pdf-submit-button.cs`](./add-confirmation-dialog-to-pdf-submit-button.cs) -- Add confirmation dialog to pdf submit button
+- [`add-custom-project-metadata-to-pdf.cs`](./add-custom-project-metadata-to-pdf.cs) -- Add custom project metadata to pdf
+- [`add-custom-xmp-metadata-projectid.cs`](./add-custom-xmp-metadata-projectid.cs) -- Add custom xmp metadata projectid
+- [`add-dashed-line-annotation-to-pdf.cs`](./add-dashed-line-annotation-to-pdf.cs) -- Add dashed line annotation to pdf
+- [`add-dashed-rectangle-annotation-opacity.cs`](./add-dashed-rectangle-annotation-opacity.cs) -- Add dashed rectangle annotation opacity
+- [`add-dashed-rectangle-annotation-to-pdf-page.cs`](./add-dashed-rectangle-annotation-to-pdf-page.cs) -- Add dashed rectangle annotation to pdf page
+- [`add-document-attachment-and-list-attachments.cs`](./add-document-attachment-and-list-attachments.cs) -- Add document attachment and list attachments
+- [`add-document-attachment-data-relationship.cs`](./add-document-attachment-data-relationship.cs) -- Add document attachment data relationship
+- [`add-document-attachment-to-pdf.cs`](./add-document-attachment-to-pdf.cs) -- Add document attachment to pdf
+- [`add-document-attachment-to-pdf__v2.cs`](./add-document-attachment-to-pdf__v2.cs) -- Add document attachment to pdf  v2
+- [`add-document-attachment-with-creation-date.cs`](./add-document-attachment-with-creation-date.cs) -- Add document attachment with creation date
+- [`add-document-attachment-with-description.cs`](./add-document-attachment-with-description.cs) -- Add document attachment with description
+- [`add-document-attachment-with-error-handling.cs`](./add-document-attachment-with-error-handling.cs) -- Add document attachment with error handling
+- [`add-embedded-file-attachment-to-pdf.cs`](./add-embedded-file-attachment-to-pdf.cs) -- Add embedded file attachment to pdf
+- [`add-encrypted-attachment-to-pdf.cs`](./add-encrypted-attachment-to-pdf.cs) -- Add encrypted attachment to pdf
+- [`add-file-attachment-annotation-with-opacity.cs`](./add-file-attachment-annotation-with-opacity.cs) -- Add file attachment annotation with opacity
+- [`add-file-attachment-link-annotation.cs`](./add-file-attachment-link-annotation.cs) -- Add file attachment link annotation
+- [`add-file-attachment-to-encrypted-pdf.cs`](./add-file-attachment-to-encrypted-pdf.cs) -- Add file attachment to encrypted pdf
+- [`add-file-attachment-to-pdf-async.cs`](./add-file-attachment-to-pdf-async.cs) -- Add file attachment to pdf async
+- [`add-file-attachment-to-pdf.cs`](./add-file-attachment-to-pdf.cs) -- Add file attachment to pdf
+- [`add-free-text-annotation-helvetica.cs`](./add-free-text-annotation-helvetica.cs) -- Add free text annotation helvetica
+- [`add-free-text-annotation-light-gray-background.cs`](./add-free-text-annotation-light-gray-background.cs) -- Add free text annotation light gray background
+- [`add-green-circle-annotation-to-pdf-page.cs`](./add-green-circle-annotation-to-pdf-page.cs) -- Add green circle annotation to pdf page
+- [`add-green-circle-annotation-to-pdf.cs`](./add-green-circle-annotation-to-pdf.cs) -- Add green circle annotation to pdf
+- [`add-help-bookmark-with-url.cs`](./add-help-bookmark-with-url.cs) -- Add help bookmark with url
+- [`add-highlight-annotation-to-pdf-page.cs`](./add-highlight-annotation-to-pdf-page.cs) -- Add highlight annotation to pdf page
+- [`add-highlight-annotation-to-pdf-page__v2.cs`](./add-highlight-annotation-to-pdf-page__v2.cs) -- Add highlight annotation to pdf page  v2
+- [`add-html-freetext-annotation.cs`](./add-html-freetext-annotation.cs) -- Add html freetext annotation
+- [`add-hyperlink-annotation-to-page.cs`](./add-hyperlink-annotation-to-page.cs) -- Add hyperlink annotation to page
+- [`add-hyperlink-annotation-to-pdf-page.cs`](./add-hyperlink-annotation-to-pdf-page.cs) -- Add hyperlink annotation to pdf page
+- [`add-image-attachment-and-stamp.cs`](./add-image-attachment-and-stamp.cs) -- Add image attachment and stamp
+- [`add-image-stamp-from-stream.cs`](./add-image-stamp-from-stream.cs) -- Add image stamp from stream
+- [`add-image-stamp-to-page-three.cs`](./add-image-stamp-to-page-three.cs) -- Add image stamp to page three
+- [`add-image-stamp-to-page-three__v2.cs`](./add-image-stamp-to-page-three__v2.cs) -- Add image stamp to page three  v2
+- [`add-image-stamp-to-pdf-page-two.cs`](./add-image-stamp-to-pdf-page-two.cs) -- Add image stamp to pdf page two
+- [`add-image-stamp-to-specific-pdf-page.cs`](./add-image-stamp-to-specific-pdf-page.cs) -- Add image stamp to specific pdf page
+- [`add-image-stamp-with-caption.cs`](./add-image-stamp-with-caption.cs) -- Add image stamp with caption
+- [`add-javascript-action-to-pdf-button.cs`](./add-javascript-action-to-pdf-button.cs) -- Add javascript action to pdf button
+- [`add-javascript-alert-annotation-to-pdf.cs`](./add-javascript-alert-annotation-to-pdf.cs) -- Add javascript alert annotation to pdf
+- [`add-javascript-calculation-to-pdf-form-field.cs`](./add-javascript-calculation-to-pdf-form-field.cs) -- Add javascript calculation to pdf form field
+- [`add-javascript-click-action-to-pdf-rectangle.cs`](./add-javascript-click-action-to-pdf-rectangle.cs) -- Add javascript click action to pdf rectangle
+- [`add-javascript-validation-button-to-pdf-form.cs`](./add-javascript-validation-button-to-pdf-form.cs) -- Add javascript validation button to pdf form
+- [`add-large-attachment-and-monitor-memory.cs`](./add-large-attachment-and-monitor-memory.cs) -- Add large attachment and monitor memory
+- [`add-large-stream-attachment-to-pdf.cs`](./add-large-stream-attachment-to-pdf.cs) -- Add large stream attachment to pdf
+- [`add-line-annotation-with-arrowheads.cs`](./add-line-annotation-with-arrowheads.cs) -- Add line annotation with arrowheads
+- [`add-mouse-enter-javascript-to-pdf-annotation.cs`](./add-mouse-enter-javascript-to-pdf-annotation.cs) -- Add mouse enter javascript to pdf annotation
+- [`add-multiline-text-stamp-to-pdf.cs`](./add-multiline-text-stamp-to-pdf.cs) -- Add multiline text stamp to pdf
+- [`add-multiple-text-annotations-to-pdf.cs`](./add-multiple-text-annotations-to-pdf.cs) -- Add multiple text annotations to pdf
+- [`add-network-attachment-to-pdf-with-retry.cs`](./add-network-attachment-to-pdf-with-retry.cs) -- Add network attachment to pdf with retry
+- [`add-page-open-javascript-log-page-number.cs`](./add-page-open-javascript-log-page-number.cs) -- Add page open javascript log page number
+- [`add-pdf-attachment-to-document.cs`](./add-pdf-attachment-to-document.cs) -- Add pdf attachment to document
+- [`add-popup-annotation-to-pdf.cs`](./add-popup-annotation-to-pdf.cs) -- Add popup annotation to pdf
+- [`add-popup-annotation-with-bullet-point-note.cs`](./add-popup-annotation-with-bullet-point-note.cs) -- Add popup annotation with bullet point note
+- [`add-rectangle-annotation-light-gray.cs`](./add-rectangle-annotation-light-gray.cs) -- Add rectangle annotation light gray
+- [`add-red-bold-text-stamp-to-pdf-page-5.cs`](./add-red-bold-text-stamp-to-pdf-page-5.cs) -- Add red bold text stamp to pdf page 5
+- [`add-red-rectangle-annotation-to-pdf-page.cs`](./add-red-rectangle-annotation-to-pdf-page.cs) -- Add red rectangle annotation to pdf page
+- [`add-right-aligned-multiline-text-stamp-page-4.cs`](./add-right-aligned-multiline-text-stamp-page-4.cs) -- Add right aligned multiline text stamp page 4
+- [`add-rotated-image-stamp-to-pdf.cs`](./add-rotated-image-stamp-to-pdf.cs) -- Add rotated image stamp to pdf
+- [`add-rtl-text-annotation-to-pdf.cs`](./add-rtl-text-annotation-to-pdf.cs) -- Add rtl text annotation to pdf
+- [`add-scaled-image-stamp-from-memory-stream.cs`](./add-scaled-image-stamp-from-memory-stream.cs) -- Add scaled image stamp from memory stream
+- [`add-square-annotation-3pt-border.cs`](./add-square-annotation-3pt-border.cs) -- Add square annotation 3pt border
+- [`add-square-annotation-red-border-transparent-fill.cs`](./add-square-annotation-red-border-transparent-fill.cs) -- Add square annotation red border transparent fill
+- [`add-stamp-annotation-with-opacity.cs`](./add-stamp-annotation-with-opacity.cs) -- Add stamp annotation with opacity
+- [`add-sticky-note-annotation-to-first-page.cs`](./add-sticky-note-annotation-to-first-page.cs) -- Add sticky note annotation to first page
+- [`add-text-annotation-to-pdf-page.cs`](./add-text-annotation-to-pdf-page.cs) -- Add text annotation to pdf page
+- [`add-text-annotation-with-custom-author.cs`](./add-text-annotation-with-custom-author.cs) -- Add text annotation with custom author
+- [`add-text-stamp-export-pdf-memory-stream.cs`](./add-text-stamp-export-pdf-memory-stream.cs) -- Add text stamp export pdf memory stream
+- [`add-text-stamp-with-shadow-to-first-page.cs`](./add-text-stamp-with-shadow-to-first-page.cs) -- Add text stamp with shadow to first page
+- [`add-tooltip-annotation-to-pdf.cs`](./add-tooltip-annotation-to-pdf.cs) -- Add tooltip annotation to pdf
+- [`add-underlined-yellow-text-stamp-page-10.cs`](./add-underlined-yellow-text-stamp-page-10.cs) -- Add underlined yellow text stamp page 10
+- [`add-unicode-attachment-description.cs`](./add-unicode-attachment-description.cs) -- Add unicode attachment description
+- [`add-utc-timestamped-annotation.cs`](./add-utc-timestamped-annotation.cs) -- Add utc timestamped annotation
+- [`add-xmp-author-and-title-metadata-to-pdf.cs`](./add-xmp-author-and-title-metadata-to-pdf.cs) -- Add xmp author and title metadata to pdf
+- [`add-xmp-branding-metadata-to-pdf.cs`](./add-xmp-branding-metadata-to-pdf.cs) -- Add xmp branding metadata to pdf
+- [`add-xmp-metadata-field-to-pdf.cs`](./add-xmp-metadata-field-to-pdf.cs) -- Add xmp metadata field to pdf
+- [`annotate-and-merge-pdfs.cs`](./annotate-and-merge-pdfs.cs) -- Annotate and merge pdfs
+- [`apply-45-degree-rotation-to-text-stamp.cs`](./apply-45-degree-rotation-to-text-stamp.cs) -- Apply 45 degree rotation to text stamp
+- [`apply-password-protection-disable-printing.cs`](./apply-password-protection-disable-printing.cs) -- Apply password protection disable printing
+- [`apply-viewer-preferences-from-json.cs`](./apply-viewer-preferences-from-json.cs) -- Apply viewer preferences from json
+- [`apply-viewer-preferences-to-multiple-pdfs.cs`](./apply-viewer-preferences-to-multiple-pdfs.cs) -- Apply viewer preferences to multiple pdfs
+- [`assign-subject-to-pdf-text-annotations.cs`](./assign-subject-to-pdf-text-annotations.cs) -- Assign subject to pdf text annotations
+- [`attach-downloaded-file-to-pdf.cs`](./attach-downloaded-file-to-pdf.cs) -- Attach downloaded file to pdf
+- [`attach-multiple-files-to-pdf.cs`](./attach-multiple-files-to-pdf.cs) -- Attach multiple files to pdf
+- [`batch-add-annotations-from-json.cs`](./batch-add-annotations-from-json.cs) -- Batch add annotations from json
+- [`batch-add-attachment-to-pdfs.cs`](./batch-add-attachment-to-pdfs.cs) -- Batch add attachment to pdfs
+- [`batch-add-js-alert-to-rectangle-annotations.cs`](./batch-add-js-alert-to-rectangle-annotations.cs) -- Batch add js alert to rectangle annotations
+- [`batch-add-password-protection-to-pdfs.cs`](./batch-add-password-protection-to-pdfs.cs) -- Batch add password protection to pdfs
+- [`batch-add-red-rectangle-annotation.cs`](./batch-add-red-rectangle-annotation.cs) -- Batch add red rectangle annotation
+- [`batch-extract-images-from-pdfs.cs`](./batch-extract-images-from-pdfs.cs) -- Batch extract images from pdfs
+- [`batch-remove-attachments-add-disclaimer.cs`](./batch-remove-attachments-add-disclaimer.cs) -- Batch remove attachments add disclaimer
+- [`batch-replace-text-in-pdfs.cs`](./batch-replace-text-in-pdfs.cs) -- Batch replace text in pdfs
+- [`batch-reposition-stamps-top-center.cs`](./batch-reposition-stamps-top-center.cs) -- Batch reposition stamps top center
+- [`batch-set-pdf-viewer-preference-full-screen.cs`](./batch-set-pdf-viewer-preference-full-screen.cs) -- Batch set pdf viewer preference full screen
+- [`center-stamp-on-page-8.cs`](./center-stamp-on-page-8.cs) -- Center stamp on page 8
+- [`change-pdf-viewer-preference.cs`](./change-pdf-viewer-preference.cs) -- Change pdf viewer preference
+- [`combine-jpeg-images-to-pdf.cs`](./combine-jpeg-images-to-pdf.cs) -- Combine jpeg images to pdf
+- [`combine-viewer-preferences.cs`](./combine-viewer-preferences.cs) -- Combine viewer preferences
+- [`compare-pdf-file-sizes.cs`](./compare-pdf-file-sizes.cs) -- Compare pdf file sizes
+- [`configure-continuous-view-mode-pdf.cs`](./configure-continuous-view-mode-pdf.cs) -- Configure continuous view mode pdf
+- [`convert-jpeg-to-pdf.cs`](./convert-jpeg-to-pdf.cs) -- Convert jpeg to pdf
+- [`convert-pdf-page-to-high-resolution-png.cs`](./convert-pdf-page-to-high-resolution-png.cs) -- Convert pdf page to high resolution png
+- [`convert-pdf-pages-to-24bit-bmp.cs`](./convert-pdf-pages-to-24bit-bmp.cs) -- Convert pdf pages to 24bit bmp
+- [`convert-pdf-pages-to-png-transparent.cs`](./convert-pdf-pages-to-png-transparent.cs) -- Convert pdf pages to png transparent
+- [`convert-pdf-pages-to-transparent-png-150-dpi.cs`](./convert-pdf-pages-to-transparent-png-150-dpi.cs) -- Convert pdf pages to transparent png 150 dpi
+- [`convert-pdf-to-jpeg-150-dpi.cs`](./convert-pdf-to-jpeg-150-dpi.cs) -- Convert pdf to jpeg 150 dpi
+- [`convert-pdf-to-multi-page-tiff-lzw.cs`](./convert-pdf-to-multi-page-tiff-lzw.cs) -- Convert pdf to multi page tiff lzw
+- [`convert-pdf-to-png-thumbnails-300-dpi.cs`](./convert-pdf-to-png-thumbnails-300-dpi.cs) -- Convert pdf to png thumbnails 300 dpi
+- [`convert-png-to-multi-page-pdf.cs`](./convert-png-to-multi-page-pdf.cs) -- Convert png to multi page pdf
+- [`create-dashed-border-rectangle-annotation.cs`](./create-dashed-border-rectangle-annotation.cs) -- Create dashed border rectangle annotation
+- [`create-nested-pdf-bookmarks.cs`](./create-nested-pdf-bookmarks.cs) -- Create nested pdf bookmarks
+- [`create-rubber-stamp-with-custom-appearance.cs`](./create-rubber-stamp-with-custom-appearance.cs) -- Create rubber stamp with custom appearance
+- [`custom-annotation-appearance-rubber-stamp.cs`](./custom-annotation-appearance-rubber-stamp.cs) -- Custom annotation appearance rubber stamp
+- [`decrypt-edit-reencrypt-protected-pdf.cs`](./decrypt-edit-reencrypt-protected-pdf.cs) -- Decrypt edit reencrypt protected pdf
+- [`decrypt-pdf-set-viewer-preferences.cs`](./decrypt-pdf-set-viewer-preferences.cs) -- Decrypt pdf set viewer preferences
+- [`delete-all-pdf-attachments-verify-count.cs`](./delete-all-pdf-attachments-verify-count.cs) -- Delete all pdf attachments verify count
+- [`delete-page-from-pdf.cs`](./delete-page-from-pdf.cs) -- Delete page from pdf
+- [`disable-zoom-controls-viewer-preference.cs`](./disable-zoom-controls-viewer-preference.cs) -- Disable zoom controls viewer preference
+- [`edit-pdf-replace-text-add-link-attachment.cs`](./edit-pdf-replace-text-add-link-attachment.cs) -- Edit pdf replace text add link attachment
+- [`embed-memory-stream-pdf-attachment.cs`](./embed-memory-stream-pdf-attachment.cs) -- Embed memory stream pdf attachment
+- [`enable-centerwindow-viewer-preference.cs`](./enable-centerwindow-viewer-preference.cs) -- Enable centerwindow viewer preference
+- [`enable-displaydoctitle-viewer-preference.cs`](./enable-displaydoctitle-viewer-preference.cs) -- Enable displaydoctitle viewer preference
+- [`encrypt-pdf-128-aes-restrict-permissions.cs`](./encrypt-pdf-128-aes-restrict-permissions.cs) -- Encrypt pdf 128 aes restrict permissions
+- [`encrypt-pdf-attachment-and-add-to-pdf.cs`](./encrypt-pdf-attachment-and-add-to-pdf.cs) -- Encrypt pdf attachment and add to pdf
+- [`encrypt-pdf-certificate-digital-signature.cs`](./encrypt-pdf-certificate-digital-signature.cs) -- Encrypt pdf certificate digital signature
+- [`export-pdf-annotations-to-json.cs`](./export-pdf-annotations-to-json.cs) -- Export pdf annotations to json
+- [`extract-first-image-from-pdf-page.cs`](./extract-first-image-from-pdf-page.cs) -- Extract first image from pdf page
+- [`extract-grayscale-images-from-pdf-page.cs`](./extract-grayscale-images-from-pdf-page.cs) -- Extract grayscale images from pdf page
+- [`extract-images-create-pdf-catalog.cs`](./extract-images-create-pdf-catalog.cs) -- Extract images create pdf catalog
+- [`extract-images-from-pdf-by-page-index.cs`](./extract-images-from-pdf-by-page-index.cs) -- Extract images from pdf by page index
+- [`extract-images-from-pdf.cs`](./extract-images-from-pdf.cs) -- Extract images from pdf
+- [`extract-pdf-viewer-preferences-to-json.cs`](./extract-pdf-viewer-preferences-to-json.cs) -- Extract pdf viewer preferences to json
+- [`extract-pdf-viewer-preferences-to-xml.cs`](./extract-pdf-viewer-preferences-to-xml.cs) -- Extract pdf viewer preferences to xml
+- [`fill-acroform-text-field.cs`](./fill-acroform-text-field.cs) -- Fill acroform text field
+- [`fill-pdf-form-fields-from-json.cs`](./fill-pdf-form-fields-from-json.cs) -- Fill pdf form fields from json
+- [`hide-annotations-when-fullscreen-enabled.cs`](./hide-annotations-when-fullscreen-enabled.cs) -- Hide annotations when fullscreen enabled
+- [`hide-menubar-viewer-preference.cs`](./hide-menubar-viewer-preference.cs) -- Hide menubar viewer preference
+- [`hide-pdf-toolbar-viewer-preference.cs`](./hide-pdf-toolbar-viewer-preference.cs) -- Hide pdf toolbar viewer preference
+- [`hide-scrollbars-viewer-preference.cs`](./hide-scrollbars-viewer-preference.cs) -- Hide scrollbars viewer preference
+- [`hide-toolbar-and-menu-bar.cs`](./hide-toolbar-and-menu-bar.cs) -- Hide toolbar and menu bar
+- [`hide-toolbar-menubar-pdf.cs`](./hide-toolbar-menubar-pdf.cs) -- Hide toolbar menubar pdf
+- [`hide-ui-and-disable-page-transitions.cs`](./hide-ui-and-disable-page-transitions.cs) -- Hide ui and disable page transitions
+- [`import-annotations-from-json.cs`](./import-annotations-from-json.cs) -- Import annotations from json
+- [`insert-blank-page-add-header-annotation.cs`](./insert-blank-page-add-header-annotation.cs) -- Insert blank page add header annotation
+- [`lock-pdf-annotation-after-creation.cs`](./lock-pdf-annotation-after-creation.cs) -- Lock pdf annotation after creation
+- [`map-pdf-viewer-preferences-to-ui-toggles.cs`](./map-pdf-viewer-preferences-to-ui-toggles.cs) -- Map pdf viewer preferences to ui toggles
+- [`merge-pdf-edit-operations-order.cs`](./merge-pdf-edit-operations-order.cs) -- Merge pdf edit operations order
+- [`move-last-page-to-beginning.cs`](./move-last-page-to-beginning.cs) -- Move last page to beginning
+- [`parallel-batch-pdf-rotation.cs`](./parallel-batch-pdf-rotation.cs) -- Parallel batch pdf rotation
+- [`pdf-attachment-annotation-pipeline.cs`](./pdf-attachment-annotation-pipeline.cs) -- Pdf attachment annotation pipeline
+- [`pdf-editing-wrapper-aspdf-content-editor.cs`](./pdf-editing-wrapper-aspdf-content-editor.cs) -- Pdf editing wrapper aspdf content editor
+- [`pdf-folder-watcher.cs`](./pdf-folder-watcher.cs) -- Pdf folder watcher
+- [`persist-viewer-preferences-after-edit.cs`](./persist-viewer-preferences-after-edit.cs) -- Persist viewer preferences after edit
+- [`populate-pdf-acroform-from-xml.cs`](./populate-pdf-acroform-from-xml.cs) -- Populate pdf acroform from xml
+- [`populate-pdf-form-fields-from-json.cs`](./populate-pdf-form-fields-from-json.cs) -- Populate pdf form fields from json
+- [`print-pdf-custom-page-ranges.cs`](./print-pdf-custom-page-ranges.cs) -- Print pdf custom page ranges
+- [`print-pdf-duplex-collated-copies.cs`](./print-pdf-duplex-collated-copies.cs) -- Print pdf duplex collated copies
+- [`print-pdf-two-copies-landscape.cs`](./print-pdf-two-copies-landscape.cs) -- Print pdf two copies landscape
+- [`read-pdf-viewer-preferences-zoom.cs`](./read-pdf-viewer-preferences-zoom.cs) -- Read pdf viewer preferences zoom
+- [`refresh-pdf-attachments.cs`](./refresh-pdf-attachments.cs) -- Refresh pdf attachments
+- [`remove-all-attachments-from-pdf.cs`](./remove-all-attachments-from-pdf.cs) -- Remove all attachments from pdf
+- [`remove-all-bookmarks-from-pdf.cs`](./remove-all-bookmarks-from-pdf.cs) -- Remove all bookmarks from pdf
+- [`remove-attachments-old-pdf.cs`](./remove-attachments-old-pdf.cs) -- Remove attachments old pdf
+- [`remove-embedded-attachment-from-pdf.cs`](./remove-embedded-attachment-from-pdf.cs) -- Remove embedded attachment from pdf
+- [`remove-specific-bookmark-from-pdf.cs`](./remove-specific-bookmark-from-pdf.cs) -- Remove specific bookmark from pdf
+- [`replace-dates-pdf-regex.cs`](./replace-dates-pdf-regex.cs) -- Replace dates pdf regex
+- [`replace-draft-with-final.cs`](./replace-draft-with-final.cs) -- Replace draft with final
+- [`replace-phrase-bold-style.cs`](./replace-phrase-bold-style.cs) -- Replace phrase bold style
+- [`replace-text-in-pdf-annotations.cs`](./replace-text-in-pdf-annotations.cs) -- Replace text in pdf annotations
+- [`replace-text-in-pdf.cs`](./replace-text-in-pdf.cs) -- Replace text in pdf
+- [`replace-text-on-page-preserve-font.cs`](./replace-text-on-page-preserve-font.cs) -- Replace text on page preserve font
+- [`replace-text-on-specific-pdf-page.cs`](./replace-text-on-specific-pdf-page.cs) -- Replace text on specific pdf page
+- [`replace-text-pdf-content-editor-disposal.cs`](./replace-text-pdf-content-editor-disposal.cs) -- Replace text pdf content editor disposal
+- [`replace-text-pdf-using-pdfcontenteditor.cs`](./replace-text-pdf-using-pdfcontenteditor.cs) -- Replace text pdf using pdfcontenteditor
+- [`replace-text-preserve-font.cs`](./replace-text-preserve-font.cs) -- Replace text preserve font
+- [`replace-text-using-regex-across-pdf-pages.cs`](./replace-text-using-regex-across-pdf-pages.cs) -- Replace text using regex across pdf pages
+- [`replace-text-with-uuid-on-pdf-page.cs`](./replace-text-with-uuid-on-pdf-page.cs) -- Replace text with uuid on pdf page
+- [`reposition-stamp-left-margin.cs`](./reposition-stamp-left-margin.cs) -- Reposition stamp left margin
+- [`retrieve-pdf-viewer-preferences-save-xml.cs`](./retrieve-pdf-viewer-preferences-save-xml.cs) -- Retrieve pdf viewer preferences save xml
+- [`retrieve-pdf-viewer-preferences.cs`](./retrieve-pdf-viewer-preferences.cs) -- Retrieve pdf viewer preferences
+- [`retrieve-viewer-preferences-after-edit.cs`](./retrieve-viewer-preferences-after-edit.cs) -- Retrieve viewer preferences after edit
+- [`rotate-stamp-annotation-90-degrees.cs`](./rotate-stamp-annotation-90-degrees.cs) -- Rotate stamp annotation 90 degrees
+- [`rotate-text-annotation-90-degrees.cs`](./rotate-text-annotation-90-degrees.cs) -- Rotate text annotation 90 degrees
+- [`select-express-shipping-method-radio-button.cs`](./select-express-shipping-method-radio-button.cs) -- Select express shipping method radio button
+- [`set-annotation-opacity.cs`](./set-annotation-opacity.cs) -- Set annotation opacity
+- [`set-checkbox-field-in-pdf-form.cs`](./set-checkbox-field-in-pdf-form.cs) -- Set checkbox field in pdf form
+- [`set-hide-menubar-viewer-preference.cs`](./set-hide-menubar-viewer-preference.cs) -- Set hide menubar viewer preference
+- [`set-pdf-permissions-allow-copy-restrict-form-edit.cs`](./set-pdf-permissions-allow-copy-restrict-form-edit.cs) -- Set pdf permissions allow copy restrict form edit
+- [`set-pdf-viewer-preference-full-screen.cs`](./set-pdf-viewer-preference-full-screen.cs) -- Set pdf viewer preference full screen
+- [`set-pdf-viewer-preference-hide-navigation.cs`](./set-pdf-viewer-preference-hide-navigation.cs) -- Set pdf viewer preference hide navigation
+- [`set-pdf-viewer-preference-show-outlines.cs`](./set-pdf-viewer-preference-show-outlines.cs) -- Set pdf viewer preference show outlines
+- [`set-pdf-viewer-preference-single-page-zoom-100.cs`](./set-pdf-viewer-preference-single-page-zoom-100.cs) -- Set pdf viewer preference single page zoom 100
+- [`set-pdf-viewer-preference-single-page.cs`](./set-pdf-viewer-preference-single-page.cs) -- Set pdf viewer preference single page
+- [`set-pdf-viewer-preferences-and-zoom.cs`](./set-pdf-viewer-preferences-and-zoom.cs) -- Set pdf viewer preferences and zoom
+- [`set-red-border-color-redaction-annotation.cs`](./set-red-border-color-redaction-annotation.cs) -- Set red border color redaction annotation
+- [`silently-print-pdf-to-network-printer.cs`](./silently-print-pdf-to-network-printer.cs) -- Silently print pdf to network printer
+- [`split-edited-pdf-into-single-page-files.cs`](./split-edited-pdf-into-single-page-files.cs) -- Split edited pdf into single page files
+- [`toggle-fullscreen-viewer-preference.cs`](./toggle-fullscreen-viewer-preference.cs) -- Toggle fullscreen viewer preference
+- [`underline-phrase-on-pdf-page.cs`](./underline-phrase-on-pdf-page.cs) -- Underline phrase on pdf page
+- [`update-pdf-creator-metadata-xmp.cs`](./update-pdf-creator-metadata-xmp.cs) -- Update pdf creator metadata xmp
+- [`validate-pdf-integrity-after-adding-margins.cs`](./validate-pdf-integrity-after-adding-margins.cs) -- Validate pdf integrity after adding margins
+- [`verify-pdf-attachment-after-save.cs`](./verify-pdf-attachment-after-save.cs) -- Verify pdf attachment after save
+- [`verify-text-annotation-position.cs`](./verify-text-annotation-position.cs) -- Verify text annotation position
+
+## See Also
+
+- [`AGENTS.md`](./AGENTS.md) -- category-specific anti-patterns, API surface, and conventions for AI coding agents
+- [`../AGENTS.md`](../AGENTS.md) -- repository-wide agent guide
+- [`../README.md`](../README.md) -- full category index and project overview
+- [Aspose.PDF for .NET docs](https://docs.aspose.com/pdf/net/)
+
+> Each `.cs` file is a standalone, build-validated console example. Drop into a fresh `dotnet new console` project, add the `Aspose.PDF` NuGet (version above), and run.
