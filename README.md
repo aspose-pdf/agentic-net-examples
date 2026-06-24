@@ -12,7 +12,7 @@ This repository provides working code examples demonstrating Aspose.PDF for .NET
 | Categories | 34 |
 | Target framework | net10.0 |
 | Aspose.PDF version | 26.5.0 |
-| Last updated | 2026-06-18 |
+| Last updated | 2026-06-24 |
 
 ## For AI Coding Agents
 
@@ -158,4 +158,4 @@ All examples use [Aspose.PDF for .NET](https://products.aspose.com/pdf/net/) and
 
 ---
 
-*This repository is maintained by automated code generation. For AI-friendly guidance, see [AGENTS.md](./AGENTS.md). Last updated: 2026-06-18*
+*Maintained by an agentic example generation workflow | For AI-friendly guidance, see [AGENTS.md](./AGENTS.md) | Last updated: 2026-06-24*

@@ -1,0 +1,136 @@
+# Facades pages
+
+> **Facades pages** in PDF using C# / .NET -- **117** verified, compile-tested examples for **Aspose.PDF for .NET** 26.5.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+
+- Category: `facades-pages`
+- Examples: 117
+- NuGet: `Aspose.PDF 26.5.0` -- target `net10.0`
+
+## Examples
+
+- [`add-10-percent-margins-to-pdf-pages.cs`](./add-10-percent-margins-to-pdf-pages.cs) -- Add 10 percent margins to pdf pages
+- [`add-20-percent-margins-to-pdf-pages.cs`](./add-20-percent-margins-to-pdf-pages.cs) -- Add 20 percent margins to pdf pages
+- [`add-5-percent-margins-and-print-pdf.cs`](./add-5-percent-margins-and-print-pdf.cs) -- Add 5 percent margins and print pdf
+- [`adjust-pdf-zoom-by-word-count.cs`](./adjust-pdf-zoom-by-word-count.cs) -- Adjust pdf zoom by word count
+- [`align-page-3-vertically-to-top.cs`](./align-page-3-vertically-to-top.cs) -- Align page 3 vertically to top
+- [`apply-boxout-transition-to-pdf-page.cs`](./apply-boxout-transition-to-pdf-page.cs) -- Apply boxout transition to pdf page
+- [`apply-custom-page-transitions.cs`](./apply-custom-page-transitions.cs) -- Apply custom page transitions
+- [`apply-different-zoom-levels-to-pdf-pages.cs`](./apply-different-zoom-levels-to-pdf-pages.cs) -- Apply different zoom levels to pdf pages
+- [`apply-dissolve-transition-to-pdf-page.cs`](./apply-dissolve-transition-to-pdf-page.cs) -- Apply dissolve transition to pdf page
+- [`apply-fade-transition-to-all-pdf-pages.cs`](./apply-fade-transition-to-all-pdf-pages.cs) -- Apply fade transition to all pdf pages
+- [`apply-left-horizontal-alignment-to-pdf-pages.cs`](./apply-left-horizontal-alignment-to-pdf-pages.cs) -- Apply left horizontal alignment to pdf pages
+- [`apply-page-settings-from-json.cs`](./apply-page-settings-from-json.cs) -- Apply page settings from json
+- [`apply-page-transitions-by-index.cs`](./apply-page-transitions-by-index.cs) -- Apply page transitions by index
+- [`apply-rotation-zoom-transition-to-pdf-pages.cs`](./apply-rotation-zoom-transition-to-pdf-pages.cs) -- Apply rotation zoom transition to pdf pages
+- [`apply-sequential-page-transitions.cs`](./apply-sequential-page-transitions.cs) -- Apply sequential page transitions
+- [`apply-split-transition-to-pdf-page.cs`](./apply-split-transition-to-pdf-page.cs) -- Apply split transition to pdf page
+- [`apply-transitions-to-odd-pages.cs`](./apply-transitions-to-odd-pages.cs) -- Apply transitions to odd pages
+- [`apply-vertical-alignment-to-selected-pdf-pages.cs`](./apply-vertical-alignment-to-selected-pdf-pages.cs) -- Apply vertical alignment to selected pdf pages
+- [`apply-zoom-to-even-pages.cs`](./apply-zoom-to-even-pages.cs) -- Apply zoom to even pages
+- [`assign-page-transitions-based-on-content-type.cs`](./assign-page-transitions-based-on-content-type.cs) -- Assign page transitions based on content type
+- [`audit-pdf-page-size-rotation.cs`](./audit-pdf-page-size-rotation.cs) -- Audit pdf page size rotation
+- [`batch-change-pdf-page-size.cs`](./batch-change-pdf-page-size.cs) -- Batch change pdf page size
+- [`batch-convert-pdfs-to-a4.cs`](./batch-convert-pdfs-to-a4.cs) -- Batch convert pdfs to a4
+- [`batch-rotate-first-page-pdf.cs`](./batch-rotate-first-page-pdf.cs) -- Batch rotate first page pdf
+- [`batch-set-fade-transition-pdf-slideshow.cs`](./batch-set-fade-transition-pdf-slideshow.cs) -- Batch set fade transition pdf slideshow
+- [`center-content-horizontally-page2.cs`](./center-content-horizontally-page2.cs) -- Center content horizontally page2
+- [`center-page-alignment-set-display-duration.cs`](./center-page-alignment-set-display-duration.cs) -- Center page alignment set display duration
+- [`change-pdf-page-orientation-to-landscape.cs`](./change-pdf-page-orientation-to-landscape.cs) -- Change pdf page orientation to landscape
+- [`change-pdf-page-size-to-a3.cs`](./change-pdf-page-size-to-a3.cs) -- Change pdf page size to a3
+- [`convert-pdf-portrait-to-landscape.cs`](./convert-pdf-portrait-to-landscape.cs) -- Convert pdf portrait to landscape
+- [`create-booklet-pdf-with-15-percent-margins.cs`](./create-booklet-pdf-with-15-percent-margins.cs) -- Create booklet pdf with 15 percent margins
+- [`create-contentsresizeparameters-15-percent-margins.cs`](./create-contentsresizeparameters-15-percent-margins.cs) -- Create contentsresizeparameters 15 percent margins
+- [`create-contentsresizeparameters-with-uniform-margins.cs`](./create-contentsresizeparameters-with-uniform-margins.cs) -- Create contentsresizeparameters with uniform margins
+- [`create-pdf-slideshow-with-page-transitions.cs`](./create-pdf-slideshow-with-page-transitions.cs) -- Create pdf slideshow with page transitions
+- [`disable-page-transition-animation.cs`](./disable-page-transition-animation.cs) -- Disable page transition animation
+- [`dispose-pdfpageeditor-after-editing.cs`](./dispose-pdfpageeditor-after-editing.cs) -- Dispose pdfpageeditor after editing
+- [`edit-pdf-in-memory-using-pdfpageeditor.cs`](./edit-pdf-in-memory-using-pdfpageeditor.cs) -- Edit pdf in memory using pdfpageeditor
+- [`edit-pdf-save-new-with-backup.cs`](./edit-pdf-save-new-with-backup.cs) -- Edit pdf save new with backup
+- [`edit-signed-pdf-pages-preserve-signatures.cs`](./edit-signed-pdf-pages-preserve-signatures.cs) -- Edit signed pdf pages preserve signatures
+- [`extract-rotate-selected-pdf-pages.cs`](./extract-rotate-selected-pdf-pages.cs) -- Extract rotate selected pdf pages
+- [`generate-page-properties-report-before-after-edit.cs`](./generate-page-properties-report-before-after-edit.cs) -- Generate page properties report before after edit
+- [`handle-invalid-page-rotation.cs`](./handle-invalid-page-rotation.cs) -- Handle invalid page rotation
+- [`hybrid-content-resize-mixed-margins.cs`](./hybrid-content-resize-mixed-margins.cs) -- Hybrid content resize mixed margins
+- [`incremental-update-pdf-annotation.cs`](./incremental-update-pdf-annotation.cs) -- Incremental update pdf annotation
+- [`left-align-page-two.cs`](./left-align-page-two.cs) -- Left align page two
+- [`log-pdf-page-property-modifications.cs`](./log-pdf-page-property-modifications.cs) -- Log pdf page property modifications
+- [`merge-pdfs-with-aligned-margins.cs`](./merge-pdfs-with-aligned-margins.cs) -- Merge pdfs with aligned margins
+- [`modify-page-rotation-size-zoom.cs`](./modify-page-rotation-size-zoom.cs) -- Modify page rotation size zoom
+- [`preserve-form-fields-while-rotating-pdf-pages.cs`](./preserve-form-fields-while-rotating-pdf-pages.cs) -- Preserve form fields while rotating pdf pages
+- [`reset-rotation-page-six.cs`](./reset-rotation-page-six.cs) -- Reset rotation page six
+- [`resize-contents-only-on-pages-with-text.cs`](./resize-contents-only-on-pages-with-text.cs) -- Resize contents only on pages with text
+- [`resize-last-pdf-page-to-a5.cs`](./resize-last-pdf-page-to-a5.cs) -- Resize last pdf page to a5
+- [`resize-pdf-and-split-into-chapters.cs`](./resize-pdf-and-split-into-chapters.cs) -- Resize pdf and split into chapters
+- [`resize-pdf-contents-asymmetric-margins.cs`](./resize-pdf-contents-asymmetric-margins.cs) -- Resize pdf contents asymmetric margins
+- [`resize-pdf-contents-top-bottom-margins.cs`](./resize-pdf-contents-top-bottom-margins.cs) -- Resize pdf contents top bottom margins
+- [`resize-pdf-contents-uniform-margins.cs`](./resize-pdf-contents-uniform-margins.cs) -- Resize pdf contents uniform margins
+- [`resize-pdf-page-contents-10-percent-margins.cs`](./resize-pdf-page-contents-10-percent-margins.cs) -- Resize pdf page contents 10 percent margins
+- [`resize-pdf-page-contents-5-percent.cs`](./resize-pdf-page-contents-5-percent.cs) -- Resize pdf page contents 5 percent
+- [`resize-pdf-page-contents-custom-margins.cs`](./resize-pdf-page-contents-custom-margins.cs) -- Resize pdf page contents custom margins
+- [`resize-pdf-page-size-and-revert.cs`](./resize-pdf-page-size-and-revert.cs) -- Resize pdf page size and revert
+- [`resize-pdf-pages-preserve-annotations.cs`](./resize-pdf-pages-preserve-annotations.cs) -- Resize pdf pages preserve annotations
+- [`resize-pdf-pages-using-pdfpageeditor.cs`](./resize-pdf-pages-using-pdfpageeditor.cs) -- Resize pdf pages using pdfpageeditor
+- [`resize-rotate-pdf-pages.cs`](./resize-rotate-pdf-pages.cs) -- Resize rotate pdf pages
+- [`resize-specific-pdf-page-to-letter.cs`](./resize-specific-pdf-page-to-letter.cs) -- Resize specific pdf page to letter
+- [`retrieve-page-rotation-after-resize.cs`](./retrieve-page-rotation-after-resize.cs) -- Retrieve page rotation after resize
+- [`retrieve-page-rotation-pdf-page-editor.cs`](./retrieve-page-rotation-pdf-page-editor.cs) -- Retrieve page rotation pdf page editor
+- [`retrieve-pdf-page-size-with-pdfpageeditor.cs`](./retrieve-pdf-page-size-with-pdfpageeditor.cs) -- Retrieve pdf page size with pdfpageeditor
+- [`retrieve-rotated-page-size.cs`](./retrieve-rotated-page-size.cs) -- Retrieve rotated page size
+- [`revert-page-size-of-pdf-page.cs`](./revert-page-size-of-pdf-page.cs) -- Revert page size of pdf page
+- [`rotate-every-third-pdf-page-to-landscape.cs`](./rotate-every-third-pdf-page-to-landscape.cs) -- Rotate every third pdf page to landscape
+- [`rotate-landscape-pages-based-on-metadata.cs`](./rotate-landscape-pages-based-on-metadata.cs) -- Rotate landscape pages based on metadata
+- [`rotate-page-2-pdf-90-degrees.cs`](./rotate-page-2-pdf-90-degrees.cs) -- Rotate page 2 pdf 90 degrees
+- [`rotate-page-four-180-degrees.cs`](./rotate-page-four-180-degrees.cs) -- Rotate page four 180 degrees
+- [`rotate-pages-encrypted-pdf.cs`](./rotate-pages-encrypted-pdf.cs) -- Rotate pages encrypted pdf
+- [`rotate-pdf-page-180-preserve-transition.cs`](./rotate-pdf-page-180-preserve-transition.cs) -- Rotate pdf page 180 preserve transition
+- [`rotate-pdf-page-reset-orientation.cs`](./rotate-pdf-page-reset-orientation.cs) -- Rotate pdf page reset orientation
+- [`rotate-pdf-page-using-pdfpageeditor-memory-stream.cs`](./rotate-pdf-page-using-pdfpageeditor-memory-stream.cs) -- Rotate pdf page using pdfpageeditor memory stream
+- [`rotate-pdf-pages-after-resizing-contents.cs`](./rotate-pdf-pages-after-resizing-contents.cs) -- Rotate pdf pages after resizing contents
+- [`rotate-pdf-pages-to-landscape.cs`](./rotate-pdf-pages-to-landscape.cs) -- Rotate pdf pages to landscape
+- [`rotate-pdf-pages-using-pdfpageeditor.cs`](./rotate-pdf-pages-using-pdfpageeditor.cs) -- Rotate pdf pages using pdfpageeditor
+- [`rotate-pdf-pages-using-pdfpageeditor__v2.cs`](./rotate-pdf-pages-using-pdfpageeditor__v2.cs) -- Rotate pdf pages using pdfpageeditor  v2
+- [`rotate-pdf-pages-with-validation.cs`](./rotate-pdf-pages-with-validation.cs) -- Rotate pdf pages with validation
+- [`rotate-resize-page3-to-letter.cs`](./rotate-resize-page3-to-letter.cs) -- Rotate resize page3 to letter
+- [`rotate-resize-zoom-pdf-pages.cs`](./rotate-resize-zoom-pdf-pages.cs) -- Rotate resize zoom pdf pages
+- [`rotate-specific-pdf-pages.cs`](./rotate-specific-pdf-pages.cs) -- Rotate specific pdf pages
+- [`safely-retrieve-pdf-page-size.cs`](./safely-retrieve-pdf-page-size.cs) -- Safely retrieve pdf page size
+- [`save-modified-pdf-to-memorystream.cs`](./save-modified-pdf-to-memorystream.cs) -- Save modified pdf to memorystream
+- [`set-boxout-transition-zoom-page.cs`](./set-boxout-transition-zoom-page.cs) -- Set boxout transition zoom page
+- [`set-cover-transition-on-pdf-page.cs`](./set-cover-transition-on-pdf-page.cs) -- Set cover transition on pdf page
+- [`set-custom-a4-landscape-page-size.cs`](./set-custom-a4-landscape-page-size.cs) -- Set custom a4 landscape page size
+- [`set-custom-page-size-with-pdfpageeditor.cs`](./set-custom-page-size-with-pdfpageeditor.cs) -- Set custom page size with pdfpageeditor
+- [`set-display-duration-even-pages.cs`](./set-display-duration-even-pages.cs) -- Set display duration even pages
+- [`set-display-duration-for-pdf-page.cs`](./set-display-duration-for-pdf-page.cs) -- Set display duration for pdf page
+- [`set-display-duration-for-pdf-pages.cs`](./set-display-duration-for-pdf-pages.cs) -- Set display duration for pdf pages
+- [`set-fade-transition-on-first-pdf-page.cs`](./set-fade-transition-on-first-pdf-page.cs) -- Set fade transition on first pdf page
+- [`set-horizontal-alignment-and-zoom-on-page.cs`](./set-horizontal-alignment-and-zoom-on-page.cs) -- Set horizontal alignment and zoom on page
+- [`set-page-content-horizontal-alignment.cs`](./set-page-content-horizontal-alignment.cs) -- Set page content horizontal alignment
+- [`set-page-size-a4.cs`](./set-page-size-a4.cs) -- Set page size a4
+- [`set-page-transition-duration-based-on-title-length.cs`](./set-page-transition-duration-based-on-title-length.cs) -- Set page transition duration based on title length
+- [`set-page-transition-effects.cs`](./set-page-transition-effects.cs) -- Set page transition effects
+- [`set-pdf-page-size-to-letter-portrait.cs`](./set-pdf-page-size-to-letter-portrait.cs) -- Set pdf page size to letter portrait
+- [`set-pdf-page-zoom-to-100-percent.cs`](./set-pdf-page-zoom-to-100-percent.cs) -- Set pdf page zoom to 100 percent
+- [`set-pdf-page-zoom-using-pdfpageeditor.cs`](./set-pdf-page-zoom-using-pdfpageeditor.cs) -- Set pdf page zoom using pdfpageeditor
+- [`set-pdf-zoom-preview-final.cs`](./set-pdf-zoom-preview-final.cs) -- Set pdf zoom preview final
+- [`set-per-page-display-duration-by-word-count.cs`](./set-per-page-display-duration-by-word-count.cs) -- Set per page display duration by word count
+- [`set-per-page-display-duration.cs`](./set-per-page-display-duration.cs) -- Set per page display duration
+- [`set-slide-display-duration.cs`](./set-slide-display-duration.cs) -- Set slide display duration
+- [`set-specific-pdf-pages-to-us-letter-size.cs`](./set-specific-pdf-pages-to-us-letter-size.cs) -- Set specific pdf pages to us letter size
+- [`set-transition-duration-for-page-range.cs`](./set-transition-duration-for-page-range.cs) -- Set transition duration for page range
+- [`set-zoom-of-specific-pdf-page.cs`](./set-zoom-of-specific-pdf-page.cs) -- Set zoom of specific pdf page
+- [`set-zoom-on-pdf-page-7.cs`](./set-zoom-on-pdf-page-7.cs) -- Set zoom on pdf page 7
+- [`vertically-center-content-page-three.cs`](./vertically-center-content-page-three.cs) -- Vertically center content page three
+- [`zoom-even-pages-pdf.cs`](./zoom-even-pages-pdf.cs) -- Zoom even pages pdf
+- [`zoom-odd-pages-pdf.cs`](./zoom-odd-pages-pdf.cs) -- Zoom odd pages pdf
+- [`zoom-page-3-to-150-percent.cs`](./zoom-page-3-to-150-percent.cs) -- Zoom page 3 to 150 percent
+- [`zoom-pdf-pages-with-images.cs`](./zoom-pdf-pages-with-images.cs) -- Zoom pdf pages with images
+- [`zoom-selected-non-consecutive-pdf-pages.cs`](./zoom-selected-non-consecutive-pdf-pages.cs) -- Zoom selected non consecutive pdf pages
+
+## See Also
+
+- [`AGENTS.md`](./AGENTS.md) -- category-specific anti-patterns, API surface, and conventions for AI coding agents
+- [`../AGENTS.md`](../AGENTS.md) -- repository-wide agent guide
+- [`../README.md`](../README.md) -- full category index and project overview
+- [Aspose.PDF for .NET docs](https://docs.aspose.com/pdf/net/)
+
+> Each `.cs` file is a standalone, build-validated console example. Drop into a fresh `dotnet new console` project, add the `Aspose.PDF` NuGet (version above), and run.
