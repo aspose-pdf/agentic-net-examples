@@ -6,32 +6,30 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "form.pdf";
+        // Path to the source PDF form
+        const string sourcePdfPath = "form.pdf";
 
-        // Verify that the source PDF exists
-        if (!File.Exists(pdfPath))
+        // Verify that the file exists before proceeding
+        if (!File.Exists(sourcePdfPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"Error: File not found – {sourcePdfPath}");
             return;
         }
 
-        // Create an AutoFiller instance and bind the PDF form file
+        // Create an AutoFiller instance and bind it to the PDF form
+        // AutoFiller implements IDisposable, so we use a using block for deterministic cleanup
         using (AutoFiller autoFiller = new AutoFiller())
         {
-            // Bind the PDF document to the AutoFiller
-            autoFiller.BindPdf(pdfPath);
+            // Bind the PDF file to the AutoFiller
+            autoFiller.BindPdf(sourcePdfPath);
 
-            // Example: list all field names in the form using the Form facade
-            using (Form form = new Form(pdfPath))
-            {
-                Console.WriteLine("Form fields:");
-                foreach (string fieldName in form.FieldNames)
-                {
-                    Console.WriteLine(fieldName);
-                }
-            }
-
-            // Additional operations (e.g., importing data, saving) can be performed here
+            // At this point the AutoFiller is ready for further operations
+            // (e.g., importing data, filling fields, saving the result).
+            // Example placeholder:
+            // autoFiller.ImportDataTable(myDataTable);
+            // autoFiller.Save("filled_form.pdf");
         }
+
+        Console.WriteLine("AutoFiller successfully bound to the PDF form.");
     }
 }
