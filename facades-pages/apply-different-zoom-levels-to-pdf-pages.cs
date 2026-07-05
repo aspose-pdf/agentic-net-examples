@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -7,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "zoomed_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,32 +16,34 @@ class Program
             return;
         }
 
-        // PdfPageEditor is a facade that allows page‑level editing (zoom, rotation, etc.).
-        using (PdfPageEditor editor = new PdfPageEditor())
+        // Load the PDF document (using rule for document disposal)
+        using (Document doc = new Document(inputPath))
         {
-            // Load the source PDF.
-            editor.BindPdf(inputPath);
-
-            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing).
-            for (int i = 1; i <= editor.GetPages(); i++)
+            // Initialize PdfPageEditor with the loaded document
+            using (PdfPageEditor editor = new PdfPageEditor(doc))
             {
-                // Example zoom logic: 0.5× for page 1, 1.0× for page 2, 1.5× for page 3, …
-                float zoomFactor = 0.5f + 0.5f * (i - 1);
+                // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+                for (int i = 1; i <= doc.Pages.Count; i++)
+                {
+                    // Example: set different zoom levels per page
+                    // Odd pages -> 50% zoom, Even pages -> 100% zoom
+                    float zoom = (i % 2 == 1) ? 0.5f : 1.0f;
 
-                // Restrict the operation to the current page.
-                editor.ProcessPages = new int[] { i };
+                    // Specify the page to edit
+                    editor.ProcessPages = new int[] { i };
 
-                // Apply the zoom factor to the selected page.
-                editor.Zoom = zoomFactor;
+                    // Apply the zoom factor
+                    editor.Zoom = zoom;
 
-                // Commit the change for this page.
-                editor.ApplyChanges();
+                    // Commit changes for this page
+                    editor.ApplyChanges();
+                }
+
+                // Save the modified PDF (using rule for saving)
+                editor.Save(outputPath);
             }
-
-            // Save the modified PDF.
-            editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Zoom‑adjusted PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Zoom levels applied and saved to '{outputPath}'.");
     }
 }

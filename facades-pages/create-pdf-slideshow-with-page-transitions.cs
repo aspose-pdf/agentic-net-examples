@@ -1,67 +1,65 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class PdfSlideshowCreator
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "slideshow.pdf";
+        // Input and output PDF file paths
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "slideshow.pdf";
 
-        if (!File.Exists(inputPath))
+        // Verify input file exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the source PDF document
-        using (Document doc = new Document(inputPath))
+        // Example: define transition type and duration for each page.
+        // Transition types are defined as constant fields in PdfPageEditor.
+        // Here we use a simple pattern: alternating between two transitions.
+        // TransitionDuration is in seconds, DisplayDuration is also in seconds.
+        // Adjust the values to match your presentation needs.
+        const int transitionDuration = 2;   // seconds for the transition effect (int required)
+        const int displayDuration    = 5;   // seconds each page stays visible (int required)
+
+        // Create and configure the PdfPageEditor facade
+        using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // Initialize the page editor facade
-            using (PdfPageEditor editor = new PdfPageEditor())
+            // Bind the source PDF file
+            editor.BindPdf(inputPdf);
+
+            // Get total number of pages in the document
+            int pageCount = editor.GetPages();
+
+            // Apply transition and display settings to each page
+            for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++)
             {
-                // Bind the document to the editor
-                editor.BindPdf(doc);
+                // Specify which page to edit
+                editor.ProcessPages = new int[] { pageNumber };
 
-                // -----------------------------------------------------------------
-                // Page 1 – set a vertical blinds transition, 2‑second effect,
-                // display the page for 5 seconds before moving to the next page.
-                // -----------------------------------------------------------------
-                editor.ProcessPages      = new int[] { 1 };
-                editor.TransitionType    = PdfPageEditor.BLINDV;   // vertical blinds
-                editor.TransitionDuration = 2;                    // seconds for the transition effect
-                editor.DisplayDuration    = 5;                    // seconds the page stays visible
+                // Choose a transition type based on page number (example pattern)
+                // Available constants: BLINDH, BLINDV, BTWIPE, DGLITTER, DISSOLVE,
+                // INBOX, LRGLITTER, LRWIPE, OUTBOX, RLWIPE, SPLITHIN, SPLITHOUT,
+                // SPLITVIN, SPLITVOUT, TBGLITTER, TBWIPE
+                editor.TransitionType = (pageNumber % 2 == 0) ? PdfPageEditor.BLINDH : PdfPageEditor.DISSOLVE;
+
+                // Set the duration of the transition effect (in seconds, int required)
+                editor.TransitionDuration = transitionDuration;
+
+                // Set how long the page is displayed before moving to the next one (in seconds, int required)
+                editor.DisplayDuration = displayDuration;
+
+                // Apply the changes for the current page
                 editor.ApplyChanges();
-
-                // -----------------------------------------------------------------
-                // Page 2 – set a dissolve transition, 1‑second effect,
-                // display the page for 4 seconds.
-                // -----------------------------------------------------------------
-                editor.ProcessPages      = new int[] { 2 };
-                editor.TransitionType    = PdfPageEditor.DISSOLVE;
-                editor.TransitionDuration = 1;
-                editor.DisplayDuration    = 4;
-                editor.ApplyChanges();
-
-                // -----------------------------------------------------------------
-                // Page 3 – set a left‑to‑right wipe transition, 3‑second effect,
-                // display the page for 6 seconds.
-                // -----------------------------------------------------------------
-                editor.ProcessPages      = new int[] { 3 };
-                editor.TransitionType    = PdfPageEditor.LRWIPE; // left‑right wipe
-                editor.TransitionDuration = 3;
-                editor.DisplayDuration    = 6;
-                editor.ApplyChanges();
-
-                // Add more pages as needed following the same pattern.
             }
 
             // Save the modified PDF as a slideshow
-            doc.Save(outputPath);
+            editor.Save(outputPdf);
         }
 
-        Console.WriteLine($"Slideshow PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Slideshow PDF created: {outputPdf}");
     }
 }

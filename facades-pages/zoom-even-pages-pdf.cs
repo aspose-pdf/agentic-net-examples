@@ -1,6 +1,6 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -12,37 +12,35 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // PdfPageEditor is a facade that edits pages (zoom, rotate, etc.)
-        using (PdfPageEditor editor = new PdfPageEditor())
-        {
-            // Load the source PDF
-            editor.BindPdf(inputPath);
+        // Initialize the page editor and bind the source PDF
+        PdfPageEditor editor = new PdfPageEditor();
+        editor.BindPdf(inputPath);
 
-            // Total number of pages (1‑based indexing)
-            int pageCount = editor.GetPages();
+        // Determine total number of pages (1‑based indexing)
+        int totalPages = editor.GetPages();
 
-            // Select even‑numbered pages only
-            int[] evenPages = Enumerable.Range(1, pageCount)
-                                        .Where(p => p % 2 == 0)
-                                        .ToArray();
+        // Collect all even‑numbered page indices
+        List<int> evenPages = new List<int>();
+        for (int i = 2; i <= totalPages; i += 2)
+            evenPages.Add(i);
 
-            // Restrict editing to the even pages
-            editor.ProcessPages = evenPages;
+        // Specify which pages to edit
+        editor.ProcessPages = evenPages.ToArray();
 
-            // Set zoom factor to 0.8 (80 % of original size)
-            editor.Zoom = 0.8f;
+        // Apply a zoom factor of 1.2 (120%)
+        editor.Zoom = 1.2f;
 
-            // Apply the changes to the selected pages
-            editor.ApplyChanges();
+        // Commit the changes to the selected pages
+        editor.ApplyChanges();
 
-            // Save the modified PDF
-            editor.Save(outputPath);
-        }
+        // Save the modified document
+        editor.Save(outputPath);
+        editor.Close();
 
-        Console.WriteLine($"Even pages zoomed to 0.8 and saved as '{outputPath}'.");
+        Console.WriteLine($"Even pages have been zoomed to 1.2× and saved as '{outputPath}'.");
     }
 }

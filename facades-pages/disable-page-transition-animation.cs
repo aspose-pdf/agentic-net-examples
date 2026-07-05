@@ -16,17 +16,16 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a PdfPageEditor facade and bind it to the document
-            PdfPageEditor editor = new PdfPageEditor();
-            editor.BindPdf(doc);
+            // Create a PdfPageEditor bound to the loaded document
+            PdfPageEditor editor = new PdfPageEditor(doc);
 
-            // Specify that only page 6 should be edited
+            // Specify that only page 6 should be processed (pages are 1‑based)
             editor.ProcessPages = new int[] { 6 };
 
-            // Set transition duration to zero seconds (disable animation)
+            // Set the transition duration to zero seconds to disable animation
             editor.TransitionDuration = 0;
 
             // Apply the changes to the document
@@ -36,6 +35,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Transition duration set to zero on page 6. Saved to '{outputPath}'.");
+        Console.WriteLine($"Transition duration disabled for page 6. Saved to '{outputPath}'.");
     }
 }

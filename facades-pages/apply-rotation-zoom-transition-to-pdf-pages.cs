@@ -3,40 +3,42 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class PresentationPdfProcessor
+class Program
 {
     static void Main()
     {
-        const string inputPdf  = "presentation_input.pdf";
-        const string outputPdf = "presentation_output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "presentation.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the source PDF and edit its pages using PdfPageEditor (Facade API)
-        using (PdfPageEditor pageEditor = new PdfPageEditor())
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Bind the source PDF file to the editor
-            pageEditor.BindPdf(inputPdf);
+            // Initialize the PdfPageEditor facade with the loaded document
+            PdfPageEditor editor = new PdfPageEditor(doc);
 
-            // Example: apply rotation, zoom, and a transition effect to all pages
-            // Rotation must be 0, 90, 180 or 270 degrees
-            pageEditor.Rotation = 90;               // rotate 90 degrees clockwise
-            pageEditor.Zoom = 1.5f;                  // 150% zoom (1.0 = 100%) – float literal
-            pageEditor.TransitionType = PdfPageEditor.BLINDH; // vertical blinds transition
-            pageEditor.TransitionDuration = 2;      // transition lasts 2 seconds
-            pageEditor.DisplayDuration = 5;         // each page displayed for 5 seconds
+            // Set a uniform rotation for all pages (allowed values: 0, 90, 180, 270)
+            editor.Rotation = 90; // rotate 90 degrees clockwise
+
+            // Set a uniform zoom factor – integer percentage (e.g., 150 = 150%)
+            editor.Zoom = 150; // 150% zoom, integer required
+
+            // Optional: define a transition effect for presentation mode
+            editor.TransitionType = PdfPageEditor.BLINDV; // vertical blinds transition
+            editor.TransitionDuration = 2; // duration in seconds, integer required
 
             // Apply the configured changes to the document pages
-            pageEditor.ApplyChanges();
+            editor.ApplyChanges();
 
-            // Save the modified PDF to the output path
-            pageEditor.Save(outputPdf);
+            // Save the modified PDF back to disk
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Presentation PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Presentation PDF saved to '{outputPath}'.");
     }
 }

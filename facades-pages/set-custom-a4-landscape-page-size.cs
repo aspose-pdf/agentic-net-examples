@@ -16,31 +16,32 @@ class Program
             return;
         }
 
-        // Load the source PDF document
-        using (Document doc = new Document(inputPath))
+        // Use PdfPageEditor (Facade) to modify page size.
+        // The class implements IDisposable, so wrap it in a using block.
+        using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // Initialize the PdfPageEditor facade
-            using (PdfPageEditor editor = new PdfPageEditor())
-            {
-                // Bind the document to the editor
-                editor.BindPdf(doc);
+            // Load the source PDF.
+            editor.BindPdf(inputPath);
 
-                // A4 size in points: 210 mm × 297 mm ≈ 595 pt × 842 pt.
-                // Landscape orientation: width = 842 pt, height = 595 pt.
-                double width  = 842; // points
-                double height = 595; // points
+            // Create a PageSize instance.
+            // A4 size in points: 595 (height) x 842 (width) for portrait.
+            // For landscape we swap them: width = 842, height = 595.
+            // PageSize has no parameterless ctor, so instantiate with dummy values
+            // and then set the Width and Height properties as required.
+            PageSize customSize = new PageSize(0, 0);
+            customSize.Width  = 842; // width in points (landscape)
+            customSize.Height = 595; // height in points (landscape)
 
-                // Set custom page size using Width and Height properties
-                editor.PageSize = new PageSize((float)width, (float)height);
+            // Assign the custom size to the editor.
+            editor.PageSize = customSize;
 
-                // Apply the changes to the document
-                editor.ApplyChanges();
-            }
+            // Apply the changes to all pages.
+            editor.ApplyChanges();
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            // Save the modified PDF.
+            editor.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with custom A4 landscape size to '{outputPath}'.");
+        Console.WriteLine($"Custom A4 landscape PDF saved to '{outputPath}'.");
     }
 }

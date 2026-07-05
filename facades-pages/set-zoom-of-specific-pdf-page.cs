@@ -9,31 +9,32 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
+        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Edit the PDF using PdfPageEditor (Facade API)
+        // PdfPageEditor edits pages (rotate, zoom, size, etc.) via the Facades API
         using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // Load the source PDF
+            // Load the PDF document into the editor
             editor.BindPdf(inputPath);
 
-            // Restrict editing to page 5 only (1‑based indexing)
-            editor.ProcessPages = new int[] { 5 };
+            // Restrict editing to page 7 (Aspose.Pdf uses 1‑based page indexing)
+            editor.ProcessPages = new int[] { 7 };
 
-            // Set zoom to 75 % (0.75 corresponds to 75 %)
-            editor.Zoom = 0.75f;
+            // Set the zoom coefficient to 2.0 (200 % magnification)
+            editor.Zoom = 2.0f;
 
-            // Apply the changes to the document
+            // Apply the modifications to the underlying document
             editor.ApplyChanges();
 
-            // Save the modified PDF
+            // Save the edited PDF to a new file
             editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Page 5 zoom set to 75 % and saved as '{outputPath}'.");
+        Console.WriteLine($"Page 7 zoom set to 2.0 and saved to '{outputPath}'.");
     }
 }

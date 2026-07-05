@@ -1,46 +1,67 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;               // PageSize enum lives here
+using Aspose.Pdf.Facades;      // PdfPageEditor lives here
 
-class Program
+class PdfPageSizeModifier
 {
-    static void Main()
+    /// <summary>
+    /// Loads a PDF from a byte array, changes all pages to the specified size,
+    /// and saves the result to a file.
+    /// </summary>
+    /// <param name="pdfBytes">PDF content as a byte array.</param>
+    /// <param name="outputPath">Path of the output PDF file.</param>
+    /// <param name="newSize">Desired page size (e.g., PageSize.A4).</param>
+    public static void ProcessPdf(byte[] pdfBytes, string outputPath, PageSize newSize)
     {
-        // Input PDF as a byte array (could be read from a file, database, etc.)
-        const string inputPath  = "input.pdf";
-        const string outputPath = "resized_output.pdf";
+        if (pdfBytes == null || pdfBytes.Length == 0)
+            throw new ArgumentException("Input PDF byte array is empty.", nameof(pdfBytes));
 
-        if (!File.Exists(inputPath))
+        // Wrap the byte array in a MemoryStream for the facade.
+        using (MemoryStream inputStream = new MemoryStream(pdfBytes))
+        using (PdfPageEditor editor = new PdfPageEditor())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // Load the PDF bytes into memory
-        byte[] pdfBytes = File.ReadAllBytes(inputPath);
-
-        // Use a MemoryStream to bind the PDF to the PdfPageEditor facade
-        using (MemoryStream pdfStream = new MemoryStream(pdfBytes))
-        using (PdfPageEditor pageEditor = new PdfPageEditor())
-        {
-            // Bind the PDF document (from the stream) to the editor
-            pageEditor.BindPdf(pdfStream);
+            // Bind the PDF stream to the editor.
+            editor.BindPdf(inputStream);
 
             // Set the desired output page size.
-            // Example: A4 landscape (842 points width, 595 points height)
-            pageEditor.PageSize = new PageSize(842F, 595F);
+            editor.PageSize = newSize;
 
-            // Optional: adjust zoom if needed (1.0 = 100%)
-            pageEditor.Zoom = 1.0F;
+            // Apply the changes to the document.
+            editor.ApplyChanges();
 
-            // Apply the changes (not strictly required before Save, but explicit)
-            pageEditor.ApplyChanges();
-
-            // Save the modified PDF to the specified file
-            pageEditor.Save(outputPath);
+            // Save the modified PDF to the specified file.
+            editor.Save(outputPath);
         }
+    }
 
-        Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
+    // Helper: creates a minimal PDF in memory (one blank page).
+    private static byte[] CreateSamplePdf()
+    {
+        using (var doc = new Document())
+        {
+            doc.Pages.Add(); // add a single blank page
+            using (var ms = new MemoryStream())
+            {
+                doc.Save(ms);
+                return ms.ToArray();
+            }
+        }
+    }
+
+    // Example usage.
+    static void Main()
+    {
+        // Instead of reading a physical file, generate a sample PDF in memory.
+        byte[] pdfData = CreateSamplePdf();
+
+        // Define output path and target page size.
+        string resultPath = "output_resized.pdf";
+        PageSize targetSize = PageSize.A4; // Change as needed (Letter, Legal, etc.)
+
+        // Perform the modification.
+        ProcessPdf(pdfData, resultPath, targetSize);
+
+        Console.WriteLine($"PDF saved with new page size to '{resultPath}'.");
     }
 }

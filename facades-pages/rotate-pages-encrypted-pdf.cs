@@ -17,14 +17,14 @@ class Program
             return;
         }
 
-        // Load the encrypted PDF by providing the user (or owner) password.
+        // Open the encrypted PDF by providing the user (or owner) password.
         using (Document doc = new Document(inputPath, password))
         {
-            // Bind the loaded document to PdfPageEditor.
+            // Bind the opened document to PdfPageEditor.
             using (PdfPageEditor editor = new PdfPageEditor(doc))
             {
                 // Example manipulation: rotate all pages 90 degrees.
-                editor.Rotation = 90; // Valid values: 0, 90, 180, 270
+                editor.Rotation = 90; // Valid values: 0, 90, 180, 270.
 
                 // Apply the changes to the document.
                 editor.ApplyChanges();
