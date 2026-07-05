@@ -1,44 +1,44 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Paths to the source PDF and the resulting PDF
+        // Input and output PDF file paths
         const string inputPath = "input.pdf";
-        const string outputPath = "output_resized.pdf";
+        const string outputPath = "output_hybrid.pdf";
 
-        // Verify that the source file exists
+        // Verify that the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Create hybrid resize parameters:
-        // - Left margin: 10% of page width (percentage)
-        // - Right margin: 20 units (absolute)
-        // - Top margin: 5% of page height (percentage)
-        // - Bottom margin: 15 units (absolute)
-        // - Contents width and height are left as auto (null) so they are calculated automatically.
-        var parameters = new PdfFileEditor.ContentsResizeParameters(
-            PdfFileEditor.ContentsResizeValue.Percents(10),   // left margin (percent)
-            null,                                            // contents width (auto)
-            PdfFileEditor.ContentsResizeValue.Units(20),    // right margin (absolute units)
-            PdfFileEditor.ContentsResizeValue.Percents(5),  // top margin (percent)
-            null,                                            // contents height (auto)
-            PdfFileEditor.ContentsResizeValue.Units(15)     // bottom margin (absolute units)
-        );
+        // Create hybrid resize parameters with mixed percentage and absolute margins
+        // - Left margin: 10% of page width
+        // - Right margin: 20 points (absolute)
+        // - Top margin: 5% of page height
+        // - Bottom margin: 30 points (absolute)
+        // Width and height are left null (auto) – they are not set in the parameters object.
+        PdfFileEditor.ContentsResizeParameters parameters = new PdfFileEditor.ContentsResizeParameters
+        {
+            LeftMargin   = PdfFileEditor.ContentsResizeValue.Percents(10),   // 10% left
+            RightMargin  = PdfFileEditor.ContentsResizeValue.Units(20),      // 20 points right
+            TopMargin    = PdfFileEditor.ContentsResizeValue.Percents(5),    // 5% top
+            BottomMargin = PdfFileEditor.ContentsResizeValue.Units(30)       // 30 points bottom
+            // Width and Height remain null (auto)
+        };
 
-        // Use PdfFileEditor to apply the resize to all pages (null page array means all pages)
-        var editor = new PdfFileEditor();
+        // Initialize the PdfFileEditor and apply the resize to all pages (pages = null)
+        PdfFileEditor editor = new PdfFileEditor();
         bool success = editor.ResizeContents(inputPath, outputPath, null, parameters);
 
+        // Report the result
         Console.WriteLine(success
-            ? $"Resize completed successfully. Output saved to '{outputPath}'."
-            : "Resize operation failed.");
+            ? $"Hybrid resize completed successfully. Output saved to '{outputPath}'."
+            : "Hybrid resize operation failed.");
     }
 }

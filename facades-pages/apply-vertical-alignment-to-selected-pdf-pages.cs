@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -7,34 +6,41 @@ class Program
 {
     static void Main()
     {
+        // Input PDF file path
         const string inputPath = "input.pdf";
+        // Output PDF file path
         const string outputPath = "aligned_output.pdf";
 
-        if (!File.Exists(inputPath))
+        // Pages to which the vertical alignment will be applied (1‑based indexing)
+        int[] selectedPages = new int[] { 1, 2, 3 }; // adjust as needed
+
+        // Ensure the input file exists
+        if (!System.IO.File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Initialize the page editor and bind the source PDF
+        // Use PdfPageEditor (a SaveableFacade) within a using block for deterministic disposal
         using (PdfPageEditor editor = new PdfPageEditor())
         {
+            // Bind the source PDF document
             editor.BindPdf(inputPath);
 
-            // Specify which pages to modify (example: pages 1, 2, and 3)
-            editor.ProcessPages = new int[] { 1, 2, 3 };
+            // Specify which pages to edit
+            editor.ProcessPages = selectedPages;
 
-            // Align the original content to the top of the result pages
-            // The VerticalAlignment enum resides in the Aspose.Pdf namespace, not Facades.
-            editor.VerticalAlignmentType = Aspose.Pdf.VerticalAlignment.Top;
+            // Set vertical alignment to Top for consistent top positioning
+            // Use the new VerticalAlignment property that expects VerticalAlignmentType
+            editor.VerticalAlignment = VerticalAlignmentType.Top;
 
-            // Apply the alignment changes
+            // Apply the changes to the selected pages
             editor.ApplyChanges();
 
-            // Save the modified PDF
+            // Save the modified PDF to the output path
             editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Vertical alignment applied and saved to '{outputPath}'.");
+        Console.WriteLine($"Vertical alignment applied. Output saved to '{outputPath}'.");
     }
 }

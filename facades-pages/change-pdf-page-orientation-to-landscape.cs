@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_landscape.pdf";
+        const string outputPath = "landscape_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,16 +16,17 @@ class Program
             return;
         }
 
-        // Use PdfPageEditor facade to modify page size/orientation
+        // Use PdfPageEditor (Facade) to modify page size/orientation
         using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // Load the source PDF
+            // Bind the source PDF file
             editor.BindPdf(inputPath);
 
-            // Set the output page size to A4 landscape.
-            // A4 portrait dimensions are 297 (width) x 210 (height) points.
-            // Landscape orientation swaps width and height.
+            // Create an A4 landscape PageSize (swap width/height of the default A4)
             PageSize landscapeA4 = new PageSize(PageSize.A4.Height, PageSize.A4.Width);
+            landscapeA4.IsLandscape = true; // optional, clarifies orientation
+
+            // Set the desired output page size
             editor.PageSize = landscapeA4;
 
             // Apply the changes to the document

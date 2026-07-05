@@ -9,33 +9,35 @@ class Program
         const string inputPath  = "input.pdf";
         const string outputPath = "output_zoomed.pdf";
 
-        // Verify the source PDF exists
+        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // PdfPageEditor is a facade for page-level modifications.
-        // It implements IDisposable, so wrap it in a using block.
-        using (PdfPageEditor editor = new PdfPageEditor())
+        try
         {
-            // Load the PDF document into the editor.
-            editor.BindPdf(inputPath);
+            // Create and bind the PDF using PdfPageEditor (facade)
+            using (PdfPageEditor editor = new PdfPageEditor())
+            {
+                editor.BindPdf(inputPath);
 
-            // Set the zoom coefficient to 1.0 (100% scaling) for all pages.
-            editor.Zoom = 1.0f;
+                // Set zoom coefficient to 1.0 (100%) for all pages
+                editor.Zoom = 1.0f;
 
-            // Apply the changes made to the document.
-            editor.ApplyChanges();
+                // Apply the changes before saving
+                editor.ApplyChanges();
 
-            // Save the modified PDF to the desired output file.
-            editor.Save(outputPath);
+                // Save the modified PDF
+                editor.Save(outputPath);
+            }
 
-            // Close the editor (optional, as using will dispose it).
-            editor.Close();
+            Console.WriteLine($"Zoom set to 1.0 for all pages. Saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Zoom set to 1.0 and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

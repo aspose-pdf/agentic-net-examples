@@ -1,151 +1,129 @@
 using System;
 using System.IO;
 using System.Text.Json;
-using System.Collections.Generic;
-using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-public class PageConfig
+namespace PdfPageAutomation
 {
-    // Rotation in degrees (0, 90, 180, 270)
-    public int? Rotation { get; set; }
-
-    // Zoom factor (1.0 = 100%)
-    public double? Zoom { get; set; }
-
-    // Horizontal alignment: Left, Center, Right (not directly supported by Aspose, placeholder for future use)
-    public string? HorizontalAlignment { get; set; }
-
-    // Vertical alignment: Bottom, Middle, Top (not directly supported by Aspose, placeholder for future use)
-    public string? VerticalAlignment { get; set; }
-
-    // Desired page size (points). If both are set, PageSize will be applied.
-    public double? PageWidth { get; set; }
-    public double? PageHeight { get; set; }
-
-    // List of page numbers to which the settings should be applied (1‑based indexing).
-    public List<int>? ProcessPages { get; set; }
-}
-
-class Program
-{
-    static void Main(string[] args)
+    // Represents the JSON configuration for page adjustments.
+    public class PageSettingsConfig
     {
-        // Expected arguments:
-        // args[0] - path to JSON configuration file
-        // args[1] - input directory containing PDF files
-        // args[2] - output directory for processed PDFs
-        if (args.Length < 3)
+        // Rotation in degrees (0, 90, 180, 270). Nullable to allow omission.
+        public int? Rotation { get; set; }
+
+        // Zoom factor where 1.0 = 100%.
+        public float? Zoom { get; set; }
+
+        // Horizontal alignment: "Left", "Center", "Right".
+        public string HorizontalAlignment { get; set; }
+
+        // Vertical alignment: "Top", "Center", "Bottom".
+        public string VerticalAlignment { get; set; }
+
+        // Specific page numbers to which the settings should be applied (1‑based indexing).
+        public int[] ProcessPages { get; set; }
+    }
+
+    class Program
+    {
+        static void Main()
         {
-            Console.Error.WriteLine("Usage: <exe> <config.json> <inputFolder> <outputFolder>");
-            return;
-        }
+            const string configPath   = "settings.json";   // JSON file with the desired settings
+            const string inputPdfPath = "input.pdf";       // Source PDF
+            const string outputPdfPath = "output.pdf";     // Result PDF
 
-        string configPath = args[0];
-        string inputFolder = args[1];
-        string outputFolder = args[2];
+            // Validate existence of required files.
+            if (!File.Exists(configPath))
+            {
+                Console.Error.WriteLine($"Configuration file not found: {configPath}");
+                return;
+            }
 
-        if (!File.Exists(configPath))
-        {
-            Console.Error.WriteLine($"Configuration file not found: {configPath}");
-            return;
-        }
+            if (!File.Exists(inputPdfPath))
+            {
+                Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+                return;
+            }
 
-        if (!Directory.Exists(inputFolder))
-        {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
-            return;
-        }
-
-        Directory.CreateDirectory(outputFolder);
-
-        // Deserialize JSON configuration
-        PageConfig config;
-        try
-        {
-            string json = File.ReadAllText(configPath);
-            config = JsonSerializer.Deserialize<PageConfig>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Failed to read configuration: {ex.Message}");
-            return;
-        }
-
-        // Process each PDF file in the input folder
-        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
-        {
-            string fileName = Path.GetFileName(pdfPath);
-            string outputPath = Path.Combine(outputFolder, fileName);
-
+            // Deserialize JSON configuration.
+            PageSettingsConfig config;
             try
             {
-                // Load the document
-                Document pdfDocument = new Document(pdfPath);
-
-                // Determine which pages to process
-                IEnumerable<int> pagesToProcess;
-                if (config.ProcessPages != null && config.ProcessPages.Count > 0)
+                string json = File.ReadAllText(configPath);
+                config = JsonSerializer.Deserialize<PageSettingsConfig>(json, new JsonSerializerOptions
                 {
-                    pagesToProcess = config.ProcessPages;
-                }
-                else
+                    PropertyNameCaseInsensitive = true
+                });
+                if (config == null)
                 {
-                    pagesToProcess = Enumerable.Range(1, pdfDocument.Pages.Count);
+                    Console.Error.WriteLine("Failed to parse configuration.");
+                    return;
                 }
-
-                // Apply rotation and custom page size directly on the Page objects
-                foreach (int pageNumber in pagesToProcess)
-                {
-                    // Guard against out‑of‑range page numbers
-                    if (pageNumber < 1 || pageNumber > pdfDocument.Pages.Count)
-                        continue;
-
-                    Page page = pdfDocument.Pages[pageNumber];
-
-                    // Apply rotation if defined (cast int to Aspose.Pdf.Rotation enum)
-                    if (config.Rotation.HasValue)
-                    {
-                        page.Rotate = (Rotation)config.Rotation.Value;
-                    }
-
-                    // Apply custom page size if dimensions are supplied
-                    if (config.PageWidth.HasValue && config.PageHeight.HasValue)
-                    {
-                        page.PageInfo.Width = config.PageWidth.Value;
-                        page.PageInfo.Height = config.PageHeight.Value;
-                    }
-                    else if (config.PageWidth.HasValue)
-                    {
-                        page.PageInfo.Width = config.PageWidth.Value;
-                    }
-                    else if (config.PageHeight.HasValue)
-                    {
-                        page.PageInfo.Height = config.PageHeight.Value;
-                    }
-                }
-
-                // Apply zoom using PdfPageEditor if a zoom factor is defined
-                if (config.Zoom.HasValue)
-                {
-                    var editor = new PdfPageEditor();
-                    editor.BindPdf(pdfDocument);
-                    editor.Zoom = (float)config.Zoom.Value;
-                    editor.ProcessPages = pagesToProcess.ToArray();
-                    editor.Save(outputPath);
-                }
-                else
-                {
-                    // Save the modified document without zoom processing
-                    pdfDocument.Save(outputPath);
-                }
-
-                Console.WriteLine($"Processed '{fileName}' -> '{outputPath}'");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error reading configuration: {ex.Message}");
+                return;
+            }
+
+            // Open the PDF document and apply the settings via PdfPageEditor.
+            try
+            {
+                using (Document doc = new Document(inputPdfPath))
+                using (PdfPageEditor editor = new PdfPageEditor(doc))
+                {
+                    // Apply rotation if specified.
+                    if (config.Rotation.HasValue)
+                    {
+                        // Valid values are 0, 90, 180, 270.
+                        editor.Rotation = config.Rotation.Value;
+                    }
+
+                    // Apply zoom if specified.
+                    if (config.Zoom.HasValue)
+                    {
+                        editor.Zoom = config.Zoom.Value;
+                    }
+
+                    // Apply horizontal alignment if specified.
+                    if (!string.IsNullOrWhiteSpace(config.HorizontalAlignment))
+                    {
+                        // Parse string to the Aspose.Pdf.HorizontalAlignment enum.
+                        editor.HorizontalAlignment = (Aspose.Pdf.HorizontalAlignment)Enum.Parse(
+                            typeof(Aspose.Pdf.HorizontalAlignment),
+                            config.HorizontalAlignment,
+                            ignoreCase: true);
+                    }
+
+                    // Apply vertical alignment if specified.
+                    if (!string.IsNullOrWhiteSpace(config.VerticalAlignment))
+                    {
+                        // Parse string to the Aspose.Pdf.VerticalAlignment enum.
+                        editor.VerticalAlignmentType = (Aspose.Pdf.VerticalAlignment)Enum.Parse(
+                            typeof(Aspose.Pdf.VerticalAlignment),
+                            config.VerticalAlignment,
+                            ignoreCase: true);
+                    }
+
+                    // Restrict processing to specific pages if the array is provided.
+                    if (config.ProcessPages != null && config.ProcessPages.Length > 0)
+                    {
+                        editor.ProcessPages = config.ProcessPages;
+                    }
+
+                    // Commit the changes to the document.
+                    editor.ApplyChanges();
+
+                    // Save the modified PDF.
+                    doc.Save(outputPdfPath);
+                }
+
+                Console.WriteLine($"PDF processed successfully. Output saved to '{outputPdfPath}'.");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
             }
         }
     }

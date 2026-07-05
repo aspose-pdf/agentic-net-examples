@@ -6,50 +6,43 @@ class Program
 {
     static void Main()
     {
-        // Input and output PDF file paths
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Verify that the source file exists
+        // Verify that the source PDF exists.
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Create an instance of PdfFileEditor (no IDisposable, so no using block)
-        PdfFileEditor fileEditor = new PdfFileEditor();
+        // Create an instance of PdfFileEditor (no IDisposable, so no using block).
+        PdfFileEditor editor = new PdfFileEditor();
 
         // Define asymmetric margins:
-        //   Left  = 10% of page width
-        //   Right = 20% of page width
-        //   Top   = 5%  of page height
-        //   Bottom= 5%  of page height
-        // Contents width/height are set to Auto (null) so they are calculated automatically.
+        // Left 5% of page width, Right 15% of page width,
+        // Top 10% of page height, Bottom 10% of page height.
+        // Width and height of the content are left null for automatic calculation.
         PdfFileEditor.ContentsResizeParameters parameters = new PdfFileEditor.ContentsResizeParameters(
-            PdfFileEditor.ContentsResizeValue.Percents(10),   // left margin
-            null,                                            // auto contents width
-            PdfFileEditor.ContentsResizeValue.Percents(20),   // right margin
-            PdfFileEditor.ContentsResizeValue.Percents(5),    // top margin
-            null,                                            // auto contents height
-            PdfFileEditor.ContentsResizeValue.Percents(5)    // bottom margin
+            PdfFileEditor.ContentsResizeValue.Percents(5),   // left margin
+            null,                                            // contents width (auto)
+            PdfFileEditor.ContentsResizeValue.Percents(15),  // right margin
+            PdfFileEditor.ContentsResizeValue.Percents(10), // top margin
+            null,                                            // contents height (auto)
+            PdfFileEditor.ContentsResizeValue.Percents(10)  // bottom margin
         );
 
-        // Resize pages 1, 2 and 3; pass null to process all pages if needed
-        int[] pagesToResize = new int[] { 1, 2, 3 };
+        // Process all pages (null array means all pages).
+        using (FileStream src = new FileStream(inputPath, FileMode.Open, FileAccess.Read))
+        using (FileStream dest = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+        {
+            bool success = editor.ResizeContents(src, dest, null, parameters);
+            if (!success)
+            {
+                Console.Error.WriteLine("Resize operation failed.");
+            }
+        }
 
-        // Perform the resize operation
-        bool success = fileEditor.ResizeContents(
-            inputPath,
-            outputPath,
-            pagesToResize,
-            parameters
-        );
-
-        // Report the result
-        if (success)
-            Console.WriteLine($"Contents resized successfully. Output saved to '{outputPath}'.");
-        else
-            Console.Error.WriteLine("Resize operation failed.");
+        Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
     }
 }

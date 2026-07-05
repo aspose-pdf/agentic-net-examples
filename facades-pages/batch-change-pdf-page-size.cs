@@ -1,16 +1,43 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class BatchPageSizeProcessor
 {
+    // Mapping of file name (or pattern) to desired page size.
+    // Adjust this dictionary to match your printing requirements.
+    private static readonly Dictionary<string, PageSize> PageSizeMap = new Dictionary<string, PageSize>(StringComparer.OrdinalIgnoreCase)
+    {
+        // Example entries:
+        // {"ReportA.pdf", PageSize.A4},
+        // {"Invoice_*.pdf", PageSize.Letter},
+        // {"Brochure.pdf", PageSize.A5}
+    };
+
+    // Determines the target page size for a given file.
+    // Returns null if no specific size is defined (no change will be applied).
+    private static PageSize GetTargetPageSize(string fileName)
+    {
+        // Direct match
+        if (PageSizeMap.TryGetValue(fileName, out PageSize size))
+            return size;
+
+        // Simple wildcard support (e.g., "Invoice_*.pdf")
+        foreach (var kvp in PageSizeMap)
+        {
+            string pattern = kvp.Key.Replace("*", ".*").Replace("?", ".");
+            if (Regex.IsMatch(fileName, "^" + pattern + "$", RegexOptions.IgnoreCase))
+                return kvp.Value;
+        }
+
+        return null; // No specific size defined
+    }
+
     static void Main()
     {
-        // Folder containing source PDFs
         const string inputFolder = @"C:\PdfInput";
-        // Folder where processed PDFs will be saved
         const string outputFolder = @"C:\PdfOutput";
 
         if (!Directory.Exists(inputFolder))
@@ -21,41 +48,45 @@ class BatchPageSizeProcessor
 
         Directory.CreateDirectory(outputFolder);
 
-        // Define required page size per document (file name without extension as key)
-        // Add entries as needed; default will be A4 if not specified.
-        var pageSizeMap = new Dictionary<string, PageSize>(StringComparer.OrdinalIgnoreCase)
+        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            // Letter size (8.5" x 11") = 612 x 792 points (1 point = 1/72 inch)
-            { "Invoice", new PageSize(612, 792) },
-            { "Report", PageSize.A4 },
-            { "Brochure", PageSize.A5 }
-            // Add more mappings here
-        };
+            string fileName = Path.GetFileName(inputPath);
+            PageSize targetSize = GetTargetPageSize(fileName);
 
-        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
-        {
-            string fileName = Path.GetFileNameWithoutExtension(pdfPath);
-            // Determine the target page size
-            PageSize targetSize;
-            if (!pageSizeMap.TryGetValue(fileName, out targetSize) || targetSize == null)
+            // If no size mapping is found, copy the file unchanged.
+            if (targetSize == null)
             {
-                targetSize = PageSize.A4; // default size
+                string copyPath = Path.Combine(outputFolder, fileName);
+                File.Copy(inputPath, copyPath, overwrite: true);
+                Console.WriteLine($"Copied without changes: {fileName}");
+                continue;
             }
 
-            string outputPath = Path.Combine(outputFolder, Path.GetFileName(pdfPath));
+            string outputPath = Path.Combine(outputFolder, fileName);
 
-            // Use PdfPageEditor (Facade) to change page size
-            var editor = new PdfPageEditor();
-            // Bind the source PDF
-            editor.BindPdf(pdfPath);
-            // Set the desired page size for all pages
-            editor.PageSize = targetSize;
-            // Apply the changes to the document
-            editor.ApplyChanges();
-            // Save the modified PDF
-            editor.Save(outputPath);
+            try
+            {
+                // Load the PDF document.
+                using (Document doc = new Document(inputPath))
+                {
+                    // Apply the desired page size to every page.
+                    foreach (Page page in doc.Pages)
+                    {
+                        page.PageInfo.Width = targetSize.Width;
+                        page.PageInfo.Height = targetSize.Height;
+                        page.PageInfo.IsLandscape = targetSize.IsLandscape;
+                    }
 
-            Console.WriteLine($"Processed '{pdfPath}' -> '{outputPath}' with page size {targetSize}");
+                    // Save the modified document.
+                    doc.Save(outputPath);
+                }
+
+                Console.WriteLine($"Processed '{fileName}' with page size {targetSize}.");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{fileName}': {ex.Message}");
+            }
         }
 
         Console.WriteLine("Batch processing completed.");

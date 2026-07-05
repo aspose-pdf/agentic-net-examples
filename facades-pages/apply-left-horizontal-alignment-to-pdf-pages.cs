@@ -12,28 +12,26 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // PdfPageEditor is a facade that edits page layout.
-        // It implements IDisposable, so use a using block.
+        // PdfPageEditor is a facade for page-level editing.
         using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // Bind the source PDF.
+            // Load the source PDF.
             editor.BindPdf(inputPath);
 
-            // Set horizontal alignment for all pages to left.
-            // The enum is Aspose.Pdf.HorizontalAlignment.
-            editor.HorizontalAlignment = Aspose.Pdf.HorizontalAlignment.Left;
+            // Explicitly set left horizontal alignment for all pages.
+            editor.HorizontalAlignment = HorizontalAlignment.Left;
 
-            // Apply the changes to the document.
+            // Apply the alignment changes.
             editor.ApplyChanges();
 
-            // Save the modified PDF.
+            // Save the result.
             editor.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with left‑justified alignment: {outputPath}");
+        Console.WriteLine($"Horizontal alignment applied and saved to '{outputPath}'.");
     }
 }
