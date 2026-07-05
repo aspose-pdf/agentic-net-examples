@@ -3,61 +3,54 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
-namespace UpdatePdfAttachmentDescription
+class Program
 {
-    class Program
+    static void Main()
     {
-        static void Main(string[] args)
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string newDescription = "Updated attachment description - version 2";
+
+        if (!File.Exists(inputPath))
         {
-            // Step 1: Create a sample PDF with a file attachment annotation
-            using (Document createDoc = new Document())
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
+
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
+        {
+            bool updated = false;
+
+            // Pages are 1‑based in Aspose.Pdf
+            for (int pageIdx = 1; pageIdx <= doc.Pages.Count; pageIdx++)
             {
-                // Add a blank page (evaluation mode allows up to 4 pages, we use only one)
-                Page page = createDoc.Pages.Add();
+                Page page = doc.Pages[pageIdx];
 
-                // Create a simple text file to attach
-                File.WriteAllText("sample.txt", "This is version 1 of the attached file.");
-
-                // Create a file specification and set initial description
-                FileSpecification fileSpec = new FileSpecification("sample.txt");
-                fileSpec.Description = "Version 1";
-
-                // Define the rectangle where the annotation icon will appear
-                Rectangle rect = new Rectangle(100, 600, 200, 700);
-
-                // Create the file attachment annotation
-                FileAttachmentAnnotation attachment = new FileAttachmentAnnotation(page, rect, fileSpec);
-                // Use the correct enum for the icon (FileIcon is the enum type)
-                attachment.Icon = FileIcon.Paperclip;
-                attachment.Contents = "Sample attachment";
-
-                // Add the annotation to the page
-                page.Annotations.Add(attachment);
-
-                // Save the PDF
-                createDoc.Save("input.pdf");
-            }
-
-            // Step 2: Open the PDF and update the attachment description
-            using (Document doc = new Document("input.pdf"))
-            {
-                // Assuming the attachment is on the first page (1‑based indexing)
-                Page firstPage = doc.Pages[1];
-
-                // Iterate through annotations to find the file attachment
-                foreach (Annotation ann in firstPage.Annotations)
+                // Annotations collection is also 1‑based
+                for (int annIdx = 1; annIdx <= page.Annotations.Count; annIdx++)
                 {
-                    if (ann is FileAttachmentAnnotation)
+                    Annotation ann = page.Annotations[annIdx];
+
+                    // Look for file attachment annotations
+                    if (ann is FileAttachmentAnnotation fileAnn)
                     {
-                        FileAttachmentAnnotation fileAnn = (FileAttachmentAnnotation)ann;
-                        // Update the description of the embedded file
-                        fileAnn.File.Description = "Version 2 - Updated description";
+                        // Update the description of the attached file
+                        fileAnn.File.Description = newDescription;
+                        updated = true;
                     }
                 }
-
-                // Save the updated PDF
-                doc.Save("output.pdf");
             }
+
+            if (!updated)
+            {
+                Console.WriteLine("No FileAttachmentAnnotation found in the document.");
+            }
+
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
+
+        Console.WriteLine($"Attachment description updated and saved to '{outputPath}'.");
     }
 }
