@@ -1,8 +1,9 @@
 using System;
 using System.IO;
-using System.Linq;                     // For ToArray()
-using Aspose.Pdf;                     // Core PDF API
-using Aspose.Pdf.Text;                // TableAbsorber and related types
+using System.Collections.Generic;
+using System.Linq;
+using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -10,7 +11,7 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string keyword    = "CONFIDENTIAL";   // Table will be removed if any cell contains this text
+        const string keyword    = "CONFIDENTIAL"; // keyword to search for in any cell
 
         if (!File.Exists(inputPath))
         {
@@ -18,58 +19,52 @@ class Program
             return;
         }
 
-        // Document lifecycle must be wrapped in a using block (see document‑disposal‑with‑using rule)
+        // Load the PDF document (wrapped in using for proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based (see page‑indexing‑one‑based rule)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Create a TableAbsorber to find all tables in the document
+            TableAbsorber absorber = new TableAbsorber();
+
+            // Extract tables from the whole document
+            absorber.Visit(doc);
+
+            // Make a copy of the TableList because Remove() modifies the collection
+            List<AbsorbedTable> tables = absorber.TableList.ToList();
+
+            // Iterate over each table and check all cells for the keyword
+            foreach (AbsorbedTable table in tables)
             {
-                Page page = doc.Pages[pageIndex];
+                bool containsKeyword = false;
 
-                // Create a TableAbsorber for the current page
-                TableAbsorber absorber = new TableAbsorber();
-
-                // Extract tables on this page (Visit(Page) method)
-                absorber.Visit(page);
-
-                // TableList is modified by Remove, so work on a copy (see TableAbsorber remarks)
-                var tables = absorber.TableList.ToArray();
-
-                foreach (AbsorbedTable table in tables)
+                foreach (var row in table.RowList)
                 {
-                    bool containsKeyword = false;
-
-                    // Scan every cell's text fragments for the keyword
-                    foreach (var row in table.RowList)
+                    foreach (var cell in row.CellList)
                     {
-                        foreach (var cell in row.CellList)
+                        foreach (TextFragment fragment in cell.TextFragments)
                         {
-                            foreach (TextFragment fragment in cell.TextFragments)
+                            if (!string.IsNullOrEmpty(fragment.Text) &&
+                                fragment.Text.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
                             {
-                                if (fragment.Text != null &&
-                                    fragment.Text.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
-                                {
-                                    containsKeyword = true;
-                                    break;
-                                }
+                                containsKeyword = true;
+                                break;
                             }
-                            if (containsKeyword) break;
                         }
                         if (containsKeyword) break;
                     }
+                    if (containsKeyword) break;
+                }
 
-                    // Remove the table if the keyword was found
-                    if (containsKeyword)
-                    {
-                        absorber.Remove(table);
-                    }
+                // If the keyword was found, remove the entire table from the page
+                if (containsKeyword)
+                {
+                    absorber.Remove(table);
                 }
             }
 
-            // Save the modified PDF (PDF format, no special SaveOptions needed)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Processing complete. Output saved to '{outputPath}'.");
     }
 }

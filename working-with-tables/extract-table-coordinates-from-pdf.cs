@@ -15,27 +15,27 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (wrapped in using for proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Create a TableAbsorber to find tables
+            // Create a TableAbsorber to locate tables in the document
             TableAbsorber absorber = new TableAbsorber();
 
-            // Extract tables from the whole document
+            // Extract tables from the entire document
             absorber.Visit(doc);
 
-            // Iterate over each found table
+            // Iterate over each detected table
             for (int i = 0; i < absorber.TableList.Count; i++)
             {
-                AbsorbedTable table = absorber.TableList[i];
+                // Rectangle describing the table's position on its page
+                Aspose.Pdf.Rectangle rect = absorber.TableList[i].Rectangle;
 
-                // Get the rectangle that describes the table position
-                Aspose.Pdf.Rectangle rect = table.Rectangle;
-
-                // Output table index, page number and rectangle coordinates
-                Console.WriteLine(
-                    $"Table {i + 1} on page {table.PageNum}: " +
-                    $"LLX={rect.LLX}, LLY={rect.LLY}, URX={rect.URX}, URY={rect.URY}");
+                // Output table index, page number, and rectangle coordinates
+                Console.WriteLine($"Table {i + 1} (Page {absorber.TableList[i].PageNum}):");
+                Console.WriteLine($"  LowerLeftX  = {rect.LLX}");
+                Console.WriteLine($"  LowerLeftY  = {rect.LLY}");
+                Console.WriteLine($"  UpperRightX = {rect.URX}");
+                Console.WriteLine($"  UpperRightY = {rect.URY}");
             }
         }
     }

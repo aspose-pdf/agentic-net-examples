@@ -16,22 +16,27 @@ class Program
             return;
         }
 
-        // Load the PDF document (using statement ensures proper disposal)
+        // Load the PDF document with deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a TableAbsorber to locate tables
+            // Initialize TableAbsorber to locate tables in the document
             TableAbsorber absorber = new TableAbsorber();
 
-            // Extract tables from the first page (pages are 1‑based)
-            absorber.Visit(doc.Pages[1]);
+            // Extract tables from all pages of the document
+            absorber.Visit(doc);
 
             // If at least one table is found, remove the first one
             if (absorber.TableList.Count > 0)
             {
+                // Remove the first absorbed table from its page
                 absorber.Remove(absorber.TableList[0]);
             }
+            else
+            {
+                Console.WriteLine("No tables found to remove.");
+            }
 
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

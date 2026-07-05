@@ -1,7 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf;               // Core PDF API (Document, Table, Row, HorizontalAlignment)
 
 class Program
 {
@@ -16,35 +15,31 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for proper disposal
+        // Document lifecycle must be wrapped in a using block (deterministic disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Create a new table
-            Table table = new Table();
+            // Create a new table instance
+            Aspose.Pdf.Table table = new Aspose.Pdf.Table();
+
+            // Optional: set the table's position on the page
+            table.Left = 50;   // distance from the left edge
+            table.Top  = 700;  // distance from the bottom edge
 
             // Align the whole table to the center of the page
             table.HorizontalAlignment = Aspose.Pdf.HorizontalAlignment.Center;
 
-            // Define column widths (example: two columns of equal width)
-            table.ColumnWidths = "200 200";
+            // Add a simple row with two cells (demo content)
+            Aspose.Pdf.Row row = table.Rows.Add();
+            row.Cells.Add("Cell 1");
+            row.Cells.Add("Cell 2");
 
-            // Add a single row with two cells
-            Row row = new Row();
-            Cell cell1 = new Cell();
-            cell1.Paragraphs.Add(new TextFragment("Cell 1"));
-            Cell cell2 = new Cell();
-            cell2.Paragraphs.Add(new TextFragment("Cell 2"));
-            row.Cells.Add(cell1);
-            row.Cells.Add(cell2);
-            table.Rows.Add(row);
-
-            // Add the table to the first page of the document
+            // Insert the table into the first page's paragraph collection
             doc.Pages[1].Paragraphs.Add(table);
 
-            // Save the modified PDF
+            // Save the modified PDF (Document.Save without SaveOptions writes PDF)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Centered table saved to '{outputPath}'.");
+        Console.WriteLine($"Centered table PDF saved to '{outputPath}'.");
     }
 }

@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 
 class Program
 {
@@ -17,44 +16,44 @@ class Program
         }
 
         // Load the existing PDF document
-        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
+        using (Document doc = new Document(inputPath))
         {
             // Get the first page (Aspose.Pdf uses 1‑based indexing)
-            Aspose.Pdf.Page page = doc.Pages[1];
+            Page page = doc.Pages[1];
 
             // Create a new table
-            Aspose.Pdf.Table table = new Aspose.Pdf.Table();
+            Table table = new Table();
 
-            // Desired absolute position on the page (X, Y)
-            float x = 100f; // horizontal coordinate
-            float y = 500f; // vertical coordinate
-
-            // Table does not expose a Position property directly; use Left and Top for absolute placement
+            // NOTE: Table does not have a Position property.
+            // Position is set via the Left and Top properties (coordinates in points).
+            // Set the desired X (left) and Y (top) coordinates.
+            float x = 100f; // X coordinate from the left edge
+            float y = 500f; // Y coordinate from the bottom edge
             table.Left = x;
             table.Top  = y;
 
-            // Define column widths (example: three equal columns)
+            // Optional: define column widths (comma‑separated or space‑separated string)
             table.ColumnWidths = "100 100 100";
 
             // Add a header row
-            Aspose.Pdf.Row headerRow = table.Rows.Add();
-            headerRow.Cells.Add("Header 1");
-            headerRow.Cells.Add("Header 2");
-            headerRow.Cells.Add("Header 3");
+            Row header = table.Rows.Add();
+            header.Cells.Add("Header 1");
+            header.Cells.Add("Header 2");
+            header.Cells.Add("Header 3");
 
             // Add a data row
-            Aspose.Pdf.Row dataRow = table.Rows.Add();
-            dataRow.Cells.Add("Cell 1");
-            dataRow.Cells.Add("Cell 2");
-            dataRow.Cells.Add("Cell 3");
+            Row data = table.Rows.Add();
+            data.Cells.Add("Cell 1");
+            data.Cells.Add("Cell 2");
+            data.Cells.Add("Cell 3");
 
-            // Insert the table into the page's paragraph collection
+            // Add the table to the page's paragraph collection
             page.Paragraphs.Add(table);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Table inserted at ({100}, {500}) and saved to '{outputPath}'.");
+        Console.WriteLine($"Table inserted and saved to '{outputPath}'.");
     }
 }

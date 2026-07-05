@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,60 +16,63 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF document (lifecycle rule: use using)
         using (Document doc = new Document(inputPath))
         {
-            // Work with the first page (Aspose.Pdf uses 1‑based indexing)
+            // Work with the first page (page indexing is 1‑based)
             Page page = doc.Pages[1];
 
-            // Get the rectangle that tightly encloses existing page content
-            Aspose.Pdf.Rectangle contentRect = page.CalculateContentBBox();
+            // Pure page height excludes page margins
+            double pagePureHeight = page.PageInfo.PureHeight;
 
-            // Define custom margins (points). Adjust as needed.
-            double topMargin    = 36; // 0.5 inch
-            double bottomMargin = 36; // 0.5 inch
+            // Bounding box of existing content (without visible margins)
+            Aspose.Pdf.Rectangle contentBBox = page.CalculateContentBBox();
 
-            // Usable page height = page height without margins minus our custom margins
-            double usableHeight = page.PageInfo.PureHeight - topMargin - bottomMargin;
+            double existingContentHeight = contentBBox.URY - contentBBox.LLY;
 
-            // Height already occupied by existing content
-            double occupiedHeight = contentRect.URY - contentRect.LLY;
+            // Remaining vertical space on the page
+            double remainingHeight = pagePureHeight - existingContentHeight;
 
-            // Remaining vertical space for the new table
-            double remainingHeight = usableHeight - occupiedHeight;
+            Console.WriteLine($"Page pure height: {pagePureHeight}");
+            Console.WriteLine($"Existing content height: {existingContentHeight}");
+            Console.WriteLine($"Remaining height for table: {remainingHeight}");
 
             // Create a simple table
             Table table = new Table();
-            table.ColumnWidths = "200 200"; // two columns, each 200 points wide
+
+            // Position the table just below the existing content (cast to float because Table.Left/Top are float)
+            table.Left = (float)contentBBox.LLX;
+            table.Top = (float)contentBBox.URY; // start after current content
+
+            // Define column widths (example: two equal columns)
+            table.ColumnWidths = "100 100";
 
             // Add a single row with two cells
             Row row = new Row();
-            row.Cells.Add("Cell 1");
-            row.Cells.Add("Cell 2");
+            Cell cell1 = new Cell();
+            cell1.Paragraphs.Add(new TextFragment("Cell 1"));
+            Cell cell2 = new Cell();
+            cell2.Paragraphs.Add(new TextFragment("Cell 2"));
+            row.Cells.Add(cell1);
+            row.Cells.Add(cell2);
             table.Rows.Add(row);
 
-            // Determine how much height the table would need (optional)
+            // Calculate the table height on this page
             double tableHeight = table.GetHeight(page);
+            Console.WriteLine($"Calculated table height: {tableHeight}");
 
-            // Place the table only if it fits in the remaining space
+            // Add the table only if it fits into the remaining space
             if (tableHeight <= remainingHeight)
             {
-                // Position the table just below the existing content,
-                // respecting the bottom margin.
-                table.Left = (float)bottomMargin;
-                // In PDF coordinates Y grows upward; the top of the free area
-                // starts at contentRect.LLY minus the bottom margin.
-                table.Top = (float)(contentRect.LLY - bottomMargin);
-
-                // Add the table to the page's paragraph collection
                 page.Paragraphs.Add(table);
+                Console.WriteLine("Table added to the page.");
             }
             else
             {
-                Console.WriteLine("Not enough space to add the table on this page.");
+                Console.WriteLine("Table does not fit in the remaining space.");
             }
 
-            // Save the modified document
+            // Save the modified document (lifecycle rule: use using)
             doc.Save(outputPath);
         }
 

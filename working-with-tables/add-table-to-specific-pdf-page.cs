@@ -1,66 +1,90 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
-using Aspose.Pdf.Drawing;   // for BorderInfo, MarginInfo, BorderSide
+using Aspose.Pdf.Text;   // Required for TextFragment if needed
 
-class Program
+class AddTableToPage
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const int targetPageNumber = 2; // 1‑based page index
+        // Input and output PDF paths
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_with_table.pdf";
+
+        // The page number (1‑based) where the table will be inserted
+        const int targetPageNumber = 2;
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the existing PDF document inside a using block (ensures disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Validate the requested page number
+            // Validate the requested page exists
             if (targetPageNumber < 1 || targetPageNumber > doc.Pages.Count)
             {
-                Console.Error.WriteLine("Invalid page number.");
+                Console.Error.WriteLine($"Page {targetPageNumber} is out of range. Document has {doc.Pages.Count} pages.");
                 return;
             }
 
-            // Access the specific page
+            // Retrieve the target page
             Page page = doc.Pages[targetPageNumber];
 
-            // Create a table with three columns
-            Table table = new Table
+            // -------------------------------------------------
+            // Create a simple table
+            // -------------------------------------------------
+            Table table = new Table();
+
+            // Define column widths (comma‑separated or space‑separated string)
+            // Example: two columns, each 200 points wide
+            table.ColumnWidths = "200 200";
+
+            // Optional: set table border and background
+            table.Border = new BorderInfo(BorderSide.All, 1f, Color.Black);
+            table.BackgroundColor = Color.LightGray;
+
+            // Add header row
+            Row header = table.Rows.Add();
+            header.Cells.Add("Header 1");
+            header.Cells.Add("Header 2");
+            // Make header text bold
+            foreach (Cell cell in header.Cells)
             {
-                ColumnWidths = "100 150 200", // widths for three columns
-                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Black), // float literal
-                DefaultCellPadding = new MarginInfo(5, 5, 5, 5)
-            };
+                cell.DefaultCellTextState = new TextState
+                {
+                    Font = FontRepository.FindFont("Helvetica-Bold"),
+                    FontSize = 12,
+                    ForegroundColor = Color.Black
+                };
+            }
 
-            // ----- Header row -----
-            Row headerRow = table.Rows.Add(); // adds a new row
-            Cell h1 = headerRow.Cells.Add();
-            h1.Paragraphs.Add(new TextFragment("Header 1"));
-            Cell h2 = headerRow.Cells.Add();
-            h2.Paragraphs.Add(new TextFragment("Header 2"));
-            Cell h3 = headerRow.Cells.Add();
-            h3.Paragraphs.Add(new TextFragment("Header 3"));
+            // Add a data row
+            Row data = table.Rows.Add();
+            data.Cells.Add("Value A");
+            data.Cells.Add("Value B");
+            // Set regular text style for data cells
+            foreach (Cell cell in data.Cells)
+            {
+                cell.DefaultCellTextState = new TextState
+                {
+                    Font = FontRepository.FindFont("Helvetica"),
+                    FontSize = 11,
+                    ForegroundColor = Color.Black
+                };
+            }
 
-            // ----- Data row -----
-            Row dataRow = table.Rows.Add();
-            dataRow.Cells.Add().Paragraphs.Add(new TextFragment("Row1 Col1"));
-            dataRow.Cells.Add().Paragraphs.Add(new TextFragment("Row1 Col2"));
-            dataRow.Cells.Add().Paragraphs.Add(new TextFragment("Row1 Col3"));
-
+            // -------------------------------------------------
             // Insert the table into the page's paragraph collection
+            // -------------------------------------------------
             page.Paragraphs.Add(table);
 
-            // Save the modified document (lifecycle rule)
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Table added to page {targetPageNumber} and saved as '{outputPath}'.");
+        Console.WriteLine($"Table added to page {targetPageNumber}. Saved as '{outputPath}'.");
     }
 }

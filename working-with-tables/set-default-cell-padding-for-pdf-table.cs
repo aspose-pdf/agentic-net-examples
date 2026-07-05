@@ -1,84 +1,55 @@
 using System;
-using System.IO;
-using System.Runtime.InteropServices; // for OS check
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // for text handling if needed
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "table_with_padding.pdf";
 
-        // Suppress known NuGet vulnerability warnings (NU1903) that may be treated as errors
-        #pragma warning disable NU1903
-        // Load existing PDF or create a new one if the file does not exist
-        using (Document doc = File.Exists(inputPath) ? new Document(inputPath) : new Document())
+        // Create a new PDF document (wrapped in using for proper disposal)
+        using (Document doc = new Document())
         {
-            // Ensure there is at least one page to host the table
-            if (doc.Pages.Count == 0)
-                doc.Pages.Add();
+            // Add a page to the document
+            Page page = doc.Pages.Add();
 
-            // Create a table with two columns
-            Table table = new Table();
-
-            // Define default cell padding (5 points on each side) using MarginInfo
-            MarginInfo defaultPadding = new MarginInfo
+            // Create a table with three columns
+            Table table = new Table
             {
-                Top    = 5,
-                Bottom = 5,
-                Left   = 5,
-                Right  = 5
+                ColumnWidths = "100 100 100"
             };
 
-            // Apply the padding to the entire table
-            table.DefaultCellPadding = defaultPadding;
+            // Define default cell padding for the entire table
+            MarginInfo padding = new MarginInfo();
+            padding.Top = 5;      // 5 points top padding
+            padding.Bottom = 5;   // 5 points bottom padding
+            padding.Left = 5;     // 5 points left padding
+            padding.Right = 5;    // 5 points right padding
+            table.DefaultCellPadding = padding;
 
-            // Add header row
-            Row headerRow = table.Rows.Add();
-            headerRow.Cells.Add("Header 1");
-            headerRow.Cells.Add("Header 2");
+            // Add a header row
+            Row header = table.Rows.Add();
+            header.Cells.Add("Header 1");
+            header.Cells.Add("Header 2");
+            header.Cells.Add("Header 3");
 
-            // Add a data row
-            Row dataRow = table.Rows.Add();
-            dataRow.Cells.Add("Data 1");
-            dataRow.Cells.Add("Data 2");
-
-            // Insert the table into the first page
-            doc.Pages[1].Paragraphs.Add(table);
-
-            // Save the modified document – guard against missing libgdiplus on non‑Windows platforms
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            // Add a few data rows
+            for (int i = 1; i <= 3; i++)
             {
-                doc.Save(outputPath);
+                Row row = table.Rows.Add();
+                row.Cells.Add($"Row {i} Col 1");
+                row.Cells.Add($"Row {i} Col 2");
+                row.Cells.Add($"Row {i} Col 3");
             }
-            else
-            {
-                try
-                {
-                    doc.Save(outputPath);
-                }
-                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
-                {
-                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. PDF saved without GDI+ dependent features.");
-                }
-            }
-        }
-        #pragma warning restore NU1903
 
-        Console.WriteLine($"Table with default cell padding saved to '{outputPath}'.");
-    }
+            // Place the table on the page
+            page.Paragraphs.Add(table);
 
-    // Helper to detect a nested DllNotFoundException (e.g., missing libgdiplus)
-    private static bool ContainsDllNotFound(Exception? ex)
-    {
-        while (ex != null)
-        {
-            if (ex is DllNotFoundException)
-                return true;
-            ex = ex.InnerException;
+            // Save the PDF document
+            doc.Save(outputPath);
         }
-        return false;
+
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }
