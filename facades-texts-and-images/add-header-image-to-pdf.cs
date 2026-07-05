@@ -4,40 +4,26 @@ using Aspose.Pdf.Facades;
 
 class Program
 {
-    // Usage:
-    //   dotnet run <headerImagePath> <outputDirectory> <inputPdf1> [<inputPdf2> ...]
     static void Main(string[] args)
     {
-        if (args.Length < 3)
+        // Expect at least two arguments: header image path and one or more PDF files
+        if (args.Length < 2)
         {
-            Console.Error.WriteLine("Usage: <headerImagePath> <outputDirectory> <inputPdf1> [<inputPdf2> ...]");
+            Console.WriteLine("Usage: <app> <headerImagePath> <pdfPath1> [pdfPath2] ...");
             return;
         }
 
         string headerImagePath = args[0];
-        string outputDirectory = args[1];
 
+        // Verify the header image exists once before processing
         if (!File.Exists(headerImagePath))
         {
             Console.Error.WriteLine($"Header image not found: {headerImagePath}");
             return;
         }
 
-        if (!Directory.Exists(outputDirectory))
-        {
-            try
-            {
-                Directory.CreateDirectory(outputDirectory);
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Failed to create output directory: {ex.Message}");
-                return;
-            }
-        }
-
-        // Process each input PDF file
-        for (int i = 2; i < args.Length; i++)
+        // Process each PDF file supplied in the arguments
+        for (int i = 1; i < args.Length; i++)
         {
             string inputPdfPath = args[i];
 
@@ -47,35 +33,19 @@ class Program
                 continue;
             }
 
-            // Build output file name: original name + "_header.pdf"
+            // Build output file name by appending "_header" before the extension
             string outputPdfPath = Path.Combine(
-                outputDirectory,
+                Path.GetDirectoryName(inputPdfPath) ?? string.Empty,
                 Path.GetFileNameWithoutExtension(inputPdfPath) + "_header.pdf");
 
-            try
-            {
-                // Initialize PdfFileStamp facade
-                PdfFileStamp fileStamp = new PdfFileStamp();
+            // Use PdfFileStamp facade to add the header image
+            PdfFileStamp fileStamp = new PdfFileStamp();
+            fileStamp.BindPdf(inputPdfPath);                     // Load the source PDF
+            fileStamp.AddHeader(headerImagePath, 20f);           // Add image as header with 20 units top margin
+            fileStamp.Save(outputPdfPath);                       // Save the modified PDF
+            fileStamp.Close();                                   // Release resources
 
-                // Bind the source PDF
-                fileStamp.BindPdf(inputPdfPath);
-
-                // Add the header image to all pages.
-                // Top margin of 20 points (adjust as needed)
-                fileStamp.AddHeader(headerImagePath, 20f);
-
-                // Save the modified PDF
-                fileStamp.Save(outputPdfPath);
-
-                // Close the facade (releases resources)
-                fileStamp.Close();
-
-                Console.WriteLine($"Processed '{inputPdfPath}' -> '{outputPdfPath}'");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{inputPdfPath}': {ex.Message}");
-            }
+            Console.WriteLine($"Processed: {inputPdfPath} -> {outputPdfPath}");
         }
     }
 }

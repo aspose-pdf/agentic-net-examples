@@ -2,37 +2,58 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-public class PdfImageRemover
+namespace PdfUtilities
 {
-    // Removes all images from the specified PDF and saves the result.
-    public static void RemoveAllImages(string inputPdfPath, string outputPdfPath)
+    public static class PdfImageRemover
     {
-        if (!File.Exists(inputPdfPath))
+        /// <summary>
+        /// Removes all images from the specified PDF file and saves the result to a new file.
+        /// </summary>
+        /// <param name="inputPdfPath">Path to the source PDF.</param>
+        /// <param name="outputPdfPath">Path where the image‑free PDF will be saved.</param>
+        public static void RemoveAllImages(string inputPdfPath, string outputPdfPath)
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
-            return;
+            if (!File.Exists(inputPdfPath))
+                throw new FileNotFoundException($"Input file not found: {inputPdfPath}");
+
+            // PdfContentEditor implements IDisposable, so we wrap it in a using block.
+            using (PdfContentEditor editor = new PdfContentEditor())
+            {
+                // Load the PDF document.
+                editor.BindPdf(inputPdfPath);
+
+                // Delete every image from the document.
+                editor.DeleteImage();
+
+                // Save the modified PDF to the output path.
+                editor.Save(outputPdfPath);
+            }
         }
-
-        // Initialize the facade (does not implement IDisposable, so no using block).
-        PdfContentEditor editor = new PdfContentEditor();
-
-        // Load the source PDF.
-        editor.BindPdf(inputPdfPath);
-
-        // Delete every image in the document.
-        editor.DeleteImage();
-
-        // Write the modified PDF to the destination file.
-        editor.Save(outputPdfPath);
     }
 
-    // Example entry point.
-    public static void Main()
+    class Program
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_no_images.pdf";
+        /// <summary>
+        /// Entry point required for a console application.
+        /// Expects two arguments: input PDF path and output PDF path.
+        /// </summary>
+        static void Main(string[] args)
+        {
+            if (args.Length != 2)
+            {
+                Console.WriteLine("Usage: PdfImageRemover <inputPdfPath> <outputPdfPath>");
+                return;
+            }
 
-        RemoveAllImages(inputPath, outputPath);
-        Console.WriteLine($"All images removed. Output saved to '{outputPath}'.");
+            try
+            {
+                PdfImageRemover.RemoveAllImages(args[0], args[1]);
+                Console.WriteLine("All images removed successfully.");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+            }
+        }
     }
 }

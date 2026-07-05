@@ -6,34 +6,27 @@ class Program
 {
     static void Main()
     {
-        // Input PDF containing the image to be removed
-        const string inputPdf  = "input.pdf";
-        // Output PDF after the image has been removed
-        const string outputPdf = "output.pdf";
-        // Object ID (index) of the image to delete on page 4
-        const int imageObjectId = 5; // adjust to the actual image index
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const int pageNumber = 4;          // target page (1‑based)
+        const int imageIndex = 2;          // index of the image to remove on that page
 
-        // Verify that the source file exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Use PdfContentEditor (Aspose.Pdf.Facades) to manipulate the PDF
+        // Create the editor and bind the source PDF
         PdfContentEditor editor = new PdfContentEditor();
+        editor.BindPdf(inputPath);
 
-        // Load the PDF document
-        editor.BindPdf(inputPdf);
+        // Delete the specified image from page four
+        editor.DeleteImage(pageNumber, new int[] { imageIndex });
 
-        // Delete the specified image from page 4.
-        // Page numbers are 1‑based; the image index array contains the object IDs to remove.
-        editor.DeleteImage(4, new int[] { imageObjectId });
+        // Save the resulting PDF
+        editor.Save(outputPath);
 
-        // Save the modified PDF
-        editor.Save(outputPdf);
-
-        Console.WriteLine($"Image with object ID {imageObjectId} removed from page 4.");
-        Console.WriteLine($"Result saved to '{outputPdf}'.");
+        Console.WriteLine($"Removed image index {imageIndex} from page {pageNumber} and saved to '{outputPath}'.");
     }
 }

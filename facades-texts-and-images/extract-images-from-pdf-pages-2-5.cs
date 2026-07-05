@@ -14,13 +14,13 @@ class Program
             return;
         }
 
-        // Create a unique temporary folder for extracted images
-        string tempFolder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        Directory.CreateDirectory(tempFolder);
+        // Create a temporary folder for extracted images
+        string tempDir = Path.Combine(Path.GetTempPath(), "AsposePdfImages_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tempDir);
 
         try
         {
-            // Use PdfExtractor facade to extract images from pages 2‑5
+            // Use PdfExtractor (facade) to extract images from pages 2‑5
             using (PdfExtractor extractor = new PdfExtractor())
             {
                 extractor.BindPdf(inputPdf);
@@ -31,14 +31,15 @@ class Program
                 int imageIndex = 1;
                 while (extractor.HasNextImage())
                 {
-                    string outputPath = Path.Combine(tempFolder, $"image_{imageIndex}.png");
-                    // Save each image as PNG (default format can be changed via overload)
-                    extractor.GetNextImage(outputPath, System.Drawing.Imaging.ImageFormat.Png);
+                    string outputPath = Path.Combine(tempDir, $"image_{imageIndex}.png");
+                    // Save each image; default format is PNG if extension is .png
+                    extractor.GetNextImage(outputPath);
+                    Console.WriteLine($"Extracted image {imageIndex} to {outputPath}");
                     imageIndex++;
                 }
             }
 
-            Console.WriteLine($"Images extracted to temporary folder: {tempFolder}");
+            Console.WriteLine($"All images saved to temporary directory: {tempDir}");
         }
         catch (Exception ex)
         {

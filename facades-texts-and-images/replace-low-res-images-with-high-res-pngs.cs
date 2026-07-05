@@ -7,61 +7,52 @@ class ReplaceLowResImages
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";
-        const string outputPdfPath  = "output.pdf";
-        const string highResFolder  = "HighResImages"; // folder containing replacement PNGs
+        // Input PDF containing low‑resolution images
+        const string inputPdfPath  = "input.pdf";
+        // Output PDF with high‑resolution PNG replacements
+        const string outputPdfPath = "output.pdf";
+        // Path to the high‑resolution PNG that will replace each image
+        const string highResPngPath = "highres.png";
 
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        if (!Directory.Exists(highResFolder))
+        if (!File.Exists(highResPngPath))
         {
-            Console.Error.WriteLine($"High‑resolution images folder not found: {highResFolder}");
+            Console.Error.WriteLine($"High‑resolution image not found: {highResPngPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF to obtain page and image counts (required for the loop)
         using (Document doc = new Document(inputPdfPath))
         {
-            // Facade for editing content (including image replacement)
-            using (PdfContentEditor editor = new PdfContentEditor())
+            int pageCount = doc.Pages.Count; // 1‑based indexing
+
+            // Facade for editing PDF content (image replacement)
+            PdfContentEditor editor = new PdfContentEditor();
+            editor.BindPdf(inputPdfPath);
+
+            // Iterate over each page
+            for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++)
             {
-                // Bind the document to the editor
-                editor.BindPdf(doc);
+                // Number of images on the current page (1‑based)
+                int imageCount = doc.Pages[pageNumber].Resources.Images.Count;
 
-                // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-                for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+                // Replace each image with the high‑resolution PNG
+                for (int imageIndex = 1; imageIndex <= imageCount; imageIndex++)
                 {
-                    Page page = doc.Pages[pageNum];
-
-                    // Image collection on the page (1‑based indexing)
-                    int imageCount = page.Resources.Images.Count;
-
-                    // Loop over each image ID on the current page
-                    for (int imgIndex = 1; imgIndex <= imageCount; imgIndex++)
-                    {
-                        // Build the expected high‑resolution PNG file name.
-                        // Example naming convention: "page1_img1.png", "page2_img3.png", etc.
-                        string highResFileName = $"page{pageNum}_img{imgIndex}.png";
-                        string highResPath = Path.Combine(highResFolder, highResFileName);
-
-                        // If a replacement image exists, replace the low‑resolution image
-                        if (File.Exists(highResPath))
-                        {
-                            // ReplaceImage replaces the image at the given page and index
-                            editor.ReplaceImage(pageNum, imgIndex, highResPath);
-                            Console.WriteLine($"Replaced image {imgIndex} on page {pageNum} with '{highResFileName}'.");
-                        }
-                    }
+                    // ReplaceImage(page, index, newImageFile)
+                    editor.ReplaceImage(pageNumber, imageIndex, highResPngPath);
                 }
-
-                // Save the modified document (PDF format)
-                doc.Save(outputPdfPath);
-                Console.WriteLine($"Modified PDF saved to '{outputPdfPath}'.");
             }
+
+            // Save the modified PDF
+            editor.Save(outputPdfPath);
         }
+
+        Console.WriteLine($"High‑resolution images applied. Output saved to '{outputPdfPath}'.");
     }
 }
