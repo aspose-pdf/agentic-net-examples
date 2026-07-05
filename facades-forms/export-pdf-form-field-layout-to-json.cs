@@ -18,14 +18,15 @@ class Program
         // Initialize the Form facade with the source PDF
         using (Form form = new Form(inputPdf))
         {
-            // Export all form fields (including their layout rectangles) to JSON
+            // Create a file stream for the JSON output
             using (FileStream jsonStream = new FileStream(outputJson, FileMode.Create, FileAccess.Write))
             {
-                // 'true' makes the JSON output indented for readability
-                form.ExportJson(jsonStream, true);
+                // Export all form fields (including their layout rectangles) to JSON.
+                // 'indented: true' makes the JSON human‑readable.
+                form.ExportJson(jsonStream, indented: true);
             }
         }
 
-        Console.WriteLine($"Form field layout exported to '{outputJson}'.");
+        Console.WriteLine($"Form field layout exported to JSON: {outputJson}");
     }
 }

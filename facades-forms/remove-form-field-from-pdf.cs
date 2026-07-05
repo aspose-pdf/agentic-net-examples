@@ -13,23 +13,30 @@ class Program
         // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // FormEditor implements SaveableFacade, so we can use a using block for deterministic disposal
-        using (FormEditor editor = new FormEditor())
+        try
         {
-            // Load the PDF document into the editor
-            editor.BindPdf(inputPath);
+            // Create the FormEditor facade
+            using (FormEditor editor = new FormEditor())
+            {
+                // Load the PDF document
+                editor.BindPdf(inputPath);
 
-            // Remove the unwanted form field
-            editor.RemoveField(fieldName);
+                // Remove the specified form field
+                editor.RemoveField(fieldName);
 
-            // Save the modified PDF to a new file
-            editor.Save(outputPath);
+                // Save the modified PDF
+                editor.Save(outputPath);
+            }
+
+            Console.WriteLine($"Field '{fieldName}' removed. Output saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Removed field '{fieldName}' and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

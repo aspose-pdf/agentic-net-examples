@@ -1,42 +1,57 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms; // TextBoxField
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations; // for AnnotationFlags
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";      // existing PDF with a form
-        const string outputPdf = "output_with_version.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        // Load the existing PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Create a zero‑size rectangle (off‑page) – the field will be hidden.
-            var rect = new Rectangle(0, 0, 0, 0);
-
-            // Create the hidden numeric field "Version" with initial value "2".
-            var versionField = new TextBoxField(doc.Pages[1], rect)
+            // Initialize FormEditor facade on the loaded document
+            using (FormEditor formEditor = new FormEditor(doc))
             {
-                PartialName = "Version",
-                Value = "2"
-                // No Flags property – a zero‑size rectangle already hides the field.
-            };
+                // Add a hidden numeric field named "Version" on page 1.
+                // Coordinates are set to a zero‑size rectangle (off‑page) because the field is hidden.
+                bool added = formEditor.AddField(FieldType.Text, "Version", 1, 0, 0, 0, 0);
+                if (!added)
+                {
+                    Console.Error.WriteLine("Failed to add the 'Version' field.");
+                    return;
+                }
 
-            // Add the field to the form on page 1.
-            doc.Form.Add(versionField, 1);
+                // Retrieve the newly created field as a TextBoxField (the concrete type for a text field).
+                TextBoxField versionField = doc.Form["Version"] as TextBoxField;
+                if (versionField == null)
+                {
+                    Console.Error.WriteLine("Unable to locate the 'Version' field after creation.");
+                    return;
+                }
 
-            // Save the modified PDF.
-            doc.Save(outputPdf);
+                // Mark the field as hidden so it does not appear in the UI or printing.
+                versionField.Flags = AnnotationFlags.Hidden;
+
+                // Set the field value (numeric 2). The field type is Text, so store as string.
+                versionField.Value = "2";
+
+                // Save the modified PDF.
+                formEditor.Save(outputPath);
+            }
         }
 
-        Console.WriteLine($"PDF saved with hidden Version field: {outputPdf}");
+        Console.WriteLine($"PDF with hidden 'Version' field saved to '{outputPath}'.");
     }
 }

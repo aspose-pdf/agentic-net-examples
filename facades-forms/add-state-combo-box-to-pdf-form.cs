@@ -1,53 +1,51 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;   // FormEditor, FieldType
-using Aspose.Pdf;           // For completeness if needed
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "template.pdf";   // PDF containing a form
-        const string outputPdf = "output.pdf";
+        const string inputPdf  = "input.pdf";   // source PDF containing a form
+        const string outputPdf = "output.pdf";  // PDF with the new combo box
 
-        // Verify the source PDF exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Initialize FormEditor with source and destination files
-        FormEditor formEditor = new FormEditor(inputPdf, outputPdf);
-
-        // Define the rectangle for the combo box (coordinates in points)
-        float llx = 100f; // lower‑left X
-        float lly = 600f; // lower‑left Y
-        float urx = 200f; // upper‑right X
-        float ury = 620f; // upper‑right Y
-
-        // Add a combo box field named "State" on page 1
-        formEditor.AddField(FieldType.ComboBox, "State", 1, llx, lly, urx, ury);
-
-        // List of US state abbreviations
-        string[] states = new string[]
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA",
-            "HI","ID","IL","IN","IA","KS","KY","LA","ME","MD",
-            "MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ",
-            "NM","NY","NC","ND","OH","OK","OR","PA","RI","SC",
-            "SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"
-        };
+            // Create a FormEditor bound to the loaded document
+            FormEditor formEditor = new FormEditor(doc);
 
-        // Populate the combo box with the state abbreviations
-        foreach (string state in states)
-        {
-            formEditor.AddListItem("State", state);
+            // Add a combo box field named "State" on page 1.
+            // Rectangle coordinates: lower‑left (100, 500), upper‑right (200, 520)
+            formEditor.AddField(FieldType.ComboBox, "State", 1, 100f, 500f, 200f, 520f);
+
+            // US state abbreviations to populate the combo box
+            string[] stateAbbreviations = new string[]
+            {
+                "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA",
+                "HI","ID","IL","IN","IA","KS","KY","LA","ME","MD",
+                "MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ",
+                "NM","NY","NC","ND","OH","OK","OR","PA","RI","SC",
+                "SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"
+            };
+
+            // Add each abbreviation as an item in the combo box
+            foreach (string abbrev in stateAbbreviations)
+            {
+                formEditor.AddListItem("State", abbrev);
+            }
+
+            // Save the modified PDF to the output file
+            formEditor.Save(outputPdf);
         }
 
-        // Persist the changes to the output PDF
-        formEditor.Save();
-
-        Console.WriteLine($"Combo box 'State' added and saved to '{outputPdf}'.");
+        Console.WriteLine($"Combo box \"State\" added and saved to '{outputPdf}'.");
     }
 }
