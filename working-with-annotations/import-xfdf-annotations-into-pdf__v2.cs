@@ -1,44 +1,39 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                 // Core PDF API
-using Aspose.Pdf.Annotations;    // Provides XfdfReader (optional)
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath     = "input.pdf";      // Source PDF
-        const string xfdfPath    = "annotations.xfdf"; // XFDF file containing annotations
-        const string outputPath  = "output.pdf";     // Resulting PDF
+        // Paths to the source PDF, XFDF file containing annotations, and the output PDF
+        const string pdfPath = "input.pdf";
+        const string xfdfPath = "annotations.xfdf";
+        const string outputPath = "output.pdf";
 
-        // Verify input files exist
+        // Verify that the required files exist before proceeding
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"Error: PDF file not found at '{pdfPath}'.");
             return;
         }
         if (!File.Exists(xfdfPath))
         {
-            Console.Error.WriteLine($"XFDF file not found: {xfdfPath}");
+            Console.Error.WriteLine($"Error: XFDF file not found at '{xfdfPath}'.");
             return;
         }
 
-        // Load the PDF document (lifecycle: load)
+        // Load the PDF document inside a using block to ensure proper disposal
         using (Document doc = new Document(pdfPath))
         {
-            // Option 1: Use Document's built‑in method
+            // Import all annotations from the XFDF file into the loaded document.
+            // This operation preserves the existing page layout and content.
             doc.ImportAnnotationsFromXfdf(xfdfPath);
 
-            // Option 2 (alternative): use XfdfReader with a stream
-            // using (FileStream xfdfStream = File.OpenRead(xfdfPath))
-            // {
-            //     XfdfReader.ReadAnnotations(xfdfStream, doc);
-            // }
-
-            // Save the modified PDF (lifecycle: save)
+            // Save the modified document to the specified output path.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Annotations imported successfully. Saved to '{outputPath}'.");
+        Console.WriteLine($"Successfully imported annotations and saved to '{outputPath}'.");
     }
 }

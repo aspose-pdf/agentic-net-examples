@@ -7,57 +7,60 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output_with_screen_annotations.pdf";
+        // Input PDF and output PDF paths
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "output_with_screen_annotations.pdf";
 
-        // Video files to be attached – one per page (repeat if fewer than pages)
-        string[] videoFiles = { "video1.mp4", "video2.mp4", "video3.mp4" };
-
-        if (!File.Exists(inputPdf))
+        // Video files – one per page (ensure the array length matches the number of pages)
+        string[] videoFiles = new string[]
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            "video1.mp4",
+            "video2.mp4",
+            "video3.mp4"
+            // Add more entries as needed for additional pages
+        };
+
+        if (!File.Exists(inputPdfPath))
+        {
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Optional: verify that video files exist
-        foreach (var vf in videoFiles)
+        // Load the PDF document (wrapped in using for deterministic disposal)
+        using (Document doc = new Document(inputPdfPath))
         {
-            if (!File.Exists(vf))
+            // Verify that we have enough video files for the pages
+            if (videoFiles.Length < doc.Pages.Count)
             {
-                Console.Error.WriteLine($"Video file not found: {vf}");
+                Console.Error.WriteLine("Not enough video files provided for the number of pages.");
                 return;
             }
-        }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
-        using (Document doc = new Document(inputPdf))
-        {
-            int pageCount = doc.Pages.Count;
-
-            // Iterate pages (Aspose.Pdf uses 1‑based indexing)
-            for (int i = 1; i <= pageCount; i++)
+            // Iterate over pages (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Select a video file for the current page (wrap around if needed)
-                string mediaPath = videoFiles[(i - 1) % videoFiles.Length];
+                Page page = doc.Pages[i];
 
-                // Define the annotation rectangle (example coordinates)
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 100, 300, 300);
+                // Define the rectangle where the screen annotation will appear
+                // (left, bottom, width, height) – adjust values as needed
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 200);
 
-                // Create a ScreenAnnotation using the constructor (ScreenAnnotation(Page, Rectangle, string))
-                ScreenAnnotation screenAnn = new ScreenAnnotation(doc.Pages[i], rect, mediaPath)
+                // Create the ScreenAnnotation with the corresponding video file
+                ScreenAnnotation screenAnn = new ScreenAnnotation(page, rect, videoFiles[i - 1])
                 {
-                    Title = $"Video {i}",
-                    Contents = $"Play video {Path.GetFileName(mediaPath)}"
+                    // Optional: set a title or contents for the annotation
+                    Title    = $"Video {i}",
+                    Contents = $"Play video {Path.GetFileName(videoFiles[i - 1])}"
                 };
 
                 // Add the annotation to the page's annotation collection
-                doc.Pages[i].Annotations.Add(screenAnn);
+                page.Annotations.Add(screenAnn);
             }
 
-            // Save the modified PDF (save-to-non-pdf rule: Save writes PDF regardless of extension)
-            doc.Save(outputPdf);
+            // Save the modified PDF
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Saved PDF with screen annotations to '{outputPdf}'.");
+        Console.WriteLine($"PDF saved with screen annotations: {outputPdfPath}");
     }
 }

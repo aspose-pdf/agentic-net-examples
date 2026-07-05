@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Core PDF API (Facades not used per namespace restriction)
 
 class Program
 {
@@ -10,38 +10,36 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
+        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (using statement ensures proper disposal)
+        // Load the PDF document (using the prescribed lifecycle rule)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
+            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing internally)
             foreach (Page page in doc.Pages)
             {
-                // Collect BackgroundArtifact instances first to avoid modifying the collection while iterating
-                List<Artifact> artifactsToRemove = new List<Artifact>();
+                // Collect BackgroundArtifact instances first
+                var toRemove = new List<Artifact>();
                 foreach (Artifact artifact in page.Artifacts)
                 {
                     if (artifact is BackgroundArtifact)
-                    {
-                        artifactsToRemove.Add(artifact);
-                    }
+                        toRemove.Add(artifact);
                 }
 
-                // Remove each collected BackgroundArtifact from the page
-                foreach (Artifact artifact in artifactsToRemove)
+                // Delete the collected artifacts from the page
+                foreach (Artifact artifact in toRemove)
                 {
-                    // Use the Delete method provided by ArtifactCollection instead of Remove
+                    // Delete removes the artifact from the collection and disposes unmanaged resources
                     page.Artifacts.Delete(artifact);
-                    // No explicit Dispose needed; the collection handles cleanup
                 }
             }
 
-            // Save the modified document
+            // Save the modified PDF (using the prescribed lifecycle rule)
             doc.Save(outputPath);
         }
 

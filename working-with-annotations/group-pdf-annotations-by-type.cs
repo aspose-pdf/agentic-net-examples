@@ -16,40 +16,38 @@ class Program
             return;
         }
 
-        // Dictionary to group annotations by their AnnotationType
-        var groups = new Dictionary<AnnotationType, List<Annotation>>();
-
-        // Load the PDF inside a using block (lifecycle rule)
+        // Load the PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based indexed
-            for (int i = 1; i <= doc.Pages.Count; i++)
-            {
-                Page page = doc.Pages[i];
-                AnnotationCollection annotations = page.Annotations;
+            // Dictionary to group annotations by their type
+            var annotationGroups = new Dictionary<AnnotationType, List<Annotation>>();
 
-                // Iterate over each annotation on the page
-                foreach (Annotation annotation in annotations)
+            // Iterate over all pages (pages collection is 1‑based, but foreach works)
+            foreach (Page page in doc.Pages)
+            {
+                // Iterate over all annotations on the current page
+                foreach (Annotation annotation in page.Annotations)
                 {
+                    // Get the annotation type (enum)
                     AnnotationType type = annotation.AnnotationType;
 
-                    // Create a list for the type if it does not exist yet
-                    if (!groups.TryGetValue(type, out List<Annotation> list))
+                    // Ensure a list exists for this type
+                    if (!annotationGroups.ContainsKey(type))
                     {
-                        list = new List<Annotation>();
-                        groups[type] = list;
+                        annotationGroups[type] = new List<Annotation>();
                     }
 
-                    list.Add(annotation);
+                    // Add the annotation to the appropriate group
+                    annotationGroups[type].Add(annotation);
                 }
             }
-        }
 
-        // Simple reporting: print the count of each annotation type
-        Console.WriteLine("Annotation report:");
-        foreach (var kvp in groups)
-        {
-            Console.WriteLine($"{kvp.Key}: {kvp.Value.Count} instance(s)");
+            // Reporting: output count of annotations per type
+            Console.WriteLine("Annotation counts by type:");
+            foreach (KeyValuePair<AnnotationType, List<Annotation>> kvp in annotationGroups)
+            {
+                Console.WriteLine($"{kvp.Key}: {kvp.Value.Count}");
+            }
         }
     }
 }

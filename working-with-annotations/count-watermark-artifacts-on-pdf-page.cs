@@ -1,6 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using System.Linq;               // For LINQ extensions (OfType, Count)
+using Aspose.Pdf;               // Core Aspose.Pdf namespace
 
 class Program
 {
@@ -14,21 +15,16 @@ class Program
             return;
         }
 
-        // Open the PDF document (lifecycle rule: wrap in using)
+        // Open the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Aspose.Pdf uses 1‑based page indexing
+            // Aspose.Pdf uses 1‑based page indexing; get the first page
             Page page = doc.Pages[1];
 
-            // Count only WatermarkArtifact instances on the page
-            int watermarkCount = 0;
-            foreach (Artifact artifact in page.Artifacts)
-            {
-                if (artifact is WatermarkArtifact)
-                {
-                    watermarkCount++;
-                }
-            }
+            // Count only artifacts that are of type WatermarkArtifact
+            int watermarkCount = page.Artifacts
+                                      .OfType<WatermarkArtifact>()
+                                      .Count();
 
             Console.WriteLine($"Watermark artifacts on page 1: {watermarkCount}");
         }

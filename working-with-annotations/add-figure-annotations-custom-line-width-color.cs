@@ -7,11 +7,10 @@ class Program
 {
     static void Main()
     {
-        // Input and output PDF paths
         const string inputPath  = "input.pdf";
         const string outputPath = "annotated_output.pdf";
 
-        // Pages on which to place the figure annotations (1‑based indexing)
+        // Pages on which to add the figure annotation (1‑based indexing)
         int[] targetPages = { 1, 3, 5 };
 
         if (!File.Exists(inputPath))
@@ -20,44 +19,35 @@ class Program
             return;
         }
 
-        // Load the PDF document (using rule: document‑disposal‑with‑using)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Define annotation appearance
-            Aspose.Pdf.Color annotationColor = Aspose.Pdf.Color.Blue;   // Stroke color
-            int lineWidth = 2;                                          // Custom line width (int, as Border.Width expects int)
-
-            // Iterate over the selected pages
             foreach (int pageNumber in targetPages)
             {
-                // Guard against invalid page numbers
+                // Guard against out‑of‑range page numbers
                 if (pageNumber < 1 || pageNumber > doc.Pages.Count)
-                {
-                    Console.WriteLine($"Skipping invalid page number: {pageNumber}");
                     continue;
-                }
 
                 Page page = doc.Pages[pageNumber];
 
-                // Define the rectangle that bounds the figure annotation
-                // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 600);
+                // Define the annotation rectangle (llx, lly, urx, ury)
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-                // Create a concrete figure annotation (SquareAnnotation)
-                SquareAnnotation figure = new SquareAnnotation(page, rect)
+                // Create a concrete figure annotation – SquareAnnotation in this case
+                SquareAnnotation square = new SquareAnnotation(page, rect)
                 {
-                    // Set the stroke color
-                    Color = annotationColor
+                    // Set the annotation border color
+                    Color = Aspose.Pdf.Color.Blue
                 };
 
-                // Set custom line width via the Border object (requires parent annotation)
-                figure.Border = new Border(figure) { Width = lineWidth };
+                // Set line width via Border (requires the parent annotation in the constructor)
+                square.Border = new Border(square) { Width = 3 };
 
-                // Add the annotation to the page's annotation collection
-                page.Annotations.Add(figure);
+                // Add the annotation to the page
+                page.Annotations.Add(square);
             }
 
-            // Save the modified PDF (using rule: document‑disposal‑with‑using)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

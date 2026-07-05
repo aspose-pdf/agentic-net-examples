@@ -7,59 +7,56 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string csvPath = "annotations_report.csv";
+        const string inputPath = "input.pdf";
+        const string csvPath   = "annotations.csv";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
+        // Open the PDF and create a CSV writer – both wrapped in using for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        using (StreamWriter writer = new StreamWriter(csvPath, false))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPdf))
-            // Open a writer for the CSV output
-            using (StreamWriter writer = new StreamWriter(csvPath, false))
+            // CSV header
+            writer.WriteLine("PageNumber,AnnotationType,RectLLX,RectLLY,RectURX,RectURY,Title,Contents");
+
+            // Pages are 1‑based in Aspose.Pdf
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                // CSV header
-                writer.WriteLine("PageNumber,AnnotationId,Author");
+                Page page = doc.Pages[pageIndex];
 
-                // Pages are 1‑based in Aspose.Pdf
-                for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+                // Annotations collection is also 1‑based
+                for (int annIndex = 1; annIndex <= page.Annotations.Count; annIndex++)
                 {
-                    Page page = doc.Pages[pageIndex];
+                    Annotation ann = page.Annotations[annIndex];
 
-                    // Annotations collection is also 1‑based
-                    for (int annIndex = 1; annIndex <= page.Annotations.Count; annIndex++)
-                    {
-                        Annotation annotation = page.Annotations[annIndex];
+                    // Rectangle coordinates
+                    Aspose.Pdf.Rectangle rect = ann.Rect;
 
-                        // Use the annotation's Name as an identifier (Id property is not available in this version)
-                        string id = annotation.Name ?? string.Empty;
+                    // Annotation type name
+                    string typeName = ann.GetType().Name;
 
-                        // The author is stored in the Title property of markup annotations
-                        string author = string.Empty;
-                        if (annotation is MarkupAnnotation markup && !string.IsNullOrEmpty(markup.Title))
-                        {
-                            author = markup.Title;
-                        }
+                    // Title exists on markup annotations; safe cast
+                    string title = string.Empty;
+                    if (ann is MarkupAnnotation markup)
+                        title = markup.Title ?? string.Empty;
 
-                        // Simple CSV escaping for commas
-                        id = id.Replace(",", ";");
-                        author = author.Replace(",", ";");
+                    // Contents may be null
+                    string contents = ann.Contents ?? string.Empty;
 
-                        writer.WriteLine($"{pageIndex},{id},{author}");
-                    }
+                    // Escape double quotes for CSV compliance
+                    title    = title.Replace("\"", "\"\"");
+                    contents = contents.Replace("\"", "\"\"");
+
+                    // Write CSV line
+                    writer.WriteLine($"{pageIndex},{typeName},{rect.LLX},{rect.LLY},{rect.URX},{rect.URY},\"{title}\",\"{contents}\"");
                 }
             }
+        }
 
-            Console.WriteLine($"CSV report generated: {csvPath}");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"Annotations exported to '{csvPath}'.");
     }
 }

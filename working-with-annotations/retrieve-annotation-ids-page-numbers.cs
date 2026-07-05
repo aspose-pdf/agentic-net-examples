@@ -20,29 +20,29 @@ class Program
         using (Document doc = new Document(inputPath))
         {
             // Dictionary to hold annotation identifier -> page number (1‑based)
-            Dictionary<string, int> annotationMap = new Dictionary<string, int>();
+            var annotationMap = new Dictionary<string, int>();
 
             // Iterate through all pages (1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
-                // Each page has an Annotations collection
-                foreach (Annotation ann in page.Annotations)
+                // Iterate through annotations on the current page
+                foreach (Annotation annot in page.Annotations)
                 {
-                    // Use the annotation's Name if set; otherwise fallback to FullName
-                    string id = !string.IsNullOrEmpty(ann.Name) ? ann.Name : ann.FullName;
+                    // Use the annotation Name as its identifier if set; otherwise fallback to FullName
+                    string id = !string.IsNullOrEmpty(annot.Name) ? annot.Name : annot.FullName;
 
                     // Ensure we have a non‑empty identifier before adding to the map
-                    if (!string.IsNullOrEmpty(id) && !annotationMap.ContainsKey(id))
+                    if (!string.IsNullOrEmpty(id))
                     {
                         // Annotation.PageIndex returns the page index (1‑based)
-                        annotationMap[id] = ann.PageIndex;
+                        annotationMap[id] = annot.PageIndex;
                     }
                 }
             }
 
             // Example usage: print the mapping
-            Console.WriteLine("Annotation ID -> Page Number:");
+            Console.WriteLine("Annotation ID -> Page Number");
             foreach (var kvp in annotationMap)
             {
                 Console.WriteLine($"{kvp.Key} -> {kvp.Value}");

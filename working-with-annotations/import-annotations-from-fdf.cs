@@ -7,33 +7,33 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";                     // source PDF
-        const string fdfPath = "Resources/annotations.fdf";    // FDF file in resources folder
-        const string outputPath = "output.pdf";                // result PDF
+        // Paths to the PDF and FDF files (assumed to be in a Resources folder)
+        string pdfPath = Path.Combine("Resources", "input.pdf");
+        string fdfPath = Path.Combine("Resources", "annotations.fdf");
+        string outputPath = Path.Combine("Resources", "output.pdf");
 
-        // Verify that both files exist before proceeding
+        // Verify that the source files exist
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
         if (!File.Exists(fdfPath))
         {
-            Console.Error.WriteLine($"FDF not found: {fdfPath}");
+            Console.Error.WriteLine($"FDF file not found: {fdfPath}");
             return;
         }
 
-        // Load the PDF document (wrapped in using for deterministic disposal)
-        using (Document doc = new Document(pdfPath))
+        // Load the PDF document, import annotations from the FDF, and save the result
+        using (Document doc = new Document(pdfPath))               // document-disposal-with-using
         {
-            // Open the FDF file as a stream
-            using (FileStream fdfStream = File.OpenRead(fdfPath))
+            using (FileStream fdfStream = File.OpenRead(fdfPath)) // load FDF stream
             {
-                // Import annotations from the FDF stream into the PDF document
+                // Import annotations from the FDF file into the PDF document
                 FdfReader.ReadAnnotations(fdfStream, doc);
             }
 
-            // Save the PDF with the imported annotations
+            // Save the PDF with the newly imported annotations
             doc.Save(outputPath);
         }
 

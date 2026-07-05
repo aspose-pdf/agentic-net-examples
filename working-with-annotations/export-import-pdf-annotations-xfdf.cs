@@ -1,13 +1,14 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string xfdfFile = "annotations.xfdf";
+        const string inputPdf  = "input.pdf";
+        const string xfdfFile  = "annotations.xfdf";
 
         if (!File.Exists(inputPdf))
         {
@@ -15,43 +16,52 @@ class Program
             return;
         }
 
-        // Load the original PDF and count its annotations
-        int originalCount;
-        using (Document originalDoc = new Document(inputPdf))
+        // Load the source PDF
+        using (Document doc = new Document(inputPdf))
         {
-            originalCount = CountAnnotations(originalDoc);
-            // Export all annotations to an XFDF file
-            originalDoc.ExportAnnotationsToXfdf(xfdfFile);
-        }
+            // Count total annotations before export
+            int originalCount = doc.Pages.Cast<Page>()
+                                         .Sum(p => p.Annotations.Count);
+            Console.WriteLine($"Original annotation count: {originalCount}");
 
-        // Load a fresh copy of the same PDF (without the exported annotations)
-        int importedCount;
-        using (Document importedDoc = new Document(inputPdf))
-        {
-            // Import annotations from the XFDF file
-            importedDoc.ImportAnnotationsFromXfdf(xfdfFile);
-            importedCount = CountAnnotations(importedDoc);
-        }
+            // Export all annotations to XFDF file
+            doc.ExportAnnotationsToXfdf(xfdfFile);
+            Console.WriteLine($"Annotations exported to: {xfdfFile}");
 
-        // Verify round‑trip integrity by comparing annotation counts
-        if (originalCount == importedCount)
-        {
-            Console.WriteLine($"Success: annotation count matches ({originalCount}).");
-        }
-        else
-        {
-            Console.WriteLine($"Mismatch: original={originalCount}, after import={importedCount}.");
-        }
-    }
+            // Remove all existing annotations from the document
+            foreach (Page page in doc.Pages)
+            {
+                // Annotations collection uses 1‑based indexing
+                while (page.Annotations.Count > 0)
+                {
+                    page.Annotations.Delete(1);
+                }
+            }
 
-    // Helper method to count all annotations in a document
-    static int CountAnnotations(Document doc)
-    {
-        int count = 0;
-        foreach (Page page in doc.Pages)
-        {
-            count += page.Annotations.Count;
+            // Verify that annotations have been removed
+            int clearedCount = doc.Pages.Cast<Page>()
+                                        .Sum(p => p.Annotations.Count);
+            Console.WriteLine($"Annotations after clearing: {clearedCount}");
+
+            // Import annotations back from the XFDF file
+            doc.ImportAnnotationsFromXfdf(xfdfFile);
+            Console.WriteLine("Annotations re‑imported from XFDF.");
+
+            // Count annotations after import
+            int roundTripCount = doc.Pages.Cast<Page>()
+                                          .Sum(p => p.Annotations.Count);
+            Console.WriteLine($"Annotation count after round‑trip: {roundTripCount}");
+
+            // Simple integrity check
+            if (originalCount == roundTripCount)
+                Console.WriteLine("Round‑trip verification succeeded: counts match.");
+            else
+                Console.WriteLine("Round‑trip verification failed: counts differ.");
+
+            // Save the resulting PDF (optional)
+            const string outputPdf = "output_roundtrip.pdf";
+            doc.Save(outputPdf);
+            Console.WriteLine($"Resulting PDF saved to: {outputPdf}");
         }
-        return count;
     }
 }
