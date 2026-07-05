@@ -6,10 +6,10 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input_form.pdf";
-        const string fdfPath = "output.fdf";
+        const string pdfPath = "PdfForm.pdf";
+        const string fdfPath = "export.fdf";
 
-        // Verify the source PDF exists
+        // Verify that the source PDF exists
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"PDF file not found: {pdfPath}");
@@ -19,11 +19,12 @@ class Program
         // Initialize the Form facade with the PDF file
         using (Form form = new Form(pdfPath))
         {
-            // Create a file stream for the FDF output
+            // Create a file stream for the output FDF file
             using (FileStream fdfStream = new FileStream(fdfPath, FileMode.Create, FileAccess.Write))
             {
-                // Export all form field data to the FDF stream
+                // Export the form fields to the FDF stream
                 form.ExportFdf(fdfStream);
+                // The using block ensures the stream is closed
             }
         }
 

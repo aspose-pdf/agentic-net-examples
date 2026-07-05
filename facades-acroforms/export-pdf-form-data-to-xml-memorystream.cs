@@ -6,9 +6,9 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
+        const string pdfPath = "input_form.pdf";
 
-        // Verify the source PDF exists
+        // Verify that the PDF form exists
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
@@ -21,13 +21,13 @@ class Program
             // Create a memory stream to hold the exported XML
             using (MemoryStream xmlStream = new MemoryStream())
             {
-                // Export form field data to the memory stream (no disk file created)
+                // Export the form fields to the memory stream (no intermediate file)
                 form.ExportXml(xmlStream);
 
-                // Reset stream position to the beginning for reading
+                // Reset the stream position to read from the beginning
                 xmlStream.Position = 0;
 
-                // Read the XML content from the memory stream
+                // Optional: read the XML content as a string and output it
                 using (StreamReader reader = new StreamReader(xmlStream))
                 {
                     string xmlContent = reader.ReadToEnd();

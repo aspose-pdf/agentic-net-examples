@@ -1,55 +1,63 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
+using System.Text.Json;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
-class ExportSelectedFormFields
+class Program
 {
     static void Main()
     {
-        // Input PDF containing form fields
         const string inputPdfPath = "input.pdf";
-
-        // Output JSON file that will contain only the selected fields
         const string outputJsonPath = "selected_fields.json";
 
-        // List of fully‑qualified field names to export.
-        // Use the exact names as they appear in the PDF form.
-        var fieldsToExport = new List<string>
+        // List of fully qualified field names to export
+        var fieldsToExport = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            "Customer.Name",
-            "Customer.Email",
-            "Order.Total"
+            "CustomerName",
+            "OrderDate",
+            "TotalAmount"
         };
 
-        // Ensure the source PDF exists
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
         // Load the PDF document
         using (var document = new Document(inputPdfPath))
         {
-            // Prepare export options.
-            // ExportFieldsToJsonOptions inherits from ExportFieldsOptions,
-            // which provides a FieldSelector predicate to filter fields.
-            var exportOptions = new ExportFieldsToJsonOptions
-            {
-                // Optional: make the JSON output indented for readability
-                WriteIndented = true,
+            // Prepare a dictionary to hold selected field values
+            var selectedData = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
-                // Filter fields based on the list defined above
-                FieldSelector = field => fieldsToExport.Contains(field.FullName)
+            // Iterate over all form fields
+            foreach (Field field in document.Form.Fields)
+            {
+                // Use the full field name for matching
+                string fullName = field.FullName;
+
+                if (fieldsToExport.Contains(fullName))
+                {
+                    // Some fields may have null values; handle gracefully
+                    object value = field.Value ?? string.Empty;
+                    selectedData[fullName] = value;
+                }
+            }
+
+            // Serialize the selected fields to JSON with indentation
+            var jsonOptions = new JsonSerializerOptions
+            {
+                WriteIndented = true
             };
 
-            // Export the selected fields to a JSON file.
-            // The overload accepts a file name and the options instance.
-            document.Form.ExportToJson(outputJsonPath, exportOptions);
+            string jsonString = JsonSerializer.Serialize(selectedData, jsonOptions);
+
+            // Write JSON to the output file
+            File.WriteAllText(outputJsonPath, jsonString);
         }
 
-        Console.WriteLine($"Selected form fields have been exported to '{outputJsonPath}'.");
+        Console.WriteLine($"Selected form fields exported to '{outputJsonPath}'.");
     }
 }
