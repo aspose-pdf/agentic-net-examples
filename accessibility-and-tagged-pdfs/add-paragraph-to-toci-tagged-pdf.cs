@@ -9,7 +9,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_note.pdf";
+        const string outputPath = "output_tagged.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -23,31 +23,32 @@ class Program
             // Access the tagged content API
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Set language and title (optional)
+            // Set language and title for the tagged PDF (optional)
             tagged.SetLanguage("en-US");
             tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
             // Get the root structure element (no cast needed)
             StructureElement root = tagged.RootElement;
 
-            // Create a paragraph element and set its text
+            // Create a TOCI (Table of Contents Item) element
+            TOCIElement toci = tagged.CreateTOCIElement();
+
+            // Create a Paragraph element to be placed under the TOCI
             ParagraphElement paragraph = tagged.CreateParagraphElement();
-            paragraph.SetText("This is a main paragraph that will contain a note.");
 
-            // Append the paragraph to the root
-            root.AppendChild(paragraph);
+            // Set the actual text for accessibility
+            paragraph.ActualText = "This is the descriptive paragraph for the TOCI entry.";
 
-            // Create a note element (supplemental information)
-            NoteElement note = tagged.CreateNoteElement();
-            note.SetText("This is the supplemental note providing additional context.");
+            // Append the paragraph as a child of the TOCI element
+            toci.AppendChild(paragraph); // bool parameter has default value
 
-            // Append the note as a child of the paragraph
-            paragraph.AppendChild(note); // bool parameter omitted (default true)
+            // Append the TOCI element to the document root
+            root.AppendChild(toci); // bool parameter has default value
 
-            // Save the modified PDF
+            // Save the modified PDF (no PreSave required)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with note element: {outputPath}");
+        Console.WriteLine($"Tagged PDF saved to '{outputPath}'.");
     }
 }

@@ -2,49 +2,37 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class PdfUaValidator
+class Program
 {
     static void Main()
     {
-        // Input PDF to be validated
-        const string inputPdfPath = "input.pdf";
+        const string inputPdf = "input.pdf";
+        const string reportPath = "ua_report.xml";
 
-        // Path for the validation log (XML/HTML format depending on Aspose.Pdf version)
-        const string validationLogPath = "validation_report.xml";
-
-        // Path for the full PDF structure export (optional, useful for debugging)
-        const string pdfStructureXmlPath = "pdf_structure.xml";
-
-        // Verify that the input file exists
-        if (!File.Exists(inputPdfPath))
+        // Verify input file exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Error: File not found – {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        try
+        // Load the PDF document (wrapped in using for deterministic disposal)
+        using (Document doc = new Document(inputPdf))
         {
-            // Load the PDF document (no custom LoadOptions required for a standard PDF)
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Validate the document against PDF/UA (PDF_UA_1) standard.
+            // The Validate method writes a detailed XML log to the specified file.
+            bool isCompliant = doc.Validate(reportPath, PdfFormat.PDF_UA_1);
+
+            // Report the overall compliance result
+            Console.WriteLine($"PDF/UA compliance: {isCompliant}");
+
+            // Read and display the XML compliance report (optional)
+            if (File.Exists(reportPath))
             {
-                // Quick check: is the document already PDF/UA compliant?
-                Console.WriteLine($"IsPdfUaCompliant: {pdfDoc.IsPdfUaCompliant}");
-
-                // Validate the document against PDF/UA (PDF_UA_1) and write the log to a file.
-                // The Validate method returns true if validation succeeded without errors.
-                bool validationResult = pdfDoc.Validate(validationLogPath, PdfFormat.PDF_UA_1);
-
-                Console.WriteLine($"Validation completed. Success: {validationResult}");
-                Console.WriteLine($"Validation report saved to: {validationLogPath}");
-
-                // Optional: export the entire PDF structure to XML for further analysis.
-                pdfDoc.SaveXml(pdfStructureXmlPath);
-                Console.WriteLine($"PDF structure exported to: {pdfStructureXmlPath}");
+                string xmlReport = File.ReadAllText(reportPath);
+                Console.WriteLine("Compliance report (XML):");
+                Console.WriteLine(xmlReport);
             }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Exception: {ex.Message}");
         }
     }
 }

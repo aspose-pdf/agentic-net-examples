@@ -1,6 +1,6 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.Json;
 using Aspose.Pdf;
 using Aspose.Pdf.Tagged;
@@ -8,6 +8,15 @@ using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
+    // Represents a node in the JSON structure tree.
+    private class JsonStructureNode
+    {
+        public string Type { get; set; } = string.Empty;
+        public string? ActualText { get; set; }
+        public string? AlternativeText { get; set; }
+        public List<JsonStructureNode> Children { get; set; } = new List<JsonStructureNode>();
+    }
+
     static void Main()
     {
         const string inputPdf = "input.pdf";
@@ -19,47 +28,46 @@ class Program
             return;
         }
 
+        // Load the PDF document.
         using (Document doc = new Document(inputPdf))
         {
+            // Access the tagged content (logical structure) of the document.
             ITaggedContent tagged = doc.TaggedContent;
+
+            // The root element of the structure tree.
             StructureElement root = tagged.RootElement;
 
-            JsonStructureNode jsonRoot = BuildJsonNode(root);
-            JsonSerializerOptions options = new JsonSerializerOptions { WriteIndented = true };
-            string json = JsonSerializer.Serialize(jsonRoot, options);
+            // Convert the structure tree to a serializable object.
+            JsonStructureNode jsonRoot = ConvertElement(root);
 
-            File.WriteAllText(outputJson, json);
-            Console.WriteLine($"Structure tree exported to '{outputJson}'.");
+            // Serialize to JSON with optional indentation.
+            JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+            string jsonString = JsonSerializer.Serialize(jsonRoot, jsonOptions);
+
+            // Write the JSON to the output file.
+            File.WriteAllText(outputJson, jsonString);
         }
+
+        Console.WriteLine($"Structure tree exported to '{outputJson}'.");
     }
 
-    // Recursively convert a StructureElement to a serializable node
-    static JsonStructureNode BuildJsonNode(StructureElement element)
+    // Recursively converts a StructureElement into a JsonStructureNode.
+    private static JsonStructureNode ConvertElement(StructureElement element)
     {
         JsonStructureNode node = new JsonStructureNode {
             Type = element.GetType().Name,
             ActualText = element.ActualText,
-            AlternativeText = element.AlternativeText,
-            Language = element.Language,
-            Children = new List<JsonStructureNode>()
+            AlternativeText = element.AlternativeText
         };
 
         foreach (Element child in element.ChildElements)
         {
-            if (child is StructureElement se)
-                node.Children.Add(BuildJsonNode(se));
+            if (child is StructureElement childStructure)
+            {
+                node.Children.Add(ConvertElement(childStructure));
+            }
         }
 
         return node;
-    }
-
-    // Simple POCO for JSON serialization
-    class JsonStructureNode
-    {
-        public string Type { get; set; }
-        public string ActualText { get; set; }
-        public string AlternativeText { get; set; }
-        public string Language { get; set; }
-        public List<JsonStructureNode> Children { get; set; }
     }
 }

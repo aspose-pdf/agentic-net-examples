@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Reflection;
 using Aspose.Pdf;
 using Aspose.Pdf.Tagged;
 using Aspose.Pdf.LogicalStructure;
@@ -16,37 +17,50 @@ class Program
             return;
         }
 
-        // Load the PDF document (using the lifecycle rule: wrap in using)
+        // Load the PDF document (using statement ensures proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Access tagged content
+            // Access tagged content via the ITaggedContent interface
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Get the root structure element (no cast needed)
+            // Root element of the logical structure (no cast needed)
             StructureElement root = tagged.RootElement;
 
-            Console.WriteLine("Structure Elements:");
-            WalkStructure(root, 0);
+            // Recursively walk the structure tree and log details
+            WalkStructure(root);
         }
     }
 
-    // Recursively walk the structure tree and log Title, Language, and StructureType (tag name)
-    static void WalkStructure(StructureElement element, int depth)
+    // Recursive traversal of structure elements
+    static void WalkStructure(StructureElement element, int depth = 0)
     {
         string indent = new string(' ', depth * 2);
-        string title = element.Title ?? "(no title)";
-        string language = element.Language ?? "(no language)";
-        string tagName = element.StructureType?.ToString() ?? "(no tag)";
 
-        Console.WriteLine($"{indent}Tag: {tagName}, Title: {title}, Language: {language}");
+        // Retrieve Title and Language (both may be null)
+        string title    = element.Title    ?? "(none)";
+        string language = element.Language ?? "(none)";
 
-        // Iterate over child elements using the correct ChildElements property
+        // Custom tag retrieval – not exposed directly, so use reflection if a 'Tag' property exists
+        string customTag = "(none)";
+        PropertyInfo tagProp = element.GetType().GetProperty("Tag", BindingFlags.Public | BindingFlags.Instance);
+        if (tagProp != null)
+        {
+            object value = tagProp.GetValue(element);
+            if (value is string s && !string.IsNullOrEmpty(s))
+                customTag = s;
+        }
+
+        // Log the information
+        Console.WriteLine($"{indent}Element: {element.GetType().Name}");
+        Console.WriteLine($"{indent}  Title   : {title}");
+        Console.WriteLine($"{indent}  Language: {language}");
+        Console.WriteLine($"{indent}  Tag     : {customTag}");
+
+        // Iterate over child elements using the ChildElements collection
         foreach (Element child in element.ChildElements)
         {
             if (child is StructureElement se)
-            {
                 WalkStructure(se, depth + 1);
-            }
         }
     }
 }

@@ -17,32 +17,32 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
             // Access the tagged content API
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Set language and title for the tagged document (optional but recommended)
+            // Optional: set document language and title metadata
             tagged.SetLanguage("en-US");
             tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
-            // Get the root structure element (no cast required)
+            // Get the root of the structure tree (no cast needed)
             StructureElement root = tagged.RootElement;
 
-            // Create a Span element
-            SpanElement span = tagged.CreateSpanElement();
+            // Create a figure element to represent an image/graphic
+            FigureElement figure = tagged.CreateFigureElement();
 
-            // Optional: add visible text to the span
-            span.SetText("example");
+            // Set a concise description using the Title property
+            figure.Title = "Figure 1: Quarterly Sales Overview";
 
-            // Supply hidden pronunciation text via the ActualText property
-            span.ActualText = "ɪɡˈzæmpəl";
+            // Provide alternative text for screen readers (accessibility)
+            figure.AlternativeText = "Bar chart showing sales for Q1–Q4";
 
-            // Attach the span to the document structure
-            root.AppendChild(span);
+            // Attach the figure to the document's structure tree
+            root.AppendChild(figure);
 
-            // Save the modified PDF
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 
