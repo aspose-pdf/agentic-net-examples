@@ -7,23 +7,26 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        // Input and output PDF file paths
+        const string inputPath = "input.pdf";
         const string outputPath = "encrypted.pdf";
+
+        // User password to protect the PDF; owner password is left undefined (null)
         const string userPassword = "user123";
 
-        // Verify that the source PDF exists
+        // Verify that the input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Initialize the facade with source and destination file names
+        // Initialize the PdfFileSecurity facade with source and destination files
         PdfFileSecurity fileSecurity = new PdfFileSecurity(inputPath, outputPath);
 
-        // Encrypt using only a user password.
-        // Owner password is passed as null – a random owner password will be generated.
-        // DocumentPrivilege.Print allows printing; adjust as needed.
+        // Encrypt the PDF using only the user password.
+        // Owner password is null, so a random one will be generated internally.
+        // DocumentPrivilege.Print grants printing permission; adjust as needed.
         // KeySize.x256 selects 256‑bit AES encryption.
         bool encrypted = fileSecurity.EncryptFile(
             userPassword,          // user password
@@ -39,7 +42,5 @@ class Program
         {
             Console.Error.WriteLine("Encryption failed.");
         }
-
-        // PdfFileSecurity writes the output file during EncryptFile; no further Save call is required.
     }
 }

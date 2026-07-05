@@ -6,40 +6,29 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "signed_input.pdf";
-        const string outputPath = "signed_without_usage_rights.pdf";
+        const string inputPath = "signed_input.pdf";
+        const string outputPath = "usage_rights_removed.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
+        // Initialize the PdfFileSignature facade and bind the signed PDF
+        PdfFileSignature pdfSignature = new PdfFileSignature();
+        pdfSignature.BindPdf(inputPath);
+
+        // Remove usage rights if they are present
+        if (pdfSignature.ContainsUsageRights())
         {
-            // Initialize the facade for signature operations
-            PdfFileSignature pdfSignature = new PdfFileSignature();
-
-            // Bind the existing signed PDF
-            pdfSignature.BindPdf(inputPath);
-
-            // Remove usage rights if they exist
-            if (pdfSignature.ContainsUsageRights())
-            {
-                pdfSignature.RemoveUsageRights();
-            }
-
-            // Save the modified PDF
-            pdfSignature.Save(outputPath);
-
-            // Release resources
-            pdfSignature.Close();
-
-            Console.WriteLine($"Usage rights removed. Output saved to '{outputPath}'.");
+            pdfSignature.RemoveUsageRights();
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        // Save the modified PDF
+        pdfSignature.Save(outputPath);
+        pdfSignature.Close();
+
+        Console.WriteLine($"Usage rights removed. Output saved to '{outputPath}'.");
     }
 }

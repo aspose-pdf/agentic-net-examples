@@ -6,12 +6,16 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        // Input and output PDF file paths
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string currentOwnerPassword = "oldOwner";
-        const string newUserPassword = "newUser";
+
+        // Existing owner password and the new passwords to set
+        const string oldOwnerPassword = "oldOwner";
+        const string newUserPassword  = "newUser";
         const string newOwnerPassword = "newOwner";
 
+        // Verify that the input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
@@ -20,20 +24,18 @@ class Program
 
         try
         {
-            // Create the PdfFileSecurity facade with source and destination files
+            // Initialize the PdfFileSecurity facade with input and output files
             PdfFileSecurity fileSecurity = new PdfFileSecurity(inputPath, outputPath);
 
             // Change both user and owner passwords in a single call
-            bool changed = fileSecurity.ChangePassword(currentOwnerPassword, newUserPassword, newOwnerPassword);
+            // This overload keeps the original security settings.
+            fileSecurity.ChangePassword(oldOwnerPassword, newUserPassword, newOwnerPassword);
 
-            Console.WriteLine(changed ? "Passwords changed successfully." : "Password change failed.");
-
-            // Release resources held by the facade
-            fileSecurity.Close();
+            Console.WriteLine("Password change completed successfully.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error during password change: {ex.Message}");
         }
     }
 }

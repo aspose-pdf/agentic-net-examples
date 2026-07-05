@@ -1,18 +1,17 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;               // DocumentPrivilege enum
+using Aspose.Pdf.Facades;      // PdfFileSecurity, KeySize, Algorithm
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "encrypted_rc4_40.pdf";
         const string userPassword  = "user123";
-        const string ownerPassword = "owner123";
+        const string ownerPassword = ""; // empty => random owner password will be generated
 
-        // Verify that the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
@@ -22,21 +21,24 @@ class Program
         // Initialize the facade with source and destination files
         using (PdfFileSecurity security = new PdfFileSecurity(inputPath, outputPath))
         {
-            // Encrypt using 256‑bit AES. Choose any required privileges; here we allow printing.
+            // Encrypt using RC4‑40 algorithm; allow printing as an example privilege
             bool encrypted = security.EncryptFile(
                 userPassword,
                 ownerPassword,
                 DocumentPrivilege.Print,
-                KeySize.x256,
-                Algorithm.AES);
+                KeySize.x40,
+                Algorithm.RC4);
 
             if (!encrypted)
             {
                 Console.Error.WriteLine("Encryption failed.");
-                return;
+                if (security.LastException != null)
+                    Console.Error.WriteLine(security.LastException.Message);
             }
-
-            Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
+            else
+            {
+                Console.WriteLine($"File encrypted successfully: {outputPath}");
+            }
         }
     }
 }
