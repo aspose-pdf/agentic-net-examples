@@ -8,13 +8,13 @@ class Program
     static void Main()
     {
         // Input PDF files to compare
-        const string firstPdfPath  = "FirstDocument.pdf";
-        const string secondPdfPath = "SecondDocument.pdf";
+        const string firstPdfPath  = "first.pdf";
+        const string secondPdfPath = "second.pdf";
 
         // Folder where the diff PDF will be saved
         const string outputFolder = "DiffResults";
-        // Name of the resulting diff PDF
-        const string diffFileName = "ComparisonResult.pdf";
+        // Name of the diff PDF file
+        const string diffPdfName = "comparison_result.pdf";
 
         // Validate input files
         if (!File.Exists(firstPdfPath))
@@ -28,22 +28,21 @@ class Program
             return;
         }
 
-        // Ensure the output directory exists
+        // Ensure the output folder exists
         Directory.CreateDirectory(outputFolder);
-        string resultPdfPath = Path.Combine(outputFolder, diffFileName);
+        string resultPdfPath = Path.Combine(outputFolder, diffPdfName);
 
         try
         {
-            // Load the two documents inside using blocks for deterministic disposal
+            // Load the two documents using the recommended lifecycle pattern (using blocks)
             using (Document doc1 = new Document(firstPdfPath))
             using (Document doc2 = new Document(secondPdfPath))
             {
-                // Create the graphical comparer
+                // Create an instance of GraphicalPdfComparer
                 GraphicalPdfComparer comparer = new GraphicalPdfComparer();
 
-                // Optional: customize appearance of differences
-                comparer.Color     = Aspose.Pdf.Color.Red;   // highlight color
-                comparer.Threshold = 0;                      // 0% threshold (detect all changes)
+                // Optional: customize comparer appearance (e.g., change highlight color)
+                // comparer.Color = Aspose.Pdf.Color.Red; // default is red
 
                 // Perform the comparison and save the diff PDF
                 comparer.CompareDocumentsToPdf(doc1, doc2, resultPdfPath);
