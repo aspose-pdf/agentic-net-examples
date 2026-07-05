@@ -7,51 +7,50 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPdf = "input.pdf";
+        // Directory containing the PDF file
+        string dataDir = @"YOUR_DATA_DIRECTORY";
+        // PDF file name
+        string pdfFile = @"YOUR_PDF_FILE";
 
-        // Folder where BMP images will be saved
-        const string outputFolder = "output";
-
-        if (!File.Exists(inputPdf))
+        string inputPath = Path.Combine(dataDir, pdfFile);
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
-
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDocument = new Document(inputPdf))
+        // Load the PDF document (lifecycle rule: use using)
+        using (Document pdfDocument = new Document(inputPath))
         {
-            // Create a Resolution object with 300 DPI
+            // Create a Resolution object for 300 DPI
             Resolution resolution = new Resolution(300);
 
-            // Initialize the BMP device with the specified resolution
+            // Initialize BmpDevice with the desired resolution
             BmpDevice bmpDevice = new BmpDevice(resolution);
 
-            // OPTIONAL: set custom rendering options for higher quality output
-            // (properties may vary depending on the Aspose.Pdf version)
+            // Optional: set high‑quality rendering options
             bmpDevice.RenderingOptions = new RenderingOptions
             {
-                // Example: enable anti‑aliasing for smoother graphics
-                // AntiAliasing = true
+                // Example settings (adjust if needed)
+                // AntiAliasing = true,
+                // TextAntiAliasing = true
             };
 
-            // Iterate over all pages (Aspose.Pdf uses 1‑based page indexing)
+            // Iterate through all pages (1‑based indexing)
             for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
             {
-                string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.bmp");
+                // Output BMP file path
+                string outPath = Path.Combine(dataDir, $"image{pageNumber}_out.bmp");
 
-                // Convert each page to BMP and write it to a file stream
-                using (FileStream bmpStream = new FileStream(outputPath, FileMode.Create))
+                // Create the output stream (lifecycle rule: use using)
+                using (FileStream bmpStream = new FileStream(outPath, FileMode.Create))
                 {
+                    // Convert the page to BMP and write to the stream
                     bmpDevice.Process(pdfDocument.Pages[pageNumber], bmpStream);
                 }
-
-                Console.WriteLine($"Page {pageNumber} saved as BMP to '{outputPath}'.");
             }
         }
+
+        Console.WriteLine("PDF pages exported as BMP images at 300 DPI.");
     }
 }

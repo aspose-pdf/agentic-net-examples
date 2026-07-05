@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Devices;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
@@ -19,24 +18,28 @@ class Program
 
         Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Convert each page to an image (PNG format) using PngDevice
-            for (int pageNumber = 1; pageNumber <= doc.Pages.Count; pageNumber++)
-            {
-                string outPath = System.IO.Path.Combine(outputDir, $"Page_{pageNumber}.png");
+            // Define the resolution for the output images (e.g., 300 DPI)
+            var resolution = new Resolution(300);
 
-                // Create a PNG device with desired resolution
-                var pngDevice = new PngDevice(new Resolution(300))
+            // Loop through all pages (Aspose.Pdf uses 1‑based indexing)
+            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
+            {
+                string outputPath = Path.Combine(outputDir, $"Page_{pageNumber}.png");
+
+                // Create a PNG device for the current page
+                var pngDevice = new PngDevice(resolution);
+
+                // Set the default font name to be used when a font is missing
+                pngDevice.RenderingOptions = new RenderingOptions
                 {
-                    // Set the default font for missing fonts
-                    RenderingOptions = new RenderingOptions { DefaultFontName = "Arial" }
+                    DefaultFontName = "Arial"
                 };
 
-                // Process the specific page and save as PNG
-                pngDevice.Process(doc.Pages[pageNumber], outPath);
-                Console.WriteLine($"Saved page {pageNumber} as image → {outPath}");
+                // Render the page to the PNG file
+                pngDevice.Process(pdfDoc.Pages[pageNumber], outputPath);
+                Console.WriteLine($"Saved page {pageNumber} as image → {outputPath}");
             }
         }
     }

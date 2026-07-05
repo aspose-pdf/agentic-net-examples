@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // Core Aspose.Pdf namespace
 
 class Program
 {
@@ -11,54 +11,55 @@ class Program
         // Output folder where extracted images will be saved
         const string outputFolder = @"C:\ExtractedImages";
 
-        if (!Directory.Exists(inputFolder))
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
+
+        // Get all PDF files in the input folder (non‑recursive)
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+        if (pdfFiles.Length == 0)
         {
-            Console.Error.WriteLine($"Input folder does not exist: {inputFolder}");
+            Console.WriteLine("No PDF files found in the input folder.");
             return;
         }
 
-        Directory.CreateDirectory(outputFolder);
-
-        // Process each PDF file in the input folder
-        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        foreach (string pdfPath in pdfFiles)
         {
-            try
+            // Use a using block for deterministic disposal of the Document (lifecycle rule)
+            using (Document doc = new Document(pdfPath))
             {
-                // Load the PDF document (wrapped in using for deterministic disposal)
-                using (Document doc = new Document(pdfPath))
+                bool anyImageFound = false;
+                int imageIndex = 1;
+
+                // Iterate through each page and its image resources
+                foreach (Page page in doc.Pages)
                 {
-                    string pdfBaseName = Path.GetFileNameWithoutExtension(pdfPath);
-
-                    // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-                    for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+                    // page.Resources.Images is a collection of XImage objects
+                    foreach (XImage img in page.Resources.Images)
                     {
-                        Page page = doc.Pages[pageNum];
-                        int imageIndex = 1;
+                        anyImageFound = true;
 
-                        // Iterate over the XImage collection (direct foreach, not a dictionary)
-                        foreach (XImage img in page.Resources.Images)
+                        // Default to PNG – Aspose.Pdf.XImage.Save works with a Stream, the format is inferred from the file extension.
+                        const string extension = "png";
+
+                        string outputPath = Path.Combine(
+                            outputFolder,
+                            $"{Path.GetFileNameWithoutExtension(pdfPath)}_p{page.Number}_img{imageIndex}.{extension}");
+
+                        // Save the image to disk via a FileStream (XImage.Save overload expects a Stream).
+                        using (var fs = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
                         {
-                            // Build a unique file name for each extracted image
-                            string imageFileName = $"{pdfBaseName}_page{pageNum}_img{imageIndex}.png";
-                            string imagePath = Path.Combine(outputFolder, imageFileName);
-
-                            // Save the image to the output folder using a FileStream because the
-                            // XImage.Save overload that accepts a string path is not available in
-                            // the referenced Aspose.Pdf version.
-                            using (FileStream fs = new FileStream(imagePath, FileMode.Create, FileAccess.Write))
-                            {
-                                img.Save(fs);
-                            }
-
-                            Console.WriteLine($"Extracted: {imagePath}");
-                            imageIndex++;
+                            img.Save(fs);
                         }
+
+                        Console.WriteLine($"Saved image: {outputPath}");
+                        imageIndex++;
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+
+                if (!anyImageFound)
+                {
+                    Console.WriteLine($"No images found in '{Path.GetFileName(pdfPath)}'.");
+                }
             }
         }
 

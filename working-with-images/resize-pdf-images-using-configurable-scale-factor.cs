@@ -1,73 +1,84 @@
 using System;
 using System.IO;
-using System.Text.Json;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Load configuration from appsettings.json using System.Text.Json (no external config packages required)
-        const string configPath = "appsettings.json";
-        if (!File.Exists(configPath))
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "output.pdf";
+        const string configPath    = "scale.config"; // file containing a single double value
+
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Configuration file not found: {configPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
+        if (!File.Exists(configPath))
+        {
+            Console.Error.WriteLine($"Config file not found: {configPath}");
+            return;
+        }
+
+        // Read scaling factor from configuration file
         double scaleFactor;
         try
         {
-            string json = File.ReadAllText(configPath);
-            using JsonDocument doc = JsonDocument.Parse(json);
-            JsonElement root = doc.RootElement;
-            if (root.TryGetProperty("ImageScaleFactor", out JsonElement factorElem) && factorElem.TryGetDouble(out double factor))
+            string txt = File.ReadAllText(configPath).Trim();
+            if (!double.TryParse(txt, out scaleFactor) || scaleFactor <= 0)
             {
-                scaleFactor = factor;
-            }
-            else
-            {
-                Console.Error.WriteLine("ImageScaleFactor not found or invalid in configuration.");
+                Console.Error.WriteLine("Invalid scaling factor in config file.");
                 return;
             }
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Failed to read configuration: {ex.Message}");
+            Console.Error.WriteLine($"Error reading config: {ex.Message}");
             return;
         }
 
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output_resized.pdf";
-
-        if (!File.Exists(inputPdf))
+        // Load the PDF document
+        using (Document doc = new Document(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
-            return;
-        }
-
-        // Load the PDF, modify images, and save
-        using (Document doc = new Document(inputPdf))
-        {
-            // Iterate over all pages
+            // Iterate through all pages
             foreach (Page page in doc.Pages)
             {
-                // Iterate over all paragraphs on the page
-                for (int i = 1; i <= page.Paragraphs.Count; i++)
+                // Absorb image placements on the current page
+                ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
+                page.Accept(absorber);
+
+                foreach (ImagePlacement placement in absorber.ImagePlacements)
                 {
-                    // Check if the paragraph is an Image
-                    if (page.Paragraphs[i] is Image img)
+                    // Save the original image to a memory stream
+                    using (MemoryStream imgStream = new MemoryStream())
                     {
-                        // Apply the scaling factor (ImageScale scales both width and height proportionally)
-                        img.ImageScale = scaleFactor;
+                        placement.Image.Save(imgStream);
+                        imgStream.Position = 0;
+
+                        // Hide the original image instance
+                        placement.Hide();
+
+                        // Compute new rectangle based on scaling factor
+                        double llx = placement.Rectangle.LLX;
+                        double lly = placement.Rectangle.LLY;
+                        double width  = placement.Rectangle.Width  * scaleFactor;
+                        double height = placement.Rectangle.Height * scaleFactor;
+                        double urx = llx + width;
+                        double ury = lly + height;
+
+                        // Add the scaled image back to the page at the new rectangle
+                        page.AddImage(imgStream, new Aspose.Pdf.Rectangle(llx, lly, urx, ury));
                     }
                 }
             }
 
-            // Save the modified PDF (format inferred from file extension)
-            doc.Save(outputPdf);
+            // Save the modified PDF
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Images resized with factor {scaleFactor} and saved to '{outputPdf}'.");
+        Console.WriteLine($"Images resized with factor {scaleFactor} and saved to '{outputPdfPath}'.");
     }
 }

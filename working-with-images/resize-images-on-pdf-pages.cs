@@ -1,13 +1,16 @@
 using System;
 using System.IO;
+using System.Drawing;
+using System.Drawing.Imaging;
 using Aspose.Pdf;
+using Aspose.Pdf.Devices; // for ImagePlacementAbsorber (belongs to Aspose.Pdf namespace, but included for clarity)
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "resized_images.pdf";
+        const string outputPath = "output_resized.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,35 +18,56 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Iterate through all pages (1‑based indexing)
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                Page page = doc.Pages[i];
+                Page page = doc.Pages[pageIndex];
 
-                // Iterate over all paragraph elements on the page
-                for (int p = 1; p <= page.Paragraphs.Count; p++)
+                // Absorb image placements on the current page
+                ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
+                page.Accept(absorber);
+
+                // Process each found image placement
+                foreach (ImagePlacement placement in absorber.ImagePlacements)
                 {
-                    // Check if the paragraph is an Image object
-                    if (page.Paragraphs[p] is Image img)
+                    // Extract the original image into a memory stream
+                    using (MemoryStream originalStream = new MemoryStream())
                     {
-                        // Scale the image to 50 % of its original size.
-                        // ImageScale applies uniformly to width and height.
-                        img.ImageScale = 0.5f;
+                        placement.Image.Save(originalStream, ImageFormat.Png);
+                        originalStream.Position = 0;
 
-                        // Alternatively, you could set explicit dimensions:
-                        // img.FixWidth  = img.FixWidth  * 0.5;
-                        // img.FixHeight = img.FixHeight * 0.5;
+                        // Load the image as a Bitmap to perform scaling
+                        using (Bitmap originalBitmap = new Bitmap(originalStream))
+                        {
+                            // Calculate half size (ensure at least 1 pixel)
+                            int newWidth  = Math.Max(1, originalBitmap.Width  / 2);
+                            int newHeight = Math.Max(1, originalBitmap.Height / 2);
+
+                            // Create a scaled bitmap
+                            using (Bitmap scaledBitmap = new Bitmap(originalBitmap, newWidth, newHeight))
+                            {
+                                // Save the scaled bitmap back to a stream
+                                using (MemoryStream scaledStream = new MemoryStream())
+                                {
+                                    scaledBitmap.Save(scaledStream, ImageFormat.Png);
+                                    scaledStream.Position = 0;
+
+                                    // Replace the original image placement with the scaled image
+                                    placement.Replace(scaledStream);
+                                }
+                            }
+                        }
                     }
                 }
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (PDF format, no SaveOptions needed)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with resized images to '{outputPath}'.");
+        Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
     }
 }

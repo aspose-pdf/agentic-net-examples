@@ -1,40 +1,42 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Core Aspose.Pdf namespace
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_grayscale_even_pages.pdf";
 
+        // Verify that the input file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Open the PDF inside a using block to ensure proper disposal.
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Aspose.Pdf uses 1‑based page indexing.
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Load the PDF document using the core Document API
+            using (Document doc = new Document(inputPath))
             {
-                // Process only even‑numbered pages.
-                if (i % 2 == 0)
+                // Pages are 1‑based. Process only even pages.
+                for (int pageNumber = 2; pageNumber <= doc.Pages.Count; pageNumber += 2)
                 {
-                    Page page = doc.Pages[i];
-                    // Convert the entire page to grayscale.
-                    // This effectively replaces all images on the page with their grayscale versions.
-                    page.MakeGrayscale();
+                    // Convert the current even page to grayscale
+                    doc.Pages[pageNumber].MakeGrayscale();
                 }
+
+                // Save the modified document
+                doc.Save(outputPath);
             }
 
-            // Save the modified document.
-            doc.Save(outputPath);
+            Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }
