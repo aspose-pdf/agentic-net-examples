@@ -20,20 +20,19 @@ class Program
 
         try
         {
-            // Load the existing PDF
+            // Load the existing PDF document
             using (Document doc = new Document(inputPath))
             {
                 // Add a text fragment to the first page
                 Page page = doc.Pages[1];
-                TextFragment tf = new TextFragment("Confidential");
-                tf.Position = new Position(100, 700); // coordinates on the page
-                tf.TextState.Font = FontRepository.FindFont("Helvetica");
+                TextFragment tf = new TextFragment("Confidential Document");
+                tf.Position = new Position(100, 700);
                 tf.TextState.FontSize = 24;
                 tf.TextState.ForegroundColor = Aspose.Pdf.Color.Red;
                 page.Paragraphs.Add(tf);
 
-                // Define permissions (e.g., allow printing only)
-                Permissions perms = Permissions.PrintDocument;
+                // Define permissions (allow printing and content extraction)
+                Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
                 // Encrypt the document with user and owner passwords using AES-256
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);

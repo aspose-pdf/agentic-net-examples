@@ -16,23 +16,29 @@ class Program
             return;
         }
 
-        // Load the existing PDF document
+        // Load the existing PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a text fragment with the desired content
-            TextFragment fragment = new TextFragment("This text is underlined.");
+            // Create a new text fragment with the desired content
+            TextFragment fragment = new TextFragment("Underlined text example");
 
-            // Set the underline property before inserting the fragment
-            fragment.TextState.Underline = true;
-
-            // Optional: set position on the page (coordinates are in points)
+            // Position the fragment on the page (coordinates are in points)
             fragment.Position = new Position(100, 700);
 
-            // Append the fragment to the first page
-            Page page = doc.Pages[1];
-            page.Paragraphs.Add(fragment);
+            // Set the underline property before adding the fragment to the page
+            fragment.TextState.Underline = true;
 
-            // Save the modified document
+            // Optionally set other text properties (font, size, color)
+            fragment.TextState.FontSize = 12;
+            fragment.TextState.Font = FontRepository.FindFont("Helvetica");
+            fragment.TextState.ForegroundColor = Color.Blue;
+
+            // Append the fragment to the first page using TextBuilder
+            Page page = doc.Pages[1];
+            TextBuilder builder = new TextBuilder(page);
+            builder.AppendText(fragment);
+
+            // Save the modified document (using the standard Save method)
             doc.Save(outputPath);
         }
 

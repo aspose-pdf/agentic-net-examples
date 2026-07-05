@@ -9,7 +9,7 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string plainText  = "Sample plain text";
+        const string textToInsert = "Sample plain text";
 
         if (!File.Exists(inputPath))
         {
@@ -17,7 +17,7 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
             // Iterate over all pages (1‑based indexing)
@@ -25,21 +25,25 @@ class Program
             {
                 Page page = doc.Pages[i];
 
-                // Create a TextFragment with the desired text
-                TextFragment fragment = new TextFragment(plainText);
+                // Create a text fragment with the desired content
+                TextFragment tf = new TextFragment(textToInsert);
 
-                // Optional: set the position of the text on the page
-                fragment.Position = new Position(100, 700); // X=100, Y=700
+                // Position the text on the page (example coordinates)
+                tf.Position = new Position(100, 700);
 
-                // Append the text fragment to the page using TextBuilder
-                TextBuilder builder = new TextBuilder(page);
-                builder.AppendText(fragment);
+                // Optional: set basic text appearance
+                tf.TextState.FontSize = 12;
+                tf.TextState.Font = FontRepository.FindFont("Helvetica");
+                tf.TextState.ForegroundColor = Color.Black;
+
+                // Add the fragment to the page's Paragraphs collection
+                page.Paragraphs.Add(tf);
             }
 
             // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Plain text added to all pages. Saved as '{outputPath}'.");
+        Console.WriteLine($"Text inserted on all pages and saved to '{outputPath}'.");
     }
 }

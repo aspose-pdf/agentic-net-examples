@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // for HorizontalAlignment / VerticalAlignment enums if needed
+using Aspose.Pdf.Facades; // for PageNumberStamp (inherits from TextStamp)
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_footer.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,10 +16,10 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+            // Iterate through all pages (1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
@@ -28,15 +28,15 @@ class Program
                 PageNumberStamp stamp = new PageNumberStamp();
 
                 // Position the stamp at the bottom center of the page
+                stamp.BottomMargin = 20;                     // distance from bottom edge
                 stamp.HorizontalAlignment = HorizontalAlignment.Center;
                 stamp.VerticalAlignment   = VerticalAlignment.Bottom;
-                stamp.BottomMargin        = 20; // distance from the bottom edge
 
                 // Add the stamp to the current page
                 page.AddStamp(stamp);
             }
 
-            // Save the modified PDF (Document.Save writes PDF regardless of extension)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

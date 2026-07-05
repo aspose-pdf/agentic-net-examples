@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
@@ -17,29 +16,30 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the existing PDF
         using (Document doc = new Document(inputPath))
         {
-            // Work with the first page (1‑based indexing)
+            // Define a TextState with custom line spacing (leading)
+            TextState textState = new TextState
+            {
+                Font = FontRepository.FindFont("Helvetica"),
+                FontSize = 12,
+                LineSpacing = 20f // desired leading in points
+            };
+
+            // Create a TextParagraph and set its bounding rectangle
+            TextParagraph paragraph = new TextParagraph
+            {
+                Rectangle = new Aspose.Pdf.Rectangle(100, 600, 400, 800)
+            };
+
+            // Append lines using the TextState that carries the custom leading
+            paragraph.AppendLine("First line with custom leading", textState);
+            paragraph.AppendLine("Second line follows", textState);
+            paragraph.AppendLine("Third line", textState);
+
+            // Add the paragraph to the first page
             Page page = doc.Pages[1];
-
-            // Create a TextState and set the desired line spacing (leading)
-            TextState textState = new TextState();
-            textState.Font = FontRepository.FindFont("Helvetica");
-            textState.FontSize = 12;
-            textState.LineSpacing = 15; // leading in points
-
-            // Create a TextParagraph and define its bounding rectangle
-            TextParagraph paragraph = new TextParagraph();
-            paragraph.Rectangle = new Aspose.Pdf.Rectangle(100, 600, 300, 800);
-            paragraph.FormattingOptions.WrapMode = TextFormattingOptions.WordWrapMode.ByWords;
-
-            // Append lines using the TextState with custom leading
-            paragraph.AppendLine("First line with custom leading.", textState);
-            paragraph.AppendLine("Second line follows the same leading.", textState);
-            paragraph.AppendLine("Third line.", textState);
-
-            // Add the paragraph to the page
             TextBuilder builder = new TextBuilder(page);
             builder.AppendParagraph(paragraph);
 
@@ -47,6 +47,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with modified line spacing to '{outputPath}'.");
+        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }
 }

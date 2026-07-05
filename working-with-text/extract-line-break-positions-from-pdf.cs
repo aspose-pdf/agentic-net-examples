@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text.Json;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
@@ -10,43 +9,44 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";          // PDF containing the multi‑line TextFragment
-        const string outputJsonPath = "lineBreaks.json";
+        const string inputPdf = "input.pdf";
+        const string outputJson = "linebreaks.json";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document (lifecycle rule: use using)
+        using (Document doc = new Document(inputPdf))
         {
-            // Absorb all text fragments on all pages
+            // Absorb all text fragments from the document
             TextFragmentAbsorber absorber = new TextFragmentAbsorber();
             doc.Pages.Accept(absorber);
 
-            // Prepare a list that will hold line‑break Y positions for each fragment
-            List<List<double>> fragmentsLineBreaks = new List<List<double>>();
+            // Use a set to collect unique Y positions (baseline) representing line breaks
+            HashSet<double> lineYPositions = new HashSet<double>();
 
+            // Iterate over all absorbed text fragments (no need for PageNumber property)
             foreach (TextFragment fragment in absorber.TextFragments)
             {
-                // Each TextFragment may consist of several TextSegment objects.
-                // Segments that share the same baseline Y coordinate belong to the same visual line.
-                List<double> lineYPositions = fragment.Segments
-                    .Select(seg => seg.Position.YIndent)   // baseline Y of the segment
-                    .Distinct()                           // unique lines
-                    .OrderByDescending(y => y)            // optional: top‑to‑bottom order
-                    .ToList();
-
-                fragmentsLineBreaks.Add(lineYPositions);
+                // Baseline Y coordinate of the fragment
+                double y = fragment.Position.YIndent;
+                lineYPositions.Add(y);
             }
 
-            // Serialize the result to JSON
-            string json = JsonSerializer.Serialize(fragmentsLineBreaks, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(outputJsonPath, json);
+            // Convert the set to a sorted list (top to bottom: higher Y first)
+            List<double> sortedLines = new List<double>(lineYPositions);
+            sortedLines.Sort((a, b) => b.CompareTo(a));
 
-            Console.WriteLine($"Line‑break positions saved to '{outputJsonPath}'.");
+            // Serialize the list to JSON
+            string json = JsonSerializer.Serialize(sortedLines, new JsonSerializerOptions { WriteIndented = true });
+
+            // Write JSON to output file
+            File.WriteAllText(outputJson, json);
         }
+
+        Console.WriteLine($"Line break positions saved to '{outputJson}'.");
     }
 }

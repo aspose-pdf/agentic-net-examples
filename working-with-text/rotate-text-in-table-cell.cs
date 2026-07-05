@@ -3,12 +3,12 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class RotateTableCellText
+class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "rotated_output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "rotated_table_cell.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,35 +16,40 @@ class RotateTableCellText
             return;
         }
 
-        // Load the PDF document (wrapped in using for deterministic disposal)
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Find tables on the first page (adjust page index as needed)
-            TableAbsorber tableAbsorber = new TableAbsorber();
-            tableAbsorber.Visit(doc.Pages[1]);
-
-            // Ensure at least one table was found
-            if (tableAbsorber.TableList.Count == 0)
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
             {
-                Console.WriteLine("No tables found on the page.");
-                doc.Save(outputPath); // Save unchanged document
-                return;
+                // Locate tables on the first page
+                TableAbsorber tableAbsorber = new TableAbsorber();
+                tableAbsorber.Visit(doc.Pages[1]);
+
+                // Verify that a table, row, cell, and text fragment exist
+                if (tableAbsorber.TableList.Count > 0 &&
+                    tableAbsorber.TableList[0].RowList.Count > 0 &&
+                    tableAbsorber.TableList[0].RowList[0].CellList.Count > 0 &&
+                    tableAbsorber.TableList[0].RowList[0].CellList[0].TextFragments.Count > 0)
+                {
+                    // Get the first text fragment in the first cell
+                    TextFragment fragment = tableAbsorber.TableList[0]
+                        .RowList[0]
+                        .CellList[0]
+                        .TextFragments[0];
+
+                    // Rotate the text by 60 degrees
+                    fragment.TextState.Rotation = 60;
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Access the first table, first row, first cell (modify indices as required)
-            var cell = tableAbsorber.TableList[0].RowList[0].CellList[0];
-
-            // Rotate each text fragment inside the cell by 60 degrees
-            foreach (TextFragment fragment in cell.TextFragments)
-            {
-                // TextFragmentState.Rotation sets the rotation angle in degrees
-                fragment.TextState.Rotation = 60;
-            }
-
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF saved with rotated text in cell: {outputPath}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

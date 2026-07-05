@@ -2,52 +2,66 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 class Program
 {
     static void Main()
     {
-        // Path to the image that will appear in the footnote
-        const string footnoteImagePath = "footnote.png";
+        const string outputPath = "footnote_with_image.pdf";
 
-        // Ensure the image file exists before proceeding
-        if (!File.Exists(footnoteImagePath))
-        {
-            Console.Error.WriteLine($"Image not found: {footnoteImagePath}");
-            return;
-        }
-
-        // Create a new PDF document and ensure deterministic disposal
+        // Create a new PDF document and ensure proper disposal
         using (Document doc = new Document())
         {
-            // Add a new page to the document
+            // Add a blank page (Pages are 1‑based)
             Page page = doc.Pages.Add();
 
             // Create a text fragment that will contain the footnote reference
-            TextFragment text = new TextFragment("This is a paragraph with a footnote reference.");
+            TextFragment fragment = new TextFragment("This is a paragraph with a footnote reference.");
 
-            // Create the footnote (Note) object
-            Note footnote = new Note();
+            // Create the footnote (Note) and set its textual content
+            Note footNote = new Note();
+            footNote.Text = "This is the footnote text.";
 
-            // Create an Image object and set its source file
-            Image footnoteImage = new Image
+            // ------------------------------------------------------------
+            // Create an in‑memory PNG image and add it to the footnote
+            // ------------------------------------------------------------
+            // 1. Build a simple bitmap (you can replace this with any image you like)
+            Bitmap bitmap = new Bitmap(100, 50);
+            using (Graphics g = Graphics.FromImage(bitmap))
             {
-                File = footnoteImagePath
-            };
+                g.Clear(System.Drawing.Color.LightGray);
+                g.DrawString("Img", new System.Drawing.Font("Arial", 12), Brushes.Black, new PointF(10, 15));
+            }
 
-            // Add the image to the footnote's Paragraphs collection
-            footnote.Paragraphs.Add(footnoteImage);
+            // 2. Save the bitmap to a MemoryStream as PNG
+            MemoryStream imageStream = new MemoryStream();
+            bitmap.Save(imageStream, ImageFormat.Png);
+            // Reset the stream position so Aspose.Pdf can read from the beginning
+            imageStream.Position = 0;
 
-            // Assign the footnote to the TextFragment
-            text.FootNote = footnote;
+            // 3. Create an Aspose.Pdf.Image and assign the stream
+            Aspose.Pdf.Image footnoteImage = new Aspose.Pdf.Image();
+            footnoteImage.ImageStream = imageStream;
 
-            // Add the TextFragment (with its footnote) to the page's content
-            page.Paragraphs.Add(text);
+            // 4. Add the image to the footnote's Paragraphs collection
+            footNote.Paragraphs.Add(footnoteImage);
 
-            // Save the resulting PDF
-            doc.Save("output.pdf");
+            // Associate the footnote with the text fragment
+            fragment.FootNote = footNote;
+
+            // Add the text fragment (with footnote) to the page
+            page.Paragraphs.Add(fragment);
+
+            // Save the PDF document
+            doc.Save(outputPath);
+
+            // Clean‑up resources that are not covered by the using‑statement above
+            imageStream.Dispose();
+            bitmap.Dispose();
         }
 
-        Console.WriteLine("PDF with footnote and image saved as 'output.pdf'.");
+        Console.WriteLine($"PDF with footnote saved to '{outputPath}'.");
     }
 }

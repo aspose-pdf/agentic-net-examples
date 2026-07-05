@@ -1,74 +1,46 @@
 using System;
-using System.Runtime.InteropServices;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // required for HtmlFragment (inherits from FormattedFragment)
 
 class Program
 {
     static void Main()
     {
-        // Create a new empty PDF document
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a blank page to host the HTML fragment
+            // Add a blank page to the document
             Page page = doc.Pages.Add();
 
             // Define CSS rules to control font, color, and spacing
             string css = @"
                 <style>
-                    .styledParagraph {
-                        font-family: Arial, Helvetica, sans-serif;
-                        color: #FF4500;               /* orange‑red text */
-                        margin-top: 12pt;
-                        margin-bottom: 12pt;
-                        line-height: 1.5;             /* spacing between lines */
+                    p {
+                        font-family: Arial, Helvetica, sans-serif; /* Font */
+                        color: #003366;                           /* Text color */
+                        line-height: 1.6;                         /* Line spacing */
+                        margin-top: 12pt;                         /* Top margin */
+                        margin-bottom: 12pt;                      /* Bottom margin */
                     }
                 </style>";
 
-            // HTML content that uses the CSS class defined above
-            string html = $@"
-                {css}
-                <p class='styledParagraph'>
-                    This is a sample paragraph rendered from an HtmlFragment.
-                    The font, color, and line spacing are controlled by the embedded CSS.
-                </p>";
+            // HTML content that will be rendered using the above CSS
+            string htmlContent = $"{css}<p>This paragraph is styled with embedded CSS.</p>";
 
-            // Create the HtmlFragment with the HTML string (including CSS)
-            HtmlFragment htmlFragment = new HtmlFragment(html);
+            // Create an HtmlFragment with the combined CSS and HTML
+            HtmlFragment htmlFragment = new HtmlFragment(htmlContent);
 
-            // Add the fragment to the page's paragraph collection
+            // Optionally, customize HtmlLoadOptions for this fragment (e.g., base path for resources)
+            // htmlFragment.HtmlLoadOptions = new HtmlLoadOptions { BasePath = "resources" };
+
+            // Add the HtmlFragment to the page's paragraph collection
             page.Paragraphs.Add(htmlFragment);
 
-            // Save the resulting PDF – guard against missing libgdiplus on non‑Windows platforms
-            string outputPath = "HtmlFragmentWithCss.pdf";
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                doc.Save(outputPath);
-            }
-            else
-            {
-                try
-                {
-                    doc.Save(outputPath);
-                }
-                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
-                {
-                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. PDF was not saved.");
-                }
-            }
+            // Save the resulting PDF
+            string outputPath = "StyledHtmlFragment.pdf";
+            doc.Save(outputPath);
+            Console.WriteLine($"PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine("PDF creation attempt finished.");
-    }
-
-    private static bool ContainsDllNotFound(Exception? ex)
-    {
-        while (ex != null)
-        {
-            if (ex is DllNotFoundException)
-                return true;
-            ex = ex.InnerException;
-        }
-        return false;
     }
 }

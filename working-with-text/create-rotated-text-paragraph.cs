@@ -6,6 +6,8 @@ class Program
 {
     static void Main()
     {
+        const string outputPath = "output.pdf";
+
         // Create a new PDF document and ensure proper disposal
         using (Document doc = new Document())
         {
@@ -16,33 +18,35 @@ class Program
             TextParagraph paragraph = new TextParagraph();
 
             // Define the rectangle where the paragraph will be placed
-            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-            paragraph.Rectangle = new Aspose.Pdf.Rectangle(100, 600, 300, 800);
-
-            // Create several TextFragment objects with different text
-            TextFragment fragment1 = new TextFragment("First line of text");
-            TextFragment fragment2 = new TextFragment("Second line of text");
-            TextFragment fragment3 = new TextFragment("Third line of text");
-
-            // Optional: set common text properties (font size, color, etc.)
-            fragment1.TextState.FontSize = 12;
-            fragment2.TextState.FontSize = 12;
-            fragment3.TextState.FontSize = 12;
-
-            // Append the fragments to the paragraph as separate lines
-            paragraph.AppendLine(fragment1);
-            paragraph.AppendLine(fragment2);
-            paragraph.AppendLine(fragment3);
+            paragraph.Rectangle = new Aspose.Pdf.Rectangle(100, 500, 400, 700);
 
             // Apply a 30-degree rotation to the entire paragraph
             paragraph.Rotation = 30;
 
-            // Use TextBuilder to add the paragraph to the page
-            TextBuilder textBuilder = new TextBuilder(page);
-            textBuilder.AppendParagraph(paragraph);
+            // First text fragment
+            TextFragment tf1 = new TextFragment("First fragment");
+            tf1.TextState.FontSize = 12;
+            tf1.TextState.Font = FontRepository.FindFont("Helvetica");
+            tf1.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
 
-            // Save the resulting PDF
-            doc.Save("output.pdf");
+            // Second text fragment
+            TextFragment tf2 = new TextFragment("Second fragment");
+            tf2.TextState.FontSize = 12;
+            tf2.TextState.Font = FontRepository.FindFont("Helvetica");
+            tf2.TextState.ForegroundColor = Aspose.Pdf.Color.Green;
+
+            // Append the fragments to the paragraph as separate lines
+            paragraph.AppendLine(tf1);
+            paragraph.AppendLine(tf2);
+
+            // Use TextBuilder to add the paragraph to the page
+            TextBuilder builder = new TextBuilder(page);
+            builder.AppendParagraph(paragraph);
+
+            // Save the PDF document
+            doc.Save(outputPath);
         }
+
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -6,38 +7,47 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "hyphenated.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_hyphenated.pdf";
 
-        // Create a new PDF document
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a blank page
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Create a text paragraph that will hold the content
+        // Load the PDF document (lifecycle: create, load, save)
+        using (Document doc = new Document(inputPath))
+        {
+            // Define a rectangle where the paragraph will be placed
             TextParagraph paragraph = new TextParagraph();
+            paragraph.Rectangle = new Aspose.Pdf.Rectangle(50, 500, 550, 700);
 
-            // Define the rectangle area where the paragraph will be placed
-            paragraph.Rectangle = new Rectangle(50, 700, 550, 800);
-
-            // Enable automatic hyphenation:
-            // - Set word wrap mode to ByWords (allows discretionary hyphenation)
-            // - Optionally specify the hyphen symbol to use
-            paragraph.FormattingOptions = new TextFormattingOptions(TextFormattingOptions.WordWrapMode.ByWords);
+            // Enable automatic hyphenation by setting the wrap mode to DiscretionaryHyphenation
+            paragraph.FormattingOptions = new TextFormattingOptions(TextFormattingOptions.WordWrapMode.DiscretionaryHyphenation);
+            // Optional: customize the hyphen symbol (default is "-")
             paragraph.FormattingOptions.HyphenSymbol = "-";
 
-            // Sample long text that may require hyphenation
-            string longText = "Supercalifragilisticexpialidocious is a very long word that might need hyphenation when it does not fit in the line.";
-            paragraph.AppendLine(longText);
+            // Create a TextState for styling the inserted text
+            TextState textState = new TextState();
+            textState.Font = FontRepository.FindFont("Helvetica");
+            textState.FontSize = 12;
+            textState.ForegroundColor = Aspose.Pdf.Color.Black;
 
-            // Render the paragraph onto the page
-            TextBuilder builder = new TextBuilder(page);
-            builder.AppendParagraph(paragraph);
+            // Long text that will trigger hyphenation
+            string longText = "Antidisestablishmentarianism is often used as an example of a very long word that may need hyphenation.";
 
-            // Save the resulting PDF
+            // Append the line with the defined TextState
+            paragraph.AppendLine(longText, textState);
+
+            // Add the paragraph to the first page using TextBuilder
+            TextBuilder textBuilder = new TextBuilder(doc.Pages[1]);
+            textBuilder.AppendParagraph(paragraph);
+
+            // Save the modified PDF (lifecycle: save)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Hyphenated PDF saved to '{outputPath}'.");
     }
 }

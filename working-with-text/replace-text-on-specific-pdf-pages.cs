@@ -28,31 +28,28 @@ class Program
         // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the page range is within the document bounds
-            int maxPage = doc.Pages.Count;
-            int from = Math.Max(1, startPage);
-            int to   = Math.Min(endPage, maxPage);
+            // Ensure the requested range is within the document bounds
+            int pageCount = doc.Pages.Count;
+            int first = Math.Max(1, startPage);
+            int last  = Math.Min(pageCount, endPage);
 
             // Iterate over the specified pages
-            for (int pageNum = from; pageNum <= to; pageNum++)
+            for (int i = first; i <= last; i++)
             {
                 // Create an absorber that searches for the target phrase
                 TextFragmentAbsorber absorber = new TextFragmentAbsorber(searchText);
 
-                // Optional: set replace options (e.g., replace all occurrences on the page)
-                absorber.TextReplaceOptions = new TextReplaceOptions(TextReplaceOptions.Scope.REPLACE_ALL);
-
                 // Perform the search on the current page
-                doc.Pages[pageNum].Accept(absorber);
+                doc.Pages[i].Accept(absorber);
 
-                // Replace each found fragment's text with the new phrase
+                // Replace each found occurrence with the new text
                 foreach (TextFragment fragment in absorber.TextFragments)
                 {
                     fragment.Text = replaceText;
                 }
             }
 
-            // Save the modified document
+            // Save the modified document (PDF format)
             doc.Save(outputPath);
         }
 

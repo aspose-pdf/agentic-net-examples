@@ -18,7 +18,7 @@ class Program
             return;
         }
 
-        // Load the PDF document (wrapped in using for deterministic disposal)
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
             // Build a case‑insensitive regular expression for the keyword
@@ -27,16 +27,16 @@ class Program
             // Create a TextFragmentAbsorber that uses the regex
             TextFragmentAbsorber absorber = new TextFragmentAbsorber(regex);
 
-            // Search the entire document
+            // Search all pages of the document
             doc.Pages.Accept(absorber);
 
-            // Highlight each found text fragment by setting a background color
+            // Highlight each found text fragment by setting its background color
             foreach (TextFragment fragment in absorber.TextFragments)
             {
                 fragment.TextState.BackgroundColor = Aspose.Pdf.Color.Yellow;
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (output format is PDF, no SaveOptions needed)
             doc.Save(outputPath);
         }
 
