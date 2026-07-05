@@ -7,30 +7,36 @@ class Program
 {
     static void Main()
     {
-        // UNC path to the PDF file on a network share
+        // UNC path to the PDF file on the network share
         const string pdfPath = @"\\server\share\documents\sample.pdf";
 
+        // Verify that the file exists before attempting to read it
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        try
+        // Use the PdfXmpMetadata facade to bind the PDF and retrieve XMP metadata
+        using (PdfXmpMetadata xmpMetadata = new PdfXmpMetadata())
         {
-            // Use the PdfXmpMetadata facade to read XMP metadata
-            using (PdfXmpMetadata xmp = new PdfXmpMetadata())
-            {
-                xmp.BindPdf(pdfPath);                     // Initialize with the PDF file
-                byte[] rawData = xmp.GetXmpMetadata();    // Retrieve XMP as XML bytes
-                string xml = Encoding.UTF8.GetString(rawData);
-                Console.WriteLine("XMP Metadata:");
-                Console.WriteLine(xml);
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error reading XMP metadata: {ex.Message}");
+            // Bind the PDF located at the UNC path
+            xmpMetadata.BindPdf(pdfPath);
+
+            // Retrieve the entire XMP metadata as a byte array (XML format)
+            byte[] fullMetadataBytes = xmpMetadata.GetXmpMetadata();
+            string fullMetadataXml = Encoding.UTF8.GetString(fullMetadataBytes);
+
+            Console.WriteLine("=== Full XMP Metadata ===");
+            Console.WriteLine(fullMetadataXml);
+            Console.WriteLine();
+
+            // Example: retrieve a specific XMP property (e.g., creator)
+            byte[] creatorBytes = xmpMetadata.GetXmpMetadata("dc:creator");
+            string creatorXml = Encoding.UTF8.GetString(creatorBytes);
+
+            Console.WriteLine("=== dc:creator Metadata ===");
+            Console.WriteLine(creatorXml);
         }
     }
 }

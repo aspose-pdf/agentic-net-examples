@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_xmp.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,29 +16,41 @@ class Program
             return;
         }
 
-        // Load the source PDF (lifecycle rule: use using for deterministic disposal)
+        // Load the source PDF
         using (Document doc = new Document(inputPath))
         {
-            // Bind the PDF to the XMP metadata facade (constructor with Document)
-            using (PdfXmpMetadata xmp = new PdfXmpMetadata(doc))
+            // Retrieve existing XMP metadata (if any)
+            byte[] existingMetadata;
+            using (MemoryStream ms = new MemoryStream())
             {
-                // Retrieve existing XMP metadata (returns empty byte[] if none)
-                byte[] existingMetadata = xmp.GetXmpMetadata();
+                doc.GetXmpMetadata(ms);
+                existingMetadata = ms.ToArray();
+            }
 
-                // If no metadata is present, add a minimal set
-                if (existingMetadata == null || existingMetadata.Length == 0)
+            // If no XMP metadata is present, create minimal metadata
+            if (existingMetadata == null || existingMetadata.Length == 0)
+            {
+                // Create a PdfXmpMetadata facade and bind it to the document
+                using (PdfXmpMetadata xmp = new PdfXmpMetadata())
                 {
-                    // Add a title and creator – using the string/object overloads
-                    xmp.Add("xmp:Title", "Untitled Document");
-                    xmp.Add("xmp:CreatorTool", "Aspose.Pdf");
-                }
+                    xmp.BindPdf(doc);
 
-                // Save the PDF with the (new or existing) XMP metadata
-                // (SaveableFacade.Save(string) follows the provided save rule)
-                xmp.Save(outputPath);
+                    // Add a few essential XMP entries
+                    xmp.Add("dc:title", "Untitled Document");
+                    xmp.Add("dc:creator", "Aspose.Pdf");
+                    xmp.Add("xmp:CreateDate", DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"));
+
+                    // Save the PDF with the newly added XMP metadata
+                    xmp.Save(outputPath);
+                }
+            }
+            else
+            {
+                // XMP metadata already exists; simply copy the PDF
+                doc.Save(outputPath);
             }
         }
 
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Processing complete. Output saved to '{outputPath}'.");
     }
 }

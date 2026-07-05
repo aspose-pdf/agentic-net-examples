@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -10,22 +9,21 @@ class Program
         const string outputPath = "output.pdf";
 
         // Verify input file exists
-        if (!File.Exists(inputPath))
+        if (!System.IO.File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF, modify its XMP metadata, and save the result
+        // Create the XMP metadata facade, bind the PDF, modify metadata, and save
         using (PdfXmpMetadata xmp = new PdfXmpMetadata())
         {
-            // Bind the existing PDF document
+            // Load the PDF into the facade
             xmp.BindPdf(inputPath);
 
-            // Example modifications: add/replace XMP properties
+            // Add or update XMP properties (key, value). Use string overload to avoid needing Aspose.Pdf.Xmp namespace.
             xmp.Add("dc:creator", "John Doe");
             xmp.Add("dc:title",   "Sample Document");
-            xmp.Add("dc:description", "Updated XMP metadata via Aspose.Pdf.Facades");
 
             // Save the PDF with the updated XMP metadata
             xmp.Save(outputPath);

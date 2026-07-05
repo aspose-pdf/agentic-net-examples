@@ -9,12 +9,12 @@ class Program
         // Expect two arguments: folder path and the new CreatorTool value
         if (args.Length < 2)
         {
-            Console.WriteLine("Usage: UpdateCreator <folderPath> <creatorTool>");
+            Console.Error.WriteLine("Usage: <exe> <folderPath> <creatorTool>");
             return;
         }
 
         string folderPath = args[0];
-        string newCreator = args[1];
+        string creatorTool = args[1];
 
         if (!Directory.Exists(folderPath))
         {
@@ -25,27 +25,23 @@ class Program
         // Get all PDF files in the specified folder (non‑recursive)
         string[] pdfFiles = Directory.GetFiles(folderPath, "*.pdf", SearchOption.TopDirectoryOnly);
 
-        foreach (string pdfFile in pdfFiles)
+        foreach (string pdfPath in pdfFiles)
         {
             try
             {
-                // Bind the PDF file using PdfFileInfo facade
-                using (PdfFileInfo fileInfo = new PdfFileInfo())
+                // Use PdfFileInfo facade to modify metadata
+                using (PdfFileInfo info = new PdfFileInfo())
                 {
-                    fileInfo.BindPdf(pdfFile);
-
-                    // Update the Creator metadata property
-                    fileInfo.Creator = newCreator;
-
-                    // Save the updated metadata back to the same file
-                    fileInfo.SaveNewInfo(pdfFile);
+                    info.BindPdf(pdfPath);          // Load the PDF
+                    info.Creator = creatorTool;    // Update CreatorTool property
+                    info.SaveNewInfo(pdfPath);     // Overwrite the original file with updated info
                 }
 
-                Console.WriteLine($"Updated Creator for: {Path.GetFileName(pdfFile)}");
+                Console.WriteLine($"Updated Creator for: {Path.GetFileName(pdfPath)}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{pdfFile}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         }
     }

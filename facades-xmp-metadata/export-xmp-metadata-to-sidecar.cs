@@ -15,13 +15,14 @@ class Program
             return;
         }
 
-        // Create the PdfXmpMetadata facade, bind the PDF, extract XMP metadata,
-        // and write it to a side‑car .xmp file.
-        using (PdfXmpMetadata xmpFacade = new PdfXmpMetadata())
+        // Bind the PDF and extract its XMP metadata as a byte array
+        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
         {
-            xmpFacade.BindPdf(inputPdf);
-            byte[] xmpData = xmpFacade.GetXmpMetadata();
-            File.WriteAllBytes(outputXmp, xmpData);
+            xmp.BindPdf(inputPdf);
+            byte[] data = xmp.GetXmpMetadata(); // full XMP metadata
+
+            // Save the metadata to a side‑car .xmp file
+            File.WriteAllBytes(outputXmp, data);
         }
 
         Console.WriteLine($"XMP metadata exported to '{outputXmp}'.");

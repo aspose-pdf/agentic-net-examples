@@ -6,24 +6,22 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string inputPath = "input.pdf";
 
-        // Verify the source file exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Create the XMP metadata facade and bind the PDF file
-        using (PdfXmpMetadata xmpMetadata = new PdfXmpMetadata())
+        // Create the XMP metadata facade and bind the PDF file to it
+        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
         {
-            xmpMetadata.BindPdf(inputPdf);
+            xmp.BindPdf(inputPath);
 
-            // Example: retrieve the entire XMP metadata as a byte array
-            byte[] xmpData = xmpMetadata.GetXmpMetadata();
-
-            Console.WriteLine($"XMP metadata retrieved: {xmpData.Length} bytes");
+            // Example: retrieve the XMP metadata as XML bytes
+            byte[] xmlBytes = xmp.GetXmpMetadata();
+            Console.WriteLine($"XMP metadata retrieved, size = {xmlBytes.Length} bytes");
         }
     }
 }

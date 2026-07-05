@@ -1,22 +1,26 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades; // PdfXmpMetadata
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main(string[] args)
     {
-        // Expected arguments: inputPdf outputPdf xmpKey xmpValue
+        // Expected arguments:
+        // 0 - input PDF path
+        // 1 - output PDF path
+        // 2 - XMP property name (e.g., "dc:creator")
+        // 3 - XMP property value
         if (args.Length != 4)
         {
-            Console.Error.WriteLine("Usage: <input.pdf> <output.pdf> <xmpKey> <xmpValue>");
+            Console.Error.WriteLine("Usage: <input.pdf> <output.pdf> <xmpPropertyName> <xmpPropertyValue>");
             return;
         }
 
         string inputPath  = args[0];
         string outputPath = args[1];
-        string xmpKey     = args[2];
-        string xmpValue   = args[3];
+        string propName   = args[2];
+        string propValue  = args[3];
 
         if (!File.Exists(inputPath))
         {
@@ -29,18 +33,24 @@ class Program
             // Bind the PDF and manipulate its XMP metadata
             using (PdfXmpMetadata xmp = new PdfXmpMetadata())
             {
+                // Load the source PDF
                 xmp.BindPdf(inputPath);
 
-                // Add or update the specified XMP property.
-                // PdfXmpMetadata provides an overload that accepts a plain string value,
-                // eliminating the need for the Aspose.Pdf.Xmp.XmpValue type.
-                xmp.Add(xmpKey, xmpValue);
+                // If the property already exists, remove it first
+                if (xmp.Contains(propName))
+                {
+                    xmp.Remove(propName);
+                }
 
-                // Save the PDF with the updated XMP metadata
+                // Add or update the XMP property
+                // The Add(string, object) overload creates the appropriate XmpValue internally
+                xmp.Add(propName, propValue);
+
+                // Save the updated PDF with the new XMP metadata
                 xmp.Save(outputPath);
             }
 
-            Console.WriteLine($"XMP property '{xmpKey}' updated and saved to '{outputPath}'.");
+            Console.WriteLine($"XMP property '{propName}' updated successfully. Output saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {
