@@ -1,48 +1,51 @@
 using System;
-using System.Drawing;               // For Color and Rectangle
+using System.Drawing;               // Required for Color parameters in Facades API
 using Aspose.Pdf.Facades;          // Facade classes for bookmark and content editing
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // Existing PDF to modify
-        const string outputPdf = "output_with_js_bookmarks.pdf";
+        const string inputPdf  = "input.pdf";   // Source PDF
+        const string outputPdf = "output.pdf";  // PDF with JavaScript‑enabled bookmarks
 
         // Ensure the source file exists
         if (!System.IO.File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Use PdfContentEditor to add a bookmark that runs JavaScript when clicked
+        // Use the Facade API to add a bookmark that runs JavaScript when clicked
         using (PdfContentEditor editor = new PdfContentEditor())
         {
-            // Load the PDF document into the editor
+            // Bind the existing PDF document
             editor.BindPdf(inputPdf);
 
-            // JavaScript code to be executed when the bookmark is activated
-            string jsCode = "app.alert('Hello from JavaScript bookmark!');";
-
-            // The destination for a JavaScript bookmark is a URI with the "javascript:" scheme
-            string jsUri = "javascript:" + jsCode;
-
-            // Create a bookmark with the desired title, color, style and JavaScript action
-            // Action type "URI" tells the viewer to treat the destination as a URI.
+            // Create a bookmark titled "Show Alert". The bookmark will appear in bold,
+            // use a blue title colour, and execute the supplied JavaScript code.
+            // Parameters:
+            //   title        – bookmark title
+            //   color        – title colour (System.Drawing.Color)
+            //   boldFlag     – true => bold title
+            //   italicFlag   – false => normal style
+            //   file         – not needed for JavaScript actions (null)
+            //   actionType   – "JavaScript" indicates a JS action
+            //   destination  – the JavaScript code to execute
             editor.CreateBookmarksAction(
-                title:      "Run JavaScript",
-                color:      Color.Blue,   // Bookmark title color
-                boldFlag:   true,         // Bold title
-                italicFlag: false,        // Not italic
-                file:       null,         // Not needed for URI action
-                actionType: "URI",        // Use URI action
-                destination: jsUri);      // JavaScript URI
+                title:       "Show Alert",
+                color:       Color.Blue,
+                boldFlag:    true,
+                italicFlag:  false,
+                file:        null,
+                actionType:  "JavaScript",
+                destination: "app.alert('Bookmark clicked!');"
+            );
 
-            // Save the modified PDF with the new bookmark
+            // Save the modified PDF
             editor.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved with JavaScript bookmark: {outputPdf}");
+        Console.WriteLine($"PDF with JavaScript bookmark saved to '{outputPdf}'.");
     }
 }

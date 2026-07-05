@@ -7,10 +7,10 @@ class Program
 {
     static void Main()
     {
-        // Folder containing source PDFs
-        const string inputFolder = "InputPdfs";
-        // Folder where PDFs with the new bookmark will be saved
-        const string outputFolder = "OutputPdfs";
+        // Folder containing the PDFs to process
+        const string inputFolder = "input_pdfs";
+        // Folder where the updated PDFs will be saved
+        const string outputFolder = "output_pdfs";
 
         if (!Directory.Exists(inputFolder))
         {
@@ -18,35 +18,39 @@ class Program
             return;
         }
 
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
         // Process each PDF file in the input folder
         foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            string fileName = Path.GetFileNameWithoutExtension(inputPath);
-            string outputPath = Path.Combine(outputFolder, $"{fileName}_reviewed.pdf");
+            string fileName = Path.GetFileName(inputPath);
+            string outputPath = Path.Combine(outputFolder, fileName);
 
-            // Initialize the bookmark editor (facade)
-            Aspose.Pdf.Facades.PdfBookmarkEditor editor = new Aspose.Pdf.Facades.PdfBookmarkEditor();
-
-            // Bind the source PDF file to the editor
-            editor.BindPdf(inputPath);
-
-            // Determine the last page number (Aspose.Pdf uses 1‑based indexing)
-            using (Document doc = new Document(inputPath))
+            try
             {
-                int lastPage = doc.Pages.Count;
-                // Add a bookmark titled "Reviewed" that points to the last page
-                editor.CreateBookmarkOfPage("Reviewed", lastPage);
+                // Use the PdfBookmarkEditor facade to modify bookmarks
+                using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
+                {
+                    // Load the PDF file
+                    editor.BindPdf(inputPath);
+
+                    // Aspose.Pdf uses 1‑based page indexing
+                    int lastPageNumber = editor.Document.Pages.Count;
+
+                    // Add a bookmark titled "Reviewed" that points to the last page
+                    editor.CreateBookmarkOfPage("Reviewed", lastPageNumber);
+
+                    // Save the modified PDF (overwrites or creates a new file)
+                    editor.Save(outputPath);
+                }
+
+                Console.WriteLine($"Processed: {fileName}");
             }
-
-            // Save the modified PDF to the output location
-            editor.Save(outputPath);
-
-            // Release resources held by the facade
-            editor.Close();
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing {fileName}: {ex.Message}");
+            }
         }
-
-        Console.WriteLine("Batch bookmark addition completed.");
     }
 }

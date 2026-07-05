@@ -6,48 +6,36 @@ class Program
 {
     static void Main()
     {
-        // Folder containing PDFs to process
-        const string inputFolder  = @"C:\PdfFolder";
-        // Folder where processed PDFs will be saved (can be the same as inputFolder)
-        const string outputFolder = @"C:\PdfFolder\Processed";
+        // Folder containing source PDFs
+        const string inputFolder = @"C:\PdfInput";
+        // Folder where processed PDFs will be saved
+        const string outputFolder = @"C:\PdfOutput";
 
-        if (!Directory.Exists(inputFolder))
-        {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
-            return;
-        }
-
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Process each PDF file in the folder
+        // Process each PDF file in the input folder
         foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            string fileName   = Path.GetFileNameWithoutExtension(inputPath);
-            string outputPath = Path.Combine(outputFolder, $"{fileName}_toc.pdf");
+            // Build the output file path (adds a suffix to avoid overwriting the original)
+            string outputPath = Path.Combine(
+                outputFolder,
+                Path.GetFileNameWithoutExtension(inputPath) + "_toc.pdf");
 
-            try
+            // Use PdfBookmarkEditor to add a "Table of Contents" bookmark linking to page 1
+            using (PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor())
             {
-                // Initialize the bookmark editor and bind the PDF file
-                PdfBookmarkEditor editor = new PdfBookmarkEditor();
-                editor.BindPdf(inputPath);
+                // Bind the source PDF file
+                bookmarkEditor.BindPdf(inputPath);
 
-                // Add a top‑level bookmark named "Table of Contents" that points to page 1
-                editor.CreateBookmarkOfPage("Table of Contents", 1);
+                // Create a top‑level bookmark titled "Table of Contents" that points to page 1
+                bookmarkEditor.CreateBookmarkOfPage("Table of Contents", 1);
 
-                // Save the modified PDF
-                editor.Save(outputPath);
-
-                // Release resources held by the editor
-                editor.Close();
-
-                Console.WriteLine($"Processed: {inputPath} → {outputPath}");
+                // Save the modified PDF to the output location
+                bookmarkEditor.Save(outputPath);
             }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
-            }
+
+            Console.WriteLine($"Processed: {Path.GetFileName(inputPath)} → {Path.GetFileName(outputPath)}");
         }
-
-        Console.WriteLine("Batch processing completed.");
     }
 }

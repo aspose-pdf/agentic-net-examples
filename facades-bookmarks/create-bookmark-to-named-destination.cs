@@ -3,14 +3,15 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
+using System.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_bookmark.pdf";
-        const string destName   = "MyNamedDestination";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_bookmarked.pdf";
+        const string destinationName = "MyNamedDestination";
 
         if (!File.Exists(inputPath))
         {
@@ -18,39 +19,32 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
-        {
-            // Ensure the document has at least one page
-            if (doc.Pages.Count == 0)
-            {
-                Console.Error.WriteLine("The PDF has no pages.");
-                return;
-            }
+        // Load the PDF to define a named destination (e.g., page 2, fit to window)
+        Document doc = new Document(inputPath);
+        // Add the named destination to the document's NamedDestinations collection
+        // FitExplicitDestination makes the view fit the whole page
+        doc.NamedDestinations.Add(destinationName, new FitExplicitDestination(doc.Pages[2]));
 
-            // Define a named destination that points to page 1 (adjust as needed)
-            Page targetPage = doc.Pages[1];
-            GoToAction goTo = new GoToAction(targetPage);
-            doc.NamedDestinations.Add(destName, goTo);
+        // Save to a temporary file so the facade can work with the updated document
+        string tempPath = Path.GetTempFileName();
+        doc.Save(tempPath);
 
-            // Create a bookmark that references the named destination
-            PdfBookmarkEditor editor = new PdfBookmarkEditor();
-            editor.BindPdf(doc);
+        // Use PdfContentEditor to create a bookmark that points to the named destination
+        PdfContentEditor editor = new PdfContentEditor();
+        editor.BindPdf(tempPath);
+        editor.CreateBookmarksAction(
+            title: "Bookmark to Named Destination",   // bookmark title
+            color: System.Drawing.Color.DarkGreen,    // title color – use System.Drawing.Color
+            boldFlag: true,                          // bold style
+            italicFlag: false,                       // italic style
+            file: null,                              // not needed for GoTo action
+            actionType: "GoTo",                    // action type that uses a named destination
+            destination: destinationName);            // the name defined above
+        editor.Save(outputPath);
+        editor.Close();
 
-            Bookmark bookmark = new Bookmark
-            {
-                Title      = "Jump to Named Destination",
-                Action     = "Named",          // Use the "Named" action type
-                Destination = destName         // Name of the destination defined above
-            };
-
-            // Add the bookmark to the document
-            editor.CreateBookmarks(bookmark);
-
-            // Save the updated PDF using the facade's Save method
-            editor.Save(outputPath);
-            editor.Close(); // optional, Dispose will be called automatically at the end of using if wrapped
-        }
+        // Clean up the temporary file
+        File.Delete(tempPath);
 
         Console.WriteLine($"Bookmark created and saved to '{outputPath}'.");
     }

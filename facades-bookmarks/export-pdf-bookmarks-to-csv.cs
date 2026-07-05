@@ -1,6 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades;   // PdfBookmarkEditor, Bookmark, Bookmarks
+using Aspose.Pdf;          // Bookmark (shared namespace)
 
 class Program
 {
@@ -15,73 +16,49 @@ class Program
             return;
         }
 
-        // Initialize the bookmark editor and bind the PDF
+        // Bind the PDF to the bookmark editor and extract the bookmark hierarchy.
         using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
         {
             editor.BindPdf(inputPdf);
+            Bookmarks rootBookmarks = editor.ExtractBookmarks();
 
-            // Extract all bookmarks (recursive hierarchy)
-            Bookmarks bookmarks = editor.ExtractBookmarks();
-
-            // Write bookmarks to CSV
-            using (StreamWriter writer = new StreamWriter(outputCsv))
+            // Write CSV header and each bookmark (including nested ones) with its level.
+            using (StreamWriter writer = new StreamWriter(outputCsv, false, System.Text.Encoding.UTF8))
             {
-                // CSV header
                 writer.WriteLine("Title,Destination,Level");
-                WriteBookmarks(bookmarks, writer, 1);
+                foreach (Bookmark bm in rootBookmarks)
+                {
+                    WriteBookmark(writer, bm, 1);
+                }
             }
-
-            // Close the editor (optional, using will dispose)
-            editor.Close();
         }
 
         Console.WriteLine($"Bookmarks exported to '{outputCsv}'.");
     }
 
-    // Recursively write bookmarks with their hierarchy level
-    private static void WriteBookmarks(Bookmarks bookmarks, StreamWriter writer, int level)
+    // Recursively writes a bookmark and its children to the CSV.
+    static void WriteBookmark(StreamWriter writer, Bookmark bm, int level)
     {
-        foreach (Bookmark bm in bookmarks)
-        {
-            string title = EscapeCsv(bm.Title);
-            string destination = GetDestination(bm);
-            writer.WriteLine($"{title},{destination},{level}");
+        // Destination: use the page number if it is set (>0); otherwise leave empty.
+        string destination = bm.PageNumber > 0 ? bm.PageNumber.ToString() : string.Empty;
 
-            // Process child bookmarks if any
-            if (bm.ChildItem != null && bm.ChildItem.Count > 0)
+        // Escape commas and quotes in the title for CSV compliance.
+        string title = bm.Title ?? string.Empty;
+        title = title.Replace("\"", "\"\"");
+        if (title.Contains(","))
+        {
+            title = $"\"{title}\"";
+        }
+
+        writer.WriteLine($"{title},{destination},{level}");
+
+        // Process child bookmarks, if any, increasing the level.
+        if (bm.ChildItem != null && bm.ChildItem.Count > 0)
+        {
+            foreach (Bookmark child in bm.ChildItem)
             {
-                WriteBookmarks(bm.ChildItem, writer, level + 1);
+                WriteBookmark(writer, child, level + 1);
             }
         }
-    }
-
-    // Determine a readable destination (page number or explicit destination)
-    private static string GetDestination(Bookmark bm)
-    {
-        // Prefer page number when available
-        if (bm.PageNumber > 0)
-            return bm.PageNumber.ToString();
-
-        // Use the Destination object's string representation if present
-        if (bm.Destination != null)
-            return EscapeCsv(bm.Destination.ToString());
-
-        // No destination information
-        return "";
-    }
-
-    // Escape CSV fields according to RFC 4180
-    private static string EscapeCsv(string field)
-    {
-        if (field == null)
-            return "";
-
-        bool mustQuote = field.Contains(",") || field.Contains("\"") || field.Contains("\n") || field.Contains("\r");
-        if (mustQuote)
-        {
-            string escaped = field.Replace("\"", "\"\"");
-            return $"\"{escaped}\"";
-        }
-        return field;
     }
 }
