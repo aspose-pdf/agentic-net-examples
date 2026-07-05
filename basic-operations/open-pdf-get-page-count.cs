@@ -6,24 +6,20 @@ class Program
 {
     static void Main()
     {
-        // Path to the PDF file on disk
         const string pdfPath = "sample.pdf";
 
-        // Verify that the file exists before attempting to open it
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Use a using block to ensure the Document is disposed properly
+        // Wrap Document in a using block for deterministic disposal (document-disposal-with-using rule)
         using (Document doc = new Document(pdfPath))
         {
-            // Retrieve the number of pages (Pages collection is 1‑based)
+            // Pages are 1‑based; retrieve the total number of pages
             int pageCount = doc.Pages.Count;
-
-            // Output the page count to the console
-            Console.WriteLine($"The document contains {pageCount} page{(pageCount == 1 ? "" : "s")}.");
+            Console.WriteLine($"Document contains {pageCount} page(s).");
         }
     }
 }

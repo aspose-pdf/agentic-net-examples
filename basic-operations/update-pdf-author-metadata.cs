@@ -6,27 +6,26 @@ class Program
 {
     static void Main()
     {
-        // Path to the PDF file
-        string pdfPath = "sample.pdf";
+        // Path to the PDF file wrapped in a FileInfo object
+        FileInfo pdfFile = new FileInfo("input.pdf");
 
-        // Create a FileInfo object for the PDF
-        FileInfo fileInfo = new FileInfo(pdfPath);
-        if (!fileInfo.Exists)
+        // Verify that the file exists before proceeding
+        if (!pdfFile.Exists)
         {
-            Console.Error.WriteLine($"File not found: {fileInfo.FullName}");
+            Console.Error.WriteLine($"File not found: {pdfFile.FullName}");
             return;
         }
 
-        // Open the PDF, modify the author, and save back to the same location
-        using (Document doc = new Document(fileInfo.FullName))
+        // Open the PDF, modify its author metadata, and save back to the same location
+        using (Document doc = new Document(pdfFile.FullName))
         {
-            // Update the Author metadata
+            // Update the Author property in the document's metadata
             doc.Info.Author = "New Author Name";
 
-            // Save the changes to the original file
-            doc.Save(fileInfo.FullName);
+            // Save the changes back to the original file path
+            doc.Save(pdfFile.FullName);
         }
 
-        Console.WriteLine($"Author metadata updated for '{fileInfo.FullName}'.");
+        Console.WriteLine("Author metadata updated successfully.");
     }
 }

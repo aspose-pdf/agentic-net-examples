@@ -21,10 +21,9 @@ class Program
             using (Document doc = new Document(inputPath))
             {
                 // Add a new blank page at the end of the document
-                // PageCollection.Add() creates an empty page using the most common size
                 doc.Pages.Add();
 
-                // Save the updated document (PDF format)
+                // Save the updated document
                 doc.Save(outputPath);
             }
 

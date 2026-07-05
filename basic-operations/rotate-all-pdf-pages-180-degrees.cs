@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "rotated_output.pdf";
+        const string outputPath = "rotated.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,20 +15,27 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Load the PDF document (using block ensures proper disposal)
+            using (Document doc = new Document(inputPath))
             {
-                // Rotate each page 180 degrees – use the correct enum value with the "on" prefix
-                doc.Pages[i].Rotate = Rotation.on180;
+                // Pages collection is 1‑based; rotate each page 180 degrees
+                for (int i = 1; i <= doc.Pages.Count; i++)
+                {
+                    // Correct enum value uses the "on" prefix
+                    doc.Pages[i].Rotate = Rotation.on180;
+                }
+
+                // Save the rotated document
+                doc.Save(outputPath);
             }
 
-            // Save the modified document (PDF format)
-            doc.Save(outputPath);
+            Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

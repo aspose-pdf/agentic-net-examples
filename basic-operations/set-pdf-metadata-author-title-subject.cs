@@ -18,13 +18,11 @@ class Program
         // Open the PDF, set metadata, and save
         using (Document doc = new Document(inputPath))
         {
-            // Set document information
             doc.Info.Author  = "John Doe";
             doc.Info.Title   = "Sample Document";
             doc.Info.Subject = "Demonstration of setting metadata";
 
-            // Save the updated PDF
-            doc.Save(outputPath);
+            doc.Save(outputPath); // lifecycle rule: use Document.Save within using
         }
 
         // Re-open the saved PDF to verify the metadata
