@@ -1,105 +1,42 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices;
-using NUnit.Framework;
+using Aspose.Pdf.Devices; // for Resolution and PngDevice
 
-// -----------------------------------------------------------------------------
-// Minimal NUnit stubs – used when the NUnit package is not referenced.
-// -----------------------------------------------------------------------------
-namespace NUnit.Framework
+class Program
 {
-    [AttributeUsage(AttributeTargets.Class)]
-    public sealed class TestFixtureAttribute : Attribute { }
-
-    [AttributeUsage(AttributeTargets.Method)]
-    public sealed class TestAttribute : Attribute { }
-
-    [AttributeUsage(AttributeTargets.Method)]
-    public sealed class OneTimeSetUpAttribute : Attribute { }
-
-    [AttributeUsage(AttributeTargets.Method)]
-    public sealed class SetUpAttribute : Attribute { }
-
-    [AttributeUsage(AttributeTargets.Method)]
-    public sealed class TearDownAttribute : Attribute { }
-
-    // Minimal TestContext implementation – provides the directory where the test runs.
-    public sealed class TestContext
+    static void Main()
     {
-        private TestContext() { }
-        public static TestContext CurrentContext { get; } = new TestContext();
-        public string TestDirectory { get; } = Directory.GetCurrentDirectory();
-    }
+        // Path to the source PDF file
+        const string inputPdfPath = "input.pdf";
 
-    public static class Assert
-    {
-        public static void IsTrue(bool condition, string message = null)
+        // Directory where the page images will be saved
+        const string outputImageFolder = "PageImages";
+
+        // Verify that the input PDF exists
+        if (!File.Exists(inputPdfPath))
         {
-            if (!condition)
-                throw new Exception(message ?? "Assert.IsTrue failed.");
+            Console.Error.WriteLine($"Error: PDF file not found at '{inputPdfPath}'.");
+            return;
         }
 
-        public static void AreEqual<T>(T expected, T actual, string message = null)
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputImageFolder);
+
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPdfPath);
+
+        // Define the resolution for the output images (e.g., 300 DPI)
+        var resolution = new Resolution(300);
+
+        // Convert each page to an image using PngDevice (Aspose.Pdf.Devices)
+        for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
         {
-            if (!object.Equals(expected, actual))
-                throw new Exception(message ?? $"Assert.AreEqual failed. Expected:<{expected}>. Actual:<{actual}>.");
+            var pngDevice = new PngDevice(resolution);
+            string outPath = Path.Combine(outputImageFolder, $"page_{pageNumber}.png");
+            pngDevice.Process(pdfDocument.Pages[pageNumber], outPath);
         }
-    }
-}
 
-namespace AsposePdfTests
-{
-    [TestFixture]
-    public class PdfConversionTests
-    {
-        [Test]
-        public void ConvertPagesToImages_GeneratesImageForEachPage()
-        {
-            // Arrange: locate a sample PDF file (ensure it exists in the test directory)
-            string inputPdfPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "sample.pdf");
-            Assert.IsTrue(File.Exists(inputPdfPath), $"Input PDF not found at '{inputPdfPath}'.");
-
-            // Create a temporary directory for the output images
-            string outputDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-            Directory.CreateDirectory(outputDir);
-
-            // Act: load the PDF and convert each page to an image using PngDevice
-            using (Document pdfDocument = new Document(inputPdfPath))
-            {
-                int pageCount = pdfDocument.Pages.Count;
-                Resolution resolution = new Resolution(150); // default resolution
-                PngDevice pngDevice = new PngDevice(resolution);
-
-                for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++)
-                {
-                    string imagePath = Path.Combine(outputDir, $"page_{pageNumber}.png");
-                    using (FileStream imageStream = new FileStream(imagePath, FileMode.Create))
-                    {
-                        pngDevice.Process(pdfDocument.Pages[pageNumber], imageStream);
-                    }
-                }
-
-                // Assert: the number of generated image files matches the number of pages
-                string[] generatedImages = Directory.GetFiles(outputDir, "page_*.png");
-                Assert.AreEqual(pageCount, generatedImages.Length,
-                    $"Expected {pageCount} images, but found {generatedImages.Length}.");
-            }
-
-            // Cleanup: remove the temporary output directory
-            Directory.Delete(outputDir, true);
-        }
-    }
-}
-
-// -----------------------------------------------------------------------------
-// Entry point required for a console‑type project. The test runner can invoke the
-// tests via reflection; the Main method simply exists to satisfy the compiler.
-// -----------------------------------------------------------------------------
-public class Program
-{
-    public static void Main(string[] args)
-    {
-        // No operation – the presence of this method satisfies the CS5001 requirement.
+        Console.WriteLine($"All pages have been converted to images in folder: {outputImageFolder}");
     }
 }

@@ -7,41 +7,29 @@ class Program
 {
     static void Main()
     {
-        // Output PDF path
-        const string outputPath = "EmbeddedFont.pdf";
-        // Path to a TrueType font file (ensure the file exists on disk)
-        const string ttfPath = "arial.ttf";
+        const string outputPath = "embedded_font.pdf";
 
-        if (!File.Exists(ttfPath))
-        {
-            Console.Error.WriteLine($"Font file not found: {ttfPath}");
-            return;
-        }
-
-        // Create a new PDF document
+        // Create a new PDF document and ensure proper disposal
         using (Document doc = new Document())
         {
             // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Open the TrueType font and mark it for embedding
-            Font trueTypeFont;
-            using (FileStream fontStream = File.OpenRead(ttfPath))
-            {
-                trueTypeFont = FontRepository.OpenFont(fontStream, FontTypes.TTF);
-            }
-            trueTypeFont.IsEmbedded = true;   // Ensure the font is embedded
-            trueTypeFont.IsSubset = false;    // Embed the full font (optional)
+            // Load a TrueType font (e.g., Arial) and mark it for embedding
+            Font trueTypeFont = FontRepository.FindFont("Arial");
+            trueTypeFont.IsEmbedded = true;
 
             // Create a text fragment using the embedded font
             TextFragment fragment = new TextFragment("Hello, embedded TrueType font!");
             fragment.TextState.Font = trueTypeFont;
             fragment.TextState.FontSize = 24;
-            fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
             fragment.Position = new Position(100, 700); // Position on the page
 
             // Add the text fragment to the page
             page.Paragraphs.Add(fragment);
+
+            // If any standard Type1 fonts are used, embed them as well
+            doc.EmbedStandardFonts = true;
 
             // Save the PDF document
             doc.Save(outputPath);

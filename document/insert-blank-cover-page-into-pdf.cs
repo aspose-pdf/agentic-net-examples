@@ -1,13 +1,13 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";   // Existing PDF
-        const string outputPath = "output_with_cover.pdf"; // Resulting PDF
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_with_cover.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,20 +15,16 @@ class Program
             return;
         }
 
-        // Load the existing PDF document inside a using block for deterministic disposal
+        // Load the existing PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Insert a blank page at the very beginning (position 1, 1‑based indexing)
-            // The Insert method creates an empty page with the most common size in the document
-            Page coverPage = doc.Pages.Insert(1);
+            // Insert an empty page at the very beginning (position 1, 1‑based indexing)
+            doc.Pages.Insert(1);
 
-            // Optional: set a background color or other properties on the cover page
-            // coverPage.Background = Aspose.Pdf.Color.LightGray;
-
-            // Save the modified document
+            // Save the updated PDF with the new cover page
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Blank cover page inserted. Saved to '{outputPath}'.");
+        Console.WriteLine($"Blank cover page added. Saved to '{outputPath}'.");
     }
 }

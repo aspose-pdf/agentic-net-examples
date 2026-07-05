@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 
 class Program
@@ -7,7 +8,7 @@ class Program
     {
         const string inputPath = "input.pdf";
 
-        if (!System.IO.File.Exists(inputPath))
+        if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
@@ -16,34 +17,39 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            OutlineCollection outlines = doc.Outlines;
+            // Get the outline hierarchy
+            Aspose.Pdf.OutlineCollection outlines = doc.Outlines;
 
             if (outlines.Count == 0)
             {
-                Console.WriteLine("The document has no outline entries.");
+                Console.WriteLine("No outline entries found.");
                 return;
             }
 
-            // Start printing from the first top‑level outline item
-            PrintOutline(outlines.First, 0);
+            // Start with the first top‑level outline item
+            Aspose.Pdf.OutlineItemCollection first = outlines.First;
+            PrintOutline(first, 0);
         }
     }
 
-    // Recursively prints an outline item and its children with indentation
-    static void PrintOutline(OutlineItemCollection item, int indentLevel)
+    // Recursively prints an outline item and its descendants as a tree
+    static void PrintOutline(Aspose.Pdf.OutlineItemCollection item, int depth)
     {
-        while (item != null)
+        Aspose.Pdf.OutlineItemCollection current = item;
+        while (current != null)
         {
-            // Indentation based on hierarchy depth
-            string indent = new string(' ', indentLevel * 2);
-            Console.WriteLine($"{indent}- {item.Title}");
+            // Indent according to hierarchy depth
+            string indent = new string(' ', depth * 2);
+            Console.WriteLine($"{indent}- {current.Title}");
 
-            // If the item has child entries, recurse into them
-            if (item.First != null)
-                PrintOutline(item.First, indentLevel + 1);
+            // If the item has child entries, print them with increased depth
+            if (current.First != null)
+            {
+                PrintOutline(current.First, depth + 1);
+            }
 
             // Move to the next sibling at the same level
-            item = item.Next;
+            current = current.Next;
         }
     }
 }

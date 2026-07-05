@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -8,28 +9,32 @@ class Program
     {
         const string outputPath = "email_link.pdf";
 
-        // Create a new PDF document and ensure proper disposal
+        // Document lifecycle must be wrapped in a using block
         using (Document doc = new Document())
         {
-            // Add a single page
+            // Add a blank page to the document
             Page page = doc.Pages.Add();
 
-            // Define the clickable area (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            // Define the clickable area (coordinates are in points)
+            Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(100, 700, 300, 730);
 
-            // Create a link annotation that opens the default mail client
-            LinkAnnotation link = new LinkAnnotation(page, rect)
+            // Create a link annotation on the page
+            LinkAnnotation link = new LinkAnnotation(page, linkRect)
             {
-                // Visual cue (optional)
-                Color = Aspose.Pdf.Color.Blue,
-                // Use GoToURIAction with a mailto: URL (cannot assign string directly)
-                Action = new GoToURIAction("mailto:example@example.com")
+                // Visual appearance of the link (optional)
+                Color = Aspose.Pdf.Color.Blue
             };
 
-            // Attach the annotation to the page
+            // Border requires the parent annotation in its constructor
+            link.Border = new Border(link) { Width = 1 };
+
+            // Use GoToURIAction for a mailto link (cannot assign string directly)
+            link.Action = new GoToURIAction("mailto:example@example.com");
+
+            // Add the annotation to the page's annotation collection
             page.Annotations.Add(link);
 
-            // Save the PDF to disk
+            // Save the PDF file
             doc.Save(outputPath);
         }
 

@@ -21,32 +21,34 @@ class Program
         // Load the existing PDF
         using (Document doc = new Document(inputPath))
         {
-            // Enable auto‑tagging so that headings are detected
+            // Enable auto‑tagging so that headings are detected and structured
             AutoTaggingSettings.Default.EnableAutoTagging = true;
-            // Use default heading levels (font‑size based mapping)
-            AutoTaggingSettings.Default.HeadingLevels = new HeadingLevels();
+            // (Optional) configure heading levels if needed
+            // AutoTaggingSettings.Default.HeadingLevels = new HeadingLevels();
 
-            // Process paragraphs to create the logical structure with headings
+            // Process the document to create the logical structure (headings, etc.)
             doc.ProcessParagraphs();
 
             // Access the tagged‑content API
-            ITaggedContent taggedContent = doc.TaggedContent;
+            ITaggedContent tagged = doc.TaggedContent;
 
-            // Create a TOC element and attach it to the root of the structure tree
-            StructureElement root = taggedContent.RootElement;
-            var tocElement = taggedContent.CreateTOCElement();
+            // Create a TOC element and set its title
+            TOCElement tocElement = tagged.CreateTOCElement();
+            tocElement.Title = "Table of Contents"; // TOCElement.Title expects a string
+
+            // Append the TOC element to the root of the structure tree
+            StructureElement root = tagged.RootElement;
             root.AppendChild(tocElement);
 
-            // Insert a new page at the beginning to hold the TOC
-            doc.Pages.Insert(1);
-            Page tocPage = doc.Pages[1];
+            // Insert a new page at the beginning of the document to hold the TOC
+            Page tocPage = doc.Pages.Insert(1);
 
-            // Configure TOC appearance (show page numbers, set title, etc.)
+            // Configure the TOC page information (show page numbers, copy to outlines, etc.)
             tocPage.TocInfo = new TocInfo
             {
-                Title = new TextFragment("Table of Contents"),
+                Title = new TextFragment("Table of Contents"), // Title must be a TextFragment
                 IsShowPageNumbers = true,
-                CopyToOutlines = true   // optional: copy TOC entries to the PDF outline
+                CopyToOutlines = true
             };
 
             // Save the modified PDF
