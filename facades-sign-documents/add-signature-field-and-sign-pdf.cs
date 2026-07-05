@@ -8,23 +8,14 @@ class Program
 {
     static void Main()
     {
-        // Input PDF, output PDF, certificate file and password
-        const string inputPdf   = "input.pdf";
-        const string outputPdf  = "signed_output.pdf";
-        const string certPath   = "certificate.pfx";
-        const string certPass   = "password";
+        const string inputPath = "input.pdf";
+        const string outputPath = "signed_output.pdf";
+        const string certPath = "certificate.pfx";
+        const string certPassword = "password";
 
-        // Signature field parameters
-        const string fieldName  = "Signature1";
-        const int    pageNumber = 1;               // 1‑based page index
-        const float  llx        = 100f;            // lower‑left X
-        const float  lly        = 500f;            // lower‑left Y
-        const float  urx        = 300f;            // upper‑right X
-        const float  ury        = 600f;            // upper‑right Y
-
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
         if (!File.Exists(certPath))
@@ -33,49 +24,33 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPdf))
+            // Add a signature field on page 1 (1‑based indexing)
+            Aspose.Pdf.Facades.FormEditor formEditor = new Aspose.Pdf.Facades.FormEditor(doc);
+            // Parameters: field type, field name, page number, llx, lly, urx, ury
+            formEditor.AddField(Aspose.Pdf.Facades.FieldType.Signature, "Signature1", 1, 100, 100, 250, 150);
+            // The field is now part of the document
+
+            // Create a PKCS#1 signature object with the certificate
+            Aspose.Pdf.Forms.PKCS1 signature = new Aspose.Pdf.Forms.PKCS1(certPath, certPassword)
             {
-                // Add a signature field to the specified page
-                using (FormEditor formEditor = new FormEditor(doc))
-                {
-                    // FieldType.Signature creates a signature form field
-                    bool added = formEditor.AddField(FieldType.Signature, fieldName,
-                                                    pageNumber, llx, lly, urx, ury);
-                    if (!added)
-                    {
-                        Console.Error.WriteLine("Failed to add signature field.");
-                        return;
-                    }
-                    // No explicit Save() call is required – changes are kept in the Document instance.
-                }
+                Reason = "Approved",
+                ContactInfo = "john.doe@example.com",
+                Location = "New York"
+            };
 
-                // Prepare the signature object (PKCS#7 in this example)
-                PKCS7 signature = new PKCS7(certPath, certPass);
-                signature.Reason       = "Document approval";
-                signature.Location     = "New York";
-                signature.ContactInfo  = "john.doe@example.com";
+            // Sign the document using the previously added signature field
+            Aspose.Pdf.Facades.PdfFileSignature pdfSigner = new Aspose.Pdf.Facades.PdfFileSignature(doc);
+            // Optional: set an image that will be used as the visual appearance of the signature
+            // pdfSigner.SignatureAppearance = "signature.png";
+            pdfSigner.Sign("Signature1", signature);
 
-                // Sign the document using the previously created field
-                using (PdfFileSignature pdfSigner = new PdfFileSignature(doc))
-                {
-                    pdfSigner.SetCertificate(certPath, certPass);
-                    // Optional: set an image to appear as the visual signature
-                    // pdfSigner.SignatureAppearance = "signature_image.png";
-
-                    // Sign using the field name; the field must be empty
-                    pdfSigner.Sign(fieldName, signature);
-                    pdfSigner.Save(outputPdf);
-                }
-            }
-
-            Console.WriteLine($"Signed PDF saved to '{outputPdf}'.");
+            // Save the signed PDF
+            pdfSigner.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Signed PDF saved to '{outputPath}'.");
     }
 }

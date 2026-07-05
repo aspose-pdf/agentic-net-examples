@@ -1,54 +1,57 @@
 using System;
 using System.IO;
 using System.Globalization;
-using System.Drawing;
-using Aspose.Pdf.Facades;          // PdfFileSignature facade
-using Aspose.Pdf.Forms;           // PKCS7 signature and SignatureCustomAppearance
+using Aspose.Pdf.Facades;          // PdfFileSignature
+using Aspose.Pdf.Forms;           // PKCS1, SignatureCustomAppearance
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";
-        const string outputPdf  = "signed_french.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "signed_french.pdf";
         const string certPath   = "certificate.pfx";
-        const string certPass   = "password";
+        const string certPassword = "password";
 
         // Verify required files exist
-        if (!File.Exists(inputPdf) || !File.Exists(certPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine("Input PDF or certificate file not found.");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            return;
+        }
+        if (!File.Exists(certPath))
+        {
+            Console.Error.WriteLine($"Certificate file not found: {certPath}");
             return;
         }
 
-        // Initialize the signature facade and bind the source PDF
-        PdfFileSignature pdfSign = new PdfFileSignature();
-        pdfSign.BindPdf(inputPdf);
+        // Initialize the facade and bind the source PDF
+        using (PdfFileSignature pdfSign = new PdfFileSignature())
+        {
+            pdfSign.BindPdf(inputPath);
 
-        // OPTIONAL: set a graphic image for the signature appearance
-        // pdfSign.SignatureAppearance = "signature_image.png";
+            // Define the signature rectangle (System.Drawing.Rectangle is required by the API)
+            System.Drawing.Rectangle rect = new System.Drawing.Rectangle(100, 100, 200, 100);
 
-        // Create a PKCS7 signature object with certificate (PKCS7 is the correct class for digital signatures)
-        PKCS7 signature = new PKCS7(certPath, certPass);
-        signature.Reason      = "Document signé";          // Reason text
-        signature.ContactInfo = "contact@example.com";    // Contact information (use ContactInfo, not Contact)
-        signature.Location    = "Paris";                  // Location text
+            // Create a PKCS#1 signature object using the certificate
+            PKCS1 signature = new PKCS1(certPath, certPassword);
+            signature.Reason      = "Approval";
+            signature.ContactInfo = "contact@example.com";
+            signature.Location    = "Paris";
 
-        // Configure custom appearance to use French locale
-        SignatureCustomAppearance customAppearance = new SignatureCustomAppearance();
-        customAppearance.Culture = new CultureInfo("fr-FR"); // French (France)
-        signature.CustomAppearance = customAppearance;       // Apply to signature
+            // Configure custom appearance to use French locale
+            SignatureCustomAppearance customAppearance = new SignatureCustomAppearance();
+            customAppearance.Culture = new CultureInfo("fr-FR");               // French culture
+            customAppearance.DigitalSignedLabel = "Signé numériquement par"; // Optional label translation
+            signature.CustomAppearance = customAppearance;
 
-        // Define the visible rectangle for the signature (System.Drawing.Rectangle)
-        Rectangle rect = new Rectangle(100, 100, 200, 100);
+            // Apply the signature on page 1 (visible) with the defined rectangle
+            pdfSign.Sign(1, true, rect, signature);
 
-        // Sign page 1 (1‑based indexing), make it visible, using the custom signature
-        pdfSign.Sign(page: 1, visible: true, annotRect: rect, sig: signature);
+            // Save the signed PDF
+            pdfSign.Save(outputPath);
+        }
 
-        // Save the signed PDF to the output file
-        pdfSign.Save(outputPdf);
-        pdfSign.Close();
-
-        Console.WriteLine($"Signed PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Signed PDF saved to '{outputPath}'.");
     }
 }
