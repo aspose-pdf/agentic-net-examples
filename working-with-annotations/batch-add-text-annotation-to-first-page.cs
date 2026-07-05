@@ -7,69 +7,48 @@ class BatchAddTextAnnotation
 {
     static void Main()
     {
-        // Folder containing PDF files to process
+        // Folder containing source PDFs
         const string inputFolder = @"C:\PdfInput";
-        // Folder where processed PDFs will be saved (can be the same as inputFolder to overwrite)
+        // Folder where annotated PDFs will be saved
         const string outputFolder = @"C:\PdfOutput";
 
-        if (!Directory.Exists(inputFolder))
-        {
-            Console.Error.WriteLine($"Input folder does not exist: {inputFolder}");
-            return;
-        }
-
+        // Ensure output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Define the annotation that will be added to each first page
-        // Position: lower‑left (100, 500), upper‑right (300, 550) – adjust as needed
-        Aspose.Pdf.Rectangle annotRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-        const string annotTitle = "Standard Note";
-        const string annotContents = "This is a standard text annotation added to the first page.";
-        Aspose.Pdf.Color annotColor = Aspose.Pdf.Color.Yellow; // Background color of the annotation
-
-        // Process each PDF file in the input folder
+        // Enumerate all PDF files in the input folder (non‑recursive)
         foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            string fileName = Path.GetFileName(pdfPath);
-            string outputPath = Path.Combine(outputFolder, fileName);
+            // Build output file path (same name, different folder)
+            string outputPath = Path.Combine(outputFolder, Path.GetFileName(pdfPath));
 
-            try
+            // Open the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(pdfPath))
             {
-                // Load the PDF document
-                using (Document doc = new Document(pdfPath))
+                // Get the first page (Aspose.Pdf uses 1‑based indexing)
+                Page firstPage = doc.Pages[1];
+
+                // Define the rectangle where the annotation will appear
+                // (llx, lly, urx, ury) – coordinates are in points
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+
+                // Create a TextAnnotation and configure its properties
+                TextAnnotation annotation = new TextAnnotation(firstPage, rect)
                 {
-                    // Ensure the document has at least one page
-                    if (doc.Pages.Count < 1)
-                    {
-                        Console.WriteLine($"Skipping '{fileName}': no pages found.");
-                        continue;
-                    }
+                    Title    = "Note",
+                    Contents = "Standard annotation added by batch process.",
+                    Open     = true,                     // annotation window opened by default
+                    Icon     = TextIcon.Note,            // note icon
+                    Color    = Aspose.Pdf.Color.Yellow   // background color of the annotation
+                };
 
-                    // Create a new TextAnnotation on the first page
-                    Page firstPage = doc.Pages[1]; // 1‑based indexing
-                    TextAnnotation textAnnot = new TextAnnotation(firstPage, annotRect)
-                    {
-                        Title = annotTitle,
-                        Contents = annotContents,
-                        Color = annotColor,
-                        Open = true // annotation window opened by default
-                    };
+                // Add the annotation to the page's annotation collection
+                firstPage.Annotations.Add(annotation);
 
-                    // Add the annotation to the page's annotation collection
-                    firstPage.Annotations.Add(textAnnot);
-
-                    // Save the modified document (overwrites if outputPath equals inputPath)
-                    doc.Save(outputPath);
-                }
-
-                Console.WriteLine($"Processed and saved: {outputPath}");
+                // Save the modified document to the output folder
+                doc.Save(outputPath);
             }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{fileName}': {ex.Message}");
-            }
+
+            Console.WriteLine($"Annotated PDF saved: {outputPath}");
         }
-
-        Console.WriteLine("Batch annotation completed.");
     }
 }

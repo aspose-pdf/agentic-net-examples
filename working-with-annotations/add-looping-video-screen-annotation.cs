@@ -7,54 +7,50 @@ class Program
 {
     static void Main()
     {
-        // Input video file (must be a supported format, e.g., MP4)
-        const string videoPath = "sample_video.mp4";
-        // Output PDF file
-        const string outputPdf = "output_with_screen_annotation.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string videoPath = "sample.mp4";
 
-        // Verify that the video file exists
+        if (!File.Exists(inputPdf))
+        {
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
+        }
+
         if (!File.Exists(videoPath))
         {
             Console.Error.WriteLine($"Video file not found: {videoPath}");
             return;
         }
 
-        // Create a new PDF document
-        using (Document doc = new Document())
+        // Load the existing PDF document
+        using (Document doc = new Document(inputPdf))
         {
-            // Add a blank page to the document
-            Page page = doc.Pages.Add();
+            // Select the page where the annotation will be placed (first page in this example)
+            Page page = doc.Pages[1];
 
-            // Define the rectangle where the video will appear (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 400, 500, 800);
+            // Define the rectangle area for the screen annotation (left, bottom, right, top)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 400, 800);
 
-            // Create the ScreenAnnotation with the video file
+            // Create a ScreenAnnotation that references the video file
             ScreenAnnotation screenAnn = new ScreenAnnotation(page, rect, videoPath);
 
-            // Add JavaScript to enable looping and hide user controls.
-            // The script accesses the annotation's media player and sets loop = true,
-            // then disables the default UI controls.
-            string js = @"
-                var annot = this.getAnnot(this.page, this.name);
-                if (annot && annot.media) {
-                    annot.media.loop = true;          // Play in a continuous loop
-                    annot.media.controls = false;    // Hide playback controls
-                }
-            ";
-            // Add the JavaScript action to the annotation's action list
-            screenAnn.Actions.Add(new JavascriptAction(js));
+            // Optional: set a title for the annotation
+            screenAnn.Title = "Embedded Video";
 
-            // Optionally set the annotation to be invisible (no border)
-            screenAnn.Border = new Border(screenAnn) { Width = 0 };
-            screenAnn.Color = Aspose.Pdf.Color.Transparent;
+            // NOTE: To enable loop playback and hide user controls, additional
+            // properties or actions may need to be configured (e.g., RichMediaAction,
+            // annotation flags, or custom JavaScript). These settings are beyond the
+            // basic constructor usage and would depend on the specific PDF viewer
+            // capabilities.
 
-            // Add the annotation to the page
+            // Add the annotation to the page's annotation collection
             page.Annotations.Add(screenAnn);
 
-            // Save the PDF document
+            // Save the modified PDF document
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF with screen annotation saved to '{outputPdf}'.");
+        Console.WriteLine($"Screen annotation with video saved to '{outputPdf}'.");
     }
 }

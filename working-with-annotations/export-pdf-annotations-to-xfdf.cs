@@ -16,15 +16,15 @@ class Program
             return;
         }
 
-        // Build the XFDF file path beside the PDF (same name, .xfdf extension)
-        string xfdfPath = Path.Combine(
-            Path.GetDirectoryName(pdfPath) ?? string.Empty,
-            Path.GetFileNameWithoutExtension(pdfPath) + ".xfdf");
+        // Build the XFDF file path in the same folder as the PDF
+        string directory = Path.GetDirectoryName(pdfPath);
+        string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
+        string xfdfPath = Path.Combine(directory, $"{fileNameWithoutExt}.xfdf");
 
-        // Load the PDF document, export its annotations to XFDF, and dispose the document
+        // Load the PDF document and export its annotations to XFDF
         using (Document doc = new Document(pdfPath))
         {
-            // Export all annotations (including those on the current page) to the XFDF file
+            // Exports all annotations in the document to the XFDF file
             doc.ExportAnnotationsToXfdf(xfdfPath);
         }
 

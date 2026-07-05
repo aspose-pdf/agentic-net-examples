@@ -13,7 +13,7 @@ class Program
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
         if (!File.Exists(videoPath))
@@ -22,13 +22,14 @@ class Program
             return;
         }
 
-        // Load the PDF (using rule: document-disposal-with-using)
+        // Load the PDF document
         using (Document doc = new Document(inputPdf))
         {
-            // Get the first page (1‑based indexing)
+            // Choose the page where the annotation will be placed (first page)
             Page page = doc.Pages[1];
 
-            // Define the annotation rectangle (fully qualified to avoid ambiguity)
+            // Define the annotation rectangle (coordinates are in points)
+            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 400, 800);
 
             // Create the RichMediaAnnotation
@@ -37,18 +38,19 @@ class Program
                 // Set the content type to Video
                 Type = RichMediaAnnotation.ContentType.Video,
 
-                // Activate on click (the closest to double‑click; PDF spec does not define double‑click)
+                // Activate on click (Aspose.Pdf does not provide a direct double‑click event;
+                // Click is the closest activation event available)
                 ActivateOn = RichMediaAnnotation.ActivationEvent.Click
             };
 
-            // Embed the video stream
+            // Embed the video file into the annotation
             using (FileStream videoStream = File.OpenRead(videoPath))
             {
-                // The first argument is the name of the embedded file
+                // The first parameter is the name of the embedded stream
                 richMedia.SetContent(Path.GetFileName(videoPath), videoStream);
             }
 
-            // Optionally set a poster image (first frame) – omitted here
+            // Optionally set a poster image (preview) – omitted here
 
             // Add the annotation to the page
             page.Annotations.Add(richMedia);

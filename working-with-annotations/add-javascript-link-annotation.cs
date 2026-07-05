@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -7,41 +6,34 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_with_js_link.pdf";
+        const string outputPath = "LinkWithJs.pdf";
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document and add a blank page
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
-        }
+            Page page = doc.Pages.Add();
 
-        // Load the existing PDF (lifecycle rule: use using for disposal)
-        using (Document doc = new Document(inputPath))
-        {
-            // Ensure there is at least one page
-            Page page = doc.Pages[1];
-
-            // Define the clickable area (fully qualified to avoid ambiguity)
+            // Define the clickable area for the link annotation
+            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Create the LinkAnnotation first
+            // Create the link annotation on the specified page and rectangle
             LinkAnnotation link = new LinkAnnotation(page, rect);
 
-            // Set visual styling after the object is instantiated
-            link.Color = Aspose.Pdf.Color.Blue;
+            // Set a visible border (optional) – border color is set via the annotation's Color property
+            link.Color = Aspose.Pdf.Color.Blue; // border color
             link.Border = new Border(link) { Width = 1 };
 
-            // Attach a JavaScript action that shows a modal dialog
-            link.Action = new JavascriptAction("app.alert('Custom modal dialog box');");
+            // Set the JavaScript action to display a modal dialog
+            link.Action = new JavascriptAction("app.alert('This is a custom modal dialog box');");
 
             // Add the annotation to the page
             page.Annotations.Add(link);
 
-            // Save the modified PDF (lifecycle rule: use Document.Save)
+            // Save the PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with JavaScript link saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with JavaScript link annotation saved to '{outputPath}'.");
     }
 }

@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_no_highlights.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,33 +16,29 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Iterate through all pages (1‑based indexing)
+            foreach (Page page in doc.Pages)
             {
-                Page page = doc.Pages[i];
-
-                // Gather all highlight annotations on the current page
-                var highlights = new System.Collections.Generic.List<Annotation>();
-                foreach (Annotation ann in page.Annotations)
+                // AnnotationCollection uses 1‑based indexing as well.
+                // Loop backwards to safely delete by index.
+                for (int i = page.Annotations.Count; i >= 1; i--)
                 {
+                    Annotation ann = page.Annotations[i];
                     if (ann is HighlightAnnotation)
-                        highlights.Add(ann);
-                }
-
-                // Delete each collected highlight annotation
-                foreach (Annotation ann in highlights)
-                {
-                    page.Annotations.Delete(ann);
+                    {
+                        // Delete the highlight annotation at this index
+                        page.Annotations.Delete(i);
+                    }
                 }
             }
 
-            // Save the modified PDF
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"All highlight annotations removed. Saved to '{outputPath}'.");
+        Console.WriteLine($"Highlight annotations removed. Saved to '{outputPath}'.");
     }
 }

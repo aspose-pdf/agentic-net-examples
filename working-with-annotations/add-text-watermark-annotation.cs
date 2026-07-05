@@ -8,7 +8,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "watermarked.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,34 +17,39 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over each page and add a watermark annotation
-            foreach (Page page in doc.Pages)
+            // Iterate over all pages (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                double pageWidth = page.PageInfo.Width;
-                double pageHeight = page.PageInfo.Height;
+                Page page = doc.Pages[i];
 
-                // Define a rectangle at the top of the page (50 units high)
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(0, pageHeight - 50, pageWidth, pageHeight);
+                // Define a rectangle at the top of the page
+                // llx = 0, lly = page height - 50, urx = page width, ury = page height
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(
+                    0,
+                    page.PageInfo.Height - 50,
+                    page.PageInfo.Width,
+                    page.PageInfo.Height);
 
-                // Create the watermark annotation
+                // Create the WatermarkAnnotation for this page
                 WatermarkAnnotation watermark = new WatermarkAnnotation(page, rect);
 
-                // Configure text appearance: bold, red, size 24
+                // Prepare text state: bold font, size 24, red color
                 TextState textState = new TextState
                 {
                     Font = FontRepository.FindFont("Helvetica-Bold"),
                     FontSize = 24,
-                    ForegroundColor = Aspose.Pdf.Color.Red
+                    ForegroundColor = Color.Red,
+                    FontStyle = FontStyles.Bold
                 };
 
-                // Set the watermark text
-                watermark.SetTextAndState(new[] { "Confidential" }, textState);
+                // Set the watermark text (single line) with the defined text state
+                watermark.SetTextAndState(new string[] { "Confidential" }, textState);
 
-                // Optional: make the watermark semi‑transparent
-                watermark.Opacity = 0.5;
+                // Optionally make the watermark semi‑transparent
+                watermark.Opacity = 0.5f;
 
                 // Add the annotation to the page
                 page.Annotations.Add(watermark);
