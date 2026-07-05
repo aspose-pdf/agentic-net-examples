@@ -1,16 +1,14 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf.Facades;
-using Newtonsoft.Json.Linq;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "template.pdf";   // PDF with form fields
-        const string outputPdfPath = "filled.pdf";     // Result PDF
-        const string jsonPath      = "data.json";      // JSON containing field values
+        const string inputPdfPath  = "input.pdf";
+        const string jsonFilePath  = "data.json";
+        const string outputPdfPath = "output.pdf";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -18,54 +16,43 @@ class Program
             return;
         }
 
-        if (!File.Exists(jsonPath))
+        if (!File.Exists(jsonFilePath))
         {
-            Console.Error.WriteLine($"JSON file not found: {jsonPath}");
+            Console.Error.WriteLine($"JSON file not found: {jsonFilePath}");
             return;
         }
 
-        // Load the PDF form using the Facades Form class.
-        // The constructor (string inputFile, string outputFile) prepares the form for editing.
-        using (Form form = new Form(inputPdfPath, outputPdfPath))
+        try
         {
-            // Retrieve the list of field names that actually exist in the PDF.
-            var pdfFieldNames = form.FieldNames.ToHashSet(StringComparer.Ordinal);
-
-            // Load the entire JSON document.
-            JObject fullJson;
-            using (FileStream jsonFs = File.OpenRead(jsonPath))
-            using (StreamReader sr = new StreamReader(jsonFs))
+            // Initialize the Form facade with the source PDF
+            using (Form form = new Form(inputPdfPath))
             {
-                fullJson = JObject.Parse(sr.ReadToEnd());
-            }
-
-            // Build a new JSON object that contains only the keys present in the PDF.
-            JObject filteredJson = new JObject();
-            foreach (var property in fullJson.Properties())
-            {
-                if (pdfFieldNames.Contains(property.Name))
+                // Open the JSON file as a stream and import the data
+                using (FileStream jsonStream = new FileStream(jsonFilePath, FileMode.Open, FileAccess.Read))
                 {
-                    filteredJson.Add(property.Name, property.Value);
+                    form.ImportJson(jsonStream);
                 }
+
+                // Optional: inspect import results for each field
+                var importResults = form.ImportResult;
+                if (importResults != null)
+                {
+                    foreach (var result in importResults)
+                    {
+                        // result is of type FormImportResult; display field name and status
+                        Console.WriteLine($"Field: {result.FieldName}, Status: {result.Status}");
+                    }
+                }
+
+                // Save the updated PDF to the output path
+                form.Save(outputPdfPath);
             }
 
-            // Write the filtered JSON to a memory stream for ImportJson.
-            using (MemoryStream filteredStream = new MemoryStream())
-            using (StreamWriter sw = new StreamWriter(filteredStream))
-            {
-                sw.Write(filteredJson.ToString());
-                sw.Flush();
-                filteredStream.Position = 0; // Reset stream position before reading.
-
-                // Import the filtered JSON into the PDF form.
-                form.ImportJson(filteredStream);
-            }
-
-            // Save the updated PDF. The Form class inherits SaveableFacade,
-            // so calling Save() writes the output file specified in the constructor.
-            form.Save();
+            Console.WriteLine($"Form data imported successfully. Output saved to '{outputPdfPath}'.");
         }
-
-        Console.WriteLine($"Form fields imported and saved to '{outputPdfPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during import: {ex.Message}");
+        }
     }
 }
