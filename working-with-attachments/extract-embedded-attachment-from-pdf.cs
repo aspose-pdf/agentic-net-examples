@@ -9,25 +9,25 @@ class Program
         // Input PDF containing the attachment
         const string pdfPath = "input.pdf";
 
-        // Name of the embedded attachment to extract
+        // Name of the embedded file to extract
         const string attachmentName = "example.txt";
 
         // Directory where the extracted file will be saved
-        const string outputDirectory = "ExtractedAttachments";
+        const string targetDirectory = "ExtractedAttachments";
 
-        // Validate input PDF existence
+        // Verify the source PDF exists
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
         // Ensure the target directory exists
-        Directory.CreateDirectory(outputDirectory);
+        Directory.CreateDirectory(targetDirectory);
 
         try
         {
-            // Load the PDF document (using statement ensures proper disposal)
+            // Load the PDF document (using block ensures proper disposal)
             using (Document doc = new Document(pdfPath))
             {
                 // Locate the embedded file by its name
@@ -39,17 +39,14 @@ class Program
                     return;
                 }
 
-                // Determine the full path for the extracted file
-                string outputPath = Path.Combine(outputDirectory,
-                                                string.IsNullOrEmpty(fileSpec.Name)
-                                                    ? attachmentName
-                                                    : fileSpec.Name);
+                // Build the full path for the extracted file
+                string outputPath = Path.Combine(targetDirectory, attachmentName);
 
-                // Save the embedded file to the target location using the Contents stream
-                using (Stream source = fileSpec.Contents)
-                using (FileStream destination = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                // Extract the attachment's content stream and write it to the target file
+                using (FileStream output = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
                 {
-                    source.CopyTo(destination);
+                    // The Contents property returns a Stream with the embedded file data
+                    fileSpec.Contents.CopyTo(output);
                 }
 
                 Console.WriteLine($"Attachment saved to: {outputPath}");
@@ -57,7 +54,7 @@ class Program
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error extracting attachment: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

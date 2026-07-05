@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string wordPath   = "sample.docx";      // Word document to embed
-        const string outputPath = "portfolio.pdf";    // Resulting PDF portfolio
+        const string wordPath = "sample.docx";
+        const string outputPdf = "portfolio.pdf";
 
         if (!File.Exists(wordPath))
         {
@@ -15,23 +15,19 @@ class Program
             return;
         }
 
-        // Create a new PDF document (empty portfolio)
+        // Create an empty PDF document (the portfolio container)
         using (Document pdfDoc = new Document())
         {
-            // Adding a blank page avoids edge‑case issues
-            pdfDoc.Pages.Add();
+            // Create a file specification for the Word document to embed
+            FileSpecification fileSpec = new FileSpecification(wordPath);
 
-            // Create a FileSpecification for the Word document using the recommended pattern
-            var fileSpec = new FileSpecification(Path.GetFileName(wordPath), "Embedded Word document");
-            fileSpec.Contents = new MemoryStream(File.ReadAllBytes(wordPath));
-
-            // Add the file to the PDF's embedded files collection (portfolio)
+            // Add the Word document to the PDF portfolio (embedded files collection)
             pdfDoc.EmbeddedFiles.Add(fileSpec);
 
-            // Save the PDF portfolio
-            pdfDoc.Save(outputPath);
+            // Save the resulting PDF portfolio
+            pdfDoc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF portfolio created at '{outputPath}'.");
+        Console.WriteLine($"PDF portfolio created at '{outputPdf}'.");
     }
 }

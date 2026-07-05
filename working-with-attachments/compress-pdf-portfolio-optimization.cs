@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "portfolio_input.pdf";   // path to the populated PDF Portfolio
-        const string outputPath = "portfolio_output.pdf";  // desired output path
+        const string inputPath = "portfolio.pdf";
+        const string outputPath = "portfolio_compressed.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,19 +16,17 @@ class Program
             return;
         }
 
-        // Load the PDF Portfolio, modify if needed, and save with compression.
+        // Load the existing PDF Portfolio
         using (Document doc = new Document(inputPath))
         {
-            // Enable object compression to reduce file size.
+            // Enable compression of PDF objects to reduce file size
             OptimizationOptions opt = new OptimizationOptions
             {
-                CompressObjects = true   // compress PDF objects
+                CompressObjects = true
             };
-
-            // Apply the optimization settings.
             doc.OptimizeResources(opt);
 
-            // Save the compressed PDF.
+            // Save the compressed PDF Portfolio
             doc.Save(outputPath);
         }
 

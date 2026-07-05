@@ -9,21 +9,20 @@ class PortfolioCreator
         // Input PDF that will become a portfolio
         const string sourcePdf = "source.pdf";
 
+        // Output PDF portfolio file
+        const string portfolioPdf = "portfolio.pdf";
+
         // Files to embed into the portfolio
-        string[] filesToEmbed = { "file1.txt", "image1.png", "document2.docx" };
+        string[] filesToEmbed = { "doc1.pdf", "image1.png", "notes.txt" };
 
-        // Output PDF portfolio
-        const string outputPdf = "portfolio.pdf";
-
-        // Verify source PDF exists
         if (!File.Exists(sourcePdf))
         {
             Console.Error.WriteLine($"Source PDF not found: {sourcePdf}");
             return;
         }
 
-        // Verify each file to embed exists
-        foreach (string f in filesToEmbed)
+        // Verify that all files to embed exist
+        foreach (var f in filesToEmbed)
         {
             if (!File.Exists(f))
             {
@@ -32,28 +31,35 @@ class PortfolioCreator
             }
         }
 
-        // Load the source PDF
+        // Open the source PDF inside a using block for deterministic disposal
         using (Document doc = new Document(sourcePdf))
         {
-            // Ensure the document has a Collection object (creates a portfolio container)
+            // Ensure the document has a Collection (portfolio) object
             if (doc.Collection == null)
                 doc.Collection = new Collection();
 
-            // Add each file as an embedded file specification
-            foreach (string filePath in filesToEmbed)
+            // Add each file as an embedded file (portfolio entry)
+            foreach (var filePath in filesToEmbed)
             {
-                string description = Path.GetFileName(filePath);
-                // Create a file specification for the embedded file
-                var fileSpec = new FileSpecification(description, description);
+                // Use the file name (without path) as the entry name in the portfolio
+                string entryName = Path.GetFileName(filePath);
+
+                // Create a FileSpecification for the embedded file
+                var fileSpec = new FileSpecification(entryName, entryName);
+                // Load the file bytes into a MemoryStream and assign to Contents
                 fileSpec.Contents = new MemoryStream(File.ReadAllBytes(filePath));
+
                 // Add the specification to the document's collection (portfolio)
                 doc.Collection.Add(fileSpec);
             }
 
-            // Save the resulting PDF as a portfolio
-            doc.Save(outputPdf);
+            // Optionally set a title for the portfolio document
+            doc.Info.Title = "PDF Portfolio";
+
+            // Save the resulting PDF portfolio
+            doc.Save(portfolioPdf);
         }
 
-        Console.WriteLine($"Portfolio PDF created: {outputPdf}");
+        Console.WriteLine($"Portfolio created: {portfolioPdf}");
     }
 }

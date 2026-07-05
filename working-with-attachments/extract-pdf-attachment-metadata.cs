@@ -5,64 +5,69 @@ using System.Text.Json;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
+class AttachmentInfo
+{
+    // Made nullable to satisfy the non‑nullable warnings when the values are not set.
+    public string? FileName { get; set; }
+    public string? CreationDate { get; set; }
+}
+
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string jsonOutputPath = "attachments.json";
+        const string inputPdfPath = "input.pdf";
+        const string outputJsonPath = "attachments.json";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(pdfPath))
-        {
-            var attachmentInfos = new List<Dictionary<string, string>>();
+        var attachments = new List<AttachmentInfo>();
 
+        // Load the PDF document (wrapped in using for proper disposal)
+        using (Document doc = new Document(inputPdfPath))
+        {
             // Iterate through all pages (1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Iterate through annotations on the page
-                foreach (Annotation ann in page.Annotations)
+                // Iterate through all annotations on the page
+                for (int j = 1; j <= page.Annotations.Count; j++)
                 {
-                    // We're interested only in file attachment annotations
+                    Annotation ann = page.Annotations[j];
+
+                    // We're interested only in FileAttachmentAnnotation objects
                     if (ann is FileAttachmentAnnotation fileAnn)
                     {
-                        var info = new Dictionary<string, string>();
+                        // Retrieve the associated file specification
+                        FileSpecification fileSpec = fileAnn.File;
 
-                        // File name (if available) – use FileSpecification.Name
-                        if (fileAnn.File != null && !string.IsNullOrEmpty(fileAnn.File.Name))
-                            info["FileName"] = fileAnn.File.Name;
-                        else
-                            info["FileName"] = "Unnamed";
+                        // Build the attachment info object
+                        AttachmentInfo info = new AttachmentInfo
+                        {
+                            FileName = fileSpec?.Name ?? "Unnamed",
+                            CreationDate = fileAnn.CreationDate != DateTime.MinValue
+                                            ? fileAnn.CreationDate.ToString("o")
+                                            : "Unknown"
+                        };
 
-                        // Creation date of the annotation – DateTime is not nullable
-                        if (fileAnn.CreationDate != DateTime.MinValue)
-                            info["CreationDate"] = fileAnn.CreationDate.ToString("o"); // ISO 8601
-                        else
-                            info["CreationDate"] = "Unknown";
-
-                        // Optional: page index where the attachment resides
-                        info["PageIndex"] = i.ToString();
-
-                        attachmentInfos.Add(info);
+                        attachments.Add(info);
                     }
                 }
             }
-
-            // Serialize the collected metadata to JSON
-            JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-            string json = JsonSerializer.Serialize(attachmentInfos, jsonOptions);
-
-            // Write JSON to file
-            File.WriteAllText(jsonOutputPath, json);
-            Console.WriteLine($"Attachment metadata written to '{jsonOutputPath}'.");
         }
+
+        // Serialize the list to JSON (indented for readability)
+        JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+        string json = JsonSerializer.Serialize(attachments, jsonOptions);
+
+        // Write JSON to the output file
+        File.WriteAllText(outputJsonPath, json);
+
+        Console.WriteLine($"Attachment metadata written to '{outputJsonPath}'.");
     }
 }

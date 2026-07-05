@@ -7,22 +7,20 @@ using Aspose.Pdf.Annotations;
 
 class Program
 {
-    // Entry point
     static async Task Main()
     {
-        const string inputPdfPath  = "input.pdf";          // source PDF
-        const string outputPdfPath = "output_with_attachment.pdf";
-        const string fileUrl       = "https://example.com/sample.docx"; // remote file URL
-        const string attachmentName = "sample.docx";       // name to show in the attachment
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output_with_attachment.pdf";
+        const string fileUrl = "https://example.com/sample.txt";
+        const string attachmentFileName = "sample.txt";
 
-        // Verify source PDF exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Download the remote file into a memory stream
+        // Download the remote file into a byte array
         byte[] fileBytes;
         using (HttpClient http = new HttpClient())
         {
@@ -37,26 +35,30 @@ class Program
             }
         }
 
-        // Open the PDF, create the attachment annotation, and save
-        using (Document doc = new Document(inputPdfPath))
+        // Open the PDF, add a file attachment annotation, and save
+        using (Document doc = new Document(inputPdf))
         {
-            // Choose the page where the annotation will be placed (first page)
+            // Use the first page (Aspose.Pdf uses 1‑based indexing)
             Page page = doc.Pages[1];
 
-            // Define the rectangle for the annotation icon (coordinates are in points)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 120, 520);
+            // Define the annotation rectangle (left, bottom, right, top)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 150, 550);
 
-            // Create a FileSpecification from the in‑memory bytes
+            // Create a FileSpecification from the in‑memory stream
             using (MemoryStream ms = new MemoryStream(fileBytes))
             {
-                FileSpecification fileSpec = new FileSpecification(ms, attachmentName);
+                // The constructor expects a file name and a description; the actual content is set via the Contents property.
+                FileSpecification fileSpec = new FileSpecification(attachmentFileName, attachmentFileName);
+                fileSpec.Contents = ms;
 
-                // Create the file attachment annotation
+                // Create the FileAttachmentAnnotation
                 FileAttachmentAnnotation attachment = new FileAttachmentAnnotation(page, rect, fileSpec)
                 {
-                    // Optional visual settings (Icon property removed due to API version differences)
-                    Color = Aspose.Pdf.Color.Blue,
-                    Contents = $"Attached file: {attachmentName}"
+                    // Icon property is optional; the enum FileAttachmentAnnotationIcon does not exist in the current Aspose.Pdf version.
+                    // If a visual icon is desired, a string value can be assigned, e.g., "Paperclip".
+                    // Icon = "Paperclip",
+                    Contents = $"Attached file: {attachmentFileName}",
+                    Title = "Remote File"
                 };
 
                 // Add the annotation to the page
@@ -64,9 +66,9 @@ class Program
             }
 
             // Save the modified PDF
-            doc.Save(outputPdfPath);
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved with attachment: {outputPdfPath}");
+        Console.WriteLine($"PDF saved with attachment: {outputPdf}");
     }
 }
