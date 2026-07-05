@@ -1,64 +1,43 @@
 using System;
-using System.IO;
-using System.Drawing;
+using System.Drawing; // required for Color
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Annotations; // optional, kept for completeness
 
-class Program
+class SetFieldDefaultAppearance
 {
     static void Main()
     {
-        // Paths to the source PDF and the output PDF
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-
-        // Verify that the input file exists
-        if (!File.Exists(inputPath))
+        // Create a new PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
-        }
-
-        // Open the PDF document inside a using block for deterministic disposal
-        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
-        {
-            // Ensure the document has at least one page
-            if (doc.Pages.Count == 0)
-            {
-                Console.Error.WriteLine("The PDF has no pages.");
-                return;
-            }
-
-            // Get the first page (Aspose.Pdf uses 1‑based indexing)
-            Aspose.Pdf.Page page = doc.Pages[1];
+            // Add a blank page (pages are 1‑based)
+            Page page = doc.Pages.Add();
 
             // Define the rectangle where the form field will be placed
-            // (llx, lly, urx, ury) – lower‑left and upper‑right coordinates
+            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
             Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
             // Create a text box field on the page
-            TextBoxField textBox = new TextBoxField(page, fieldRect)
-            {
-                PartialName = "SampleTextBox"
-            };
+            TextBoxField textField = new TextBoxField(page, fieldRect);
 
-            // Set the default appearance (DA) for the field:
-            // Font: Helvetica, Size: 12 points, Color: Black
-            // NOTE: DefaultAppearance expects a System.Drawing.Color, not Aspose.Pdf.Color
-            DefaultAppearance defaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
+            // Set the default appearance (font, size, color) using System.Drawing.Color
+            textField.DefaultAppearance = new DefaultAppearance(
+                "Helvetica",          // font name
+                12,                    // font size
+                System.Drawing.Color.Blue); // text color (System.Drawing.Color required)
 
-            // Assign the DefaultAppearance to the field
-            textBox.DefaultAppearance = defaultAppearance;
+            // Optionally set a name and initial value for the field
+            textField.PartialName = "SampleField";
+            textField.Value = "Default text";
 
             // Add the field to the document's form collection
-            doc.Form.Add(textBox);
+            doc.Form.Add(textField);
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            // Save the PDF (no SaveOptions needed for PDF output)
+            doc.Save("field_with_default_appearance.pdf");
         }
 
-        Console.WriteLine($"PDF saved with updated field appearance to '{outputPath}'.");
+        Console.WriteLine("PDF created with a form field that has a custom DefaultAppearance.");
     }
 }

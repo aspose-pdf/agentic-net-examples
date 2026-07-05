@@ -3,70 +3,76 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "template.pdf";   // existing PDF or blank template
-        const string outputPath = "invoice_with_total.pdf";
+        const string outputPath = "InvoiceWithTotal.pdf";
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
-        }
+            // Add a blank page
+            Page page = doc.Pages.Add();
 
-        // Load the PDF document (using rule: document-disposal-with-using)
-        using (Document doc = new Document(inputPath))
-        {
-            // Ensure the form object exists
-            Form form = doc.Form;
+            // Define rectangles for the fields (left, bottom, width, height)
+            // Quantity field
+            Rectangle qtyRect = new Rectangle(100, 700, 150, 20);
+            // Unit Price field
+            Rectangle priceRect = new Rectangle(300, 700, 150, 20);
+            // Total Price field (calculated)
+            Rectangle totalRect = new Rectangle(500, 700, 150, 20);
 
-            // ---- Quantity field (NumberField) ----
-            // Aspose.Pdf.Rectangle(xLL, yLL, xUR, yUR) – coordinates are in points
-            NumberField qtyField = new NumberField(doc, new Aspose.Pdf.Rectangle(100, 700, 150, 720));
-            qtyField.PartialName = "Quantity";
-            qtyField.AlternateName = "Qty";
-            qtyField.DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
-            form.Add(qtyField);
+            // Create Quantity field (NumberField)
+            NumberField qtyField = new NumberField(page, qtyRect)
+            {
+                PartialName = "Quantity",
+                Value = "0"
+            };
+            // Create Unit Price field (NumberField)
+            NumberField priceField = new NumberField(page, priceRect)
+            {
+                PartialName = "UnitPrice",
+                Value = "0"
+            };
+            // Create Total field (NumberField) – this will be calculated
+            NumberField totalField = new NumberField(page, totalRect)
+            {
+                PartialName = "Total",
+                ReadOnly = true // user should not edit directly
+            };
 
-            // ---- Unit Price field (NumberField) ----
-            NumberField priceField = new NumberField(doc, new Aspose.Pdf.Rectangle(200, 700, 250, 720));
-            priceField.PartialName = "UnitPrice";
-            priceField.AlternateName = "Price";
-            priceField.DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
-            form.Add(priceField);
+            // Add fields to the form (page numbers are 1‑based)
+            doc.Form.Add(qtyField, 1);
+            doc.Form.Add(priceField, 1);
+            doc.Form.Add(totalField, 1);
 
-            // ---- Total Price field (TextBoxField) ----
-            TextBoxField totalField = new TextBoxField(doc, new Aspose.Pdf.Rectangle(300, 700, 380, 720));
-            totalField.PartialName = "Total";
-            totalField.AlternateName = "TotalPrice";
-            totalField.ReadOnly = true;                     // user should not edit directly
-            totalField.DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
-            form.Add(totalField);
+            // Ensure the form recalculates automatically when any field changes
+            doc.Form.AutoRecalculate = true;
 
-            // ---- JavaScript calculation ----
-            // The calculation is attached to the Total field via its OnCalculate action.
-            // It reads the values of Quantity and UnitPrice, multiplies them, and sets the result.
+            // JavaScript to calculate Total = Quantity * UnitPrice
             string js = @"
                 var qty = this.getField('Quantity').value;
                 var price = this.getField('UnitPrice').value;
-                // Ensure numeric values; empty fields are treated as 0
-                qty = isNaN(qty) ? 0 : parseFloat(qty);
-                price = isNaN(price) ? 0 : parseFloat(price);
-                this.getField('Total').value = (qty * price).toFixed(2);
+                // Convert to numbers to avoid string concatenation
+                qty = parseFloat(qty);
+                price = parseFloat(price);
+                if (!isNaN(qty) && !isNaN(price)) {
+                    this.getField('Total').value = (qty * price).toFixed(2);
+                } else {
+                    this.getField('Total').value = '';
+                }
             ";
+
+            // Assign the calculation script to the Total field
             totalField.Actions.OnCalculate = new JavascriptAction(js);
 
-            // Optional: improve performance when filling many fields
-            form.AutoRecalculate = true; // default is true; kept for clarity
-
-            // Save the modified PDF (using rule: document-disposal-with-using)
+            // Save the PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with calculated total saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with calculated Total field saved to '{outputPath}'.");
     }
 }

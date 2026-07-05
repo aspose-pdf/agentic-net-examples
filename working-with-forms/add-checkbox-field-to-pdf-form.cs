@@ -16,22 +16,18 @@ class Program
             return;
         }
 
-        // Load the existing PDF (Document creation is handled by the using block)
+        // Load the existing PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Define the rectangle where the checkbox will appear (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 120, 520);
+            // Define the position and size of the checkbox (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 700, 120, 720);
 
             // Create a new checkbox field on the document
-            CheckboxField checkbox = new CheckboxField(doc, rect)
-            {
-                Name = "AgreeTerms",          // Field name
-                PartialName = "AgreeTerms",   // Optional, ensures the same name is used internally
-                ExportValue = "Yes",          // Value when checked (optional)
-                Checked = false               // Initial state (unchecked)
-            };
+            CheckboxField checkbox = new CheckboxField(doc, rect);
+            checkbox.Name = "AgreeTerms";   // Set the field name
+            checkbox.Checked = false;       // Default state (unchecked)
 
-            // Add the checkbox to the form
+            // Add the field to the form
             doc.Form.Add(checkbox);
 
             // Save the modified PDF

@@ -7,9 +7,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName  = "MyTextField"; // name of the text field to modify
+        const string fieldName = "MyTextField"; // name of the text field to modify
 
         if (!File.Exists(inputPath))
         {
@@ -20,7 +20,7 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Find the text field by its name
+            // Find the text box field by name
             TextBoxField textField = doc.Form[fieldName] as TextBoxField;
             if (textField == null)
             {
@@ -28,15 +28,17 @@ class Program
                 return;
             }
 
-            // Set a light‑gray background color.
-            // TextBoxField does not expose a BackgroundColor property; use the generic Color property
-            // which controls the field's fill (background) appearance.
+            // Set the background color of the text field to light gray.
+            // In Aspose.Pdf the Color property of a form field is used for the field's background appearance.
             textField.Color = Aspose.Pdf.Color.LightGray;
+
+            // Optionally, set a border to make the field visible.
+            // textField.Border = new Border(textField) { Width = 1, Color = Aspose.Pdf.Color.Black };
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Background color set to LightGray for field '{fieldName}'. Saved to '{outputPath}'.");
+        Console.WriteLine($"Background color set to LightGray and saved to '{outputPath}'.");
     }
 }

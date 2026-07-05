@@ -7,34 +7,39 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";   // existing PDF (or blank PDF)  
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_with_tooltip.pdf";
 
+        // If the source PDF does not exist, create a simple one-page document.
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
+            using (Document tempDoc = new Document())
+            {
+                tempDoc.Pages.Add();                     // 1‑based page indexing
+                tempDoc.Save(inputPath);                 // Save as PDF
+            }
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Open the PDF inside a using block for deterministic disposal.
         using (Document doc = new Document(inputPath))
         {
-            // Define the rectangle where the field will appear (fully qualified to avoid ambiguity)
+            // Retrieve the first page (pages are 1‑based).
+            Page page = doc.Pages[1];
+
+            // Define the field rectangle. Fully qualify to avoid ambiguity.
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 530);
 
-            // Create a text box field on the document
-            TextBoxField txtField = new TextBoxField(doc, rect);
+            // Create a text box field on the page.
+            TextBoxField textField = new TextBoxField(page, rect);
+            textField.Name = "UserNameField";
 
-            // Set the tooltip (displayed as an alternate name in Acrobat)
-            txtField.AlternateName = "Enter date in format MM/DD/YYYY";
+            // Set the tooltip (displayed as a hover hint in PDF viewers).
+            textField.AlternateName = "Enter your full name (e.g., John Doe)";
 
-            // Optionally set a visible name for the field (used in the form hierarchy)
-            txtField.Name = "DateField";
+            // Add the field to the document's form.
+            doc.Form.Add(textField);
 
-            // Add the field to the form
-            doc.Form.Add(txtField);
-
-            // Save the modified PDF
+            // Save the modified PDF.
             doc.Save(outputPath);
         }
 

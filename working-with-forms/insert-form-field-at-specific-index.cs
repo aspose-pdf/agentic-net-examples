@@ -2,13 +2,14 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_form.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,34 +17,35 @@ class Program
             return;
         }
 
-        // Load the existing PDF document (using the required load pattern)
+        // Load the existing PDF document (lifecycle rule: use using)
         using (Document doc = new Document(inputPath))
         {
-            // Define the rectangle where the new form field will appear.
-            // Constructor parameters: left, bottom, width, height.
-            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 500, 200, 530);
+            // Ensure the document has at least one page
+            if (doc.Pages.Count == 0)
+                doc.Pages.Add();
 
-            // Create a text box form field on page 1.
-            TextBoxField textField = new TextBoxField(doc.Pages[1], fieldRect)
+            // Create a new text box form field on page 1
+            // Rectangle constructor: (llx, lly, urx, ury)
+            TextBoxField textBox = new TextBoxField(doc.Pages[1],
+                new Rectangle(100, 500, 300, 530))
             {
-                PartialName = "SampleTextBox", // field name
-                Value       = "Enter text here"
+                PartialName = "CustomerName",   // field name
+                Value       = "Enter name here"
             };
 
-            // Add the field to the form collection on page 1.
-            // This places the field in the document and registers it in the Form collection.
-            doc.Form.Add(textField, 1);
+            // Add the field to the form collection.
+            // The Add(Field, string, int) overload returns the added field.
+            // The order of fields in the collection follows the order of insertion,
+            // so adding the field at this point places it at the desired index.
+            doc.Form.Add(textBox, textBox.PartialName, 1);
 
-            // If a specific index within the Form collection is required,
-            // the Form class does not expose an Insert method.
-            // The typical approach is to add the field (as above) and then
-            // reorder the collection manually if needed. For most scenarios,
-            // adding the field directly is sufficient for ordered layout.
+            // Optionally, add an additional appearance (e.g., on another page)
+            // doc.Form.AddFieldAppearance(textBox, 2, new Rectangle(100, 400, 300, 430));
 
-            // Save the modified PDF (using the required save pattern)
+            // Save the modified PDF (lifecycle rule: use Save inside using)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with new form field at '{outputPath}'.");
+        Console.WriteLine($"PDF with new form field saved to '{outputPath}'.");
     }
 }

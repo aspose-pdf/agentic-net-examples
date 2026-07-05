@@ -3,70 +3,53 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
-class Program
+class ExportFormFieldAppearances
 {
     static void Main()
     {
         const string inputPdfPath = "input.pdf";
-        const string outputFolder = "FieldAppearances";
 
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
-
-        // Open the source PDF
-        using (Document sourceDoc = new Document(inputPdfPath))
+        // Load the source PDF containing the form fields
+        using (Aspose.Pdf.Document sourceDoc = new Aspose.Pdf.Document(inputPdfPath))
         {
-            int fieldCounter = 0;
-
-            // Iterate over all form fields in the document
-            foreach (Field field in sourceDoc.Form.Fields)
+            // Iterate over each field in the form
+            foreach (Aspose.Pdf.Forms.Field field in sourceDoc.Form.Fields)
             {
-                fieldCounter++;
-
-                // Create a new PDF document that will contain only this field's appearance
-                using (Document fieldDoc = new Document())
+                // Create a fresh copy of the source document for each field
+                // (so that added pages do not accumulate)
+                using (Aspose.Pdf.Document tempDoc = new Aspose.Pdf.Document(inputPdfPath))
                 {
-                    // Add a blank page to the new document
-                    Page page = fieldDoc.Pages.Add();
+                    // Add a new blank page where the appearance will be placed
+                    Aspose.Pdf.Page appearancePage = tempDoc.Pages.Add();
 
-                    // Clone the field into the new document
-                    // (Add creates a copy of the field that belongs to the new document)
-                    fieldDoc.Form.Add(field);
+                    // Use the field's original rectangle for placement
+                    Aspose.Pdf.Rectangle fieldRect = field.Rect;
 
-                    // Determine a rectangle for the appearance.
-                    // Use the original field rectangle; if it is null, use a default size.
-                    Aspose.Pdf.Rectangle appearanceRect = field.Rect ?? new Aspose.Pdf.Rectangle(0, 0, 200, 50);
+                    // Add the field's appearance to the newly added page
+                    // This copies the appearance stream onto the page
+                    tempDoc.Form.AddFieldAppearance(field, appearancePage.Number, fieldRect);
 
-                    // Add the field's appearance to the first page of the new document
-                    // This copies the visual representation (appearance stream) of the field.
-                    fieldDoc.Form.AddFieldAppearance(field, 1, appearanceRect);
+                    // Extract only the page that contains the appearance into a separate document
+                    using (Aspose.Pdf.Document singlePageDoc = new Aspose.Pdf.Document())
+                    {
+                        // Pages are 1‑based indexed
+                        singlePageDoc.Pages.Add(appearancePage);
+                        // Build a safe file name from the field's full name
+                        string safeFieldName = field.FullName.Replace("/", "_").Replace("\\", "_");
+                        string outputPath = $"{safeFieldName}_appearance.pdf";
 
-                    // Build a safe file name based on the field's partial name (or a fallback)
-                    string safeName = MakeSafeFileName(field.PartialName ?? $"field_{fieldCounter}");
-                    string outputPath = Path.Combine(outputFolder, $"{safeName}.pdf");
-
-                    // Save the document containing only this field's appearance
-                    fieldDoc.Save(outputPath);
+                        // Save the appearance as an independent PDF file
+                        singlePageDoc.Save(outputPath);
+                        Console.WriteLine($"Exported appearance of field '{field.FullName}' to '{outputPath}'.");
+                    }
                 }
             }
         }
-
-        Console.WriteLine("Form field appearance export completed.");
-    }
-
-    // Helper to replace invalid filename characters
-    private static string MakeSafeFileName(string name)
-    {
-        foreach (char c in Path.GetInvalidFileNameChars())
-        {
-            name = name.Replace(c, '_');
-        }
-        return name;
     }
 }

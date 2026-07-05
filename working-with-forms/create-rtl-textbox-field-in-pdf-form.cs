@@ -1,45 +1,41 @@
 using System;
-using System.Drawing; // Required for DefaultAppearance color
-using Aspose.Pdf; // Core PDF classes
-using Aspose.Pdf.Forms;
+using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text; // HorizontalAlignment enum
+using Aspose.Pdf.Forms;
+using Aspose.Pdf.Text;
+using Aspose.Pdf.Drawing; // for Rectangle
 
 class Program
 {
     static void Main()
     {
-        // Create a new PDF document
+        // Create a new PDF document and ensure proper disposal
         using (Document doc = new Document())
         {
-            // Add a blank page (page indexing is 1‑based)
+            // Add a page (1‑based indexing)
             Page page = doc.Pages.Add();
 
             // Define the rectangle where the text box will appear
-            // (llx, lly, urx, ury) – coordinates are in points
-            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 500, 300, 530);
+            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
+            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(50, 750, 550, 800);
 
-            // Create a text box field that supports right‑to‑left languages
+            // Create a text box field for right‑to‑left language input
             TextBoxField rtlField = new TextBoxField(page, fieldRect)
             {
-                // Field name (used for form data extraction)
-                PartialName = "ArabicField",
-
-                // Use a font that contains Arabic glyphs
-                // DefaultAppearance constructor requires System.Drawing.Color
-                DefaultAppearance = new DefaultAppearance("Arial Unicode MS", 12, System.Drawing.Color.Black),
-
-                // Align text to the right (common for RTL scripts)
-                TextHorizontalAlignment = HorizontalAlignment.Right,
-
-                // Sample Arabic text (optional initial value)
-                Value = "مثال"
+                PartialName = "ArabicField",               // field name
+                Contents = "مثال",                         // sample Arabic text
+                TextHorizontalAlignment = HorizontalAlignment.Right // align text to the right
             };
 
-            // Add the field to the form on page 1 (int page number, not Page object)
+            // Set a default appearance using a font that supports Arabic characters
+            // DefaultAppearance constructor takes (fontName, fontSize, Aspose.Pdf.Color)
+            rtlField.DefaultAppearance = new DefaultAppearance("Arial Unicode MS", 12, System.Drawing.Color.Black);
+
+            // Add the field to the document's form on page 1
             doc.Form.Add(rtlField, 1);
 
-            // Save the PDF document
+            // Save the PDF (no SaveOptions needed for PDF output)
             doc.Save("rtl_form.pdf");
         }
 

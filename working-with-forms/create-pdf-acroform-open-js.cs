@@ -15,25 +15,29 @@ class Program
             // Add a blank page (pages are 1‑based)
             Page page = doc.Pages.Add();
 
-            // Create a text box field on the page
-            // Fully qualify Rectangle to avoid ambiguity with System.Drawing
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 300, 650);
-            TextBoxField txtField = new TextBoxField(page, rect)
+            // Define the rectangle for the text field (left, bottom, right, top)
+            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 600, 300, 630);
+
+            // Create a simple text field and associate it with the page
+            Field textField = new Field(doc)
             {
-                PartialName = "SampleTextBox",
-                Value = "Enter text here"
+                Name = "SampleText",          // Full field name
+                PartialName = "SampleText",   // Partial name (same as full for simple fields)
+                Rect = fieldRect,               // Position on the page
+                Value = "Enter text here"      // Default value
             };
-            // Add the field to the document's form
-            doc.Form.Add(txtField);
+
+            // Associate the field with the page using the Form.Add overload that expects a page number (1‑based)
+            doc.Form.Add(textField, 1);
 
             // Set a document‑level JavaScript that runs when the PDF is opened
-            // Document.OpenAction expects a PdfAction; JavascriptAction derives from it
-            doc.OpenAction = new JavascriptAction("app.alert('Document opened');");
+            JavascriptAction openJs = new JavascriptAction("app.alert('Document opened');");
+            doc.OpenAction = openJs;
 
-            // Save the PDF
+            // Save the PDF (no SaveOptions needed for PDF output)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF created with AcroForm field and open‑action JavaScript: {outputPath}");
+        Console.WriteLine($"PDF with AcroForm and open‑action JavaScript saved to '{outputPath}'.");
     }
 }

@@ -1,16 +1,16 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations; // for AnnotationFlags
-using Aspose.Pdf.Forms;      // for Field
+using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName  = "myField";   // name of the form field to modify
+        const string fieldName = "MyFormField"; // replace with the actual field name
 
         if (!File.Exists(inputPath))
         {
@@ -18,28 +18,31 @@ class Program
             return;
         }
 
-        // Load the PDF document (use using for deterministic disposal)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the field from the form collection by its fully qualified name.
-            // The Form indexer returns a WidgetAnnotation, so we cast it to Field.
-            Field? field = doc.Form[fieldName] as Field;
+            // Access the AcroForm collection
+            Form form = doc.Form;
 
-            if (field != null)
+            // Retrieve the specific field by its fully qualified name.
+            // In Aspose.PDF the collection returns a WidgetAnnotation for form fields.
+            WidgetAnnotation widget = form[fieldName] as WidgetAnnotation;
+
+            if (widget == null)
             {
-                // Make the field visible on screen but non‑printable.
-                // Clear the Print flag while leaving other flags untouched.
-                field.Flags = field.Flags & ~AnnotationFlags.Print;
+                Console.Error.WriteLine($"Field '{fieldName}' not found or is not a widget annotation.");
+                return;
             }
-            else
-            {
-                Console.Error.WriteLine($"Field '{fieldName}' not found in the document.");
-            }
+
+            // Ensure the field is visible (do not set the Hide flag) and make it non‑printable.
+            // The NoPrint flag may not be present in older SDK versions; use its numeric value (256) if needed.
+            const AnnotationFlags NoPrintFlag = (AnnotationFlags)256; // 0x100
+            widget.Flags = widget.Flags | NoPrintFlag; // add NoPrint while preserving existing flags
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Field '{fieldName}' updated. Saved to '{outputPath}'.");
     }
 }

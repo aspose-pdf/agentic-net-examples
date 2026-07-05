@@ -1,16 +1,16 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations; // for AnnotationFlags
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";   // PDF containing the form field
+        const string inputPath = "input.pdf";
         const string outputPath = "output_hidden.pdf";
-        const string fieldName = "myTextField"; // Fully‑qualified name of the field to hide
+        const string fieldName = "myField"; // name of the form field to hide
 
         if (!File.Exists(inputPath))
         {
@@ -18,24 +18,28 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // The Form indexer returns a WidgetAnnotation. Cast it to Field (which derives from WidgetAnnotation).
-            Field? field = doc.Form[fieldName] as Field;
-            if (field == null)
+            // Retrieve the widget annotation that represents the form field
+            WidgetAnnotation widget = doc.Form[fieldName] as WidgetAnnotation;
+            if (widget != null)
             {
-                Console.Error.WriteLine($"Field \"{fieldName}\" not found or is not a form field.");
-                return;
+                // Preserve existing flags and add the Hidden flag so the field does not appear when rendered
+                widget.Flags |= AnnotationFlags.Hidden;
             }
-
-            // Hide the widget by setting the Hidden flag.
-            field.Flags |= AnnotationFlags.Hidden; // make the field invisible on the page
+            else
+            {
+                // If the field is not a widget (unlikely for a form field), fall back to a HideAction on page open
+                HideAction hide = new HideAction(fieldName, true);
+                // PageActionCollection exposes OnOpen (not Open)
+                doc.Pages[1].Actions.OnOpen = hide;
+            }
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Field \"{fieldName}\" hidden and saved to '{outputPath}'.");
+        Console.WriteLine($"Field '{fieldName}' hidden and saved to '{outputPath}'.");
     }
 }

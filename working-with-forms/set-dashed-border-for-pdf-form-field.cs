@@ -1,19 +1,16 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF containing a form field
         const string inputPath = "input.pdf";
-        // Output PDF with the modified field border
         const string outputPath = "output.pdf";
-        // Name of the form field whose border style should be changed
-        const string fieldName = "MyTextField";
+        const string fieldName = "OptionalField"; // name of the form field to modify
 
         if (!File.Exists(inputPath))
         {
@@ -21,33 +18,37 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block to ensure proper disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the field from the form collection and cast to Field
-            Field? field = doc.Form[fieldName] as Field;
-            if (field == null)
+            // Retrieve the form field by name. The Form indexer returns a WidgetAnnotation, so cast it to Field.
+            Field field = doc.Form[fieldName] as Field;
+            if (field is TextBoxField textField)
             {
-                Console.Error.WriteLine($"Field '{fieldName}' not found in the document.");
-                return;
+                // The TextBoxField is also a WidgetAnnotation, so we can work with it directly.
+                WidgetAnnotation widget = (WidgetAnnotation)textField;
+
+                // Ensure a Border object exists; create one if necessary.
+                if (widget.Border == null)
+                {
+                    widget.Border = new Border(widget);
+                }
+
+                // Set the border style to dashed.
+                widget.Border.Style = BorderStyle.Dashed;
+
+                // Optional: define dash pattern (e.g., 3 units on, 2 units off) and width.
+                widget.Border.Dash = new Dash(3, 2);
+                widget.Border.Width = 1; // 1 point width (int)
+
+                Console.WriteLine($"Border style for field '{fieldName}' set to dashed.");
+            }
+            else
+            {
+                Console.Error.WriteLine($"Form field '{fieldName}' not found or not a TextBoxField.");
             }
 
-            // Create a new Border object for the field.
-            // The Border constructor requires the parent annotation (the field itself).
-            Border border = new Border(field)
-            {
-                // Set the border style to dashed
-                Style = BorderStyle.Dashed,
-                // Set a reasonable border width (in points)
-                Width = 1,
-                // Define the dash pattern: 3 points on, 3 points off
-                Dash = new Dash(3, 3)
-            };
-
-            // Assign the configured border to the field
-            field.Border = border;
-
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

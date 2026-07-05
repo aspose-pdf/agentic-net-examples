@@ -6,29 +6,37 @@ class Program
 {
     static void Main()
     {
-        const string jsonPath = "form_fields.json";
-        const string outputPdf = "generated.pdf";
+        const string jsonPath   = "form_fields.json";   // JSON schema describing AcroForm fields
+        const string outputPath = "generated_form.pdf";
 
-        // Verify that the JSON schema file exists
+        // Verify JSON file exists
         if (!File.Exists(jsonPath))
         {
-            Console.Error.WriteLine($"JSON schema not found: {jsonPath}");
+            Console.Error.WriteLine($"JSON file not found: {jsonPath}");
             return;
         }
 
-        // Create a new PDF document
-        using (Document doc = new Document())
+        try
         {
-            // Ensure the document has at least one page
-            doc.Pages.Add();
+            // Create a new empty PDF document
+            using (Document doc = new Document())
+            {
+                // Import AcroForm fields from the JSON schema
+                using (FileStream jsonStream = new FileStream(jsonPath, FileMode.Open, FileAccess.Read))
+                {
+                    // The Form object provides ImportFromJson overloads for Stream and file name
+                    doc.Form.ImportFromJson(jsonStream);
+                }
 
-            // Import AcroForm fields from the JSON schema
-            doc.Form.ImportFromJson(jsonPath);
+                // Save the newly generated PDF with the imported form fields
+                doc.Save(outputPath);
+            }
 
-            // Save the PDF with the recreated form fields
-            doc.Save(outputPdf);
+            Console.WriteLine($"PDF with AcroForm fields created: {outputPath}");
         }
-
-        Console.WriteLine($"PDF with imported AcroForm fields saved to '{outputPdf}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

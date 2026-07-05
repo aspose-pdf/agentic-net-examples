@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -8,47 +7,40 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";   // source PDF with a form field
-        const string outputPath = "output.pdf";  // destination PDF
-        const string fieldName  = "myTextField"; // name of the textbox field to modify
-        const int    maxLength  = 10;            // desired maximum character length
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Verify that the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (using the recommended using block for disposal)
+        // Load the PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document contains a form and the specified field
-            if (doc.Form != null &&
-                doc.Form.Fields != null &&
-                doc.Form.Fields.Any(f => f.Name == fieldName))
-            {
-                // Retrieve the field as a TextBoxField
-                TextBoxField txtField = doc.Form[fieldName] as TextBoxField;
-                if (txtField != null)
-                {
-                    // Set the maximum allowed characters for user input
-                    txtField.MaxLen = maxLength;
-                }
-                else
-                {
-                    Console.Error.WriteLine($"Field '{fieldName}' is not a TextBoxField.");
-                }
-            }
-            else
-            {
-                Console.Error.WriteLine($"Form does not contain a field named '{fieldName}'.");
-            }
+            // Get the first page (Aspose.Pdf uses 1‑based indexing)
+            Page page = doc.Pages[1];
 
-            // Save the modified PDF (PDF format does not require explicit SaveOptions)
+            // Define the rectangle where the password field will appear
+            // (left, bottom, right, top)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 530);
+
+            // Create a text box field on the page and enforce a maximum length of 20 characters
+            TextBoxField pwdField = new TextBoxField(page, rect)
+            {
+                PartialName = "Password", // field name
+                MaxLen = 20                // enforce maximum length of 20 characters
+                // Note: The IsPassword property is not available in the current Aspose.PDF version.
+            };
+
+            // Add the field to the document's form collection
+            doc.Form.Add(pwdField);
+
+            // Save the modified PDF (lifecycle rule: use Save inside using)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with password field max length set to 20 characters: {outputPath}");
     }
 }

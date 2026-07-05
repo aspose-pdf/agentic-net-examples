@@ -1,45 +1,41 @@
 using System;
 using System.IO;
-using System.Text;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Paths to the input PDF and the output PDF
-        const string inputPdfPath  = "input.pdf";
+        // Paths to the source PDF and the output PDF
+        const string inputPdfPath = "input.pdf";
         const string outputPdfPath = "output_filled.pdf";
 
-        // JSON string containing form field values.
-        // The JSON keys must match the full names of the form fields.
-        string jsonData = @"{
+        // JSON string containing form field values (field names must match PDF form field names)
+        const string jsonData = @"{
             ""FirstName"": ""John"",
             ""LastName"": ""Doe"",
-            ""Email"": ""john.doe@example.com"",
-            ""AgreeTerms"": true
+            ""Email"": ""john.doe@example.com""
         }";
 
-        // Ensure the input file exists
+        // Verify that the source PDF exists
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document, import JSON data into its form fields, and save the result.
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Convert the JSON string to a UTF‑8 memory stream
+        using (MemoryStream jsonStream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(jsonData)))
         {
-            // Convert the JSON string to a UTF‑8 memory stream.
-            using (MemoryStream jsonStream = new MemoryStream(Encoding.UTF8.GetBytes(jsonData)))
+            // Load the PDF document (using block ensures proper disposal)
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                // Import the form field values from the JSON stream.
-                // This matches fields by their full names.
+                // Import form field values from the JSON stream
                 pdfDoc.Form.ImportFromJson(jsonStream);
-            }
 
-            // Save the updated PDF.
-            pdfDoc.Save(outputPdfPath);
+                // Save the modified PDF
+                pdfDoc.Save(outputPdfPath);
+            }
         }
 
         Console.WriteLine($"Form data imported and saved to '{outputPdfPath}'.");

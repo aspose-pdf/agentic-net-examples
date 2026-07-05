@@ -8,7 +8,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output_with_reset.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,43 +17,27 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using)
+        // Load the PDF document (using rule: document-disposal-with-using)
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document contains a form
-            Form form = doc.Form;
-            if (form == null)
-            {
-                Console.Error.WriteLine("The PDF does not contain a form.");
-                return;
-            }
+            // Define the button rectangle (coordinates: llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle btnRect = new Aspose.Pdf.Rectangle(100, 500, 200, 540);
 
-            // Define the rectangle for the reset button
-            Aspose.Pdf.Rectangle buttonRect = new Aspose.Pdf.Rectangle(100, 100, 200, 130);
-
-            // Create a push button field on the first page
-            ButtonField resetButton = new ButtonField(doc, buttonRect)
+            // Create a push button field on the document
+            ButtonField resetButton = new ButtonField(doc, btnRect)
             {
-                Name = "ResetButton",
-                PartialName = "ResetButton",
-                // Use NormalCaption to set the visible label on the button
-                NormalCaption = "Reset",
-                // Border color (the annotation's Color property controls the border color)
-                Color = Aspose.Pdf.Color.DarkGray
-                // Note: BackColor property does not exist on ButtonField in current API version.
+                PartialName      = "ResetButton",      // internal field name
+                AlternateCaption = "Reset Form"        // caption shown on the button
             };
 
-            // Set the border (Border requires the parent annotation and has no Color property)
-            resetButton.Border = new Border(resetButton) { Width = 1 };
-
-            // Assign a JavaScript action that resets the form to its default values
-            // The JavaScript "this.resetForm();" clears all fields and restores defaults.
+            // Assign a JavaScript action that clears all form fields when the button is clicked
+            // Use a valid action property (OnPressMouseBtn) instead of the non‑existent OnMouseUp
             resetButton.Actions.OnPressMouseBtn = new JavascriptAction("this.resetForm();");
 
-            // Add the button to the form on page 1 (page indexing is 1‑based)
-            form.Add(resetButton, 1);
+            // Add the button to the PDF form (using Form.Add)
+            doc.Form.Add(resetButton);
 
-            // Save the modified PDF (lifecycle rule: save inside using)
+            // Save the modified PDF (using rule: document-disposal-with-using)
             doc.Save(outputPath);
         }
 

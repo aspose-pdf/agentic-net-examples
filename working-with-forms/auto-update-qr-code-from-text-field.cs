@@ -8,7 +8,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";   // PDF containing a TextBoxField named "txtInput" and a BarcodeField named "qrField"
+        const string inputPath = "input.pdf";   // PDF containing a text field and a QR code field
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,38 +17,60 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the text box field (the source of the data)
-            TextBoxField txtField = doc.Form["txtInput"] as TextBoxField;
-            // Retrieve the barcode field that will display the QR code
-            BarcodeField qrField = doc.Form["qrField"] as BarcodeField;
-
-            if (txtField == null || qrField == null)
+            // ------------------------------------------------------------
+            // 1. Locate the text field (the field whose value will drive the QR code)
+            // ------------------------------------------------------------
+            TextBoxField? textField = null;
+            foreach (Field field in doc.Form)
             {
-                Console.Error.WriteLine("Required fields not found in the PDF form.");
+                if (field is TextBoxField tb && tb.PartialName == "TextField") // adjust name as needed
+                {
+                    textField = tb;
+                    break;
+                }
+            }
+
+            // ------------------------------------------------------------
+            // 2. Locate the QR code field (a BarcodeField)
+            // ------------------------------------------------------------
+            BarcodeField? qrField = null;
+            foreach (Field field in doc.Form)
+            {
+                if (field is BarcodeField bf && bf.PartialName == "QRField") // adjust name as needed
+                {
+                    qrField = bf;
+                    break;
+                }
+            }
+
+            if (textField == null || qrField == null)
+            {
+                Console.Error.WriteLine("Required fields not found in the document.");
                 return;
             }
 
-            // NOTE: BarcodeField.Symbology is read‑only. The QR code symbology must be
-            // pre‑configured in the PDF template. We only need to ensure the field can be
-            // updated by JavaScript.
-            qrField.ReadOnly = false;
+            // ------------------------------------------------------------
+            // 3. Ensure the barcode field can be modified by JavaScript.
+            //    The QR symbology must already be defined in the source PDF.
+            // ------------------------------------------------------------
+            // NOTE: BarcodeField.Symbology is read‑only; it must be set in the PDF designer.
+            qrField.ReadOnly = false; // allow JavaScript to modify its value
 
-            // Attach JavaScript to the text field: whenever a character is modified,
-            // set the barcode field's value to the current text field value.
-            // The JavaScript runs inside the PDF viewer and updates the QR code automatically.
-            txtField.Actions.OnModifyCharacter = new JavascriptAction(
-                "var txt = event.value; " +                     // current text box value
-                "var qr = this.getField('qrField'); " +        // reference to the barcode field
-                "qr.value = txt; " +                           // update barcode field value
-                "qr.recalculate();");                          // trigger barcode regeneration
+            // ------------------------------------------------------------
+            // 4. Attach JavaScript to the text field so that whenever its value changes,
+            //    the QR code field is updated with the same value.
+            //    The JavaScript runs on the client side (Adobe Reader) and sets the
+            //    value of the barcode field, which automatically regenerates the QR code.
+            // ------------------------------------------------------------
+            string js = $"this.getField('{qrField.PartialName}').value = event.value;";
+            textField.Actions.OnModifyCharacter = new JavascriptAction(js);
 
-            // Optionally enable automatic recalculation for the whole form (default is true)
-            doc.Form.AutoRecalculate = true;
-
-            // Save the modified PDF
+            // ------------------------------------------------------------
+            // 5. Save the modified PDF
+            // ------------------------------------------------------------
             doc.Save(outputPath);
         }
 

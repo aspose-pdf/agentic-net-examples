@@ -8,33 +8,37 @@ class Program
 {
     static void Main()
     {
+        // Path for the generated PDF
         const string outputPath = "tracking.pdf";
 
-        // Generate a GUID at runtime for tracking
-        string trackingId = Guid.NewGuid().ToString();
+        // Generate a GUID at runtime
+        string trackingGuid = Guid.NewGuid().ToString();
 
-        // Create a new PDF document (lifecycle rule: use using for disposal)
+        // Create a new PDF document and ensure proper disposal
         using (Document doc = new Document())
         {
-            // Add a blank page (pages are 1‑based)
+            // Add a blank page (required for placing form fields)
             Page page = doc.Pages.Add();
 
-            // Define a zero‑size rectangle so the field is not visible
-            Aspose.Pdf.Rectangle hiddenRect = new Aspose.Pdf.Rectangle(0, 0, 0, 0);
+            // Define a zero‑size rectangle for the hidden field
+            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
+            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(0, 0, 0, 0);
 
-            // Create a hidden text box field on the page
-            TextBoxField hiddenField = new TextBoxField(page, hiddenRect)
+            // Create a text box field that will hold the GUID
+            TextBoxField hiddenField = new TextBoxField(page, fieldRect)
             {
-                // Store the GUID value
-                Value = trackingId,
-                // Mark the field as hidden using annotation flags
-                Flags = AnnotationFlags.Hidden
+                Name = "TrackingId",          // Field name
+                Value = trackingGuid,         // Store the GUID
+                ReadOnly = true               // Prevent user edits
             };
+
+            // Mark the field as hidden using the annotation flag (enum assignment, not int)
+            hiddenField.Flags = AnnotationFlags.Hidden;
 
             // Add the field to the document's form collection
             doc.Form.Add(hiddenField);
 
-            // Save the PDF (lifecycle rule: save inside using block)
+            // Save the PDF (no explicit SaveOptions needed for PDF output)
             doc.Save(outputPath);
         }
 
