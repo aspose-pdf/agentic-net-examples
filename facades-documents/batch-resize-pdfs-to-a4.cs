@@ -3,47 +3,61 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class Program
+class BatchResizeToA4
 {
     static void Main()
     {
-        // Source folder containing the original PDFs
-        const string sourceFolder = "SourcePdfs";
+        // Source folder containing PDF files
+        const string sourceFolder = @"C:\SourcePdfs";
         // Target folder where resized PDFs will be saved
-        const string targetFolder = "ResizedPdfs";
+        const string targetFolder = @"C:\ResizedPdfs";
 
-        // Verify source folder exists
+        // Ensure target directory exists
+        Directory.CreateDirectory(targetFolder);
+
+        // Verify that the source directory exists before trying to enumerate files
         if (!Directory.Exists(sourceFolder))
         {
-            Console.Error.WriteLine($"Source folder not found: {sourceFolder}");
+            Console.WriteLine($"Source folder does not exist: {sourceFolder}");
+            Console.WriteLine("Please create the folder and place PDF files inside before running the program.");
             return;
         }
 
-        // Ensure target folder exists
-        Directory.CreateDirectory(targetFolder);
-
-        // Get all PDF files in the source folder (non‑recursive)
+        // Get all PDF files in the source folder
         string[] pdfFiles = Directory.GetFiles(sourceFolder, "*.pdf", SearchOption.TopDirectoryOnly);
 
-        foreach (string srcPath in pdfFiles)
+        if (pdfFiles.Length == 0)
         {
-            string fileName = Path.GetFileName(srcPath);
-            string destPath = Path.Combine(targetFolder, fileName);
-
-            // Use PdfPageEditor (facade) to change page size to A4
-            using (PdfPageEditor editor = new PdfPageEditor())
-            {
-                // Load the source PDF
-                editor.BindPdf(srcPath);
-                // Set the desired page size (A4)
-                editor.PageSize = PageSize.A4;
-                // Apply changes to all pages (default ProcessPages = all)
-                editor.ApplyChanges();
-                // Save the resized PDF to the target location
-                editor.Save(destPath);
-            }
-
-            Console.WriteLine($"Resized '{fileName}' to A4 and saved to '{destPath}'.");
+            Console.WriteLine($"No PDF files found in {sourceFolder}.");
+            return;
         }
+
+        foreach (string sourcePath in pdfFiles)
+        {
+            try
+            {
+                // Determine output file path
+                string fileName = Path.GetFileName(sourcePath);
+                string outputPath = Path.Combine(targetFolder, fileName);
+
+                // Use PdfPageEditor to change page size to A4
+                using (PdfPageEditor pageEditor = new PdfPageEditor())
+                {
+                    pageEditor.BindPdf(sourcePath);                     // Load the PDF
+                    pageEditor.PageSize = PageSize.A4;                  // Set desired page size (A4)
+                    pageEditor.ProcessPages = null;                    // Process all pages (null means all)
+                    pageEditor.ApplyChanges();                          // Apply the changes
+                    pageEditor.Save(outputPath);                        // Save the resized PDF
+                }
+
+                Console.WriteLine($"Resized: {fileName}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to process '{sourcePath}': {ex.Message}");
+            }
+        }
+
+        Console.WriteLine("Batch resizing completed.");
     }
 }

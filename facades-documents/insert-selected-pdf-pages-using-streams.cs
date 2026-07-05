@@ -1,46 +1,47 @@
 using System;
 using System.IO;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Paths to the PDFs
-        const string destinationPdfPath = "destination.pdf";
-        const string sourcePdfPath      = "source.pdf";
-        const string outputPdfPath      = "output.pdf";
+        // Paths to the destination PDF, source PDF (pages to insert), and the output PDF.
+        const string destinationPath = "destination.pdf";
+        const string sourcePath      = "source.pdf";
+        const string outputPath      = "result.pdf";
 
-        // Pages to insert from the source PDF (1‑based page numbers)
-        int[] pagesToInsert = new int[] { 2, 4, 6 };
+        // Pages (1‑based) from the source PDF that should be inserted.
+        int[] pagesToInsert = new int[] { 2, 4, 5 };
 
-        // Position in the destination PDF where the pages will be inserted (1‑based)
+        // Position (1‑based) in the destination PDF where the pages will be inserted.
         int insertPosition = 3;
 
-        // Verify that the input files exist
-        if (!File.Exists(destinationPdfPath))
+        // Verify that the input files exist.
+        if (!File.Exists(destinationPath))
         {
-            Console.Error.WriteLine($"File not found: {destinationPdfPath}");
+            Console.Error.WriteLine($"Destination file not found: {destinationPath}");
             return;
         }
-        if (!File.Exists(sourcePdfPath))
+        if (!File.Exists(sourcePath))
         {
-            Console.Error.WriteLine($"File not found: {sourcePdfPath}");
+            Console.Error.WriteLine($"Source file not found: {sourcePath}");
             return;
         }
 
-        // Open streams for the source, destination, and output PDFs
-        using (FileStream destStream = new FileStream(destinationPdfPath, FileMode.Open, FileAccess.Read))
-        using (FileStream srcStream  = new FileStream(sourcePdfPath, FileMode.Open, FileAccess.Read))
-        using (FileStream outStream  = new FileStream(outputPdfPath, FileMode.Create, FileAccess.Write))
+        // Open the streams with proper disposal.
+        using (FileStream destStream = new FileStream(destinationPath, FileMode.Open, FileAccess.Read))
+        using (FileStream srcStream  = new FileStream(sourcePath,    FileMode.Open, FileAccess.Read))
+        using (FileStream outStream  = new FileStream(outputPath,    FileMode.Create, FileAccess.Write))
         {
-            // PdfFileEditor does NOT implement IDisposable, so it is instantiated directly
-            Aspose.Pdf.Facades.PdfFileEditor editor = new Aspose.Pdf.Facades.PdfFileEditor();
+            // PdfFileEditor provides the Insert method that works directly with streams.
+            PdfFileEditor editor = new PdfFileEditor();
 
-            // Insert the selected pages from the source PDF into the destination PDF
-            bool success = editor.Insert(destStream, insertPosition, srcStream, pagesToInsert, outStream);
+            // Insert the selected pages from srcStream into destStream at the specified position.
+            bool result = editor.Insert(destStream, insertPosition, srcStream, pagesToInsert, outStream);
 
-            if (success)
-                Console.WriteLine($"Pages inserted successfully. Output saved to '{outputPdfPath}'.");
+            if (result)
+                Console.WriteLine($"Pages inserted successfully. Output saved to '{outputPath}'.");
             else
                 Console.Error.WriteLine("Failed to insert pages.");
         }

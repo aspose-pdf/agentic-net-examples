@@ -6,10 +6,19 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file path
         const string inputPdf = "input.pdf";
+        const string outputFolder = "SplitBulks";
 
-        // Define page ranges (start and end pages, 1‑based indexing)
+        if (!File.Exists(inputPdf))
+        {
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            return;
+        }
+
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
+
+        // Define page ranges (start and end pages are 1‑based)
         int[][] ranges = new int[][]
         {
             new int[] { 1, 3 },   // pages 1‑3
@@ -17,31 +26,28 @@ class Program
             new int[] { 6, 10 }   // pages 6‑10
         };
 
-        // Verify that the source file exists
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
-            return;
-        }
-
-        // Split the PDF into the defined bulks
+        // PdfFileEditor does not implement IDisposable; instantiate directly
         PdfFileEditor editor = new PdfFileEditor();
+
+        // Split the PDF into the specified bulks; each MemoryStream holds a PDF document
         MemoryStream[] bulks = editor.SplitToBulks(inputPdf, ranges);
 
-        // Save each resulting MemoryStream to a separate PDF file
+        // Save each bulk to a separate PDF file
         for (int i = 0; i < bulks.Length; i++)
         {
-            string outputPath = $"output_part_{i + 1}.pdf";
+            // Reset stream position before reading
+            bulks[i].Position = 0;
 
-            // Ensure the stream is positioned at the beginning before copying
-            using (MemoryStream ms = bulks[i])
-            using (FileStream fs = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+            string outPath = Path.Combine(outputFolder, $"part{i + 1}.pdf");
+            using (FileStream file = new FileStream(outPath, FileMode.Create, FileAccess.Write))
             {
-                ms.Position = 0;
-                ms.CopyTo(fs);
+                bulks[i].CopyTo(file);
             }
 
-            Console.WriteLine($"Saved split part {i + 1} to '{outputPath}'.");
+            // Dispose the MemoryStream after saving
+            bulks[i].Dispose();
+
+            Console.WriteLine($"Saved bulk {i + 1} to '{outPath}'.");
         }
     }
 }

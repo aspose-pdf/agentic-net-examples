@@ -6,45 +6,42 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file path
         const string inputPath = "input.pdf";
-        // Output PDF file path after deletion and resizing
         const string outputPath = "output_resized.pdf";
 
-        // Pages to delete (1‑based indexing). Example: delete pages 2 and 3.
+        // Pages to delete (1‑based indexing)
         int[] pagesToDelete = new int[] { 2, 3 };
 
-        // Verify that the input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Create a PdfFileEditor instance (does NOT implement IDisposable)
-        PdfFileEditor editor = new PdfFileEditor();
-
-        // Step 1: Delete the specified pages using streams
+        // Delete pages and then resize the remaining pages
         using (FileStream inputStream = new FileStream(inputPath, FileMode.Open, FileAccess.Read))
-        using (MemoryStream afterDeleteStream = new MemoryStream())
+        using (MemoryStream intermediateStream = new MemoryStream())
         {
-            // Delete pages; pages are 1‑based
-            editor.Delete(inputStream, pagesToDelete, afterDeleteStream);
-            // Reset the stream position for the next operation
-            afterDeleteStream.Position = 0;
+            PdfFileEditor editor = new PdfFileEditor();
 
-            // Step 2: Resize the contents of the resulting document
-            using (MemoryStream finalStream = new MemoryStream())
+            // Delete specified pages; result is written to intermediateStream
+            editor.Delete(inputStream, pagesToDelete, intermediateStream);
+            intermediateStream.Position = 0; // reset for next operation
+
+            // Resize contents of all pages to 80 % of original width/height
+            using (FileStream outputStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
             {
-                // null pages array means all pages will be processed
-                // Resize to 80 % of original width and height (percent values)
-                editor.ResizeContentsPct(afterDeleteStream, finalStream, null, 80, 80);
-                finalStream.Position = 0;
+                bool resized = editor.ResizeContentsPct(
+                    intermediateStream,   // source (after deletion)
+                    outputStream,        // destination
+                    null,                // null = all pages
+                    80,                  // new width in percent
+                    80);                 // new height in percent
 
-                // Step 3: Save the final PDF to the output file
-                using (FileStream outputStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                if (!resized)
                 {
-                    finalStream.CopyTo(outputStream);
+                    Console.Error.WriteLine("Resize operation failed.");
+                    return;
                 }
             }
         }
