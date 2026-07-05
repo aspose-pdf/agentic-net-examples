@@ -8,66 +8,64 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "signed_output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "signed_output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+        // Load the certificate from a hardware token (PKCS#11). Replace the thumbprint with the actual value.
+        string certThumbprint = "YOUR_CERT_THUMBPRINT";
+        X509Certificate2 cert = GetCertificateFromStore(certThumbprint);
+        if (cert == null)
         {
-            // Define the rectangle where the visible signature will appear
-            // Parameters: llx, lly, urx, ury (lower‑left X/Y, upper‑right X/Y)
-            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 300, 150);
-
-            // Create a signature field on the first page
-            SignatureField sigField = new SignatureField(doc, sigRect);
-            // Add the field to the document's form collection
-            doc.Form.Add(sigField);
-
-            // Retrieve a certificate from the hardware token / smart card.
-            // This example selects the first certificate that has a private key.
-            // Adjust the selection logic as needed for your environment.
-            X509Certificate2 cert = null;
-            using (X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser))
-            {
-                store.Open(OpenFlags.ReadOnly);
-                foreach (X509Certificate2 c in store.Certificates)
-                {
-                    if (c.HasPrivateKey)
-                    {
-                        cert = c;
-                        break;
-                    }
-                }
-                store.Close();
-            }
-
-            if (cert == null)
-            {
-                Console.Error.WriteLine("No suitable certificate with a private key was found in the current user's store.");
-                return;
-            }
-
-            // Create an external signature object that works with non‑exportable private keys (e.g., hardware token)
-            ExternalSignature externalSig = new ExternalSignature(cert);
-
-            // Set optional signature metadata
-            externalSig.Reason      = "Document approval";
-            externalSig.Location    = "Head Office";
-            externalSig.ContactInfo = "signer@example.com";
-
-            // Sign the PDF using the signature field and the external signature
-            sigField.Sign(externalSig);
-
-            // Save the signed PDF
-            doc.Save(outputPdf);
+            Console.Error.WriteLine("Certificate not found on token or does not have a private key.");
+            return;
         }
 
-        Console.WriteLine($"PDF signed successfully and saved to '{outputPdf}'.");
+        // Load the PDF document.
+        using (Document doc = new Document(inputPath))
+        {
+            // Create a signature field on the first page.
+            // Fully qualified rectangle to avoid ambiguity with System.Drawing.
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            SignatureField signatureField = new SignatureField(doc.Pages[1], rect)
+            {
+                PartialName = "Signature1"
+            };
+            doc.Form.Add(signatureField, 1);
+
+            // Create an external signature using the certificate from the token.
+            ExternalSignature externalSignature = new ExternalSignature(cert);
+
+            // Sign the document.
+            signatureField.Sign(externalSignature);
+
+            // Save the signed PDF.
+            doc.Save(outputPath);
+        }
+
+        Console.WriteLine($"Signed PDF saved to '{outputPath}'.");
+    }
+
+    // Retrieves a certificate with the specified thumbprint from the CurrentUser store.
+    // The certificate must have an accessible private key (e.g., on a hardware token).
+    static X509Certificate2 GetCertificateFromStore(string thumbprint)
+    {
+        using (X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser))
+        {
+            store.Open(OpenFlags.ReadOnly);
+            foreach (X509Certificate2 cert in store.Certificates)
+            {
+                if (string.Equals(cert.Thumbprint, thumbprint, StringComparison.OrdinalIgnoreCase) && cert.HasPrivateKey)
+                {
+                    return cert;
+                }
+            }
+        }
+        return null;
     }
 }

@@ -1,49 +1,53 @@
 using System;
 using System.IO;
+using System.Linq; // Needed for Count() extension method
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Security;
-using System.Security.Cryptography.X509Certificates;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "signed_document.pdf";
+        const string inputPath = "signed.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document (wrapped in using for proper disposal)
+        using (Document doc = new Document(inputPath))
         {
-            // Iterate over all form fields and find signature fields
+            // Ensure the document contains a form with fields
+            if (doc.Form == null || doc.Form.Fields == null || doc.Form.Fields.Count() == 0)
+            {
+                Console.WriteLine("No form fields (including signature fields) found in the document.");
+                return;
+            }
+
+            // Configure validation to use CRL distribution points and strict mode
+            var validationOptions = new ValidationOptions
+            {
+                // Use only CRL for revocation checking
+                ValidationMethod = ValidationMethod.Crl,
+                // Strict mode makes revocation failures cause overall signature invalidation
+                ValidationMode = ValidationMode.Strict,
+                // Do not check the full certificate chain (only revocation status is needed)
+                CheckCertificateChain = false
+            };
+
+            // Iterate over each field, filter for signature fields, and verify them
             foreach (Field field in doc.Form.Fields)
             {
-                if (field is SignatureField sigField)
+                if (field is SignatureField sigField && sigField.Signature != null)
                 {
-                    // Obtain the Signature object associated with the field
-                    Signature signature = sigField.Signature;
-
-                    // Set up validation options to use CRL checking only
-                    ValidationOptions options = new ValidationOptions
-                    {
-                        ValidationMethod = ValidationMethod.Crl,          // Use CRL distribution points
-                        ValidationMode   = ValidationMode.Strict,        // Fail if revocation check fails
-                        CheckCertificateChain = false                    // Skip chain validation (focus on revocation)
-                    };
-
-                    // Perform verification
                     ValidationResult validationResult;
-                    bool isValid = signature.Verify(options, out validationResult);
+                    bool isValid = sigField.Signature.Verify(validationOptions, out validationResult);
 
-                    // Output results
-                    Console.WriteLine($"Signature field: {sigField.PartialName}");
-                    Console.WriteLine($"  Verification passed: {isValid}");
-                    Console.WriteLine($"  ValidationResult: {validationResult}");
+                    Console.WriteLine($"Signature field '{sigField.PartialName}': Valid = {isValid}");
+                    // Optional: display additional information from validationResult if required
                 }
             }
         }

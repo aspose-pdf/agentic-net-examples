@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath = "encrypted.pdf";
-        const string outputPath = "decrypted_modified.pdf";
+        const string outputPath = "decrypted_updated.pdf";
         const string ownerPassword = "owner123";
 
         if (!File.Exists(inputPath))
@@ -16,29 +16,22 @@ class Program
             return;
         }
 
-        try
+        // Open the encrypted PDF using the owner password
+        using (Document doc = new Document(inputPath, ownerPassword))
         {
-            // Open the encrypted PDF with the owner password
-            using (Document doc = new Document(inputPath, ownerPassword))
-            {
-                // Decrypt the document (no parameters)
-                doc.Decrypt();
+            // Decrypt the document (removes encryption)
+            doc.Decrypt();
 
-                // Modify metadata
-                doc.Info.Title = "Updated Title";
-                doc.Info.Author = "Updated Author";
-                doc.Info.Subject = "Updated Subject";
-                doc.Info.Keywords = "keyword1, keyword2";
+            // Update document metadata
+            doc.Info.Title = "New Title";
+            doc.Info.Author = "New Author";
+            doc.Info.Subject = "Updated subject";
+            doc.Info.Keywords = "Aspose, PDF, metadata";
 
-                // Save the decrypted and updated PDF
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"Decrypted and updated PDF saved to '{outputPath}'.");
+            // Save the decrypted and updated PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Decrypted PDF saved to '{outputPath}'.");
     }
 }

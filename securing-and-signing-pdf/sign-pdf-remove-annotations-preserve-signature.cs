@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
@@ -11,70 +10,67 @@ class Program
     {
         const string inputPdf   = "input.pdf";          // source PDF
         const string outputPdf  = "signed_clean.pdf";   // result PDF
-        const string pfxPath    = "certificate.pfx";    // signing certificate
-        const string pfxPassword = "password";          // certificate password
+        const string certPath   = "certificate.pfx";   // signing certificate
+        const string certPass   = "password";           // certificate password
 
-        if (!File.Exists(inputPdf) || !File.Exists(pfxPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine("Input PDF or certificate not found.");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            return;
+        }
+        if (!File.Exists(certPath))
+        {
+            Console.Error.WriteLine($"Certificate file not found: {certPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle: using ensures proper disposal)
+        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
         using (Document doc = new Document(inputPdf))
         {
-            // Prevent automatic sanitization that could invalidate the signature after modifications
+            // Disable automatic signature sanitization so that the signature remains valid
+            // after we modify the document (remove other annotations).
             doc.EnableSignatureSanitization = false;
 
             // -----------------------------------------------------------------
-            // 1. Create a signature field on the first page
+            // 1) Create a signature field on the first page.
             // -----------------------------------------------------------------
-            // Fully qualified rectangle to avoid ambiguity with System.Drawing
-            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 250, 150);
-            SignatureField sigField = new SignatureField(doc, sigRect)
+            // Define the rectangle where the visual signature will appear.
+            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+
+            // Create the signature field and add it to the document's form.
+            SignatureField signatureField = new SignatureField(doc, sigRect)
             {
                 PartialName = "Signature1"
             };
+            doc.Form.Add(signatureField);
 
             // -----------------------------------------------------------------
-            // 2. Prepare the signature object (PKCS7)
+            // 2) Sign the document using a PKCS#7 signature.
             // -----------------------------------------------------------------
-            // PKCS7 can be constructed from a file path or a stream; here we use the file path
-            PKCS7 pkcs7 = new PKCS7(pfxPath, pfxPassword)
-            {
-                Reason   = "Document signed",
-                Location = "Office"
-            };
+            // The PKCS7 class represents a standard digital signature.
+            Signature pkcs7Signature = new PKCS7(certPath, certPass);
+            signatureField.Sign(pkcs7Signature);
 
             // -----------------------------------------------------------------
-            // 3. Sign the document using the signature field
+            // 3) Remove all annotations except the signature field.
             // -----------------------------------------------------------------
-            sigField.Sign(pkcs7);
-
-            // -----------------------------------------------------------------
-            // 4. Remove all annotations except the signature field
-            // -----------------------------------------------------------------
+            // Annotations collection uses 1‑based indexing. Iterate backwards
+            // to safely delete items while iterating.
             foreach (Page page in doc.Pages)
             {
-                // Collect annotations that are NOT the signature field
-                List<Annotation> toDelete = new List<Annotation>();
-                foreach (Annotation ann in page.Annotations)
+                for (int idx = page.Annotations.Count; idx >= 1; idx--)
                 {
+                    Annotation ann = page.Annotations[idx];
+                    // Preserve the signature field; delete everything else.
                     if (!(ann is SignatureField))
                     {
-                        toDelete.Add(ann);
+                        page.Annotations.Delete(idx);
                     }
-                }
-
-                // Delete the collected annotations
-                foreach (Annotation ann in toDelete)
-                {
-                    page.Annotations.Delete(ann);
                 }
             }
 
             // -----------------------------------------------------------------
-            // 5. Save the signed PDF with annotations removed
+            // 4) Save the signed PDF without the other annotations.
             // -----------------------------------------------------------------
             doc.Save(outputPdf);
         }

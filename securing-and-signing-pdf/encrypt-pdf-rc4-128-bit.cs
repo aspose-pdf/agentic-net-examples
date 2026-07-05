@@ -1,17 +1,21 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core Aspose.Pdf namespace
+using Aspose.Pdf; // CryptoAlgorithm, Permissions, Document
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";      // Source PDF
-        const string outputPath = "encrypted.pdf";  // Encrypted PDF output
-        const string userPassword  = "user123";     // Password required to open the PDF
-        const string ownerPassword = "owner123";    // Password required to change permissions
+        const string inputPath  = "input.pdf";
+        const string outputPath = "encrypted_rc4_128.pdf";
 
-        // Verify input file exists
+        // Passwords for opening (user) and changing permissions (owner)
+        const string userPassword  = "user123";
+        const string ownerPassword = "owner123";
+
+        // Restrict editing: allow only printing and content extraction
+        Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
@@ -20,20 +24,17 @@ class Program
 
         try
         {
-            // Load the PDF document inside a using block for deterministic disposal
+            // Load the PDF document
             using (Document doc = new Document(inputPath))
             {
-                // Restrict editing by allowing only printing (no modify, fill, etc.)
-                Permissions permissions = Permissions.PrintDocument;
+                // Apply RC4 128‑bit encryption with the specified permissions
+                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.RC4x128);
 
-                // Apply RC4 128‑bit encryption
-                doc.Encrypt(userPassword, ownerPassword, permissions, CryptoAlgorithm.RC4x128);
-
-                // Save the encrypted document
+                // Save the encrypted PDF
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"PDF encrypted successfully and saved to '{outputPath}'.");
+            Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {
