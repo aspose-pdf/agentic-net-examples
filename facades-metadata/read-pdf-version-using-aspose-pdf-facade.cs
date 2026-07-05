@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath = "sample.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -14,16 +14,16 @@ class Program
             return;
         }
 
-        // Initialize PdfFileInfo with the PDF file path.
+        // Initialize the PdfFileInfo facade with the PDF file
         using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
         {
-            // Retrieve the PDF version string.
+            // Get the PDF version string
             string pdfVersion = pdfInfo.GetPdfVersion();
 
-            // Example usage: display the version.
+            // Example usage: display the version
             Console.WriteLine($"PDF version: {pdfVersion}");
 
-            // The variable 'pdfVersion' can be stored or passed to other methods as needed.
+            // The variable pdfVersion can be used later in the program as needed
         }
     }
 }

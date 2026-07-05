@@ -8,7 +8,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,21 +17,23 @@ class Program
             return;
         }
 
-        // Load the PDF using the PdfFileInfo facade
+        // Load the PDF using the Facades PdfFileInfo class.
+        // The constructor binds the file automatically.
         using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
         {
-            // Access the underlying Document object
+            // Access the underlying Document object.
             Document doc = pdfInfo.Document;
 
-            // Set the document language via the tagged content API
+            // Set the natural language for the entire document via the tagged content API.
             ITaggedContent tagged = doc.TaggedContent;
             tagged.SetLanguage("en-US");
 
-            // Save the updated PDF using the facade
-            bool success = pdfInfo.SaveNewInfo(outputPath);
-            Console.WriteLine(success
+            // Save the updated PDF using PdfFileInfo.
+            // SaveNewInfo writes the changes to a new file.
+            bool saved = pdfInfo.SaveNewInfo(outputPath);
+            Console.WriteLine(saved
                 ? $"Language set to 'en-US' and saved to '{outputPath}'."
-                : "Failed to save the updated PDF.");
+                : $"Failed to save updated PDF to '{outputPath}'.");
         }
     }
 }

@@ -8,19 +8,20 @@ class Program
     {
         const string inputPath = "input.pdf";
 
+        // Verify the PDF file exists before attempting to read metadata
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Open the PDF file info facade to read metadata
+        // PdfFileInfo provides access to document metadata; it implements IDisposable
         using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
         {
-            // Store the Creator metadata in a variable
+            // Retrieve the Creator property and store it in a variable
             string creator = pdfInfo.Creator;
 
-            // Example usage: output the value
+            // Example usage: display the value
             Console.WriteLine($"Creator: {creator}");
         }
     }
