@@ -2,20 +2,21 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "signed.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "signed_output.pdf";
         const string certPath = "certificate.pfx";
         const string certPassword = "password";
         const string appearanceImage = "signature.png"; // optional appearance image
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
         if (!File.Exists(certPath))
@@ -24,35 +25,49 @@ class Program
             return;
         }
 
-        // Load the PDF to obtain page dimensions and count
-        using (Document doc = new Document(inputPdf))
+        // Bind the PDF, set certificate and appearance, then sign
+        using (PdfFileSignature pdfSign = new PdfFileSignature())
         {
-            int lastPageNumber = doc.Pages.Count; // 1‑based indexing
-            double pageWidth = doc.Pages[lastPageNumber].PageInfo.Width;
-            double pageHeight = doc.Pages[lastPageNumber].PageInfo.Height;
+            pdfSign.BindPdf(inputPath);
 
-            // Define a rectangle for the visible signature (e.g., 150×50 points)
-            // placed 20 points from the right and bottom edges
-            int sigWidth = 150;
-            int sigHeight = 50;
-            int margin = 20;
-            int llx = (int)(pageWidth - sigWidth - margin);
-            int lly = (int)(pageHeight - sigHeight - margin);
-            System.Drawing.Rectangle rect = new System.Drawing.Rectangle(llx, lly, sigWidth, sigHeight);
+            // Optional: set a graphic appearance for the signature
+            if (File.Exists(appearanceImage))
+                pdfSign.SignatureAppearance = appearanceImage;
 
-            // Create the signature facade, bind the PDF, set certificate and appearance, then sign
-            using (PdfFileSignature pdfSign = new PdfFileSignature())
-            {
-                pdfSign.BindPdf(inputPdf);
-                pdfSign.SignatureAppearance = appearanceImage; // optional visual appearance
-                pdfSign.SetCertificate(certPath, certPassword);
+            // Set the signing certificate
+            pdfSign.SetCertificate(certPath, certPassword);
 
-                // Sign the last page with a visible signature
-                pdfSign.Sign(lastPageNumber, "Document signed", "contact@example.com", "Location", true, rect);
-                pdfSign.Save(outputPdf);
-            }
+            // Determine the last page (Aspose.Pdf uses 1‑based indexing)
+            int lastPage = pdfSign.Document.Pages.Count;
+
+            // Retrieve page dimensions
+            Page page = pdfSign.Document.Pages[lastPage];
+            double pageWidth = page.PageInfo.Width;
+            double pageHeight = page.PageInfo.Height;
+
+            // Define signature rectangle size and position (bottom‑right corner)
+            int sigWidth = 150;   // width in points
+            int sigHeight = 50;   // height in points
+            int margin = 20;      // margin from page edges
+
+            int x = (int)(pageWidth - sigWidth - margin); // left coordinate
+            int y = margin;                               // bottom coordinate
+
+            var rect = new System.Drawing.Rectangle(x, y, sigWidth, sigHeight);
+
+            // Apply the visible signature
+            pdfSign.Sign(
+                lastPage,               // page number
+                "Document approved",    // reason
+                "contact@example.com",  // contact
+                "Office",               // location
+                true,                   // visible
+                rect);                  // signature rectangle
+
+            // Save the signed PDF
+            pdfSign.Save(outputPath);
         }
 
-        Console.WriteLine($"Signed PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Signed PDF saved to '{outputPath}'.");
     }
 }

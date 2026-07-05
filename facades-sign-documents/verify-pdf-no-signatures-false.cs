@@ -6,22 +6,29 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "unsigned.pdf";
+        // Path to the PDF that has no digital signatures
+        const string inputPdf = "unsigned.pdf";
 
-        if (!File.Exists(inputPath))
+        // Ensure the file exists before attempting to bind it
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.WriteLine($"File '{inputPdf}' not found.");
             return;
         }
 
-        // Bind the PDF file to the PdfFileSignature facade.
+        // Initialize the PdfFileSignature facade and bind the PDF file
         PdfFileSignature pdfSignature = new PdfFileSignature();
-        pdfSignature.BindPdf(inputPath);
+        pdfSignature.BindPdf(inputPdf);
 
-        // Verify a signature that does not exist.
-        // When the document has no signatures, VerifySigned returns false.
-        bool isSignatureValid = pdfSignature.VerifySigned("Signature1");
+        // Check if the document contains any signatures (expected: false)
+        bool containsSignature = pdfSignature.ContainsSignature();
 
-        Console.WriteLine($"VerifySigned returned: {isSignatureValid}");
+        // Verify a signature by name using the non‑obsolete API.
+        // Since the PDF has no signatures, this should return false.
+        bool isSignatureValid = pdfSignature.VerifySignature("Signature1");
+
+        // Output the results
+        Console.WriteLine($"ContainsSignature: {containsSignature}");
+        Console.WriteLine($"VerifySignature result: {isSignatureValid}");
     }
 }

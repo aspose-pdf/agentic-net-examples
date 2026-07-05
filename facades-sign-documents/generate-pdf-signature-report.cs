@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Text;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Text;
@@ -9,7 +8,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "signed_document.pdf";
+        const string inputPdf = "signed.pdf";
         const string reportPdf = "signature_report.pdf";
 
         if (!File.Exists(inputPdf))
@@ -18,81 +17,66 @@ class Program
             return;
         }
 
-        // Bind the source PDF to the PdfFileSignature facade
+        // Load signatures using PdfFileSignature facade
         using (PdfFileSignature pdfSign = new PdfFileSignature())
         {
             pdfSign.BindPdf(inputPdf);
 
-            // Retrieve all non‑empty signature names
-            var signatureNames = pdfSign.GetSignatureNames();
-
-            // Build the report text
-            StringBuilder reportBuilder = new StringBuilder();
-            reportBuilder.AppendLine("Signature Summary Report");
-            reportBuilder.AppendLine("========================");
-            reportBuilder.AppendLine();
-
-            if (signatureNames.Count == 0)
-            {
-                reportBuilder.AppendLine("No signatures were found in the document.");
-            }
-            else
-            {
-                for (int i = 0; i < signatureNames.Count; i++)
-                {
-                    var sigName = signatureNames[i];
-
-                    // Gather details for each signature
-                    string signer   = pdfSign.GetSignerName(sigName) ?? "N/A";
-                    string reason   = pdfSign.GetReason(sigName) ?? "N/A";
-                    string location = pdfSign.GetLocation(sigName) ?? "N/A";
-
-                    // GetDateTime returns a non‑nullable DateTime; treat MinValue as "not set"
-                    DateTime dt = pdfSign.GetDateTime(sigName);
-                    string dateTime = dt != DateTime.MinValue ? dt.ToString() : "N/A";
-
-                    bool   valid    = pdfSign.VerifySignature(sigName);
-                    int    revision = pdfSign.GetRevision(sigName);
-                    bool   coversWhole = pdfSign.CoversWholeDocument(sigName);
-
-                    reportBuilder.AppendLine($"Signature {i + 1}:");
-                    reportBuilder.AppendLine($"  Name          : {sigName}");
-                    reportBuilder.AppendLine($"  Signer        : {signer}");
-                    reportBuilder.AppendLine($"  Reason        : {reason}");
-                    reportBuilder.AppendLine($"  Location      : {location}");
-                    reportBuilder.AppendLine($"  Date/Time     : {dateTime}");
-                    reportBuilder.AppendLine($"  Valid         : {valid}");
-                    reportBuilder.AppendLine($"  Revision      : {revision}");
-                    reportBuilder.AppendLine($"  Covers Whole  : {coversWhole}");
-                    reportBuilder.AppendLine();
-                }
-
-                // Total revisions in the document
-                int totalRevisions = pdfSign.GetTotalRevision();
-                reportBuilder.AppendLine($"Total Document Revisions: {totalRevisions}");
-            }
+            // Get all non‑empty signature names
+            var sigNames = pdfSign.GetSignatureNames();
 
             // Create a new PDF document for the report
             using (Document reportDoc = new Document())
             {
-                // Add a page
+                // Add the first page
                 Page page = reportDoc.Pages.Add();
 
-                // Create a text fragment with the report content
-                TextFragment tf = new TextFragment(reportBuilder.ToString())
-                {
-                    // Use a readable font and size
-                    TextState = { Font = FontRepository.FindFont("Helvetica"), FontSize = 12, ForegroundColor = Color.Black }
-                };
+                // Header
+                TextFragment header = new TextFragment("Signature Report");
+                header.TextState.FontSize = 18;
+                header.TextState.Font = FontRepository.FindFont("Helvetica");
+                header.Position = new Position(50, 800);
+                page.Paragraphs.Add(header);
 
-                // Add the fragment to the page
-                page.Paragraphs.Add(tf);
+                double y = 760; // Starting Y position for entries
+
+                foreach (var sigName in sigNames)
+                {
+                    // Retrieve signature details
+                    string signer = pdfSign.GetSignerName(sigName);
+                    string reason = pdfSign.GetReason(sigName);
+                    string location = pdfSign.GetLocation(sigName);
+                    DateTime? dateTime = pdfSign.GetDateTime(sigName);
+                    bool isValid = pdfSign.VerifySignature(sigName);
+                    int revision = pdfSign.GetRevision(sigName);
+                    bool coversWhole = pdfSign.CoversWholeDocument(sigName);
+
+                    // Build line text
+                    string line = $"Name: {sigName}, Signer: {signer}, Reason: {reason}, Location: {location}, " +
+                                  $"Date: {(dateTime.HasValue ? dateTime.Value.ToString() : "N/A")}, " +
+                                  $"Valid: {isValid}, Revision: {revision}, CoversWhole: {coversWhole}";
+
+                    TextFragment tf = new TextFragment(line);
+                    tf.TextState.FontSize = 12;
+                    tf.TextState.Font = FontRepository.FindFont("Helvetica");
+                    tf.Position = new Position(50, y);
+                    page.Paragraphs.Add(tf);
+
+                    y -= 20; // Move down for next entry
+
+                    // Add a new page if needed
+                    if (y < 50)
+                    {
+                        page = reportDoc.Pages.Add();
+                        y = 800;
+                    }
+                }
 
                 // Save the report PDF
                 reportDoc.Save(reportPdf);
             }
         }
 
-        Console.WriteLine($"Signature report generated: {reportPdf}");
+        Console.WriteLine($"Signature report saved to '{reportPdf}'.");
     }
 }

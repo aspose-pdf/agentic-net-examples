@@ -1,57 +1,57 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
-using System.Linq;
-using Aspose.Pdf.Facades;   // PdfFileSignature, SignatureName
-using Aspose.Pdf;           // Document (if needed for other operations)
+using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_removed.pdf";
-        const string targetSignature = "Signature1"; // name of the signature to remove
+        const string inputPath = "signed.pdf";
+        const string outputPath = "signed_removed.pdf";
+        const string targetSignature = "Signature1";
 
-        // Ensure the source file exists
-        if (!System.IO.File.Exists(inputPath))
+        // Verify input file exists
+        if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        try
+        // Load the PDF into the PdfFileSignature facade
+        PdfFileSignature pdfSign = new PdfFileSignature();
+        pdfSign.BindPdf(inputPath);
+
+        // Get the list of existing (non‑empty) signature names
+        IList<SignatureName> existingNames = pdfSign.GetSignatureNames();
+
+        // Check whether the requested signature exists
+        bool signatureExists = false;
+        foreach (SignatureName name in existingNames)
         {
-            // Initialize the facade and bind the PDF
-            PdfFileSignature pdfSign = new PdfFileSignature();
-            pdfSign.BindPdf(inputPath);
-
-            // Retrieve all existing signature names
-            IList<SignatureName> existingNames = pdfSign.GetSignatureNames();
-
-            // Check whether the requested signature exists
-            bool signatureExists = existingNames
-                .Any(sn => string.Equals(sn.ToString(), targetSignature, StringComparison.Ordinal));
-
-            if (!signatureExists)
+            if (name.Name.Equals(targetSignature, StringComparison.OrdinalIgnoreCase))
             {
-                // Handle the missing signature case gracefully
-                Console.WriteLine($"Signature \"{targetSignature}\" does not exist in the document.");
+                signatureExists = true;
+                break;
             }
-            else
-            {
-                // Remove the signature using the string overload (no need to instantiate SignatureName)
-                pdfSign.RemoveSignature(targetSignature);
-                Console.WriteLine($"Signature \"{targetSignature}\" removed.");
-            }
-
-            // Save the resulting PDF
-            pdfSign.Save(outputPath);
-            Console.WriteLine($"Result saved to \"{outputPath}\".");
         }
-        catch (Exception ex)
+
+        if (signatureExists)
         {
-            // General error handling – report any unexpected issues
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            // Remove the signature; keep the signature field (removeField = false)
+            // Use the overload that accepts a string name directly (SignatureName has no public ctor).
+            pdfSign.RemoveSignature(targetSignature, false);
+            Console.WriteLine($"Signature '{targetSignature}' removed successfully.");
         }
+        else
+        {
+            // Handle missing signature gracefully
+            Console.WriteLine($"Signature '{targetSignature}' does not exist. No removal performed.");
+        }
+
+        // Save the modified PDF
+        pdfSign.Save(outputPath);
+        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }
 }

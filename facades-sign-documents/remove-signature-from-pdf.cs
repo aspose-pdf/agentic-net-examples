@@ -8,25 +8,27 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
+        const string signatureName = "ApprovalSignature";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF with the PdfFileSignature facade
+        // Initialize the PdfFileSignature facade and ensure resources are released
         using (PdfFileSignature pdfSign = new PdfFileSignature())
         {
+            // Bind the PDF document to the facade
             pdfSign.BindPdf(inputPath);
 
-            // Remove the signature by its name (no SignatureName object needed)
-            pdfSign.RemoveSignature("ApprovalSignature");
+            // Remove the signature with the specified name using the string overload
+            pdfSign.RemoveSignature(signatureName);
 
-            // Save the updated PDF
+            // Save the resulting PDF
             pdfSign.Save(outputPath);
         }
 
-        Console.WriteLine($"Signature 'ApprovalSignature' removed. Saved to '{outputPath}'.");
+        Console.WriteLine($"Signature '{signatureName}' removed. Saved to '{outputPath}'.");
     }
 }

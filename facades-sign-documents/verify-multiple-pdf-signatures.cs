@@ -1,36 +1,37 @@
 using System;
-using System.Collections.Generic;
+using System.IO;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "signed.pdf";
+        const string inputPdf = "signed_document.pdf";
 
-        if (!System.IO.File.Exists(inputPath))
+        // Ensure the PDF file exists before attempting to bind it.
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Create the PdfFileSignature facade and bind the PDF
-        PdfFileSignature pdfSign = new PdfFileSignature();
-        pdfSign.BindPdf(inputPath);
-
-        // Retrieve all non‑empty signature names
-        IList<SignatureName> names = pdfSign.GetSignatureNames();
-
-        // Verify each signature and output the result
-        foreach (SignatureName sigName in names)
+        // Initialize the PdfFileSignature facade and bind the PDF file
+        using (PdfFileSignature pdfSignature = new PdfFileSignature())
         {
-            string nameStr = sigName.ToString();
-            bool isValid = pdfSign.VerifySigned(nameStr);
-            Console.WriteLine($"Signature name: {nameStr}");
-            Console.WriteLine($"  Valid: {isValid}");
-        }
+            pdfSignature.BindPdf(inputPdf);
 
-        // Release resources
-        pdfSign.Close();
+            // Retrieve the names of all non‑empty signatures in the document
+            var signatureInfos = pdfSignature.GetSignatureNames();
+
+            // Iterate through each signature name and verify its validity
+            foreach (var sigInfo in signatureInfos)
+            {
+                // SignatureInfo objects expose the actual name via the "Name" property
+                string sigName = sigInfo.Name;
+                // Use the non‑obsolete VerifySignature method instead of VerifySigned
+                bool isValid = pdfSignature.VerifySignature(sigName);
+                Console.WriteLine($"Signature '{sigName}': Valid = {isValid}");
+            }
+        }
     }
 }
