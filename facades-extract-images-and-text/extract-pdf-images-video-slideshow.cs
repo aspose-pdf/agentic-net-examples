@@ -2,87 +2,109 @@ using System;
 using System.IO;
 using System.Diagnostics;
 using Aspose.Pdf.Facades;
+using System.Drawing.Imaging;
 
 class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string imagesFolder = "ExtractedImages";
-        const string outputVideo = "slideshow.mp4";
+        // Paths – adjust as needed
+        const string pdfPath = "input.pdf";                     // PDF to extract images from
+        const string imagesDir = "ExtractedImages";            // Folder to store extracted pictures
+        const string videoPath = "slideshow.mp4";              // Output video file
+        const string ffmpegExe = "ffmpeg";                     // Assumes ffmpeg is in the system PATH
 
-        if (!File.Exists(inputPdf))
+        // Ensure the source PDF exists
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        // Ensure the folder for extracted images exists
-        Directory.CreateDirectory(imagesFolder);
+        // Create the output directory for images
+        Directory.CreateDirectory(imagesDir);
 
-        // Extract images from the PDF using Aspose.Pdf.Facades.PdfExtractor
+        // -----------------------------------------------------------------
+        // 1. Extract images from the PDF using Aspose.Pdf.Facades.PdfExtractor
+        // -----------------------------------------------------------------
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            extractor.BindPdf(inputPdf);
-            extractor.StartPage = 1;
-            extractor.EndPage = int.MaxValue; // Process all pages
-            extractor.Resolution = 150;       // Optional: set image resolution
-            extractor.ExtractImage();         // Enable image extraction
+            // Bind the PDF file to the extractor
+            extractor.BindPdf(pdfPath);
+
+            // Enable image extraction mode – use the method, not the property
+            extractor.ExtractImage();
 
             int imageIndex = 1;
             while (extractor.HasNextImage())
             {
-                string imagePath = Path.Combine(imagesFolder, $"img_{imageIndex:D4}.jpg");
-                extractor.GetNextImage(imagePath); // Saves the next image as JPEG
+                // Build a zero‑padded file name (e.g., image_001.jpg)
+                string imageFile = Path.Combine(
+                    imagesDir,
+                    $"image_{imageIndex:D3}.jpg");
+
+                // Save the next image as JPEG
+                extractor.GetNextImage(imageFile, ImageFormat.Jpeg);
+
                 imageIndex++;
             }
         }
 
-        // Verify that images were extracted
-        string[] imageFiles = Directory.GetFiles(imagesFolder, "*.jpg");
-        if (imageFiles.Length == 0)
+        // Verify that at least one image was extracted
+        string[] extractedFiles = Directory.GetFiles(imagesDir, "image_*.jpg");
+        if (extractedFiles.Length == 0)
         {
             Console.Error.WriteLine("No images were extracted from the PDF.");
             return;
         }
 
-        // Build and run FFmpeg command to create a video slideshow from the extracted images
-        // Assumes ffmpeg is available in the system PATH. Adjust ffmpegPath if needed.
-        const string ffmpegPath = "ffmpeg";
-        string inputPattern = Path.Combine(imagesFolder, "img_%04d.jpg");
-        var psi = new ProcessStartInfo
+        // ---------------------------------------------------------------
+        // 2. Create a video slideshow from the extracted images using FFmpeg
+        // ---------------------------------------------------------------
+        // Build the FFmpeg arguments:
+        // -y               : overwrite output file without asking
+        // -framerate 1     : 1 frame per second (adjust as needed)
+        // -i image_%03d.jpg: input pattern matching the extracted files
+        // -c:v libx264    : encode video with H.264 codec
+        // -r 30            : output frame rate
+        // -pix_fmt yuv420p : pixel format compatible with most players
+        string ffmpegArgs = $"-y -framerate 1 -i \"image_%03d.jpg\" -c:v libx264 -r 30 -pix_fmt yuv420p \"{videoPath}\"";
+
+        ProcessStartInfo startInfo = new ProcessStartInfo
         {
-            FileName = ffmpegPath,
-            Arguments = $"-y -framerate 1 -i \"{inputPattern}\" -c:v libx264 -r 30 -pix_fmt yuv420p \"{outputVideo}\"",
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
+            FileName = ffmpegExe,
+            Arguments = ffmpegArgs,
+            WorkingDirectory = Path.GetFullPath(imagesDir),
             UseShellExecute = false,
-            CreateNoWindow = true
+            CreateNoWindow = true,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true
         };
 
         try
         {
-            using (Process proc = Process.Start(psi))
+            using (Process ffmpeg = Process.Start(startInfo))
             {
                 // Capture any output for debugging purposes
-                string stdOut = proc.StandardOutput.ReadToEnd();
-                string stdErr = proc.StandardError.ReadToEnd();
-                proc.WaitForExit();
+                string stdout = ffmpeg.StandardOutput.ReadToEnd();
+                string stderr = ffmpeg.StandardError.ReadToEnd();
 
-                if (proc.ExitCode != 0)
+                ffmpeg.WaitForExit();
+
+                if (ffmpeg.ExitCode == 0)
                 {
-                    Console.Error.WriteLine($"FFmpeg exited with code {proc.ExitCode}.");
-                    Console.Error.WriteLine(stdErr);
+                    Console.WriteLine($"Video slideshow created successfully: {videoPath}");
                 }
                 else
                 {
-                    Console.WriteLine($"Video slideshow created successfully: {outputVideo}");
+                    Console.Error.WriteLine("FFmpeg reported an error:");
+                    Console.Error.WriteLine(stderr);
                 }
             }
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"An error occurred while running FFmpeg: {ex.Message}");
+            Console.Error.WriteLine($"Failed to start FFmpeg: {ex.Message}");
         }
     }
 }

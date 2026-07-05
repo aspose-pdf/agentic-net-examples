@@ -1,43 +1,48 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
-using System.Drawing.Imaging;
+using System.Drawing.Imaging;               // ImageFormat enum
+using Aspose.Pdf.Facades;                  // PdfConverter
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputDir = "ExtractedImages";
+        const string inputPdf  = "input.pdf";          // source PDF
+        const string outputDir = "ExportedImages";     // folder for JPEGs
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Create and configure the PdfConverter facade
+        // Use PdfConverter (Facade) to extract images
         using (PdfConverter converter = new PdfConverter())
         {
-            // Bind the source PDF
+            // Bind the PDF file to the converter
             converter.BindPdf(inputPdf);
-            // Perform initial conversion setup
+
+            // Prepare the converter for image extraction
             converter.DoConvert();
 
-            int imageCount = 1;
-            // Iterate through all images in the PDF
+            int imageIndex = 1;
+            // Loop through all images in the PDF
             while (converter.HasNextImage())
             {
-                string outputPath = Path.Combine(outputDir, $"image_{imageCount}.jpg");
-                // Export the current image as JPEG with quality set to 85
-                converter.GetNextImage(outputPath, ImageFormat.Jpeg, 85);
-                imageCount++;
+                // Build the output file name (e.g., image1.jpg, image2.jpg, ...)
+                string outputFile = Path.Combine(outputDir, $"image{imageIndex}.jpg");
+
+                // Export the current image as JPEG with quality = 85
+                // GetNextImage(string outputFile, ImageFormat format, int quality)
+                converter.GetNextImage(outputFile, ImageFormat.Jpeg, 85);
+
+                imageIndex++;
             }
         }
 
-        Console.WriteLine("All images have been exported as JPEG with quality 85.");
+        Console.WriteLine("Image export completed.");
     }
 }

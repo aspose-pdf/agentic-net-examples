@@ -1,67 +1,60 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging;
+using System.Drawing.Imaging; // ImageFormat for specifying output image type
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file (local path)
-        const string inputPdf = @"C:\Docs\sample.pdf";
+        // Path to the source PDF file
+        const string pdfPath = @"C:\Docs\sample.pdf";
 
-        // UNC output directory (e.g., \\Server\Share\Images)
-        const string uncOutputDir = @"\\Server\Share\Images";
-
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
+        // UNC folder where extracted images will be saved
+        const string uncFolder = @"\\Server\Share\Images";
 
         // Ensure the UNC directory exists
-        try
+        if (!Directory.Exists(uncFolder))
         {
-            Directory.CreateDirectory(uncOutputDir);
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Failed to create output directory '{uncOutputDir}': {ex.Message}");
+            Console.Error.WriteLine($"UNC folder not found: {uncFolder}");
             return;
         }
 
-        try
+        // Validate source PDF existence
+        if (!File.Exists(pdfPath))
         {
-            // Use PdfExtractor facade to extract images
-            using (PdfExtractor extractor = new PdfExtractor())
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            return;
+        }
+
+        // Extract images using Aspose.Pdf.Facades.PdfExtractor
+        using (PdfExtractor extractor = new PdfExtractor())
+        {
+            // Bind the PDF document to the extractor
+            extractor.BindPdf(pdfPath);
+
+            // Prepare the extractor to retrieve images
+            extractor.ExtractImage();
+
+            int imageIndex = 1;
+            // Loop through all images in the PDF
+            while (extractor.HasNextImage())
             {
-                extractor.BindPdf(inputPdf);          // Load the PDF
-                extractor.ExtractImage();             // Prepare image extraction
+                // Build the UNC file name for the current image
+                string outputFile = Path.Combine(uncFolder, $"image-{imageIndex}.png");
 
-                int imageIndex = 1;
-                while (extractor.HasNextImage())
+                // Save the image as PNG (you can change ImageFormat as needed)
+                bool success = extractor.GetNextImage(outputFile, ImageFormat.Png);
+
+                if (!success)
                 {
-                    // Build UNC file name for each extracted image
-                    string outputFile = Path.Combine(
-                        uncOutputDir,
-                        $"image-{imageIndex}.png");
-
-                    // Save the image in PNG format
-                    bool success = extractor.GetNextImage(outputFile, ImageFormat.Png);
-                    if (!success)
-                    {
-                        Console.Error.WriteLine($"Failed to extract image #{imageIndex}");
-                    }
-
-                    imageIndex++;
+                    Console.Error.WriteLine($"Failed to extract image #{imageIndex}");
                 }
-            }
 
-            Console.WriteLine("Image extraction completed.");
+                imageIndex++;
+            }
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during extraction: {ex.Message}");
-        }
+
+        Console.WriteLine("Image extraction completed.");
     }
 }

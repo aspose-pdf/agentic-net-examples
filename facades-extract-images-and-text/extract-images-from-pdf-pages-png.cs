@@ -1,8 +1,8 @@
 using System;
 using System.IO;
+using System.Drawing.Imaging; // Added for ImageFormat
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using System.Drawing.Imaging; // <-- added for ImageFormat
 
 class Program
 {
@@ -11,39 +11,42 @@ class Program
         const string inputPdf = "input.pdf";
         const string outputFolder = "ExtractedImages";
 
-        // Verify input file exists
+        // Verify that the source PDF exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.WriteLine($"Input file '{inputPdf}' not found. Extraction aborted.");
             return;
         }
 
-        // Ensure output directory exists
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Use PdfExtractor (implements IDisposable) within a using block
+        // Use PdfExtractor (Facade) to extract images from pages 5‑10
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the PDF document to the extractor
+            // Bind the source PDF file
             extractor.BindPdf(inputPdf);
 
             // Set the page range (Aspose.Pdf uses 1‑based indexing)
             extractor.StartPage = 5;
             extractor.EndPage   = 10;
 
-            // Perform image extraction for the specified pages
+            // Optional: extract only images that are actually rendered on the page
+            extractor.ExtractImageMode = ExtractImageMode.ActuallyUsed;
+
+            // Prepare the extractor for image extraction
             extractor.ExtractImage();
 
             int imageCounter = 1;
             // Iterate through all extracted images
             while (extractor.HasNextImage())
             {
-                // Build output file path (PNG format)
-                string outputPath = Path.Combine(outputFolder, $"image_{imageCounter}.png");
+                // Build a unique file name for each image
+                string outputPath = Path.Combine(outputFolder,
+                    $"image-{imageCounter}.png");
 
-                // Save the current image as PNG
+                // Save the current image as PNG using System.Drawing.Imaging.ImageFormat
                 extractor.GetNextImage(outputPath, ImageFormat.Png);
-
                 imageCounter++;
             }
         }

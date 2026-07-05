@@ -2,65 +2,49 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-namespace AsposePdfBatchExtractor
+class Program
 {
-    class Program
+    static void Main(string[] args)
     {
-        /// <summary>
-        /// Batch extracts text from all PDF files in a directory using Aspose.Pdf.Facades.PdfExtractor.
-        /// </summary>
-        /// <param name="args">
-        /// args[0] (optional) – Source directory containing PDF files. If omitted, the current working directory is used.
-        /// args[1] (optional) – Output directory for the extracted .txt files. If omitted, a sub‑folder named "ExtractedText" is created under the source directory.
-        /// </param>
-        static void Main(string[] args)
+        // Expect exactly two arguments: input directory and output directory
+        if (args.Length != 2)
         {
-            // Resolve source directory (default: current directory)
-            string sourceDirectory = args.Length > 0 && !string.IsNullOrWhiteSpace(args[0])
-                ? args[0]
-                : Directory.GetCurrentDirectory();
+            Console.WriteLine("Usage: PdfBatchExtract <InputDirectory> <OutputDirectory>");
+            return;
+        }
 
-            // Resolve output directory (default: <sourceDirectory>\ExtractedText)
-            string outputDirectory = args.Length > 1 && !string.IsNullOrWhiteSpace(args[1])
-                ? args[1]
-                : Path.Combine(sourceDirectory, "ExtractedText");
+        string inputDirectory = args[0];
+        string outputDirectory = args[1];
 
-            // Ensure the output directory exists
-            if (!Directory.Exists(outputDirectory))
+        // Validate input directory
+        if (!Directory.Exists(inputDirectory))
+        {
+            Console.WriteLine($"Error: Input directory does not exist -> {inputDirectory}");
+            return;
+        }
+
+        // Ensure output directory exists
+        if (!Directory.Exists(outputDirectory))
+        {
+            Directory.CreateDirectory(outputDirectory);
+        }
+
+        // Get all PDF files (non‑recursive) in the input directory
+        string[] pdfFiles = Directory.GetFiles(inputDirectory, "*.pdf", SearchOption.TopDirectoryOnly);
+
+        foreach (string pdfPath in pdfFiles)
+        {
+            string txtFilePath = Path.Combine(outputDirectory, Path.GetFileNameWithoutExtension(pdfPath) + ".txt");
+
+            // Use PdfExtractor inside a using block to guarantee disposal
+            using (PdfExtractor extractor = new PdfExtractor())
             {
-                Directory.CreateDirectory(outputDirectory);
+                extractor.BindPdf(pdfPath);
+                extractor.ExtractText();
+                extractor.GetText(txtFilePath);
             }
 
-            // Get all PDF files in the source directory (non‑recursive)
-            string[] pdfFiles = Directory.GetFiles(sourceDirectory, "*.pdf", SearchOption.TopDirectoryOnly);
-
-            if (pdfFiles.Length == 0)
-            {
-                Console.WriteLine($"No PDF files found in '{sourceDirectory}'.");
-                return;
-            }
-
-            foreach (string pdfPath in pdfFiles)
-            {
-                string baseName = Path.GetFileNameWithoutExtension(pdfPath);
-                string txtPath = Path.Combine(outputDirectory, baseName + ".txt");
-
-                try
-                {
-                    // Using statement ensures proper disposal of the extractor
-                    using (PdfExtractor extractor = new PdfExtractor())
-                    {
-                        extractor.BindPdf(pdfPath);
-                        extractor.ExtractText();
-                        extractor.GetText(txtPath);
-                    }
-                    Console.WriteLine($"Extracted text from '{Path.GetFileName(pdfPath)}' to '{txtPath}'.");
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine($"Failed to extract text from '{pdfPath}': {ex.Message}");
-                }
-            }
+            Console.WriteLine($"Extracted text from '{Path.GetFileName(pdfPath)}' to '{txtFilePath}'");
         }
     }
 }

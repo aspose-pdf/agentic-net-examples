@@ -1,85 +1,94 @@
 using System;
 using System.IO;
-using System.Linq;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using System.Drawing.Imaging;
+using System.Drawing.Imaging;               // for ImageFormat
+using Aspose.Pdf;                           // core PDF API
+using Aspose.Pdf.Facades;                  // facades for extraction and editing
 
 class Program
 {
     static void Main()
     {
         const string inputPdfPath      = "input.pdf";          // source PDF
-        const string watermarkImagePath = "watermark.png";      // watermark image
-        const string outputDir         = "ExtractedImages";    // folder for images
+        const string watermarkImgPath  = "watermark.png";      // watermark image to overlay
+        const string outputFolder      = "ExtractedImages";   // folder for watermarked images
 
+        // Validate input files
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(watermarkImagePath))
+        if (!File.Exists(watermarkImgPath))
         {
-            Console.Error.WriteLine($"Watermark image not found: {watermarkImagePath}");
+            Console.Error.WriteLine($"Watermark image not found: {watermarkImgPath}");
             return;
         }
 
-        Directory.CreateDirectory(outputDir);
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputFolder);
 
         // -----------------------------------------------------------------
-        // Step 1: Add watermark image to every page of the PDF.
+        // Step 1: Add watermark to each page of the PDF and save a temp file
         // -----------------------------------------------------------------
-        string tempWatermarkedPdf = Path.Combine(Path.GetTempPath(), $"watermarked_{Guid.NewGuid()}.pdf");
+        string tempWatermarkedPdf = Path.Combine(outputFolder, "temp_watermarked.pdf");
 
-        // Determine total page count.
+        // Determine page count using a lightweight Document instance
         int pageCount;
-        using (Document doc = new Document(inputPdfPath))
+        using (Document srcDoc = new Document(inputPdfPath))
         {
-            pageCount = doc.Pages.Count;
+            pageCount = srcDoc.Pages.Count;   // 1‑based page indexing
         }
 
-        // Prepare an array with all page numbers (1‑based indexing).
-        int[] allPages = Enumerable.Range(1, pageCount).ToArray();
-
-        // Add the watermark using PdfFileMend.
+        // Use PdfFileMend to place the watermark image on every page
         using (PdfFileMend mend = new PdfFileMend())
         {
-            mend.BindPdf(inputPdfPath); // load source PDF
+            mend.BindPdf(inputPdfPath);
 
-            // Open the watermark image as a stream.
-            using (FileStream wmStream = File.OpenRead(watermarkImagePath))
+            // Position and size of the watermark on the page.
+            // Adjust these values as needed (coordinates are in points).
+            float lowerLeftX  = 50f;   // distance from left edge
+            float lowerLeftY  = 50f;   // distance from bottom edge
+            float upperRightX = 200f;  // width of watermark
+            float upperRightY = 200f;  // height of watermark
+
+            for (int pageNum = 1; pageNum <= pageCount; pageNum++)
             {
-                // Position the watermark at the lower‑left corner (adjust as needed).
-                // lowerLeftX, lowerLeftY, upperRightX, upperRightY are in PDF points.
-                mend.AddImage(wmStream, allPages, 10f, 10f, 110f, 110f);
+                // Add the same watermark image to each page.
+                // The method returns a bool indicating success; ignore for brevity.
+                mend.AddImage(watermarkImgPath, pageNum,
+                              lowerLeftX, lowerLeftY,
+                              upperRightX, upperRightY);
             }
 
             // Save the watermarked PDF to a temporary file.
             mend.Save(tempWatermarkedPdf);
-            mend.Close();
         }
 
-        // -----------------------------------------------------------------
-        // Step 2: Extract images from the watermarked PDF.
-        // -----------------------------------------------------------------
+        // ---------------------------------------------------------------
+        // Step 2: Extract images from the watermarked PDF using PdfExtractor
+        // ---------------------------------------------------------------
         using (PdfExtractor extractor = new PdfExtractor())
         {
             extractor.BindPdf(tempWatermarkedPdf);
-            extractor.ExtractImage();
+            extractor.ExtractImage();                     // Prepare extraction
 
             int imageIndex = 1;
             while (extractor.HasNextImage())
             {
-                string outputImagePath = Path.Combine(outputDir, $"image-{imageIndex}.png");
-                // Save each extracted image as PNG.
-                extractor.GetNextImage(outputImagePath, ImageFormat.Png);
+                // Build output file name (PNG format)
+                string outImagePath = Path.Combine(outputFolder,
+                    $"image-{imageIndex}.png");
+
+                // Save the extracted image as PNG.
+                // Overload with ImageFormat allows explicit format selection.
+                extractor.GetNextImage(outImagePath, ImageFormat.Png);
                 imageIndex++;
             }
         }
 
-        // Clean up the temporary watermarked PDF.
+        // Optional: clean up the temporary watermarked PDF
         try { File.Delete(tempWatermarkedPdf); } catch { /* ignore cleanup errors */ }
 
-        Console.WriteLine($"Extraction complete. Images saved to '{outputDir}'.");
+        Console.WriteLine($"Extraction complete. Images saved to '{outputFolder}'.");
     }
 }

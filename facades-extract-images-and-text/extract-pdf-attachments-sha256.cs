@@ -9,52 +9,81 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string outputDir = "Attachments";
+        const string pdfPath = "input.pdf";               // source PDF containing attachments
+        const string outputDir = "ExtractedAttachments";  // folder to store extracted files
 
-        if (!File.Exists(pdfPath))
-        {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
-            return;
-        }
-
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Bind the PDF and extract all attachments
-        PdfExtractor extractor = new PdfExtractor();
-        extractor.BindPdf(pdfPath);
-        extractor.ExtractAttachment();
-
-        // Retrieve attachment names and streams using the generic IList<string>
-        IList<string> attachNames = extractor.GetAttachNames();
-        MemoryStream[] streams = extractor.GetAttachment();
-
-        for (int i = 0; i < streams.Length; i++)
+        // ------------------------------------------------------------
+        // Make sure the source PDF exists. If it does not, create an
+        // empty PDF so the example can run without throwing a
+        // FileNotFoundException. This also demonstrates a pattern that
+        // can be reused in other samples where an input file might be
+        // missing.
+        // ------------------------------------------------------------
+        if (!File.Exists(pdfPath))
         {
-            // Guard against a possible null name returned by the extractor
-            string name = attachNames[i] ?? $"attachment_{i}";
-            string filePath = Path.Combine(outputDir, name);
-
-            // Save each attachment to disk
-            using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+            Console.WriteLine($"File '{pdfPath}' not found. Creating an empty PDF for demonstration purposes.");
+            using (Document emptyDoc = new Document())
             {
-                streams[i].Position = 0;
-                streams[i].CopyTo(fs);
+                // No pages or attachments are added – the document is
+                // intentionally empty.
+                emptyDoc.Save(pdfPath);
             }
-
-            // Compute SHA‑256 hash of the saved file
-            string hash = ComputeSha256(filePath);
-            Console.WriteLine($"{name}: {hash}");
         }
-    }
 
-    static string ComputeSha256(string filePath)
-    {
-        using (FileStream fs = File.OpenRead(filePath))
-        using (SHA256 sha = SHA256.Create())
+        try
         {
-            byte[] hashBytes = sha.ComputeHash(fs);
-            return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
+            // ---------- Extract attachments ----------
+            // Create the extractor, bind the PDF and extract all attachments
+            using (PdfExtractor extractor = new PdfExtractor())
+            {
+                extractor.BindPdf(pdfPath);
+                extractor.ExtractAttachment();
+
+                // Retrieve attachment names and their corresponding streams
+                IList<string> attachmentNames = extractor.GetAttachNames();          // list of string names
+                MemoryStream[] attachmentStreams = extractor.GetAttachment(); // parallel array of streams
+
+                // Process each attachment
+                for (int i = 0; i < attachmentStreams.Length; i++)
+                {
+                    string? name = attachmentNames[i];
+                    if (string.IsNullOrEmpty(name))
+                    {
+                        // Skip entries with no name to avoid Path.Combine null warnings
+                        attachmentStreams[i].Dispose();
+                        continue;
+                    }
+
+                    string outPath = Path.Combine(outputDir, name);
+
+                    // Save the attachment to disk
+                    using (FileStream fileStream = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+                    {
+                        // Reset stream position just in case
+                        attachmentStreams[i].Position = 0;
+                        attachmentStreams[i].CopyTo(fileStream);
+                    }
+
+                    // Compute SHA‑256 hash of the saved file
+                    using (FileStream fileStream = new FileStream(outPath, FileMode.Open, FileAccess.Read))
+                    using (SHA256 sha256 = SHA256.Create())
+                    {
+                        byte[] hashBytes = sha256.ComputeHash(fileStream);
+                        string hashHex = BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
+                        Console.WriteLine($"Attachment: {name}  SHA‑256: {hashHex}");
+                    }
+
+                    // Dispose the memory stream for this attachment
+                    attachmentStreams[i].Dispose();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred while extracting attachments: {ex.Message}");
         }
     }
 }
