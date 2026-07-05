@@ -6,34 +6,39 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_pdfa.pdf";
-        const string logFile   = "conversion_log.txt";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_pdfa.pdf";
+        const string logPath = "conversion_log.txt";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         try
         {
             // Load the source PDF
-            using (Document doc = new Document(inputPdf))
+            using (Document doc = new Document(inputPath))
             {
-                // Convert to PDF/A‑1b, skipping (i.e., not failing) non‑convertible elements
-                // ConvertErrorAction.None corresponds to “skip” behavior
-                doc.Convert(logFile, PdfFormat.PDF_A_1B, ConvertErrorAction.None);
+                // Configure conversion: PDF/A‑1b format, skip non‑convertible elements
+                PdfFormatConversionOptions options = new PdfFormatConversionOptions(PdfFormat.PDF_A_1B, ConvertErrorAction.None)
+                {
+                    LogFileName = logPath // optional log file for conversion messages
+                };
+
+                // Perform the conversion
+                doc.Convert(options);
 
                 // Save the converted PDF/A document
-                doc.Save(outputPdf);
+                doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Conversion completed. Output saved to '{outputPdf}'. Log written to '{logFile}'.");
+            Console.WriteLine($"PDF successfully converted to PDF/A‑1b and saved as '{outputPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

@@ -6,42 +6,39 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputHtml = "output.html";   // base name; pages will be saved as output.html, output_2.html, ...
+        // Input PDF file
+        const string inputPdf = "input.pdf";
 
+        // Directory where individual HTML pages will be saved
+        const string outputFolder = "HtmlPages";
+
+        // Verify that the source PDF exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        try
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
+
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Load the PDF document
-            using (Document pdfDoc = new Document(inputPdf))
+            // Configure HTML save options to split each PDF page into a separate HTML file
+            HtmlSaveOptions htmlOptions = new HtmlSaveOptions
             {
-                // Configure HTML save options to split each page into a separate file
-                HtmlSaveOptions htmlOpts = new HtmlSaveOptions
-                {
-                    SplitIntoPages = true,
-                    // Optional: embed images as PNG inside SVG to keep a single output folder
-                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
-                };
+                SplitIntoPages = true
+            };
 
-                // Save – the converter will create one HTML file per page
-                pdfDoc.Save(outputHtml, htmlOpts);
-            }
+            // Base file name for the first page; subsequent pages will be named
+            // page.html, page_1.html, page_2.html, etc., in the same folder
+            string baseHtmlPath = Path.Combine(outputFolder, "page.html");
 
-            Console.WriteLine("PDF pages have been converted to individual HTML files.");
+            // Save the document using the configured options
+            pdfDoc.Save(baseHtmlPath, htmlOptions);
         }
-        catch (TypeInitializationException)
-        {
-            // HTML conversion relies on GDI+ which is Windows‑only
-            Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine("PDF has been converted to individual HTML pages.");
     }
 }

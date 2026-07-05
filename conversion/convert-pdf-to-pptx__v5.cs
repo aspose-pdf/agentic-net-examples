@@ -1,33 +1,38 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace provides Document and SaveFormat
+using Aspose.Pdf; // Core PDF handling – provides Document, SaveFormat, PptxSaveOptions
 
 class Program
 {
     static void Main()
     {
-        // Input PDF and output PPTX paths
-        const string pdfPath = "input.pdf";
-        const string pptxPath = "output.pptx";
+        // Paths for input PDF and final PPTX (no intermediate file needed)
+        const string inputPdfPath = "input.pdf";
+        const string outputPptxPath = "output.pptx";
 
-        // -------------------------------------------------
-        // 1. Validate input PDF existence
-        // -------------------------------------------------
-        if (!File.Exists(pdfPath))
+        // Verify the source PDF exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // -------------------------------------------------
-        // 2. Convert PDF to PPTX using Aspose.Pdf only
-        // -------------------------------------------------
-        using (Document pdfDoc = new Document(pdfPath))
+        // ------------------------------------------------------------
+        // 1. Convert PDF to PPTX using Aspose.Pdf only
+        // ------------------------------------------------------------
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
-            // Directly save as PPTX – no separate PptxSaveOptions class is required
-            pdfDoc.Save(pptxPath, SaveFormat.Pptx);
+            // Simple conversion – format is inferred from the file extension
+            pdfDocument.Save(outputPptxPath, SaveFormat.Pptx);
+
+            // If you need to tweak conversion options, use PptxSaveOptions instead:
+            // var pptxOptions = new PptxSaveOptions();
+            // pdfDocument.Save(outputPptxPath, pptxOptions);
         }
 
-        Console.WriteLine($"Conversion complete. PPTX saved to '{pptxPath}'.");
+        // NOTE: Adding speaker notes to the generated PPTX requires the Aspose.Slides library.
+        // Because the project is restricted to Aspose.Pdf only, speaker‑note manipulation is omitted.
+
+        Console.WriteLine($"PDF successfully converted to PPTX: '{outputPptxPath}'.");
     }
 }

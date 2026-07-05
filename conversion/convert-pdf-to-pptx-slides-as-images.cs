@@ -9,25 +9,26 @@ class Program
         const string inputPdf = "input.pdf";
         const string outputPptx = "output.pptx";
 
+        // Verify input file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document pdfDoc = new Document(inputPdf))
         {
-            // Initialize PPTX save options and enable rendering each slide as an image
+            // Initialize PPTX save options and enable raster image rendering for each slide
             PptxSaveOptions pptxOptions = new PptxSaveOptions
             {
                 SlidesAsImages = true
             };
 
-            // Save the document as PPTX, passing the explicit save options as required
+            // Save the document as PPTX using the configured options
             pdfDoc.Save(outputPptx, pptxOptions);
         }
 
-        Console.WriteLine($"PDF successfully converted to PPTX: {outputPptx}");
+        Console.WriteLine($"Conversion completed: {outputPptx}");
     }
 }

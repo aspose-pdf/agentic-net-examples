@@ -1,7 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Text; // for FontEmbeddingOptions
+using Aspose.Pdf;                     // Core PDF API
+using Aspose.Pdf.Facades;            // For PdfFormat enum (same namespace, but included for completeness)
 
 class Program
 {
@@ -16,16 +16,20 @@ class Program
             return;
         }
 
-        // Load the source PDF
+        // Load the source PDF, perform conversion to PDF/A‑3b with font substitution,
+        // then save the resulting PDF.
         using (Document doc = new Document(inputPath))
         {
-            // Configure conversion options for PDF/A‑3b
+            // Configure conversion options for PDF/A‑3b.
             PdfFormatConversionOptions convOptions = new PdfFormatConversionOptions(PdfFormat.PDF_A_3B);
 
-            // Enable default font substitution for fonts that cannot be embedded
+            // Enable default font substitution for fonts that cannot be embedded.
             convOptions.FontEmbeddingOptions.UseDefaultSubstitution = true;
 
-            // Perform the conversion
+            // Optional: reduce file size by optimizing fonts (does not affect substitution).
+            // convOptions.OptimizeFileSize = true;
+
+            // Perform the conversion.
             bool success = doc.Convert(convOptions);
             if (!success)
             {
@@ -33,7 +37,7 @@ class Program
                 return;
             }
 
-            // Save the converted document
+            // Save the converted document.
             doc.Save(outputPath);
         }
 

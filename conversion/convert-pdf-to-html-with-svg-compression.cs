@@ -6,38 +6,41 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.html";
+        const string inputPdfPath  = "input.pdf";
+        const string outputHtmlPath = "output.html";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
         try
         {
             // Load the PDF document
-            using (Document doc = new Document(inputPath))
+            using (Document pdfDocument = new Document(inputPdfPath))
             {
-                // Configure HTML save options with SVG compression
-                HtmlSaveOptions htmlOpts = new HtmlSaveOptions();
-                htmlOpts.CompressSvgGraphicsIfAny = true;
+                // Configure HTML save options
+                HtmlSaveOptions htmlOptions = new HtmlSaveOptions
+                {
+                    // Compress any SVG graphics found during conversion
+                    CompressSvgGraphicsIfAny = true
+                };
 
-                // Save as HTML
-                doc.Save(outputPath, htmlOpts);
+                // Save as HTML with the specified options
+                pdfDocument.Save(outputHtmlPath, htmlOptions);
             }
 
-            Console.WriteLine($"PDF successfully converted to HTML: {outputPath}");
+            Console.WriteLine($"PDF successfully converted to HTML: '{outputHtmlPath}'");
         }
         catch (TypeInitializationException)
         {
-            // HTML conversion relies on GDI+ (Windows only)
+            // HTML conversion requires GDI+ and is only supported on Windows
             Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
         }
     }
 }

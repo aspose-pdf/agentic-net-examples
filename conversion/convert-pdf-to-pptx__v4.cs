@@ -1,16 +1,17 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core PDF API
+using Aspose.Pdf;
+using Aspose.Pdf.Drawing; // for drawing‑related classes if needed
 
-class Program
+class PdfToPptxConverter
 {
     static void Main()
     {
-        // Paths – adjust as needed
+        // Paths for the source PDF and the target PPTX file
         const string pdfPath = "input.pdf";
         const string pptxPath = "output.pptx";
 
-        // Validate input PDF
+        // Verify that the input PDF exists
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"PDF file not found: {pdfPath}");
@@ -18,23 +19,23 @@ class Program
         }
 
         // -------------------------------------------------
-        // 1. Convert PDF to PPTX using Aspose.Pdf core API
+        // Step 1: Convert PDF to PPTX using Aspose.Pdf only
         // -------------------------------------------------
-        using (Document pdfDoc = new Document(pdfPath))
+        using (Document pdfDocument = new Document(pdfPath))
         {
-            // Save the PDF directly as PPTX – no extra SaveOptions class needed
-            pdfDoc.Save(pptxPath, SaveFormat.Pptx);
+            // Aspose.Pdf can directly save a PDF as a PPTX file – no Aspose.Slides required.
+            pdfDocument.Save(pptxPath, SaveFormat.Pptx);
         }
 
-        // -------------------------------------------------
-        // 2. Verify conversion result
-        // -------------------------------------------------
-        if (!File.Exists(pptxPath))
-        {
-            Console.Error.WriteLine($"Failed to create PPTX file: {pptxPath}");
-            return;
-        }
+        Console.WriteLine($"PDF successfully converted to PPTX: {pptxPath}");
 
-        Console.WriteLine("PDF to PPTX conversion completed successfully.");
+        // -------------------------------------------------
+        // Step 2: (Optional) Extract images from the generated PPTX
+        // -------------------------------------------------
+        // Image extraction from PPTX normally uses the Aspose.Slides API.
+        // Because the current project does not reference Aspose.Slides (and the
+        // namespace is unavailable), this step is omitted. To enable it, add a
+        // reference to the Aspose.Slides assembly and implement the extraction
+        // logic similar to the original example.
     }
 }

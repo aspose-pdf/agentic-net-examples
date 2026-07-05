@@ -6,38 +6,30 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.doc";
+        const string inputPdf = "input.pdf";
+        const string outputDoc = "output.doc";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for proper disposal
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Load the PDF document
-            using (Document pdfDoc = new Document(inputPath))
+            // Configure save options to produce a DOC file with plain‑text extraction
+            DocSaveOptions saveOptions = new DocSaveOptions
             {
-                // Configure DOC save options to extract plain text only
-                DocSaveOptions saveOptions = new DocSaveOptions
-                {
-                    // Set output format to DOC
-                    Format = DocSaveOptions.DocFormat.Doc,
-                    // Use the Textbox recognition mode for plain text extraction
-                    Mode = DocSaveOptions.RecognitionMode.Textbox
-                };
+                Format = DocSaveOptions.DocFormat.Doc,
+                // Use the Textbox recognition mode, which extracts text without layout formatting
+                Mode = DocSaveOptions.RecognitionMode.Textbox
+            };
 
-                // Save the document as DOC with the specified options
-                pdfDoc.Save(outputPath, saveOptions);
-            }
+            // Save the document as DOC using the specified options
+            pdfDoc.Save(outputDoc, saveOptions);
+        }
 
-            Console.WriteLine($"PDF successfully converted to DOC: {outputPath}");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
-        }
+        Console.WriteLine($"PDF successfully converted to DOC: {outputDoc}");
     }
 }

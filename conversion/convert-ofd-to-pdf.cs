@@ -6,26 +6,32 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.ofd";
+        // Input OFD file and desired PDF output paths
+        const string inputPath = "input.ofd";
         const string outputPath = "output.pdf";
 
-        // Verify the source OFD file exists
+        // Verify the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the OFD file using the appropriate load options
-        OfdLoadOptions loadOptions = new OfdLoadOptions();
-
-        // Document implements IDisposable; wrap in using for deterministic cleanup
-        using (Document doc = new Document(inputPath, loadOptions))
+        try
         {
-            // Save the loaded document as PDF with default settings
-            doc.Save(outputPath);
-        }
+            // Load the OFD file using the appropriate load options
+            using (Document doc = new Document(inputPath, new OfdLoadOptions()))
+            {
+                // Save the loaded document as PDF (default settings)
+                doc.Save(outputPath);
+            }
 
-        Console.WriteLine($"OFD successfully converted to PDF: {outputPath}");
+            Console.WriteLine($"Successfully converted OFD to PDF: {outputPath}");
+        }
+        catch (Exception ex)
+        {
+            // Report any errors that occur during loading or saving
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

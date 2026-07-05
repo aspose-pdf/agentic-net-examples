@@ -1,31 +1,32 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Provides Document, PptxSaveOptions, etc.
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pptx";
+        // Paths for source PDF and destination PPTX.
+        const string inputPdfPath  = "input.pdf";
+        const string outputPptxPath = "output.pptx";
 
-        // Verify that the source PDF exists.
-        if (!File.Exists(inputPath))
+        // Verify that the source file exists.
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {inputPdfPath}");
             return;
         }
 
         // Load the PDF document inside a using block for deterministic disposal.
-        using (Document pdfDoc = new Document(inputPath))
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
             // Initialize default PPTX save options.
-            PptxSaveOptions saveOptions = new PptxSaveOptions();
+            PptxSaveOptions pptxOptions = new PptxSaveOptions();
 
             // Save the document as PPTX using the explicit save options.
-            pdfDoc.Save(outputPath, saveOptions);
+            pdfDocument.Save(outputPptxPath, pptxOptions);
         }
 
-        Console.WriteLine($"PDF successfully converted to PPTX: {outputPath}");
+        Console.WriteLine($"PDF successfully converted to PPTX: {outputPptxPath}");
     }
 }
