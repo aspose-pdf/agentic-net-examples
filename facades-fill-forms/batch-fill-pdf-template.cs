@@ -7,12 +7,13 @@ using Aspose.Pdf.Facades;
 class BatchPdfFiller
 {
     /// <summary>
-    /// Fills a PDF template with each DataTable in the list and creates separate output files.
+    /// Fills a PDF template with multiple data sets and creates separate PDF files.
     /// </summary>
-    /// <param name="templatePath">Path to the PDF form template.</param>
-    /// <param name="dataTables">List of DataTable objects, each containing field‑name/value pairs.</param>
+    /// <param name="templatePath">Path to the PDF template containing form fields.</param>
+    /// <param name="dataTables">List of DataTable objects, each representing a data set for one output PDF.</param>
     /// <param name="outputDirectory">Directory where the filled PDFs will be saved.</param>
-    public static void FillTemplateBatch(string templatePath, List<DataTable> dataTables, string outputDirectory)
+    /// <param name="baseFileName">Base name for generated files (e.g., "filled"). Files will be named "filled0.pdf", "filled1.pdf", ...</param>
+    public static void FillTemplateBatch(string templatePath, List<DataTable> dataTables, string outputDirectory, string baseFileName)
     {
         if (!File.Exists(templatePath))
         {
@@ -27,59 +28,58 @@ class BatchPdfFiller
 
         for (int i = 0; i < dataTables.Count; i++)
         {
-            DataTable table = dataTables[i];
+            DataTable dt = dataTables[i];
+            string outputPath = Path.Combine(outputDirectory, $"{baseFileName}{i}.pdf");
 
-            // Each AutoFiller instance works with one output PDF.
-            using (AutoFiller autoFiller = new AutoFiller())
+            // Ensure the output stream is properly disposed.
+            using (FileStream outStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+            // AutoFiller implements IDisposable, so wrap it in a using block.
+            using (AutoFiller filler = new AutoFiller())
             {
                 // Bind the template PDF.
-                autoFiller.BindPdf(templatePath);
+                filler.BindPdf(templatePath);
 
-                // Import the data. Column names must match field names in the PDF (case‑sensitive).
-                autoFiller.ImportDataTable(table);
+                // Import the current data set.
+                filler.ImportDataTable(dt);
 
-                // Build a unique file name for this data set.
-                string outputPath = Path.Combine(outputDirectory, $"filled_{i + 1}.pdf");
+                // Direct the filled result to the file stream.
+                filler.OutputStream = outStream;
 
-                // Save the filled PDF. Save(string) is the recommended overload for facades.
-                autoFiller.Save(outputPath);
+                // Save the filled PDF.
+                filler.Save();
             }
 
-            Console.WriteLine($"Created filled PDF: {i + 1}/{dataTables.Count}");
+            Console.WriteLine($"Generated: {outputPath}");
         }
     }
 
     // Example usage.
     static void Main()
     {
-        // Path to the PDF form that contains fields named "CompanyName", "ContactName", etc.
-        const string templatePdf = "TemplateForm.pdf";
+        string template = "TemplateForm.pdf";
+        string outputDir = "FilledOutputs";
+        string baseName = "FilledDoc";
 
-        // Prepare a list of DataTables. In a real scenario these could come from a database.
-        List<DataTable> tables = new List<DataTable>();
+        // Prepare sample data tables.
+        var tables = new List<DataTable>();
 
-        // Example: first data set.
+        // First data set.
         DataTable dt1 = new DataTable("DataSet1");
-        dt1.Columns.Add("CompanyName", typeof(string));
-        dt1.Columns.Add("ContactName", typeof(string));
+        dt1.Columns.Add("FirstName", typeof(string));
+        dt1.Columns.Add("LastName", typeof(string));
         dt1.Columns.Add("Address", typeof(string));
-        dt1.Columns.Add("PostalCode", typeof(string));
-        dt1.Columns.Add("City", typeof(string));
-        dt1.Columns.Add("Country", typeof(string));
-        dt1.Columns.Add("Heading", typeof(string));
-
-        dt1.Rows.Add("Acme Corp", "John Doe", "123 Main St", "12345", "Metropolis", "USA", "Dear John,");
+        dt1.Rows.Add("John", "Doe", "123 Main St");
         tables.Add(dt1);
 
-        // Example: second data set.
-        DataTable dt2 = dt1.Clone(); // same schema
-        dt2.Rows.Add("Globex Inc", "Jane Smith", "456 Oak Ave", "67890", "Gotham", "USA", "Dear Jane,");
+        // Second data set.
+        DataTable dt2 = new DataTable("DataSet2");
+        dt2.Columns.Add("FirstName", typeof(string));
+        dt2.Columns.Add("LastName", typeof(string));
+        dt2.Columns.Add("Address", typeof(string));
+        dt2.Rows.Add("Jane", "Smith", "456 Oak Ave");
         tables.Add(dt2);
 
-        // Output folder for the generated PDFs.
-        const string outputFolder = "FilledPdfs";
-
-        // Perform the batch fill.
-        FillTemplateBatch(templatePdf, tables, outputFolder);
+        // Perform batch filling.
+        FillTemplateBatch(template, tables, outputDir, baseName);
     }
 }

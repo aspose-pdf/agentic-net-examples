@@ -1,120 +1,121 @@
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Collections.Generic;
 using System.Text.Json;
 using Aspose.Pdf.Facades;
-
-#nullable enable
 
 class Program
 {
     static void Main()
     {
         // Paths – adjust as needed
-        const string templatePdfPath = "template.pdf";
-        const string csvFilePath      = "data.csv";   // Excel data exported as CSV
-        const string mappingFilePath  = "mapping.json";
-        const string outputFolder     = "FilledPdfs";
+        const string csvPath           = "data.csv";          // Excel exported as CSV
+        const string pdfTemplatePath   = "template.pdf";
+        const string outputPdfPath     = "filled.pdf";
+        const string mappingConfigPath = "fieldMap.json";
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
-
-        // Load column‑to‑field mapping from a JSON file.
-        // Example content: { "ExcelColumnA": "PdfField1", "ExcelColumnB": "PdfField2" }
-        // Guard against a missing or malformed mapping file.
-        if (!File.Exists(mappingFilePath))
+        // Load the column‑to‑field mapping (Excel column name → PDF field name)
+        Dictionary<string, string> fieldMap = LoadMapping(mappingConfigPath) ?? new Dictionary<string, string>();
+        if (fieldMap.Count == 0)
         {
-            Console.Error.WriteLine($"Mapping file not found: {mappingFilePath}");
+            Console.Error.WriteLine("Mapping configuration is empty or invalid.");
             return;
         }
 
-        string mappingJson = File.ReadAllText(mappingFilePath);
-        Dictionary<string, string>? rawMap = JsonSerializer.Deserialize<Dictionary<string, string>>(mappingJson);
-        // If deserialization fails, fall back to an empty map to avoid null‑reference warnings.
-        Dictionary<string, string> columnToFieldMap = rawMap ?? new Dictionary<string, string>();
-
-        // Load CSV data into a DataTable (cross‑platform, no OleDb).
-        DataTable dataTable = LoadCsvToDataTable(csvFilePath);
-
-        // Iterate over each row and fill a new PDF using the mapping.
-        for (int i = 0; i < dataTable.Rows.Count; i++)
+        // Load the CSV (exported from Excel) into a DataTable
+        DataTable dataTable = LoadCsvToDataTable(csvPath);
+        if (dataTable.Rows.Count == 0)
         {
-            DataRow row = dataTable.Rows[i];
+            Console.Error.WriteLine("No data rows found in the CSV file.");
+            return;
+        }
 
-            // Bind the template PDF via the Form facade.
-            using (Form pdfForm = new Form(templatePdfPath))
+        // For demonstration we fill the PDF with the first data row
+        DataRow dataRow = dataTable.Rows[0];
+
+        // Use the Form facade to bind the template and fill fields
+        using (Form form = new Form(pdfTemplatePath))
+        {
+            foreach (KeyValuePair<string, string> mapping in fieldMap)
             {
-                if (pdfForm == null)
+                string excelColumn = mapping.Key;   // column name in CSV (original Excel header)
+                string pdfField    = mapping.Value; // corresponding PDF field name
+
+                // Verify that the CSV column exists
+                if (!dataTable.Columns.Contains(excelColumn))
                 {
-                    Console.Error.WriteLine($"Failed to load PDF template: {templatePdfPath}");
+                    Console.Error.WriteLine($"Excel column \"{excelColumn}\" not found – skipping.");
                     continue;
                 }
 
-                // Fill each mapped field.
-                foreach (KeyValuePair<string, string> kvp in columnToFieldMap)
+                // Retrieve the cell value and convert to string (null → empty)
+                string fieldValue = dataRow[excelColumn]?.ToString() ?? string.Empty;
+
+                // Fill the PDF field; FillField returns true if the field was found
+                bool filled = form.FillField(pdfField, fieldValue);
+                if (!filled)
                 {
-                    string excelColumn = kvp.Key;
-                    string pdfField    = kvp.Value;
-
-                    // Guard against missing columns.
-                    if (!dataTable.Columns.Contains(excelColumn))
-                        continue;
-
-                    // row[excelColumn] can be DBNull – treat it as empty string.
-                    object? rawValue = row[excelColumn];
-                    string fieldValue = rawValue is DBNull ? string.Empty : rawValue?.ToString() ?? string.Empty;
-
-                    pdfForm.FillField(pdfField, fieldValue);
+                    Console.Error.WriteLine($"PDF field \"{pdfField}\" not found – skipping.");
                 }
-
-                // Save the filled PDF – one file per CSV row.
-                string outputPath = Path.Combine(outputFolder, $"filled_{i + 1}.pdf");
-                pdfForm.Save(outputPath);
             }
+
+            // Save the filled PDF
+            form.Save(outputPdfPath);
         }
 
-        Console.WriteLine("All PDFs have been generated.");
+        Console.WriteLine($"PDF successfully saved to \"{outputPdfPath}\".");
     }
 
-    /// <summary>
-    /// Loads a CSV file into a DataTable. The first line is treated as the header row.
-    /// Simple comma‑separated parsing; does not handle escaped commas or newlines inside quotes.
-    /// </summary>
-    private static DataTable LoadCsvToDataTable(string csvFilePath)
+    // Loads a JSON file that maps Excel column names to PDF field names.
+    // Expected format: { "ExcelColumn1": "PdfField1", "ExcelColumn2": "PdfField2", ... }
+    static Dictionary<string, string>? LoadMapping(string configPath)
     {
-        var table = new DataTable();
-        if (!File.Exists(csvFilePath))
+        if (!File.Exists(configPath))
         {
-            Console.Error.WriteLine($"CSV file not found: {csvFilePath}");
-            return table;
+            Console.Error.WriteLine($"Mapping file not found: {configPath}");
+            return null;
         }
 
+        using (FileStream fs = File.OpenRead(configPath))
+        {
+            return JsonSerializer.Deserialize<Dictionary<string, string>>(fs);
+        }
+    }
+
+    // Reads a CSV file into a DataTable. The first line is treated as column headers.
+    // This replaces the previous OleDb‑based Excel reader and works cross‑platform.
+    static DataTable LoadCsvToDataTable(string csvFilePath)
+    {
+        if (!File.Exists(csvFilePath))
+            throw new FileNotFoundException($"CSV file not found: {csvFilePath}");
+
+        DataTable table = new DataTable();
         using (var reader = new StreamReader(csvFilePath))
         {
-            if (reader.EndOfStream)
-                return table; // empty file
-
             // Read header line
-            string headerLine = reader.ReadLine() ?? string.Empty;
-            string[] headers = headerLine.Split(',');
+            string? headerLine = reader.ReadLine();
+            if (headerLine == null)
+                throw new InvalidOperationException("CSV file is empty.");
+
+            string[] headers = SplitCsvLine(headerLine);
             foreach (string header in headers)
             {
-                // Trim whitespace and use string type for all columns
-                table.Columns.Add(header.Trim(), typeof(string));
+                // Trim spaces and ensure unique column names
+                string colName = header.Trim();
+                if (table.Columns.Contains(colName))
+                    colName = MakeUniqueColumnName(table, colName);
+                table.Columns.Add(colName, typeof(string));
             }
 
             // Read data rows
             while (!reader.EndOfStream)
             {
                 string? line = reader.ReadLine();
-                if (string.IsNullOrWhiteSpace(line))
-                    continue;
-
-                string[] values = line.Split(',');
+                if (line == null) continue; // safety
+                string[] values = SplitCsvLine(line);
                 DataRow row = table.NewRow();
-                int colCount = Math.Min(values.Length, table.Columns.Count);
-                for (int i = 0; i < colCount; i++)
+                for (int i = 0; i < table.Columns.Count && i < values.Length; i++)
                 {
                     row[i] = values[i].Trim();
                 }
@@ -122,5 +123,54 @@ class Program
             }
         }
         return table;
+    }
+
+    // Simple CSV splitter that respects quoted fields.
+    static string[] SplitCsvLine(string line)
+    {
+        var fields = new List<string>();
+        bool inQuotes = false;
+        var current = new System.Text.StringBuilder();
+        for (int i = 0; i < line.Length; i++)
+        {
+            char c = line[i];
+            if (c == '"')
+            {
+                // Toggle in‑quotes state; handle escaped double quotes "" inside a quoted field
+                if (inQuotes && i + 1 < line.Length && line[i + 1] == '"')
+                {
+                    current.Append('"');
+                    i++; // skip the escaped quote
+                }
+                else
+                {
+                    inQuotes = !inQuotes;
+                }
+            }
+            else if (c == ',' && !inQuotes)
+            {
+                fields.Add(current.ToString());
+                current.Clear();
+            }
+            else
+            {
+                current.Append(c);
+            }
+        }
+        fields.Add(current.ToString());
+        return fields.ToArray();
+    }
+
+    // Generates a unique column name if a duplicate is found.
+    static string MakeUniqueColumnName(DataTable table, string baseName)
+    {
+        int suffix = 1;
+        string newName = baseName + "_" + suffix;
+        while (table.Columns.Contains(newName))
+        {
+            suffix++;
+            newName = baseName + "_" + suffix;
+        }
+        return newName;
     }
 }

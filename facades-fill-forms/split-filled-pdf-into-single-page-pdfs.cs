@@ -6,14 +6,10 @@ class Program
 {
     static void Main()
     {
-        // Path to the filled PDF that needs to be split
         const string inputPdf = "filled.pdf";
+        const string outputTemplate = "output/page%NUM%.pdf";
 
-        // Template for the output single‑page PDFs.
-        // %NUM% will be replaced with the page number (1‑based).
-        const string outputTemplate = "output/page_%NUM%.pdf";
-
-        // Verify that the source file exists
+        // Verify input file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input file not found: {inputPdf}");
@@ -27,13 +23,10 @@ class Program
             Directory.CreateDirectory(outputDir);
         }
 
-        // PdfFileEditor does NOT implement IDisposable, so we instantiate it directly
-        PdfFileEditor editor = new PdfFileEditor();
+        // Split the PDF into single‑page files using the template
+        PdfFileEditor pdfEditor = new PdfFileEditor();
+        pdfEditor.SplitToPages(inputPdf, outputTemplate);
 
-        // Split the PDF into single‑page documents and save them using the template
-        // This method creates one PDF per page, naming them according to the template.
-        editor.SplitToPages(inputPdf, outputTemplate);
-
-        Console.WriteLine("PDF successfully split into individual pages.");
+        Console.WriteLine("PDF split into individual pages successfully.");
     }
 }
