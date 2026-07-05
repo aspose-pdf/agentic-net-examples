@@ -1,43 +1,47 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
-using System.Xml.Linq;
+using Aspose.Pdf.Facades;          // PdfAnnotationEditor
+using System.Xml.Linq;            // XDocument for pretty‑printing
 
-class Program
+class ExportAnnotationsPretty
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string xfdfPath = "annotations_pretty.xfdf";
+        const string inputPdfPath  = "input.pdf";      // source PDF with annotations
+        const string outputXfdfPath = "annotations_pretty.xfdf"; // pretty‑printed XFDF
 
-        if (!File.Exists(pdfPath))
+        // Ensure the source PDF exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Bind the PDF to the annotation editor
+        // Use PdfAnnotationEditor to export annotations to a memory stream
         using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            editor.BindPdf(pdfPath);
+            editor.BindPdf(inputPdfPath);
 
-            // Export annotations to a memory stream
-            using (MemoryStream rawStream = new MemoryStream())
+            using (MemoryStream tempStream = new MemoryStream())
             {
-                editor.ExportAnnotationsToXfdf(rawStream);
-                rawStream.Position = 0; // Reset stream for reading
+                // Export all annotations into the temporary stream
+                editor.ExportAnnotationsToXfdf(tempStream);
 
-                // Load the raw XFDF XML
-                XDocument xfdfDoc = XDocument.Load(rawStream);
+                // Reset stream position for reading
+                tempStream.Position = 0;
 
-                // Save the XML with indentation (pretty‑printed)
-                using (FileStream outFs = new FileStream(xfdfPath, FileMode.Create, FileAccess.Write))
+                // Load the XFDF XML into XDocument (provides LINQ‑to‑XML capabilities)
+                XDocument xfdfDoc = XDocument.Load(tempStream);
+
+                // Save the XML with indentation (pretty‑printed) to the final file
+                using (FileStream outFile = new FileStream(outputXfdfPath, FileMode.Create, FileAccess.Write))
                 {
-                    xfdfDoc.Save(outFs);
+                    // SaveOptions.None writes formatted XML (indented)
+                    xfdfDoc.Save(outFile, SaveOptions.None);
                 }
             }
         }
 
-        Console.WriteLine($"Annotations exported to '{xfdfPath}' with pretty‑printed XML.");
+        Console.WriteLine($"Annotations exported and pretty‑printed to '{outputXfdfPath}'.");
     }
 }

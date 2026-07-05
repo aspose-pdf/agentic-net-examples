@@ -6,36 +6,36 @@ class Program
 {
     static void Main(string[] args)
     {
-        // Determine the folder to process: use first argument or current directory
-        string folderPath = args.Length > 0 ? args[0] : Directory.GetCurrentDirectory();
+        // Input folder can be passed as first argument; default to "InputPdfs"
+        string inputFolder = args.Length > 0 ? args[0] : "InputPdfs";
 
-        if (!Directory.Exists(folderPath))
+        if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"Folder not found: {folderPath}");
+            Console.Error.WriteLine($"Folder not found: {inputFolder}");
             return;
         }
 
         // Process each PDF file in the folder
-        foreach (string pdfFile in Directory.GetFiles(folderPath, "*.pdf"))
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
+            string directory = Path.GetDirectoryName(pdfPath);
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
+            string outputPath = Path.Combine(directory, $"{fileNameWithoutExt}_flattened.pdf");
+
             try
             {
-                // Build the output file name with "_flattened" suffix
-                string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfFile);
-                string outputFile = Path.Combine(folderPath, $"{fileNameWithoutExt}_flattened.pdf");
+                // Create the facade, load the PDF, flatten annotations, and save
+                PdfAnnotationEditor editor = new PdfAnnotationEditor();   // create
+                editor.BindPdf(pdfPath);                                 // load
+                editor.FlatteningAnnotations();                          // flatten all annotations
+                editor.Save(outputPath);                                 // save
+                editor.Close();                                          // release resources
 
-                // Create the annotation editor, bind the source PDF, flatten annotations, and save
-                PdfAnnotationEditor editor = new PdfAnnotationEditor();
-                editor.BindPdf(pdfFile);                     // Load the PDF into the editor
-                editor.FlatteningAnnotations();              // Flatten all annotations
-                editor.Save(outputFile);                     // Save the flattened PDF
-                editor.Close();                              // Release resources held by the editor
-
-                Console.WriteLine($"Flattened: '{pdfFile}' → '{outputFile}'");
+                Console.WriteLine($"Flattened: {outputPath}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{pdfFile}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         }
     }

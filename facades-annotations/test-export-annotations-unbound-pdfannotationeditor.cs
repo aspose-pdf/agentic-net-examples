@@ -9,22 +9,20 @@ class Program
         // Create a PdfAnnotationEditor without binding it to any PDF document.
         PdfAnnotationEditor editor = new PdfAnnotationEditor();
 
-        try
+        // Prepare a stream to receive XFDF output.
+        using (MemoryStream xfdfStream = new MemoryStream())
         {
-            // Attempt to export annotations to a stream.
-            // This should fail because the editor is not bound to a document.
-            using (MemoryStream ms = new MemoryStream())
+            try
             {
-                editor.ExportAnnotationsToXfdf(ms);
+                // This call should fail because the editor is not bound to a document.
+                editor.ExportAnnotationsToXfdf(xfdfStream);
+                Console.WriteLine("Test failed: no exception was thrown.");
             }
-
-            // If no exception is thrown, the test has failed.
-            Console.WriteLine("Test Failed: No exception was thrown.");
-        }
-        catch (Exception ex)
-        {
-            // Expected path: an exception is thrown.
-            Console.WriteLine($"Test Passed: Caught expected exception -> {ex.GetType().Name}: {ex.Message}");
+            catch (Exception ex)
+            {
+                // Expected path – an exception indicates the editor is correctly enforcing binding.
+                Console.WriteLine($"Test passed: caught expected exception ({ex.GetType().Name}) - {ex.Message}");
+            }
         }
     }
 }

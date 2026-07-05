@@ -17,32 +17,26 @@ class Program
             return;
         }
 
-        // Load the PDF document (needed to obtain a Page object for the annotation constructor)
+        // Load the document to obtain a Page instance – required for the TextAnnotation constructor.
         Document doc = new Document(inputPath);
-        Page page = doc.Pages[1]; // 1‑based indexing
+        Page page = doc.Pages[1];
 
-        // Create a rectangle for the annotation (position and size can be adjusted as needed)
-        Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 700, 200, 750);
-
-        // Instantiate TextAnnotation using the (Page, Rectangle) constructor
-        TextAnnotation newAnnotation = new TextAnnotation(page, rect)
+        // TextAnnotation does not have a parameter‑less constructor. Use the (Page, Rectangle) overload.
+        // A zero‑size rectangle is sufficient when the annotation is only used as a template for modification.
+        TextAnnotation newAnnotation = new TextAnnotation(page, new Aspose.Pdf.Rectangle(0, 0, 0, 0))
         {
             Subject = "Updated Subject",
-            Color = Aspose.Pdf.Color.Blue
+            Color   = Aspose.Pdf.Color.Blue
         };
 
-        // Initialize the annotation editor facade and bind the same PDF
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-        {
-            editor.BindPdf(inputPath);
+        // Initialize the annotation editor facade and bind the PDF.
+        PdfAnnotationEditor editor = new PdfAnnotationEditor();
+        editor.BindPdf(inputPath);
 
-            // Modify the first annotation (index 1) on page 1 with the new annotation
-            editor.ModifyAnnotations(1, 1, newAnnotation);
+        // Apply the changes to annotations on page 1 (start = end = 1).
+        editor.ModifyAnnotations(1, 1, newAnnotation);
 
-            // Save the modified PDF
-            editor.Save(outputPath);
-        }
-
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        // Save the modified PDF.
+        editor.Save(outputPath);
     }
 }

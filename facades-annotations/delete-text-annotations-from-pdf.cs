@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_no_text_annots.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,15 +15,13 @@ class Program
             return;
         }
 
-        // Load the PDF into the annotation editor
-        PdfAnnotationEditor editor = new PdfAnnotationEditor();
-        editor.BindPdf(inputPath);
-
-        // Delete only annotations of type "Text"
-        editor.DeleteAnnotations("Text");
-
-        // Save the resulting PDF
-        editor.Save(outputPath);
+        // Load the PDF, delete only text annotations, and save the result
+        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        {
+            editor.BindPdf(inputPath);
+            editor.DeleteAnnotations("Text"); // removes only annotations of type "Text"
+            editor.Save(outputPath);
+        }
 
         Console.WriteLine($"Text annotations removed. Saved to '{outputPath}'.");
     }

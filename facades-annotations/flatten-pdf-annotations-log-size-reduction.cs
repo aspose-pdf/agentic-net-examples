@@ -15,35 +15,28 @@ class Program
             return;
         }
 
-        // Record original file size
+        // Get original file size
         long originalSize = new FileInfo(inputPath).Length;
 
-        // Initialize the annotation editor and bind the PDF
+        // Flatten annotations using PdfAnnotationEditor
         PdfAnnotationEditor editor = new PdfAnnotationEditor();
-        editor.BindPdf(inputPath);
+        editor.BindPdf(inputPath);                 // Load the PDF
+        editor.FlatteningAnnotations();            // Flatten all annotations
+        editor.Save(outputPath);                    // Save the flattened PDF
+        editor.Close();                            // Release resources
 
-        // Flatten all annotations in the document
-        editor.FlatteningAnnotations();
-
-        // Save the flattened document
-        editor.Save(outputPath);
-
-        // Release resources held by the editor
-        editor.Close();
-        editor.Dispose();
-
-        // Record new file size
-        long newSize = new FileInfo(outputPath).Length;
+        // Get flattened file size
+        long flattenedSize = new FileInfo(outputPath).Length;
 
         // Calculate reduction
-        long reductionBytes = originalSize - newSize;
-        double reductionPercent = originalSize > 0
-            ? (double)reductionBytes / originalSize * 100
-            : 0;
+        long sizeReduction = originalSize - flattenedSize;
+        double percentReduction = originalSize > 0
+            ? (sizeReduction / (double)originalSize) * 100.0
+            : 0.0;
 
         // Log the results
-        Console.WriteLine($"Original size: {originalSize:N0} bytes");
-        Console.WriteLine($"Flattened size: {newSize:N0} bytes");
-        Console.WriteLine($"Size reduction: {reductionBytes:N0} bytes ({reductionPercent:F2}%)");
+        Console.WriteLine($"Original size : {originalSize} bytes");
+        Console.WriteLine($"Flattened size: {flattenedSize} bytes");
+        Console.WriteLine($"Size reduction : {sizeReduction} bytes ({percentReduction:F2}%)");
     }
 }

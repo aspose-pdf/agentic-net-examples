@@ -2,104 +2,95 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;                     // Core PDF API
+using Aspose.Pdf.Facades;            // Facades API for annotation handling
 
-public static class AnnotationFlattener
+class Program
 {
-    /// <summary>
-    /// Flattens all annotations in a batch of PDF files.
-    /// The operation can be cancelled via the provided <see cref="CancellationToken"/>.
-    /// </summary>
-    /// <param name="inputFiles">Full paths of the PDF files to process.</param>
-    /// <param name="outputDirectory">Directory where flattened PDFs will be saved.</param>
-    /// <param name="cancellationToken">Token to observe cancellation requests.</param>
-    /// <returns>A task that completes when all files have been processed or cancellation is requested.</returns>
-    public static async Task FlattenAnnotationsBatchAsync(string[] inputFiles, string outputDirectory, CancellationToken cancellationToken)
+    static async Task Main(string[] args)
     {
-        if (inputFiles == null) throw new ArgumentNullException(nameof(inputFiles));
-        if (string.IsNullOrWhiteSpace(outputDirectory)) throw new ArgumentException("Output directory must be specified.", nameof(outputDirectory));
+        // Example input PDF files (could be read from args, config, etc.)
+        string[] inputFiles = new[]
+        {
+            "doc1.pdf",
+            "doc2.pdf",
+            "doc3.pdf"
+        };
 
-        // Ensure the output directory exists.
+        string outputDirectory = "FlattenedOutput";
+
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputDirectory);
 
-        foreach (string inputPath in inputFiles)
-        {
-            // Throw if cancellation was requested before starting the next file.
-            cancellationToken.ThrowIfCancellationRequested();
+        // Create a cancellation token source that could be triggered by the user
+        using CancellationTokenSource cts = new CancellationTokenSource();
 
-            if (!File.Exists(inputPath))
-            {
-                Console.Error.WriteLine($"File not found: {inputPath}");
-                continue; // Skip missing files.
-            }
-
-            // Derive output file name.
-            string outputPath = Path.Combine(outputDirectory, Path.GetFileNameWithoutExtension(inputPath) + "_flattened.pdf");
-
-            // Load the PDF document using the standard Document constructor (lifecycle rule).
-            using (Document doc = new Document(inputPath))
-            {
-                // Initialize the annotation editor and bind the loaded document.
-                using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-                {
-                    editor.BindPdf(doc);
-
-                    // Flatten all annotations in the document.
-                    editor.FlatteningAnnotations();
-
-                    // The underlying Document instance now contains the flattened content.
-                    // Save the document asynchronously, passing the cancellation token.
-                    await doc.SaveAsync(outputPath, cancellationToken).ConfigureAwait(false);
-                }
-            }
-
-            Console.WriteLine($"Flattened: {inputPath} → {outputPath}");
-        }
-    }
-}
-
-public class Program
-{
-    /// <summary>
-    /// Entry point required for a console application. It demonstrates how the
-    /// <see cref="AnnotationFlattener.FlattenAnnotationsBatchAsync"/> method can be invoked.
-    /// The implementation is intentionally minimal – the primary goal is to satisfy
-    /// the compiler's requirement for a static Main method.
-    /// </summary>
-    public static async Task Main(string[] args)
-    {
-        // Example usage (can be removed or replaced by real arguments).
-        // If no arguments are supplied, the program simply exits.
-        if (args.Length < 2)
-        {
-            Console.WriteLine("Usage: <outputDirectory> <inputFile1> [<inputFile2> ...]");
-            return;
-        }
-
-        string outputDirectory = args[0];
-        string[] inputFiles = args[1..]; // all remaining arguments are input files
-
-        using var cts = new CancellationTokenSource();
-        Console.CancelKeyPress += (sender, e) =>
-        {
-            e.Cancel = true; // prevent the process from terminating immediately
-            cts.Cancel();
-            Console.WriteLine("Cancellation requested…");
-        };
+        // For demonstration, cancel after 10 seconds (remove in real usage)
+        // Task.Delay(TimeSpan.FromSeconds(10)).ContinueWith(_ => cts.Cancel());
 
         try
         {
-            await AnnotationFlattener.FlattenAnnotationsBatchAsync(inputFiles, outputDirectory, cts.Token);
-            Console.WriteLine("All files processed.");
+            await FlattenAnnotationsBatchAsync(inputFiles, outputDirectory, cts.Token);
+            Console.WriteLine("Batch flattening completed successfully.");
         }
         catch (OperationCanceledException)
         {
-            Console.WriteLine("Operation was cancelled by the user.");
+            Console.WriteLine("Batch flattening was cancelled by the user.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
+            Console.Error.WriteLine($"Error during batch flattening: {ex.Message}");
         }
+    }
+
+    /// <summary>
+    /// Flattens annotations for a collection of PDF files.
+    /// The operation can be cancelled via the provided <see cref="CancellationToken"/>.
+    /// </summary>
+    /// <param name="inputPaths">Array of source PDF file paths.</param>
+    /// <param name="outputDir">Directory where flattened PDFs will be saved.</param>
+    /// <param name="cancellationToken">Token to observe cancellation requests.</param>
+    /// <returns>A task representing the asynchronous batch operation.</returns>
+    public static async Task FlattenAnnotationsBatchAsync(
+        string[] inputPaths,
+        string outputDir,
+        CancellationToken cancellationToken)
+    {
+        // Run the CPU‑bound work on a background thread to keep the async signature.
+        await Task.Run(() =>
+        {
+            foreach (string inputPath in inputPaths)
+            {
+                // Throw if cancellation was requested before processing the next file.
+                cancellationToken.ThrowIfCancellationRequested();
+
+                if (!File.Exists(inputPath))
+                {
+                    Console.Error.WriteLine($"File not found: {inputPath}");
+                    continue; // Skip missing files, continue with the rest.
+                }
+
+                // Determine output file name (same name, different folder).
+                string outputPath = Path.Combine(outputDir, Path.GetFileName(inputPath));
+
+                // Use PdfAnnotationEditor (facade) to flatten annotations.
+                // The editor implements IDisposable via the base SaveableFacade, so we wrap it in a using block.
+                using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+                {
+                    // Bind the source PDF.
+                    editor.BindPdf(inputPath);
+
+                    // Perform flattening of all annotations.
+                    editor.FlatteningAnnotations();
+
+                    // Save the modified document.
+                    // PdfAnnotationEditor provides a synchronous Save(string) method.
+                    // This complies with the lifecycle rule: use the provided save logic.
+                    editor.Save(outputPath);
+                }
+
+                Console.WriteLine($"Flattened: {inputPath} → {outputPath}");
+            }
+        }, cancellationToken);
     }
 }
