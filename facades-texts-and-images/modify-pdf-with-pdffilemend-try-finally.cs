@@ -1,12 +1,13 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -22,18 +23,20 @@ class Program
             mend = new PdfFileMend();
             mend.BindPdf(inputPath);
 
-            // Example operation: add an image to page 1 (replace with real parameters as needed)
-            // mend.AddImage("logo.png", 1, 100f, 100f, 200f, 200f);
+            // Perform any desired modifications here (e.g., AddText, AddImage, etc.)
 
-            // Save the modified PDF
+            // Save the changes to the output file
             mend.Save(outputPath);
         }
         finally
         {
-            // Ensure the facade is closed and resources are released
-            mend?.Close();
+            // Ensure the facade is closed to release resources and finalize the PDF
+            if (mend != null)
+            {
+                mend.Close();
+            }
         }
 
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }
