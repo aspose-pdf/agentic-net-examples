@@ -1,26 +1,34 @@
 using System;
-using System.IO;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_2up.pdf";
+        // Paths for the source PDF and the resulting 2‑up PDF
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output_2up.pdf";
 
-        // Verify the input PDF exists
-        if (!File.Exists(inputPath))
+        // Verify that the input file exists
+        if (!System.IO.File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Use PdfFileEditor to create a 2‑up layout (2 columns, 1 row)
-        // The MakeNUp method expects an array of source files and a landscape flag.
+        // Create the PdfFileEditor (does not implement IDisposable, so no using block needed)
         PdfFileEditor editor = new PdfFileEditor();
-        editor.MakeNUp(new[] { inputPath }, outputPath, false);
 
-        Console.WriteLine($"2‑up PDF created successfully: {outputPath}");
+        // Make a 2‑up layout: 2 columns (x) and 1 row (y) – pages are placed side‑by‑side horizontally
+        bool success = editor.MakeNUp(inputPdf, outputPdf, 2, 1);
+
+        if (success)
+        {
+            Console.WriteLine($"2‑up PDF created successfully: {outputPdf}");
+        }
+        else
+        {
+            Console.Error.WriteLine("Failed to create 2‑up PDF.");
+        }
     }
 }
