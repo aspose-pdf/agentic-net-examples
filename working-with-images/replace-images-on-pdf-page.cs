@@ -3,78 +3,73 @@ using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 
-class Program
+class ReplaceImagesOnPage
 {
     static void Main()
     {
-        // Input and output PDF paths
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        // Input PDF, output PDF and the page number to process
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const int    pageIndex = 2;               // 1‑based page number
 
-        // Page number to modify (1‑based indexing)
-        const int pageNumber = 1;
-
-        // Dictionary mapping image index (1‑based) to new image file path
+        // Mapping of original image indices (1‑based) to new image file paths
         var imageReplacements = new Dictionary<int, string>
         {
             { 1, "newImage1.jpg" },
-            { 2, "newImage2.png" }
+            { 3, "newImage3.png" }
         };
 
-        // Validate input PDF
-        if (!File.Exists(inputPath))
+        // Ensure the source file exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Source PDF not found: {inputPdf}");
             return;
         }
 
-        // Validate replacement image files
-        foreach (var kvp in imageReplacements)
+        // Process the document
+        using (Document doc = new Document(inputPdf))
         {
-            if (!File.Exists(kvp.Value))
+            // Validate page number
+            if (pageIndex < 1 || pageIndex > doc.Pages.Count)
             {
-                Console.Error.WriteLine($"Replacement image not found: {kvp.Value}");
-                return;
-            }
-        }
-
-        // Load PDF document (using rule: wrap Document in using)
-        using (Document doc = new Document(inputPath))
-        {
-            // Validate requested page number
-            if (pageNumber < 1 || pageNumber > doc.Pages.Count)
-            {
-                Console.Error.WriteLine($"Page number {pageNumber} is out of range.");
+                Console.Error.WriteLine($"Page number {pageIndex} is out of range.");
                 return;
             }
 
-            // Get the target page
-            Page page = doc.Pages[pageNumber];
+            // Get the target page and its image collection
+            Page page = doc.Pages[pageIndex];
+            XImageCollection images = page.Resources.Images;
 
             // Replace each specified image
             foreach (var kvp in imageReplacements)
             {
-                int imgIndex = kvp.Key;          // 1‑based index in the XImageCollection
-                string newImgPath = kvp.Value;   // Path to the new image file
+                int imageIndex = kvp.Key;          // 1‑based index in the collection
+                string newImagePath = kvp.Value;
 
-                // Ensure the image index exists on this page
-                if (imgIndex < 1 || imgIndex > page.Resources.Images.Count)
+                if (!File.Exists(newImagePath))
                 {
-                    Console.Error.WriteLine($"Image index {imgIndex} is out of range on page {pageNumber}.");
+                    Console.Error.WriteLine($"Replacement image not found: {newImagePath}");
+                    continue; // skip missing files
+                }
+
+                // Ensure the index is within the collection bounds
+                if (imageIndex < 1 || imageIndex > images.Count)
+                {
+                    Console.Error.WriteLine($"Image index {imageIndex} is out of range (1..{images.Count}).");
                     continue;
                 }
 
-                // Open the new image stream and replace the existing image
-                using (FileStream imgStream = File.OpenRead(newImgPath))
+                // Replace the image using a stream (JPEG format is expected)
+                using (FileStream imgStream = File.OpenRead(newImagePath))
                 {
-                    page.Resources.Images.Replace(imgIndex, imgStream);
+                    images.Replace(imageIndex, imgStream);
                 }
             }
 
-            // Save the modified PDF (PDF format, no extra SaveOptions needed)
-            doc.Save(outputPath);
+            // Save the modified PDF
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Images replaced successfully. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Images replaced and saved to '{outputPdf}'.");
     }
 }

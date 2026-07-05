@@ -1,14 +1,15 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core API (Document, Page, ImageStamp)
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";          // source PDF
-        const string overlayPng = "overlay.png";        // transparent PNG to overlay
-        const string outputPdf  = "output.pdf";         // result PDF
+        const string inputPdf  = "input.pdf";
+        const string overlayPng = "overlay.png";   // transparent PNG
+        const string outputPdf = "output.pdf";
 
         if (!File.Exists(inputPdf))
         {
@@ -22,31 +23,25 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPdf))
         {
-            // Iterate over all pages (1‑based indexing)
+            // Create an ImageStamp for the PNG overlay
+            ImageStamp pngStamp = new ImageStamp(overlayPng)
+            {
+                // Ensure the stamp is placed on top (Background = false is default)
+                Background = false,
+                // Adjust opacity if needed (0.0 = fully transparent, 1.0 = opaque)
+                Opacity = 0.5f,
+                // Center the overlay on each page
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center
+            };
+
+            // Add the stamp to every page
             foreach (Page page in doc.Pages)
             {
-                // Create an ImageStamp from the transparent PNG
-                ImageStamp stamp = new ImageStamp(overlayPng)
-                {
-                    // Ensure the stamp is placed on top of existing content
-                    Background = false,          // false = top layer (default, kept for clarity)
-
-                    // Optional: control opacity (0.0 = fully transparent, 1.0 = opaque)
-                    Opacity = 0.8f,
-
-                    // Position the stamp to cover the whole page
-                    // Width/Height are in user units (points). Page.Rect gives the page size.
-                    Width   = page.Rect.Width,
-                    Height  = page.Rect.Height,
-                    XIndent = 0,
-                    YIndent = 0
-                };
-
-                // Add the stamp to the current page
-                page.AddStamp(stamp);
+                page.AddStamp(pngStamp);
             }
 
             // Save the modified PDF

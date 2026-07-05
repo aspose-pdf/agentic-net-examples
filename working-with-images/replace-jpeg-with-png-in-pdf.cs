@@ -6,53 +6,46 @@ class Program
 {
     static void Main()
     {
-        // Input PDF containing JPEG images
-        const string inputPdfPath  = "input.pdf";
-        // PNG image that will replace each JPEG (same dimensions are kept by the PDF engine)
-        const string pngReplacePath = "replacement.png";
-        // Output PDF with PNG images in the original positions
-        const string outputPdfPath = "output.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string pngReplacement = "replacement.png";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        if (!File.Exists(pngReplacePath))
+        if (!File.Exists(pngReplacement))
         {
-            Console.Error.WriteLine($"Replacement PNG not found: {pngReplacePath}");
+            Console.Error.WriteLine($"Replacement PNG not found: {pngReplacement}");
             return;
         }
 
-        // Open the PDF document
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF document
+        using (Document doc = new Document(inputPdf))
         {
-            // Iterate through all pages (1‑based indexing)
-            foreach (Page page in pdfDoc.Pages)
+            // Iterate over all pages
+            foreach (Page page in doc.Pages)
             {
-                // XImageCollection holds the image resources for the page
+                // Access the image collection of the page
                 var images = page.Resources.Images;
 
-                // Replace each image resource with the PNG data.
-                // The collection is also 1‑based.
-                for (int idx = 1; idx <= images.Count; idx++)
+                // Replace each image with the PNG while preserving its position
+                for (int i = 1; i <= images.Count; i++)
                 {
-                    // Open the PNG file as a stream for each replacement.
-                    // The stream is closed automatically by the using block.
-                    using (FileStream pngStream = File.OpenRead(pngReplacePath))
+                    // Open the PNG stream for each replacement
+                    using (FileStream pngStream = File.OpenRead(pngReplacement))
                     {
-                        // Replace keeps the original resource index, so all
-                        // references (positions, scaling, etc.) remain unchanged.
-                        images.Replace(idx, pngStream);
+                        images.Replace(i, pngStream);
                     }
                 }
             }
 
             // Save the modified PDF
-            pdfDoc.Save(outputPdfPath);
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved with PNG images: {outputPdfPath}");
+        Console.WriteLine($"PDF saved with PNG images to '{outputPdf}'.");
     }
 }

@@ -1,53 +1,47 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // ImagePlacementAbsorber resides in this namespace
 
 class ReplaceImageExample
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";          // source PDF
-        const string outputPdfPath = "output.pdf";         // result PDF
-        const string newImagePath  = "newImage.jpg";       // replacement image
-        const int    targetPage    = 1;                    // page number (1‑based)
+        // Paths to the source PDF, the new image file, and the output PDF.
+        const string pdfPath      = "input.pdf";
+        const string newImagePath = "newImage.jpg";
+        const string outputPath   = "output.pdf";
 
-        // Ensure files exist
-        if (!File.Exists(inputPdfPath))
+        // Ensure the source files exist.
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
         if (!File.Exists(newImagePath))
         {
-            Console.Error.WriteLine($"Replacement image not found: {newImagePath}");
+            Console.Error.WriteLine($"Image not found: {newImagePath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF document inside a using block for deterministic disposal.
+        using (Document doc = new Document(pdfPath))
         {
-            // Create an absorber to locate image placements on the specified page
-            ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
+            // Choose the page that contains the image to replace (1‑based index).
+            Page page = doc.Pages[1];
 
-            // Accept the absorber for the target page
-            pdfDoc.Pages[targetPage].Accept(absorber);
-
-            // Iterate over each found image placement and replace it
-            foreach (ImagePlacement placement in absorber.ImagePlacements)
+            // The Images collection is 1‑based as well.
+            // Replace the first image in the collection with the new image stream.
+            // Adjust the index if you need to replace a different image.
+            using (FileStream imgStream = File.OpenRead(newImagePath))
             {
-                // Open the new image as a stream
-                using (FileStream imgStream = File.OpenRead(newImagePath))
-                {
-                    // Replace the existing image with the new one (method defined on ImagePlacement)
-                    placement.Replace(imgStream);
-                }
+                // Replace image at index 1.
+                page.Resources.Images.Replace(1, imgStream);
             }
 
-            // Save the modified PDF (lifecycle rule: use Document.Save)
-            pdfDoc.Save(outputPdfPath);
+            // Save the modified PDF.
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Image replacement completed. Saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Image replaced and saved to '{outputPath}'.");
     }
 }

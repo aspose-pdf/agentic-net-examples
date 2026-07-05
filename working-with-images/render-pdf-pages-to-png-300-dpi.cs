@@ -8,26 +8,26 @@ class Program
     static void Main()
     {
         // Input PDF path
-        const string inputPdfPath = "input.pdf";
+        const string inputPath = "input.pdf";
         // Output directory for PNG images
-        const string outputDir = "PngPages";
+        const string outputDir = "output_images";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDocument = new Document(inputPdfPath))
+        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        using (Document pdfDocument = new Document(inputPath))
         {
             // Create a Resolution object with 300 DPI
             Resolution resolution = new Resolution(300);
 
-            // Initialize the PNG device with the specified resolution
+            // Initialize the PNG device with the desired resolution
             PngDevice pngDevice = new PngDevice(resolution);
 
             // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
