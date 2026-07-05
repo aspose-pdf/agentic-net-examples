@@ -7,43 +7,34 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "merged_metadata.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        // Load and modify standard PDF file info entries
+        using (PdfFileInfo fileInfo = new PdfFileInfo(inputPath))
         {
-            // -----------------------------------------------------------------
-            // 1. Access and modify the standard file information (PdfFileInfo)
-            // -----------------------------------------------------------------
-            // PdfFileInfo works on the same underlying document instance.
-            using (PdfFileInfo fileInfo = new PdfFileInfo(doc))
+            fileInfo.Title  = "Merged XMP and FileInfo";
+            fileInfo.Author = "John Doe";
+
+            // Load XMP metadata, add a custom entry, and merge it back
+            using (PdfXmpMetadata xmp = new PdfXmpMetadata())
             {
-                // Set or update desired metadata fields
-                fileInfo.Title   = "Comprehensive Document Title";
-                fileInfo.Author  = "John Doe";
-                fileInfo.Subject = "Merged XMP and FileInfo Metadata";
-                fileInfo.Keywords = "Aspose.Pdf, XMP, Metadata";
+                xmp.BindPdf(inputPath);
 
-                // Optional: add custom key/value pairs
-                fileInfo.SetMetaInfo("CustomField", "CustomValue");
+                // Add a custom XMP property
+                xmp.Add("xmp:CustomProperty", new XmpValue("CustomValue"));
 
-                // -------------------------------------------------------------
-                // 2. Save the document while preserving existing XMP metadata
-                // -------------------------------------------------------------
-                // SaveNewInfoWithXmp writes the updated file‑info entries and
-                // merges them with any existing XMP packet, leaving untouched
-                // XMP data intact.
-                bool success = fileInfo.SaveNewInfoWithXmp(outputPdf);
-                Console.WriteLine(success
-                    ? $"Metadata merged and saved to '{outputPdf}'."
-                    : $"Failed to save merged metadata to '{outputPdf}'.");
+                // Save the combined FileInfo and XMP metadata to a new file
+                bool saved = fileInfo.SaveNewInfoWithXmp(outputPath);
+                Console.WriteLine(saved
+                    ? $"Metadata merged and saved to '{outputPath}'."
+                    : "Failed to save merged metadata.");
             }
         }
     }

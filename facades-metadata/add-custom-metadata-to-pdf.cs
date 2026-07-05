@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -18,12 +18,19 @@ class Program
         // Load the PDF using the PdfFileInfo facade
         using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
         {
-            // Set a custom metadata entry named "ProjectCode"
+            // Add a custom metadata entry named "ProjectCode"
             pdfInfo.SetMetaInfo("ProjectCode", "ABC123");
 
             // Save the updated PDF to a new file
             bool saved = pdfInfo.SaveNewInfo(outputPath);
-            Console.WriteLine(saved ? $"Metadata added and saved to '{outputPath}'." : "Failed to save the updated PDF.");
+            if (!saved)
+            {
+                Console.Error.WriteLine("Failed to save the updated PDF.");
+            }
+            else
+            {
+                Console.WriteLine($"Custom metadata added and saved to '{outputPath}'.");
+            }
         }
     }
 }

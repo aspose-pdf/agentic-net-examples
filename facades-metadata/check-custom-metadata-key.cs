@@ -6,21 +6,22 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string pdfPath = "input.pdf";
 
-        if (!File.Exists(inputPath))
+        // Verify the PDF file exists
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Initialize the PdfFileInfo facade for the PDF document.
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
+        // PdfFileInfo provides access to custom metadata via GetMetaInfo
+        using (PdfFileInfo pdfInfo = new PdfFileInfo(pdfPath))
         {
-            // Get the value of the custom metadata key "Confidential".
-            // GetMetaInfo returns an empty string if the key does not exist.
+            // Attempt to read the custom metadata key "Confidential"
             string confidentialValue = pdfInfo.GetMetaInfo("Confidential");
 
+            // GetMetaInfo returns an empty string if the key does not exist
             if (string.IsNullOrEmpty(confidentialValue))
             {
                 Console.WriteLine("Custom metadata 'Confidential' does not exist.");

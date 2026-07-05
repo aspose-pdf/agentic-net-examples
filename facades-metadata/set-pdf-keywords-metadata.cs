@@ -1,38 +1,33 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades;   // PdfFileInfo resides here
+using Aspose.Pdf;          // optional, for Document if needed later
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_with_keywords.pdf";
-        const string keywords  = "Aspose, PDF, Metadata";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string keywords   = "Aspose PDF, Metadata, Keywords";
 
-        if (!File.Exists(inputPdf))
+        // Ensure the source PDF exists
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF, set the Keywords metadata, and save to a new file
-        using (PdfFileInfo info = new PdfFileInfo(inputPdf))
+        // Load the PDF, set the Keywords metadata, and save the updated file
+        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
         {
-            // Set the Keywords property
-            info.Keywords = keywords;
-
-            // Save the updated PDF; SaveNewInfo returns true on success
-            bool saved = info.SaveNewInfo(outputPdf);
-            if (!saved)
-            {
-                Console.Error.WriteLine("Failed to save updated PDF.");
-                return;
-            }
+            pdfInfo.Keywords = keywords;                     // set Keywords field
+            bool saved = pdfInfo.SaveNewInfo(outputPath);    // persist changes
+            Console.WriteLine(saved ? "Keywords saved successfully." : "Failed to save Keywords.");
         }
 
-        // Verify that the Keywords were written correctly
-        using (PdfFileInfo verifyInfo = new PdfFileInfo(outputPdf))
+        // Verify that the Keywords were written by reading them back
+        using (PdfFileInfo verifyInfo = new PdfFileInfo(outputPath))
         {
             Console.WriteLine($"Keywords after save: {verifyInfo.Keywords}");
         }

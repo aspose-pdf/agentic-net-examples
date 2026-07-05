@@ -7,67 +7,53 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "sample.pdf";
+        const string pdfPath = "sample.pdf";
 
-        if (!File.Exists(inputPath))
+        // Verify that the PDF file exists before attempting to open it.
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.WriteLine($"Error: The file '{pdfPath}' was not found.");
             return;
         }
 
-        // Initialize the PdfFileInfo facade with the PDF file
-        PdfFileInfo pdfInfo = new PdfFileInfo(inputPath);
-
-        // Retrieve the ModDate string (PDF format, e.g., "D:20230815123045+02'00'")
-        string modDateRaw = pdfInfo.ModDate;
-
-        if (string.IsNullOrEmpty(modDateRaw))
+        // Initialize PdfFileInfo facade for the PDF file.
+        // Using the constructor that accepts the file path ensures the object is properly initialized.
+        using (PdfFileInfo info = new PdfFileInfo(pdfPath))
         {
-            Console.WriteLine("ModDate is not set in the document.");
-            return;
-        }
+            // Retrieve the ModDate string (e.g., "D:20230702120000+00'00'")
+            string rawModDate = info.ModDate;
 
-        // Remove the leading "D:" if present
-        if (modDateRaw.StartsWith("D:", StringComparison.Ordinal))
-            modDateRaw = modDateRaw.Substring(2);
+            // Remove the leading "D:" if present.
+            if (rawModDate.StartsWith("D:", StringComparison.OrdinalIgnoreCase))
+                rawModDate = rawModDate.Substring(2);
 
-        // Convert PDF timezone format (+HH'mm' or -HH'mm') to a .NET compatible format (+HH:mm)
-        if (modDateRaw.Length > 0 && (modDateRaw[0] == '+' || modDateRaw[0] == '-'))
-        {
-            int apostropheIdx = modDateRaw.IndexOf('\'');
-            if (apostropheIdx > 0 && apostropheIdx + 2 < modDateRaw.Length)
+            // PDF date format can include timezone like "+05'30'". Replace the apostrophes for parsing.
+            string cleaned = rawModDate.Replace("'", string.Empty);
+
+            // Define possible date patterns (with and without timezone).
+            string[] patterns =
             {
-                string hourPart = modDateRaw.Substring(0, apostropheIdx);
-                string minutePart = modDateRaw.Substring(apostropheIdx + 1, 2);
-                modDateRaw = $"{hourPart}:{minutePart}";
+                "yyyyMMddHHmmsszzz",   // with timezone offset (e.g., +05:30)
+                "yyyyMMddHHmmsszz",    // with timezone offset without colon
+                "yyyyMMddHHmmss",      // without timezone
+                "yyyyMMdd"             // date only
+            };
+
+            if (DateTime.TryParseExact(
+                    cleaned,
+                    patterns,
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.AssumeUniversal,
+                    out DateTime modDate))
+            {
+                // Output formatted date.
+                Console.WriteLine("Modification Date: " + modDate.ToString("yyyy-MM-dd HH:mm:ss"));
+            }
+            else
+            {
+                // Fallback to the raw string if parsing fails.
+                Console.WriteLine("Modification Date (raw): " + info.ModDate);
             }
         }
-
-        // Define possible date formats that may appear in the PDF metadata
-        string[] possibleFormats = new[]
-        {
-            "yyyyMMddHHmmsszzz", // with timezone offset like +02:00
-            "yyyyMMddHHmmss",    // without timezone
-            "yyyyMMddHHmmssK",   // generic with timezone
-            "yyyyMMddHHmmss'Z'"  // UTC indicated by 'Z'
-        };
-
-        // Try to parse the date using the known formats
-        if (!DateTime.TryParseExact(modDateRaw,
-                                    possibleFormats,
-                                    CultureInfo.InvariantCulture,
-                                    DateTimeStyles.None,
-                                    out DateTime modDate))
-        {
-            // Fallback to a more permissive parse if exact formats fail
-            if (!DateTime.TryParse(modDateRaw, out modDate))
-            {
-                Console.WriteLine($"Unable to parse ModDate: {pdfInfo.ModDate}");
-                return;
-            }
-        }
-
-        // Output the modification date in a readable format
-        Console.WriteLine($"Modification date: {modDate:yyyy-MM-dd HH:mm:ss}");
     }
 }
