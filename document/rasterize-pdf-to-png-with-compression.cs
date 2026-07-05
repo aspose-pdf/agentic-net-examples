@@ -9,56 +9,42 @@ class Program
     static void Main()
     {
         const string inputPdf = "input.pdf";
-        const string outputDir = "output_images";
+        const string outputFolder = "output_images";
 
-        // Verify input file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdf))
+        // Load the PDF document
+        using (Document doc = new Document(inputPdf))
         {
-            // ------------------------------------------------------------
-            // Configure PNG compression via ImageCompressionOptions
-            // ------------------------------------------------------------
+            // Configure image compression options for PNG output
             OptimizationOptions opt = new OptimizationOptions();
-
-            // Enable image compression inside the PDF
-            opt.ImageCompressionOptions.CompressImages = true;
-
-            // Set compression quality (0‑100). Higher values give stronger compression.
-            // This influences the PNG compression level when the pages are rasterized.
-            opt.ImageCompressionOptions.ImageQuality = 80; // example value
+            ImageCompressionOptions imgComp = opt.ImageCompressionOptions;
+            imgComp.CompressImages = true;      // enable compression
+            imgComp.ImageQuality = 90;          // PNG compression level (0-100)
 
             // Apply the optimization settings to the document
-            pdfDoc.OptimizeResources(opt);
+            doc.OptimizeResources(opt);
 
-            // ------------------------------------------------------------
-            // Rasterize each page to a lossless PNG image
-            // ------------------------------------------------------------
-            // Define the resolution for the PNG output (e.g., 300 DPI)
-            Resolution resolution = new Resolution(300);
-            PngDevice pngDevice = new PngDevice(resolution);
-
-            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
-            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
+            // Rasterize each page to a PNG image
+            for (int pageNumber = 1; pageNumber <= doc.Pages.Count; pageNumber++)
             {
-                string outPath = Path.Combine(outputDir, $"page_{pageNum}.png");
+                // Create a PNG device with desired resolution
+                PngDevice pngDevice = new PngDevice(new Resolution(300));
 
-                // Save each page as a PNG file
-                using (FileStream outStream = new FileStream(outPath, FileMode.Create))
+                string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.png");
+                using (FileStream outStream = new FileStream(outputPath, FileMode.Create))
                 {
-                    pngDevice.Process(pdfDoc.Pages[pageNum], outStream);
+                    pngDevice.Process(doc.Pages[pageNumber], outStream);
                 }
+
+                Console.WriteLine($"Saved page {pageNumber} as PNG to '{outputPath}'.");
             }
         }
-
-        Console.WriteLine("Rasterization completed.");
     }
 }

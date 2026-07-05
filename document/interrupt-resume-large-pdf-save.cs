@@ -9,51 +9,57 @@ class Program
 {
     static async Task Main()
     {
-        const string inputPath  = "large_input.pdf";
-        const string outputPath = "partial_output.pdf";
-        const string finalPath  = "final_output.pdf";
+        const string inputPdf  = "large_input.pdf";
+        const string outputPdf = "large_output.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the large PDF document (read‑only stream is sufficient for saving)
+        await SaveWithInterruptionAsync(inputPdf, outputPdf);
+    }
+
+    // Demonstrates interrupting a long‑running save operation and then resuming it.
+    private static async Task SaveWithInterruptionAsync(string inputPath, string outputPath)
+    {
+        // Load the document inside a using block for deterministic disposal.
         using (Document doc = new Document(inputPath))
         {
-            // Create an interrupt monitor – it provides a CancellationToken
+            // Create an interrupt monitor – it provides a CancellationToken that can be
+            // passed to the asynchronous save operation.
             using (InterruptMonitor monitor = new InterruptMonitor())
             {
-                // Start asynchronous save operation
-                Task saveTask = doc.SaveAsync(outputPath, monitor.CancellationToken);
+                CancellationToken token = monitor.CancellationToken;
 
-                // Simulate work while the save is in progress
+                // Start the asynchronous save. This runs on a background thread and
+                // observes the provided cancellation token.
+                Task saveTask = doc.SaveAsync(outputPath, token);
+
+                // Simulate some condition that requires the operation to be paused.
+                // Here we wait 2 seconds and then request interruption.
                 await Task.Delay(TimeSpan.FromSeconds(2));
-
-                // Request interruption of the ongoing save
-                monitor.Interrupt();
+                monitor.Interrupt(); // Sends a cancellation request.
 
                 try
                 {
-                    // Await the task – it will complete with an OperationCanceledException
+                    // Await the save task – it will throw OperationCanceledException
+                    // when the interrupt request is honored.
                     await saveTask;
                 }
                 catch (OperationCanceledException)
                 {
-                    Console.WriteLine("Save operation was successfully interrupted.");
+                    Console.WriteLine("Save operation was interrupted to release resources.");
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Unexpected error during save: {ex.Message}");
-                }
-            }
 
-            // At this point resources held by the first save are released.
-            // To resume saving, reopen (or reuse) the document and perform a normal save.
-            // Here we demonstrate a fresh save without interruption.
-            doc.Save(finalPath);
-            Console.WriteLine($"Document saved completely to '{finalPath}'.");
+                // At this point resources used by the partially completed save have been
+                // released. To resume, simply start a new save operation. If incremental
+                // saving is required, the document must have been opened with a writable
+                // stream (not shown here). For simplicity we perform a full save again.
+                await doc.SaveAsync(outputPath, CancellationToken.None);
+                Console.WriteLine("Save operation resumed and completed successfully.");
+            }
         }
     }
 }

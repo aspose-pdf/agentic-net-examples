@@ -15,17 +15,17 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document (lifecycle rule: load)
         using (Document doc = new Document(inputPath))
         {
             // Set each page's rotation to 90 degrees (portrait on landscape devices)
-            foreach (Page page in doc.Pages)
+            for (int i = 1; i <= doc.Pages.Count; i++) // page indexing is 1‑based
             {
-                // Correct enum value uses the 'on' prefix
-                page.Rotate = Rotation.on90;
+                Page page = doc.Pages[i];
+                page.Rotate = Rotation.on90; // Correct enum value with 'on' prefix
             }
 
-            // Save the modified document
+            // Save the modified PDF (lifecycle rule: save)
             doc.Save(outputPath);
         }
 

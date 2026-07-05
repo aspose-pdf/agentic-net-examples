@@ -1,29 +1,31 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Path to the PDF file to be loaded
-        const string inputPath = "sample.pdf";
+        const string inputPath = "input.pdf";
 
-        // Verify that the file exists before attempting to load
+        // Verify that the file exists before attempting to load it
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF into a Document object.
-        // The Document constructor that accepts a filename opens the file.
-        // Wrapped in a using block to ensure deterministic disposal (resource leak prevention).
-        using (Document doc = new Document(inputPath))
+        // Load the PDF into a Document instance.
+        // The Document is wrapped in a using block to ensure deterministic disposal.
+        using (Document pdfDoc = new Document(inputPath))
         {
-            // At this point 'doc' is ready for further processing.
-            Console.WriteLine($"PDF loaded successfully. Pages: {doc.Pages.Count}");
-            // Example: you could now manipulate the document, e.g., add annotations, extract text, etc.
+            // At this point the PDF is loaded and ready for further processing.
+            Console.WriteLine($"PDF loaded successfully. Page count: {pdfDoc.Pages.Count}");
+
+            // Example placeholder for additional manipulation:
+            // pdfDoc.Pages[1].Paragraphs.Add(new TextFragment("Hello, Aspose.Pdf!"));
         }
+
+        // The Document has been disposed automatically here.
     }
 }

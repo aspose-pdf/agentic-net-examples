@@ -13,35 +13,35 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Enable automatic tagging (optional but improves overall accessibility)
+        // Enable auto‑tagging and use automatic heading detection
         AutoTaggingSettings.Default.EnableAutoTagging = true;
+        AutoTaggingSettings.Default.HeadingRecognitionStrategy = HeadingRecognitionStrategy.Auto;
 
-        // Load the existing PDF
         using (Document doc = new Document(inputPath))
         {
-            // Access the tagged content API
+            // Access the tagged‑content API
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Set language and title for the PDF
+            // Set document language and title (accessible metadata)
             tagged.SetLanguage("en-US");
             tagged.SetTitle("Accessible Document");
 
             // Root element of the logical structure tree
             StructureElement root = tagged.RootElement;
 
-            // ----- Heading (H1) -----
-            HeaderElement heading = tagged.CreateHeaderElement(1);
-            heading.SetText("Document Title");
-            root.AppendChild(heading); // AppendChild with a single argument
+            // ----- Heading (level 1) -----
+            HeaderElement h1 = tagged.CreateHeaderElement(1);
+            h1.SetText("Document Title");
+            root.AppendChild(h1);
 
             // ----- Paragraph -----
-            ParagraphElement paragraph = tagged.CreateParagraphElement();
-            paragraph.SetText("This is an example paragraph that provides introductory text for the document.");
-            root.AppendChild(paragraph);
+            ParagraphElement para = tagged.CreateParagraphElement();
+            para.SetText("This is the first paragraph of the document. It provides an overview of the content.");
+            root.AppendChild(para);
 
             // ----- Table -----
             TableElement table = tagged.CreateTableElement();
@@ -66,13 +66,13 @@ class Program
             TableTRElement bodyRow = tagged.CreateTableTRElement();
             tbody.AppendChild(bodyRow);
             TableTDElement td1 = tagged.CreateTableTDElement();
-            td1.SetText("Row 1, Cell 1");
+            td1.SetText("Row 1, Cell A");
             bodyRow.AppendChild(td1);
             TableTDElement td2 = tagged.CreateTableTDElement();
-            td2.SetText("Row 1, Cell 2");
+            td2.SetText("Row 1, Cell B");
             bodyRow.AppendChild(td2);
 
-            // Save the modified PDF with accessibility tags
+            // Save the PDF with the new accessibility tags
             doc.Save(outputPath);
         }
 

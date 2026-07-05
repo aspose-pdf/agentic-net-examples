@@ -1,14 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "clean_output.pdf";
+        const string outputPath = "clean.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -18,18 +17,17 @@ class Program
 
         try
         {
-            // Load the PDF (using the documented lifecycle rule)
+            // Load the PDF document (lifecycle rule: use Document constructor)
             using (Document doc = new Document(inputPath))
             {
-                // Pages are 1‑based; iterate through each page
+                // Pages are 1‑based (global rule)
                 for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    Page page = doc.Pages[i];
-                    // Clear all annotations on the current page
-                    page.Annotations.Clear(); // AnnotationCollection.Clear deletes all annotations
+                    // Delete all annotations on each page (AnnotationCollection.Delete)
+                    doc.Pages[i].Annotations.Delete();
                 }
 
-                // Save the cleaned PDF (Save without options always writes PDF)
+                // Save the cleaned PDF (lifecycle rule: use Document.Save)
                 doc.Save(outputPath);
             }
 

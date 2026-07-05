@@ -6,56 +6,55 @@ class Program
 {
     static void Main()
     {
-        // Folder containing the source PDFs
-        const string inputFolder = "InputPdfs";
-        // Folder where sanitized PDFs will be saved
-        const string outputFolder = "SanitizedPdfs";
-
-        if (!Directory.Exists(inputFolder))
-        {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
-            return;
-        }
+        // Input folder containing PDFs to be sanitized
+        const string inputFolder = @"C:\InputPdfs";
+        // Output folder where cleaned PDFs will be saved
+        const string outputFolder = @"C:\SanitizedPdfs";
 
         // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
+        if (!Directory.Exists(outputFolder))
+        {
+            Directory.CreateDirectory(outputFolder);
+        }
 
         // Get all PDF files in the input folder (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
 
-        foreach (string inputPath in pdfFiles)
+        foreach (string pdfPath in pdfFiles)
         {
-            string fileName   = Path.GetFileName(inputPath);
-            string outputPath = Path.Combine(outputFolder, fileName);
-
-            try
+            // Load the PDF document
+            using (Document doc = new Document(pdfPath))
             {
-                // Load the PDF document (lifecycle rule: use using for deterministic disposal)
-                using (Document doc = new Document(inputPath))
-                {
-                    // Remove document metadata
-                    doc.RemoveMetadata();
+                // ---- Sanitization steps ----
+                // Remove all metadata
+                doc.RemoveMetadata();
 
-                    // Remove PDF/A and PDF/UA compliance flags, if present
-                    doc.RemovePdfaCompliance();
-                    doc.RemovePdfUaCompliance();
+                // Remove PDF/UA compliance (accessibility tags)
+                doc.RemovePdfUaCompliance();
 
-                    // Optimize resources: remove unused objects and merge duplicates
-                    doc.OptimizeResources();
+                // Remove PDF/A compliance (archival tags)
+                doc.RemovePdfaCompliance();
 
-                    // Flatten form fields and annotations into the page content
-                    doc.Flatten();
+                // Flatten form fields (replace fields with their appearances)
+                doc.Flatten();
 
-                    // Save the sanitized PDF (lifecycle rule: use Document.Save(string))
-                    doc.Save(outputPath);
-                }
+                // Optimize resources (remove unused objects, merge duplicates)
+                doc.OptimizeResources();
 
-                Console.WriteLine($"Sanitized: {fileName}");
+                // Optional: validate the document after sanitization
+                // bool isValid = doc.Check(true);
+
+                // Build the output file path (append "_clean" to the original name)
+                string fileName = Path.GetFileNameWithoutExtension(pdfPath);
+                string cleanedPath = Path.Combine(outputFolder, fileName + "_clean.pdf");
+
+                // Save the sanitized PDF
+                doc.Save(cleanedPath);
             }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Failed to process {fileName}: {ex.Message}");
-            }
+
+            Console.WriteLine($"Sanitized PDF saved: {pdfPath}");
         }
+
+        Console.WriteLine("All PDFs have been processed.");
     }
 }

@@ -15,17 +15,17 @@ class Program
             return;
         }
 
-        // Load the PDF document (wrapped in using for deterministic disposal)
+        // Load the PDF document
         using (Document pdfDoc = new Document(inputPdf))
         {
-            // Create a file stream to write the XMP metadata (XML format)
-            using (FileStream outStream = new FileStream(outputXml, FileMode.Create, FileAccess.Write))
+            // Create a file stream for the XML output
+            using (FileStream xmlStream = new FileStream(outputXml, FileMode.Create, FileAccess.Write))
             {
                 // Extract the embedded XMP metadata into the stream
-                pdfDoc.GetXmpMetadata(outStream);
+                pdfDoc.GetXmpMetadata(xmlStream);
             }
         }
 
-        Console.WriteLine($"XMP metadata extracted to '{outputXml}'.");
+        Console.WriteLine($"XMP metadata saved to '{outputXml}'.");
     }
 }

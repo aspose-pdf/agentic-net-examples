@@ -1,50 +1,57 @@
 using System;
+using System.Data;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "MultiPageTable.pdf";
-
-        // Create a new PDF document and ensure proper disposal
+        // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a page (first page is index 1)
+            // Add a page to the document (first page)
             Page page = doc.Pages.Add();
 
             // Create a table that will automatically break across pages
-            Table table = new Table();
-
-            // Define column widths (values are in points)
-            table.ColumnWidths = "100 200 100";
-
-            // Enable automatic breaking of the table onto subsequent pages
-            table.IsBroken = true;   // table will be split when it exceeds page height
-
-            // Add a header row (will be repeated on each new page)
-            Row header = table.Rows.Add();
-            header.Cells.Add("Header 1");
-            header.Cells.Add("Header 2");
-            header.Cells.Add("Header 3");
-            table.RepeatingRowsCount = 1; // repeat the first row as header
-
-            // Populate the table with many rows to force pagination
-            for (int i = 1; i <= 100; i++)
+            Table table = new Table
             {
-                Row row = table.Rows.Add();
-                row.Cells.Add($"Row {i} - Col 1");
-                row.Cells.Add($"Row {i} - Col 2");
-                row.Cells.Add($"Row {i} - Col 3");
+                // Define column widths (in points)
+                ColumnWidths = "50 150 250",
+                // Enable automatic breaking across pages
+                IsBroken = true,
+                // Repeat the first row (header) on each new page fragment
+                RepeatingRowsCount = 1
+            };
+
+            // ----- Header row -----
+            Row header = table.Rows.Add();
+            header.Cells.Add("ID");
+            header.Cells.Add("Name");
+            header.Cells.Add("Description");
+
+            // ----- Populate data rows -----
+            DataTable data = new DataTable();
+            data.Columns.Add("ID", typeof(int));
+            data.Columns.Add("Name", typeof(string));
+            data.Columns.Add("Description", typeof(string));
+
+            // Generate enough rows to span multiple pages
+            for (int i = 1; i <= 200; i++)
+            {
+                data.Rows.Add(i, $"Item {i}", $"Description for item {i}");
             }
+
+            // Import the data rows into the table (skip column names because header already added)
+            // Parameters: DataTable, isColumnNamesImported, firstFilledRow, firstFilledColumn
+            table.ImportDataTable(data, false, 0, 0);
 
             // Add the table to the page's paragraph collection
             page.Paragraphs.Add(table);
 
-            // Save the document as PDF
-            doc.Save(outputPath);
+            // Save the PDF (extension determines PDF output)
+            doc.Save("MultiPageTable.pdf");
         }
 
-        Console.WriteLine($"PDF with multi‑page table saved to '{outputPath}'.");
+        Console.WriteLine("PDF with multi‑page table created successfully.");
     }
 }

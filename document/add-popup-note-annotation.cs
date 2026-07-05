@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_popupped.pdf";
+        const string outputPath = "output_with_popup.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,42 +16,43 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the existing PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least one page
-            Page page = doc.Pages[1]; // 1‑based indexing
+            // Get the first page (page indexing is 1‑based)
+            Page page = doc.Pages[1];
 
-            // Define the rectangle where the sticky‑note icon will appear
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 700, 120, 720);
+            // Define the rectangle where the annotation will appear
+            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 600);
 
-            // Create the visible TextAnnotation (the sticky note)
+            // Create a TextAnnotation (the sticky‑note icon that the user sees)
             TextAnnotation textAnn = new TextAnnotation(page, rect)
             {
-                Title    = "Note",                     // Title shown in the pop‑up window title bar
-                Contents = "Hover to see details",    // Short tooltip text
-                Icon     = TextIcon.Comment,           // Choose an icon style
-                Open     = false                       // Start closed; will open on hover/click
+                Icon     = TextIcon.Comment,          // icon displayed on the page
+                Title    = "Quick Note",              // title shown in the popup window
+                Contents = "Hover to see details.",   // short tooltip text
+                Open     = false                      // popup is closed by default
             };
 
-            // Create the hidden PopupAnnotation that holds the detailed information
+            // Create a PopupAnnotation that holds the detailed information
             PopupAnnotation popup = new PopupAnnotation(page, rect)
             {
-                Contents = "This is the detailed information displayed in the pop‑up window when the note is activated.",
-                Open     = false // Keep closed initially
+                Contents = "This is the detailed information that appears when the user hovers over the note annotation.",
+                Open     = false                      // keep it closed until the user activates it
             };
 
-            // Link the popup to its parent annotation
+            // Associate the popup with its parent text annotation
             popup.Parent = textAnn;
-            textAnn.Popup = popup;
 
-            // Add the parent annotation (which now carries the popup) to the page
+            // Add both annotations to the page's annotation collection
             page.Annotations.Add(textAnn);
+            page.Annotations.Add(popup);
 
-            // Save the modified PDF (PDF format by default)
+            // Save the modified PDF (lifecycle rule: save inside using block)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Pop‑up note annotation added and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with pop‑up note saved to '{outputPath}'.");
     }
 }
