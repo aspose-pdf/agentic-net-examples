@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf.Facades;          // PdfConverter
-using Aspose.Pdf.Devices;          // CompressionType
+using Aspose.Pdf.Devices;          // CompressionType, TiffSettings
 
 class Program
 {
@@ -18,17 +18,20 @@ class Program
 
         try
         {
-            // Create and configure the PDF converter
+            // Initialize the converter and bind the source PDF
             using (PdfConverter converter = new PdfConverter())
             {
-                // Bind the source PDF file
                 converter.BindPdf(inputPdf);
-
-                // Prepare the converter (required before saving)
                 converter.DoConvert();
 
-                // Save all pages as a multi‑page TIFF using LZW compression
-                converter.SaveAsTIFF(outputTiff, CompressionType.LZW);
+                // Configure TIFF settings with LZW compression
+                TiffSettings tiffSettings = new TiffSettings
+                {
+                    Compression = CompressionType.LZW
+                };
+
+                // Save all pages as a single multi‑page TIFF file
+                converter.SaveAsTIFF(outputTiff, tiffSettings);
             }
 
             Console.WriteLine($"PDF successfully converted to TIFF: {outputTiff}");

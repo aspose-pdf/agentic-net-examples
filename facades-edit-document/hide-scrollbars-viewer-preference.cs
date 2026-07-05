@@ -11,25 +11,23 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // PdfContentEditor does not implement IDisposable, so we manage its lifetime manually.
+        // Initialize the facade and bind the source PDF
         PdfContentEditor editor = new PdfContentEditor();
-
-        // Load the PDF document.
         editor.BindPdf(inputPath);
 
-        // Hide UI elements (including scrollbars) for a cleaner small‑screen view.
+        // Hide UI elements (scrollbars, navigation controls) for small‑screen devices
         editor.ChangeViewerPreference(ViewerPreference.HideWindowUI);
 
-        // Save the modified PDF.
+        // Save the modified document
         editor.Save(outputPath);
 
-        // Release resources.
+        // Release resources if the facade supports it
         editor.Close();
 
-        Console.WriteLine($"Viewer preference applied. Output saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with hidden UI to '{outputPath}'.");
     }
 }

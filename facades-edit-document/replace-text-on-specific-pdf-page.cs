@@ -9,36 +9,30 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string srcText    = "old text";   // text to find
-        const string destText   = "new text";   // replacement text
+        const string srcText    = "TextToReplace";   // text to find
+        const string destText   = "NewReplacement"; // replacement text
 
+        // Ensure the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
+        // Open the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPath))
-            {
-                // Initialize the content editor and bind the document
-                PdfContentEditor editor = new PdfContentEditor();
-                editor.BindPdf(doc);
+            // Create a PdfContentEditor facade and bind it to the document
+            PdfContentEditor editor = new PdfContentEditor();
+            editor.BindPdf(doc);
 
-                // Replace text only on page 3 (Aspose.Pdf uses 1‑based page indexing)
-                editor.ReplaceText(srcText, 3, destText);
+            // Replace text only on page 3 (Aspose.Pdf uses 1‑based page indexing)
+            editor.ReplaceText(srcText, 3, destText);
 
-                // Save the modified document
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"Text on page 3 replaced and saved to '{outputPath}'.");
+            // Save the modified document
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Text replacement completed. Output saved to '{outputPath}'.");
     }
 }

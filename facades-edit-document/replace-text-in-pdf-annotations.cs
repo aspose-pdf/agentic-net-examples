@@ -1,21 +1,24 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF, output PDF and the text to replace inside annotations
+        // Input / output files
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string srcText    = "OldText";
-        const string destText   = "NewText";
 
-        // Pages on which the replacement should be performed (1‑based indexing)
-        int[] targetPages = { 1, 2, 3 };
+        // Text to replace inside annotations
+        const string srcString = "OldText";
+        const string destString = "NewText";
+
+        // Pages on which the replacement should be performed.
+        // Use 0 to indicate all pages.
+        int[] pagesToProcess = new int[] { 1, 2, 0 }; // example: pages 1, 2 and all pages (0)
 
         if (!File.Exists(inputPath))
         {
@@ -23,46 +26,44 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document inside a using block (ensures proper disposal)
+        using (Document doc = new Document(inputPath))
         {
-            // PdfAnnotationEditor is a Facade class – wrap it in a using block for deterministic disposal
-            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+            // Bind the document to the PdfAnnotationEditor facade (required by the task)
+            PdfAnnotationEditor annotationEditor = new PdfAnnotationEditor();
+            annotationEditor.BindPdf(doc);
+
+            // Determine the set of pages to iterate
+            bool processAll = Array.Exists(pagesToProcess, p => p == 0);
+            int startPage = 1;
+            int endPage   = doc.Pages.Count;
+
+            for (int pageNum = startPage; pageNum <= endPage; pageNum++)
             {
-                // Bind the existing PDF file to the editor
-                editor.BindPdf(inputPath);
+                // Skip pages that are not in the explicit list when not processing all pages
+                if (!processAll && Array.IndexOf(pagesToProcess, pageNum) < 0)
+                    continue;
 
-                // Iterate over the requested pages
-                foreach (int pageNumber in targetPages)
+                Page page = doc.Pages[pageNum];
+
+                // Iterate over all annotations on the current page
+                foreach (Annotation ann in page.Annotations)
                 {
-                    // Guard against invalid page numbers
-                    if (pageNumber < 1 || pageNumber > editor.Document.Pages.Count)
-                        continue;
-
-                    Page page = editor.Document.Pages[pageNumber];
-
-                    // Annotations collection uses 1‑based indexing as well
-                    for (int idx = 1; idx <= page.Annotations.Count; idx++)
+                    // Only process annotations that have textual content
+                    if (!string.IsNullOrEmpty(ann.Contents) && ann.Contents.Contains(srcString))
                     {
-                        Annotation annotation = page.Annotations[idx];
-
-                        // Only modify the Contents property of annotations that contain the source text
-                        if (!string.IsNullOrEmpty(annotation.Contents) && annotation.Contents.Contains(srcText))
-                        {
-                            annotation.Contents = annotation.Contents.Replace(srcText, destText);
-                        }
+                        // Replace the target text inside the annotation
+                        ann.Contents = ann.Contents.Replace(srcString, destString);
+                        // Optionally update the modification timestamp
+                        ann.Modified = DateTime.Now;
                     }
                 }
-
-                // Save the modified PDF – this writes only the changed annotation data,
-                // the main page content remains untouched.
-                editor.Save(outputPath);
             }
 
-            Console.WriteLine($"Annotations updated and saved to '{outputPath}'.");
+            // Save the modified document (PDF format)
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Annotations updated and saved to '{outputPath}'.");
     }
 }

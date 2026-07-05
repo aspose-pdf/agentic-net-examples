@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,36 +16,41 @@ class Program
             return;
         }
 
-        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Get the first page (1‑based indexing)
-            Page page = doc.Pages[1];
+            // Verify that page 6 exists (1‑based indexing)
+            if (doc.Pages.Count < 6)
+            {
+                Console.Error.WriteLine("The document has fewer than 6 pages.");
+                return;
+            }
 
-            // Define the rectangle area for the annotation
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            Page page = doc.Pages[6];
+
+            // Define the rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 700);
 
             // Create a square (rectangle) annotation
-            SquareAnnotation rectAnnot = new SquareAnnotation(page, rect)
+            SquareAnnotation square = new SquareAnnotation(page, rect)
             {
-                // Set the border color
-                Color = Aspose.Pdf.Color.Red,
-                // Set opacity to 75%
-                Opacity = 0.75f,
-                // Optional: add some contents (tooltip)
-                Contents = "Custom dashed rectangle"
+                // Optional contents displayed when the annotation is selected
+                Contents = "Dashed rectangle annotation",
+                // Set 50 % opacity
+                Opacity = 0.5,
+                // Border color (the annotation's own Color property controls border color)
+                Color = Aspose.Pdf.Color.Red
             };
 
-            // Configure the border with custom dash pattern
-            // Dash pattern: 3 units on, 2 units off
-            rectAnnot.Border = new Border(rectAnnot)
+            // Configure the border: dashed style and width
+            square.Border = new Border(square)
             {
                 Width = 2,
-                Dash = new Dash(new int[] { 3, 2 })
+                // Dash pattern: 3 units on, 3 units off
+                Dash = new Dash(new int[] { 3, 3 })
             };
 
             // Add the annotation to the page
-            page.Annotations.Add(rectAnnot);
+            page.Annotations.Add(square);
 
             // Save the modified PDF
             doc.Save(outputPath);

@@ -1,19 +1,22 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf       = "input.pdf";
-        const string attachmentPath = "attachment_file.pdf";
-        const string outputPdf      = "output_with_attachment.pdf";
+        // Paths – adjust as needed
+        const string inputPdfPath      = "input.pdf";
+        const string attachmentPath    = "attachment_file.pdf";
+        const string outputPdfPath     = "output_with_attachment.pdf";
+        const string attachmentDesc    = "Description of the attached file";
 
-        // Verify source files exist.
-        if (!File.Exists(inputPdf))
+        // Verify files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
         if (!File.Exists(attachmentPath))
@@ -22,13 +25,18 @@ class Program
             return;
         }
 
-        // Bind the existing PDF, add an embedded file attachment (no visible annotation),
-        // and save the result.
+        // PdfContentEditor does not implement IDisposable, so no using block needed
         PdfContentEditor editor = new PdfContentEditor();
-        editor.BindPdf(inputPdf);
-        editor.AddDocumentAttachment(attachmentPath, "Sample attachment description");
-        editor.Save(outputPdf);
 
-        Console.WriteLine($"Attachment added. Output saved to '{outputPdf}'.");
+        // Bind the source PDF
+        editor.BindPdf(inputPdfPath);
+
+        // Add the attachment as an embedded file (no visible annotation)
+        editor.AddDocumentAttachment(attachmentPath, attachmentDesc);
+
+        // Save the modified PDF
+        editor.Save(outputPdfPath);
+
+        Console.WriteLine($"Attachment added and saved to '{outputPdfPath}'.");
     }
 }

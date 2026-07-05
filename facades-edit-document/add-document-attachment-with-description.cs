@@ -11,24 +11,29 @@ class Program
         const string description = "Sample attachment description";
         const string outputPdf = "output.pdf";
 
+        // Verify that the source PDF and attachment file exist
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-
         if (!File.Exists(attachmentPath))
         {
             Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
             return;
         }
 
-        // Load the PDF, add the attachment with a description, and save.
+        // Add the attachment using PdfContentEditor (Facades API)
         using (PdfContentEditor editor = new PdfContentEditor())
         {
-            editor.BindPdf(inputPdf);                                 // Load PDF
-            editor.AddDocumentAttachment(attachmentPath, description); // Add attachment
-            editor.Save(outputPdf);                                   // Save updated PDF
+            // Bind the existing PDF document
+            editor.BindPdf(inputPdf);
+
+            // Add the attachment with a descriptive label
+            editor.AddDocumentAttachment(attachmentPath, description);
+
+            // Save the updated PDF
+            editor.Save(outputPdf);
         }
 
         Console.WriteLine($"Attachment added and saved to '{outputPdf}'.");

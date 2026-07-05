@@ -1,15 +1,15 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades;   // Facade API for stamping
+using Aspose.Pdf;          // Core types (Aspose.Pdf.Facades.Stamp)
 
 class Program
 {
     static void Main()
     {
         const string inputPdf  = "input.pdf";   // source PDF
-        const string outputPdf = "output.pdf";  // result PDF
-        const string imagePath = "stampImage.png"; // image to use as stamp
+        const string outputPdf = "output.pdf";  // stamped PDF
+        const string imagePath = "stamp.png";   // image to use as stamp
 
         // Verify files exist
         if (!File.Exists(inputPdf))
@@ -23,26 +23,22 @@ class Program
             return;
         }
 
-        // Initialize the facade and specify input/output files
+        // Initialize the PdfFileStamp facade
         PdfFileStamp fileStamp = new PdfFileStamp();
         fileStamp.InputFile  = inputPdf;
         fileStamp.OutputFile = outputPdf;
 
-        // Create a stamp, bind the image, and configure its appearance
-        Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-        stamp.BindImage(imagePath);               // use the image file
-        stamp.SetOrigin(140, 400);                // position on the page (X, Y)
-        stamp.SetImageSize(50, 50);               // width and height of the stamp
-        stamp.Opacity = 0.8f;                     // semi‑transparent
-        stamp.IsBackground = true;                // place behind page content
-        stamp.Pages = new int[] { 2 };            // apply only to page 2 (1‑based)
+        // Create and configure the stamp
+        Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();                 // default constructor
+        stamp.BindImage(imagePath);                // use the image file
+        stamp.SetOrigin(100, 500);                 // position on the page (X, Y)
+        stamp.SetImageSize(150, 100);              // width, height of the stamp
+        stamp.Opacity = 0.8f;                      // semi‑transparent
+        stamp.IsBackground = false;                // place on top of page content
+        stamp.PageNumber = 2;                      // apply only to the second page
 
-        // Add the configured stamp to the PDF
+        // Add the stamp to the PDF and finalize
         fileStamp.AddStamp(stamp);
-
-        // Finalize and write the output file
-        fileStamp.Close();
-
-        Console.WriteLine($"Aspose.Pdf.Facades.Stamp added to page 2 and saved as '{outputPdf}'.");
+        fileStamp.Close(); // saves the output file
     }
 }

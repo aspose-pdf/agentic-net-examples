@@ -1,53 +1,46 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core API types
+using Aspose.Pdf;   // Document, Page, ImageStamp
 
 class Program
 {
     static void Main()
     {
-        // Paths for input PDF, output PDF, and source image file (used to create the memory stream)
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "output.pdf";
-        const string imageFilePath = "logo.png";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string imagePath = "logo.png";
 
-        // Verify that required files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(imageFilePath))
+        if (!File.Exists(imagePath))
         {
-            Console.Error.WriteLine($"Image file not found: {imageFilePath}");
+            Console.Error.WriteLine($"Image file not found: {imagePath}");
             return;
         }
 
         // Load the image into a memory stream
-        byte[] imageBytes = File.ReadAllBytes(imageFilePath);
-        using (MemoryStream imageStream = new MemoryStream(imageBytes))
+        using (FileStream imgStream = File.OpenRead(imagePath))
         {
-            // Create an ImageStamp from the memory stream
-            Aspose.Pdf.ImageStamp imgStamp = new Aspose.Pdf.ImageStamp(imageStream);
+            // Create an ImageStamp from the stream
+            ImageStamp stamp = new ImageStamp(imgStream);
 
-            // Scale the stamp to 50% (Zoom factor 0.5)
-            imgStamp.Zoom = 0.5; // 50% of original size
+            // Scale the stamp to 50 % (both width and height)
+            stamp.Zoom = 0.5;   // equivalent to setting ZoomX and ZoomY to 0.5
 
-            // Optional: set position of the stamp on the page (coordinates from left and bottom)
-            imgStamp.XIndent = 100; // 100 points from the left edge
-            imgStamp.YIndent = 100; // 100 points from the bottom edge
-
-            // Open the PDF document
-            using (Aspose.Pdf.Document pdfDoc = new Aspose.Pdf.Document(inputPdfPath))
+            // Open the PDF document (wrapped in using for deterministic disposal)
+            using (Document pdfDoc = new Document(inputPdf))
             {
-                // Add the stamp to the first page (pages are 1‑based)
-                pdfDoc.Pages[1].AddStamp(imgStamp);
+                // Add the stamp to the first page (Aspose.Pdf uses 1‑based indexing)
+                pdfDoc.Pages[1].AddStamp(stamp);
 
                 // Save the modified PDF
-                pdfDoc.Save(outputPdfPath);
+                pdfDoc.Save(outputPdf);
             }
-
-            Console.WriteLine($"Image stamp added and saved to '{outputPdfPath}'.");
         }
+
+        Console.WriteLine($"Image stamp applied and saved to '{outputPdf}'.");
     }
 }
