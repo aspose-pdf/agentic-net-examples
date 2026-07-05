@@ -6,9 +6,10 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
+        const string inputPdf = "input.pdf";
         const string outputXml = "output.xml";
 
+        // Verify the source PDF exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"File not found: {inputPdf}");
@@ -17,17 +18,18 @@ class Program
 
         try
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document pdfDoc = new Document(inputPdf))
+            // Load the PDF document (lifecycle: load)
+            using (Document doc = new Document(inputPdf))
             {
-                // Export the internal XML representation of the PDF
-                pdfDoc.SaveXml(outputXml);
+                // Export the internal XML representation (lifecycle: save)
+                doc.SaveXml(outputXml);
             }
 
             Console.WriteLine($"XML representation saved to '{outputXml}'.");
         }
         catch (Exception ex)
         {
+            // Handle any errors that occur during processing
             Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }

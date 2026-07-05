@@ -1,104 +1,97 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Xml.Linq;
-using System.Collections.Generic;
 using Aspose.Pdf;
 
 class Program
 {
-    // Simple DTO to hold margin settings for a page range
-    class SectionMargin
-    {
-        public int StartPage { get; set; }
-        public int EndPage   { get; set; }
-        public int Top       { get; set; }   // points
-        public int Left      { get; set; }
-        public int Right     { get; set; }
-        public int Bottom    { get; set; }
-    }
-
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "output.pdf";
-        const string marginsXmlPath = "margins.xml";
+        const string pdfPath = "input.pdf";
+        const string xmlPath = "margins.xml";
+        const string outputPdf = "output_with_margins.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(marginsXmlPath))
-        {
-            Console.Error.WriteLine($"XML not found: {marginsXmlPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
-        // Parse XML – expected format:
+        if (!File.Exists(xmlPath))
+        {
+            Console.Error.WriteLine($"XML not found: {xmlPath}");
+            return;
+        }
+
+        // Load margin definitions from XML.
+        // Expected XML format:
         // <Margins>
-        //   <Section startPage="1" endPage="3">
-        //     <Top>20</Top><Left>15</Left><Right>15</Right><Bottom>20</Bottom>
-        //   </Section>
+        //   <Page number="1">
+        //     <Margin top="20" left="15" right="15" bottom="20"/>
+        //   </Page>
+        //   <Page number="2">
+        //     <Margin top="10" left="10" right="10" bottom="10"/>
+        //   </Page>
         //   ...
         // </Margins>
-        var sections = new List<SectionMargin>();
-        XDocument xmlDoc = XDocument.Load(marginsXmlPath);
-        foreach (var secElem in xmlDoc.Root.Elements("Section"))
-        {
-            var sec = new SectionMargin
-            {
-                StartPage = (int)secElem.Attribute("startPage"),
-                EndPage   = (int)secElem.Attribute("endPage"),
-                Top       = (int?)secElem.Element("Top")   ?? 0,
-                Left      = (int?)secElem.Element("Left")  ?? 0,
-                Right     = (int?)secElem.Element("Right") ?? 0,
-                Bottom    = (int?)secElem.Element("Bottom")?? 0
-            };
-            sections.Add(sec);
-        }
+        var pageMargins = new Dictionary<int, MarginInfo>();
 
         try
         {
-            // Open PDF – use the lifecycle rule (using block)
-            using (Document pdfDoc = new Document(inputPdfPath))
+            XDocument xDoc = XDocument.Load(xmlPath);
+            foreach (var pageElem in xDoc.Root.Elements("Page"))
+            {
+                int pageNumber = (int)pageElem.Attribute("number");
+                var marginElem = pageElem.Element("Margin");
+                if (marginElem == null) continue;
+
+                // Values are expected in points. If they are in other units, convert accordingly.
+                double top    = (double)marginElem.Attribute("top");
+                double left   = (double)marginElem.Attribute("left");
+                double right  = (double)marginElem.Attribute("right");
+                double bottom = (double)marginElem.Attribute("bottom");
+
+                var marginInfo = new MarginInfo
+                {
+                    Top    = top,
+                    Left   = left,
+                    Right  = right,
+                    Bottom = bottom
+                };
+
+                pageMargins[pageNumber] = marginInfo;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to parse XML: {ex.Message}");
+            return;
+        }
+
+        // Load the PDF, apply margins, and save.
+        try
+        {
+            using (var pdfDoc = new Document(pdfPath))
             {
                 // Iterate over all pages (1‑based indexing)
                 for (int i = 1; i <= pdfDoc.Pages.Count; i++)
                 {
-                    // Find the first section that covers this page
-                    SectionMargin match = null;
-                    foreach (var sec in sections)
+                    if (pageMargins.TryGetValue(i, out var mi))
                     {
-                        if (i >= sec.StartPage && i <= sec.EndPage)
-                        {
-                            match = sec;
-                            break;
-                        }
-                    }
-
-                    if (match != null)
-                    {
-                        // Create and assign a new MarginInfo instance using the correct property names
-                        var marginInfo = new MarginInfo
-                        {
-                            Top    = match.Top,
-                            Bottom = match.Bottom,
-                            Left   = match.Left,
-                            Right  = match.Right
-                        };
-                        pdfDoc.Pages[i].PageInfo.Margin = marginInfo;
+                        // Set the margin for the current page.
+                        pdfDoc.Pages[i].PageInfo.Margin = mi;
                     }
                 }
 
-                // Save the modified PDF – simple Save (no extra SaveOptions needed for PDF output)
-                pdfDoc.Save(outputPdfPath);
+                // Save the modified PDF.
+                pdfDoc.Save(outputPdf);
+                Console.WriteLine($"PDF saved with custom margins to '{outputPdf}'.");
             }
-
-            Console.WriteLine($"PDF saved with custom margins to '{outputPdfPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"An error occurred: {ex.Message}");
+            Console.Error.WriteLine($"PDF processing error: {ex.Message}");
         }
     }
 }

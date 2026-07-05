@@ -8,70 +8,44 @@ class Program
 {
     static void Main()
     {
-        // ------------------------------------------------------------
-        // Step 1: Create a simple PDF document with a single page.
-        // ------------------------------------------------------------
-        using (Document doc = new Document())
+        const string pdfTemplatePath = "template.pdf";   // existing PDF (can be blank)
+        const string xmlDefinitionPath = "formDefinition.xml"; // XML that defines XFA form fields
+        const string outputPdfPath = "filled_form.pdf";
+
+        // Verify input files exist
+        if (!File.Exists(pdfTemplatePath))
         {
-            Page page = doc.Pages.Add();
-            doc.Save("input.pdf");
+            Console.Error.WriteLine($"Template PDF not found: {pdfTemplatePath}");
+            return;
+        }
+        if (!File.Exists(xmlDefinitionPath))
+        {
+            Console.Error.WriteLine($"XML definition not found: {xmlDefinitionPath}");
+            return;
         }
 
-        // ------------------------------------------------------------
-        // Step 2: Re‑open the PDF and add form fields defined in XML.
-        // ------------------------------------------------------------
-        using (Document doc = new Document("input.pdf"))
+        // Load the PDF document
+        using (Document doc = new Document(pdfTemplatePath))
         {
-            // XML that describes the form fields and their default values.
-            string xmlContent = @"<Fields>
-    <Field Name='FullName' Type='TextBox' DefaultValue='John Doe' />
-    <Field Name='Agree'    Type='CheckBox' DefaultValue='true' />
-    <Field Name='Age'      Type='TextBox' DefaultValue='30' />
-    <Field Name='Subscribe' Type='CheckBox' DefaultValue='false' />
-</Fields>";
+            // Load the XML that describes the form (XFA)
+            XmlDocument xfaXml = new XmlDocument();
+            xfaXml.Load(xmlDefinitionPath);
 
-            XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(xmlContent);
+            // Assign the XFA data to the PDF form
+            doc.Form.AssignXfa(xfaXml);
 
-            XmlNodeList fieldNodes = xmlDoc.SelectNodes("/Fields/Field");
-            int fieldIndex = 0;
-            foreach (XmlNode fieldNode in fieldNodes)
+            // Set default values for each form field
+            foreach (Field field in doc.Form.Fields)
             {
-                string fieldName = fieldNode.Attributes["Name"].Value;
-                string fieldType = fieldNode.Attributes["Type"].Value;
-                string defaultValue = fieldNode.Attributes["DefaultValue"].Value;
-
-                // Simple layout: each field is placed 30 points lower than the previous one.
-                double lowerLeftX = 100;
-                double lowerLeftY = 700 - (fieldIndex * 30);
-                double upperRightX = 300;
-                double upperRightY = lowerLeftY + 20;
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(lowerLeftX, lowerLeftY, upperRightX, upperRightY);
-
-                if (fieldType == "TextBox")
-                {
-                    TextBoxField textBox = new TextBoxField(doc.Pages[1], rect);
-                    textBox.PartialName = fieldName;
-                    textBox.Value = defaultValue;
-                    doc.Form.Add(textBox);
-                }
-                else if (fieldType == "CheckBox")
-                {
-                    CheckboxField checkBox = new CheckboxField(doc.Pages[1], rect);
-                    checkBox.PartialName = fieldName;
-                    bool isChecked = false;
-                    if (Boolean.TryParse(defaultValue, out isChecked))
-                    {
-                        checkBox.Checked = isChecked;
-                    }
-                    doc.Form.Add(checkBox);
-                }
-
-                fieldIndex++;
+                // Example default: use the field's full name prefixed with "Default_"
+                // Replace with any custom logic as needed
+                field.Value = $"Default_{field.FullName}";
             }
 
-            // Save the resulting PDF with the newly added form fields.
-            doc.Save("output.pdf");
+            // Save the resulting PDF with populated form fields
+            doc.Save(outputPdfPath);
         }
+
+        Console.WriteLine($"PDF with form fields created and saved to '{outputPdfPath}'.");
     }
 }

@@ -1,54 +1,47 @@
 using System;
 using System.IO;
-using System.Xml;
+using System.Xml.Linq;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputXmlPath  = "input.xml";   // XML containing CDATA sections with HTML
-        const string outputPdfPath = "output.pdf";
+        const string xmlPath = "input.xml";
+        const string pdfPath = "output.pdf";
 
-        if (!File.Exists(inputXmlPath))
+        if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputXmlPath}");
+            Console.Error.WriteLine($"XML file not found: {xmlPath}");
             return;
         }
 
         // Load the XML document (no special load options required for plain XML)
-        XmlDocument xmlDoc = new XmlDocument();
-        xmlDoc.Load(inputXmlPath);
+        XDocument xDoc = XDocument.Load(xmlPath);
 
-        // Create a new PDF document and ensure deterministic disposal
+        // Create a new empty PDF document
         using (Document pdfDoc = new Document())
         {
-            // Add a single page – additional pages can be added as needed
-            Page page = pdfDoc.Pages.Add();
-
-            // Iterate through all CDATA sections in the XML
-            foreach (XmlNode node in xmlDoc.SelectNodes("//*"))
+            // Iterate over all CDATA sections in the XML
+            foreach (XCData cdata in xDoc.DescendantNodes().OfType<XCData>())
             {
-                foreach (XmlNode child in node.ChildNodes)
-                {
-                    if (child.NodeType == XmlNodeType.CDATA)
-                    {
-                        // The CDATA value contains an HTML fragment
-                        string htmlFragment = child.Value;
+                // Each CDATA is assumed to contain an HTML fragment
+                string htmlContent = cdata.Value;
 
-                        // Create an Aspose.Pdf.HtmlFragment from the HTML string
-                        HtmlFragment fragment = new HtmlFragment(htmlFragment);
+                // Add a new page for this fragment
+                Page page = pdfDoc.Pages.Add();
 
-                        // Add the fragment to the page's paragraph collection
-                        page.Paragraphs.Add(fragment);
-                    }
-                }
+                // Create an HtmlFragment from the HTML string
+                Aspose.Pdf.HtmlFragment htmlFragment = new Aspose.Pdf.HtmlFragment(htmlContent);
+
+                // Add the fragment to the page's paragraph collection
+                page.Paragraphs.Add(htmlFragment);
             }
 
-            // Save the result as a PDF file
-            pdfDoc.Save(outputPdfPath);
+            // Save the resulting PDF
+            pdfDoc.Save(pdfPath);
         }
 
-        Console.WriteLine($"PDF generated successfully: {outputPdfPath}");
+        Console.WriteLine($"PDF generated successfully: {pdfPath}");
     }
 }
