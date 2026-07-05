@@ -1,63 +1,53 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Drawing;
-using Aspose.Pdf.Text;
 
-public class Program
+class Program
 {
-    public static void Main()
+    static void Main()
     {
-        // Create a tiny PNG image to be used as a stamp (1x1 pixel transparent)
-        string imagePath = "stamp.png";
-        byte[] pngBytes = Convert.FromBase64String(
-            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+XK6cAAAAASUVORK5CYII=");
-        File.WriteAllBytes(imagePath, pngBytes);
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string stampPath  = "stamp.png";
 
-        // ---------------------------------------------------------------------
-        // Step 1: Create a sample PDF with a single page and a bookmark (outline)
-        // ---------------------------------------------------------------------
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add one blank page
-            doc.Pages.Add();
-
-            // Add a simple text fragment so the page is not empty
-            TextFragment tf = new TextFragment("Sample PDF with bookmark");
-            doc.Pages[1].Paragraphs.Add(tf);
-
-            // Create a bookmark that points to the first page
-            OutlineItemCollection bookmark = new OutlineItemCollection(doc.Outlines);
-            bookmark.Title = "First Page";
-            bookmark.Action = new GoToAction(doc.Pages[1]);
-            doc.Outlines.Add(bookmark);
-
-            // Save the sample PDF
-            doc.Save("input.pdf");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            return;
         }
 
-        // ---------------------------------------------------------------
-        // Step 2: Open the PDF and add an image stamp to each page
-        // ---------------------------------------------------------------
-        using (Document pdfDoc = new Document("input.pdf"))
+        if (!File.Exists(stampPath))
         {
-            int pageCount = pdfDoc.Pages.Count;
-            for (int pageIndex = 1; pageIndex <= pageCount; pageIndex++)
+            Console.Error.WriteLine($"Stamp image not found: {stampPath}");
+            return;
+        }
+
+        // Load the existing PDF (bookmarks and outline are kept)
+        using (Document doc = new Document(inputPath))
+        {
+            // Create an image stamp – configure its appearance as needed
+            ImageStamp imgStamp = new ImageStamp(stampPath)
             {
-                // Create an ImageStamp from the PNG file
-                ImageStamp stamp = new ImageStamp(imagePath);
-                // Position the stamp at the bottom‑center of the page
-                stamp.HorizontalAlignment = HorizontalAlignment.Center;
-                stamp.VerticalAlignment = VerticalAlignment.Bottom;
+                // Align stamp to the bottom‑right corner of each page
+                HorizontalAlignment = HorizontalAlignment.Right,
+                VerticalAlignment   = VerticalAlignment.Bottom,
                 // Make the stamp semi‑transparent
-                stamp.Opacity = 0.5f;
-                // Add the stamp to the current page
-                pdfDoc.Pages[pageIndex].AddStamp(stamp);
+                Opacity = 0.5,
+                // Optional margins from the page edges
+                RightMargin  = 10,
+                BottomMargin = 10
+            };
+
+            // Apply the stamp to every page; existing bookmarks/outlines remain unchanged
+            foreach (Page page in doc.Pages)
+            {
+                page.AddStamp(imgStamp);
             }
 
-            // Save the modified PDF – bookmarks are preserved automatically
-            pdfDoc.Save("output.pdf");
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
+
+        Console.WriteLine($"Image stamp added successfully. Output saved to '{outputPath}'.");
     }
 }

@@ -10,39 +10,48 @@ class Program
         const string stampImagePath = "stamp.png";
         const string outputPdfPath  = "output.pdf";
 
+        // Verify required files exist
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-
         if (!File.Exists(stampImagePath))
         {
             Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
             return;
         }
 
-        // Load the PDF document (AcroForm fields are preserved by default)
+        // Load the source PDF, extract its XMP metadata, add the image stamp,
+        // then re‑apply the metadata before saving.
         using (Document doc = new Document(inputPdfPath))
         {
-            // Apply the image stamp to each page (1‑based indexing)
-            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            // Extract existing XMP metadata into a memory stream
+            using (MemoryStream xmpStream = new MemoryStream())
             {
-                // Create an ImageStamp from the image file
+                doc.GetXmpMetadata(xmpStream);
+                xmpStream.Position = 0; // Reset for later reading
+
+                // Create an image stamp from the specified image file
                 ImageStamp imgStamp = new ImageStamp(stampImagePath)
                 {
-                    // Optional visual settings
-                    Background = false,                     // stamp on top of page content
+                    // Example visual settings (optional)
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment   = VerticalAlignment.Center,
-                    Opacity = 0.5f                         // semi‑transparent
+                    Opacity             = 0.5f
                 };
 
-                // Add the stamp to the current page
-                doc.Pages[pageNum].AddStamp(imgStamp);
+                // Apply the stamp to every page in the document
+                foreach (Page page in doc.Pages)
+                {
+                    page.AddStamp(imgStamp);
+                }
+
+                // Re‑apply the original XMP metadata to the modified document
+                doc.SetXmpMetadata(xmpStream);
             }
 
-            // Save the modified PDF; AcroForm fields remain intact
+            // Save the resulting PDF
             doc.Save(outputPdfPath);
         }
 
