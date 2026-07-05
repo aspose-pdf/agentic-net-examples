@@ -6,8 +6,8 @@ class Program
 {
     static void Main(string[] args)
     {
-        // Expect exactly two arguments: input PDF path and output PDF path
-        if (args.Length != 2)
+        // Expect two arguments: input PDF path and output PDF path
+        if (args.Length < 2)
         {
             Console.Error.WriteLine("Usage: RemoveAnnotations <input.pdf> <output.pdf>");
             return;
@@ -19,32 +19,28 @@ class Program
         // Verify that the input file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Error: Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Initialize the annotation editor facade
+            // Create the annotation editor and bind the source PDF
             PdfAnnotationEditor editor = new PdfAnnotationEditor();
-
-            // Bind the PDF document to the editor
             editor.BindPdf(inputPath);
 
-            // Delete all annotations in the document
+            // Remove all annotations from the document
             editor.DeleteAnnotations();
 
-            // Save the modified PDF to the specified output path
+            // Save the resulting PDF to the specified output path
             editor.Save(outputPath);
 
-            // Release resources associated with the bound document
+            // Release resources associated with the editor
             editor.Close();
-
-            Console.WriteLine($"All annotations removed. Output saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -13,23 +12,22 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Flatten all annotations using the PdfAnnotationEditor facade
-        PdfAnnotationEditor editor = new PdfAnnotationEditor();
-        editor.BindPdf(inputPath);
-        editor.FlatteningAnnotations(); // removes annotation objects from the PDF
-        editor.Save(flattenedPath);
-        editor.Close(); // release resources held by the facade
+        // Flatten all annotations using PdfAnnotationEditor
+        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        {
+            editor.BindPdf(inputPath);
+            editor.FlatteningAnnotations(); // removes annotation objects
+            editor.Save(flattenedPath);
+        }
 
-        // Verify that no annotation objects remain by scanning the PDF object tree
+        // Verify that no annotation objects remain after flattening
         using (Document doc = new Document(flattenedPath))
         {
             bool anyAnnotations = false;
-
-            // Pages are 1‑based indexed in Aspose.Pdf
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
@@ -42,11 +40,7 @@ class Program
 
             if (!anyAnnotations)
             {
-                Console.WriteLine("Validation passed: No annotation objects remain after flattening.");
-            }
-            else
-            {
-                Console.WriteLine("Validation failed: Some annotations were not flattened.");
+                Console.WriteLine("All annotations have been successfully flattened; none remain.");
             }
         }
     }

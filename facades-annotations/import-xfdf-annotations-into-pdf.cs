@@ -6,35 +6,37 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string xfdfPath = "annotations.xfdf";
+        const string pdfPath   = "input.pdf";
+        const string xfdfPath  = "annotations.xfdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
         if (!File.Exists(xfdfPath))
         {
-            Console.Error.WriteLine($"XFDF not found: {xfdfPath}");
+            Console.Error.WriteLine($"XFDF file not found: {xfdfPath}");
             return;
         }
 
-        // Use PdfAnnotationEditor facade to work with annotations
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-        {
-            // Load the PDF document into the editor
-            editor.BindPdf(pdfPath);
+        // Create the annotation editor facade
+        PdfAnnotationEditor editor = new PdfAnnotationEditor();
 
-            // Import all annotations from the XFDF file
-            editor.ImportAnnotationsFromXfdf(xfdfPath);
+        // Load the target PDF document
+        editor.BindPdf(pdfPath);
 
-            // Save the modified PDF with imported annotations
-            editor.Save(outputPath);
-        }
+        // Import all annotations from the XFDF file
+        editor.ImportAnnotationsFromXfdf(xfdfPath);
 
-        Console.WriteLine($"Annotations imported and saved to '{outputPath}'.");
+        // Save the modified PDF
+        editor.Save(outputPath);
+
+        // Release resources held by the facade
+        editor.Close();
+
+        Console.WriteLine($"Annotations imported successfully. Saved to '{outputPath}'.");
     }
 }

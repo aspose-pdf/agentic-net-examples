@@ -1,69 +1,57 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations;
 
-class DeleteAnnotationByName
+class Program
 {
     static void Main()
     {
+        // Paths to the source and destination PDF files
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+
+        // The annotation name (ID) to be removed – could be obtained at runtime
+        string annotationName = "my-annotation-id";
+
         // ------------------------------------------------------------
-        // 1. Create a sample PDF that contains a named text annotation.
+        // Ensure the source PDF exists and contains an annotation with
+        // the required name. If the file is missing we create a minimal
+        // PDF on‑the‑fly so the example can run without external files.
         // ------------------------------------------------------------
-        using (Document document = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a page (1‑based indexing)
-            Page page = document.Pages.Add();
+            // Create a new PDF document with a single page
+            Document doc = new Document();
+            Page page = doc.Pages.Add();
 
-            // Define the annotation rectangle (fully qualified to avoid ambiguity)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 200, 650);
+            // Add a text annotation and give it the same Name (Id) we will
+            // later pass to DeleteAnnotation.
+            TextAnnotation txtAnn = new TextAnnotation(page,
+                new Aspose.Pdf.Rectangle(100, 600, 200, 650))
+            {
+                Title    = "Sample",
+                Contents = "This annotation will be removed",
+                // The Name property is the identifier used by DeleteAnnotation
+                Name = annotationName
+            };
+            page.Annotations.Add(txtAnn);
 
-            // Create the text annotation using the (Page, Rectangle) constructor
-            TextAnnotation textAnnotation = new TextAnnotation(page, rect);
-            textAnnotation.Contents = "Sample annotation";
-            textAnnotation.Name = "MyAnnotation"; // the name we will use for deletion
-
-            // Add the annotation to the page
-            page.Annotations.Add(textAnnotation);
-
-            // Save the PDF – this file will be used in the next step
-            document.Save("input.pdf");
+            // Save the temporary source PDF
+            doc.Save(inputPath);
         }
 
         // ------------------------------------------------------------
-        // 2. Delete the annotation using a string literal.
+        // Delete the annotation whose name matches the variable value
         // ------------------------------------------------------------
         using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            editor.BindPdf("input.pdf");
-            // The name is supplied directly as a literal string
-            editor.DeleteAnnotation("MyAnnotation");
-            editor.Save("output_literal.pdf");
-        }
-
-        // ------------------------------------------------------------
-        // 3. Re‑create the sample PDF for the variable‑based example.
-        // ------------------------------------------------------------
-        using (Document document = new Document())
-        {
-            Page page = document.Pages.Add();
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 200, 650);
-            TextAnnotation textAnnotation = new TextAnnotation(page, rect);
-            textAnnotation.Contents = "Sample annotation";
-            textAnnotation.Name = "MyAnnotation";
-            page.Annotations.Add(textAnnotation);
-            document.Save("input2.pdf");
-        }
-
-        // ------------------------------------------------------------
-        // 4. Delete the annotation using a variable that holds the name.
-        // ------------------------------------------------------------
-        string annotationName = "MyAnnotation"; // variable containing the annotation name
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-        {
-            editor.BindPdf("input2.pdf");
+            editor.BindPdf(inputPath);
             editor.DeleteAnnotation(annotationName);
-            editor.Save("output_variable.pdf");
+            editor.Save(outputPath);
         }
+
+        Console.WriteLine($"Annotation '{annotationName}' removed. Result saved to '{outputPath}'.");
     }
 }

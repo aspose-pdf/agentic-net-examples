@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -17,25 +17,29 @@ class Program
             return;
         }
 
-        // Load the document to obtain a Page object (PdfAnnotationEditor does not expose GetPage)
-        Document doc = new Document(inputPath);
-        Page page = doc.Pages[1]; // first page (1‑based index)
-
-        // A rectangle is required by the constructor; its actual size is irrelevant when only flags are changed
-        Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(0, 0, 0, 0);
-
-        // Create a TextAnnotation template and set the ReadOnly flag
-        TextAnnotation template = new TextAnnotation(page, rect)
-        {
-            Flags = AnnotationFlags.ReadOnly
-        };
-
-        // Bind the PDF to the annotation editor and apply the flag to annotations on the desired page range
+        // Initialize the annotation editor and bind the PDF file
         using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
             editor.BindPdf(inputPath);
-            editor.ModifyAnnotations(1, 1, template);
+
+            // The editor works on the whole document, but we need a dummy TextAnnotation
+            // instance to specify the flag we want to apply. Use the first page and a zero‑size rectangle.
+            Page firstPage = editor.Document.Pages[1];
+            Aspose.Pdf.Rectangle dummyRect = new Aspose.Pdf.Rectangle(0, 0, 0, 0);
+            TextAnnotation readOnlyAnnot = new TextAnnotation(firstPage, dummyRect)
+            {
+                Flags = AnnotationFlags.ReadOnly
+            };
+
+            // Apply the flag to all pages (adjust range as needed)
+            int startPage = 1;
+            int endPage = editor.Document.Pages.Count; // total pages in the document
+
+            editor.ModifyAnnotations(startPage, endPage, readOnlyAnnot);
+
+            // Save the modified PDF
             editor.Save(outputPath);
+            // editor.Close() is called automatically by the using block
         }
 
         Console.WriteLine($"Read‑only flag applied and saved to '{outputPath}'.");

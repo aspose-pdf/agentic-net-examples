@@ -1,72 +1,76 @@
 using System;
 using System.Collections.Generic;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Facades;
 
 namespace AsposePdfApi
 {
-    public static class PdfAnnotationHelper
+    public static class AnnotationCounter
     {
-        /// <summary>
-        /// Returns a dictionary where the key is the annotation type name
-        /// and the value is the number of occurrences of that type in the PDF.
-        /// </summary>
-        /// <param name="pdfPath">Path to the PDF file.</param>
-        /// <returns>Dictionary of annotation type names to counts.</returns>
+        // Returns a dictionary where the key is the annotation type name
+        // and the value is the number of occurrences of that type in the PDF.
         public static Dictionary<string, int> GetAnnotationCounts(string pdfPath)
         {
-            // Validate input
             if (string.IsNullOrEmpty(pdfPath))
                 throw new ArgumentException("PDF path must be provided.", nameof(pdfPath));
 
-            // Use PdfAnnotationEditor (facade) to work with annotations.
-            // The facade implements IDisposable, so wrap it in a using block.
+            var counts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+            // Use PdfAnnotationEditor (Facade) to bind the PDF.
             using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
             {
-                // Bind the PDF file to the editor.
                 editor.BindPdf(pdfPath);
 
-                // Determine the total number of pages in the document.
-                int pageCount = editor.Document.Pages.Count;
+                // Access the underlying Document from the editor.
+                Document doc = editor.Document;
 
-                // Extract all annotations from the whole document.
-                // Passing an empty string array retrieves annotations of all types.
-                IList<Annotation> annotations = editor.ExtractAnnotations(1, pageCount, new string[0]);
-
-                // Prepare the result dictionary.
-                Dictionary<string, int> counts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-
-                // Iterate through the extracted annotations and count each type.
-                foreach (Annotation annotation in annotations)
+                // Iterate through all pages (1‑based indexing).
+                for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
                 {
-                    // AnnotationType is an enum; use its name as the dictionary key.
-                    string typeName = annotation.AnnotationType.ToString();
+                    Page page = doc.Pages[pageIndex];
 
-                    if (counts.ContainsKey(typeName))
-                        counts[typeName] += 1;
-                    else
-                        counts[typeName] = 1;
+                    // Iterate through each annotation on the page.
+                    foreach (Annotation annotation in page.Annotations)
+                    {
+                        string typeName = annotation.AnnotationType.ToString();
+
+                        if (counts.ContainsKey(typeName))
+                            counts[typeName]++;
+                        else
+                            counts[typeName] = 1;
+                    }
                 }
-
-                return counts;
             }
+
+            return counts;
         }
     }
 
-    // Minimal entry point required for a console application.
-    // It does not perform any work; it simply satisfies the compiler.
-    internal class Program
+    // Added entry point to satisfy the project’s requirement for a Main method.
+    class Program
     {
         static void Main(string[] args)
         {
-            // Example usage (optional). Commented out to avoid runtime errors when no PDF is supplied.
-            // if (args.Length > 0)
-            // {
-            //     var result = PdfAnnotationHelper.GetAnnotationCounts(args[0]);
-            //     foreach (var kvp in result)
-            //         Console.WriteLine($"{kvp.Key}: {kvp.Value}");
-            // }
+            if (args.Length == 0)
+            {
+                Console.WriteLine("Usage: AsposePdfApi <pdfPath>");
+                return;
+            }
+
+            string pdfPath = args[0];
+            try
+            {
+                var counts = AnnotationCounter.GetAnnotationCounts(pdfPath);
+                foreach (var kvp in counts)
+                {
+                    Console.WriteLine($"{kvp.Key}: {kvp.Value}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+            }
         }
     }
 }

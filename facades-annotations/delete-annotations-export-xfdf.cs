@@ -1,15 +1,14 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // source PDF
-        const string outputPdf = "output.pdf";         // PDF after deletion
-        const string xfdfPath  = "remaining_annotations.xfdf"; // XFDF output
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string xfdfPath = "remaining_annotations.xfdf";
 
         if (!File.Exists(inputPdf))
         {
@@ -17,16 +16,15 @@ class Program
             return;
         }
 
-        // PdfAnnotationEditor implements IDisposable, so wrap it in a using block
+        // Initialize the annotation editor and bind the PDF document
         using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            // Load the PDF document into the editor
             editor.BindPdf(inputPdf);
 
-            // Delete all annotations of a specific type, e.g., "Highlight"
-            editor.DeleteAnnotations("Highlight");
+            // Delete all annotations of the specified type (e.g., Text annotations)
+            editor.DeleteAnnotations("Text");
 
-            // Save the modified PDF (annotations of the specified type are removed)
+            // Save the PDF after deletion
             editor.Save(outputPdf);
 
             // Export the remaining annotations to an XFDF file
@@ -34,9 +32,11 @@ class Program
             {
                 editor.ExportAnnotationsToXfdf(xfdfStream);
             }
+
+            // Close the editor (optional, handled by using)
+            editor.Close();
         }
 
-        Console.WriteLine($"Processed PDF saved to '{outputPdf}'.");
-        Console.WriteLine($"Remaining annotations exported to '{xfdfPath}'.");
+        Console.WriteLine($"Deleted 'Text' annotations, saved PDF to '{outputPdf}', and exported remaining annotations to '{xfdfPath}'.");
     }
 }

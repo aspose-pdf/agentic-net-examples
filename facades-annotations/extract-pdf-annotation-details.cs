@@ -1,75 +1,100 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Drawing;
 
-namespace AnnotationExtraction
+class AnnotationInfo
 {
-    // Custom DTO to hold annotation details
-    public class AnnotationInfo
-    {
-        // Initialise with safe defaults to satisfy non‑nullable warnings
-        public string Name { get; set; } = string.Empty;               // Annotation name (may be empty)
-        public string Type { get; set; } = string.Empty;               // Annotation type as string
-        // Provide a default rectangle with explicit coordinates (0,0,0,0)
-        public Aspose.Pdf.Rectangle Rect { get; set; } = new Aspose.Pdf.Rectangle(0, 0, 0, 0); // Annotation rectangle (coordinates)
-    }
+    public string? Name { get; set; }
+    public string? Type { get; set; }
+    public Aspose.Pdf.Rectangle? Rect { get; set; }
+}
 
-    class Program
+class Program
+{
+    static void Main()
     {
-        static void Main()
+        const string pdfPath = "input.pdf";
+
+        // Ensure a PDF exists so the example can run without external files.
+        EnsureSamplePdf(pdfPath);
+
+        // Initialize the annotation editor and bind the PDF file
+        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            const string inputPdf = "input.pdf";
+            editor.BindPdf(pdfPath);
 
-            // Ensure the source file exists
-            if (!System.IO.File.Exists(inputPdf))
-            {
-                Console.Error.WriteLine($"File not found: {inputPdf}");
-                return;
-            }
+            // Determine total number of pages using PdfFileInfo
+            PdfFileInfo fileInfo = new PdfFileInfo(pdfPath);
+            int pageCount = fileInfo.NumberOfPages;
 
-            // List to store extracted annotation information
+            // Retrieve all possible annotation types
+            AnnotationType[] allTypes = (AnnotationType[])Enum.GetValues(typeof(AnnotationType));
+
+            // Extract annotations from all pages
+            IList<Annotation> annotations = editor.ExtractAnnotations(1, pageCount, allTypes);
+
+            // Convert to custom objects for analysis
             List<AnnotationInfo> extracted = new List<AnnotationInfo>();
-
-            // Use PdfAnnotationEditor facade to work with annotations
-            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+            foreach (Annotation ann in annotations)
             {
-                // Bind the PDF document to the facade
-                editor.BindPdf(inputPdf);
-
-                // Get total number of pages from the underlying Document
-                int pageCount = editor.Document.Pages.Count;
-
-                // Extract all annotations from all pages (empty type array = all types)
-                IList<Annotation> annotations = editor.ExtractAnnotations(1, pageCount, new AnnotationType[0]);
-
-                // Iterate through each annotation and map required properties
-                foreach (Annotation ann in annotations)
+                extracted.Add(new AnnotationInfo
                 {
-                    // Some annotations may not have a name; handle null safely
-                    string name = ann.Name ?? string.Empty;
-
-                    // AnnotationType is an enum; convert to its name for readability
-                    string type = ann.AnnotationType.ToString();
-
-                    // Rectangle may be null; guard against it using a default rectangle with explicit coordinates
-                    Aspose.Pdf.Rectangle rect = ann.Rect ?? new Aspose.Pdf.Rectangle(0, 0, 0, 0);
-
-                    extracted.Add(new AnnotationInfo
-                    {
-                        Name = name,
-                        Type = type,
-                        Rect = rect
-                    });
-                }
+                    Name = ann.Name,
+                    Type = ann.AnnotationType.ToString(),
+                    Rect = ann.Rect
+                });
             }
 
-            // Output the collected information (example: console)
+            // Example output
             foreach (var info in extracted)
             {
-                Console.WriteLine($"Name: {info.Name}, Type: {info.Type}, Rect: [{info.Rect.LLX}, {info.Rect.LLY}, {info.Rect.URX}, {info.Rect.URY}]");
+                string name = info.Name ?? "<null>";
+                string type = info.Type ?? "<null>";
+                var rect = info.Rect;
+                if (rect != null)
+                {
+                    Console.WriteLine($"Name: {name}, Type: {type}, Rect: [{rect.LLX}, {rect.LLY}, {rect.URX}, {rect.URY}]");
+                }
+                else
+                {
+                    Console.WriteLine($"Name: {name}, Type: {type}, Rect: <null>");
+                }
             }
+        }
+    }
+
+    /// <summary>
+    /// Creates a minimal PDF with a single text annotation if the file does not already exist.
+    /// This makes the sample self‑contained and eliminates the FileNotFoundException.
+    /// </summary>
+    private static void EnsureSamplePdf(string path)
+    {
+        if (File.Exists(path))
+            return;
+
+        // Create a new PDF document
+        using (Document doc = new Document())
+        {
+            // Add a blank page
+            Page page = doc.Pages.Add();
+
+            // Add a simple text annotation so that extraction has something to return
+            var rect = new Aspose.Pdf.Rectangle(100, 600, 200, 650); // fully qualified to avoid ambiguity
+            TextAnnotation txtAnn = new TextAnnotation(page, rect)
+            {
+                Name = "SampleAnnotation",
+                Title = "Demo",
+                Contents = "This is a sample annotation",
+                Color = Aspose.Pdf.Color.Yellow // fully qualified to avoid ambiguity
+            };
+            page.Annotations.Add(txtAnn);
+
+            // Save the PDF to the specified path
+            doc.Save(path);
         }
     }
 }

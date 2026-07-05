@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        // Folder containing PDF files
+        // Folder containing the PDF files to process
         const string folderPath = @"C:\PdfFolder";
 
         if (!Directory.Exists(folderPath))
@@ -15,7 +15,7 @@ class Program
             return;
         }
 
-        // Process each PDF file in the folder
+        // Iterate over all PDF files in the folder
         foreach (string pdfFile in Directory.GetFiles(folderPath, "*.pdf"))
         {
             try

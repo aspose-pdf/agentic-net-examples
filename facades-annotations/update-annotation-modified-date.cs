@@ -3,45 +3,46 @@ using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
 
-class UpdateAnnotationModifiedDate
+class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Ensure the source file exists
-        if (!System.IO.File.Exists(inputPdf))
+        // Verify that the source PDF exists
+        if (!System.IO.File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Create the annotation editor facade
+        // Create the annotation editor and bind the PDF document
         using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            // Bind the existing PDF document
-            editor.BindPdf(inputPdf);
+            editor.BindPdf(inputPath);
 
-            // A temporary TextAnnotation is required only to carry the Modified date.
-            // TextAnnotation does not have a parameter‑less constructor – it must be created
-            // with a Page and a Rectangle (any rectangle, even zero‑size, works for this purpose).
-            Page page = editor.Document.Pages[1];
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(0, 0, 0, 0);
-            TextAnnotation tempAnnot = new TextAnnotation(page, rect)
+            // The prototype annotation must be instantiated with a Page and a Rectangle.
+            // We use the first page and a zero‑size rectangle because only the Modified
+            // property is relevant for the ModifyAnnotations call.
+            Page firstPage = editor.Document.Pages[1];
+            Aspose.Pdf.Rectangle dummyRect = new Aspose.Pdf.Rectangle(0, 0, 0, 0);
+            TextAnnotation prototype = new TextAnnotation(firstPage, dummyRect)
             {
                 Modified = DateTime.Now // set to current system time
             };
 
-            // Apply the modification to all annotations on pages 1 through the last page.
+            // Determine the page range (Aspose.Pdf uses 1‑based indexing)
             int startPage = 1;
-            int endPage   = editor.Document.Pages.Count; // total pages in the bound document
-            editor.ModifyAnnotations(startPage, endPage, tempAnnot);
+            int endPage   = editor.Document.Pages.Count; // all pages
+
+            // Apply the modification to all annotations of the specified type on the range
+            editor.ModifyAnnotations(startPage, endPage, prototype);
 
             // Save the updated PDF
-            editor.Save(outputPdf);
+            editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Annotation Modified dates updated and saved to '{outputPdf}'.");
+        Console.WriteLine($"Annotations' Modified date updated and saved to '{outputPath}'.");
     }
 }

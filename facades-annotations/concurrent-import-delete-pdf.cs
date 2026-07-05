@@ -1,100 +1,112 @@
 using System;
 using System.IO;
-using System.Threading.Tasks;
+using System.Threading;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class Program
+class ConcurrentPdfTest
 {
+    // Paths for test files
+    private const string BasePdfPath = "base.pdf";
+    private const string ExtraPdfPath = "extra.pdf";
+    private const string ResultPdfPath = "result.pdf";
+
     static void Main()
     {
-        const string basePdf = "base.pdf";
-        const string sourcePdf = "source.pdf";
-        const string outputPdf = "output_concurrent.pdf";
+        // Ensure clean state
+        CleanupFiles();
 
-        // Verify required files exist
-        if (!File.Exists(basePdf) || !File.Exists(sourcePdf))
+        // Create base PDF (3 pages)
+        using (Document baseDoc = new Document())
         {
-            Console.Error.WriteLine("Required PDF files not found.");
-            return;
+            for (int i = 0; i < 3; i++)
+                baseDoc.Pages.Add();
+
+            baseDoc.Save(BasePdfPath);
         }
 
-        // Remove any previous output
-        if (File.Exists(outputPdf))
-            File.Delete(outputPdf);
-
-        // Initialize output with a copy of the base PDF
-        File.Copy(basePdf, outputPdf);
-
-        // Number of concurrent import and delete operations
-        int importTaskCount = 5;
-        int deleteTaskCount = 5;
-
-        // Synchronization object to serialize file access
-        object fileLock = new object();
-
-        // Create import tasks (append first page of sourcePdf)
-        Task[] importTasks = new Task[importTaskCount];
-        for (int i = 0; i < importTaskCount; i++)
+        // Create extra PDF (2 pages) to be imported
+        using (Document extraDoc = new Document())
         {
-            importTasks[i] = Task.Run(() =>
+            for (int i = 0; i < 2; i++)
+                extraDoc.Pages.Add();
+
+            extraDoc.Save(ExtraPdfPath);
+        }
+
+        // Prepare threads
+        Thread importThread = new Thread(ImportPages);
+        Thread deleteThread = new Thread(DeletePages);
+
+        // Start both operations concurrently
+        importThread.Start();
+        deleteThread.Start();
+
+        // Wait for both to finish
+        importThread.Join();
+        deleteThread.Join();
+
+        // Verify result
+        if (File.Exists(ResultPdfPath))
+        {
+            using (Document resultDoc = new Document(ResultPdfPath))
             {
-                try
-                {
-                    lock (fileLock)
-                    {
-                        PdfFileEditor editor = new PdfFileEditor();
-                        // Append page 1 of sourcePdf to the end of outputPdf
-                        // TryAppend returns false instead of throwing on failure
-                        bool success = editor.TryAppend(outputPdf, new string[] { sourcePdf }, 1, 1, outputPdf);
-                        Console.WriteLine($"Import completed: {success}");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine($"Import error: {ex.Message}");
-                }
-            });
+                Console.WriteLine($"Result PDF created with {resultDoc.Pages.Count} pages.");
+            }
         }
-
-        // Create delete tasks (remove page 2 from outputPdf)
-        Task[] deleteTasks = new Task[deleteTaskCount];
-        for (int i = 0; i < deleteTaskCount; i++)
+        else
         {
-            deleteTasks[i] = Task.Run(() =>
-            {
-                try
-                {
-                    lock (fileLock)
-                    {
-                        PdfFileEditor editor = new PdfFileEditor();
-                        // Delete page 2 if it exists
-                        bool success = editor.TryDelete(outputPdf, new int[] { 2 }, outputPdf);
-                        Console.WriteLine($"Delete completed: {success}");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine($"Delete error: {ex.Message}");
-                }
-            });
+            Console.WriteLine("Result PDF was not created.");
         }
 
-        // Wait for all operations to finish
-        Task.WaitAll(importTasks);
-        Task.WaitAll(deleteTasks);
+        // Clean up temporary files
+        CleanupFiles();
+    }
 
-        // Verify the resulting PDF can be opened and report page count
+    // Appends ExtraPdfPath to BasePdfPath and writes to ResultPdfPath
+    private static void ImportPages()
+    {
         try
         {
-            using (Document finalDoc = new Document(outputPdf))
+            // Load both documents
+            using (Document baseDoc = new Document(BasePdfPath))
+            using (Document extraDoc = new Document(ExtraPdfPath))
             {
-                Console.WriteLine($"Final page count: {finalDoc.Pages.Count}");
+                // Append all pages from extraDoc to the end of baseDoc
+                baseDoc.Pages.Insert(baseDoc.Pages.Count + 1, extraDoc.Pages);
+                // Save the combined document
+                baseDoc.Save(ResultPdfPath);
             }
+            Console.WriteLine("Import operation completed.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Verification failed: {ex.Message}");
+            Console.Error.WriteLine($"Import error: {ex.Message}");
+        }
+    }
+
+    // Deletes page 2 from BasePdfPath and writes to ResultPdfPath
+    private static void DeletePages()
+    {
+        try
+        {
+            PdfFileEditor editor = new PdfFileEditor();
+            // Delete page number 2 (1‑based indexing) from base.pdf, output to result.pdf
+            bool success = editor.TryDelete(BasePdfPath, new int[] { 2 }, ResultPdfPath);
+            Console.WriteLine($"Delete operation {(success ? "succeeded" : "failed")}." );
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Delete error: {ex.Message}");
+        }
+    }
+
+    // Helper to remove test files before/after execution
+    private static void CleanupFiles()
+    {
+        foreach (var path in new[] { BasePdfPath, ExtraPdfPath, ResultPdfPath })
+        {
+            try { if (File.Exists(path)) File.Delete(path); } catch { }
         }
     }
 }

@@ -1,27 +1,35 @@
 using System;
-using System.IO;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        // Ensure the source file exists
+        if (!System.IO.File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Delete all annotations, flatten any remaining ones, and save the result
+        // PdfAnnotationEditor implements IDisposable via SaveableFacade,
+        // so wrap it in a using block for deterministic cleanup.
         using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            editor.BindPdf(inputPath);          // Load the PDF
-            editor.DeleteAnnotations();         // Remove all annotations
-            editor.FlatteningAnnotations();    // Flatten any remaining annotations (if any)
-            editor.Save(outputPath);            // Save the processed PDF
+            // Load the PDF document into the facade.
+            editor.BindPdf(inputPath);
+
+            // Remove all annotations from the document.
+            editor.DeleteAnnotations();
+
+            // Flatten any remaining annotations (if any were added later).
+            editor.FlatteningAnnotations();
+
+            // Save the processed PDF.
+            editor.Save(outputPath);
         }
 
         Console.WriteLine($"Processed PDF saved to '{outputPath}'.");

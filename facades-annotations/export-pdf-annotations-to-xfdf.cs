@@ -2,38 +2,39 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-class Program
+class ExportAnnotationsExample
 {
     static void Main()
     {
-        // Input PDF file containing annotations
-        const string inputPdfPath = "input.pdf";
-        // Output XFDF file that will store the exported annotations
-        const string outputXfdfPath = "annotations.xfdf";
+        // Input PDF file path
+        const string pdfPath = "input.pdf";
+        // Output XFDF file path
+        const string xfdfPath = "annotations.xfdf";
 
-        // Verify that the source PDF exists
-        if (!File.Exists(inputPdfPath))
+        // Ensure the input PDF exists
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Error: PDF file not found – {inputPdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        // Create a PdfAnnotationEditor facade and bind it to the PDF document
+        // Use PdfAnnotationEditor facade to work with annotations
         using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            editor.BindPdf(inputPdfPath);
+            // Bind the PDF document to the editor
+            editor.BindPdf(pdfPath);
 
-            // Create the output stream for the XFDF file
-            using (FileStream xfdfStream = File.Create(outputXfdfPath))
+            // Create the output XFDF file stream
+            using (FileStream xfdfStream = File.Create(xfdfPath))
             {
-                // Export all annotations from the bound PDF into the XFDF stream
+                // Export all annotations to the XFDF stream
                 editor.ExportAnnotationsToXfdf(xfdfStream);
             }
 
-            // Optionally, you can close the editor explicitly (Dispose will be called by using)
-            editor.Close();
+            // Optionally, save the PDF if any modifications were made (not required for export only)
+            // editor.Save("output.pdf");
         }
 
-        Console.WriteLine($"Annotations exported successfully to '{outputXfdfPath}'.");
+        Console.WriteLine($"Annotations exported to '{xfdfPath}'.");
     }
 }
