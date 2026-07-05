@@ -2,41 +2,36 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class RemoveSignatureExample
+class Program
 {
     static void Main()
     {
-        // Input PDF path (may contain a digital signature)
-        const string inputPath = "signed_input.pdf";
-
-        // Output PDF path (signature will be removed)
-        const string outputPath = "unsigned_output.pdf";
-
-        // Optional password if the PDF is protected (empty string if not needed)
-        const string password = ""; // e.g., "ownerPassword"
+        const string inputPath = "signed.pdf";
+        const string outputPath = "unsigned.pdf";
+        const string password = ""; // set if the PDF is password‑protected
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Error: File not found – {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document (with password if required)
+            // Load the PDF; supply the password only when needed
             using (Document doc = string.IsNullOrEmpty(password)
-                                   ? new Document(inputPath)
-                                   : new Document(inputPath, password))
+                                 ? new Document(inputPath)
+                                 : new Document(inputPath, password))
             {
-                // Enable signature sanitization – this removes signature fields
-                // when the document is saved, provided the current privileges allow it.
+                // EnableSignatureSanitization is true by default.
+                // When true, saving the document strips removable digital signatures.
                 doc.EnableSignatureSanitization = true;
 
-                // Save the modified document; the signature data will be stripped.
+                // Save the modified PDF – signatures are removed if the document permits it.
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Signature removed successfully. Output saved to '{outputPath}'.");
+            Console.WriteLine($"Unsigned PDF saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

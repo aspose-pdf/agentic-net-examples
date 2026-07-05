@@ -18,22 +18,30 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all fields and filter for signature fields
+            bool anySignature = false;
+            int sigIndex = 1;
+
+            // Iterate over all form fields and pick the signature fields
             foreach (Field field in doc.Form.Fields)
             {
                 if (field is SignatureField sigField)
                 {
-                    // The Signature object contains the metadata (Reason, Location, etc.)
-                    Signature signature = sigField.Signature;
-
+                    anySignature = true;
+                    // The Signature object holds the metadata such as Reason and Location
+                    var signature = sigField.Signature;
                     string reason   = signature?.Reason   ?? "(no reason)";
                     string location = signature?.Location ?? "(no location)";
 
-                    Console.WriteLine($"Signature Field: {sigField.FullName}");
-                    Console.WriteLine($"  Reason:   {reason}");
-                    Console.WriteLine($"  Location: {location}");
-                    Console.WriteLine();
+                    Console.WriteLine($"Signature {sigIndex}:");
+                    Console.WriteLine($"  Reason   : {reason}");
+                    Console.WriteLine($"  Location : {location}");
+                    sigIndex++;
                 }
+            }
+
+            if (!anySignature)
+            {
+                Console.WriteLine("No digital signatures found in the document.");
             }
         }
     }

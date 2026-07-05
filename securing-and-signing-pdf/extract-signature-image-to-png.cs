@@ -1,60 +1,67 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging;               // ImageFormat for PNG
-using Aspose.Pdf;                           // Core PDF API
-using Aspose.Pdf.Forms;                     // SignatureField type
+using System.Drawing.Imaging;          // for ImageFormat
+using System.Linq;                     // for Any()
+using Aspose.Pdf;                     // core PDF classes
+using Aspose.Pdf.Forms;               // SignatureField
 
 class ExtractSignatureImage
 {
     static void Main()
     {
-        const string inputPdf  = "signed_document.pdf";   // source PDF with a signature field
-        const string outputPng = "signature_image.png";   // destination PNG file
+        const string pdfPath   = "signed_document.pdf";
+        const string fieldName = "Signature1";   // name of the signature field
+        const string outputPng = "signature_image.png";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle: using ensures deterministic disposal)
-        using (Document pdfDoc = new Document(inputPdf))
+        try
         {
-            // Iterate over all form fields and locate the first signature field
-            SignatureField sigField = null;
-            foreach (Field field in pdfDoc.Form.Fields)
+            // Load the PDF document
+            using (Document doc = new Document(pdfPath))
             {
-                if (field is SignatureField sf)
+                // Verify that the form contains a field with the requested name
+                bool fieldExists = doc?.Form?.Fields?.Any(f => f.Name == fieldName) ?? false;
+                if (!fieldExists)
                 {
-                    sigField = sf;
-                    break; // use the first signature field found
-                }
-            }
-
-            if (sigField == null)
-            {
-                Console.Error.WriteLine("No signature field found in the document.");
-                return;
-            }
-
-            // Extract the signature appearance image as a PNG-encoded stream
-            // The overload accepts System.Drawing.Imaging.ImageFormat
-            using (Stream imageStream = sigField.ExtractImage(ImageFormat.Png))
-            {
-                if (imageStream == null)
-                {
-                    Console.Error.WriteLine("Signature image could not be extracted.");
+                    Console.Error.WriteLine($"Signature field '{fieldName}' not found.");
                     return;
                 }
 
-                // Save the PNG stream to a file
-                using (FileStream fileOut = new FileStream(outputPng, FileMode.Create, FileAccess.Write))
+                // Retrieve the field and cast it to SignatureField
+                SignatureField sigField = doc.Form[fieldName] as SignatureField;
+                if (sigField == null)
                 {
-                    imageStream.CopyTo(fileOut);
+                    Console.Error.WriteLine($"Field '{fieldName}' is not a signature field.");
+                    return;
                 }
+
+                // Extract the image as PNG (the overload accepts System.Drawing.Imaging.ImageFormat)
+                using (Stream imgStream = sigField.ExtractImage(ImageFormat.Png))
+                {
+                    if (imgStream == null)
+                    {
+                        Console.Error.WriteLine("No image found in the signature appearance.");
+                        return;
+                    }
+
+                    // Write the PNG stream to a file
+                    using (FileStream fileOut = new FileStream(outputPng, FileMode.Create, FileAccess.Write))
+                    {
+                        imgStream.CopyTo(fileOut);
+                    }
+                }
+
+                Console.WriteLine($"Signature image saved to '{outputPng}'.");
             }
         }
-
-        Console.WriteLine($"Signature image extracted and saved to '{outputPng}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

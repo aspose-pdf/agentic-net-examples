@@ -1,72 +1,63 @@
 using System;
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using System.Security.Cryptography.X509Certificates;
 
-class Program
+class ExtractCertificateChain
 {
     static void Main()
     {
-        const string inputPdf = "signed.pdf";
-        const string outputDir = "certs";
+        const string inputPdf  = "signed_document.pdf";
+        const string outputDir = "certificates";
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Ensure output directory exists
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document (lifecycle rule: use using)
+        // Load the PDF document (lifecycle: load)
         using (Document doc = new Document(inputPdf))
         {
-            // Check for signature fields
-            if (doc.Form == null || doc.Form.Fields == null)
+            // Iterate over all form fields in the document
+            foreach (var field in doc.Form)
             {
-                Console.WriteLine("No form fields found in the document.");
-                return;
-            }
-
-            int signatureIndex = 1;
-
-            // Iterate over each field and process only signature fields
-            foreach (Field field in doc.Form.Fields)
-            {
-                if (field is SignatureField sigField)
+                // Process only signature fields
+                if (field is SignatureField signatureField)
                 {
-                    // Extract the leaf certificate as an X509Certificate2 object
-                    X509Certificate2 leafCert = sigField.ExtractCertificateObject();
+                    // Extract the X509 certificate object from the signature
+                    X509Certificate2 cert = signatureField.ExtractCertificateObject();
 
-                    if (leafCert == null)
+                    if (cert == null)
                     {
-                        Console.WriteLine($"Signature {signatureIndex}: no certificate extracted.");
-                        signatureIndex++;
+                        Console.WriteLine("No certificate found in this signature field.");
                         continue;
                     }
 
-                    // Build the certificate chain for the extracted leaf certificate
+                    // Build the certificate chain using .NET's X509Chain
                     X509Chain chain = new X509Chain();
-                    chain.Build(leafCert);
-
-                    int certIndex = 0;
+                    chain.Build(cert);
 
                     // Save each certificate in the chain as a DER file
-                    foreach (X509ChainElement element in chain.ChainElements)
+                    for (int i = 0; i < chain.ChainElements.Count; i++)
                     {
-                        byte[] derBytes = element.Certificate.Export(X509ContentType.Cert);
-                        string fileName = $"sig{signatureIndex}_cert{certIndex}.der";
-                        string filePath = Path.Combine(outputDir, fileName);
-                        File.WriteAllBytes(filePath, derBytes);
-                        Console.WriteLine($"Saved certificate: {filePath}");
-                        certIndex++;
-                    }
+                        X509Certificate2 chainCert = chain.ChainElements[i].Certificate;
+                        string outPath = Path.Combine(outputDir, $"cert_{i}.der");
 
-                    signatureIndex++;
+                        // Export the certificate in DER (binary) format and write to file
+                        byte[] derBytes = chainCert.Export(X509ContentType.Cert);
+                        File.WriteAllBytes(outPath, derBytes);
+
+                        Console.WriteLine($"Saved certificate {i} to '{outPath}'.");
+                    }
                 }
             }
         }
+
+        Console.WriteLine("Certificate extraction completed.");
     }
 }
