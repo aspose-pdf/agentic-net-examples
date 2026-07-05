@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // for PageSize class
 
 class Program
 {
@@ -22,29 +22,28 @@ class Program
             return;
         }
 
-        // Load the template to obtain target page dimensions
+        // Load the template and obtain its first page dimensions
+        PageSize targetSize;
         using (Document templateDoc = new Document(templatePath))
         {
-            // Assume the first page defines the desired size
-            Page templatePage = templateDoc.Pages[1];
-            double targetWidth  = templatePage.Rect.URX - templatePage.Rect.LLX;
-            double targetHeight = templatePage.Rect.URY - templatePage.Rect.LLY;
-            PageSize targetSize = new PageSize((float)targetWidth, (float)targetHeight);
-
-            // Load the document to be resized
-            using (Document sourceDoc = new Document(inputPath))
-            {
-                // Resize each page to match the template size
-                for (int i = 1; i <= sourceDoc.Pages.Count; i++)
-                {
-                    Page page = sourceDoc.Pages[i];
-                    page.Resize(targetSize); // Resizes the page to the target dimensions
-                }
-
-                // Save the resized document
-                sourceDoc.Save(outputPath);
-                Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
-            }
+            Page templatePage = templateDoc.Pages[1]; // pages are 1‑based
+            float width  = (float)(templatePage.Rect.URX - templatePage.Rect.LLX);
+            float height = (float)(templatePage.Rect.URY - templatePage.Rect.LLY);
+            targetSize = new PageSize(width, height);
         }
+
+        // Load the PDF to be resized and apply the target size to each page
+        using (Document doc = new Document(inputPath))
+        {
+            foreach (Page page in doc.Pages)
+            {
+                page.Resize(targetSize);
+            }
+
+            // Save the resized document
+            doc.Save(outputPath);
+        }
+
+        Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
     }
 }

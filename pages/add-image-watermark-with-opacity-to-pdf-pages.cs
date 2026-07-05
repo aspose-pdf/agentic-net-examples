@@ -1,53 +1,53 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // needed for ImageStamp (inherits from Stamp)
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "watermarked.pdf";
-        const string imagePath = "logo.png"; // watermark image file
+        const string inputPdfPath   = "input.pdf";
+        const string outputPdfPath  = "output.pdf";
+        const string watermarkImgPath = "watermark.png";
 
-        if (!File.Exists(inputPdf))
+        // Verify input files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
+        }
+        if (!File.Exists(watermarkImgPath))
+        {
+            Console.Error.WriteLine($"Watermark image not found: {watermarkImgPath}");
             return;
         }
 
-        if (!File.Exists(imagePath))
+        // Load the PDF document (lifecycle rule: use using for disposal)
+        using (Document doc = new Document(inputPdfPath))
         {
-            Console.Error.WriteLine($"Watermark image not found: {imagePath}");
-            return;
-        }
-
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
-        {
-            // Create an ImageStamp once; it can be reused for all pages
-            ImageStamp stamp = new ImageStamp(imagePath)
-            {
-                // 20% opacity for subtle branding
-                Opacity = 0.2,
-                // Position the stamp (optional). Here we center it on the page.
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Center,
-                // Keep the stamp on top of page content
-                Background = false
-            };
-
-            // Apply the stamp to each page individually
+            // Apply the watermark to each page
             foreach (Page page in doc.Pages)
             {
-                page.AddStamp(stamp);
+                // Create a watermark artifact
+                WatermarkArtifact wm = new WatermarkArtifact();
+
+                // Set the image for the watermark
+                wm.SetImage(watermarkImgPath);
+
+                // Set opacity to 20% (0.2)
+                wm.Opacity = 0.2;
+
+                // Place the watermark on top of page content
+                wm.IsBackground = false;
+
+                // Add the artifact to the page
+                page.Artifacts.Add(wm);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPdf);
+            // Save the modified PDF (lifecycle rule: use Save)
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Watermarked PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Watermarked PDF saved to '{outputPdfPath}'.");
     }
 }

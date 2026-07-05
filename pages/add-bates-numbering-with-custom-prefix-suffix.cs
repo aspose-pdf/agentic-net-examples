@@ -7,29 +7,37 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_bates.pdf";
+        const string outputPath = "bates_numbered.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Add Bates numbering to each page with custom prefix and suffix
-            doc.Pages.AddBatesNumbering(artifact =>
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
             {
-                artifact.Prefix = "DOC";      // Custom prefix
-                artifact.Suffix = "-2026";    // Custom suffix
-                artifact.StartNumber = 1;     // Optional: start numbering at 1
-            });
+                // Add Bates numbering to each page with custom prefix and suffix
+                doc.Pages.AddBatesNumbering(artifact =>
+                {
+                    artifact.Prefix = "DOC";          // Custom prefix
+                    artifact.Suffix = "-2026";        // Custom suffix
+                    artifact.StartNumber = 1;         // Starting number
+                    artifact.NumberOfDigits = 6;      // Optional: number of digits
+                });
 
-            // Save the updated PDF
-            doc.Save(outputPath);
+                // Save the modified document
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Bates numbering applied. Saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Bates-numbered PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -6,30 +6,30 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";      // Path to the source PDF
-        const string outputCsvPath = "pages_dimensions.csv"; // Path for the CSV output
+        const string inputPdfPath = "input.pdf";      // source PDF
+        const string outputCsvPath = "pages_dimensions.csv"; // CSV output
 
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Open the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF document (using the standard Document constructor)
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Prepare the CSV file for writing
+            // Open a StreamWriter for the CSV file
             using (StreamWriter writer = new StreamWriter(outputCsvPath, false))
             {
                 // Write CSV header
                 writer.WriteLine("PageNumber,Width,Height");
 
                 // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
-                for (int i = 1; i <= pdfDoc.Pages.Count; i++)
+                for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    Page page = pdfDoc.Pages[i];
+                    Page page = doc.Pages[i];
 
-                    // Page dimensions are available via PageInfo
+                    // PageInfo provides the page dimensions in points (1 point = 1/72 inch)
                     double width = page.PageInfo.Width;
                     double height = page.PageInfo.Height;
 
@@ -37,6 +37,8 @@ class Program
                     writer.WriteLine($"{i},{width},{height}");
                 }
             }
+
+            // No additional saving of the PDF is required; we only exported data.
         }
 
         Console.WriteLine($"Page dimensions exported to '{outputCsvPath}'.");

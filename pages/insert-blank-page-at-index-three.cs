@@ -1,12 +1,12 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core Aspose.Pdf namespace
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,17 +15,16 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle: load)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Insert a blank page at position 3 (pages are 1‑based)
-            // This creates an empty page with the most common size in the document.
+            // Insert a blank page at index 3 (pages are 1‑based)
             doc.Pages.Insert(3);
 
-            // Save the modified PDF (lifecycle: save)
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Blank page inserted at index 3. Saved to '{outputPath}'.");
+        Console.WriteLine($"Blank page inserted at index 3 and saved to '{outputPath}'.");
     }
 }

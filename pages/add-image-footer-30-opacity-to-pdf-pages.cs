@@ -1,14 +1,14 @@
 using System;
 using System.IO;
-using Aspose.Pdf;          // Core Aspose.Pdf namespace
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";      // source PDF
-        const string outputPdf = "output_with_footer.pdf";
-        const string footerImg = "footer.png";     // image to use as footer
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string footerImg = "footer.png"; // image to use as footer
 
         if (!File.Exists(inputPdf))
         {
@@ -22,7 +22,7 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
         using (Document doc = new Document(inputPdf))
         {
             // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
@@ -30,22 +30,27 @@ class Program
             {
                 Page page = doc.Pages[i];
 
-                // Create a FooterArtifact, set the image and opacity (30%)
+                // Create a FooterArtifact instance
                 FooterArtifact footer = new FooterArtifact();
-                footer.SetImage(footerImg);   // load image from file
-                footer.Opacity = 0.3f;        // 30% opacity
 
-                // Optional: adjust margins if needed (example: 10 points from bottom)
-                footer.BottomMargin = 10;
+                // Set the image that will appear in the footer
+                footer.SetImage(footerImg);
+
+                // Position the footer at the bottom centre of the page
+                footer.ArtifactHorizontalAlignment = HorizontalAlignment.Center;
+                footer.ArtifactVerticalAlignment   = VerticalAlignment.Bottom;
+
+                // Set the desired opacity (30 % = 0.3)
+                footer.Opacity = 0.3;
 
                 // Add the artifact to the page's artifact collection
                 page.Artifacts.Add(footer);
             }
 
-            // Save the modified document
+            // Save the modified PDF (lifecycle rule: use Document.Save)
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved with image footer: {outputPdf}");
+        Console.WriteLine($"PDF with image footer saved to '{outputPdf}'.");
     }
 }
