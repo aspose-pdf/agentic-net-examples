@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Devices;
 using System.Drawing.Imaging;
 
 class Program
@@ -26,28 +27,31 @@ class Program
                 // Bind the source PDF file
                 converter.BindPdf(inputPdf);
 
-                // Set the page range: start at page 3, end at page 8
-                converter.StartPage = 3;
-                converter.EndPage = 8;
+                // Set resolution to 200 DPI
+                converter.Resolution = new Resolution(200);
+
+                // NOTE: The CoordinateType enum is no longer part of recent Aspose.Pdf versions.
+                // The default coordinate system (CropBox) is used automatically, so the line that
+                // attempted to set it has been removed.
 
                 // Prepare the conversion process
                 converter.DoConvert();
 
-                int pageNumber = converter.StartPage;
-                // Iterate through the selected pages and save each as BMP
+                int pageNumber = 1;
+                // Extract each page as a BMP image
                 while (converter.HasNextImage())
                 {
-                    string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.bmp");
-                    converter.GetNextImage(outputPath, ImageFormat.Bmp);
+                    string outPath = Path.Combine(outputDir, $"page_{pageNumber}.bmp");
+                    converter.GetNextImage(outPath, ImageFormat.Bmp);
                     pageNumber++;
                 }
             }
 
-            Console.WriteLine("PDF to BMP conversion completed successfully.");
+            Console.WriteLine("PDF successfully converted to BMP images.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
         }
     }
 }

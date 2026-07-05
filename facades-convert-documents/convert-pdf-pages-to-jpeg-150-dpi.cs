@@ -1,50 +1,58 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Devices;
+using System.Drawing.Imaging; // for ImageFormat
+using Aspose.Pdf.Facades; // PdfConverter
+using Aspose.Pdf.Devices; // Resolution
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputDir = "Images";
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "Images";
 
-        if (!File.Exists(inputPdf))
+        // Verify source PDF exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        Directory.CreateDirectory(outputDir);
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF document
-        using (Document pdfDocument = new Document(inputPdf))
+        // PdfConverter implements IDisposable – use a using block for deterministic cleanup
+        using (PdfConverter converter = new PdfConverter())
         {
-            // Determine how many pages we actually have (max 10)
-            int totalPages = Math.Min(10, pdfDocument.Pages.Count);
+            // Bind the source PDF
+            converter.BindPdf(inputPdfPath);
 
-            // JpegDevice expects a Resolution object for DPI.
-            // The second argument is the image quality (0‑100). 100 = best quality.
-            Resolution resolution = new Resolution(150); // 150 DPI for both X and Y
-            var jpegDevice = new JpegDevice(resolution, 100);
+            // Convert only pages 1 through 10
+            converter.StartPage = 1;
+            converter.EndPage   = 10;
 
-            for (int pageNumber = 1; pageNumber <= totalPages; pageNumber++)
+            // Set resolution to 150 DPI
+            converter.Resolution = new Resolution(150);
+
+            // Use CropBox coordinates (default is CropBox, so we can omit explicit setting if the enum is unavailable)
+            // converter.CoordinateType = CoordinateType.CropBox; // Removed – not present in older versions
+
+            // Prepare the converter
+            converter.DoConvert();
+
+            int pageIndex = 1;
+            while (converter.HasNextImage())
             {
-                string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.jpg");
+                // Build output file name (e.g., page_1.jpg, page_2.jpg, ...)
+                string outputPath = Path.Combine(outputFolder, $"page_{pageIndex}.jpg");
 
-                // The JpegDevice respects the page's CropBox when rendering.
-                // If you need to enforce it explicitly you can set:
-                // pdfDocument.Pages[pageNumber].CropBox = pdfDocument.Pages[pageNumber].CropBox;
-                // but the default behaviour already uses the CropBox.
+                // Save the current page as JPEG using System.Drawing.Imaging.ImageFormat
+                converter.GetNextImage(outputPath, ImageFormat.Jpeg);
 
-                using (FileStream imageStream = new FileStream(outputPath, FileMode.Create))
-                {
-                    jpegDevice.Process(pdfDocument.Pages[pageNumber], imageStream);
-                }
+                pageIndex++;
             }
         }
 
-        Console.WriteLine("PDF pages 1‑10 have been converted to JPEG images.");
+        Console.WriteLine("Conversion of pages 1‑10 to JPEG (150 DPI, CropBox) completed.");
     }
 }

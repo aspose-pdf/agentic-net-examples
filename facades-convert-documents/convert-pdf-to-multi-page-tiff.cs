@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Devices;
 
 class Program
 {
@@ -10,28 +11,27 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.tiff";
 
+        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Create PdfConverter, bind the PDF, configure font substitution, and save as TIFF
+        // PdfConverter is a Facade that handles PDF‑to‑image conversion
         using (PdfConverter converter = new PdfConverter())
         {
-            // Load the PDF file
+            // Bind the PDF file to the converter
             converter.BindPdf(inputPath);
 
-            // Set rendering options to convert Symbol font to Unicode TTF (Arial Unicode MS)
-            converter.RenderingOptions = new RenderingOptions
-            {
-                ConvertFontsToUnicodeTTF = true
-            };
+            // Set the resolution to 300 dpi for high‑quality output
+            // PdfConverter.Resolution expects a Resolution object, not an int
+            converter.Resolution = new Resolution(300);
 
-            // Prepare the converter
+            // Prepare the converter (required before saving)
             converter.DoConvert();
 
-            // Save all pages to a single multi‑page TIFF file
+            // Save all pages as a single multi‑page TIFF file
             converter.SaveAsTIFF(outputPath);
         }
 

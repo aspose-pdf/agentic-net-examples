@@ -1,7 +1,8 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices; // for Resolution
+using System.Drawing.Imaging;
 
 class Program
 {
@@ -13,32 +14,29 @@ class Program
         // Verify input file exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
         // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // PdfConverter implements IDisposable – wrap in using for deterministic cleanup
+        // Convert each PDF page to a separate PNG file using PdfConverter (Facade API)
         using (PdfConverter converter = new PdfConverter())
         {
-            // Bind the source PDF file
+            // Bind the source PDF
             converter.BindPdf(inputPdf);
 
-            // Set low resolution (72 DPI) for quick preview images
-            converter.Resolution = new Resolution(72);
-
-            // Prepare the converter (initial work before extracting images)
+            // Prepare the converter for image extraction
             converter.DoConvert();
 
             int pageNumber = 1;
-            // Extract each page as a PNG image
+            // Iterate through all pages and save as PNG
             while (converter.HasNextImage())
             {
                 string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
-                // GetNextImage infers the image format from the file extension, no ImageFormat needed
-                converter.GetNextImage(outputPath);
+                // Save current page image as PNG
+                converter.GetNextImage(outputPath, ImageFormat.Png);
                 pageNumber++;
             }
         }

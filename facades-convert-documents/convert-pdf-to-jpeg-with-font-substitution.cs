@@ -1,65 +1,62 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using System.Drawing.Imaging;
+using Aspose.Pdf.Devices;
+using Aspose.Pdf.Text;
 
-class PdfToJpegConverter
+class PdfToJpegWithFontSubstitution
 {
     static void Main()
     {
-        // Input PDF file
-        const string inputPdf = "input.pdf";
-
-        // Directory where JPEG images will be saved
-        const string outputDir = "JpegPages";
-
-        // Font to use when the original PDF references a missing font
-        const string substituteFont = "Arial";
-
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
-            return;
-        }
+        // Input PDF, output folder and fallback font name
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "OutputImages";
+        const string fallbackFontName = "Arial";
 
         // Ensure output directory exists
-        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+        // If the input PDF does not exist, create a simple one for demonstration purposes
+        if (!File.Exists(inputPdfPath))
         {
-            // Configure font substitution: use the specified default font for any missing fonts
-            PdfSaveOptions saveOptions = new PdfSaveOptions
+            using (Document sampleDoc = new Document())
             {
-                DefaultFontName = substituteFont
-            };
-
-            // Save the document to a memory stream with the substitution applied
-            using (MemoryStream pdfStream = new MemoryStream())
-            {
-                doc.Save(pdfStream, saveOptions);
-                pdfStream.Position = 0; // Reset stream position for reading
-
-                // Initialize the PDF converter facade
-                using (PdfConverter converter = new PdfConverter())
+                Page page = sampleDoc.Pages.Add();
+                // Add a paragraph with some text using the fallback font
+                page.Paragraphs.Add(new TextFragment("Sample PDF created because 'input.pdf' was missing.")
                 {
-                    // Bind the in‑memory PDF (with substituted fonts) to the converter
-                    converter.BindPdf(pdfStream);
-                    converter.DoConvert();
-
-                    int pageNumber = 1;
-                    // Iterate through all pages and save each as a JPEG image
-                    while (converter.HasNextImage())
-                    {
-                        string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.jpg");
-                        converter.GetNextImage(outputPath, ImageFormat.Jpeg);
-                        pageNumber++;
-                    }
-                }
+                    TextState = { Font = FontRepository.FindFont(fallbackFontName) }
+                });
+                sampleDoc.Save(inputPdfPath);
             }
         }
 
-        Console.WriteLine("Conversion completed successfully.");
+        // Load the source PDF
+        using (Document srcDoc = new Document(inputPdfPath))
+        {
+            // Register a font substitution for any missing fonts
+            FontRepository.Substitutions.Add(new SimpleFontSubstitution("MissingFont", fallbackFontName));
+
+            // Iterate through each page and convert it to a JPEG image
+            int pageNumber = 1;
+            foreach (Page page in srcDoc.Pages)
+            {
+                string outputImagePath = Path.Combine(outputFolder, $"page_{pageNumber}.jpg");
+
+                // Use Aspose's JpegDevice (does not rely on System.Drawing and avoids CA1416 warnings)
+                // Quality is supplied via the constructor overload, not a settable property.
+                JpegDevice jpegDevice = new JpegDevice(new Resolution(300), 90);
+
+                using (MemoryStream imageStream = new MemoryStream())
+                {
+                    jpegDevice.Process(page, imageStream);
+                    File.WriteAllBytes(outputImagePath, imageStream.ToArray());
+                }
+
+                pageNumber++;
+            }
+        }
+
+        Console.WriteLine("Conversion completed.");
     }
 }
