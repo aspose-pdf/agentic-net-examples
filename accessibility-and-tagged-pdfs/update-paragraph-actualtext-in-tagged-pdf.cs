@@ -10,8 +10,8 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string targetTitle = "Original Paragraph Title";
-        const string correctedActualText = "Corrected paragraph actual text";
+        const string targetTitle   = "Original Title";   // title to locate
+        const string correctedText = "Corrected Title"; // new ActualText
 
         if (!File.Exists(inputPath))
         {
@@ -19,41 +19,34 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access tagged content (if the PDF is tagged)
+            // Access the tagged content API
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Ensure the document has a structure tree
-            if (tagged == null || tagged.RootElement == null)
-            {
-                Console.Error.WriteLine("Document does not contain tagged content.");
-                return;
-            }
-
-            // Get the root of the structure tree
+            // Root element of the structure tree (no cast needed)
             StructureElement root = tagged.RootElement;
 
-            // Find all paragraph elements in the document (recursive search)
+            // Recursively find all paragraph elements
             var paragraphs = root.FindElements<ParagraphElement>(true);
 
-            // Locate the paragraph with the specified title (ActualText)
             foreach (ParagraphElement para in paragraphs)
             {
-                // Compare the existing ActualText with the target title
-                if (string.Equals(para.ActualText, targetTitle, StringComparison.OrdinalIgnoreCase))
+                // Compare the existing ActualText with the title we are looking for
+                if (para.ActualText == targetTitle)
                 {
-                    // Update the ActualText property with the corrected value
-                    para.ActualText = correctedActualText;
+                    // Modify the ActualText to the corrected value
+                    para.ActualText = correctedText;
                     Console.WriteLine("Paragraph ActualText updated.");
-                    break; // Assuming only one match is needed
+                    break; // stop after first match
                 }
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (no PreSave required)
             doc.Save(outputPath);
-            Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
         }
+
+        Console.WriteLine($"Corrected PDF saved to '{outputPath}'.");
     }
 }

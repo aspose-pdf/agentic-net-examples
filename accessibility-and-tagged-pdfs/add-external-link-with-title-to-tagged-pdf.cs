@@ -1,9 +1,9 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Tagged;               // ITaggedContent
-using Aspose.Pdf.LogicalStructure;    // StructureElement, LinkElement
-using Aspose.Pdf;                     // WebHyperlink
+using Aspose.Pdf.Tagged;                 // ITaggedContent
+using Aspose.Pdf.LogicalStructure;      // StructureElement, LinkElement
+using Aspose.Pdf;                        // WebHyperlink
 
 class Program
 {
@@ -23,31 +23,35 @@ class Program
         // Load the PDF and work with its tagged content
         using (Document doc = new Document(inputPath))
         {
+            // Access the tagged content API
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Ensure the document is tagged (if not, tagging will be created automatically)
+            // Optional: ensure the document is marked as tagged (no setter needed)
+            // The RootElement is a StructureElement; no cast required.
             StructureElement root = tagged.RootElement;
 
-            // Create a LinkElement in the logical structure
-            LinkElement linkElement = tagged.CreateLinkElement();
+            // Create a LinkElement (structure element representing a link)
+            LinkElement linkElem = tagged.CreateLinkElement();
 
-            // Set the visible text for the link (optional, but useful for accessibility)
-            linkElement.SetText("Visit Example Site");
+            // Set the visible text of the link (what screen readers will read)
+            linkElem.SetText("Visit Example Site");
 
-            // Assign the title attribute (appears as tooltip in PDF viewers)
-            linkElement.Title = linkTitle;
+            // Assign the title attribute (appears as tooltip in some viewers)
+            linkElem.Title = linkTitle;
 
-            // Create a WebHyperlink pointing to the external URL and assign it
+            // Create a WebHyperlink pointing to the external URL
             WebHyperlink webLink = new WebHyperlink(url);
-            linkElement.Hyperlink = webLink;
 
-            // Attach the LinkElement to the root of the structure tree
-            root.AppendChild(linkElement);
+            // Associate the hyperlink with the LinkElement
+            linkElem.Hyperlink = webLink;
+
+            // Append the link element to the document's structure tree
+            root.AppendChild(linkElem);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with external link: '{outputPath}'.");
+        Console.WriteLine($"PDF saved with external link: {outputPath}");
     }
 }
