@@ -1,8 +1,9 @@
 using System;
 using System.IO;
+using System.Drawing.Imaging;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text;
-using Aspose.Pdf.Devices; // for Resolution
+using Aspose.Pdf.Text; // required for font substitution
 
 class Program
 {
@@ -19,32 +20,41 @@ class Program
 
         Directory.CreateDirectory(outputDir);
 
-        // Register font substitution: replace missing Helvetica with Times New Roman
-        FontRepository.Substitutions.Add(new SimpleFontSubstitution("Helvetica", "Times New Roman"));
-
-        // Initialize the PdfConverter facade
-        using (PdfConverter converter = new PdfConverter())
+        // Load the PDF document
+        using (Document doc = new Document(inputPdf))
         {
-            // Load the PDF document
-            converter.BindPdf(inputPdf);
+            // Substitute missing Helvetica with Times New Roman
+            // Use FontRepository.Substitutions with SimpleFontSubstitution (Aspose.Pdf.Text namespace)
+            FontRepository.Substitutions.Add(new SimpleFontSubstitution("Helvetica", "Times New Roman"));
 
-            // Set desired resolution (default is 150 DPI)
-            converter.Resolution = new Resolution(150);
-
-            // Define the page range to convert (all pages)
-            converter.StartPage = 1;
-            converter.EndPage = converter.PageCount;
-
-            int pageNumber = converter.StartPage;
-            while (converter.HasNextImage())
+            // Initialize the PDF converter facade
+            using (PdfConverter converter = new PdfConverter(doc))
             {
-                string outPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
-                // Save the current page as a PNG image; format inferred from file extension
-                converter.GetNextImage(outPath);
-                pageNumber++;
+                // Optional: set rendering resolution (default is 150 DPI)
+                var renderingOptions = new RenderingOptions();
+                // renderingOptions.Resolution = 150; // Uncomment if the property exists in your version.
+                converter.RenderingOptions = renderingOptions;
+
+                // Convert all pages
+                converter.StartPage = 1;
+                converter.EndPage   = doc.Pages.Count;
+                converter.DoConvert();
+
+                int pageNumber = 1;
+                // Extract each page as a PNG image
+                while (converter.HasNextImage())
+                {
+                    string outPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
+                    // Save the next image as PNG
+                    converter.GetNextImage(outPath, ImageFormat.Png);
+                    pageNumber++;
+                }
+
+                // Release resources held by the converter
+                converter.Close();
             }
         }
 
-        Console.WriteLine("PDF to PNG conversion completed.");
+        Console.WriteLine($"PDF pages have been converted to PNG images in '{outputDir}'.");
     }
 }
