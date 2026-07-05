@@ -3,51 +3,55 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
 
-public class PdfGenerator
+public static class PdfGenerator
 {
-    // Dummy entry point to satisfy the compiler when building as an executable.
-    public static void Main(string[] args)
-    {
-        // No operation – the library method can be called from other code.
-        // Example usage (optional):
-        // byte[] pdfBytes = CreatePdfWithGraph();
-    }
-
+    // Creates a PDF in memory, adds a simple graph, and returns the PDF as a byte array.
     public static byte[] CreatePdfWithGraph()
     {
-        // MemoryStream will hold the generated PDF
-        using (MemoryStream outputStream = new MemoryStream())
+        // Output stream that will hold the generated PDF.
+        using (var outputStream = new MemoryStream())
         {
-            // Create a new PDF document (wrapped in using for proper disposal)
-            using (Document doc = new Document())
+            // Document lifecycle must be wrapped in a using block (see document-disposal-with-using rule).
+            using (var pdfDoc = new Document())
             {
-                // Add a single page
-                Page page = doc.Pages.Add();
+                // Add a single page to the document.
+                var page = pdfDoc.Pages.Add();
 
-                // Create a Graph container (width, height in points) – use double constructor as required
-                Graph graph = new Graph(400.0, 200.0);
+                // Use the double‑parameter Graph constructor (see use-double-graph-constructor-and-float-rectangle-params rule).
+                var graph = new Graph(400.0, 200.0);
 
-                // Create a rectangle shape inside the graph – use float parameters
-                var rect = new Aspose.Pdf.Drawing.Rectangle(0f, 0f, 200f, 100f);
+                // Use Aspose.Pdf.Drawing.Rectangle for shapes (see use-drawing-rectangle-for-graph-shapes rule).
+                var rect = new Aspose.Pdf.Drawing.Rectangle(0f, 0f, 100f, 50f);
                 rect.GraphInfo = new GraphInfo
                 {
-                    FillColor = Aspose.Pdf.Color.LightGray,
-                    Color = Aspose.Pdf.Color.Black,
-                    LineWidth = 1f // float literal
+                    FillColor = Color.LightGray,
+                    Color = Color.Black,
+                    LineWidth = 1f // float literal as required by GraphInfo
                 };
 
-                // Add the rectangle to the graph
+                // Add the rectangle shape to the graph.
                 graph.Shapes.Add(rect);
 
-                // Add the graph to the page's paragraph collection
+                // Add the graph to the page's paragraph collection.
                 page.Paragraphs.Add(graph);
 
-                // Save the PDF into the memory stream
-                doc.Save(outputStream);
+                // Save the PDF into the memory stream.
+                pdfDoc.Save(outputStream);
             }
 
-            // Return the PDF as a byte array
+            // Convert the memory stream to a byte array and return it.
             return outputStream.ToArray();
         }
+    }
+}
+
+// Dummy entry point to satisfy the compiler when the project is built as an executable.
+public class Program
+{
+    public static void Main()
+    {
+        // Example usage – not required for library functionality.
+        byte[] pdfBytes = PdfGenerator.CreatePdfWithGraph();
+        Console.WriteLine($"Generated PDF size: {pdfBytes.Length} bytes");
     }
 }

@@ -1,43 +1,40 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
-using System.Runtime.InteropServices; // optional, for platform‑specific handling
 
 class Program
 {
     static void Main()
     {
-        // Create a new PDF document and ensure deterministic disposal
+        // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a blank page (1‑based indexing)
+            // Add a blank page
             Page page = doc.Pages.Add();
 
-            // Create a graph container with desired size (width, height in points)
-            // Use the double‑based constructor (the float overload is obsolete)
+            // Create a graph container (width: 400 points, height: 300 points) – use double literals as required by the new constructor
             Graph graph = new Graph(400.0, 300.0);
 
             // ----- Rectangle shape -----
-            // Parameters: left, bottom, width, height (float values are required)
+            // Parameters: left, bottom, width, height – constructors expect float values
             var rectShape = new Aspose.Pdf.Drawing.Rectangle(50f, 150f, 200f, 100f);
             rectShape.GraphInfo = new GraphInfo
             {
-                FillColor = Aspose.Pdf.Color.LightGray,
-                Color = Aspose.Pdf.Color.DarkBlue,
-                LineWidth = 2f // float literal
+                FillColor = Color.LightGray,   // Light gray fill
+                Color = Color.Black,           // Border color
+                LineWidth = 2f                 // Border thickness (float literal)
             };
             // Add rectangle to the graph
             graph.Shapes.Add(rectShape);
 
             // ----- Ellipse shape -----
-            // Parameters: left, bottom, width, height (float values are required)
-            var ellipseShape = new Ellipse(300f, 150f, 150f, 100f);
+            // Parameters: left, bottom, width, height – constructors expect float values
+            var ellipseShape = new Aspose.Pdf.Drawing.Ellipse(300f, 150f, 150f, 100f);
             ellipseShape.GraphInfo = new GraphInfo
             {
-                FillColor = Aspose.Pdf.Color.Yellow,
-                Color = Aspose.Pdf.Color.Red,
-                LineWidth = 1.5f
+                FillColor = Color.Yellow,      // Yellow fill
+                Color = Color.Red,             // Outline color
+                LineWidth = 1.5f               // Outline thickness (float literal)
             };
             // Add ellipse to the graph
             graph.Shapes.Add(ellipseShape);
@@ -45,38 +42,10 @@ class Program
             // Add the graph to the page's paragraph collection
             page.Paragraphs.Add(graph);
 
-            // Save the PDF to disk (guard for platforms without libgdiplus if needed)
-            string outputPath = "GraphExample.pdf";
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
-                // On non‑Windows platforms libgdiplus may be missing; attempt save and handle possible failure gracefully.
-                try
-                {
-                    doc.Save(outputPath);
-                    Console.WriteLine($"PDF saved to '{outputPath}'.");
-                }
-                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
-                {
-                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. PDF was not saved.");
-                }
-            }
-            else
-            {
-                doc.Save(outputPath);
-                Console.WriteLine($"PDF saved to '{outputPath}'.");
-            }
+            // Save the PDF
+            doc.Save("output.pdf");
         }
-    }
 
-    // Helper to detect a nested DllNotFoundException (e.g., missing libgdiplus)
-    private static bool ContainsDllNotFound(Exception ex)
-    {
-        while (ex != null)
-        {
-            if (ex is DllNotFoundException)
-                return true;
-            ex = ex.InnerException;
-        }
-        return false;
+        Console.WriteLine("PDF with graph (rectangle + ellipse) created: output.pdf");
     }
 }
