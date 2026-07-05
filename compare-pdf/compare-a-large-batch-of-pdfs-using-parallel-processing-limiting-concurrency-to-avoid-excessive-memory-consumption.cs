@@ -1,76 +1,76 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Threading;
 using Aspose.Pdf;
 using Aspose.Pdf.Comparison;
 
-class PdfBatchComparer
+class BatchPdfComparer
 {
     // Entry point
     static void Main()
     {
-        // Input: directory containing PDFs to compare
-        const string sourceDirectory = @"C:\PdfBatch\Input";
-        // Reference PDF to compare each file against
-        const string referencePdfPath = @"C:\PdfBatch\Reference\baseline.pdf";
+        // Input directory containing PDFs to compare
+        const string inputDirectory = @"C:\PdfBatch\Input";
         // Output directory for comparison results
-        const string outputDirectory = @"C:\PdfBatch\Output";
+        const string outputDirectory = @"C:\PdfBatch\Results";
 
-        // Validate paths
-        if (!Directory.Exists(sourceDirectory))
+        // Verify that the input directory exists; otherwise exit with a clear message
+        if (!Directory.Exists(inputDirectory))
         {
-            Console.Error.WriteLine($"Source directory not found: {sourceDirectory}");
+            Console.Error.WriteLine($"Input directory does not exist: '{inputDirectory}'. Please create the directory and place PDF files to compare.");
             return;
         }
-        if (!File.Exists(referencePdfPath))
-        {
-            Console.Error.WriteLine($"Reference PDF not found: {referencePdfPath}");
-            return;
-        }
+
+        // Ensure output directory exists
         Directory.CreateDirectory(outputDirectory);
 
-        // Gather all PDF files in the source directory (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(sourceDirectory, "*.pdf", SearchOption.TopDirectoryOnly);
-
-        // Load the reference document once (shared across tasks)
-        using (Document referenceDoc = new Document(referencePdfPath))
+        // Get all PDF files in the input directory
+        string[] pdfFiles = Directory.GetFiles(inputDirectory, "*.pdf", SearchOption.TopDirectoryOnly);
+        if (pdfFiles.Length < 2)
         {
-            // Prepare parallel options – limit degree of parallelism to avoid high memory usage
-            ParallelOptions parallelOptions = new ParallelOptions {
-                // Adjust this value based on available memory / CPU cores
-                MaxDegreeOfParallelism = Math.Max(1, Environment.ProcessorCount / 2)
-            };
-
-            // Perform comparisons in parallel
-            Parallel.ForEach(pdfFiles, parallelOptions, pdfPath =>
-            {
-                try
-                {
-                    // Load the target document inside its own using block
-                    using (Document targetDoc = new Document(pdfPath))
-                    {
-                        // Prepare comparison options (default settings)
-                        SideBySideComparisonOptions compareOptions = new SideBySideComparisonOptions();
-
-                        // Build result file name: <original>_vs_baseline.pdf
-                        string resultFileName = Path.GetFileNameWithoutExtension(pdfPath) + "_vs_baseline.pdf";
-                        string resultPath = Path.Combine(outputDirectory, resultFileName);
-
-                        // Perform side‑by‑side comparison and save the result PDF
-                        SideBySidePdfComparer.Compare(referenceDoc, targetDoc, resultPath, compareOptions);
-                    }
-
-                    Console.WriteLine($"Compared: {Path.GetFileName(pdfPath)}");
-                }
-                catch (Exception ex)
-                {
-                    // Log any errors but continue processing other files
-                    Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
-                }
-            });
+            Console.Error.WriteLine("At least two PDF files are required for comparison.");
+            return;
         }
+
+        // Choose the first file as the reference document
+        string referencePath = pdfFiles[0];
+        string[] filesToCompare = new string[pdfFiles.Length - 1];
+        Array.Copy(pdfFiles, 1, filesToCompare, 0, filesToCompare.Length);
+
+        // Limit the degree of parallelism to avoid high memory usage
+        ParallelOptions parallelOptions = new ParallelOptions
+        {
+            // Adjust this value based on available memory / CPU cores
+            MaxDegreeOfParallelism = Math.Max(1, Environment.ProcessorCount / 2)
+        };
+
+        // Perform comparisons in parallel
+        Parallel.ForEach(filesToCompare, parallelOptions, targetPath =>
+        {
+            try
+            {
+                // Load reference and target documents inside using blocks for deterministic disposal
+                using (Document referenceDoc = new Document(referencePath))
+                using (Document targetDoc = new Document(targetPath))
+                {
+                    // Prepare comparison options (default settings are sufficient for most cases)
+                    SideBySideComparisonOptions compareOptions = new SideBySideComparisonOptions();
+
+                    // Build result file name: <reference>_vs_<target>.pdf
+                    string resultFileName = $"{Path.GetFileNameWithoutExtension(referencePath)}_vs_{Path.GetFileNameWithoutExtension(targetPath)}.pdf";
+                    string resultPath = Path.Combine(outputDirectory, resultFileName);
+
+                    // Perform side‑by‑side comparison; the method writes the result PDF directly
+                    SideBySidePdfComparer.Compare(referenceDoc, targetDoc, resultPath, compareOptions);
+                }
+
+                Console.WriteLine($"Compared '{Path.GetFileName(targetPath)}' with reference. Result saved.");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error comparing '{targetPath}': {ex.Message}");
+            }
+        });
 
         Console.WriteLine("Batch comparison completed.");
     }
