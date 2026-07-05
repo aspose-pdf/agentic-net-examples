@@ -7,39 +7,33 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_inserted_pages.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
+            // Aspose.Pdf uses 1‑based page indexing.
+            // Calculate the position just after the middle of the existing pages.
+            // For even counts this inserts after the first half; for odd counts it inserts after the exact middle page.
+            int middlePosition = (doc.Pages.Count / 2) + 1;
+
+            // Insert ten empty pages at the calculated position.
+            // Insert(int) creates an empty page with the most common size in the document.
+            for (int i = 0; i < 10; i++)
             {
-                // Aspose.Pdf uses 1‑based page indexing
-                int pageCount = doc.Pages.Count;
-                // Position after the first half of the pages (midpoint)
-                int middle = (pageCount / 2) + 1;
-
-                // Insert ten empty pages at the calculated midpoint
-                for (int i = 0; i < 10; i++)
-                {
-                    doc.Pages.Insert(middle);
-                }
-
-                // Save the modified document
-                doc.Save(outputPath);
+                doc.Pages.Insert(middlePosition);
             }
 
-            Console.WriteLine($"Inserted 10 pages at the midpoint. Saved to '{outputPath}'.");
+            // Save the modified document.
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Document saved with ten inserted pages at the midpoint: {outputPath}");
     }
 }

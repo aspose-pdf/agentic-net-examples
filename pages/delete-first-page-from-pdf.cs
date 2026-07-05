@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core Aspose.Pdf namespace
+using Aspose.Pdf;
 
 class Program
 {
@@ -15,17 +15,23 @@ class Program
             return;
         }
 
-        // Document lifecycle must be wrapped in a using block (rule: document-disposal-with-using)
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Pages are 1‑based (rule: page-indexing-one-based)
-            // Delete the first page; subsequent pages shift automatically.
-            doc.Pages.Delete(1);
+            // Load the PDF document (wrapped in using for deterministic disposal)
+            using (Document doc = new Document(inputPath))
+            {
+                // Pages are 1‑based; delete the first page.
+                doc.Pages.Delete(1);
 
-            // Save the modified PDF (rule: document-disposal-with-using ensures proper disposal)
-            doc.Save(outputPath);
+                // Save the modified document.
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"First page removed and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"First page removed. Result saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

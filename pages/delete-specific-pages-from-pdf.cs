@@ -1,59 +1,64 @@
 using System;
 using System.IO;
 using System.Linq;
-using Aspose.Pdf; // Aspose.Pdf namespace contains Document and PageCollection
+using Aspose.Pdf; // Core Aspose.Pdf namespace
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPdfPath = "input.pdf";
-        // Output PDF file path after deletions
+        // Paths – adjust as needed
+        const string inputPdfPath  = "input.pdf";
         const string outputPdfPath = "output.pdf";
-        // Text file containing page numbers to delete (one number per line)
-        const string pagesToDeletePath = "pages_to_delete.txt";
+        const string configPath    = "pages_to_delete.txt"; // one page number per line or comma‑separated
 
-        // Validate input files
+        // Validate files
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(pagesToDeletePath))
+        if (!File.Exists(configPath))
         {
-            Console.Error.WriteLine($"Page list file not found: {pagesToDeletePath}");
+            Console.Error.WriteLine($"Configuration file not found: {configPath}");
             return;
         }
 
-        try
-        {
-            // Read page numbers from the text file, ignore empty lines and whitespace
-            int[] pagesToDelete = File.ReadAllLines(pagesToDeletePath)
-                                      .Select(line => line.Trim())
-                                      .Where(line => !string.IsNullOrEmpty(line))
-                                      .Select(line => int.Parse(line))
-                                      .ToArray();
-
-            // Load the PDF document
-            using (Document doc = new Document(inputPdfPath))
+        // Read page numbers from the configuration file.
+        // Supports lines like "3", " 5 ", or "1,2,4".
+        int[] pagesToDelete = File.ReadAllLines(configPath)
+            .SelectMany(line => line.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries))
+            .Select(token => token.Trim())
+            .Where(token => !string.IsNullOrEmpty(token))
+            .Select(token =>
             {
-                // Delete the specified pages (Page numbers are 1‑based)
-                doc.Pages.Delete(pagesToDelete);
+                if (int.TryParse(token, out int n))
+                    return n;
+                Console.Error.WriteLine($"Invalid page number '{token}' – ignored.");
+                return -1; // placeholder for invalid entries
+            })
+            .Where(n => n > 0) // keep only valid positive numbers
+            .Distinct()
+            .OrderBy(n => n)   // ordering is optional; Delete(int[]) does not depend on order
+            .ToArray();
 
-                // Save the modified document
-                doc.Save(outputPdfPath);
-            }
+        if (pagesToDelete.Length == 0)
+        {
+            Console.WriteLine("No valid page numbers to delete – nothing to do.");
+            return;
+        }
 
-            Console.WriteLine($"Pages deleted and saved to '{outputPdfPath}'.");
-        }
-        catch (FormatException fe)
+        // Load the PDF, delete the specified pages, and save the result.
+        // Document implements IDisposable – use a using block as per the lifecycle rule.
+        using (Document doc = new Document(inputPdfPath))
         {
-            Console.Error.WriteLine($"Invalid page number format: {fe.Message}");
+            // Page numbers are 1‑based; Delete(int[]) expects an array of such numbers.
+            doc.Pages.Delete(pagesToDelete);
+
+            // Save the modified document.
+            doc.Save(outputPdfPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Deleted pages [{string.Join(", ", pagesToDelete)}] and saved to '{outputPdfPath}'.");
     }
 }

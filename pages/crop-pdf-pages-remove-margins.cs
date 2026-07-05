@@ -18,31 +18,31 @@ class Program
         // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
+            // Define the amount to trim from each side (points; 1 inch = 72 points)
+            const double marginLeft   = 36; // 0.5 inch
+            const double marginRight  = 36;
+            const double marginTop    = 36;
+            const double marginBottom = 36;
+
             // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Get the original page size (MediaBox)
+                // Get the original media box (full page size)
                 Aspose.Pdf.Rectangle mediaBox = page.MediaBox;
 
-                // Define margins to trim (example: 20 units from each side)
-                double leftMargin   = 20;
-                double bottomMargin = 20;
-                double rightMargin  = 20;
-                double topMargin    = 20;
+                // Calculate new CropBox coordinates by subtracting the margins
+                double llx = mediaBox.LLX + marginLeft;
+                double lly = mediaBox.LLY + marginBottom;
+                double urx = mediaBox.URX - marginRight;
+                double ury = mediaBox.URY - marginTop;
 
-                // Compute new CropBox coordinates
-                double llx = mediaBox.LLX + leftMargin;
-                double lly = mediaBox.LLY + bottomMargin;
-                double urx = mediaBox.URX - rightMargin;
-                double ury = mediaBox.URY - topMargin;
-
-                // Set the CropBox to the new rectangle (fully qualified type to avoid ambiguity)
+                // Set the CropBox to the new rectangle
                 page.CropBox = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
             }
 
-            // Save the modified PDF (saving without explicit SaveOptions writes PDF)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

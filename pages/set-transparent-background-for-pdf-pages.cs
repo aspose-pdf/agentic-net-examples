@@ -18,16 +18,16 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Set the document-wide background to transparent (optional)
+            // Optional: set the document‑level background to transparent
             doc.Background = Aspose.Pdf.Color.Transparent;
 
-            // Ensure each page has a transparent background
+            // Set each page's background to transparent
             foreach (Page page in doc.Pages)
             {
                 page.Background = Aspose.Pdf.Color.Transparent;
             }
 
-            // Save the modified PDF
+            // Save the result
             doc.Save(outputPath);
         }
 
