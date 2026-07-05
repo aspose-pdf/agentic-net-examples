@@ -1,53 +1,70 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Signatures;
+using Aspose.Pdf.Security;
 
-namespace VerifySignatureExample
+class VerifyPdfSignature
 {
-    class Program
+    static void Main()
     {
-        static void Main(string[] args)
+        const string pdfPath = "signed_document.pdf";
+
+        if (!File.Exists(pdfPath))
         {
-            // Step 1: Create a sample PDF with a signature field (self‑contained example)
-            using (Document sampleDoc = new Document())
+            Console.Error.WriteLine($"File not found: {pdfPath}");
+            return;
+        }
+
+        // Load the PDF document inside a using block for proper disposal
+        using (Document doc = new Document(pdfPath))
+        {
+            // 1. Check for compromised signatures using SignaturesCompromiseDetector
+            SignaturesCompromiseDetector detector = new SignaturesCompromiseDetector(doc);
+            CompromiseCheckResult compromiseResult;
+            bool notCompromised = detector.Check(out compromiseResult);
+
+            Console.WriteLine($"Compromise check passed: {notCompromised}");
+            if (compromiseResult.HasCompromisedSignatures)
             {
-                // Add a blank page
-                Page page = sampleDoc.Pages.Add();
-
-                // Define a rectangle for the signature field (coordinates are in points)
-                Rectangle signatureRect = new Rectangle(100, 600, 200, 650);
-
-                // Create the signature field and add it to the form on page 1
-                SignatureField signatureField = new SignatureField(page, signatureRect);
-                signatureField.PartialName = "Signature1";
-                sampleDoc.Form.Add(signatureField, 1);
-
-                // Save the PDF (no actual digital signature is applied – we only need a field to demonstrate verification)
-                sampleDoc.Save("signed.pdf");
+                Console.WriteLine("Warning: Compromised signatures detected in the document.");
             }
 
-            // Step 2: Open the PDF and enumerate its signature fields
-            using (Document signedDoc = new Document("signed.pdf"))
+            // 2. Iterate over all signature fields to verify each signature and retrieve signer details
+            foreach (Field field in doc.Form.Fields)
             {
-                // Aspose.PDF core library does not provide direct digital‑signature verification APIs.
-                // Verification of a real digital signature would require the PdfFileSignature class from the Facades namespace,
-                // which is prohibited by the task constraints. Therefore we limit the example to locating signature fields.
-
-                Console.WriteLine("Enumerating signature fields in the document...");
-                int signatureFieldCount = 0;
-                foreach (Field field in signedDoc.Form.Fields)
+                if (field is SignatureField sigField)
                 {
-                    if (field is SignatureField sigField)
+                    // The Signature object may be null if the field is empty
+                    var signature = sigField.Signature;
+                    if (signature == null)
                     {
-                        signatureFieldCount++;
-                        Console.WriteLine($"Signature field name: {sigField.PartialName}");
-                        // Output rectangle information for completeness
-                        Rectangle rect = sigField.Rect;
-                        Console.WriteLine($"  Position: LLX={rect.LLX}, LLY={rect.LLY}, URX={rect.URX}, URY={rect.URY}");
+                        Console.WriteLine($"Signature field '{sigField.PartialName}' is empty.");
+                        continue;
                     }
+
+                    // Basic verification (returns true if the signature is cryptographically valid)
+                    bool basicValid = signature.Verify();
+                    Console.WriteLine($"Signature field '{sigField.PartialName}': Basic verification = {basicValid}");
+
+                    // Retrieve signer details from the signature object
+                    Console.WriteLine($"  Authority : {signature.Authority}");
+                    Console.WriteLine($"  Date      : {signature.Date}");
+                    Console.WriteLine($"  Reason    : {signature.Reason}");
+                    Console.WriteLine($"  Location  : {signature.Location}");
+
+                    // Optional: perform strict validation with certificate chain checking
+                    ValidationOptions validationOptions = new ValidationOptions
+                    {
+                        ValidationMode = ValidationMode.Strict,
+                        CheckCertificateChain = true
+                    };
+                    ValidationResult validationResult;
+                    bool strictValid = signature.Verify(validationOptions, out validationResult);
+                    Console.WriteLine($"  Strict validation = {strictValid}");
+                    Console.WriteLine($"  Validation status : {validationResult.Status}");
                 }
-                Console.WriteLine($"Number of signature fields found: {signatureFieldCount}");
             }
         }
     }
