@@ -1,87 +1,16 @@
 {
   "category": "parse-pdf",
-  "nuget_version": "26.5.0",
-  "last_updated": "2026-06-15T09:58:19Z",
+  "nuget_version": "26.6.0",
+  "last_updated": "2026-07-05T09:42:56Z",
   "examples": {
     "load-pdf-list-acroform-fields": {
       "title": "Load PDF and List AcroForm Fields",
       "filename": "load-pdf-list-acroform-fields.cs",
-      "description": "Shows how to load a PDF file using Aspose.Pdf, access its AcroForm, and iterate through all form fields to display each field's name and type.",
+      "description": "Demonstrates loading a PDF file with Aspose.Pdf, accessing its AcroForm, and enumerating each form field's name, type, and value.",
       "tags": [
         "pdf",
         "acroform",
         "form-fields",
-        "aspose.pdf",
-        "c#"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Forms.Form",
-        "Aspose.Pdf.Forms.Field",
-        "Aspose.Pdf.Document.Form",
-        "Aspose.Pdf.Forms.Form.Count"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
-      "status": "verified"
-    },
-    "read-acroform-fields-from-pdf-stream": {
-      "title": "Read AcroForm Fields from a PDF Stream",
-      "filename": "read-acroform-fields-from-pdf-stream.cs",
-      "description": "Demonstrates opening a PDF as a read‑only stream, creating an Aspose.Pdf Document from it, and enumerating AcroForm fields with type‑safe value extraction without writing to disk.",
-      "tags": [
-        "pdf",
-        "acroform",
-        "fields",
-        "stream",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Form",
-        "Aspose.Pdf.Forms.Field",
-        "Aspose.Pdf.Forms.TextBoxField",
-        "Aspose.Pdf.Forms.CheckboxField",
-        "Aspose.Pdf.Forms.ListBoxField",
-        "Aspose.Pdf.Forms.SignatureField"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
-      "status": "verified"
-    },
-    "retrieve-acroform-fields-from-pdf": {
-      "title": "Retrieve All AcroForm Fields from a PDF",
-      "filename": "retrieve-acroform-fields-from-pdf.cs",
-      "description": "Shows how to load a PDF with Aspose.Pdf, access its AcroForm collection, and iterate through all form fields to read properties such as name, value and read‑only status.",
-      "tags": [
-        "pdf",
-        "acroform",
-        "form-fields",
-        "aspose.pdf",
-        "c#"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Forms.Form",
-        "Aspose.Pdf.Forms.Field",
-        "Aspose.Pdf.Annotations.WidgetAnnotation",
-        "Form.Count",
-        "Field.FullName",
-        "Field.Value",
-        "Field.ReadOnly"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
-      "status": "verified"
-    },
-    "retrieve-modify-pdf-form-field": {
-      "title": "Retrieve and Modify PDF Form Field by Name",
-      "filename": "retrieve-modify-pdf-form-field.cs",
-      "description": "Demonstrates how to load a PDF, locate a form field using the Document.Form indexer, read its properties, change its value, and save the updated document.",
-      "tags": [
-        "pdf",
-        "form",
-        "field",
         "aspose",
         "csharp"
       ],
@@ -89,22 +18,89 @@
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Forms.Form",
         "Aspose.Pdf.Forms.Field",
+        "Aspose.Pdf.Forms.Field.FullName",
+        "Aspose.Pdf.Forms.Field.Value"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-07-05T09:42:56Z",
+      "status": "verified"
+    },
+    "read-acroform-fields-from-pdf-memory": {
+      "title": "Read AcroForm Fields from PDF Using MemoryStream",
+      "filename": "read-acroform-fields-from-pdf-memory.cs",
+      "description": "Demonstrates loading a PDF into a MemoryStream and enumerating its AcroForm fields without writing to disk, including creating a sample PDF with a text box when the source file is absent.",
+      "tags": [
+        "AcroForm",
+        "MemoryStream",
+        "Aspose.Pdf",
+        "FormFields",
+        "C#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Forms.Field",
+        "Aspose.Pdf.Forms.TextBoxField",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-05T09:42:56Z",
+      "status": "verified"
+    },
+    "retrieve-acroform-fields": {
+      "title": "Retrieve All AcroForm Fields from a PDF",
+      "filename": "retrieve-acroform-fields.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, access its AcroForm collection, and enumerate all form fields, printing each field's name, value, and type.",
+      "tags": [
+        "pdf",
+        "acroform",
+        "fields",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.Form",
+        "Aspose.Pdf.Forms.Field",
+        "Aspose.Pdf.Document.Form",
+        "Aspose.Pdf.Forms.Form.Fields"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-07-05T09:42:56Z",
+      "status": "verified"
+    },
+    "retrieve-pdf-form-field-by-name": {
+      "title": "Retrieve PDF Form Field by Name",
+      "filename": "retrieve-pdf-form-field-by-name.cs",
+      "description": "Demonstrates loading a PDF with Aspose.Pdf, accessing a form field via the Form indexer, and reading its current value.",
+      "tags": [
+        "pdf",
+        "form",
+        "field",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.Form",
+        "Aspose.Pdf.Forms.Field",
         "Aspose.Pdf.Forms.WidgetAnnotation"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "iterate-pdf-pages-list-form-fields": {
+    "list-form-fields-per-pdf-page": {
       "title": "Iterate PDF Pages to List Form Fields",
-      "filename": "iterate-pdf-pages-list-form-fields.cs",
-      "description": "Shows how to load a PDF with Aspose.Pdf, loop through each page, retrieve the form fields in tab order, and output each field's full name.",
+      "filename": "list-form-fields-per-pdf-page.cs",
+      "description": "The example loads a PDF, iterates through each page, retrieves the form fields in tab order, and prints each field's name and type.",
       "tags": [
         "pdf",
         "form-fields",
-        "pages",
-        "aspose",
+        "aspose-pdf",
+        "page-iteration",
         "csharp"
       ],
       "apis_used": [
@@ -115,41 +111,41 @@
         "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "enumerate-pdf-form-fields-on-page": {
-      "title": "Enumerate PDF Form Fields on a Specific Page",
-      "filename": "enumerate-pdf-form-fields-on-page.cs",
-      "description": "Loads a PDF document, checks for form fields, and iterates over widget annotations on a given page, logging each field's name, type, and value.",
+    "enumerate-pdf-form-fields": {
+      "title": "Enumerate PDF Form Fields and Log Details",
+      "filename": "enumerate-pdf-form-fields.cs",
+      "description": "Loads a PDF, iterates through each page, and lists every form field with its name, type, and current value.",
       "tags": [
         "pdf",
         "form-fields",
-        "enumeration",
         "aspose-pdf",
-        "csharp"
+        "csharp",
+        "enumeration"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Forms.Form",
-        "Aspose.Pdf.Annotations.WidgetAnnotation",
+        "Aspose.Pdf.Page",
         "Aspose.Pdf.Forms.Field",
-        "Aspose.Pdf.Document.Form"
+        "Aspose.Pdf.Page.FieldsInTabOrder",
+        "Aspose.Pdf.Document.Pages"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
     "read-checkbox-value-to-boolean": {
-      "title": "Read Checkbox Field Value and Convert to Boolean",
+      "title": "Read Checkbox Value and Convert to Boolean",
       "filename": "read-checkbox-value-to-boolean.cs",
-      "description": "Loads a PDF, accesses its form, reads the Value of a CheckboxField and converts the string value to a Boolean indicating whether the box is checked.",
+      "description": "Loads a PDF document, accesses the first checkbox field in the interactive form, reads its string Value property, and converts it to a Boolean indicating whether the box is checked.",
       "tags": [
         "checkbox",
         "pdf",
         "form",
-        "boolean",
-        "aspose"
+        "aspose",
+        "boolean"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -159,35 +155,35 @@
         "Aspose.Pdf.Forms.CheckboxField.Value"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "parse-numeric-form-fields-to-decimal": {
-      "title": "Parse Numeric Form Fields to Decimal",
-      "filename": "parse-numeric-form-fields-to-decimal.cs",
-      "description": "Loads a PDF, iterates over its form fields, extracts values from NumberField controls, parses the text into a decimal using invariant culture, and demonstrates a simple calculation.",
+    "parse-number-form-fields-from-pdf": {
+      "title": "Parse Number Form Fields from PDF",
+      "filename": "parse-number-form-fields-from-pdf.cs",
+      "description": "Loads a PDF, iterates over its form fields, extracts numeric values from NumberField objects, parses them to decimal, and writes the results with a simple calculation to a text file.",
       "tags": [
         "pdf",
         "form-fields",
-        "numberfield",
         "parsing",
-        "decimal"
+        "decimal",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.Field",
         "Aspose.Pdf.Forms.NumberField",
         "Aspose.Pdf.Document.Form",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Forms.Form"
+        "Aspose.Pdf.Document.Form.Fields"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
     "export-pdf-form-data-to-json": {
       "title": "Export PDF Form Data to JSON",
       "filename": "export-pdf-form-data-to-json.cs",
-      "description": "Shows how to load a PDF with Aspose.Pdf, export all form fields to a JSON string using the ExportToJson method, and output the result.",
+      "description": "Shows how to load a PDF with Aspose.Pdf, export all form fields to a JSON string using Form.ExportToJson, and output the JSON.",
       "tags": [
         "pdf",
         "form",
@@ -201,29 +197,33 @@
         "Aspose.Pdf.Form.ExportToJson"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "save-json-data-to-utf8-file": {
-      "title": "Save JSON Data to UTF-8 File",
-      "filename": "save-json-data-to-utf8-file.cs",
-      "description": "Shows how to write a JSON string to a file on disk using UTF‑8 encoding with File.WriteAllText.",
+    "export-pdf-form-data-to-json__v2": {
+      "title": "Export PDF Form Data to JSON",
+      "filename": "export-pdf-form-data-to-json__v2.cs",
+      "description": "Demonstrates loading a PDF document with form fields using Aspose.Pdf and exporting the form data to a UTF-8 encoded JSON file.",
       "tags": [
+        "pdf",
+        "form",
         "json",
-        "file-io",
-        "utf-8",
-        "csharp",
-        "write"
+        "export",
+        "aspose"
       ],
-      "apis_used": [],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Form",
+        "Aspose.Pdf.Form.ExportToJson"
+      ],
       "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
     "export-pdf-form-fields-to-xml": {
       "title": "Export PDF Form Fields to XML",
       "filename": "export-pdf-form-fields-to-xml.cs",
-      "description": "Loads a PDF document, iterates through its form fields, and writes each field's name and value to an XML file using a FileStream and XmlWriter.",
+      "description": "Loads a PDF document and saves its form fields as an XML file using Aspose.Pdf's XmlSaveOptions.",
       "tags": [
         "pdf",
         "form",
@@ -233,146 +233,124 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Forms.Form",
-        "Aspose.Pdf.Forms.Field",
-        "Aspose.Pdf.Forms.FieldCollection",
-        "Aspose.Pdf.Forms.Field.Value"
+        "Aspose.Pdf.XmlSaveOptions",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
     "export-pdf-form-data-to-fdf": {
       "title": "Export PDF Form Data to FDF",
       "filename": "export-pdf-form-data-to-fdf.cs",
-      "description": "Demonstrates binding a PDF to the Aspose.Pdf.Facades.Form facade and exporting its form fields to an FDF file via a FileStream.",
+      "description": "Loads a PDF document, accesses its form via the Aspose.Pdf.Facades.Form facade, and writes the form field values to an FDF file using a FileStream.",
       "tags": [
         "pdf",
         "form",
         "fdf",
         "export",
-        "aspose"
+        "aspose-pdf"
       ],
       "apis_used": [
+        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.Form",
-        "Aspose.Pdf.Facades.Form.BindPdf",
         "Aspose.Pdf.Facades.Form.ExportFdf"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
     "export-acroform-fields-to-xfdf": {
       "title": "Export AcroForm Fields to XFDF",
       "filename": "export-acroform-fields-to-xfdf.cs",
-      "description": "Loads a PDF document, creates a FileStream, and uses Aspose.Pdf to export all AcroForm fields (annotations) to an XFDF file.",
+      "description": "Demonstrates loading a PDF with Aspose.Pdf, verifying its existence, and exporting all AcroForm fields (annotations) to an XFDF file using a FileStream.",
       "tags": [
+        "pdf",
         "xfdf",
         "acroform",
         "export",
-        "aspose-pdf",
-        "csharp"
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.ExportAnnotationsToXfdf"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "export-pdf-to-pdf-html-svg-with-stream-cleanup": {
-      "title": "Export PDF to PDF, HTML, and SVG with Stream Cleanup",
-      "filename": "export-pdf-to-pdf-html-svg-with-stream-cleanup.cs",
-      "description": "Demonstrates loading a PDF with Aspose.Pdf and exporting it to PDF, HTML, and SVG formats while properly closing FileStream objects using using blocks.",
+    "add-image-to-pdf-save-filestream": {
+      "title": "Add Image to PDF and Save with FileStream",
+      "filename": "add-image-to-pdf-save-filestream.cs",
+      "description": "Demonstrates loading a PDF, inserting an image onto the first page, and saving the result using a FileStream that is properly disposed.",
       "tags": [
         "pdf",
-        "export",
-        "html",
-        "svg",
-        "stream"
+        "image",
+        "aspose",
+        "filestream",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.HtmlSaveOptions",
-        "Aspose.Pdf.SvgSaveOptions",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Image",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.ParagraphCollection"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
     "modify-checkbox-appearance-extract-value": {
-      "title": "Modify Checkbox Appearance and Extract Value using Aspose.PDF Drawing",
+      "title": "Modify Checkbox Appearance and Extract Its Value",
       "filename": "modify-checkbox-appearance-extract-value.cs",
-      "description": "The example loads a PDF, finds a checkbox form field, customizes its visual appearance with Aspose.Pdf.Drawing (Graph, Rectangle, GraphInfo), changes its style and state, extracts its value, and saves the modified document.",
+      "description": "Demonstrates how to change a PDF form checkbox's visual style and color using Aspose.PDF.Drawing, draw a custom check mark, and then read the checkbox value.",
       "tags": [
         "checkbox",
-        "form-field",
         "appearance",
-        "Aspose.PDF",
-        "drawing"
+        "drawing",
+        "form",
+        "pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Forms.CheckboxField",
-        "Aspose.Pdf.Page",
+        "Aspose.Pdf.BoxStyle",
         "Aspose.Pdf.Drawing.Graph",
-        "Aspose.Pdf.Drawing.Rectangle",
-        "Aspose.Pdf.Drawing.GraphInfo",
-        "Aspose.Pdf.Color"
+        "Aspose.Pdf.Drawing.Line",
+        "Aspose.Pdf.Drawing.GraphInfo"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
     "extract-pdf-form-fields": {
-      "title": "Extract PDF Form Field Names and Values",
+      "title": "Extract PDF Form Fields to Dictionary",
       "filename": "extract-pdf-form-fields.cs",
-      "description": "Shows how to load a PDF using Aspose.Pdf, iterate through all form fields, and return a dictionary mapping each field's full name to its current string value.",
+      "description": "Shows how to load a PDF with Aspose.Pdf, iterate over its form fields, and return a dictionary mapping each field's full name to its current value.",
       "tags": [
         "pdf",
         "form",
         "aspose",
-        "extract",
-        "dictionary"
+        "dictionary",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.Field",
         "Aspose.Pdf.Document.Form",
-        "Aspose.Pdf.Forms.Form.Fields",
+        "Aspose.Pdf.Document.Form.Fields",
         "Aspose.Pdf.Forms.Field.FullName",
         "Aspose.Pdf.Forms.Field.Value"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "export-pdf-form-data-to-json__v2": {
-      "title": "Export PDF Form Data to JSON Files",
-      "filename": "export-pdf-form-data-to-json__v2.cs",
-      "description": "Shows how to iterate over PDF files in a folder, load each with Aspose.Pdf, and export its form fields to a JSON file.",
-      "tags": [
-        "pdf",
-        "form",
-        "json",
-        "export",
-        "batch"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Form",
-        "Aspose.Pdf.Form.ExportToJson",
-        "Aspose.Pdf.Document(string)"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
-      "status": "verified"
-    },
-    "combine-pdf-form-data-to-json": {
-      "title": "Combine Form Data from Multiple PDFs into a JSON Array",
-      "filename": "combine-pdf-form-data-to-json.cs",
-      "description": "The example loads several PDF files, exports each form's fields to JSON, and merges the individual JSON objects into a single JSON array for batch processing.",
+    "export-pdf-form-fields-to-json": {
+      "title": "Export PDF Form Fields to JSON Files",
+      "filename": "export-pdf-form-fields-to-json.cs",
+      "description": "Shows how to process a folder of PDFs, extract each document's form data, and write the data to individual JSON files using Aspose.Pdf.",
       "tags": [
         "pdf",
         "form",
@@ -385,40 +363,63 @@
         "Aspose.Pdf.Form",
         "Aspose.Pdf.Form.ExportToJson"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "export-pdf-form-data-to-json__v3": {
-      "title": "Export PDF Form Data to JSON",
-      "filename": "export-pdf-form-data-to-json__v3.cs",
-      "description": "Shows how to create a command‑line utility that loads a PDF with Aspose.Pdf and exports its interactive form fields to a JSON file.",
+    "combine-pdf-form-data-to-json": {
+      "title": "Combine PDF Form Data into a Single JSON Array",
+      "filename": "combine-pdf-form-data-to-json.cs",
+      "description": "Demonstrates loading multiple PDFs, exporting each form's fields to JSON, and merging them into a single JSON array for batch processing.",
       "tags": [
         "pdf",
         "form",
-        "export",
         "json",
+        "export",
+        "batch"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Form",
+        "Aspose.Pdf.Form.ExportToJson",
+        "Aspose.Pdf.Document.Form",
+        "Aspose.Pdf.Document.Dispose"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-05T09:42:56Z",
+      "status": "verified"
+    },
+    "export-pdf-form-data-to-json-or-xfdf": {
+      "title": "Export PDF Form Data to JSON or XFDF",
+      "filename": "export-pdf-form-data-to-json-or-xfdf.cs",
+      "description": "Loads a PDF using Aspose.Pdf and exports its form fields to a JSON file or all annotations to an XFDF file based on a command‑line format flag.",
+      "tags": [
+        "pdf",
+        "form-export",
+        "json",
+        "xfdf",
         "command-line"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Form",
-        "Aspose.Pdf.Form.ExportToJson"
+        "Aspose.Pdf.Form.ExportToJson",
+        "Aspose.Pdf.Document.ExportAnnotationsToXfdf"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "extract-pdf-forms-with-timestamp-logging": {
-      "title": "Extract PDF Forms with Timestamp Logging",
-      "filename": "extract-pdf-forms-with-timestamp-logging.cs",
-      "description": "Demonstrates loading a PDF with Aspose.Pdf, iterating through pages to extract XForm text, and logging start and end timestamps for the extraction run.",
+    "extract-pdf-form-xobjects-with-logging": {
+      "title": "Extract PDF Form XObjects with Timestamp Logging",
+      "filename": "extract-pdf-form-xobjects-with-logging.cs",
+      "description": "Demonstrates how to load a PDF, iterate through each page and form XObject, extract its text using Aspose.Pdf, and log start and end timestamps for the extraction run.",
       "tags": [
         "pdf",
-        "form extraction",
-        "timestamp",
+        "form-extraction",
         "logging",
-        "aspose"
+        "aspose",
+        "text-absorption"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -427,55 +428,59 @@
         "Aspose.Pdf.Text.TextAbsorber",
         "Aspose.Pdf.Text.TextAbsorber.Visit"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "export-pdf-form-data-to-json-byte-array": {
+    "export-pdf-form-fields-to-json-byte-array": {
       "title": "Export PDF Form Fields to JSON Byte Array",
-      "filename": "export-pdf-form-data-to-json-byte-array.cs",
-      "description": "Loads a PDF, extracts all form fields as JSON using Aspose.Pdf, writes the JSON to a MemoryStream, and returns the content as a byte array for API consumption.",
+      "filename": "export-pdf-form-fields-to-json-byte-array.cs",
+      "description": "Loads a PDF document, extracts its form fields as JSON, writes the JSON to a MemoryStream, and returns the resulting byte array for API consumption.",
       "tags": [
         "pdf",
         "form",
         "json",
         "memorystream",
-        "aspose"
+        "export"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document..ctor(string)",
         "Aspose.Pdf.Forms.Form",
         "Aspose.Pdf.Forms.Form.ExportToJson"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
     "export-filtered-pdf-form-fields-to-json": {
       "title": "Export Filtered PDF Form Fields to JSON",
       "filename": "export-filtered-pdf-form-fields-to-json.cs",
-      "description": "The example loads a PDF document, iterates over its form fields, selects only those whose names start with a specified prefix, extracts their values, and writes the resulting name‑value pairs to a formatted JSON file.",
+      "description": "Loads a PDF, selects form fields whose names start with a given prefix, extracts their values, and writes the result to a JSON file.",
       "tags": [
         "pdf",
         "form-fields",
         "json",
         "filter",
-        "aspose-pdf"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Forms.Form",
         "Aspose.Pdf.Forms.Field",
-        "Aspose.Pdf.Forms.FieldCollection"
+        "Aspose.Pdf.Forms.TextBoxField",
+        "Aspose.Pdf.Forms.CheckboxField",
+        "Aspose.Pdf.Forms.RadioButtonField",
+        "Aspose.Pdf.Forms.ListBoxField",
+        "Aspose.Pdf.Forms.ComboBoxField"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
     "count-acroform-fields-in-pdf": {
       "title": "Count AcroForm Fields in a PDF",
       "filename": "count-acroform-fields-in-pdf.cs",
-      "description": "Loads a PDF using Aspose.Pdf, accesses the Form collection, retrieves the total number of AcroForm fields via Document.Form.Count, and writes the count to the console.",
+      "description": "Loads a PDF using Aspose.Pdf, accesses the Form collection, and outputs the total number of AcroForm fields present in the document.",
       "tags": [
         "acroform",
         "field-count",
@@ -485,102 +490,105 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Forms.Form",
+        "Aspose.Pdf.Form",
         "Aspose.Pdf.Document.Form",
-        "Aspose.Pdf.Document.Form.Count"
+        "Aspose.Pdf.Form.Count",
+        "Aspose.Pdf.Document.Dispose"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "iterate-pdf-form-fields-update-textboxes": {
-      "title": "Iterate Over PDF Form Fields and Update Text Boxes",
-      "filename": "iterate-pdf-form-fields-update-textboxes.cs",
-      "description": "Demonstrates how to loop through all form fields in a PDF using a foreach loop, read each field's name and value, and modify text box fields before saving the document.",
+    "iterate-pdf-form-fields-set-values": {
+      "title": "Iterate Over PDF Form Fields and Set Values",
+      "filename": "iterate-pdf-form-fields-set-values.cs",
+      "description": "Loads a PDF, loops through each form field, displays its name and value, and sets default values based on the field type before saving the document.",
       "tags": [
         "pdf",
         "form-fields",
-        "foreach",
         "aspose-pdf",
-        "csharp"
+        "csharp",
+        "iteration"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Forms.Field",
         "Aspose.Pdf.Forms.TextBoxField",
-        "Aspose.Pdf.Document.Form",
+        "Aspose.Pdf.Forms.CheckboxField",
+        "Aspose.Pdf.Forms.RadioButtonField",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
     "retrieve-pdf-form-field-types": {
       "title": "Retrieve PDF Form Field Types",
       "filename": "retrieve-pdf-form-field-types.cs",
-      "description": "Loads a PDF, iterates over its form fields and prints each field's full name together with its concrete runtime type using GetType().",
+      "description": "Shows how to load a PDF, access its AcroForm, iterate through each form field, and obtain the concrete runtime type of each field using GetType().",
       "tags": [
         "pdf",
         "form",
-        "field",
-        "type",
-        "aspose"
+        "field-type",
+        "aspose",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Forms.Form",
-        "Aspose.Pdf.Annotations.WidgetAnnotation",
-        "Aspose.Pdf.Document(string)",
-        "Aspose.Pdf.Forms.Form.Count"
+        "Aspose.Pdf.Forms.Field",
+        "Aspose.Pdf.Forms.Form.Count",
+        "Aspose.Pdf.Forms.Form.GetEnumerator"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "export-pdf-form-data-to-json__v4": {
+    "export-pdf-form-data-to-json__v3": {
       "title": "Export PDF Form Data to JSON via FileStream",
-      "filename": "export-pdf-form-data-to-json__v4.cs",
-      "description": "Shows how to load a PDF, set JSON export options, and write all form fields directly to a JSON file using a FileStream.",
+      "filename": "export-pdf-form-data-to-json__v3.cs",
+      "description": "Demonstrates how to export all form fields from a PDF document directly to a JSON file using a FileStream with Aspose.Pdf's ExportToJson method.",
       "tags": [
         "pdf",
         "form",
         "json",
         "export",
-        "aspose"
+        "filestream"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Forms.Form",
-        "Aspose.Pdf.Forms.ExportFieldsToJsonOptions",
-        "Aspose.Pdf.Forms.Form.ExportToJson"
+        "Aspose.Pdf.Form",
+        "Aspose.Pdf.Form.ExportToJson"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "export-pdf-form-data-to-xml-memorystream": {
-      "title": "Export PDF Form Data to XML via MemoryStream",
-      "filename": "export-pdf-form-data-to-xml-memorystream.cs",
-      "description": "Shows how to export form fields from a PDF document to an XML representation using Aspose.Pdf.Facades.Form and write the XML from a MemoryStream to a file.",
+    "export-pdf-form-data-to-xml": {
+      "title": "Export PDF Form Data to XML Using MemoryStream",
+      "filename": "export-pdf-form-data-to-xml.cs",
+      "description": "Demonstrates how to export form fields from a PDF document to an XML representation directly into a MemoryStream using Aspose.Pdf's Form facade.",
       "tags": [
         "pdf",
         "form",
         "xml",
-        "memorystream",
-        "export"
+        "export",
+        "memorystream"
       ],
       "apis_used": [
+        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.Form",
+        "Aspose.Pdf.Facades.Form.BindPdf",
         "Aspose.Pdf.Facades.Form.ExportXml"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
     "export-pdf-form-data-to-fdf__v2": {
-      "title": "Export PDF Form Data to FDF Using Aspose.Pdf",
+      "title": "Export PDF Form Data to FDF",
       "filename": "export-pdf-form-data-to-fdf__v2.cs",
-      "description": "Demonstrates loading a PDF document, accessing its form fields via the Form facade, and exporting the data to an FDF file using a FileStream.",
+      "description": "Loads a PDF document, accesses its form via the Form facade, and writes the form fields to an FDF file using ExportFdf with proper stream disposal.",
       "tags": [
         "pdf",
         "fdf",
@@ -594,59 +602,58 @@
         "Aspose.Pdf.Facades.Form.ExportFdf"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "export-pdf-form-data-to-xfdf": {
-      "title": "Export PDF Form Data to XFDF Using FileStream",
-      "filename": "export-pdf-form-data-to-xfdf.cs",
-      "description": "Demonstrates loading a PDF, using the Form facade to export its form fields to an XFDF file via a FileStream, and properly releasing resources.",
+    "export-pdf-form-fields-to-xfdf": {
+      "title": "Export PDF Form Fields to XFDF",
+      "filename": "export-pdf-form-fields-to-xfdf.cs",
+      "description": "Demonstrates how to use Aspose.Pdf to export form field data from a PDF document to an XFDF file via a FileStream, handling resource disposal with using blocks.",
       "tags": [
         "xfdf",
         "form-export",
-        "aspose-pdf",
-        "filestream",
-        "pdf-forms"
+        "pdf",
+        "aspnet",
+        "filestream"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.Form",
-        "Aspose.Pdf.Facades.Form.ExportXfdf",
-        "Aspose.Pdf.Facades.Form.Close"
+        "Aspose.Pdf.Facades.Form.ExportXfdf"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
     "log-form-field-count-per-pdf-page": {
       "title": "Log Form Field Count per PDF Page",
       "filename": "log-form-field-count-per-pdf-page.cs",
-      "description": "Loads a PDF, iterates through each page to count and log form fields, then flattens the document and saves the result.",
+      "description": "Shows how to open a PDF with Aspose.Pdf, iterate through each page, count the form fields on that page, and log the counts for monitoring purposes.",
       "tags": [
         "pdf",
         "form-fields",
-        "aspose-pdf",
-        "page-iteration",
-        "flatten"
+        "logging",
+        "aspose",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Forms.Field",
-        "Aspose.Pdf.Document.Flatten",
+        "Aspose.Pdf.Page.FieldsInTabOrder",
+        "Aspose.Pdf.Document.Pages",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
     "extract-vector-graphics-to-svg": {
-      "title": "Extract Vector Graphics from PDF to SVG Files",
+      "title": "Extract Vector Graphics from PDF as Individual SVG Files",
       "filename": "extract-vector-graphics-to-svg.cs",
-      "description": "Shows how to load a PDF with Aspose.Pdf, iterate through its pages, and use SvgExtractor to export each vector graphic as an individual SVG file in separate page folders.",
+      "description": "Demonstrates how to load a PDF, detect pages with vector graphics, and export each graphic to separate SVG files using Aspose.Pdf's SvgExtractor.",
       "tags": [
         "pdf",
-        "vector",
+        "vector-graphics",
         "svg",
         "extraction",
         "aspose"
@@ -654,18 +661,18 @@
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.HasVectorGraphics",
         "Aspose.Pdf.Vector.SvgExtractor",
-        "Aspose.Pdf.Document.Pages",
         "Aspose.Pdf.Vector.SvgExtractor.Extract"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "extract-vector-graphics-to-svg__v2": {
-      "title": "Extract Vector Graphics from PDF Page to SVG",
-      "filename": "extract-vector-graphics-to-svg__v2.cs",
-      "description": "Demonstrates how to load a PDF, select a specific page, and extract each vector graphic on that page as separate SVG files using Aspose.Pdf.",
+    "extract-vector-graphics-from-pdf-page": {
+      "title": "Extract Vector Graphics from PDF Page to SVG Files",
+      "filename": "extract-vector-graphics-from-pdf-page.cs",
+      "description": "Demonstrates how to load a PDF, verify a page contains vector graphics, and extract each graphic as a separate SVG file using Aspose.Pdf.",
       "tags": [
         "pdf",
         "svg",
@@ -677,21 +684,21 @@
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Vector.SvgExtractor",
-        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Page.HasVectorGraphics",
         "Aspose.Pdf.Vector.SvgExtractor.Extract"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "extract-vector-graphics-to-combined-svg": {
-      "title": "Extract Vector Graphics from PDF to Combined SVG",
-      "filename": "extract-vector-graphics-to-combined-svg.cs",
-      "description": "Loads a PDF, extracts vector graphics from each page as SVG using Aspose.Pdf's SvgExtractor, and merges them into a single multi‑page SVG document.",
+    "combine-pdf-page-vector-graphics-into-svg": {
+      "title": "Combine PDF Page Vector Graphics into a Multi‑Page SVG",
+      "filename": "combine-pdf-page-vector-graphics-into-svg.cs",
+      "description": "Loads a PDF, extracts vector graphics from each page using Aspose.Pdf.Vector.SvgExtractor, wraps each page's graphics in a <g> element, and writes a single combined multi‑page SVG file.",
       "tags": [
         "pdf",
         "svg",
-        "vector-graphics",
+        "vector",
         "extraction",
         "aspose"
       ],
@@ -703,58 +710,59 @@
         "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
     "extract-pdf-subpaths-to-png": {
-      "title": "Extract PDF Subpaths and Export as PNG Images",
+      "title": "Extract PDF Subpaths to Individual PNG Images",
       "filename": "extract-pdf-subpaths-to-png.cs",
-      "description": "Shows how to use GraphicsAbsorber to capture each SubPath on PDF pages, save them as SVG, and convert each SVG to an individual PNG file.",
+      "description": "Shows how to use GraphicsAbsorber to capture each SubPath on PDF pages, render it on a temporary page, and save it as a separate PNG file.",
       "tags": [
-        "graphicsabsorption",
-        "subpath",
-        "svg",
-        "png",
-        "aspose-pdf"
+        "GraphicsAbsorber",
+        "SubPath",
+        "PNG",
+        "Aspose.Pdf",
+        "PDF extraction"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Vector.GraphicsAbsorber",
-        "Aspose.Pdf.Vector.SubPath.SaveToSvg",
-        "Aspose.Pdf.SvgLoadOptions",
-        "Aspose.Pdf.Page.ConvertToPNGMemoryStream"
+        "Aspose.Pdf.Vector.SubPath",
+        "Aspose.Pdf.Page.ConvertToPNGMemoryStream",
+        "Aspose.Pdf.Vector.GraphicElement",
+        "Aspose.Pdf.Vector.SubPath.AddOnPage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "export-pdf-page-as-raster-image": {
-      "title": "Export PDF Page as Raster Image with Specified DPI",
-      "filename": "export-pdf-page-as-raster-image.cs",
-      "description": "Shows how to load a PDF, flatten transparency, and convert a page (including vector graphics) to a raster PNG image at a chosen resolution using Aspose.Pdf.",
+    "export-pdf-page-as-png": {
+      "title": "Export PDF Page as PNG Image at Specified DPI",
+      "filename": "export-pdf-page-as-png.cs",
+      "description": "Shows how to rasterize a single PDF page to a PNG file with a defined resolution (DPI) using Aspose.Pdf.",
       "tags": [
         "pdf",
-        "rasterization",
-        "resolution",
-        "Aspose.Pdf",
-        "image-export"
+        "png",
+        "rasterize",
+        "dpi",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Devices.Resolution",
-        "Aspose.Pdf.Page.AsByteArray",
-        "Aspose.Pdf.Document.FlattenTransparency"
+        "Aspose.Pdf.Resolution",
+        "Aspose.Pdf.Devices.PngDevice",
+        "Aspose.Pdf.Devices.PngDevice.Process"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
     "extract-single-graphic-element-as-svg": {
-      "title": "Extract Single Graphic Element as SVG from PDF",
+      "title": "Extract a Single Graphic Element from PDF as SVG",
       "filename": "extract-single-graphic-element-as-svg.cs",
-      "description": "Shows how to load a PDF, use Aspose.Pdf.Vector.SvgExtractor to get vector graphics from a page, pick one element by its index, and save it as an SVG file.",
+      "description": "Shows how to load a PDF, use SvgExtractor to get vector graphics from a page, pick an element by its index, and save it as an SVG file.",
       "tags": [
         "pdf",
         "svg",
@@ -766,134 +774,134 @@
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Vector.SvgExtractor",
-        "Aspose.Pdf.Vector.SvgExtractor.Extract",
-        "Aspose.Pdf.Document.Pages"
+        "Aspose.Pdf.Vector.SvgExtractor.Extract"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "extract-first-page-text-to-utf8-file": {
-      "title": "Extract First Page Text from PDF to UTF-8 File",
-      "filename": "extract-first-page-text-to-utf8-file.cs",
-      "description": "Demonstrates how to load a PDF with Aspose.Pdf, extract the text of the first page using a TextAbsorber, and save the result to a UTF‑8 encoded text file.",
+    "extract-first-page-text-from-pdf": {
+      "title": "Extract First Page Text from PDF",
+      "filename": "extract-first-page-text-from-pdf.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, extract the text of the first page using TextDevice, and write it to a UTF‑8 encoded text file.",
       "tags": [
         "pdf",
         "text-extraction",
         "aspose",
-        "utf-8",
-        "csharp"
+        "csharp",
+        "utf-8"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.TextAbsorber",
-        "Aspose.Pdf.Page.Accept",
-        "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.Text.TextAbsorber.Text"
+        "Aspose.Pdf.Devices.TextDevice",
+        "Aspose.Pdf.Devices.TextDevice.Process",
+        "Aspose.Pdf.PageCollection",
+        "Aspose.Pdf.Page"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
     "extract-text-from-pdf-to-txt": {
       "title": "Extract Text from PDF and Save to TXT",
       "filename": "extract-text-from-pdf-to-txt.cs",
-      "description": "Shows how to load a PDF with Aspose.Pdf, use TextAbsorber to extract all page text, and write the concatenated result to a .txt file.",
+      "description": "Shows how to load a PDF with Aspose.Pdf, use TextAbsorber to extract text from all pages, and write the concatenated result to a .txt file.",
       "tags": [
         "pdf",
         "text-extraction",
-        "aspose.pdf",
+        "aspose",
         "file-io",
-        "c#"
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Text.TextAbsorber",
-        "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.Document.Pages.Accept",
+        "Aspose.Pdf.PageCollection.Accept",
         "Aspose.Pdf.Text.TextAbsorber.Text"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "extract-stamp-texts-to-json": {
-      "title": "Extract Stamp Annotation Texts from PDF to JSON",
-      "filename": "extract-stamp-texts-to-json.cs",
-      "description": "Shows how to load a PDF with Aspose.Pdf, iterate through its pages and annotations, identify stamp annotations, collect their text content, and serialize the results into a JSON array.",
+    "extract-pdf-stamp-texts": {
+      "title": "Extract Stamp Texts from PDF",
+      "filename": "extract-pdf-stamp-texts.cs",
+      "description": "Loads a PDF, iterates through its pages and annotations, extracts the visible text of StampAnnotation objects, and writes the collected strings to a JSON array.",
       "tags": [
         "pdf",
         "stamp",
         "annotation",
-        "json",
-        "aspose"
+        "extraction",
+        "json"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Annotations.Annotation",
-        "Aspose.Pdf.Annotations.StampAnnotation"
+        "Aspose.Pdf.Annotations.StampAnnotation",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Page.Annotations"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "extract-annotate-superscripts-subscripts-pdf": {
-      "title": "Extract and Annotate Superscripts/Subscripts from PDF",
-      "filename": "extract-annotate-superscripts-subscripts-pdf.cs",
-      "description": "The example loads a PDF, extracts text fragments with positioning information, heuristically identifies superscript and subscript segments based on baseline and font size, and writes the annotated text to an output file.",
+    "extract-superscript-subscript-from-pdf": {
+      "title": "Extract Superscript and Subscript from PDF",
+      "filename": "extract-superscript-subscript-from-pdf.cs",
+      "description": "Demonstrates how to extract text from a PDF, identify superscript and subscript characters using font size and baseline heuristics, and write the annotated results to a text file.",
       "tags": [
         "pdf",
         "text-extraction",
         "superscript",
         "subscript",
-        "annotation"
+        "aspnet"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextFragmentAbsorber",
-        "Aspose.Pdf.Text.TextExtractionOptions",
         "Aspose.Pdf.Text.TextFragment",
         "Aspose.Pdf.Text.TextSegment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "extract-paragraphs-with-line-breaks": {
-      "title": "Extract Paragraphs with Line Breaks from PDF",
-      "filename": "extract-paragraphs-with-line-breaks.cs",
-      "description": "Demonstrates how to use Aspose.Pdf to extract paragraph structures from a PDF while preserving line breaks and save the result to a text file.",
+    "extract-paragraphs-from-pdf-to-text": {
+      "title": "Extract Paragraphs from PDF and Save as Text",
+      "filename": "extract-paragraphs-from-pdf-to-text.cs",
+      "description": "Demonstrates how to use Aspose.Pdf to absorb paragraph structures from a PDF, preserve line breaks, and write the extracted content to a .txt file. Includes a helper that creates a sample PDF if none exists.",
       "tags": [
         "pdf",
         "paragraph",
-        "text-extraction",
-        "aspose-pdf",
-        "csharp"
+        "extraction",
+        "text",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Text.ParagraphAbsorber",
-        "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.PageMarkup",
         "Aspose.Pdf.Text.MarkupSection",
         "Aspose.Pdf.Text.MarkupParagraph",
-        "Aspose.Pdf.Text.TextFragment"
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.Position"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "extract-images-from-pdf-to-png": {
+    "extract-images-from-pdf": {
       "title": "Extract Images from PDF and Save as PNG",
-      "filename": "extract-images-from-pdf-to-png.cs",
-      "description": "Loads a PDF with Aspose.Pdf, iterates through each page's image resources, and saves every extracted image as a PNG file in a specified output folder.",
+      "filename": "extract-images-from-pdf.cs",
+      "description": "Demonstrates how to load a PDF with Aspose.Pdf, iterate through each page's image resources, and save each image as a PNG file to an output folder.",
       "tags": [
         "pdf",
         "image-extraction",
         "aspose-pdf",
-        "png",
-        "csharp"
+        "csharp",
+        "png"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -903,103 +911,100 @@
         "Aspose.Pdf.XImage.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "extract-export-pdf-fonts-ttf": {
-      "title": "Extract and Export Fonts from a PDF to TTF Files",
-      "filename": "extract-export-pdf-fonts-ttf.cs",
-      "description": "Shows how to load a PDF with Aspose.Pdf, iterate through each page's font resources, and save each unique font as a TrueType (.ttf) file to a specified directory.",
+    "extract-fonts-from-pdf": {
+      "title": "Extract Fonts from PDF and Save as TTF Files",
+      "filename": "extract-fonts-from-pdf.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, retrieve all embedded fonts, and export each font to a .ttf file in a designated output folder.",
       "tags": [
         "pdf",
-        "font",
+        "fonts",
+        "extraction",
         "ttf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.FontUtilities",
+        "Aspose.Pdf.FontUtilities.GetAllFonts",
+        "Aspose.Pdf.Font",
+        "Aspose.Pdf.Font.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-07-05T09:42:56Z",
+      "status": "verified"
+    },
+    "extract-pdf-tables-to-csv": {
+      "title": "Extract PDF Tables to Separate CSV Files",
+      "filename": "extract-pdf-tables-to-csv.cs",
+      "description": "Shows how to use Aspose.Pdf's TableAbsorber to locate tables in a PDF and export each detected table to its own CSV file, with optional sample PDF creation.",
+      "tags": [
+        "pdf",
+        "table",
+        "csv",
         "aspose-pdf",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.Font",
-        "Aspose.Pdf.Text.Font.Save",
-        "Aspose.Pdf.Text.Font.FontName",
-        "Aspose.Pdf.Text.Font.BaseFont"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-06-15T09:58:19Z",
-      "status": "verified"
-    },
-    "extract-pdf-tables-to-csv": {
-      "title": "Extract PDF Tables to CSV Files",
-      "filename": "extract-pdf-tables-to-csv.cs",
-      "description": "Shows how to use Aspose.Pdf's TableAbsorber to detect tables in a PDF document and export each detected table as a separate CSV file.",
-      "tags": [
-        "pdf",
-        "table",
-        "csv",
-        "aspose",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
         "Aspose.Pdf.TableAbsorber",
-        "Aspose.Pdf.TableAbsorber.Visit",
-        "Aspose.Pdf.TableAbsorber.TableList",
-        "Aspose.Pdf.Table.RowList",
-        "Aspose.Pdf.Text.TextFragment"
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.BorderInfo"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
     "export-acroform-fields-to-json": {
       "title": "Export AcroForm Fields to JSON",
       "filename": "export-acroform-fields-to-json.cs",
-      "description": "Shows how to load a PDF with Aspose.Pdf, access its AcroForm fields, and export them directly to a JSON file.",
+      "description": "Shows how to load a PDF with Aspose.Pdf, access its AcroForm, and export all form field names and values to a JSON file.",
       "tags": [
         "pdf",
         "acroform",
         "json",
         "export",
-        "aspose-pdf"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Form",
-        "Aspose.Pdf.Form",
-        "Aspose.Pdf.Form.ExportToJson",
-        "Aspose.Pdf.Document.Dispose"
+        "Aspose.Pdf.Forms.Form",
+        "Aspose.Pdf.Forms.Form.ExportToJson"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
     "batch-extract-vector-graphics-to-svg": {
       "title": "Batch Extract Vector Graphics from PDFs to SVG",
       "filename": "batch-extract-vector-graphics-to-svg.cs",
-      "description": "Demonstrates how to iterate through a folder of PDF files, extract each page's vector graphics using Aspose.Pdf, and save them as individual SVG files in a common output directory.",
+      "description": "Shows how to iterate through PDF files in a folder, detect pages that contain vector graphics, and save each page's graphics as an SVG file using Aspose.Pdf.",
       "tags": [
         "pdf",
-        "svg",
         "vector-graphics",
+        "svg",
         "batch-processing",
-        "aspose-pdf"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Page.TrySaveVectorGraphics",
-        "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.PageCollection"
+        "Aspose.Pdf.Page.HasVectorGraphics",
+        "Aspose.Pdf.Page.TrySaveVectorGraphics"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
     "parallel-pdf-text-extraction": {
       "title": "Parallel PDF Text Extraction with TPL",
       "filename": "parallel-pdf-text-extraction.cs",
-      "description": "Demonstrates how to extract text from multiple PDF files concurrently using the Task Parallel Library and Aspose.Pdf's TextAbsorber.",
+      "description": "Demonstrates how to extract text from multiple PDF files concurrently using the Task Parallel Library and Aspose.Pdf. Each file is processed in parallel and the results are stored in a thread‑safe collection.",
       "tags": [
         "pdf",
         "text-extraction",
@@ -1010,22 +1015,23 @@
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Text.TextAbsorber",
-        "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.PageCollection.Accept"
+        "Aspose.Pdf.PageCollection.Accept",
+        "Aspose.Pdf.Text.TextAbsorber.Text",
+        "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "export-pdf-to-svg-with-dpi-options": {
-      "title": "Export PDF to SVG with Custom DPI and Extraction Options",
-      "filename": "export-pdf-to-svg-with-dpi-options.cs",
-      "description": "Demonstrates converting a PDF to SVG using Aspose.Pdf with pixel‑based scaling (DPI) and multithreading, and extracting individual vector graphics from a page with custom extraction settings.",
+    "export-pdf-to-svg-with-custom-options": {
+      "title": "Export PDF to SVG with Custom Options and Extract Vector Graphics",
+      "filename": "export-pdf-to-svg-with-custom-options.cs",
+      "description": "Demonstrates how to save an entire PDF as a single SVG using custom DPI and multithreading settings, and how to extract individual vector graphics from each page with configurable extraction options.",
       "tags": [
         "svg",
-        "pdf-conversion",
-        "dpi",
-        "vector-extraction",
+        "export",
+        "vector-graphics",
+        "pdf",
         "aspose-pdf"
       ],
       "apis_used": [
@@ -1036,264 +1042,262 @@
         "Aspose.Pdf.Page"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "extract-large-vector-graphics-to-svg": {
-      "title": "Extract Large Vector Graphics from PDF as SVG",
-      "filename": "extract-large-vector-graphics-to-svg.cs",
-      "description": "Loads a PDF, absorbs vector graphics on each page, filters them by bounding rectangle area, and exports the qualifying graphics as individual SVG files.",
+    "extract-large-graphics-to-svg": {
+      "title": "Extract and Export Large Graphics from PDF as SVG",
+      "filename": "extract-large-graphics-to-svg.cs",
+      "description": "Loads a PDF, uses GraphicsAbsorber to collect graphic elements, filters them by bounding‑box area, and saves the qualifying graphics as individual SVG files.",
       "tags": [
         "pdf",
-        "vector-graphics",
+        "graphics",
         "svg",
-        "graphics-absorption",
-        "filtering"
+        "filter",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Vector.GraphicsAbsorber",
         "Aspose.Pdf.Vector.GraphicElement",
-        "Aspose.Pdf.Vector.SvgExtractor.Extract",
-        "Aspose.Pdf.Rectangle"
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Vector.GraphicElement.SaveToSvg"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "extract-graphics-svg-from-selected-pdf-pages": {
-      "title": "Extract Graphics as SVG from Selected PDF Pages",
-      "filename": "extract-graphics-svg-from-selected-pdf-pages.cs",
-      "description": "Shows how to use GraphicsAbsorber to collect graphic elements from specific PDF pages and convert them into SVG files with SvgExtractor.",
+    "extract-graphics-from-pdf-pages": {
+      "title": "Extract Graphics from Specific PDF Pages to SVG",
+      "filename": "extract-graphics-from-pdf-pages.cs",
+      "description": "Demonstrates how to use GraphicsAbsorber and SvgExtractor to collect graphic elements from selected PDF pages and save them as SVG files.",
       "tags": [
         "graphics",
         "svg",
         "pdf",
         "extraction",
-        "aspose-pdf"
+        "pages"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Vector.GraphicsAbsorber",
         "Aspose.Pdf.Vector.GraphicsAbsorber.Visit",
-        "Aspose.Pdf.Vector.SvgExtractor.Extract"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-06-15T09:58:19Z",
-      "status": "verified"
-    },
-    "combine-pdf-vectors-into-multi-page-svg": {
-      "title": "Combine PDF Vector Graphics into a Multi‑Page SVG",
-      "filename": "combine-pdf-vectors-into-multi-page-svg.cs",
-      "description": "Loads multiple PDF files, extracts vector graphics from each page using Aspose.Pdf's SvgExtractor, and merges them into a single multi‑page SVG document.",
-      "tags": [
-        "pdf",
-        "svg",
-        "vector-graphics",
-        "aspose-pdf",
-        "conversion"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Page.HasVectorGraphics",
-        "Aspose.Pdf.Vector.SvgExtractor",
-        "Aspose.Pdf.Vector.SvgExtractor.Extract"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-06-15T09:58:19Z",
-      "status": "verified"
-    },
-    "extract-subpaths-to-separate-svg": {
-      "title": "Extract Each Subpath to Separate SVG Files",
-      "filename": "extract-subpaths-to-separate-svg.cs",
-      "description": "Demonstrates how to load a PDF with Aspose.Pdf, configure SVG extraction to create an individual SVG for every graphic subpath, and save each subpath as a separate image with a transparent background.",
-      "tags": [
-        "svg",
-        "subpath",
-        "extraction",
-        "aspdf",
-        "pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.SvgExtractionOptions",
         "Aspose.Pdf.SvgExtractor",
         "Aspose.Pdf.SvgExtractor.Extract"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "extract-vector-graphics-from-encrypted-pdf": {
-      "title": "Extract Vector Graphics from Encrypted PDF to SVG",
-      "filename": "extract-vector-graphics-from-encrypted-pdf.cs",
-      "description": "Shows how to open an encrypted PDF by supplying a password, then export its vector graphics as an SVG file using Aspose.Pdf.",
+    "combine-pdf-vector-graphics-to-svg": {
+      "title": "Combine Vector Graphics from Multiple PDFs into a Single SVG",
+      "filename": "combine-pdf-vector-graphics-to-svg.cs",
+      "description": "The example loads several PDF files, extracts vector graphics from each page using Aspose.Pdf's SVG extractor, and merges all fragments into one multi‑page SVG document.",
       "tags": [
         "pdf",
-        "vector",
         "svg",
-        "encryption",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.SvgSaveOptions",
-        "Aspose.Pdf.InvalidPasswordException",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Document..ctor(string, string)"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
-      "status": "verified"
-    },
-    "preserve-pdf-coordinate-system-to-svg": {
-      "title": "Convert PDF Pages to SVG While Preserving Coordinate System",
-      "filename": "preserve-pdf-coordinate-system-to-svg.cs",
-      "description": "Loads a PDF, sets SvgSaveOptions.ScaleToPixels to false to keep the original PDF point coordinate system, and saves each page as a separate SVG file.",
-      "tags": [
-        "svg",
-        "pdf",
-        "coordinate-system",
-        "aspose-pdf",
-        "conversion"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.SvgSaveOptions",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.Document.Pages.Count"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
-      "status": "verified"
-    },
-    "pdf-summary-report-image-graphic-text": {
-      "title": "PDF Summary Report: Count Images, Graphics, and Text Length",
-      "filename": "pdf-summary-report-image-graphic-text.cs",
-      "description": "The example loads each PDF in a folder, counts extracted images and XObject graphics on all pages, extracts all text, and prints a summary of image count, graphic count, and total text length.",
-      "tags": [
-        "pdf",
-        "summary",
-        "images",
-        "graphics",
-        "text-extraction"
+        "vector-extraction",
+        "aspose",
+        "merge"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.PageCollection",
-        "Aspose.Pdf.Resources",
-        "Aspose.Pdf.Text.TextAbsorber"
+        "Aspose.Pdf.Vector.SvgExtractor",
+        "Aspose.Pdf.Vector.SvgExtractor.Extract"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "check-missing-fonts-in-pdf": {
-      "title": "Check for Missing Fonts in a PDF Document",
-      "filename": "check-missing-fonts-in-pdf.cs",
-      "description": "The example loads a PDF, iterates through each page's font resources, and reports any fonts that are not installed on the system.",
+    "export-subpaths-as-separate-svg-images": {
+      "title": "Export Subpaths as Separate SVG Images",
+      "filename": "export-subpaths-as-separate-svg-images.cs",
+      "description": "Shows how to extract each subpath from a PDF page and save it as an individual SVG file with a transparent background using Aspose.Pdf.",
+      "tags": [
+        "svg",
+        "extraction",
+        "subpath",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.SvgExtractionOptions",
+        "Aspose.Pdf.SvgExtractor",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.SvgExtractor.Extract"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-05T09:42:56Z",
+      "status": "verified"
+    },
+    "extract-vector-graphics-from-encrypted-pdf": {
+      "title": "Extract Vector Graphics from Encrypted PDF",
+      "filename": "extract-vector-graphics-from-encrypted-pdf.cs",
+      "description": "Shows how to open an encrypted PDF with a password, locate vector graphic objects, and save each graphic as a separate PDF file.",
+      "tags": [
+        "encrypted-pdf",
+        "vector-graphics",
+        "extraction",
+        "Aspose.Pdf",
+        "C#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Decrypt",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-05T09:42:56Z",
+      "status": "verified"
+    },
+    "extract-vector-graphics-to-svg__v2": {
+      "title": "Extract Vector Graphics to SVG Preserving Coordinate System",
+      "filename": "extract-vector-graphics-to-svg__v2.cs",
+      "description": "Shows how to iterate PDF pages and save their vector graphics as SVG files while keeping the original coordinate system, using TrySaveVectorGraphics with a fallback to SvgExtractor.",
       "tags": [
         "pdf",
-        "fonts",
-        "validation",
-        "aspose",
-        "missing"
+        "svg",
+        "vector-graphics",
+        "extraction",
+        "coordinate-system"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.Font",
-        "Aspose.Pdf.FontRepository.LoadFonts",
-        "Aspose.Pdf.FontCollection"
+        "Aspose.Pdf.Page.TrySaveVectorGraphics",
+        "Aspose.Pdf.SvgExtractor",
+        "Aspose.Pdf.SvgExtractor.Extract"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "extract-pdf-metadata-and-save-vector-graphics": {
-      "title": "Extract PDF Metadata and Save Vector Graphics as SVG",
-      "filename": "extract-pdf-metadata-and-save-vector-graphics.cs",
-      "description": "Demonstrates how to read basic PDF metadata (author, title) and export the document or individual pages as SVG vector graphics, with optional text extraction for documentation.",
+    "pdf-summary-report-graphics-text-images": {
+      "title": "Generate PDF Summary Report: Graphics, Text Length, and Image Count",
+      "filename": "pdf-summary-report-graphics-text-images.cs",
+      "description": "The example loads PDF files, counts vector graphics, extracts the total length of all text, and counts embedded images, then prints a summary for each document.",
       "tags": [
         "pdf",
-        "metadata",
-        "svg",
-        "vector",
-        "aspose-pdf"
+        "summary",
+        "graphics",
+        "text",
+        "images"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.SvgSaveOptions",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.PageCollection.Add",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
         "Aspose.Pdf.Text.TextAbsorber",
-        "Aspose.Pdf.Pages.Accept"
+        "Aspose.Pdf.XImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "extract-images-using-graphicsabsorber": {
-      "title": "Extract Images from PDF Using GraphicsAbsorber",
-      "filename": "extract-images-using-graphicsabsorber.cs",
-      "description": "Shows how to employ GraphicsAbsorber to collect only image elements on each PDF page, ignore other graphics, and save the extracted images as JPEG files.",
+    "extract-pdf-font-table-form-stats": {
+      "title": "Extract Font, Table, and Form Field Statistics from PDF",
+      "filename": "extract-pdf-font-table-form-stats.cs",
+      "description": "Loads one or more PDF files and logs the number of distinct fonts, tables, and form fields found in each document.",
       "tags": [
         "pdf",
-        "image-extraction",
-        "graphicsabsorber",
+        "fonts",
+        "tables",
+        "form-fields",
+        "statistics"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.Resources",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Form",
+        "Aspose.Pdf.FormFieldCollection"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-05T09:42:56Z",
+      "status": "verified"
+    },
+    "validate-pdf-fonts-against-system": {
+      "title": "Validate PDF Fonts Against System Installed Fonts",
+      "filename": "validate-pdf-fonts-against-system.cs",
+      "description": "Loads a PDF, extracts all text fragments, checks each fragment's font against the system font repository, and reports any fonts that are not installed.",
+      "tags": [
+        "fonts",
+        "validation",
+        "pdf",
         "aspose-pdf",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.GraphicsAbsorber",
-        "Aspose.Pdf.ImagePlacementAbsorber",
-        "Aspose.Pdf.ImagePlacement",
-        "Aspose.Pdf.Image"
+        "Aspose.Pdf.Text.TextFragmentAbsorber",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.Font",
+        "Aspose.Pdf.FontRepository.LoadFonts"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "extract-pdf-paragraphs-to-markdown": {
-      "title": "Extract PDF Paragraphs to Markdown Preserving Indentation",
-      "filename": "extract-pdf-paragraphs-to-markdown.cs",
-      "description": "Loads a PDF, uses Aspose.Pdf's ParagraphAbsorber to collect paragraphs from each page while keeping leading spaces, and writes the text to a UTF‑8 markdown file.",
+    "retrieve-pdf-metadata-vector-graphics": {
+      "title": "Retrieve PDF Metadata and Count Vector Graphics",
+      "filename": "retrieve-pdf-metadata-vector-graphics.cs",
+      "description": "Demonstrates loading a PDF with Aspose.Pdf, reading basic metadata such as title, author, subject, and keywords, and outlines where vector graphics extraction could be added.",
+      "tags": [
+        "metadata",
+        "pdf",
+        "aspose",
+        "vector-graphics",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.DocumentInfo"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-07-05T09:42:56Z",
+      "status": "verified"
+    },
+    "extract-pdf-paragraphs-with-indentation-to-markdown": {
+      "title": "Extract PDF Paragraphs with Indentation to Markdown",
+      "filename": "extract-pdf-paragraphs-with-indentation-to-markdown.cs",
+      "description": "Loads a PDF, uses ParagraphAbsorber to retrieve paragraphs, calculates leading spaces from each paragraph's X‑indent, prepends those spaces to preserve indentation, and saves the result as a Markdown file.",
       "tags": [
         "pdf",
         "markdown",
         "paragraph",
-        "extraction",
-        "indentation"
+        "indentation",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.ParagraphAbsorber",
-        "Aspose.Pdf.Text.MarkupParagraph",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.ParagraphAbsorber.Visit"
+        "Aspose.Pdf.ParagraphAbsorber",
+        "Aspose.Pdf.PageMarkup",
+        "Aspose.Pdf.MarkupParagraph",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.MarkdownSaveOptions"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "extract-superscript-subscript-from-pdf": {
+    "extract-superscript-subscript-from-pdf__v2": {
       "title": "Extract Superscript and Subscript Text from PDF",
-      "filename": "extract-superscript-subscript-from-pdf.cs",
-      "description": "Shows how to load a PDF with Aspose.Pdf, extract text fragments with formatting, detect superscript or subscript flags, and write the extracted text wrapped in custom Unicode markers.",
+      "filename": "extract-superscript-subscript-from-pdf__v2.cs",
+      "description": "Demonstrates how to load a PDF with Aspose.Pdf, detect superscript and subscript text fragments, and output the extracted text with Unicode markers.",
       "tags": [
         "pdf",
         "text-extraction",
         "superscript",
         "subscript",
-        "aspose"
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -1302,60 +1306,59 @@
         "Aspose.Pdf.Text.TextFragment",
         "Aspose.Pdf.Text.TextState"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "export-pdf-tables-to-csv-with-border-markers": {
-      "title": "Export PDF Tables to CSV with Border Markers",
-      "filename": "export-pdf-tables-to-csv-with-border-markers.cs",
-      "description": "Demonstrates how to extract tables from a PDF using Aspose.Pdf, preserve visual cell borders, and write the data to a CSV file with delimiter markers for easy reference.",
+    "export-pdf-table-to-csv-with-border-markers": {
+      "title": "Export PDF Table to CSV with Border Markers",
+      "filename": "export-pdf-table-to-csv-with-border-markers.cs",
+      "description": "Shows how to extract tables from a PDF using Aspose.Pdf's TableAbsorber and write them to a CSV file while preserving visual border information by wrapping cell contents with delimiters.",
       "tags": [
         "pdf",
         "table",
         "csv",
         "border",
-        "aspose"
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
         "Aspose.Pdf.TableAbsorber",
-        "Aspose.Pdf.TableAbsorber.Table",
-        "Aspose.Pdf.TableAbsorber.Row",
-        "Aspose.Pdf.TableAbsorber.Cell",
-        "Aspose.Pdf.Text.TextFragment"
+        "Aspose.Pdf.TableAbsorber.Visit",
+        "Aspose.Pdf.AbsorbedTable.RowList",
+        "Aspose.Pdf.AbsorbedRow.CellList",
+        "Aspose.Pdf.AbsorbedCell.TextFragments",
+        "Aspose.Pdf.AbsorbedCell.BorderInfo"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "extract-checkbox-states-from-pdf-acroform": {
-      "title": "Extract Checkbox States from PDF AcroForm",
-      "filename": "extract-checkbox-states-from-pdf-acroform.cs",
-      "description": "Loads a PDF, iterates over its AcroForm fields, collects the checked state of each checkbox, and writes the boolean list to a JSON file.",
+    "extract-checkbox-states-to-json": {
+      "title": "Extract Checkbox States from PDF AcroForm to JSON",
+      "filename": "extract-checkbox-states-to-json.cs",
+      "description": "Loads a PDF, iterates through its AcroForm fields, captures the checked state of each checkbox, and writes the resulting boolean list to a formatted JSON file.",
       "tags": [
         "pdf",
-        "acroform",
         "checkbox",
+        "acroform",
         "json",
         "aspnet"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.Form",
         "Aspose.Pdf.Forms.Field",
-        "Aspose.Pdf.Forms.CheckboxField",
-        "Aspose.Pdf.Form",
-        "Aspose.Pdf.Forms.FormFieldCollection"
+        "Aspose.Pdf.Forms.CheckboxField"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
     "extract-selected-radio-button-labels": {
       "title": "Extract Selected Radio Button Labels from PDF Form",
       "filename": "extract-selected-radio-button-labels.cs",
-      "description": "Shows how to load a PDF, iterate its form fields, identify radio button fields, and obtain the display label and export value of the selected option.",
+      "description": "Loads a PDF, iterates over its form fields, and prints the label of the selected option for each radio button field.",
       "tags": [
         "pdf",
         "form",
@@ -1365,36 +1368,34 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Forms.Form",
-        "Aspose.Pdf.Annotations.WidgetAnnotation",
+        "Aspose.Pdf.Forms.Field",
         "Aspose.Pdf.Forms.RadioButtonField",
-        "Aspose.Pdf.Forms.RadioButtonOption"
+        "Aspose.Pdf.Forms.RadioButtonField.Selected",
+        "Aspose.Pdf.Forms.RadioButtonField.Options"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     },
-    "extract-vector-graphics-brand-color": {
-      "title": "Extract Vector Graphics and Apply Brand Color to SVG",
-      "filename": "extract-vector-graphics-brand-color.cs",
-      "description": "Creates a PDF with vector graphics, extracts them as SVG, replaces the original colors with a brand palette, and saves the transformed SVG.",
+    "extract-svg-apply-brand-colors": {
+      "title": "Extract SVG Graphics from PDF and Apply Brand Color Transformation",
+      "filename": "extract-svg-apply-brand-colors.cs",
+      "description": "Demonstrates how to extract vector graphics as SVG from each PDF page, replace specific colors to match a brand palette, and save the transformed SVG files.",
       "tags": [
-        "vector graphics",
+        "pdf",
         "svg",
-        "color transformation",
-        "aspose.pdf",
-        "c#"
+        "extraction",
+        "color-transformation",
+        "branding"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Drawing.Rectangle",
-        "Aspose.Pdf.Drawing.GraphInfo",
-        "Aspose.Pdf.Saving.SvgSaveOptions",
-        "System.IO.File"
+        "Aspose.Pdf.Vector.SvgExtractor",
+        "Aspose.Pdf.Vector.SvgExtractor.Extract"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-06-15T09:58:19Z",
+      "generated_at": "2026-07-05T09:42:56Z",
       "status": "verified"
     }
   }

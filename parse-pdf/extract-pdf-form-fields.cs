@@ -4,68 +4,55 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
-public static class PdfFormUtility
+namespace PdfFormUtilityDemo
 {
-    /// <summary>
-    /// Loads a PDF document and extracts all form field names with their current values.
-    /// </summary>
-    /// <param name="pdfPath">Full path to the PDF file.</param>
-    /// <returns>Dictionary where the key is the field's full name and the value is its string representation.</returns>
-    public static Dictionary<string, string> GetFormFields(string pdfPath)
+    public static class PdfFormUtility
     {
-        // Ensure the file exists before attempting to open it.
-        if (string.IsNullOrEmpty(pdfPath) || !File.Exists(pdfPath))
-            throw new ArgumentException($"PDF file not found: {pdfPath}");
-
-        // Use a using block for deterministic disposal of the Document (lifecycle rule).
-        using (Document doc = new Document(pdfPath))
+        /// <summary>
+        /// Reads all form fields from a PDF and returns a dictionary where the key is the field's full name
+        /// and the value is the field's current value (as a string).
+        /// </summary>
+        /// <param name="pdfPath">Path to the PDF file.</param>
+        /// <returns>Dictionary of field names and their values.</returns>
+        public static Dictionary<string, string> GetFormFields(string pdfPath)
         {
-            var fieldsDictionary = new Dictionary<string, string>();
+            // Ensure the file exists before attempting to open it.
+            if (!File.Exists(pdfPath))
+                throw new FileNotFoundException($"PDF file not found: {pdfPath}");
 
-            // Iterate over all fields in the form.
-            foreach (Field field in doc.Form.Fields)
+            // Load the PDF document inside a using block for deterministic disposal.
+            using (Document doc = new Document(pdfPath))
             {
-                // FullName uniquely identifies the field.
-                string fieldName = field.FullName;
+                var fields = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-                // Value may be null; convert to string safely.
-                string fieldValue = field.Value?.ToString() ?? string.Empty;
+                // Iterate over all fields in the form.
+                foreach (Field field in doc.Form.Fields)
+                {
+                    // FullName uniquely identifies the field; Value may be null.
+                    string name = field.FullName;
+                    string value = field.Value?.ToString() ?? string.Empty;
 
-                // Add to the dictionary (duplicate names are unlikely but handled).
-                fieldsDictionary[fieldName] = fieldValue;
+                    fields[name] = value;
+                }
+
+                return fields;
             }
-
-            return fieldsDictionary;
         }
     }
-}
 
-public class Program
-{
-    /// <summary>
-    /// Simple console entry point to demonstrate the utility.
-    /// </summary>
-    /// <param name="args">First argument should be the PDF file path.</param>
-    public static void Main(string[] args)
+    // Minimal entry point required for a console‑type project.
+    // The method does not perform any work; it simply satisfies the compiler.
+    internal class Program
     {
-        if (args.Length == 0)
+        static void Main(string[] args)
         {
-            Console.WriteLine("Usage: <executable> <pdfPath>");
-            return;
-        }
-
-        try
-        {
-            var fields = PdfFormUtility.GetFormFields(args[0]);
-            Console.WriteLine($"Found {fields.Count} form field(s):");
-            foreach (var kvp in fields)
-            {
-                Console.WriteLine($"{kvp.Key}: {kvp.Value}");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            // Example usage (can be removed in production):
+            // if (args.Length > 0)
+            // {
+            //     var result = PdfFormUtility.GetFormFields(args[0]);
+            //     foreach (var kvp in result)
+            //         Console.WriteLine($"{kvp.Key}: {kvp.Value}");
+            // }
         }
     }
 }

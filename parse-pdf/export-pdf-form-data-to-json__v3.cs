@@ -2,55 +2,34 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class ExportFormData
+class Program
 {
-    // Entry point of the command‑line utility
-    static void Main(string[] args)
+    static void Main()
     {
-        // Expect exactly two arguments: input PDF path and output format flag
-        if (args.Length != 2)
+        const string inputPdfPath = "input.pdf";
+        const string outputJsonPath = "formdata.json";
+
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine("Usage: ExportFormData <pdfPath> <format>");
-            Console.Error.WriteLine("Supported format flags: json");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        string pdfPath = args[0];
-        string formatFlag = args[1].ToLowerInvariant();
-
-        if (!File.Exists(pdfPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            Console.Error.WriteLine($"Error: PDF file not found – '{pdfPath}'.");
-            return;
-        }
-
-        // Determine output file name based on the requested format
-        string outputPath;
-        switch (formatFlag)
-        {
-            case "json":
-                outputPath = Path.ChangeExtension(pdfPath, ".json");
-                break;
-            default:
-                Console.Error.WriteLine($"Error: Unsupported format '{formatFlag}'. Only 'json' is supported.");
-                return;
-        }
-
-        try
-        {
-            // Load the PDF document (lifecycle rule: use using for deterministic disposal)
-            using (Document doc = new Document(pdfPath))
+            // Create a FileStream that will receive the JSON output
+            using (FileStream jsonStream = new FileStream(outputJsonPath, FileMode.Create, FileAccess.Write))
             {
-                // Export all form fields to JSON using the built‑in ExportToJson method
-                // This writes directly to the specified file; no manual Save() call is needed
-                doc.Form.ExportToJson(outputPath);
+                // Export all form fields directly to the stream as JSON
+                // No options are required; default behavior is used
+                pdfDoc.Form.ExportToJson(jsonStream);
             }
 
-            Console.WriteLine($"Form data exported to '{outputPath}'.");
+            // Alternative overload (commented) – export directly to a file path
+            // pdfDoc.Form.ExportToJson(outputJsonPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during export: {ex.Message}");
-        }
+
+        Console.WriteLine($"Form data exported to '{outputJsonPath}'.");
     }
 }

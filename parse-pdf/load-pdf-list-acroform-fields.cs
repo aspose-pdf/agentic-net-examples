@@ -1,36 +1,43 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms; // Core API for AcroForm handling
+using Aspose.Pdf.Forms; // For accessing form fields
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string pdfPath = "input.pdf";
 
         // Verify the file exists before attempting to load it
-        if (!File.Exists(inputPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
         // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        using (Document doc = new Document(pdfPath))
         {
-            // Access the AcroForm associated with the document
+            // Retrieve the AcroForm object
             Form acroForm = doc.Form;
 
-            // Output basic information about the form fields
-            Console.WriteLine($"Total form fields: {acroForm.Count}");
-
-            // Iterate over each field in the AcroForm
-            foreach (Field field in acroForm)
+            // Check if the document contains any form fields
+            if (acroForm == null || acroForm.Count == 0)
             {
-                // Field.Name provides the fully qualified field name
-                // field.GetType().Name indicates the specific field type (e.g., TextBoxField, CheckBoxField)
-                Console.WriteLine($"Field: {field.Name}, Type: {field.GetType().Name}");
+                Console.WriteLine("No AcroForm fields found in the document.");
+            }
+            else
+            {
+                Console.WriteLine($"AcroForm contains {acroForm.Count} field(s):");
+
+                // Iterate over each field and display basic information
+                foreach (Field field in acroForm)
+                {
+                    // Field.FullName gives the hierarchical name of the field
+                    // field.Value returns the current value (may be null for some field types)
+                    Console.WriteLine($"- Name: {field.FullName}, Type: {field.GetType().Name}, Value: {field.Value}");
+                }
             }
         }
     }

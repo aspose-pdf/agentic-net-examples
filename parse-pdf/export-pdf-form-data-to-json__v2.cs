@@ -1,53 +1,29 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace
+using Aspose.Pdf; // Aspose.Pdf namespace provides Document and Form classes
 
 class Program
 {
     static void Main()
     {
-        // Folder containing the source PDF files
-        const string inputFolder = "InputPdfs";
+        const string pdfPath  = "input.pdf";      // source PDF containing form fields
+        const string jsonPath = "formdata.json";  // target JSON file (UTF‑8)
 
-        // Folder where the JSON files will be written
-        const string outputFolder = "FormJson";
-
-        // Verify input folder exists
-        if (!Directory.Exists(inputFolder))
+        // Verify that the source PDF exists
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Error: PDF file not found at '{pdfPath}'.");
             return;
         }
 
-        // Ensure the output folder exists
-        Directory.CreateDirectory(outputFolder);
-
-        // Get all PDF files in the input folder (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-
-        foreach (string pdfPath in pdfFiles)
+        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        using (Document doc = new Document(pdfPath))
         {
-            try
-            {
-                // Build the JSON file name – same base name as the PDF
-                string jsonFileName = Path.GetFileNameWithoutExtension(pdfPath) + ".json";
-                string jsonPath = Path.Combine(outputFolder, jsonFileName);
-
-                // Load the PDF document inside a using block for deterministic disposal
-                using (Document doc = new Document(pdfPath))
-                {
-                    // Export the form fields of the document to the JSON file
-                    // ExportToJson(string) writes the JSON directly to the specified path
-                    doc.Form.ExportToJson(jsonPath);
-                }
-
-                Console.WriteLine($"Exported form data: {Path.GetFileName(pdfPath)} → {Path.GetFileName(jsonPath)}");
-            }
-            catch (Exception ex)
-            {
-                // Log any errors but continue processing remaining files
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
-            }
+            // Export all form fields to a JSON file.
+            // The ExportToJson overload writes the JSON using UTF‑8 encoding internally.
+            doc.Form.ExportToJson(jsonPath);
         }
+
+        Console.WriteLine($"Form data successfully exported to '{jsonPath}'.");
     }
 }
