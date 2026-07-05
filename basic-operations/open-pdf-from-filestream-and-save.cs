@@ -15,14 +15,14 @@ class Program
             return;
         }
 
-        // Open the PDF from a FileStream and ensure resources are disposed properly
+        // Open the PDF from a FileStream and ensure deterministic disposal
         using (FileStream inputStream = new FileStream(inputPath, FileMode.Open, FileAccess.Read))
-        using (Document doc = new Document(inputStream))
+        using (Document pdfDoc = new Document(inputStream))
         {
-            // Save the document with default settings
-            doc.Save(outputPath);
+            // Save to another file using default PDF settings
+            pdfDoc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF successfully saved to '{outputPath}'.");
     }
 }

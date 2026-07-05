@@ -6,40 +6,48 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_pdfx3.pdf";
-        const string logPath    = "conversion_log.txt";
+        // Input PDF file path
+        const string inputPdf = "input.pdf";
+        // Output PDF/X‑3 file path
+        const string outputPdfX3 = "output_pdfx3.pdf";
+        // Path for conversion log (optional, can be any writable location)
+        const string logPath = "conversion_log.txt";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the source PDF
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Prepare conversion options for PDF/X‑3
-            PdfFormatConversionOptions options = new PdfFormatConversionOptions(PdfFormat.PDF_X_3)
+            // Load the source PDF
+            using (Document doc = new Document(inputPdf))
             {
-                // Preserve existing ICC profiles – leave IccProfileFileName null (default)
-                // Log any conversion messages
-                LogFileName = logPath,
-                // Choose how to handle objects that cannot be converted
-                ErrorAction = ConvertErrorAction.Delete
-            };
+                // Configure conversion options for PDF/X‑3
+                // No need to set IccProfileFileName – leaving it null preserves the
+                // existing ICC profiles embedded in the source document.
+                PdfFormatConversionOptions options = new PdfFormatConversionOptions(
+                    logPath,                // log file
+                    PdfFormat.PDF_X_3,     // target format
+                    ConvertErrorAction.Delete); // how to handle conversion errors
 
-            // Perform the conversion
-            bool success = doc.Convert(options);
-            if (!success)
-            {
-                Console.Error.WriteLine("Conversion reported errors. See log for details.");
+                // Perform the conversion
+                bool success = doc.Convert(options);
+                if (!success)
+                {
+                    Console.Error.WriteLine("Conversion reported failures. Check the log file for details.");
+                }
+
+                // Save the converted document as PDF/X‑3
+                doc.Save(outputPdfX3);
             }
 
-            // Save the resulting PDF/X‑3 document
-            doc.Save(outputPath);
+            Console.WriteLine($"PDF successfully converted to PDF/X‑3: {outputPdfX3}");
         }
-
-        Console.WriteLine($"PDF converted to PDF/X‑3 and saved as '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+        }
     }
 }
