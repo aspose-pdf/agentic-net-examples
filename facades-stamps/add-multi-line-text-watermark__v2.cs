@@ -1,71 +1,66 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades; // Facade classes for stamping
-using System.Drawing; // for Color
+using System.Linq;
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "watermarked.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "watermarked.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Bind the source PDF to a PdfFileStamp facade
-        PdfFileStamp pdfStamp = new PdfFileStamp();
-        pdfStamp.BindPdf(inputPdf);
+        // Load the document to obtain the total page count.
+        Document doc = new Document(inputPath);
+        int[] allPages = Enumerable.Range(1, doc.Pages.Count).ToArray();
 
-        // ----- First line (largest font) -----
-        var ft1 = new FormattedText(
-            "CONFIDENTIAL",               // text
-            Color.Red,                     // text color
-            "Helvetica",                  // font name
-            EncodingType.Winansi,          // encoding
-            false,                         // embed font?
-            48);                           // font size
-        var stamp1 = new Stamp();
-        stamp1.BindLogo(ft1);
-        stamp1.SetOrigin(100, 750); // X, Y coordinates (points from bottom‑left)
-        stamp1.Opacity = 0.5f;       // semi‑transparent
-        pdfStamp.AddStamp(stamp1);
+        // Use PdfFileMend (Facades) to add formatted text as a watermark.
+        using (Aspose.Pdf.Facades.PdfFileMend mend = new Aspose.Pdf.Facades.PdfFileMend())
+        {
+            mend.BindPdf(inputPath);
 
-        // ----- Second line (medium font) -----
-        var ft2 = new FormattedText(
-            "Do Not Distribute",
-            Color.Red,
-            "Helvetica",
-            EncodingType.Winansi,
-            false,
-            36);
-        var stamp2 = new Stamp();
-        stamp2.BindLogo(ft2);
-        stamp2.SetOrigin(100, 700);
-        stamp2.Opacity = 0.5f;
-        pdfStamp.AddStamp(stamp2);
+            // Line 1 – largest font size
+            FormattedText line1 = new FormattedText(
+                "CONFIDENTIAL",
+                System.Drawing.Color.Red,
+                "Helvetica",
+                EncodingType.Winansi,
+                false,
+                48f);
+            // Position the first line near the top of the page.
+            mend.AddText(line1, allPages, 0f, 100f, 500f, 50f);
 
-        // ----- Third line (smallest font) -----
-        var ft3 = new FormattedText(
-            "Company Internal Use Only",
-            Color.Red,
-            "Helvetica",
-            EncodingType.Winansi,
-            false,
-            24);
-        var stamp3 = new Stamp();
-        stamp3.BindLogo(ft3);
-        stamp3.SetOrigin(100, 650);
-        stamp3.Opacity = 0.5f;
-        pdfStamp.AddStamp(stamp3);
+            // Line 2 – medium font size
+            FormattedText line2 = new FormattedText(
+                "Do Not Distribute",
+                System.Drawing.Color.Red,
+                "Helvetica",
+                EncodingType.Winansi,
+                false,
+                36f);
+            mend.AddText(line2, allPages, 0f, 150f, 500f, 50f);
 
-        // Save the watermarked PDF and release resources
-        pdfStamp.Save(outputPdf);
-        pdfStamp.Close();
+            // Line 3 – smaller font size
+            FormattedText line3 = new FormattedText(
+                "Company Name",
+                System.Drawing.Color.Red,
+                "Helvetica",
+                EncodingType.Winansi,
+                false,
+                24f);
+            mend.AddText(line3, allPages, 0f, 200f, 500f, 50f);
 
-        Console.WriteLine($"Watermarked PDF saved to '{outputPdf}'.");
+            // Persist the changes.
+            mend.Save(outputPath);
+        }
+
+        Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
     }
 }

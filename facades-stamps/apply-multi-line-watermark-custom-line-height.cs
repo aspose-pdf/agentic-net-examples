@@ -1,60 +1,57 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;          // Facade classes: PdfFileStamp, Stamp, FormattedText, EncodingType
-using Aspose.Pdf;                 // Core classes (if needed for other operations)
+using System.Drawing;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Paths to the source PDF and the output PDF
         const string inputPdf  = "input.pdf";
         const string outputPdf = "watermarked.pdf";
 
-        // Verify that the input file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Create a PdfFileStamp facade and bind the source PDF
-        using (PdfFileStamp pdfStamp = new PdfFileStamp())
-        {
-            pdfStamp.BindPdf(inputPdf);   // Load the document to be stamped
+        // Create the formatted text that will be used as the watermark.
+        // All styling (text, colour, font, size, etc.) must be supplied via the constructor.
+        FormattedText formatted = new FormattedText(
+            "CONFIDENTIAL\nDO NOT DISTRIBUTE\nFOR INTERNAL USE ONLY",
+            Color.FromArgb(150, 200, 200, 200), // semi‑transparent gray
+            "Helvetica",
+            EncodingType.Winansi,
+            false,
+            48); // base font size
 
-            // Build the formatted text for the watermark.
-            // The constructor parameters are:
-            //   text, color (System.Drawing.Color), font name, encoding, isBold, font size
-            var formattedText = new Aspose.Pdf.Facades.FormattedText(
-                "Confidential",                         // First line (initial text)
-                System.Drawing.Color.Red,               // Text color
-                "Helvetica",                            // Font name
-                Aspose.Pdf.Facades.EncodingType.Winansi, // Encoding
-                false,                                  // Not bold
-                36);                                    // Font size (points)
+        // If you need extra spacing between the lines you can insert an empty line
+        // or a line that contains only spaces. Here we add a blank line after each
+        // real line to double the line height.
+        formatted.AddNewLineText(" "); // first blank line
+        formatted.AddNewLineText("CONFIDENTIAL");
+        formatted.AddNewLineText(" ");
+        formatted.AddNewLineText("DO NOT DISTRIBUTE");
+        formatted.AddNewLineText(" ");
+        formatted.AddNewLineText("FOR INTERNAL USE ONLY");
 
-            // Append additional lines with explicit line spacing.
-            // The second argument is the extra spacing added after the line.
-            formattedText.AddNewLineText("Do Not Distribute", 12f); // 12 points extra spacing
-            formattedText.AddNewLineText("Company XYZ", 12f);       // 12 points extra spacing
+        // Create a Stamp (facade) and bind the formatted text to it.
+        Stamp stamp = new Stamp();
+        stamp.BindLogo(formatted);
+        stamp.IsBackground = true;   // place behind page content
+        stamp.Opacity = 0.5f;        // overall opacity
+        // Position the stamp at the centre of each page. We will set the origin
+        // after we know the page dimensions (here we simply use (0,0) and rely on
+        // the default centre alignment of the stamp when added to the document).
+        stamp.SetOrigin(0, 0);
 
-            // Create a Stamp object and bind the formatted text to it.
-            var stamp = new Aspose.Pdf.Facades.Stamp();
-            stamp.BindLogo(formattedText);   // Use the text as the stamp content
-
-            // Optional visual settings for the stamp
-            stamp.IsBackground = true;      // Render behind page content
-            stamp.Opacity      = 0.3f;      // Semi‑transparent
-            stamp.SetOrigin(100f, 400f);    // Position (X, Y) from the lower‑left corner
-
-            // Add the stamp to all pages of the document
-            pdfStamp.AddStamp(stamp);
-
-            // Save the result and release resources
-            pdfStamp.Save(outputPdf);
-            pdfStamp.Close();
-        }
+        // Apply the stamp to every page of the source PDF.
+        PdfFileStamp fileStamp = new PdfFileStamp();
+        fileStamp.BindPdf(inputPdf);
+        fileStamp.AddStamp(stamp);
+        fileStamp.Save(outputPdf);
+        fileStamp.Close();
 
         Console.WriteLine($"Watermarked PDF saved to '{outputPdf}'.");
     }

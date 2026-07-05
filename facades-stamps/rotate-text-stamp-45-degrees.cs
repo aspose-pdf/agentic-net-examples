@@ -1,53 +1,54 @@
 using System;
-using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text; // FormattedText
+using System.Drawing;                     // For System.Drawing.Color used by FormattedText
+using Aspose.Pdf.Facades;                // Facade classes: PdfFileStamp, Stamp, FormattedText
 
-class Program
+class RotateTextStampExample
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        // Paths to the source PDF and the output PDF
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "rotated_stamp.pdf";
 
-        if (!File.Exists(inputPath))
+        // Ensure the input file exists
+        if (!System.IO.File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Create the facade and bind the source PDF (load)
-        using (PdfFileStamp fileStamp = new PdfFileStamp())
-        {
-            fileStamp.BindPdf(inputPath);
+        // Initialize the PdfFileStamp facade with input and output files
+        // (PdfFileStamp does NOT implement IDisposable, so we call Close() explicitly)
+        PdfFileStamp fileStamp = new PdfFileStamp(inputPdf, outputPdf);
 
-            // Create a text stamp (logo) with desired appearance
-            FormattedText ft = new FormattedText(
-                "CONFIDENTIAL",                 // text
-                System.Drawing.Color.Red,       // text color (System.Drawing.Color required)
-                "Helvetica",                    // font name
-                EncodingType.Winansi,           // encoding
-                false,                          // embed font flag
-                36);                            // font size
+        // Create a text stamp
+        Stamp stamp = new Stamp();
 
-            Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-            stamp.BindLogo(ft);
+        // Bind a formatted text to the stamp.
+        // FormattedText constructor: (text, color, fontName, encoding, isEmbedded, fontSize)
+        FormattedText formatted = new FormattedText(
+            "CONFIDENTIAL",               // Text to display
+            Color.Red,                    // Text color (System.Drawing.Color)
+            "Helvetica",                  // Font name
+            EncodingType.Winansi,         // Encoding
+            false,                        // Do not embed the font
+            48);                          // Font size
 
-            // Rotate the stamp 45 degrees around its center
-            stamp.Rotation = 45f; // arbitrary angle; alternatively stamp.RotateAngle = 45.0;
+        stamp.BindLogo(formatted);
 
-            // Position the stamp (example coordinates)
-            stamp.SetOrigin(200, 400);
+        // Set the rotation angle to 45 degrees (around the stamp's center)
+        stamp.Rotation = 45f;
 
-            // Add the stamp to the document (applies to all pages)
-            fileStamp.AddStamp(stamp);
+        // Optionally set the position of the stamp on the page (origin is lower‑left corner)
+        // Here we place it near the center of a typical A4 page (595x842 points)
+        stamp.SetOrigin(200f, 400f);
 
-            // Save the modified PDF (save)
-            fileStamp.Save(outputPath);
-            fileStamp.Close();
-        }
+        // Add the stamp to all pages of the document
+        fileStamp.AddStamp(stamp);
 
-        Console.WriteLine($"Rotated text stamp saved to '{outputPath}'.");
+        // Finalize and save the output PDF
+        fileStamp.Close();
+
+        Console.WriteLine($"Stamp with 45° rotation applied and saved to '{outputPdf}'.");
     }
 }

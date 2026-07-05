@@ -7,17 +7,15 @@ class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string inputPdf  = "input.pdf";
+        const string inputPdf = "input.pdf";
         const string outputPdf = "branded_output.pdf";
-        const string fontPath  = "custom.ttf"; // TrueType font file for branding
+        const string fontPath = "MyBrandFont.ttf";
 
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
-
         if (!File.Exists(fontPath))
         {
             Console.Error.WriteLine($"Font file not found: {fontPath}");
@@ -27,37 +25,42 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPdf))
         {
-            // Load the custom TrueType font
+            // Load custom TrueType font
             Font customFont = FontRepository.FindFont(fontPath);
 
-            // Configure text appearance using TextState
+            // Configure text state with the custom font
             TextState textState = new TextState
             {
-                Font = customFont,                     // custom font
-                FontSize = 48,                         // desired size
-                ForegroundColor = Aspose.Pdf.Color.Blue // text color
+                Font = customFont,
+                FontSize = 36,
+                ForegroundColor = Aspose.Pdf.Color.DarkBlue
             };
 
-            // Create a TextStamp with the branding text and the custom TextState
-            TextStamp brandStamp = new TextStamp("MyBrand", textState)
+            // Create a text stamp using the custom font
+            TextStamp brandStamp = new TextStamp("My Brand", textState)
             {
-                // Position the stamp on the page (coordinates are from bottom‑left)
-                XIndent = 100,   // horizontal position
-                YIndent = 700,   // vertical position
-
-                // Optional visual settings
-                Opacity = 0.85f, // semi‑transparent
-                Background = false // draw on top of page content
+                // Place stamp behind page content
+                Background = true,
+                // Position of the stamp (coordinates from bottom‑left)
+                XIndent = 100,
+                YIndent = 100,
+                // Optional opacity for a subtle effect
+                Opacity = 0.6f,
+                // Center alignment on the page
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
             };
 
-            // Add the stamp to the first page (1‑based indexing)
-            Page firstPage = doc.Pages[1];
-            firstPage.AddStamp(brandStamp);
+            // Apply the stamp to every page in the document
+            foreach (Page page in doc.Pages)
+            {
+                page.AddStamp(brandStamp);
+            }
 
-            // Save the modified PDF
+            // Save the stamped PDF
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Branded PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Stamped PDF saved to '{outputPdf}'.");
     }
 }
