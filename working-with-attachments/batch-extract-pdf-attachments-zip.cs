@@ -1,75 +1,90 @@
 using System;
 using System.IO;
 using System.IO.Compression;
+using System.Collections.Generic;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF files – adjust the paths as needed
-        string[] pdfFiles = new string[]
-        {
-            "Document1.pdf",
-            "Document2.pdf",
-            "Document3.pdf"
-        };
+        // Directory containing source PDFs
+        const string inputFolder = "InputPdfs";
+        // Path for the consolidated ZIP archive
+        const string outputZip = "AllAttachments.zip";
 
-        // Output ZIP archive that will contain all extracted attachments
-        const string outputZipPath = "AllAttachments.zip";
-
-        // Create (or overwrite) the ZIP archive
-        using (FileStream zipStream = new FileStream(outputZipPath, FileMode.Create, FileAccess.Write))
-        using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Create))
+        // Verify that the input folder exists
+        if (!Directory.Exists(inputFolder))
         {
-            foreach (string pdfPath in pdfFiles)
+            Console.WriteLine($"Input folder '{inputFolder}' does not exist. No PDFs to process.");
+            return;
+        }
+
+        // Collect all PDF files
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
+
+        // Temporary folder to store extracted attachments before zipping
+        string tempDir = Path.Combine(Path.GetTempPath(), "PdfAttachments");
+        Directory.CreateDirectory(tempDir);
+
+        // Keep track of extracted file paths for later archiving
+        List<string> extractedFiles = new List<string>();
+
+        foreach (string pdfPath in pdfFiles)
+        {
+            if (!File.Exists(pdfPath))
+                continue;
+
+            // Load each PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(pdfPath))
             {
-                if (!File.Exists(pdfPath))
+                // Embedded files collection may be null if no attachments exist
+                EmbeddedFileCollection attachments = doc.EmbeddedFiles;
+                if (attachments != null && attachments.Count > 0)
                 {
-                    Console.Error.WriteLine($"File not found: {pdfPath}");
-                    continue;
-                }
-
-                // Open the PDF document inside a using block for deterministic disposal
-                using (Document doc = new Document(pdfPath))
-                {
-                    // The EmbeddedFiles collection holds the attached files (FileSpecification objects)
-                    if (doc.EmbeddedFiles == null || doc.EmbeddedFiles.Count == 0)
+                    // The collection is 1‑based indexed in Aspose.Pdf
+                    for (int i = 1; i <= attachments.Count; i++)
                     {
-                        Console.WriteLine($"No attachments found in: {pdfPath}");
-                        continue;
-                    }
-
-                    foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
-                    {
-                        // Ensure the file specification has a name and content stream
-                        if (string.IsNullOrEmpty(fileSpec.Name) || fileSpec.Contents == null)
+                        FileSpecification spec = attachments[i];
+                        if (spec?.Contents == null)
                             continue;
 
-                        // Create a unique entry name to avoid collisions between PDFs
-                        string safePdfName = Path.GetFileNameWithoutExtension(pdfPath);
-                        string entryName = $"{safePdfName}_{fileSpec.Name}";
+                        // Build a unique file name to avoid collisions
+                        string safeName = $"{Path.GetFileNameWithoutExtension(pdfPath)}_{spec.Name}";
+                        string outPath = Path.Combine(tempDir, safeName);
 
-                        // Create a new entry in the ZIP archive
-                        ZipArchiveEntry zipEntry = archive.CreateEntry(entryName, CompressionLevel.Optimal);
-
-                        // Copy the attachment's content into the ZIP entry
-                        using (Stream entryStream = zipEntry.Open())
-                        using (Stream attachmentStream = fileSpec.Contents)
+                        // Save the embedded file to the temporary location using the Contents stream
+                        using (FileStream outStream = File.Create(outPath))
                         {
-                            // Reset the attachment stream position in case it is not at the beginning
-                            if (attachmentStream.CanSeek)
-                                attachmentStream.Position = 0;
-
-                            attachmentStream.CopyTo(entryStream);
+                            spec.Contents.CopyTo(outStream);
                         }
 
-                        Console.WriteLine($"Extracted '{fileSpec.Name}' from '{pdfPath}' into archive.");
+                        extractedFiles.Add(outPath);
                     }
                 }
             }
         }
 
-        Console.WriteLine($"All attachments have been consolidated into '{outputZipPath}'.");
+        // Create the consolidated ZIP archive
+        using (FileStream zipStream = new FileStream(outputZip, FileMode.Create))
+        using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Update))
+        {
+            foreach (string filePath in extractedFiles)
+            {
+                // Add each extracted attachment to the archive
+                archive.CreateEntryFromFile(filePath, Path.GetFileName(filePath));
+            }
+        }
+
+        // Clean up temporary files and directory
+        foreach (string filePath in extractedFiles)
+        {
+            if (File.Exists(filePath))
+                File.Delete(filePath);
+        }
+        if (Directory.Exists(tempDir))
+            Directory.Delete(tempDir, true);
+
+        Console.WriteLine($"All attachments have been extracted to '{outputZip}'.");
     }
 }

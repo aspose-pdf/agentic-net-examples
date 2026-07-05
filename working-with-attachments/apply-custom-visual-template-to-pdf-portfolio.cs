@@ -2,29 +2,40 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPortfolio = "portfolio.pdf";
-        const string outputPortfolio = "portfolio_with_template.pdf";
+        const string inputPath = "portfolio.pdf";
+        const string outputPath = "portfolio_with_template.pdf";
 
-        if (!File.Exists(inputPortfolio))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPortfolio}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        using (Document doc = new Document(inputPortfolio))
+        // Load the existing PDF Portfolio
+        using (Document doc = new Document(inputPath))
         {
-            foreach (Page page in doc.Pages)
+            // Apply the visual template to each page (Aspose.Pdf uses 1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Graph container sized to the page
+                Page page = doc.Pages[i];
+
+                // -----------------------------------------------------------------
+                // 1. Create a Graph container that matches the page size.
+                // -----------------------------------------------------------------
+                // Graph constructor expects double values for width/height.
                 Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
 
-                // ---- Background rectangle (light gray) ----
-                // Use Aspose.Pdf.Drawing.Rectangle (shape) – not Aspose.Pdf.Rectangle (annotation)
+                // -----------------------------------------------------------------
+                // 2. Add a background rectangle (full‑page) with a light fill color.
+                //    Use GraphInfo to set visual properties (FillColor, Stroke Color, LineWidth).
+                // -----------------------------------------------------------------
+                // Drawing.Rectangle expects float parameters, so cast the page dimensions.
                 var background = new Aspose.Pdf.Drawing.Rectangle(
                     0f,
                     0f,
@@ -32,36 +43,32 @@ class Program
                     (float)page.PageInfo.Height);
                 background.GraphInfo = new GraphInfo
                 {
-                    FillColor = Aspose.Pdf.Color.LightGray,
-                    Color = Aspose.Pdf.Color.DarkGray,
-                    LineWidth = 0f // float literal as required by GraphInfo
+                    FillColor = Aspose.Pdf.Color.FromRgb(0.9, 0.9, 0.95), // light gray‑blue
+                    Color = Aspose.Pdf.Color.Gray,                     // border color
+                    LineWidth = 0.5f
                 };
                 graph.Shapes.Add(background);
 
-                // ---- Header line (blue, 2pt) ----
-                // Line expects a float[]; cast page dimensions to float
-                float[] linePoints = {
-                    0f,
-                    (float)(page.PageInfo.Height - 50),
-                    (float)page.PageInfo.Width,
-                    (float)(page.PageInfo.Height - 50)
-                };
-                var headerLine = new Line(linePoints);
-                headerLine.GraphInfo = new GraphInfo
-                {
-                    Color = Aspose.Pdf.Color.Blue,
-                    LineWidth = 2f // float literal
-                };
-                graph.Shapes.Add(headerLine);
-
-                // Add the Graph (containing the shapes) to the page's content
+                // -----------------------------------------------------------------
+                // 3. Add the Graph to the page's Paragraphs collection.
+                // -----------------------------------------------------------------
                 page.Paragraphs.Add(graph);
+
+                // -----------------------------------------------------------------
+                // 4. Optionally add a header text on top of the template.
+                //    TextFragment uses Aspose.Pdf.Text.Position for placement.
+                // -----------------------------------------------------------------
+                TextFragment header = new TextFragment("Custom Visual Template");
+                header.Position = new Position(50, page.PageInfo.Height - 50); // 50 pts from left, 50 pts from top
+                header.TextState.FontSize = 24;
+                header.TextState.ForegroundColor = Aspose.Pdf.Color.DarkBlue;
+                page.Paragraphs.Add(header);
             }
 
-            // Save the modified portfolio
-            doc.Save(outputPortfolio);
+            // Save the modified PDF Portfolio
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Portfolio saved with visual template: {outputPortfolio}");
+        Console.WriteLine($"Portfolio with visual template saved to '{outputPath}'.");
     }
 }

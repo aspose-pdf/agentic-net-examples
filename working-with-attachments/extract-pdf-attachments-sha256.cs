@@ -1,60 +1,90 @@
 using System;
 using System.IO;
 using System.Security.Cryptography;
+using System.Reflection;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
+        const string inputPath = "input.pdf";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(pdfPath))
+        // Document must be disposed via using (lifecycle rule)
+        using (Document doc = new Document(inputPath))
         {
-            // Check if the document contains any embedded files (attachments)
+            // If there are no embedded files, report and exit
             if (doc.EmbeddedFiles == null || doc.EmbeddedFiles.Count == 0)
             {
                 Console.WriteLine("No attachments found in the PDF.");
                 return;
             }
 
-            Console.WriteLine($"Found {doc.EmbeddedFiles.Count} attachment(s):");
-
-            // Iterate over each embedded file using reflection to avoid direct dependency on the EmbeddedFile type
-            foreach (var attachment in doc.EmbeddedFiles)
+            // Iterate over each attachment using reflection to avoid direct dependency on EmbeddedFile type
+            foreach (var embedded in doc.EmbeddedFiles)
             {
                 // Retrieve the attachment name via reflection
-                var nameProp = attachment.GetType().GetProperty("Name");
-                string name = nameProp?.GetValue(attachment) as string ?? "<unknown>";
+                string name = GetPropertyValue<string>(embedded, "Name") ?? "Unnamed";
 
-                // Obtain a stream for the attachment's data via reflection
-                var getFileMethod = attachment.GetType().GetMethod("GetFile", Type.EmptyTypes);
-                if (getFileMethod == null)
+                // Load attachment data into a memory stream
+                using (MemoryStream ms = new MemoryStream())
                 {
-                    Console.WriteLine($"Attachment '{name}' does not expose a GetFile method.");
-                    continue;
-                }
+                    // Try to invoke Save(Stream) method
+                    MethodInfo saveMethod = embedded.GetType().GetMethod("Save", new[] { typeof(Stream) });
+                    if (saveMethod != null)
+                    {
+                        saveMethod.Invoke(embedded, new object[] { ms });
+                    }
+                    else
+                    {
+                        // Fallback to Save(string) overload if available
+                        MethodInfo saveString = embedded.GetType().GetMethod("Save", new[] { typeof(string) });
+                        if (saveString != null)
+                        {
+                            string tempPath = Path.GetTempFileName();
+                            saveString.Invoke(embedded, new object[] { tempPath });
+                            ms.Write(File.ReadAllBytes(tempPath), 0, (int)new FileInfo(tempPath).Length);
+                            File.Delete(tempPath);
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Cannot extract attachment: {name}");
+                            continue;
+                        }
+                    }
 
-                using (Stream dataStream = (Stream)getFileMethod.Invoke(attachment, null))
-                using (SHA256 sha256 = SHA256.Create())
-                {
-                    // Compute the SHA‑256 hash
-                    byte[] hashBytes = sha256.ComputeHash(dataStream);
+                    byte[] data = ms.ToArray();
 
-                    // Convert hash to a hexadecimal string
-                    string hashHex = BitConverter.ToString(hashBytes).Replace("-", string.Empty).ToLowerInvariant();
+                    // Compute SHA‑256 hash of the attachment bytes
+                    byte[] hash;
+                    using (SHA256 sha = SHA256.Create())
+                    {
+                        hash = sha.ComputeHash(data);
+                    }
+
+                    // Convert hash to a hex string for display
+                    string hashHex = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
 
                     Console.WriteLine($"Attachment: {name}");
                     Console.WriteLine($"SHA‑256: {hashHex}");
                 }
             }
         }
+    }
+
+    private static T GetPropertyValue<T>(object obj, string propertyName)
+    {
+        PropertyInfo prop = obj.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
+        if (prop != null && prop.CanRead)
+        {
+            return (T)prop.GetValue(obj);
+        }
+        return default;
     }
 }

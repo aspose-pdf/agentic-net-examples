@@ -4,70 +4,57 @@ using Aspose.Pdf;
 
 class Program
 {
-    static void Main()
+    static void Main(string[] args)
     {
-        const string inputPath = "encrypted.pdf";   // Path to the encrypted PDF
-        const string password  = "user123";        // Decryption password
-        const string outputDir = "Attachments";    // Folder to store extracted files
+        // Resolve the PDF path – first try the argument (if supplied), otherwise look in the executable folder.
+        string encryptedPdfPath = args.Length > 0 ? args[0] : Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "encrypted.pdf");
+        const string password = "user123";               // password to open the PDF
+        const string outputFolder = "Attachments";       // folder to store extracted files
 
-        // Ensure the source file exists
-        if (!File.Exists(inputPath))
+        // Verify that the encrypted PDF actually exists before attempting to open it.
+        if (!File.Exists(encryptedPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.WriteLine($"Error: Could not find the encrypted PDF at '{encryptedPdfPath}'.");
+            Console.WriteLine("Place the file in the specified location or pass its full path as a command‑line argument.");
             return;
         }
 
-        // Create output directory if it does not exist
-        Directory.CreateDirectory(outputDir);
+        // Ensure the output directory exists.
+        Directory.CreateDirectory(outputFolder);
 
-        try
+        // Open the encrypted PDF with the supplied password. The Document constructor that accepts (string filename, string password) loads the file.
+        // Decrypt() removes encryption; after this the document can be accessed normally.
+        using (Document doc = new Document(encryptedPdfPath, password))
         {
-            // Open the encrypted PDF using the password (Document ctor handles encrypted files)
-            using (Document doc = new Document(inputPath, password))
+            // Decrypt the document (no parameters).
+            doc.Decrypt();
+
+            // Iterate over all embedded file attachments.
+            // EmbeddedFiles is a collection of FileSpecification objects.
+            for (int i = 1; i <= doc.EmbeddedFiles.Count; i++) // 1‑based indexing as required by Aspose.Pdf
             {
-                // Decrypt the document so that all content, including embedded files, is accessible
-                doc.Decrypt();
+                FileSpecification spec = doc.EmbeddedFiles[i];
+                string fileName = spec.Name; // original attachment name
 
-                // Iterate over all embedded files (attachments) using reflection – avoids direct dependency on EmbeddedFile type
-                foreach (var embedded in doc.EmbeddedFiles)
+                // Build full path for the extracted file.
+                string outputPath = Path.Combine(outputFolder, fileName);
+
+                // Save the attachment to disk using the Contents stream of the FileSpecification.
+                if (spec.Contents != null)
                 {
-                    // Get the attachment name via reflection
-                    var nameProp = embedded.GetType().GetProperty("Name");
-                    string attachmentName = nameProp?.GetValue(embedded) as string ?? "unknown.bin";
-
-                    // Build a full path for the extracted attachment
-                    string outPath = Path.Combine(outputDir, attachmentName);
-
-                    // Try to invoke the Save(string) method via reflection
-                    var saveMethod = embedded.GetType().GetMethod("Save", new[] { typeof(string) });
-                    if (saveMethod != null)
+                    using (FileStream outStream = File.Create(outputPath))
                     {
-                        saveMethod.Invoke(embedded, new object[] { outPath });
+                        spec.Contents.CopyTo(outStream);
                     }
-                    else
-                    {
-                        // Fallback: extract the raw stream from the FileSpecification if Save is unavailable
-                        var fileSpec = embedded.GetType().GetProperty("FileSpecification")?.GetValue(embedded);
-                        var contents = fileSpec?.GetType().GetProperty("Contents")?.GetValue(fileSpec) as Stream;
-                        if (contents != null)
-                        {
-                            using (var fs = File.Create(outPath))
-                                contents.CopyTo(fs);
-                        }
-                        else
-                        {
-                            Console.Error.WriteLine($"Unable to extract attachment: {attachmentName}");
-                            continue;
-                        }
-                    }
-
-                    Console.WriteLine($"Saved attachment: {outPath}");
+                    Console.WriteLine($"Extracted: {fileName} → {outputPath}");
+                }
+                else
+                {
+                    Console.WriteLine($"Attachment '{fileName}' does not contain a content stream.");
                 }
             }
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine("Attachment extraction completed.");
     }
 }

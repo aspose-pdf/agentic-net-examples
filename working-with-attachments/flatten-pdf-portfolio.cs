@@ -15,23 +15,15 @@ class Program
             return;
         }
 
-        try
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF Portfolio
-            using (Document doc = new Document(inputPath))
-            {
-                // Flatten removes interactive collection features and fields
-                doc.Flatten();
+            // Remove interactive form fields and annotations
+            doc.Flatten();
 
-                // Save as a standard PDF
-                doc.Save(outputPath);
-            }
+            // Save as a standard PDF
+            doc.Save(outputPath);
+        }
 
-            Console.WriteLine($"Flattened PDF saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"Flattened PDF saved to '{outputPath}'.");
     }
 }

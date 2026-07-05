@@ -1,83 +1,86 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Aspose.Pdf;   // Core Aspose.Pdf namespace
+using Aspose.Pdf;
 
 class Program
 {
-    // Extracts all embedded file attachments from the given PDF files in parallel.
-    // Each PDF gets its own sub‑folder under the outputRoot directory.
     static void Main()
     {
-        // Example input PDF files – replace with your actual paths.
-        string[] pdfFiles = {
-            @"C:\Docs\Sample1.pdf",
-            @"C:\Docs\Sample2.pdf",
-            @"C:\Docs\Sample3.pdf"
+        // Input PDF files – adjust the paths as needed
+        List<string> pdfFiles = new List<string>
+        {
+            "doc1.pdf",
+            "doc2.pdf",
+            "doc3.pdf"
         };
 
-        // Directory where extracted attachments will be saved.
-        string outputRoot = @"C:\ExtractedAttachments";
+        // Directory where extracted attachments will be saved
+        string outputDirectory = "ExtractedAttachments";
+        Directory.CreateDirectory(outputDirectory);
 
-        // Ensure the root output directory exists.
-        Directory.CreateDirectory(outputRoot);
-
-        // Run extraction concurrently.
-        ExtractAttachmentsParallel(pdfFiles, outputRoot);
-    }
-
-    static void ExtractAttachmentsParallel(string[] pdfPaths, string outputRoot)
-    {
-        // Parallel.ForEach will schedule a separate task for each PDF file.
-        Parallel.ForEach(pdfPaths, pdfPath =>
+        // Process each PDF in parallel
+        Parallel.ForEach(pdfFiles, pdfPath =>
         {
+            if (!File.Exists(pdfPath))
+            {
+                Console.Error.WriteLine($"File not found: {pdfPath}");
+                return;
+            }
+
             try
             {
-                if (!File.Exists(pdfPath))
-                {
-                    Console.Error.WriteLine($"File not found: {pdfPath}");
-                    return;
-                }
-
-                // Create a sub‑folder named after the PDF (without extension) to avoid name clashes.
-                string pdfName = Path.GetFileNameWithoutExtension(pdfPath);
-                string pdfOutputDir = Path.Combine(outputRoot, pdfName);
-                Directory.CreateDirectory(pdfOutputDir);
-
-                // Load the PDF document inside a using block for deterministic disposal.
+                // Load the PDF document (lifecycle rule: use using for disposal)
                 using (Document doc = new Document(pdfPath))
                 {
-                    // The EmbeddedFiles collection holds all attached files.
-                    // It uses 1‑based indexing (consistent with Aspose.Pdf page collections).
-                    for (int i = 1; i <= doc.EmbeddedFiles.Count; i++)
+                    // Iterate over embedded files (attachments) if any using reflection
+                    foreach (var attachment in doc.EmbeddedFiles)
                     {
-                        // Each entry is a FileSpecification representing an attachment.
-                        FileSpecification attachment = doc.EmbeddedFiles[i];
+                        // Get the attachment name via reflection
+                        var nameProp = attachment.GetType().GetProperty("Name");
+                        string attachmentName = nameProp?.GetValue(attachment) as string ?? "unknown";
 
-                        // Determine a safe file name for the extracted attachment.
-                        string attachmentName = !string.IsNullOrEmpty(attachment.Name)
-                            ? attachment.Name
-                            : $"attachment_{i}";
+                        // Build a unique file name for the extracted attachment
+                        string attachmentFileName = $"{Path.GetFileNameWithoutExtension(pdfPath)}_{attachmentName}";
+                        string attachmentPath = Path.Combine(outputDirectory, attachmentFileName);
 
-                        string outputPath = Path.Combine(pdfOutputDir, attachmentName);
-
-                        // Write the attachment's content stream to disk.
-                        using (FileStream outputStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                        // Try to invoke the Save(string) method via reflection
+                        var saveMethod = attachment.GetType().GetMethod("Save", new[] { typeof(string) });
+                        if (saveMethod != null)
                         {
-                            // The Contents property is a Stream containing the file data.
-                            attachment.Contents.CopyTo(outputStream);
+                            saveMethod.Invoke(attachment, new object[] { attachmentPath });
+                            Console.WriteLine($"Extracted: {attachmentPath}");
                         }
-
-                        // Optional: output some metadata for verification.
-                        Console.WriteLine($"Extracted '{attachmentName}' from '{pdfPath}' to '{outputPath}'.");
+                        else
+                        {
+                            // Fallback: attempt to read the file specification stream directly
+                            var fileSpecProp = attachment.GetType().GetProperty("FileSpecification");
+                            var fileSpec = fileSpecProp?.GetValue(attachment);
+                            var contentsProp = fileSpec?.GetType().GetProperty("Contents");
+                            var contents = contentsProp?.GetValue(fileSpec) as Stream;
+                            if (contents != null)
+                            {
+                                using (var outStream = File.Create(attachmentPath))
+                                {
+                                    contents.CopyTo(outStream);
+                                }
+                                Console.WriteLine($"Extracted (stream fallback): {attachmentPath}");
+                            }
+                            else
+                            {
+                                Console.Error.WriteLine($"Unable to extract attachment '{attachmentName}' from '{pdfPath}'.");
+                            }
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
-                // Log any errors but continue processing other files.
                 Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         });
+
+        Console.WriteLine("Attachment extraction completed.");
     }
 }

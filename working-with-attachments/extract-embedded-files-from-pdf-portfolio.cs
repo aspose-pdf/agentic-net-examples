@@ -1,66 +1,91 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core Aspose.Pdf namespace
+using Aspose.Pdf; // Core Aspose.Pdf namespace
 
-class Program
+class PortfolioExtractor
 {
     static void Main()
     {
         // Input PDF portfolio file
-        const string inputPdf = "portfolio.pdf";
+        const string inputPdfPath = "portfolio.pdf";
 
-        // Output root folder where extracted files will be placed
-        const string outputRoot = "ExtractedFiles";
+        // Output base directory where extracted files will be placed
+        const string outputBaseDir = "ExtractedFiles";
 
-        if (!File.Exists(inputPdf))
+        // Validate input file existence
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure the output root directory exists
-        Directory.CreateDirectory(outputRoot);
+        // Ensure the output base directory exists
+        Directory.CreateDirectory(outputBaseDir);
 
-        // Load the PDF document (portfolio) inside a using block for proper disposal
-        using (Document doc = new Document(inputPdf))
+        try
         {
-            // The EmbeddedFiles collection holds all files attached to the portfolio
-            var embeddedFiles = doc.EmbeddedFiles;
-
-            if (embeddedFiles == null || embeddedFiles.Count == 0)
+            // Load the PDF document (portfolio) using a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                Console.WriteLine("No embedded files found in the PDF portfolio.");
-                return;
-            }
-
-            // Iterate over each embedded file specification
-            foreach (FileSpecification fileSpec in embeddedFiles)
-            {
-                // The Name property may contain a path (e.g., "folder/subfolder/file.txt")
-                // Use it to recreate the original folder hierarchy under the output root.
-                string relativePath = fileSpec.Name ?? "UnnamedFile";
-
-                // Combine with the output root and normalize directory separators
-                string destinationPath = Path.Combine(outputRoot, relativePath);
-                string destinationDir = Path.GetDirectoryName(destinationPath);
-
-                // Create any necessary subdirectories
-                if (!string.IsNullOrEmpty(destinationDir))
+                // The EmbeddedFiles collection holds all files embedded in the portfolio
+                if (pdfDoc.EmbeddedFiles == null || pdfDoc.EmbeddedFiles.Count == 0)
                 {
-                    Directory.CreateDirectory(destinationDir);
+                    Console.WriteLine("No embedded files found in the PDF portfolio.");
+                    return;
                 }
 
-                // Write the file contents to disk
-                using (FileStream outputStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write))
+                // Iterate over each embedded file using reflection to avoid direct dependency on the EmbeddedFile type
+                foreach (var embedded in pdfDoc.EmbeddedFiles)
                 {
-                    // The Contents stream contains the binary data of the embedded file
-                    fileSpec.Contents.CopyTo(outputStream);
-                }
+                    // Retrieve the file name (may contain sub‑folder structure)
+                    var nameProp = embedded.GetType().GetProperty("Name");
+                    string relativePath = nameProp?.GetValue(embedded) as string ?? "UnnamedFile";
 
-                Console.WriteLine($"Extracted: {destinationPath}");
+                    // Determine any sub‑folder hierarchy encoded in the name
+                    string subFolder = Path.GetDirectoryName(relativePath) ?? string.Empty;
+
+                    // Build the full directory path where this file will be saved
+                    string targetDir = Path.Combine(outputBaseDir, subFolder);
+                    Directory.CreateDirectory(targetDir); // Create subfolders as needed
+
+                    // Build the full file path (including file name)
+                    string targetFilePath = Path.Combine(targetDir, Path.GetFileName(relativePath));
+
+                    // Invoke the Save(string) method via reflection
+                    var saveMethod = embedded.GetType().GetMethod("Save", new[] { typeof(string) });
+                    if (saveMethod != null)
+                    {
+                        saveMethod.Invoke(embedded, new object[] { targetFilePath });
+                        Console.WriteLine($"Extracted: {targetFilePath}");
+                    }
+                    else
+                    {
+                        // Fallback: try to obtain the raw stream from the FileSpecification if Save is unavailable
+                        var fileSpecProp = embedded.GetType().GetProperty("FileSpecification");
+                        var fileSpec = fileSpecProp?.GetValue(embedded);
+                        var contentsProp = fileSpec?.GetType().GetProperty("Contents");
+                        var contents = contentsProp?.GetValue(fileSpec) as Stream;
+                        if (contents != null)
+                        {
+                            using (var outStream = File.Create(targetFilePath))
+                            {
+                                contents.CopyTo(outStream);
+                            }
+                            Console.WriteLine($"Extracted (stream fallback): {targetFilePath}");
+                        }
+                        else
+                        {
+                            Console.Error.WriteLine($"Unable to extract embedded file: {relativePath}");
+                        }
+                    }
+                }
             }
+
+            Console.WriteLine("All embedded files have been extracted successfully.");
         }
-
-        Console.WriteLine("All embedded files have been extracted.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during extraction: {ex.Message}");
+        }
     }
 }

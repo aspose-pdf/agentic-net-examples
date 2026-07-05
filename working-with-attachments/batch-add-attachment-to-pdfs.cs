@@ -6,17 +6,17 @@ class BatchAttachmentProcessor
 {
     static void Main()
     {
-        // Input folder containing PDFs to process
-        const string inputFolder = @"C:\InputPdfs";
-        // Output folder where processed PDFs will be saved
-        const string outputFolder = @"C:\OutputPdfs";
-        // Path to the file that will be attached to every PDF
-        const string attachmentPath = @"C:\Attachment\sample.txt";
+        // Folder containing source PDF files
+        const string sourceFolder = @"C:\PdfFolder\Input";
+        // Folder where processed PDFs will be saved
+        const string outputFolder = @"C:\PdfFolder\Output";
+        // Path to the attachment file to be added to each PDF
+        const string attachmentPath = @"C:\Attachments\sample.txt";
 
-        // Validate paths
-        if (!Directory.Exists(inputFolder))
+        // Validate folders and attachment
+        if (!Directory.Exists(sourceFolder))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Source folder not found: {sourceFolder}");
             return;
         }
 
@@ -29,32 +29,33 @@ class BatchAttachmentProcessor
         // Ensure output folder exists
         Directory.CreateDirectory(outputFolder);
 
-        // Process each PDF file in the input folder
-        foreach (string pdfFilePath in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Process each PDF file in the source folder
+        foreach (string pdfFile in Directory.GetFiles(sourceFolder, "*.pdf"))
         {
             try
             {
                 // Load the PDF document inside a using block for deterministic disposal
-                using (Document doc = new Document(pdfFilePath))
+                using (Document doc = new Document(pdfFile))
                 {
-                    // Create a FileSpecification for the attachment using the constructor that accepts file path and description
-                    FileSpecification attachment = new FileSpecification(attachmentPath, "Sample attachment");
+                    // Create a file specification for the attachment using the constructor
+                    // The second argument is a description (optional, can be empty string)
+                    FileSpecification attachment = new FileSpecification(attachmentPath, "Embedded attachment");
 
-                    // Add the attachment to the document's EmbeddedFiles collection
+                    // Add the attachment to the document's embedded files collection
                     doc.EmbeddedFiles.Add(attachment);
 
-                    // Determine output file path (same name, different folder)
-                    string outputPath = Path.Combine(outputFolder, Path.GetFileName(pdfFilePath));
+                    // Build the output file path (same name, different folder)
+                    string outputPath = Path.Combine(outputFolder, Path.GetFileName(pdfFile));
 
-                    // Save the modified PDF; Save(string) writes PDF regardless of extension
+                    // Save the modified PDF (PDF format, no SaveOptions needed)
                     doc.Save(outputPath);
                 }
 
-                Console.WriteLine($"Processed and saved: {Path.GetFileName(pdfFilePath)}");
+                Console.WriteLine($"Processed: {Path.GetFileName(pdfFile)}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{pdfFilePath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{pdfFile}': {ex.Message}");
             }
         }
 

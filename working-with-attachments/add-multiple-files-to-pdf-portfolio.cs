@@ -1,54 +1,41 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Document, FileSpecification, EmbeddedFileCollection
 
 class Program
 {
     static void Main()
     {
-        // Output PDF that will contain the portfolio
+        // Folder containing files of various types to be added to the PDF portfolio
+        const string sourceFolder = "FilesToEmbed";
+        // Output PDF portfolio file
         const string outputPdf = "portfolio.pdf";
 
-        // List of files of various types to be added to the portfolio
-        List<string> filePaths = new List<string>
+        if (!Directory.Exists(sourceFolder))
         {
-            "sample.pdf",
-            "image.png",
-            "document.docx",
-            "notes.txt"
-        };
+            Console.Error.WriteLine($"Source folder not found: {sourceFolder}");
+            return;
+        }
 
-        // Create an empty PDF document (the portfolio container)
+        // Create a new empty PDF document (portfolio)
         using (Document doc = new Document())
         {
-            // Get the embedded files collection (the portfolio)
-            EmbeddedFileCollection portfolio = doc.EmbeddedFiles;
+            // Access the embedded files collection of the document
+            EmbeddedFileCollection embeddedFiles = doc.EmbeddedFiles;
 
-            // Loop through each file and add it to the portfolio
-            foreach (string path in filePaths)
+            // Loop through all files in the source folder and add each to the portfolio
+            foreach (string filePath in Directory.GetFiles(sourceFolder))
             {
-                if (!File.Exists(path))
-                {
-                    Console.Error.WriteLine($"File not found: {path}");
-                    continue;
-                }
-
                 // Create a file specification for the current file
-                FileSpecification fileSpec = new FileSpecification(path)
-                {
-                    // Optional: set a human‑readable description
-                    Description = Path.GetFileName(path)
-                };
-
-                // Add the file specification to the portfolio using the file name as the key
-                portfolio.Add(Path.GetFileName(path), fileSpec);
+                FileSpecification fileSpec = new FileSpecification(filePath);
+                // Add the file specification to the embedded files collection
+                embeddedFiles.Add(fileSpec);
             }
 
-            // Save the PDF containing the portfolio
+            // Save the resulting PDF portfolio
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Portfolio PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Portfolio created: {outputPdf}");
     }
 }
