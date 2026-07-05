@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -15,34 +16,22 @@ class Program
             return;
         }
 
-        // Load the source PDF document
-        Document doc = new Document(inputPath);
+        // Initialize the stamp facade and bind the source PDF (use the non‑obsolete constructor)
+        PdfFileStamp fileStamp = new PdfFileStamp();
+        fileStamp.BindPdf(inputPath);
 
-        // Configure a page‑number stamp
-        PageNumberStamp pageNumberStamp = new PageNumberStamp
-        {
-            // Use Arabic numerals
-            NumberingStyle = NumberingStyle.NumeralsArabic,
-            // Start numbering at 1 (default, kept for clarity)
-            StartingNumber = 1,
-            // Format string with leading zeros (001, 002, ...)
-            // {0:000} pads the page number to three digits
-            Format = "{0:000}",
-            // Position the stamp at the bottom‑center of each page
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Bottom,
-            YIndent = 20f // distance from the bottom edge
-            // Note: PageNumberStamp does not expose an IsBackground property; it always renders in front.
-        };
+        // Use Arabic numerals for page numbering (enum lives in Aspose.Pdf namespace)
+        fileStamp.NumberingStyle = NumberingStyle.NumeralsArabic;
 
-        // Apply the stamp to every page in the document
-        foreach (Page page in doc.Pages)
-        {
-            page.AddStamp(pageNumberStamp);
-        }
+        // Starting number (default is 1, can be changed if needed)
+        fileStamp.StartingNumber = 1;
 
-        // Save the modified PDF to the output path
-        doc.Save(outputPath);
+        // Add page numbers with leading zeros (e.g., 001, 002, …)
+        fileStamp.AddPageNumber("00#");
+
+        // Save the stamped PDF to the desired output path
+        fileStamp.Save(outputPath);
+        fileStamp.Close();
 
         Console.WriteLine($"Page numbers added and saved to '{outputPath}'.");
     }
