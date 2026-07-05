@@ -1,41 +1,38 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string sourcePdf = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPdf  = "input.pdf";          // source PDF
+        const string outputPdf = "output_with_submit.pdf"; // destination PDF
 
-        if (!File.Exists(sourcePdf))
+        // Verify that the source file exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Source file not found: {sourcePdf}");
+            Console.Error.WriteLine($"Source file not found: {inputPdf}");
             return;
         }
 
-        // Initialize FormEditor with source and destination files
-        using (FormEditor formEditor = new FormEditor(sourcePdf, outputPdf))
+        // Create a FormEditor facade with source and destination paths
+        using (FormEditor formEditor = new FormEditor(inputPdf, outputPdf))
         {
-            // Define button position (lower‑left and upper‑right corners)
-            float llx = 50f;   // lower‑left X
-            float lly = 750f;  // lower‑left Y
-            float urx = 150f;  // upper‑right X
-            float ury = 800f;  // upper‑right Y
-
-            // Add a submit button named "SubmitForm" on page 1
+            // Add a submit button named "SubmitForm" on page 1.
+            // Parameters: fieldName, page (1‑based), label, URL, llx, lly, urx, ury
             formEditor.AddSubmitBtn(
                 fieldName: "SubmitForm",
                 page: 1,
-                label: "Submit",
+                label: "SubmitForm",
                 url: "https://api.example.com/submit",
-                llx: llx,
-                lly: lly,
-                urx: urx,
-                ury: ury);
+                llx: 100f,
+                lly: 100f,
+                urx: 200f,
+                ury: 150f);
 
-            // Persist changes to the output PDF
+            // Persist the changes to the destination file
             formEditor.Save();
         }
 

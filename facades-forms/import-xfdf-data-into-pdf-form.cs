@@ -6,39 +6,36 @@ class Program
 {
     static void Main()
     {
-        // Paths for the source PDF, XFDF data and the resulting PDF
-        const string sourcePdfPath = "input.pdf";
-        const string xfdfPath      = "data.xfdf";
-        const string outputPdfPath = "output.pdf";
+        const string pdfPath = "input.pdf";      // Existing PDF with form fields
+        const string xfdfPath = "data.xfdf";     // XFDF file containing field values
+        const string outputPath = "output.pdf";  // Destination PDF after import
 
-        // Verify that the required files exist
-        if (!File.Exists(sourcePdfPath))
+        // Verify input files exist
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
-
         if (!File.Exists(xfdfPath))
         {
-            Console.Error.WriteLine($"XFDF file not found: {xfdfPath}");
+            Console.Error.WriteLine($"XFDF not found: {xfdfPath}");
             return;
         }
 
-        // Use the Form facade to import XFDF field values into the PDF.
-        // The Form constructor takes the source PDF and the target PDF file name.
-        using (Form form = new Form(sourcePdfPath, outputPdfPath))
+        // Form facade handles AcroForm operations.
+        // Constructor binds the source PDF and sets the output file name.
+        using (Form form = new Form(pdfPath, outputPath))
         {
-            // Open the XFDF file as a read‑only stream.
+            // Open XFDF stream and import field values.
             using (FileStream xfdfStream = new FileStream(xfdfPath, FileMode.Open, FileAccess.Read))
             {
-                // Import field values; matching is performed by full field names.
                 form.ImportXfdf(xfdfStream);
             }
 
-            // Persist the changes to the output PDF.
+            // Persist changes to the output PDF.
             form.Save();
         }
 
-        Console.WriteLine($"Form fields imported successfully to '{outputPdfPath}'.");
+        Console.WriteLine($"Form fields imported and saved to '{outputPath}'.");
     }
 }

@@ -1,13 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Forms;
 
-class Program
+class BatchAddHiddenField
 {
     static void Main()
     {
+        // Folder containing the PDF forms
         const string inputFolder = "InputForms";
 
         if (!Directory.Exists(inputFolder))
@@ -21,28 +21,29 @@ class Program
         {
             try
             {
-                // Open the PDF document
-                using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(pdfPath))
+                // ------------------------------------------------------------
+                // 1. Add a hidden text field named "ProcessedDate" to the PDF.
+                // ------------------------------------------------------------
+                // Load the document.
+                using (Document doc = new Document(pdfPath))
                 {
-                    // Create a FormEditor bound to the document
-                    FormEditor formEditor = new FormEditor(doc);
-
-                    // Define field name and generate a GUID value
-                    const string fieldName = "ProcessedDate";
+                    // Generate a GUID that will be stored in the hidden field.
                     string guidValue = Guid.NewGuid().ToString();
 
-                    // Add a hidden text field on the first page (coordinates can be adjusted as needed)
-                    // Parameters: FieldType, field name, page number (1‑based), llx, lly, urx, ury
-                    formEditor.AddField(FieldType.Text, fieldName, 1, 50, 50, 200, 70);
+                    // Create a zero‑size rectangle – the field will be invisible.
+                    Rectangle rect = new Rectangle(0, 0, 0, 0);
 
-                    // Fill the field with the generated GUID
-                    Form formFacade = new Form(doc);
-                    formFacade.FillField(fieldName, guidValue);
+                    // Create the hidden text field.
+                    TextBoxField hiddenField = new TextBoxField(doc.Pages[1], rect)
+                    {
+                        PartialName = "ProcessedDate",
+                        Value = guidValue
+                    };
 
-                    // Mark the field as hidden using AnnotationFlags
-                    formEditor.SetFieldAppearance(fieldName, AnnotationFlags.Hidden);
+                    // Add the field to the document's form collection.
+                    doc.Form.Add(hiddenField, 1);
 
-                    // Save the modified PDF (overwrites the original file)
+                    // Save the changes back to the original file.
                     doc.Save(pdfPath);
                 }
 

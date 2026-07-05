@@ -1,43 +1,45 @@
 using System;
-using System.Drawing;               // System.Drawing.Color is required by FormFieldFacade
-using Aspose.Pdf.Facades;          // FormEditor, FormFieldFacade, FieldType
+using System.IO;
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
+using System.Drawing; // System.Drawing.Color is required by FormFieldFacade
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";   // source PDF containing list fields
-        const string outputPdf = "decorated_output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "decorated.pdf";
 
-        // Ensure the source file exists
-        if (!System.IO.File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // FormEditor works with file paths directly; it implements IDisposable.
-        using (FormEditor editor = new FormEditor(inputPdf, outputPdf))
+        // Load the PDF document (lifecycle rule: use using for disposal)
+        using (Document doc = new Document(inputPath))
         {
-            // Create a facade that holds visual attributes for the fields.
-            editor.Facade = new FormFieldFacade();
+            // Initialize FormEditor with the loaded document
+            using (FormEditor editor = new FormEditor(doc))
+            {
+                // Set visual attributes via FormFieldFacade
+                editor.Facade = new FormFieldFacade();
+                // FormFieldFacade expects System.Drawing.Color, not Aspose.Pdf.Color
+                editor.Facade.BackgroundColor = System.Drawing.Color.LightGray; // uniform background
+                editor.Facade.BorderColor     = System.Drawing.Color.Black;   // uniform border color
+                editor.Facade.BorderStyle     = FormFieldFacade.BorderStyleSolid;
+                editor.Facade.BorderWidth     = FormFieldFacade.BorderWidthThin;
 
-            // Uniform appearance settings for all list-type fields.
-            editor.Facade.BackgroundColor = Color.LightGray;          // background fill
-            editor.Facade.BorderColor     = Color.DarkBlue;          // border color
-            editor.Facade.BorderStyle     = FormFieldFacade.BorderStyleSolid;
-            editor.Facade.BorderWidth     = FormFieldFacade.BorderWidthMedium;
+                // Apply the appearance to all list-like fields
+                editor.DecorateField(FieldType.ListBox);   // list box fields
+                editor.DecorateField(FieldType.ComboBox); // combo box fields (also list‑like)
 
-            // Apply the appearance to every ListBox field in the document.
-            editor.DecorateField(FieldType.ListBox);
-
-            // If combo boxes should also be styled, uncomment the following line:
-            // editor.DecorateField(FieldType.ComboBox);
-
-            // Persist changes to the output file.
-            editor.Save();
+                // Save the modified PDF (lifecycle rule: use provided Save method)
+                editor.Save(outputPath);
+            }
         }
 
-        Console.WriteLine($"List fields decorated and saved to '{outputPdf}'.");
+        Console.WriteLine($"Decorated PDF saved to '{outputPath}'.");
     }
 }
