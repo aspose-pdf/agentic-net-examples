@@ -1,15 +1,15 @@
 using System;
 using System.IO;
+using System.Text;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputDir = "ExtractedImages";
-        const string keyword = "CONFIDENTIAL";
+        const string inputPdf   = "input.pdf";
+        const string outputDir  = "ExtractedImages";
+        const string keyword    = "YOUR_KEYWORD"; // replace with the desired keyword
 
         if (!File.Exists(inputPdf))
         {
@@ -19,45 +19,53 @@ class Program
 
         Directory.CreateDirectory(outputDir);
 
-        // Initialize the extractor and bind the PDF file
-        PdfExtractor extractor = new PdfExtractor();
-        extractor.BindPdf(inputPdf);
-
-        // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-        for (int pageNum = 1; pageNum <= extractor.Document.Pages.Count; pageNum++)
+        // Initialize the extractor facade
+        using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Extract text of the current page using TextAbsorber
-            TextAbsorber absorber = new TextAbsorber();
-            absorber.Visit(extractor.Document.Pages[pageNum]);
-            string pageText = absorber.Text;
+            // Bind the PDF file
+            extractor.BindPdf(inputPdf);
 
-            // If the page contains the keyword, extract its images
-            if (!string.IsNullOrEmpty(pageText) &&
-                pageText.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+            // Total number of pages (Aspose.Pdf uses 1‑based indexing)
+            int pageCount = extractor.Document.Pages.Count;
+
+            // Iterate through each page
+            for (int page = 1; page <= pageCount; page++)
             {
-                // Limit extraction to the current page only
-                extractor.StartPage = pageNum;
-                extractor.EndPage   = pageNum;
+                // Limit operations to the current page
+                extractor.StartPage = page;
+                extractor.EndPage   = page;
 
-                // Perform image extraction for this page
-                extractor.ExtractImage();
+                // ----- Extract text from the current page -----
+                extractor.ExtractText();
 
-                int imageIndex = 1;
-                while (extractor.HasNextImage())
+                // Capture the extracted text into a string
+                string pageText;
+                using (MemoryStream textStream = new MemoryStream())
                 {
-                    string imagePath = Path.Combine(
-                        outputDir,
-                        $"Page{pageNum}_Image{imageIndex}.png");
+                    extractor.GetText(textStream);
+                    pageText = Encoding.UTF8.GetString(textStream.ToArray());
+                }
 
-                    // Save the next image to the specified file
-                    extractor.GetNextImage(imagePath);
-                    imageIndex++;
+                // Check for the keyword (case‑insensitive)
+                if (pageText.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    // ----- Extract images from the same page -----
+                    extractor.ExtractImage();
+
+                    int imageIndex = 1;
+                    while (extractor.HasNextImage())
+                    {
+                        string imagePath = Path.Combine(
+                            outputDir,
+                            $"page{page}_img{imageIndex}.png"); // extension can be any supported image type
+
+                        // Save the next image to file
+                        extractor.GetNextImage(imagePath);
+                        imageIndex++;
+                    }
                 }
             }
         }
-
-        // Release resources held by the extractor
-        extractor.Close();
 
         Console.WriteLine("Image extraction completed.");
     }

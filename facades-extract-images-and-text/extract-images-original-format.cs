@@ -1,52 +1,50 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;   // PdfExtractor resides here
-using Aspose.Pdf;           // ExtractImageMode enum
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputDir = "ExtractedImages";
+        const string inputPdf = "sample.pdf";
+        const string outputFolder = "ExtractedImages";
 
-        // Verify source PDF exists
+        // Verify input file exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
         // Ensure output directory exists
-        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(outputFolder);
 
-        // Use PdfExtractor (implements IDisposable) inside a using block
-        using (PdfExtractor extractor = new PdfExtractor())
+        // Initialize the extractor and bind the PDF document
+        PdfExtractor extractor = new PdfExtractor();
+        extractor.BindPdf(inputPdf);
+
+        // Configure extraction to retrieve images that are actually used on pages
+        // (images are saved in their original format)
+        extractor.ExtractImageMode = ExtractImageMode.ActuallyUsed;
+
+        // Start the image extraction process
+        extractor.ExtractImage();
+
+        int imageIndex = 1;
+        // Retrieve each extracted image and save it
+        while (extractor.HasNextImage())
         {
-            // Bind the PDF file to the extractor
-            extractor.BindPdf(inputPdf);
-
-            // Set extraction mode to keep the original image format
-            // DefinedInResources extracts images exactly as stored in the PDF resources
-            extractor.ExtractImageMode = ExtractImageMode.DefinedInResources;
-
-            // Start the extraction process
-            extractor.ExtractImage();
-
-            int imageIndex = 1;
-            // Iterate through all extracted images
-            while (extractor.HasNextImage())
-            {
-                // Build output file path; the extractor will preserve the original format
-                string outputPath = Path.Combine(outputDir, $"image_{imageIndex}");
-
-                // Save the current image; the method determines the correct file extension
-                extractor.GetNextImage(outputPath);
-
-                imageIndex++;
-            }
+            string outputPath = Path.Combine(outputFolder, $"image-{imageIndex}");
+            // GetNextImage(string) preserves the original image format,
+            // so we omit a specific extension.
+            extractor.GetNextImage(outputPath);
+            imageIndex++;
         }
 
-        Console.WriteLine("Image extraction completed.");
+        // Release resources
+        extractor.Close();
+
+        Console.WriteLine($"Image extraction completed. Files saved to '{outputFolder}'.");
     }
 }

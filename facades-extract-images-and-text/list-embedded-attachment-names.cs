@@ -14,15 +14,16 @@ class Program
             return;
         }
 
-        // Initialize PdfExtractor and bind the PDF document
+        // PdfExtractor implements IDisposable via Facade, so use using for deterministic disposal
         using (PdfExtractor extractor = new PdfExtractor())
         {
+            // Bind the PDF file to the extractor
             extractor.BindPdf(inputPath);
 
-            // Must extract attachments before retrieving their names
+            // Extract attachments (required before calling GetAttachNames)
             extractor.ExtractAttachment();
 
-            // Get the list of attachment names
+            // Retrieve the list of attachment names
             IList<string> attachmentNames = extractor.GetAttachNames();
 
             // Output each attachment name

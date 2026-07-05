@@ -6,7 +6,6 @@ class Program
 {
     static void Main()
     {
-        // Path to the PDF to be examined
         const string pdfPath = "input.pdf";
 
         if (!File.Exists(pdfPath))
@@ -15,39 +14,35 @@ class Program
             return;
         }
 
-        bool hasImages = false;
-
-        // PdfExtractor implements IDisposable, so wrap it in a using block
+        // Use PdfExtractor (Facade) inside a using block for deterministic disposal
         using (PdfExtractor extractor = new PdfExtractor())
         {
             // Bind the PDF file to the extractor
             extractor.BindPdf(pdfPath);
 
-            // Start the image extraction process
+            // Extract images from the document (no need to specify a folder)
             extractor.ExtractImage();
 
+            int imageCount = 0;
+
             // Iterate through all extracted images.
-            // GetNextImage writes the image to a stream; we use a MemoryStream
-            // to avoid creating any files on disk.
+            // GetNextImage advances the internal pointer, so we must call it to move forward.
             while (extractor.HasNextImage())
             {
-                using (MemoryStream ms = new MemoryStream())
+                // Retrieve the next image into a dummy stream (we don't need to save it)
+                using (MemoryStream dummy = new MemoryStream())
                 {
-                    extractor.GetNextImage(ms);
-                    if (ms.Length > 0)
-                    {
-                        hasImages = true;
-                        // An image was found; we can stop further extraction.
-                        break;
-                    }
+                    extractor.GetNextImage(dummy);
                 }
+                imageCount++;
             }
-        }
 
-        // Output the result
-        if (hasImages)
-            Console.WriteLine("The PDF contains images.");
-        else
-            Console.WriteLine("The PDF is text‑only.");
+            // Determine if the PDF is text‑only
+            bool isTextOnly = imageCount == 0;
+
+            Console.WriteLine(isTextOnly
+                ? "The PDF contains only text (no images were found)."
+                : $"The PDF contains images ({imageCount} image(s) found).");
+        }
     }
 }

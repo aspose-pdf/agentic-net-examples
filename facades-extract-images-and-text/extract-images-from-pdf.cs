@@ -1,43 +1,52 @@
 using System;
 using System.IO;
 using Aspose.Pdf.Facades;
-using System.Drawing.Imaging;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        // Path to the source PDF file
+        const string pdfPath = "input.pdf";
 
-        if (!File.Exists(inputPdf))
+        // Verify the source file exists
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Create a temporary folder for the extracted images
+        // Create a temporary folder for extracted images
         string tempFolder = Path.Combine(Path.GetTempPath(), "PdfImages_" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(tempFolder);
 
-        // Use PdfExtractor to extract images
+        // Use PdfExtractor (Facade) to extract images
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the PDF file
-            extractor.BindPdf(inputPdf);
+            // Bind the PDF document
+            extractor.BindPdf(pdfPath);
 
-            // Default mode (DefinedInResources) extracts all images defined in resources
+            // Use default extraction mode (DefinedInResources) – no need to set explicitly
             extractor.ExtractImage();
 
             int imageIndex = 1;
+            // Iterate through all extracted images
             while (extractor.HasNextImage())
             {
-                string outputPath = Path.Combine(tempFolder, $"image-{imageIndex}.png");
-                // Extract the next image as PNG
-                extractor.GetNextImage(outputPath, ImageFormat.Png);
+                // Build output file name (e.g., image-1.pdf, image-2.pdf, ...)
+                string outputFile = Path.Combine(tempFolder, $"image-{imageIndex}.pdf");
+
+                // Extract the next image to the file
+                bool success = extractor.GetNextImage(outputFile);
+                if (!success)
+                {
+                    Console.Error.WriteLine($"Failed to extract image #{imageIndex}");
+                }
+
                 imageIndex++;
             }
         }
 
-        Console.WriteLine($"Images have been extracted to: {tempFolder}");
+        Console.WriteLine($"Images extracted to temporary folder: {tempFolder}");
     }
 }

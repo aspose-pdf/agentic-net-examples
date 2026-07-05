@@ -1,58 +1,47 @@
 using System;
 using System.IO;
 using System.Text;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text; // Added namespace for TextFragment
 
 class Program
 {
     static void Main()
     {
-        // Path to the source PDF file
-        const string pdfPath = "input.pdf";
-
-        // Ensure the PDF file exists
-        if (!File.Exists(pdfPath))
+        // Create a sample PDF entirely in memory so no external file is required.
+        using (MemoryStream inputStream = new MemoryStream())
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
-            return;
-        }
+            CreateSamplePdf(inputStream);
+            // Reset the position to the beginning before binding.
+            inputStream.Position = 0;
 
-        // Extract text from the PDF into a memory stream
-        using (PdfExtractor extractor = new PdfExtractor())
-        {
-            // Bind the PDF file to the extractor
-            extractor.BindPdf(pdfPath);
-
-            // Extract text using Unicode encoding
-            extractor.ExtractText(Encoding.Unicode);
-
-            // MemoryStream will hold the extracted text
-            using (MemoryStream textStream = new MemoryStream())
+            using (MemoryStream outputStream = new MemoryStream())
             {
-                // Save the extracted text into the stream
-                extractor.GetText(textStream);
-
-                // Reset stream position for reading by the next component
-                textStream.Position = 0;
-
-                // ------------------------------------------------------------
-                // Pass the memory stream to another library that generates a PDF.
-                // The following is a placeholder for that library's API.
-                // Replace 'OtherPdfGenerator' and its method with the actual
-                // implementation you intend to use.
-                // ------------------------------------------------------------
-                // Example:
-                // OtherPdfGenerator.CreatePdfFromTextStream(textStream, "output_generated.pdf");
-                // ------------------------------------------------------------
-
-                // For demonstration, we simply read the text and display it.
-                using (StreamReader reader = new StreamReader(textStream, Encoding.Unicode))
+                // Extract text from the PDF using PdfExtractor.
+                using (PdfExtractor extractor = new PdfExtractor())
                 {
-                    string extractedText = reader.ReadToEnd();
-                    Console.WriteLine("Extracted Text:");
-                    Console.WriteLine(extractedText);
+                    extractor.BindPdf(inputStream);
+                    extractor.ExtractText();
+                    extractor.GetText(outputStream);
                 }
+
+                // Read the extracted text from the output memory stream.
+                outputStream.Position = 0;
+                // PdfExtractor writes UTF‑8 text, so use UTF8 encoding when converting to string.
+                string extractedText = Encoding.UTF8.GetString(outputStream.ToArray());
+                Console.WriteLine("Extracted text:");
+                Console.WriteLine(extractedText);
             }
         }
+    }
+
+    // Helper that builds a minimal PDF with some text and writes it to the provided stream.
+    private static void CreateSamplePdf(Stream stream)
+    {
+        Document doc = new Document();
+        Page page = doc.Pages.Add();
+        page.Paragraphs.Add(new TextFragment("Hello Aspose PDF!"));
+        doc.Save(stream, SaveFormat.Pdf);
     }
 }

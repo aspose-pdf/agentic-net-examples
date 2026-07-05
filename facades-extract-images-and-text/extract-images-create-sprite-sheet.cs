@@ -1,75 +1,82 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using Aspose.Pdf.Facades;
-using System.Drawing.Imaging; // needed for PdfExtractor.GetNextImage
-using Aspose.Pdf.Drawing;   // needed for PdfConverter.MergeImages
 
-class Program
+class SpriteSheetCreator
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPng = "sprite.png";
+        const string inputPdfPath = "input.pdf";
+        const string outputSpritePath = "sprite.png";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // -----------------------------------------------------------------
-        // 1. Extract all images from the PDF into memory streams (PNG format)
-        // -----------------------------------------------------------------
-        List<Stream> imageStreams = new List<Stream>();
+        // List to hold each extracted image as a Bitmap
+        List<Bitmap> images = new List<Bitmap>();
+
+        // Extract images from the PDF using PdfExtractor
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            extractor.BindPdf(inputPdf);
-            extractor.ExtractImage();
+            extractor.BindPdf(inputPdfPath);
+            extractor.ExtractImage(); // extract all images defined in resources
 
             while (extractor.HasNextImage())
             {
-                // Each image is written to a MemoryStream as PNG
-                MemoryStream ms = new MemoryStream();
-                // Fully qualified to avoid ambiguity with Aspose.Pdf.Drawing.ImageFormat
-                extractor.GetNextImage(ms, System.Drawing.Imaging.ImageFormat.Png);
-                ms.Position = 0;               // reset for later reading
-                imageStreams.Add(ms);
+                using (MemoryStream imgStream = new MemoryStream())
+                {
+                    // Save each image as PNG into the memory stream
+                    extractor.GetNextImage(imgStream, ImageFormat.Png);
+                    imgStream.Position = 0; // reset stream position for reading
+
+                    // Load the image into a Bitmap (System.Drawing)
+                    Bitmap bmp = new Bitmap(imgStream);
+                    images.Add(bmp);
+                }
             }
         }
 
-        if (imageStreams.Count == 0)
+        if (images.Count == 0)
         {
             Console.WriteLine("No images were found in the PDF.");
             return;
         }
 
-        // ---------------------------------------------------------------
-        // 2. Merge the extracted images into a single sprite sheet (horizontal)
-        // ---------------------------------------------------------------
-        // ImageMergeMode.Horizontal arranges images side‑by‑side.
-        using (Stream mergedStream = PdfConverter.MergeImages(
-            imageStreams,
-            Aspose.Pdf.Drawing.ImageFormat.Png, // Aspose.Pdf.Drawing.ImageFormat
-            ImageMergeMode.Horizontal,
-            null,   // optional spacing between images (null = default)
-            null)) // optional max width/height (null = auto)
+        // Calculate sprite sheet dimensions (horizontal layout)
+        int totalWidth = 0;
+        int maxHeight = 0;
+        foreach (Bitmap bmp in images)
         {
-            // -----------------------------------------------------------
-            // 3. Save the merged sprite sheet to a PNG file
-            // -----------------------------------------------------------
-            using (FileStream outFile = new FileStream(outputPng, FileMode.Create, FileAccess.Write))
+            totalWidth += bmp.Width;
+            if (bmp.Height > maxHeight)
+                maxHeight = bmp.Height;
+        }
+
+        // Create the sprite sheet bitmap
+        using (Bitmap sprite = new Bitmap(totalWidth, maxHeight))
+        using (Graphics g = Graphics.FromImage(sprite))
+        {
+            g.Clear(Color.Transparent); // start with a transparent background
+
+            // Draw each image side by side
+            int offsetX = 0;
+            foreach (Bitmap bmp in images)
             {
-                mergedStream.CopyTo(outFile);
+                g.DrawImage(bmp, offsetX, 0, bmp.Width, bmp.Height);
+                offsetX += bmp.Width;
+                bmp.Dispose(); // free individual bitmap after drawing
             }
+
+            // Save the combined sprite sheet as PNG
+            sprite.Save(outputSpritePath, ImageFormat.Png);
         }
 
-        // Clean up individual image streams
-        foreach (var s in imageStreams)
-        {
-            s.Dispose();
-        }
-
-        Console.WriteLine($"Sprite sheet created: {outputPng}");
+        Console.WriteLine($"Sprite sheet created: {outputSpritePath}");
     }
 }

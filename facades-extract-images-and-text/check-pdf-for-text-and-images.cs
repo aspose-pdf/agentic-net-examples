@@ -5,19 +5,16 @@ using Aspose.Pdf.Facades;
 public static class PdfContentChecker
 {
     /// <summary>
-    /// Returns true if the specified PDF file contains at least one piece of text and at least one image.
+    /// Returns true if the specified PDF file contains both text and at least one image.
     /// </summary>
-    /// <param name="pdfPath">Full path to the PDF file to be examined.</param>
+    /// <param name="pdfPath">Full path to the PDF file.</param>
     /// <returns>True when both text and images are present; otherwise false.</returns>
     public static bool ContainsTextAndImages(string pdfPath)
     {
-        if (string.IsNullOrWhiteSpace(pdfPath))
-            throw new ArgumentException("PDF path must be a non‑empty string.", nameof(pdfPath));
-
-        if (!File.Exists(pdfPath))
+        if (string.IsNullOrWhiteSpace(pdfPath) || !File.Exists(pdfPath))
             throw new FileNotFoundException("PDF file not found.", pdfPath);
 
-        // PdfExtractor implements IDisposable, so use a using block for deterministic cleanup.
+        // PdfExtractor implements IDisposable, so use a using block for deterministic disposal.
         using (PdfExtractor extractor = new PdfExtractor())
         {
             // Bind the PDF file to the extractor.
@@ -27,20 +24,24 @@ public static class PdfContentChecker
             // Extract all text from the document.
             extractor.ExtractText();
 
-            // Capture the extracted text into a memory stream.
             bool hasText;
+            // Retrieve the extracted text into a memory stream and examine its content.
             using (MemoryStream textStream = new MemoryStream())
             {
                 extractor.GetText(textStream);
-                // If the stream contains any bytes, the PDF had text.
-                hasText = textStream.Length > 0;
+                textStream.Position = 0;
+                using (StreamReader reader = new StreamReader(textStream))
+                {
+                    string extractedText = reader.ReadToEnd();
+                    hasText = !string.IsNullOrWhiteSpace(extractedText);
+                }
             }
 
             // ---------- Check for images ----------
             // Extract images from the document.
             extractor.ExtractImage();
 
-            // HasNextImage returns true if at least one image is available.
+            // HasNextImage returns true if at least one image is available after extraction.
             bool hasImage = extractor.HasNextImage();
 
             // Return true only when both conditions are satisfied.
@@ -49,11 +50,8 @@ public static class PdfContentChecker
     }
 }
 
-// ---------------------------------------------------------------------------
-// Minimal entry point required for a console‑application build.
-// This does not affect the library logic; it simply satisfies the compiler.
-// ---------------------------------------------------------------------------
-public static class Program
+// Simple console entry point so the project compiles as an executable.
+public class Program
 {
     public static void Main(string[] args)
     {
