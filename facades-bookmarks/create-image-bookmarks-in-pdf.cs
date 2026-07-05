@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
@@ -7,43 +8,49 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_bookmarked.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output_with_image_bookmarks.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document (1‑based page indexing)
-        using (Document doc = new Document(inputPath))
+        // Load the PDF to inspect its pages and images
+        List<(int pageNumber, int imageIndex)> imageLocations = new List<(int, int)>();
+        using (Document doc = new Document(inputPdf))
         {
-            // Initialize the bookmark editor and bind the loaded document
-            using (PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor())
+            // Pages are 1‑based in Aspose.Pdf
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
-                bookmarkEditor.BindPdf(doc);
-
-                // Iterate through each page and add a bookmark for every image found
-                for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+                Page page = doc.Pages[pageNum];
+                int imgIdx = 0;
+                foreach (XImage img in page.Resources.Images)
                 {
-                    Page page = doc.Pages[pageNum];
-                    int imageIndex = 0;
-
-                    foreach (XImage img in page.Resources.Images)
-                    {
-                        imageIndex++;
-                        string bookmarkName = $"Image {imageIndex} on page {pageNum}";
-                        // Create a bookmark that points to the page containing the image
-                        bookmarkEditor.CreateBookmarkOfPage(bookmarkName, pageNum);
-                    }
+                    // Record each image's page number and its order on that page
+                    imageLocations.Add((pageNum, ++imgIdx));
                 }
-
-                // Save the PDF with the newly created bookmarks
-                bookmarkEditor.Save(outputPath);
             }
         }
 
-        Console.WriteLine($"Bookmarks added and saved to '{outputPath}'.");
+        // Create bookmarks that point to the pages containing images
+        PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor();
+        bookmarkEditor.BindPdf(inputPdf);
+
+        int bookmarkCounter = 0;
+        foreach (var (pageNumber, imageIndex) in imageLocations)
+        {
+            bookmarkCounter++;
+            string bookmarkName = $"Image {bookmarkCounter} (Page {pageNumber}, Image #{imageIndex})";
+            // Create a bookmark that navigates to the specified page
+            bookmarkEditor.CreateBookmarkOfPage(bookmarkName, pageNumber);
+        }
+
+        // Save the PDF with the new bookmarks
+        bookmarkEditor.Save(outputPdf);
+        bookmarkEditor.Close();
+
+        Console.WriteLine($"Bookmarks added for {bookmarkCounter} images. Output saved to '{outputPdf}'.");
     }
 }
