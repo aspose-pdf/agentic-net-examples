@@ -23,32 +23,26 @@ class Program
             return;
         }
 
-        // Load the PDF, replace its XMP metadata, and save to a temporary file
+        // Load the PDF document
         using (Document pdfDoc = new Document(inputPdfPath))
         {
+            // Replace the existing XMP metadata with the external XMP file
             using (FileStream xmpStream = File.OpenRead(xmpFilePath))
             {
-                // Replace the existing XMP block with the external XMP data
                 pdfDoc.SetXmpMetadata(xmpStream);
             }
 
-            // Save the modified PDF to a temporary location
-            string tempPdfPath = Path.GetTempFileName();
-            pdfDoc.Save(tempPdfPath);
-
-            // Use the Facades API (PdfFileInfo) to write the new XMP block into the final output
-            PdfFileInfo fileInfo = new PdfFileInfo();
-            fileInfo.BindPdf(tempPdfPath);
+            // Save the updated PDF. Using PdfFileInfo facade to ensure the XMP block is written.
+            PdfFileInfo fileInfo = new PdfFileInfo(inputPdfPath);
             bool saved = fileInfo.SaveNewInfoWithXmp(outputPdfPath);
+
+            // Fallback to direct save if the facade method fails
             if (!saved)
             {
-                Console.Error.WriteLine("Failed to save the PDF with the new XMP metadata.");
+                pdfDoc.Save(outputPdfPath);
             }
-
-            // Clean up the temporary file
-            File.Delete(tempPdfPath);
         }
 
-        Console.WriteLine($"PDF with replaced XMP metadata saved to '{outputPdfPath}'.");
+        Console.WriteLine($"PDF saved with replaced XMP metadata to '{outputPdfPath}'.");
     }
 }

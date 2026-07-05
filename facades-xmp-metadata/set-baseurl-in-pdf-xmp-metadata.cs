@@ -1,36 +1,33 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string baseUrl = "https://www.example.com/";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string baseUrl    = "https://www.example.com/";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle: load)
-        using (Document doc = new Document(inputPdf))
+        // Bind to the PDF and modify its XMP metadata
+        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
         {
-            // Bind XMP metadata facade to the document (lifecycle: create)
-            using (PdfXmpMetadata xmp = new PdfXmpMetadata(doc))
-            {
-                // Set the BaseURL property in XMP metadata (feature: Add)
-                xmp.Add(DefaultMetadataProperties.BaseURL, new XmpValue(baseUrl));
+            xmp.BindPdf(inputPath);
 
-                // Save the PDF with updated XMP metadata (lifecycle: save)
-                xmp.Save(outputPdf);
-            }
+            // Set the BaseURL property (xmp:BaseURL) in the XMP metadata
+            xmp.Add("xmp:BaseURL", baseUrl);
+
+            // Save the updated PDF with the new metadata
+            xmp.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with BaseURL set to '{baseUrl}'.");
+        Console.WriteLine($"BaseURL set to '{baseUrl}' and saved as '{outputPath}'.");
     }
 }

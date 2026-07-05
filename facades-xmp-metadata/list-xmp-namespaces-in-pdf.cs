@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Aspose.Pdf.Facades;
 
 class XmpNamespaceLister
@@ -8,25 +9,26 @@ class XmpNamespaceLister
     {
         const string inputPdf = "input.pdf";
 
-        if (!System.IO.File.Exists(inputPdf))
+        if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load XMP metadata facade for the PDF
+        // Use PdfXmpMetadata facade to access XMP metadata
         using (PdfXmpMetadata xmp = new PdfXmpMetadata())
         {
+            // Bind the PDF file
             xmp.BindPdf(inputPdf);
 
-            // Collect unique namespace prefixes from metadata keys (e.g., "dc:creator")
-            HashSet<string> prefixes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            // Collect distinct namespace prefixes from metadata keys (e.g., "dc:creator")
+            HashSet<string> prefixes = new HashSet<string>(StringComparer.Ordinal);
             foreach (string key in xmp.Keys)
             {
-                int colonIndex = key.IndexOf(':');
-                if (colonIndex > 0)
+                int colonPos = key.IndexOf(':');
+                if (colonPos > 0)
                 {
-                    string prefix = key.Substring(0, colonIndex);
+                    string prefix = key.Substring(0, colonPos);
                     prefixes.Add(prefix);
                 }
             }
@@ -35,16 +37,14 @@ class XmpNamespaceLister
             Console.WriteLine("XMP Namespaces found in the PDF:");
             foreach (string prefix in prefixes)
             {
-                try
-                {
-                    string uri = xmp.GetNamespaceURIByPrefix(prefix);
-                    Console.WriteLine($"Prefix: {prefix}  URI: {uri}");
-                }
-                catch (Exception ex)
-                {
-                    // If the prefix is not registered, GetNamespaceURIByPrefix may throw
-                    Console.WriteLine($"Prefix: {prefix}  URI: (not registered)  Error: {ex.Message}");
-                }
+                string uri = xmp.GetNamespaceURIByPrefix(prefix);
+                Console.WriteLine($"{prefix} => {uri}");
+            }
+
+            // If no prefixes were found, indicate that the PDF has no XMP namespaces
+            if (prefixes.Count == 0)
+            {
+                Console.WriteLine("No XMP namespaces detected.");
             }
         }
     }
