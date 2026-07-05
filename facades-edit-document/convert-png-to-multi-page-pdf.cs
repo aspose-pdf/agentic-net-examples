@@ -8,17 +8,15 @@ class Program
 {
     static void Main()
     {
-        // Input PNG files (adjust the paths as needed)
-        string[] pngFiles = {
+        // Input PNG files – adjust the paths as needed
+        string[] pngFiles = new string[]
+        {
             "image1.png",
             "image2.png",
             "image3.png"
         };
 
-        // Output PDF file
-        const string outputPdf = "combined.pdf";
-
-        // Validate input files
+        // Validate that all input files exist
         foreach (string file in pngFiles)
         {
             if (!File.Exists(file))
@@ -28,42 +26,44 @@ class Program
             }
         }
 
-        // List to hold individual PDF streams (one page per image)
+        // List to hold individual PDF streams (one per image)
         List<MemoryStream> pdfPages = new List<MemoryStream>();
 
-        // Create a one‑page PDF for each PNG image
+        // Convert each PNG to a single‑page PDF stored in memory
         foreach (string pngPath in pngFiles)
         {
-            // Create a new PDF document
-            using (Document doc = new Document())
+            using (Document imgDoc = new Document())
             {
-                // Add a blank page
-                Page page = doc.Pages.Add();
+                // Add a new page (default size) and place the image on it
+                Page page = imgDoc.Pages.Add();
 
-                // Add the PNG image to the page
-                Aspose.Pdf.Image img = new Aspose.Pdf.Image();
-                img.File = pngPath;               // Set image source
-                page.Paragraphs.Add(img);         // Place image on the page
+                Aspose.Pdf.Image img = new Aspose.Pdf.Image
+                {
+                    File = pngPath
+                };
+                page.Paragraphs.Add(img);
 
-                // Save the single‑page PDF to a memory stream
+                // Save the one‑page PDF to a memory stream
                 MemoryStream ms = new MemoryStream();
-                doc.Save(ms);
-                ms.Position = 0;                  // Reset stream position for reading
+                imgDoc.Save(ms);
+                ms.Position = 0; // Reset stream position for later reading
                 pdfPages.Add(ms);
             }
         }
 
-        // Use PdfFileEditor (Aspose.Pdf.Facades) to concatenate the page PDFs
+        // Output PDF file that will contain all pages
+        const string outputPdf = "combined.pdf";
+
+        // Use PdfFileEditor (Facade) to concatenate the in‑memory PDFs
         PdfFileEditor editor = new PdfFileEditor();
 
-        // Prepare output stream for the final PDF
+        // Concatenate accepts an array of streams and an output stream
         using (FileStream outStream = new FileStream(outputPdf, FileMode.Create, FileAccess.Write))
         {
-            // Concatenate all page streams into one PDF
             editor.Concatenate(pdfPages.ToArray(), outStream);
         }
 
-        // Dispose all intermediate memory streams
+        // Dispose all temporary memory streams
         foreach (MemoryStream ms in pdfPages)
         {
             ms.Dispose();

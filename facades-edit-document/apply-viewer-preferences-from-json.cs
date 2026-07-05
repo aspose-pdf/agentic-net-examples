@@ -1,25 +1,22 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Text.Json;
-using Aspose.Pdf;
+using System.Collections.Generic;
 using Aspose.Pdf.Facades;
-
-class ViewerPreferenceConfig
-{
-    // List of PDF file paths to process
-    public List<string> PdfFiles { get; set; }
-
-    // List of viewer preference names (e.g., "HideMenubar", "PageModeUseNone")
-    public List<string> Preferences { get; set; }
-}
 
 class Program
 {
+    // Model for JSON configuration
+    private class ViewerConfig
+    {
+        public string[] Preferences { get; set; }
+    }
+
     static void Main()
     {
-        const string configPath = "viewerPreferences.json";
+        const string configPath = "viewerConfig.json";   // JSON file with viewer preferences
+        const string inputFolder = "InputPdfs";          // Folder containing PDFs to process
+        const string outputFolder = "OutputPdfs";        // Folder to save modified PDFs
 
         if (!File.Exists(configPath))
         {
@@ -27,12 +24,17 @@ class Program
             return;
         }
 
-        // Deserialize JSON configuration
-        ViewerPreferenceConfig config;
+        // Load and deserialize JSON configuration
+        ViewerConfig config;
         try
         {
             string json = File.ReadAllText(configPath);
-            config = JsonSerializer.Deserialize<ViewerPreferenceConfig>(json);
+            config = JsonSerializer.Deserialize<ViewerConfig>(json);
+            if (config?.Preferences == null || config.Preferences.Length == 0)
+            {
+                Console.Error.WriteLine("No viewer preferences defined in the configuration.");
+                return;
+            }
         }
         catch (Exception ex)
         {
@@ -40,63 +42,51 @@ class Program
             return;
         }
 
-        if (config?.PdfFiles == null || config.PdfFiles.Count == 0)
+        // Resolve ViewerPreference flags from string names
+        int combinedFlags = 0;
+        foreach (string prefName in config.Preferences)
         {
-            Console.Error.WriteLine("No PDF files specified in configuration.");
+            var field = typeof(ViewerPreference).GetField(prefName);
+            if (field == null)
+            {
+                Console.Error.WriteLine($"Unknown ViewerPreference: {prefName}");
+                continue;
+            }
+            combinedFlags |= (int)field.GetValue(null);
+        }
+
+        if (combinedFlags == 0)
+        {
+            Console.Error.WriteLine("No valid viewer preferences were resolved.");
             return;
         }
 
-        // Compute combined preference flag from the list of names
-        int combinedPreference = 0;
-        foreach (string prefName in config.Preferences ?? new List<string>())
-        {
-            // ViewerPreference fields are defined as const ints
-            FieldInfo field = typeof(ViewerPreference).GetField(prefName, BindingFlags.Public | BindingFlags.Static);
-            if (field != null && field.FieldType == typeof(int))
-            {
-                combinedPreference |= (int)field.GetValue(null);
-            }
-            else
-            {
-                Console.Error.WriteLine($"Warning: ViewerPreference '{prefName}' not found.");
-            }
-        }
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        // Process each PDF file
-        foreach (string pdfPath in config.PdfFiles)
+        // Process each PDF file in the input folder
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            if (!File.Exists(pdfPath))
-            {
-                Console.Error.WriteLine($"PDF file not found: {pdfPath}");
-                continue;
-            }
+            string fileName = Path.GetFileName(pdfPath);
+            string outputPath = Path.Combine(outputFolder, fileName);
 
-            // Initialize the facade
-            PdfContentEditor editor = new PdfContentEditor();
             try
             {
+                // Bind the PDF to the facade
+                PdfContentEditor editor = new PdfContentEditor();
                 editor.BindPdf(pdfPath);
 
-                // Apply the combined viewer preference
-                editor.ChangeViewerPreference(combinedPreference);
+                // Apply the combined viewer preferences
+                editor.ChangeViewerPreference(combinedFlags);
 
-                // Save to a new file (original name with suffix)
-                string outputPath = Path.Combine(
-                    Path.GetDirectoryName(pdfPath),
-                    Path.GetFileNameWithoutExtension(pdfPath) + "_pref.pdf");
-
+                // Save the modified PDF
                 editor.Save(outputPath);
-                Console.WriteLine($"Processed '{pdfPath}' -> '{outputPath}'");
+
+                Console.WriteLine($"Processed '{fileName}' -> '{outputPath}'");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
-            }
-            finally
-            {
-                // Dispose the facade if it implements IDisposable
-                if (editor is IDisposable disposable)
-                    disposable.Dispose();
+                Console.Error.WriteLine($"Error processing '{fileName}': {ex.Message}");
             }
         }
     }

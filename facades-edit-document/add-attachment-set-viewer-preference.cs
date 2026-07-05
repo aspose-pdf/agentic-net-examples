@@ -4,57 +4,50 @@ using Aspose.Pdf.Facades;
 
 class Program
 {
+    // Usage: AttachAndSetViewer <inputPdf> <attachmentFile> <attachmentDescription> <outputPdf>
     static void Main(string[] args)
     {
-        // Expected arguments:
-        // 0 - input PDF file path
-        // 1 - attachment file path
-        // 2 - attachment description
-        // 3 - output PDF file path (optional)
-        if (args.Length < 3)
+        if (args.Length != 4)
         {
-            Console.Error.WriteLine("Usage: <inputPdf> <attachmentFile> <description> [outputPdf]");
+            Console.Error.WriteLine("Usage: AttachAndSetViewer <inputPdf> <attachmentFile> <attachmentDescription> <outputPdf>");
             return;
         }
 
-        string inputPdf = args[0];
-        string attachmentFile = args[1];
-        string description = args[2];
-        string outputPdf = args.Length >= 4 ? args[3] : Path.Combine(
-            Path.GetDirectoryName(inputPdf) ?? string.Empty,
-            Path.GetFileNameWithoutExtension(inputPdf) + "_attached.pdf");
+        string inputPdfPath = args[0];
+        string attachmentPath = args[1];
+        string attachmentDescription = args[2];
+        string outputPdfPath = args[3];
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        if (!File.Exists(attachmentFile))
+        if (!File.Exists(attachmentPath))
         {
-            Console.Error.WriteLine($"Attachment file not found: {attachmentFile}");
+            Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
             return;
         }
 
         try
         {
-            // Use PdfContentEditor facade to modify the PDF
+            // Create the PdfContentEditor facade and bind the source PDF
             using (PdfContentEditor editor = new PdfContentEditor())
             {
-                // Bind the source PDF
-                editor.BindPdf(inputPdf);
+                editor.BindPdf(inputPdfPath);
 
-                // Add the attachment without a visual annotation
-                editor.AddDocumentAttachment(attachmentFile, description);
+                // Add the attachment without an annotation
+                editor.AddDocumentAttachment(attachmentPath, attachmentDescription);
 
-                // Set viewer preference to show attachment panel on open
-                editor.ChangeViewerPreference(Aspose.Pdf.Facades.ViewerPreference.PageModeUseAttachment);
+                // Set viewer preference to show attachments in the side panel
+                editor.ChangeViewerPreference(ViewerPreference.PageModeUseAttachment);
 
                 // Save the modified PDF
-                editor.Save(outputPdf);
+                editor.Save(outputPdfPath);
             }
 
-            Console.WriteLine($"Attachment added and viewer preference set. Output saved to '{outputPdf}'.");
+            Console.WriteLine($"Attachment added and viewer preference set. Output saved to '{outputPdfPath}'.");
         }
         catch (Exception ex)
         {

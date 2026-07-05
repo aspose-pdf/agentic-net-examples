@@ -1,6 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades; // PdfContentEditor, ViewerPreference
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -15,25 +16,25 @@ class Program
             return;
         }
 
-        // Use PdfContentEditor (facade) to edit viewer preferences
+        // Use PdfContentEditor (facade) to modify viewer preferences
         using (PdfContentEditor editor = new PdfContentEditor())
         {
             // Bind the source PDF
             editor.BindPdf(inputPath);
 
-            // Read current viewer preferences (bitmask of ViewerPreference flags)
+            // Retrieve current viewer preference flags
             int currentPrefs = editor.GetViewerPreference();
 
-            // Ensure the HideMenubar flag is set (preserve other flags)
+            // Ensure the HideMenubar flag is set
             int newPrefs = currentPrefs | ViewerPreference.HideMenubar;
 
-            // Apply the modified preferences
+            // Apply the updated viewer preferences
             editor.ChangeViewerPreference(newPrefs);
 
             // Save the modified PDF
             editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Viewer preference updated. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Viewer preferences updated. Output saved to '{outputPath}'.");
     }
 }

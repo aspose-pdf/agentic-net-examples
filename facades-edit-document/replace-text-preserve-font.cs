@@ -7,11 +7,11 @@ class Program
 {
     static void Main()
     {
-        // Input PDF path, text to find, replacement text, and output path
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string srcText    = "Hello World";
-        const string destText   = "Hi Universe";
+        const string inputPath  = "input.pdf";   // source PDF
+        const string outputPath = "output.pdf";  // result PDF
+        const string srcText    = "Hello World"; // text to replace
+        const string destText   = "Hi Universe"; // replacement text
+        const int    pageNumber = 0; // 0 = all pages, otherwise 1‑based page index
 
         if (!File.Exists(inputPath))
         {
@@ -19,18 +19,16 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a PdfContentEditor (does NOT implement IDisposable)
+            // Create a PdfContentEditor and bind it to the loaded document
             PdfContentEditor editor = new PdfContentEditor();
-
-            // Bind the editor to the loaded document
             editor.BindPdf(doc);
 
-            // Replace the text on all pages (page number 0 means all pages)
-            // This overload preserves the original font, size, and color
-            editor.ReplaceText(srcText, 0, destText);
+            // Replace text while preserving original font, size and color.
+            // The overload without TextState keeps the original appearance.
+            editor.ReplaceText(srcText, pageNumber, destText);
 
             // Save the modified document
             doc.Save(outputPath);

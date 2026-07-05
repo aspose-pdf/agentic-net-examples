@@ -6,31 +6,31 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string attachmentPath = "Terms.pdf";
-        const string description = "Contract Terms";
+        const string pdfPath = "input.pdf";
+        const string attachmentPath = "invoice.pdf";
+        const string outputPath = "output.pdf";
 
-        // Verify that the source PDF and attachment exist.
-        if (!File.Exists(inputPdf))
+        // Verify source PDF exists
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Source PDF not found: {pdfPath}");
             return;
         }
+
+        // Verify attachment file exists
         if (!File.Exists(attachmentPath))
         {
             Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
             return;
         }
 
-        // Use PdfContentEditor to bind the PDF, add the attachment, and save.
-        using (PdfContentEditor editor = new PdfContentEditor())
-        {
-            editor.BindPdf(inputPdf);                                 // Load the PDF.
-            editor.AddDocumentAttachment(attachmentPath, description); // Add Terms.pdf with description.
-            editor.Save(outputPdf);                                   // Persist changes.
-        }
+        // Create the facade, bind the PDF, add the attachment, and save the result
+        PdfContentEditor editor = new PdfContentEditor();
+        editor.BindPdf(pdfPath);
+        // The MIME type is inferred from the .pdf extension (application/pdf)
+        editor.AddDocumentAttachment(attachmentPath, "Invoice Document");
+        editor.Save(outputPath);
 
-        Console.WriteLine($"Attachment added and saved to '{outputPdf}'.");
+        Console.WriteLine($"Attachment added and saved to '{outputPath}'.");
     }
 }

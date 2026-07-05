@@ -1,13 +1,13 @@
 using System;
 using System.IO;
-using System.Drawing;               // Rectangle for link area
-using Aspose.Pdf.Facades;          // PdfContentEditor
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,20 +16,19 @@ class Program
             return;
         }
 
-        // Create a PdfContentEditor, bind the source PDF, add a web link on page 2, and save.
+        // Use PdfContentEditor to add a web link on page 2
         using (PdfContentEditor editor = new PdfContentEditor())
         {
-            // Load the PDF document into the editor.
+            // Bind the existing PDF document
             editor.BindPdf(inputPath);
 
-            // Define the clickable rectangle (x, y, width, height).
-            // Adjust coordinates as needed for your document.
-            Rectangle linkRect = new Rectangle(100, 500, 200, 50);
+            // Define the clickable rectangle (x, y, width, height)
+            System.Drawing.Rectangle rect = new System.Drawing.Rectangle(100, 500, 200, 50);
 
-            // Add a hyperlink that opens the specified URL when clicked on page 2.
-            editor.CreateWebLink(linkRect, "https://example.com", 2);
+            // Create a web link that opens the specified URL when clicked on page 2
+            editor.CreateWebLink(rect, "https://example.com", 2);
 
-            // Persist the changes to a new file.
+            // Save the modified PDF
             editor.Save(outputPath);
         }
 

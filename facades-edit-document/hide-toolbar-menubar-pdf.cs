@@ -1,14 +1,13 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades;   // Facade API for viewer preferences
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "minimal_ui.pdf";
+        const string inputPath  = "input.pdf";   // source PDF
+        const string outputPath = "minimal_ui.pdf"; // result PDF with hidden UI
 
         if (!File.Exists(inputPath))
         {
@@ -16,18 +15,18 @@ class Program
             return;
         }
 
-        // Load the PDF using the PdfContentEditor facade
+        // Load the PDF into the facade, change viewer preferences, and save.
         PdfContentEditor editor = new PdfContentEditor();
         editor.BindPdf(inputPath);
 
-        // Combine the HideToolbar and HideMenubar flags
-        int viewerPrefs = ViewerPreference.HideToolbar | ViewerPreference.HideMenubar;
-        editor.ChangeViewerPreference(viewerPrefs);
+        // Hide the toolbar and the menu bar.
+        editor.ChangeViewerPreference(ViewerPreference.HideToolbar);
+        editor.ChangeViewerPreference(ViewerPreference.HideMenubar);
 
-        // Save the modified PDF
+        // Persist the changes.
         editor.Save(outputPath);
         editor.Close();
 
-        Console.WriteLine($"PDF saved with hidden toolbar and menubar: '{outputPath}'.");
+        Console.WriteLine($"Viewer preferences updated. Output saved to '{outputPath}'.");
     }
 }

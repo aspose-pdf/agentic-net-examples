@@ -1,53 +1,44 @@
 using System;
-using System.IO;
-using Aspose.Pdf.Facades;   // Facade classes for security
-using Aspose.Pdf;           // Needed for DocumentPrivilege, KeySize, Algorithm
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input and output PDF file paths
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "secured_output.pdf";
+        // Paths to the source and destination PDF files
+        const string inputPath  = "input.pdf";
+        const string outputPath = "encrypted.pdf";
 
-        // User and owner passwords (can be empty strings if not required)
+        // Passwords for the encrypted PDF
         const string userPassword  = "user123";
         const string ownerPassword = "owner123";
 
-        // Verify that the input file exists
-        if (!File.Exists(inputPdf))
+        // Ensure the input file exists
+        if (!System.IO.File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        try
+        // Use PdfFileSecurity to encrypt the PDF with 128‑bit AES and restrict all privileges
+        using (PdfFileSecurity security = new PdfFileSecurity(inputPath, outputPath))
         {
-            // Create a PdfFileSecurity facade with source and destination files
-            PdfFileSecurity security = new PdfFileSecurity(inputPdf, outputPdf);
-
-            // Define privileges: forbid all actions (no printing, no editing, etc.)
-            DocumentPrivilege privilege = DocumentPrivilege.ForbidAll;
-
-            // Encrypt using 128‑bit AES (KeySize.x128) and AES algorithm
+            // DocumentPrivilege.ForbidAll disables printing, editing, copying, etc.
             bool success = security.EncryptFile(
                 userPassword,
                 ownerPassword,
-                privilege,
+                DocumentPrivilege.ForbidAll,
                 KeySize.x128,
                 Algorithm.AES);
 
-            // Close the facade (releases resources)
-            security.Close();
-
-            Console.WriteLine(success
-                ? $"PDF encrypted successfully and saved to '{outputPdf}'."
-                : "PDF encryption failed.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            if (!success)
+            {
+                Console.Error.WriteLine("Failed to encrypt the PDF.");
+            }
+            else
+            {
+                Console.WriteLine($"PDF encrypted successfully and saved to '{outputPath}'.");
+            }
         }
     }
 }

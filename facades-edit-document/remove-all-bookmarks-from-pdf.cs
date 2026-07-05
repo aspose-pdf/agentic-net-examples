@@ -11,7 +11,7 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
@@ -27,7 +27,7 @@ class Program
         // Save the resulting PDF without bookmarks
         editor.Save(outputPath);
 
-        // Release any resources held by the facade
+        // Release resources held by the facade
         editor.Close();
 
         Console.WriteLine($"All bookmarks removed. Saved to '{outputPath}'.");
