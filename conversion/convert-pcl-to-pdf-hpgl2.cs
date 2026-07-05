@@ -6,34 +6,28 @@ class Program
 {
     static void Main()
     {
-        // Paths to the source PCL file and the destination PDF file
-        const string pclPath = "input.pcl";
-        const string pdfPath = "output.pdf";
+        const string inputPath  = "input.pcl";
+        const string outputPath = "output.pdf";
 
-        // Verify that the source file exists
-        if (!File.Exists(pclPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source file not found: {pclPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // -----------------------------------------------------------------
-        // Create PCL load options. In recent Aspose.Pdf versions HP‑GL/2
-        // vector loading is enabled by default, and the former EnableHPGL2
-        // property has been removed. Therefore we instantiate the options
-        // without setting that property.
-        // -----------------------------------------------------------------
+        // Initialize PCL load options.
         PclLoadOptions loadOptions = new PclLoadOptions();
 
-        // Load the PCL file using the options. The Document constructor that
-        // accepts a filename and LoadOptions performs the conversion.
-        using (Document pdfDocument = new Document(pclPath, loadOptions))
+        // If the library version supports it, enable HP‑GL/2 vector loading.
+        // Uncomment the following line when the property is available:
+        // loadOptions.EnableHPGL2 = true;
+
+        // Load the PCL file with the specified options and save as PDF.
+        using (Document pdfDocument = new Document(inputPath, loadOptions))
         {
-            // Save the resulting PDF. No SaveOptions are required because the
-            // default PDF format is used.
-            pdfDocument.Save(pdfPath);
+            pdfDocument.Save(outputPath);
         }
 
-        Console.WriteLine($"PCL file '{pclPath}' successfully converted to PDF at '{pdfPath}'.");
+        Console.WriteLine($"PCL file has been converted to PDF: {outputPath}");
     }
 }

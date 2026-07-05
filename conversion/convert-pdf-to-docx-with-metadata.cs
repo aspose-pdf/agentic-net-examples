@@ -6,36 +6,37 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputDocxPath = "output.docx";
+        const string inputPdf  = "input.pdf";
+        const string outputDocx = "output.docx";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDocument = new Document(inputPdfPath))
+        // Load the PDF document (lifecycle rule: use Document constructor)
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Set custom metadata properties
-            pdfDocument.Info.Author = "John Doe";
-            pdfDocument.Info.Title = "Converted Document";
+            // Add custom metadata (author and title)
+            pdfDoc.Info.Author = "John Doe";
+            pdfDoc.Info.Title  = "Converted Document";
 
-            // Configure DOCX save options
-            DocSaveOptions saveOptions = new DocSaveOptions
+            // Configure DOCX save options (must pass explicit SaveOptions for non‑PDF formats)
+            DocSaveOptions docxOptions = new DocSaveOptions
             {
-                // Specify DOCX output format (correct enum value)
+                // Output format DOCX
                 Format = DocSaveOptions.DocFormat.DocX,
-                // Enable bullet detection (optional)
+                // Use full flow recognition for better editability
+                Mode = DocSaveOptions.RecognitionMode.Flow,
+                // Enable bullet recognition (optional)
                 RecognizeBullets = true
-                // Note: The 'Mode' property was removed in recent versions and is therefore omitted.
             };
 
-            // Save the PDF as DOCX using the specified options
-            pdfDocument.Save(outputDocxPath, saveOptions);
+            // Save the document as DOCX (lifecycle rule: use Document.Save with options)
+            pdfDoc.Save(outputDocx, docxOptions);
         }
 
-        Console.WriteLine($"PDF successfully converted to DOCX: {outputDocxPath}");
+        Console.WriteLine($"PDF successfully converted to DOCX: {outputDocx}");
     }
 }

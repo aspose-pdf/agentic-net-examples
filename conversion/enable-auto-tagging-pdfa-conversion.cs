@@ -16,34 +16,29 @@ class Program
             return;
         }
 
-        // Load the source PDF document
+        // Load the source PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create conversion options for PDF/A‑1B format
-            PdfFormatConversionOptions options = new PdfFormatConversionOptions(PdfFormat.PDF_A_1B);
+            // Create conversion options for PDF/A output.
+            // This constructor sets the log file, target PDF format and error handling action.
+            PdfFormatConversionOptions options = new PdfFormatConversionOptions(
+                logPath,
+                PdfFormat.PDF_A_1B,
+                ConvertErrorAction.Delete);
 
-            // Optional: write conversion messages to a log file
-            options.LogFileName = logPath;
+            // Assign auto‑tagging settings. Use the default settings and ensure auto‑tagging is enabled.
+            options.AutoTaggingSettings = AutoTaggingSettings.Default;
+            options.AutoTaggingSettings.EnableAutoTagging = true;
 
-            // Enable automatic tagging during the conversion
-            AutoTaggingSettings autoTagSettings = new AutoTaggingSettings
-            {
-                EnableAutoTagging = true
-                // Additional settings can be configured here, e.g.:
-                // HeadingRecognitionStrategy = HeadingRecognitionStrategy.Automatic,
-                // HeadingLevels = new HeadingLevels()
-            };
-            options.AutoTaggingSettings = autoTagSettings;
-
-            // Perform the conversion; the method returns true on success
-            bool conversionSucceeded = doc.Convert(options);
-            if (!conversionSucceeded)
+            // Perform the conversion. The method returns true on success.
+            bool converted = doc.Convert(options);
+            if (!converted)
             {
                 Console.Error.WriteLine("Conversion failed. See the log file for details.");
                 return;
             }
 
-            // Save the resulting PDF/A document
+            // Save the converted PDF/A document.
             doc.Save(outputPath);
         }
 

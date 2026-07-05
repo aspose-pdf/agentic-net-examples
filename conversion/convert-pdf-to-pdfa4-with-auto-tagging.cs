@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_pdfa4.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,28 +15,33 @@ class Program
             return;
         }
 
-        // Load the source PDF
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Prepare conversion options for PDF/A‑4
-            PdfFormatConversionOptions options = new PdfFormatConversionOptions(PdfFormat.PDF_A_4);
-
-            // Enable auto‑tagging during conversion
-            options.AutoTaggingSettings = AutoTaggingSettings.Default;
-            options.AutoTaggingSettings.EnableAutoTagging = true;
-
-            // Perform the conversion (in‑place)
-            bool success = doc.Convert(options);
-            if (!success)
+            // Load the source PDF
+            using (Document doc = new Document(inputPath))
             {
-                Console.Error.WriteLine("Conversion to PDF/A‑4 failed.");
-                return;
+                // Create conversion options for PDF/A‑4 with auto‑tagging enabled
+                PdfFormatConversionOptions options = new PdfFormatConversionOptions(PdfFormat.PDF_A_4, ConvertErrorAction.Delete);
+                // Use the default auto‑tagging settings (auto‑tagging is enabled by default)
+                options.AutoTaggingSettings = AutoTaggingSettings.Default;
+                // Explicitly ensure auto‑tagging is turned on
+                options.AutoTaggingSettings.EnableAutoTagging = true;
+
+                // Convert the document to PDF/A‑4
+                bool converted = doc.Convert(options);
+                if (!converted)
+                {
+                    Console.Error.WriteLine("Conversion to PDF/A‑4 failed.");
+                }
+
+                // Save the converted PDF/A‑4 document
+                doc.Save(outputPath);
+                Console.WriteLine($"PDF/A‑4 file saved to '{outputPath}'.");
             }
-
-            // Save the converted document
-            doc.Save(outputPath);
         }
-
-        Console.WriteLine($"PDF successfully converted to PDF/A‑4 with auto‑tagging: {outputPath}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

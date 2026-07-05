@@ -7,41 +7,37 @@ class PdfToHtmlConverter
     static void Main()
     {
         // Input PDF file path
-        const string inputPdfPath = "input.pdf";
+        const string pdfPath = "input.pdf";
 
-        // Output HTML file path (single HTML file containing all pages)
-        const string outputHtmlPath = "output.html";
+        // Output HTML file path (single-page HTML)
+        const string htmlPath = "output.html";
 
-        // Verify that the source PDF exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Error: File not found – {inputPdfPath}");
+            Console.Error.WriteLine($"Error: PDF file not found at '{pdfPath}'.");
             return;
         }
 
         try
         {
             // Load the PDF document
-            using (Document pdfDocument = new Document(inputPdfPath))
+            using (Document pdfDocument = new Document(pdfPath))
             {
-                // Configure HTML save options
+                // Initialize HTML save options
                 HtmlSaveOptions htmlOptions = new HtmlSaveOptions
                 {
-                    // Embed all resources (images, CSS, fonts) into the single HTML file
-                    PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
+                    // Preserve fonts in all formats (WOFF, TTF, EOT) for maximum compatibility
+                    FontSavingMode = HtmlSaveOptions.FontSavingModes.SaveInAllFormats,
 
-                    // Preserve original fonts by embedding them (WOFF format by default)
-                    FontSavingMode = HtmlSaveOptions.FontSavingModes.AlwaysSaveAsWOFF,
-
-                    // Ensure the result is a single HTML page (default behavior)
+                    // Ensure the result is a single HTML file
                     SplitIntoPages = false
                 };
 
-                // Save the PDF as a single-page HTML file
-                pdfDocument.Save(outputHtmlPath, htmlOptions);
+                // Save the PDF as a single-page HTML preserving layout and fonts
+                pdfDocument.Save(htmlPath, htmlOptions);
             }
 
-            Console.WriteLine($"PDF successfully converted to HTML: '{outputHtmlPath}'");
+            Console.WriteLine($"PDF successfully converted to HTML: '{htmlPath}'.");
         }
         catch (Exception ex)
         {

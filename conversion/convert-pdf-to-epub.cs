@@ -1,32 +1,30 @@
 using System;
 using System.IO;
-using Aspose.Pdf;   // All save options, including EpubSaveOptions, are in this namespace
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
+        const string inputPdf = "input.pdf";
         const string outputEpub = "output.epub";
 
-        // Verify the source file exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document (Document implements IDisposable, so wrap in using)
-        using (Document pdfDocument = new Document(inputPdf))
+        // Load the PDF document
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Initialize default EPUB save options – no custom settings required
+            // Default EPUB save options
             EpubSaveOptions epubOptions = new EpubSaveOptions();
 
-            // Save the document as EPUB using the explicit save options.
-            // This follows the rule: Document.Save(string, SaveOptions) for non‑PDF formats.
-            pdfDocument.Save(outputEpub, epubOptions);
+            // Convert and save as EPUB
+            pdfDoc.Save(outputEpub, epubOptions);
         }
 
-        Console.WriteLine($"Conversion completed: '{outputEpub}'");
+        Console.WriteLine($"PDF successfully converted to EPUB: {outputEpub}");
     }
 }

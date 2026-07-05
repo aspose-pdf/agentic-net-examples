@@ -6,43 +6,44 @@ class Program
 {
     static void Main()
     {
-        // Paths for input PDF and output LaTeX file
-        const string pdfPath = "input.pdf";
-        const string texPath = "output.tex";
+        const string inputPdfPath  = "input.pdf";
+        const string outputTexPath = "output.tex";
 
-        // Custom LaTeX macro definitions for special symbols
-        // Adjust these definitions as needed for your document
-        string customMacros = @"
-% Custom macro definitions
-\newcommand{\specialAlpha}{\alpha}
-\newcommand{\specialBeta}{\beta}
-% Add more macros here
-";
-
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
         try
         {
             // Load the PDF document
-            using (Document pdfDocument = new Document(pdfPath))
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                // Initialize TeXSaveOptions (no special properties required)
-                TeXSaveOptions saveOptions = new TeXSaveOptions();
+                // Initialize TeX save options
+                TeXSaveOptions texSaveOptions = new TeXSaveOptions();
 
-                // Save the PDF as LaTeX (TeX) using the save options
-                pdfDocument.Save(texPath, saveOptions);
+                // Save the PDF as LaTeX (TeX) file
+                pdfDoc.Save(outputTexPath, texSaveOptions);
             }
 
-            // Read the generated TeX file, prepend custom macro definitions, and overwrite the file
-            string originalTex = File.ReadAllText(texPath);
-            string finalTex = customMacros + Environment.NewLine + originalTex;
-            File.WriteAllText(texPath, finalTex);
+            // Define custom LaTeX macros for special symbols
+            string customMacros = @"
+% Custom macro definitions for special symbols
+\newcommand{\specialsymbolA}{\ensuremath{\alpha}}
+\newcommand{\specialsymbolB}{\ensuremath{\beta}}
+";
 
-            Console.WriteLine($"PDF successfully converted to LaTeX with custom macros: '{texPath}'");
+            // Read the generated TeX content
+            string texContent = File.ReadAllText(outputTexPath);
+
+            // Prepend the custom macros to the TeX file
+            string finalTexContent = customMacros + Environment.NewLine + texContent;
+
+            // Write the updated content back to the file
+            File.WriteAllText(outputTexPath, finalTexContent);
+
+            Console.WriteLine($"PDF successfully converted to LaTeX with custom macros: '{outputTexPath}'");
         }
         catch (Exception ex)
         {
