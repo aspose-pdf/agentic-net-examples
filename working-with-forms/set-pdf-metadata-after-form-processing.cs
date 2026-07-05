@@ -7,42 +7,50 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "form_filled.pdf";
-        const string outputPath = "final_with_metadata.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF that contains form fields
-            using (Document doc = new Document(inputPath))
+            // ----- Form processing (example) -----
+            // Fill a form field named "Name" if it exists
+            Form form = doc.Form;
+            if (form != null && form.Count > 0)
             {
-                // OPTIONAL: process the form (e.g., flatten fields)
-                if (doc.Form != null)
+                // Retrieve the field by name and set its value using the Field API
+                Field nameField = null;
+                foreach (Field f in form.Fields)
                 {
-                    doc.Form.Flatten();
+                    if (string.Equals(f.Name, "Name", StringComparison.OrdinalIgnoreCase))
+                    {
+                        nameField = f;
+                        break;
+                    }
                 }
 
-                // Set standard metadata properties
-                doc.Info.Author = "John Doe";
-                doc.Info.Title  = "Processed Form Document";
-
-                // Alternative way to set the title (both are valid)
-                doc.SetTitle("Processed Form Document");
-
-                // Save the updated PDF
-                doc.Save(outputPath);
+                if (nameField != null)
+                {
+                    nameField.Value = "John Doe";
+                }
             }
 
-            Console.WriteLine($"Document saved with metadata to '{outputPath}'.");
+            // ----- Set PDF metadata -----
+            doc.Info.Author = "John Doe";
+            doc.Info.Title = "Processed Form Document";
+            doc.Info.Subject = "Form processing example";
+            doc.Info.Keywords = "Aspose.Pdf, metadata, form";
+
+            // Save the updated PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Document saved to '{outputPath}'.");
     }
 }

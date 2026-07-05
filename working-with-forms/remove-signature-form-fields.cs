@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -8,7 +8,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output_no_signatures.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,23 +17,23 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle: using ensures proper disposal)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Collect all signature fields present in the form
-            List<Field> signatureFields = new List<Field>();
+            // Gather all signature fields (subtype 'Signature')
+            List<SignatureField> signatureFields = new List<SignatureField>();
             foreach (Field field in doc.Form)
             {
-                if (field is SignatureField)
+                if (field is SignatureField sigField)
                 {
-                    signatureFields.Add(field);
+                    signatureFields.Add(sigField);
                 }
             }
 
-            // Remove each collected signature field from the form
-            foreach (Field sig in signatureFields)
+            // Remove each signature field from the form
+            foreach (SignatureField sigField in signatureFields)
             {
-                doc.Form.Delete(sig);
+                doc.Form.Delete(sigField);
             }
 
             // Save the modified document

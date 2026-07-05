@@ -1,51 +1,84 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Forms;
+using Aspose.Pdf.Drawing; // for Graph if needed (not used here)
 
 class Program
 {
     static void Main()
     {
-        // Create a sample PDF (self‑contained example)
+        // Output PDF path
+        const string outputPath = "LanguageForm.pdf";
+
+        // Create a new PDF document
         using (Document doc = new Document())
         {
-            doc.Pages.Add();
-            doc.Save("sample.pdf");
+            // Add a blank page
+            Page page = doc.Pages.Add();
+
+            // ---------- Create language selection ComboBox ----------
+            // Position: left=100, bottom=700, right=250, top=730
+            Aspose.Pdf.Rectangle comboRect = new Aspose.Pdf.Rectangle(100, 700, 250, 730);
+            ComboBoxField languageCombo = new ComboBoxField(page, comboRect)
+            {
+                PartialName = "langSelect",
+                // Set default appearance (font, size, color)
+                DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black),
+                // Commit the value immediately so JavaScript fires on change
+                CommitImmediately = true
+            };
+            // Add language options
+            languageCombo.AddOption("English");
+            languageCombo.AddOption("Spanish");
+
+            // ---------- Create label fields that will be updated ----------
+            // Label 1 (e.g., "Name:" / "Nombre:")
+            Aspose.Pdf.Rectangle label1Rect = new Aspose.Pdf.Rectangle(100, 650, 250, 670);
+            TextBoxField label1 = new TextBoxField(page, label1Rect)
+            {
+                PartialName = "label1",
+                ReadOnly = true,
+                Value = "Name:",
+                DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black)
+            };
+
+            // Label 2 (e.g., "Address:" / "Dirección:")
+            Aspose.Pdf.Rectangle label2Rect = new Aspose.Pdf.Rectangle(100, 620, 250, 640);
+            TextBoxField label2 = new TextBoxField(page, label2Rect)
+            {
+                PartialName = "label2",
+                ReadOnly = true,
+                Value = "Address:",
+                DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black)
+            };
+
+            // ---------- Add fields to the form ----------
+            // Page numbers are 1‑based
+            doc.Form.Add(languageCombo, 1);
+            doc.Form.Add(label1, 1);
+            doc.Form.Add(label2, 1);
+
+            // ---------- Attach JavaScript to the ComboBox ----------
+            // This script updates the label fields based on the selected language
+            string js = @"
+var f1 = this.getField('label1');
+var f2 = this.getField('label2');
+if (event.value == 'English') {
+    f1.value = 'Name:';
+    f2.value = 'Address:';
+} else if (event.value == 'Spanish') {
+    f1.value = 'Nombre:';
+    f2.value = 'Dirección:';
+}";
+            // Use OnCalculate (or OnModifyCharacter) which is a valid action for value change
+            languageCombo.Actions.OnCalculate = new JavascriptAction(js);
+
+            // Save the PDF
+            doc.Save(outputPath);
         }
 
-        // Open the sample PDF and add form fields
-        using (Document doc = new Document("sample.pdf"))
-        {
-            Page page = doc.Pages[1];
-
-            // Label field that will be changed by JavaScript
-            TextBoxField labelField = new TextBoxField(page, new Rectangle(100, 700, 200, 720));
-            labelField.PartialName = "Label1";
-            labelField.Value = "Name:";
-            doc.Form.Add(labelField);
-
-            // Input field for the name
-            TextBoxField nameField = new TextBoxField(page, new Rectangle(210, 700, 350, 720));
-            nameField.PartialName = "NameField";
-            doc.Form.Add(nameField);
-
-            // Language selection combo box
-            ComboBoxField langCombo = new ComboBoxField(page, new Rectangle(100, 650, 200, 670));
-            langCombo.PartialName = "LangCombo";
-            langCombo.AddOption("English");
-            langCombo.AddOption("Spanish");
-            langCombo.AddOption("French");
-
-            // JavaScript to change the label based on selected language
-            string js = "var lang = event.value;" +
-                        "if (lang == 'English') this.getField('Label1').value = 'Name:';" +
-                        "else if (lang == 'Spanish') this.getField('Label1').value = 'Nombre:';" +
-                        "else if (lang == 'French') this.getField('Label1').value = 'Nom:';";
-            langCombo.Actions.OnValidate = new JavascriptAction(js);
-            doc.Form.Add(langCombo);
-
-            doc.Save("output.pdf");
-        }
+        Console.WriteLine($"PDF form with language dropdown saved to '{outputPath}'.");
     }
 }

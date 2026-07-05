@@ -2,16 +2,15 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";          // existing PDF with a ListBox field
-        const string outputPath = "output.pdf";         // PDF after selection is set
-        const string listBoxName = "MyListBox";         // full name of the ListBox field
-        const int desiredIndex = 2;                     // index of the option to select (1‑based)
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string listBoxName = "myListBox"; // name of the ListBox field in the PDF
+        const int desiredIndex = 2; // index of the option to select (1‑based)
 
         if (!File.Exists(inputPath))
         {
@@ -19,40 +18,42 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        // Load the existing PDF
         using (Document doc = new Document(inputPath))
         {
-            ListBoxField listBox = null;
-
-            // Locate the ListBox field by its full name
-            foreach (Page page in doc.Pages)
+            // Ensure the document contains a form
+            if (doc.Form != null)
             {
-                foreach (Annotation ann in page.Annotations)
+                // Retrieve the field by name using the indexer; returns null if not found
+                ListBoxField listBox = doc.Form[listBoxName] as ListBoxField;
+                if (listBox != null)
                 {
-                    if (ann is ListBoxField lb && lb.FullName == listBoxName)
+                    // Verify the desired index is within the range of available options
+                    int optionsCount = listBox.Options.Count; // Options collection is zero‑based
+                    if (desiredIndex >= 1 && desiredIndex <= optionsCount)
                     {
-                        listBox = lb;
-                        break;
+                        // ListBoxField.Selected is zero‑based, so subtract 1 from the 1‑based index
+                        listBox.Selected = desiredIndex - 1;
+                    }
+                    else
+                    {
+                        Console.Error.WriteLine($"Desired index {desiredIndex} is out of range (1‑{optionsCount}).");
                     }
                 }
-                if (listBox != null) break;
-            }
-
-            if (listBox == null)
-            {
-                Console.Error.WriteLine($"ListBox field '{listBoxName}' not found.");
+                else
+                {
+                    Console.Error.WriteLine($"ListBox field '{listBoxName}' not found or is not a ListBoxField.");
+                }
             }
             else
             {
-                // Set the selected option (items are numbered from 1)
-                listBox.Selected = desiredIndex;
-                Console.WriteLine($"ListBox '{listBoxName}' set to option index {desiredIndex}.");
+                Console.Error.WriteLine("The PDF does not contain any form fields.");
             }
 
-            // Save the modified PDF (lifecycle rule: Save inside using block)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Document saved to '{outputPath}'.");
+        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }
 }

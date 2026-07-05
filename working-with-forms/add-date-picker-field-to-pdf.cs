@@ -8,8 +8,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_with_datefield.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,21 +17,24 @@ class Program
             return;
         }
 
+        // Load the existing PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Rectangle where the date field will be placed (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 700, 250, 730);
+            // Define the rectangle where the date field will appear (llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 250, 630);
 
             // Create a DateField on the first page
-            DateField dateField = new DateField(doc.Pages[1], rect)
-            {
-                Name = "DatePicker",
-                DateFormat = "mm/dd/yyyy"
-            };
+            DateField dateField = new DateField(doc.Pages[1], rect);
 
-            // Attach JavaScript that opens the calendar widget when the field is clicked
-            // Use a valid action property from AnnotationActionCollection (OnPressMouseBtn)
-            dateField.Actions.OnPressMouseBtn = new JavascriptAction("app.execMenuItem('ShowDatePicker');");
+            // Set a name for the field (used to reference it later)
+            dateField.Name = "DatePicker";
+
+            // Define the display format for the date (e.g., mm/dd/yyyy)
+            dateField.DateFormat = "mm/dd/yyyy";
+
+            // Attach JavaScript that opens the calendar picker when the field is activated
+            // The script uses the built‑in AFDate_FormatEx function to format the selected date
+            dateField.OnActivated = new JavascriptAction("AFDate_FormatEx('mm/dd/yyyy');");
 
             // Add the field to the document's form collection
             doc.Form.Add(dateField);
@@ -40,6 +43,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Date picker field added and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with date picker saved to '{outputPath}'.");
     }
 }

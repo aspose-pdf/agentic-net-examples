@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
@@ -20,23 +19,22 @@ class Program
         // Load the existing PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Define the rectangle where the text field will appear (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 400, 700);
+            // Define the position and size of the text field (lower‑left‑x, lower‑left‑y, upper‑right‑x, upper‑right‑y)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 400, 600);
 
-            // Create a multiline TextBoxField on page 1
+            // Create a multiline TextBoxField on the first page
             TextBoxField feedbackField = new TextBoxField(doc.Pages[1], rect);
-            feedbackField.PartialName = "Feedback"; // field identifier
-            feedbackField.Name = "Feedback";        // annotation name
-            feedbackField.Multiline = true;        // allow multiple lines
-            feedbackField.MaxLen = 500;            // limit to 500 characters
+            feedbackField.Name = "Feedback";   // field name
+            feedbackField.Multiline = true;    // allow multiple lines
+            feedbackField.MaxLen = 500;        // limit to 500 characters
 
-            // Add the field to the form on page 1
-            doc.Form.Add(feedbackField, 1);
+            // Add the field to the form
+            doc.Form.Add(feedbackField);
 
-            // Save the modified PDF
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with 'Feedback' field saved to '{outputPath}'.");
     }
 }

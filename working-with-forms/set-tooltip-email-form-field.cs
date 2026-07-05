@@ -16,25 +16,38 @@ class Program
             return;
         }
 
-        // Open the PDF document
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
             // Retrieve the form field named "Email"
-            // The Email field is typically a TextBoxField. Use the Contents property to set the tooltip.
-            if (doc.Form["Email"] is TextBoxField emailField)
+            // The Form indexer returns a WidgetAnnotation, so cast it to Field.
+            Field field = doc.Form["Email"] as Field;
+            if (field == null)
             {
-                // Set the tooltip text to guide the user on the required format
-                emailField.Contents = "Enter email in format: user@example.com";
+                Console.Error.WriteLine("Field 'Email' not found or is not a form field.");
             }
             else
             {
-                Console.WriteLine("Email field not found or is not a TextBoxField.");
+                // Set the tooltip via the AlternateName property.
+                if (field is TextBoxField txtField)
+                {
+                    txtField.AlternateName = "Enter email in format user@example.com";
+                }
+                else if (field is PasswordBoxField pwdField)
+                {
+                    pwdField.AlternateName = "Enter email in format user@example.com";
+                }
+                else
+                {
+                    // Fallback for other field types that expose AlternateName directly.
+                    field.AlternateName = "Enter email in format user@example.com";
+                }
             }
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with tooltip at '{outputPath}'.");
+        Console.WriteLine($"Tooltip set and saved to '{outputPath}'.");
     }
 }

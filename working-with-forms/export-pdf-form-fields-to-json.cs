@@ -1,36 +1,38 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputJson = "form_schema.json";
+        const string inputPath = "input.pdf";
 
-        // Verify input file exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Configure JSON export options (indentation for readability)
-            ExportFieldsToJsonOptions options = new ExportFieldsToJsonOptions
+            // Export all form fields to JSON using a memory stream
+            using (MemoryStream ms = new MemoryStream())
             {
-                WriteIndented = true,
-                ExportPasswordValue = false // do not export password field values
-            };
+                // The ExportToJson method writes JSON to the provided stream
+                doc.Form.ExportToJson(ms);
 
-            // Export all form fields to a JSON file (Form.ExportToJson overload)
-            doc.Form.ExportToJson(outputJson, options);
+                // Reset the stream position to read from the beginning
+                ms.Position = 0;
+
+                // Read the JSON content as a string
+                using (StreamReader reader = new StreamReader(ms))
+                {
+                    string json = reader.ReadToEnd();
+                    Console.WriteLine(json); // Output the JSON string
+                }
+            }
         }
-
-        Console.WriteLine($"Form fields exported to JSON: {outputJson}");
     }
 }

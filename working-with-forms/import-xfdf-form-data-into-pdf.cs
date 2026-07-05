@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Net;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -7,39 +8,36 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";      // Source PDF with form fields
-        const string xfdfPath = "data.xfdf";     // XML (XFDF) file containing field values
-        const string outputPath = "output.pdf";  // Resulting PDF after import
+        const string pdfTemplatePath = "template.pdf";
+        const string outputPdfPath = "filled.pdf";
+        const string xfdfUrl = "https://example.com/formdata.xfdf";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(pdfTemplatePath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
-            return;
-        }
-
-        if (!File.Exists(xfdfPath))
-        {
-            Console.Error.WriteLine($"XFDF file not found: {xfdfPath}");
+            Console.Error.WriteLine($"Template PDF not found: {pdfTemplatePath}");
             return;
         }
 
         try
         {
-            // Load the PDF document (lifecycle rule: use using for disposal)
-            using (Document pdfDoc = new Document(pdfPath))
+            // Load the PDF document
+            using (Document doc = new Document(pdfTemplatePath))
             {
-                // Open the XFDF (XML) stream
-                using (FileStream xfdfStream = File.OpenRead(xfdfPath))
+                // Retrieve XFDF (XML) data from the network
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(xfdfUrl);
+                request.Method = "GET";
+
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                using (Stream xfdfStream = response.GetResponseStream())
                 {
-                    // Import matching form field values from the XFDF stream into the PDF
-                    XfdfReader.ReadFields(xfdfStream, pdfDoc);
+                    // Import field values from the XFDF stream into the PDF form
+                    XfdfReader.ReadFields(xfdfStream, doc);
                 }
 
-                // Save the updated PDF (lifecycle rule: use Save without extra options)
-                pdfDoc.Save(outputPath);
+                // Save the updated PDF
+                doc.Save(outputPdfPath);
+                Console.WriteLine($"PDF saved to '{outputPdfPath}'.");
             }
-
-            Console.WriteLine($"Form data imported successfully. Saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

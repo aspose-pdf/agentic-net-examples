@@ -1,41 +1,39 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // Core Aspose.Pdf namespace
+using Aspose.Pdf.Text;          // Required for text handling if needed
 
 class Program
 {
     static void Main()
     {
-        // Paths for the source PDF and the destination XML file.
-        const string pdfPath  = "input.pdf";
-        const string xmlPath  = "form_data.xml";
+        // Paths for input PDF and output XML file
+        const string inputPdfPath  = "input.pdf";
+        const string outputXmlPath = "formData.xml";
 
-        // Verify that the source PDF exists.
-        if (!File.Exists(pdfPath))
+        // Verify that the source PDF exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Source PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"Error: PDF file not found at '{inputPdfPath}'.");
             return;
         }
 
-        // Load the PDF document.
-        using (Document pdfDoc = new Document(pdfPath))
+        try
         {
-            // OPTIONAL: Fill some form fields programmatically.
-            // Example: set a text field named "Name" to "John Doe".
-            // The core Form API works with WidgetAnnotation objects.
-            // Uncomment and adjust field names as needed.
-            /*
-            var field = pdfDoc.Form["Name"] as TextBoxField;
-            if (field != null)
-                field.Value = "John Doe";
-            */
+            // Load the PDF document (core API, no Facades)
+            using (Aspose.Pdf.Document pdfDoc = new Aspose.Pdf.Document(inputPdfPath))
+            {
+                // The core Document API provides a SaveXml method that writes the
+                // complete PDF model (including form fields) to an XML file.
+                // This can be used for offline collection of form data.
+                pdfDoc.SaveXml(outputXmlPath);
 
-            // Export the entire document model (including form data) to an XML file.
-            // SaveXml writes the PDF structure as XML; this can be used for offline
-            // data collection or further processing.
-            pdfDoc.SaveXml(xmlPath);
+                Console.WriteLine($"Form data exported to XML: '{outputXmlPath}'.");
+            }
         }
-
-        Console.WriteLine($"Form data exported to XML file: {xmlPath}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Exception: {ex.Message}");
+        }
     }
 }

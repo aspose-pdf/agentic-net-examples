@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -8,37 +7,48 @@ class Program
 {
     static void Main()
     {
-        // Input PDF path, output PDF path and the desired checkbox state
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        bool checkBoxShouldBeChecked = true; // set based on your input data
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output.pdf";
+        const string checkboxFieldName = "AgreeTerms";
+        bool shouldCheck = true;
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Load the existing PDF document (lifecycle rule: use using)
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Locate the first checkbox field in the form (adjust the search as needed)
-            CheckboxField checkbox = doc.Form.Fields
-                .FirstOrDefault(f => f is CheckboxField) as CheckboxField;
+            // Access the form object
+            Form form = doc.Form;
 
-            if (checkbox == null)
+            // Retrieve the field safely – the Form indexer returns a WidgetAnnotation,
+            // so we cast it to Aspose.Pdf.Forms.Field (or null if the cast fails).
+            Field field = form[checkboxFieldName] as Field;
+            if (field == null)
             {
-                Console.Error.WriteLine("No checkbox field found in the document.");
+                Console.Error.WriteLine($"Field '{checkboxFieldName}' not found or is not a form field.");
                 return;
             }
 
-            // Set the checkbox state
-            checkbox.Checked = checkBoxShouldBeChecked;
+            // Ensure the field is a checkbox
+            if (field is CheckboxField checkbox)
+            {
+                // Set the checkbox state (Checked property)
+                checkbox.Checked = shouldCheck; // true => checked, false => unchecked
+            }
+            else
+            {
+                Console.Error.WriteLine($"Field '{checkboxFieldName}' is not a checkbox.");
+                return;
+            }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            // Save the modified PDF (lifecycle rule: use Save without extra options for PDF)
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Checkbox updated and saved to '{outputPath}'.");
+        Console.WriteLine($"Checkbox field '{checkboxFieldName}' set to {(shouldCheck ? "checked" : "unchecked")} and saved to '{outputPdfPath}'.");
     }
 }

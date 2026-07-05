@@ -9,23 +9,25 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "filled.pdf";
-        const string fieldName = "myTextField";
-        const string fieldValue = "Provided string value";
+        const string fieldName = "myField";          // Name of the text field to fill
+        const string fieldValue = "Hello World";     // Value to set
 
+        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF, fill the specified text field, and save the result.
+        // Load the PDF document (wrapped in using for proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // The Form indexer returns a WidgetAnnotation; cast it to a Field safely.
+            // The Form indexer returns a WidgetAnnotation; cast it to a Field.
             Field? field = doc.Form[fieldName] as Field;
+
             if (field != null)
             {
-                // For text fields (e.g., TextBoxField) the Value property sets the content.
+                // Set the field's value
                 field.Value = fieldValue;
             }
             else
@@ -33,10 +35,10 @@ class Program
                 Console.Error.WriteLine($"Field '{fieldName}' not found or is not a form field.");
             }
 
-            // Save the modified document.
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with filled field to '{outputPath}'.");
     }
 }

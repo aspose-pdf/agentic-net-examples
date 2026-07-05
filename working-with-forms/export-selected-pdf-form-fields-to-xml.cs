@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Xml;
+using System.Xml.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -9,8 +9,16 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
+        const string inputPdf = "input.pdf";
         const string outputXml = "selected_fields.xml";
+
+        // List of form field names that should be exported
+        var fieldsToExport = new List<string>
+        {
+            "FirstName",
+            "LastName",
+            "Email"
+        };
 
         if (!File.Exists(inputPdf))
         {
@@ -19,40 +27,40 @@ class Program
         }
 
         // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdf))
+        using (Document doc = new Document(inputPdf))
         {
-            // List of fully qualified field names to export
-            var fieldsToExport = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-            {
-                "Customer.Name",
-                "Customer.Email",
-                "Order.Total"
-            };
+            // Create the root element for the XML document
+            XElement root = new XElement("FormFields");
 
-            // Prepare XML writer
-            using (var writer = XmlWriter.Create(outputXml, new XmlWriterSettings { Indent = true }))
+            foreach (string fieldName in fieldsToExport)
             {
-                writer.WriteStartDocument();
-                writer.WriteStartElement("FormData");
-
-                // Iterate over all form fields and write only the selected ones
-                foreach (Field field in pdfDoc.Form.Fields)
+                // Check if the form contains the field
+                if (doc.Form.HasField(fieldName))
                 {
-                    // FullName provides the fully qualified name of the field
-                    if (fieldsToExport.Contains(field.FullName))
+                    // Retrieve the field (as a Field object)
+                    Field field = doc.Form[fieldName] as Field;
+                    if (field != null)
                     {
-                        writer.WriteStartElement("Field");
-                        writer.WriteAttributeString("Name", field.FullName);
-                        writer.WriteString(field.Value?.ToString() ?? string.Empty);
-                        writer.WriteEndElement(); // Field
+                        // Get the field value; convert null to empty string
+                        string value = field.Value?.ToString() ?? string.Empty;
+
+                        // Add an element with the field name and its value
+                        XElement fieldElement = new XElement("Field",
+                            new XAttribute("Name", fieldName),
+                            new XAttribute("Value", value));
+                        root.Add(fieldElement);
                     }
                 }
-
-                writer.WriteEndElement(); // FormData
-                writer.WriteEndDocument();
+                else
+                {
+                    Console.WriteLine($"Field not found: {fieldName}");
+                }
             }
 
-            Console.WriteLine($"Selected fields exported to '{outputXml}'.");
+            // Save the XML document
+            XDocument xmlDoc = new XDocument(new XDeclaration("1.0", "utf-8", "yes"), root);
+            xmlDoc.Save(outputXml);
+            Console.WriteLine($"Selected form fields exported to '{outputXml}'.");
         }
     }
 }

@@ -2,52 +2,54 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string buttonName = "SubmitBtn"; // name of the submit button in the PDF
-        const string tooltip = "Please fill all required fields before submitting.";
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document and ensure deterministic disposal
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            // Add a blank page to host the button
+            Page page = doc.Pages.Add();
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
-        {
-            // Access the form associated with the document
-            Form form = doc.Form;
+            // Define the button rectangle (llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle buttonRect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
 
-            // Verify that the button field exists
-            if (form.HasField(buttonName))
+            // Create a push button field on the page
+            ButtonField submitButton = new ButtonField(page, buttonRect)
             {
-                // Retrieve the field and cast it to ButtonField
-                ButtonField submitButton = form[buttonName] as ButtonField;
-                if (submitButton != null)
-                {
-                    // Set the tooltip (AlternateName) that appears in PDF viewers
-                    submitButton.AlternateName = tooltip;
-                }
-                else
-                {
-                    Console.Error.WriteLine($"Field '{buttonName}' is not a button field.");
-                }
-            }
-            else
-            {
-                Console.Error.WriteLine($"Button field '{buttonName}' not found in the document.");
-            }
+                // Internal name of the field
+                PartialName = "SubmitButton",
 
-            // Save the modified PDF
+                // Tooltip shown in Acrobat (alternate name)
+                AlternateName = "Please fill all required fields before submitting.",
+
+                // Mark the field as required (optional)
+                Required = true
+            };
+
+            // Configure the submit action (POST to a URL)
+            SubmitFormAction submitAction = new SubmitFormAction
+            {
+                // Url property expects a FileSpecification, not a plain string
+                Url = new FileSpecification("https://example.com/submit")
+            };
+
+            // Attach the submit action to the button – use a supported action property
+            // OnReleaseMouseBtn is the correct property for a button click
+            submitButton.Actions.OnReleaseMouseBtn = submitAction;
+
+            // Add the button to the document's form on page 1 (1‑based indexing)
+            doc.Form.Add(submitButton, 1);
+
+            // Save the PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with tooltip to '{outputPath}'.");
+        Console.WriteLine($"PDF with submit button saved to '{outputPath}'.");
     }
 }

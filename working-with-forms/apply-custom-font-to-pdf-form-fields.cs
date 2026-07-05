@@ -1,8 +1,7 @@
 using System;
 using System.IO;
-using System.Drawing; // For System.Drawing.Color
+using System.Drawing;                     // Required for System.Drawing.Color
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // For Aspose.Pdf.Text.Font
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations;
 
@@ -10,48 +9,32 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string fontPath = "customfont.ttf"; // path to the custom TrueType font
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string fontName   = "Arial";   // replace with your custom font name
+        const double fontSize   = 12;        // desired font size
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        if (!File.Exists(fontPath))
+        // Load the PDF document (lifecycle rule: use using for disposal)
+        using (Document doc = new Document(inputPath))
         {
-            Console.Error.WriteLine($"Font file not found: {fontPath}");
-            return;
-        }
-
-        // Load the custom font from a stream and ensure it will be embedded in the PDF
-        Aspose.Pdf.Text.Font customFont;
-        using (FileStream fontStream = File.OpenRead(fontPath))
-        {
-            customFont = FontRepository.OpenFont(fontStream, FontTypes.TTF);
-            customFont.IsEmbedded = true;
-        }
-
-        // Open the PDF document
-        using (Document doc = new Document(inputPdf))
-        {
-            // Iterate over all form fields in the document
-            foreach (Field field in doc.Form.Fields)
+            // Iterate over all form fields
+            foreach (Field field in doc.Form)
             {
-                // Set the default appearance for the field: font name, size, and color
-                field.DefaultAppearance = new DefaultAppearance(
-                    customFont.FontName, // font name from the loaded font
-                    12,                  // desired font size
-                    System.Drawing.Color.Black // use System.Drawing.Color
-                );
+                // Set a new DefaultAppearance for each field.
+                // DefaultAppearance constructor requires System.Drawing.Color for the text color.
+                field.DefaultAppearance = new DefaultAppearance(fontName, fontSize, System.Drawing.Color.Black);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPdf);
+            // Save the modified PDF (lifecycle rule: use Save without extra options for PDF output)
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with custom font applied to all form fields: {outputPdf}");
+        Console.WriteLine($"Custom font applied to all form fields. Saved as '{outputPath}'.");
     }
 }

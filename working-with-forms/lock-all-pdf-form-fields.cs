@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "locked.pdf";
+        const string outputPath = "locked_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -19,19 +19,22 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Lock every form field by setting it to read‑only
-            foreach (Field field in doc.Form.Fields)
+            // Access the form object
+            Form form = doc.Form;
+
+            // Iterate over all fields and set them to read‑only
+            foreach (Field field in form)
             {
                 field.ReadOnly = true;
             }
 
-            // Optionally, you could flatten the form instead:
-            // doc.Form.Flatten();
+            // Optionally flatten the form to remove interactive elements completely
+            // form.Flatten(); // Uncomment if you want to permanently embed values
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"All fields locked. Saved to '{outputPath}'.");
+        Console.WriteLine($"All fields locked and saved to '{outputPath}'.");
     }
 }
