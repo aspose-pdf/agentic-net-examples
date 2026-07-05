@@ -1,14 +1,14 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;   // TableAbsorber, AbsorbedTable
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,28 +17,33 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Create a TableAbsorber to find tables in the document
-            TableAbsorber absorber = new TableAbsorber();
-
-            // Extract tables from all pages
-            absorber.Visit(doc);
-
-            // Copy the TableList because Remove modifies the collection
-            List<AbsorbedTable> tables = new List<AbsorbedTable>(absorber.TableList);
-
-            // Remove each absorbed table from its page
-            foreach (AbsorbedTable table in tables)
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
             {
-                absorber.Remove(table);
+                // Create a TableAbsorber to locate tables
+                TableAbsorber absorber = new TableAbsorber();
+                absorber.Visit(doc);
+
+                // Copy the list because Remove modifies the collection
+                var tables = absorber.TableList.ToList();
+
+                // Remove each absorbed table from its page
+                foreach (var table in tables)
+                {
+                    absorber.Remove(table);
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Save the modified document
-            doc.Save(outputPath);
+            Console.WriteLine($"Tables removed and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Tables removed and document saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

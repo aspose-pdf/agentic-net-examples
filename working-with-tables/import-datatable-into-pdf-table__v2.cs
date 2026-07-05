@@ -1,54 +1,54 @@
 using System;
 using System.Data;
+using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Drawing; // for BorderInfo
 
 class Program
 {
     static void Main()
     {
-        // Create a sample PDF document
+        // ---------- 1. Create an in‑memory DataTable with sample data ----------
+        DataTable dataTable = new DataTable();
+        dataTable.Columns.Add("Id", typeof(int));
+        dataTable.Columns.Add("Name", typeof(string));
+        dataTable.Columns.Add("Quantity", typeof(int));
+
+        dataTable.Rows.Add(1, "Item A", 10);
+        dataTable.Rows.Add(2, "Item B", 20);
+        dataTable.Rows.Add(3, "Item C", 30);
+
+        // ---------- 2. Create a PDF document and add a table ----------
         using (Document pdfDocument = new Document())
         {
-            // Add a page to the document
+            // Add a new page to the document
             Page page = pdfDocument.Pages.Add();
 
-            // Create a table with three columns
-            Table pdfTable = new Table();
-            pdfTable.ColumnWidths = "100 100 100";
+            // Create a Table instance
+            Table table = new Table
+            {
+                // Adjust columns to fit the content (correct enum value)
+                ColumnAdjustment = ColumnAdjustment.AutoFitToContent,
+                // Set a default border for all cells
+                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Black)
+            };
 
-            // Simulate filling a DataTable from a database query
-            DataTable dataTable = new DataTable();
-            dataTable.Columns.Add("ID", typeof(int));
-            dataTable.Columns.Add("Name", typeof(string));
-            dataTable.Columns.Add("Score", typeof(double));
+            // Initialise ColumnWidths – required by ImportDataTable to avoid NullReferenceException
+            // ColumnWidths is a string containing space‑separated width values (in points).
+            // Here we give each column a default width of 100 points.
+            table.ColumnWidths = string.Join(" ", Enumerable.Repeat("100", dataTable.Columns.Count));
 
-            DataRow row1 = dataTable.NewRow();
-            row1["ID"] = 1;
-            row1["Name"] = "Alice";
-            row1["Score"] = 85.5;
-            dataTable.Rows.Add(row1);
+            // Import the DataTable into the Aspose.Pdf.Table
+            // Parameters: (DataTable, isColumnNamesImported, firstFilledRow, firstFilledColumn)
+            table.ImportDataTable(dataTable, true, 0, 0);
 
-            DataRow row2 = dataTable.NewRow();
-            row2["ID"] = 2;
-            row2["Name"] = "Bob";
-            row2["Score"] = 92.0;
-            dataTable.Rows.Add(row2);
+            // Add the populated table to the page's paragraph collection
+            page.Paragraphs.Add(table);
 
-            DataRow row3 = dataTable.NewRow();
-            row3["ID"] = 3;
-            row3["Name"] = "Charlie";
-            row3["Score"] = 78.0;
-            dataTable.Rows.Add(row3);
-
-            // Import the DataTable into the PDF table (include column names as the first row)
-            pdfTable.ImportDataTable(dataTable, true, 0, 0);
-
-            // Add the table to the page
-            page.Paragraphs.Add(pdfTable);
-
-            // Save the resulting PDF
+            // Save the PDF document
             pdfDocument.Save("output.pdf");
         }
+
+        Console.WriteLine("PDF with imported table has been created successfully.");
     }
 }

@@ -3,7 +3,7 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class InsertTableBeforeImage
+class Program
 {
     static void Main()
     {
@@ -16,56 +16,51 @@ class InsertTableBeforeImage
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use Document constructor)
+        // Load the PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages
+            // Iterate over all pages
             foreach (Page page in doc.Pages)
             {
-                // Scan the page's paragraph collection to locate an Image object
+                // Search for an Image object in the page's paragraph collection
                 for (int i = 0; i < page.Paragraphs.Count; i++)
                 {
-                    // Image is a subclass of Aspose.Pdf.Image
                     if (page.Paragraphs[i] is Image)
                     {
-                        // Create a simple table to insert before the image
+                        // Create a simple table to insert
                         Table table = new Table
                         {
-                            // Position the table at the top-left of the page (optional)
-                            // Left and Top are in points; adjust as needed
-                            Left = 50,
-                            Top  = (float)page.PageInfo.Height - 100f
+                            // Define column widths (in points)
+                            ColumnWidths = "150 150",
+                            // Table border
+                            Border = new BorderInfo(BorderSide.All, 1f, Aspose.Pdf.Color.Black),
+                            // Default cell border (use float literal for line width)
+                            DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Gray)
                         };
 
-                        // Define two columns
-                        table.ColumnWidths = "200 200";
-
-                        // Add a header row
+                        // Header row
                         Row header = table.Rows.Add();
-                        header.Cells.Add("Header 1");
-                        header.Cells.Add("Header 2");
-                        // Apply a background color to the header (using Aspose.Pdf.Color)
-                        header.BackgroundColor = Aspose.Pdf.Color.LightGray;
+                        header.Cells.Add("Column 1");
+                        header.Cells.Add("Column 2");
 
-                        // Add a data row
+                        // Data row
                         Row data = table.Rows.Add();
-                        data.Cells.Add("Cell A1");
-                        data.Cells.Add("Cell B1");
+                        data.Cells.Add("Value 1");
+                        data.Cells.Add("Value 2");
 
-                        // Insert the table at the current index (before the image)
+                        // Insert the table before the found image (index i)
                         page.Paragraphs.Insert(i, table);
 
-                        // Since we inserted a new paragraph, the image shifts to i+1.
-                        // Break after first insertion per page (remove if multiple images per page are needed)
+                        // Stop after inserting once per page (optional)
                         break;
                     }
                 }
             }
 
-            // Save the modified PDF (lifecycle rule: use Document.Save)
+            // Save the modified document (lifecycle rule)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Table inserted before image and saved to '{outputPath}'.");
+        Console.WriteLine($"Table inserted before images and saved to '{outputPath}'.");
     }
 }

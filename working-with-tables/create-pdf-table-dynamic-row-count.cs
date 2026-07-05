@@ -1,97 +1,66 @@
 using System;
 using System.Data;
-using System.Runtime.InteropServices;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Path for output PDF
-        const string outputPdfPath = "output_with_table.pdf";
+        // Prepare source data (DataTable) with a dynamic number of rows
+        DataTable sourceTable = BuildSourceData();
 
-        // ---------------------------------------------------------------
-        // Prepare source data (DataTable). In a real scenario this could be
-        // loaded from a database, CSV, etc.
-        // ---------------------------------------------------------------
-        DataTable sourceTable = new DataTable("SampleData");
-        sourceTable.Columns.Add("ID",   typeof(int));
-        sourceTable.Columns.Add("Name", typeof(string));
-        sourceTable.Columns.Add("Score",typeof(double));
-
-        // Populate the DataTable with sample rows
-        for (int i = 1; i <= 15; i++)
-        {
-            sourceTable.Rows.Add(i, $"Student {i}", 60 + i);
-        }
-
-        // Determine the number of source records (rows) before import
-        int recordCount = sourceTable.Rows.Count;
-        Console.WriteLine($"Number of source records: {recordCount}");
-
-        // ---------------------------------------------------------------
-        // Create a new PDF document (or load a template) and add a table
-        // ---------------------------------------------------------------
+        // Create a new PDF document (wrapped in using for proper disposal)
         using (Document pdfDoc = new Document())
         {
-            // Add a blank page to host the table
+            // Add a page to the document (Pages collection is 1‑based)
             Page page = pdfDoc.Pages.Add();
 
-            // Create and configure the Table instance
-            Table table = new Table
-            {
-                Left = 50,                     // 50 points from the left edge
-                Top = 700,                     // 700 points from the bottom edge
-                ColumnWidths = "100 200 100",
-                Border = new BorderInfo(BorderSide.All, 1f, Aspose.Pdf.Color.Black),
-                DefaultCellPadding = new MarginInfo(5, 5, 5, 5),
-                DefaultCellTextState = new TextState
-                {
-                    Font = FontRepository.FindFont("Helvetica"),
-                    FontSize = 12,
-                    ForegroundColor = Aspose.Pdf.Color.Black
-                }
-            };
+            // Create a table instance
+            Table table = new Table();
 
-            // Import the DataTable into the PDF Table.
-            // true  – import column names as the first row
-            // 0,0   – start at first row / first column of the target table
+            // Example: set column widths (optional, adjust as needed)
+            table.ColumnWidths = "100 150 100";
+
+            // Import the DataTable into the Aspose.Pdf.Table
+            // - true  => import column names as the first row
+            // - 0, 0  => start importing at the first row and first column of the table
             table.ImportDataTable(sourceTable, true, 0, 0);
 
-            // Add the table to the page's paragraph collection
+            // Add the populated table to the page's paragraph collection
             page.Paragraphs.Add(table);
 
-            // Save the resulting PDF – guard against missing libgdiplus on non‑Windows platforms
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                pdfDoc.Save(outputPdfPath);
-            }
-            else
-            {
-                try
-                {
-                    pdfDoc.Save(outputPdfPath);
-                }
-                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
-                {
-                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. PDF saved without GDI‑dependent features.");
-                }
-            }
+            // Save the PDF document
+            pdfDoc.Save("output.pdf");
         }
-
-        Console.WriteLine($"PDF with table saved to '{outputPdfPath}'.");
     }
 
-    // Helper to detect a nested DllNotFoundException (e.g., missing libgdiplus)
-    private static bool ContainsDllNotFound(Exception? ex)
+    // Builds a DataTable with a dynamic row count determined at runtime
+    static DataTable BuildSourceData()
     {
-        while (ex != null)
+        DataTable dt = new DataTable();
+
+        // Define columns
+        dt.Columns.Add("ID", typeof(int));
+        dt.Columns.Add("Name", typeof(string));
+        dt.Columns.Add("Amount", typeof(double));
+
+        // Determine the number of records dynamically (e.g., based on external logic)
+        int recordCount = GetRecordCount();
+
+        // Populate the DataTable
+        for (int i = 1; i <= recordCount; i++)
         {
-            if (ex is DllNotFoundException)
-                return true;
-            ex = ex.InnerException;
+            dt.Rows.Add(i, $"Item {i}", i * 12.34);
         }
-        return false;
+
+        return dt;
+    }
+
+    // Placeholder for logic that determines how many records to import
+    static int GetRecordCount()
+    {
+        // In a real scenario this could query a database, read a file, etc.
+        // Here we simply return a fixed number for demonstration.
+        return 7;
     }
 }

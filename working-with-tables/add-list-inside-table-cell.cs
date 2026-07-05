@@ -1,48 +1,56 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
-using System.Collections.Generic;
 
 class Program
 {
     static void Main()
     {
-        // Create a sample PDF file (self‑contained example)
-        using (Document createDoc = new Document())
-        {
-            createDoc.Pages.Add();
-            createDoc.Save("input.pdf");
-        }
+        const string outputPath = "list_in_cell.pdf";
 
-        // Open the sample PDF and add a table with a bullet list inside a cell
-        using (Document doc = new Document("input.pdf"))
+        // Create a new PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document())
         {
-            // Create a table with two columns
-            Table table = new Table();
-            doc.Pages[1].Paragraphs.Add(table);
-            table.ColumnWidths = "250 250";
+            // Add a page to the document
+            Page page = doc.Pages.Add();
 
-            // Add a row to the table
+            // Create a table and configure its appearance
+            Table table = new Table
+            {
+                // Single column of width 200 points
+                ColumnWidths = "200",
+                // Simple black border around the table
+                Border = new BorderInfo(BorderSide.All, 1, Aspose.Pdf.Color.Black)
+            };
+            page.Paragraphs.Add(table);
+
+            // Add a single row to the table
             Row row = table.Rows.Add();
 
-            // Add a cell where the list will be placed
+            // Add a single cell to the row
             Cell cell = row.Cells.Add();
 
-            // Define list items (maximum 4 to respect evaluation limits)
-            string[] listItems = new string[] { "First item", "Second item", "Third item" };
+            // Define the list items to be placed inside the cell
+            string[] listItems = { "First item", "Second item", "Third item" };
 
-            // Insert each item as a paragraph prefixed with a bullet character
+            // For each item, create a paragraph that starts with a bullet marker
             foreach (string item in listItems)
             {
+                // Create a TextFragment containing a bullet (U+2022) and the item text
                 TextFragment tf = new TextFragment("\u2022 " + item);
-                tf.TextState.Font = FontRepository.FindFont("Times New Roman");
+                tf.TextState.Font = FontRepository.FindFont("Helvetica");
                 tf.TextState.FontSize = 12;
-                tf.TextState.ForegroundColor = Color.Black;
+                tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+
+                // Add the TextFragment to the cell's Paragraphs collection
                 cell.Paragraphs.Add(tf);
             }
 
-            // Save the modified PDF
-            doc.Save("output.pdf");
+            // Save the PDF document
+            doc.Save(outputPath);
         }
+
+        Console.WriteLine($"PDF with list inside a cell saved to '{outputPath}'.");
     }
 }

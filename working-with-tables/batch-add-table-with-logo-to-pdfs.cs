@@ -1,93 +1,63 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Drawing;
 using Aspose.Pdf.Text;
 
 class BatchAddTableWithLogo
 {
     static void Main()
     {
-        // Input folder containing PDFs
-        const string inputFolder = @"C:\InputPdfs";
-        // Output folder for processed PDFs
-        const string outputFolder = @"C:\OutputPdfs";
-        // Path to the company logo image (any supported format)
-        const string logoPath = @"C:\Assets\company_logo.png";
+        const string sourceFolder = @"C:\PdfInput";
+        const string outputFolder = @"C:\PdfOutput";
+        const string logoPath = @"C:\Assets\CompanyLogo.png";
 
-        // Ensure output directory exists
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Verify logo file exists
-        if (!File.Exists(logoPath))
+        // Process each PDF file in the source folder
+        foreach (string pdfFile in Directory.GetFiles(sourceFolder, "*.pdf"))
         {
-            Console.Error.WriteLine($"Logo file not found: {logoPath}");
-            return;
-        }
-
-        // Process each PDF file in the input folder
-        foreach (string pdfFile in Directory.GetFiles(inputFolder, "*.pdf"))
-        {
-            try
+            // Load the PDF document
+            using (Document doc = new Document(pdfFile))
             {
-                // Load the PDF document (using statement ensures proper disposal)
-                using (Document doc = new Document(pdfFile))
+                // Create a table with two columns (logo + text)
+                Table table = new Table();
+                table.ColumnWidths = "100 400"; // widths in points
+
+                // Add a single row
+                var row = table.Rows.Add();
+
+                // ----- Cell 1: Company Logo -----
+                var logoCell = row.Cells.Add();
+                Aspose.Pdf.Image logoImage = new Aspose.Pdf.Image
                 {
-                    // Create a table with two columns: logo and company name
-                    Table table = new Table
-                    {
-                        // Optional styling – use float literals for width values
-                        Border = new BorderInfo(BorderSide.All, 1f, Aspose.Pdf.Color.Black),
-                        DefaultCellPadding = new MarginInfo(5f, 5f, 5f, 5f),
-                        DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Gray)
-                    };
+                    File = logoPath,
+                    FixWidth = 80,
+                    FixHeight = 80
+                };
+                logoCell.Paragraphs.Add(logoImage);
 
-                    // Define column widths (percentage of page width)
-                    // First column for logo (20%), second for text (80%)
-                    table.ColumnWidths = "20 80";
+                // ----- Cell 2: Company Name -----
+                var textCell = row.Cells.Add();
+                TextFragment companyName = new TextFragment("Acme Corporation");
+                // TextState is read‑only; configure its members instead of reassigning
+                companyName.TextState.FontSize = 14;
+                companyName.TextState.Font = FontRepository.FindFont("Helvetica");
+                companyName.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+                textCell.Paragraphs.Add(companyName);
 
-                    // Add a single row
-                    Row row = table.Rows.Add();
+                // Insert the table at the top of the first page
+                doc.Pages[1].Paragraphs.Add(table);
 
-                    // ----- Cell 1: Logo image -----
-                    Cell logoCell = row.Cells.Add();
-                    // Create an Image object and set its source file
-                    Image logoImg = new Image
-                    {
-                        File = logoPath,
-                        // Scale the image to fit the cell (optional)
-                        ImageScale = 0.5f // float literal required by Aspose.Pdf
-                    };
-                    // Add the image to the cell's paragraph collection
-                    logoCell.Paragraphs.Add(logoImg);
+                // Build the output file path (same name, different folder)
+                string outputPath = System.IO.Path.Combine(outputFolder, System.IO.Path.GetFileName(pdfFile));
 
-                    // ----- Cell 2: Company name text -----
-                    Cell textCell = row.Cells.Add();
-                    TextFragment tf = new TextFragment("Acme Corporation")
-                    {
-                        // Use cross‑platform Aspose.Pdf.Color
-                        TextState = { FontSize = 14, Font = FontRepository.FindFont("Helvetica"), ForegroundColor = Aspose.Pdf.Color.DarkBlue }
-                    };
-                    textCell.Paragraphs.Add(tf);
-
-                    // Insert the table at the top of the first page
-                    Page firstPage = doc.Pages[1];
-                    // Optionally set a margin from the top of the page – use float literals
-                    table.Margin = new MarginInfo(0f, 0f, 20f, 0f);
-                    firstPage.Paragraphs.Add(table);
-
-                    // Build output file path preserving original name
-                    string outputPath = Path.Combine(outputFolder, Path.GetFileName(pdfFile));
-
-                    // Save the modified document (using the standard Save method)
-                    doc.Save(outputPath);
-                }
-
-                Console.WriteLine($"Processed: {Path.GetFileName(pdfFile)}");
+                // Save the modified document
+                doc.Save(outputPath);
             }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{pdfFile}': {ex.Message}");
-            }
+
+            Console.WriteLine($"Processed: {System.IO.Path.GetFileName(pdfFile)}");
         }
 
         Console.WriteLine("Batch processing completed.");

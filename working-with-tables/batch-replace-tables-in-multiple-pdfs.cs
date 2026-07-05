@@ -4,21 +4,16 @@ using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class Program
+class BatchTableReplacer
 {
     static void Main()
     {
         // Folder containing source PDFs
-        string inputFolder = "InputPdfs";
-        // Folder where updated PDFs will be written
-        string outputFolder = "OutputPdfs";
+        const string inputFolder = @"C:\InputPdfs";
+        // Folder where modified PDFs will be saved
+        const string outputFolder = @"C:\OutputPdfs";
 
-        if (!Directory.Exists(inputFolder))
-        {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
-            return;
-        }
-
+        // Ensure output directory exists
         Directory.CreateDirectory(outputFolder);
 
         // Process each PDF file in the input folder
@@ -27,54 +22,47 @@ class Program
             string fileName = Path.GetFileNameWithoutExtension(inputPath);
             string outputPath = Path.Combine(outputFolder, fileName + "_updated.pdf");
 
-            try
+            // Load the PDF document (using statement ensures proper disposal)
+            using (Document doc = new Document(inputPath))
             {
-                // Load the PDF document (using statement ensures proper disposal)
-                using (Document doc = new Document(inputPath))
+                // Create a TableAbsorber to locate tables in the document
+                TableAbsorber absorber = new TableAbsorber();
+
+                // Extract tables from the entire document
+                absorber.Visit(doc);
+
+                // Copy the TableList to avoid collection modification issues during replacement
+                var tables = absorber.TableList.ToList();
+
+                // Iterate over each absorbed table and replace it with a new table
+                foreach (AbsorbedTable oldTable in tables)
                 {
-                    // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-                    for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+                    // Create a simple replacement table
+                    Table newTable = new Table
                     {
-                        Page page = doc.Pages[pageNum];
+                        // Example: set a light gray background for visibility
+                        BackgroundColor = Aspose.Pdf.Color.LightGray,
+                        // Define column widths (single column in this example)
+                        ColumnWidths = "200"
+                    };
 
-                        // Locate tables on the current page
-                        TableAbsorber absorber = new TableAbsorber();
-                        absorber.Visit(page);
+                    // Add a single row with one cell containing updated text
+                    Row row = new Row();
+                    Cell cell = new Cell();
+                    cell.Paragraphs.Add(new TextFragment("Updated"));
+                    row.Cells.Add(cell);
+                    newTable.Rows.Add(row);
 
-                        // Copy the list because Replace modifies the collection
-                        var tables = absorber.TableList.Cast<AbsorbedTable>().ToList();
-
-                        foreach (AbsorbedTable oldTable in tables)
-                        {
-                            // Create a replacement table (example: two columns, one row)
-                            Table newTable = new Table();
-                            newTable.ColumnWidths = "150 150"; // column widths in points
-
-                            // Set default cell border using the constructor that includes color
-                            newTable.DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Black);
-
-                            // Add a row with placeholder text
-                            Row newRow = newTable.Rows.Add();
-                            Cell cell1 = newRow.Cells.Add();
-                            cell1.Paragraphs.Add(new TextFragment("Updated 1"));
-                            Cell cell2 = newRow.Cells.Add();
-                            cell2.Paragraphs.Add(new TextFragment("Updated 2"));
-
-                            // Replace the original table with the new one
-                            absorber.Replace(page, oldTable, newTable);
-                        }
-                    }
-
-                    // Save the modified document
-                    doc.Save(outputPath);
+                    // Replace the old table on its page with the new table
+                    // PageNum is 1‑based, matching Aspose.Pdf indexing
+                    absorber.Replace(doc.Pages[oldTable.PageNum], oldTable, newTable);
                 }
 
-                Console.WriteLine($"Processed: {inputPath} -> {outputPath}");
+                // Save the modified document to the output folder
+                doc.Save(outputPath);
             }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
-            }
+
+            Console.WriteLine($"Processed '{inputPath}' → '{outputPath}'");
         }
     }
 }

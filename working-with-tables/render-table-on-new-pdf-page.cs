@@ -1,93 +1,61 @@
 using System;
-using System.Runtime.InteropServices;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text;   // for TextFragment used in table cells
 
 class Program
 {
     static void Main()
     {
+        // Input and output paths (adjust as needed)
         const string outputPath = "table_page.pdf";
 
-        // Create a new PDF document and ensure deterministic disposal
+        // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a fresh page (1‑based indexing)
+            // Add a new blank page to the document
             Page page = doc.Pages.Add();
 
-            // Create a table and configure its layout
+            // Create a table instance
             Table table = new Table
             {
-                // Define three column widths (in points)
-                ColumnWidths = "100 150 100",
-                // Apply a thin black border to all cells by default
-                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Black),
-                // Add padding inside each cell
-                DefaultCellPadding = new MarginInfo(5, 5, 5, 5)
+                // Optional: set table position and size
+                // Left and Top define the upper‑left corner of the table on the page
+                Left = 50,
+                Top = 700,
+                // Set a border for visual clarity
+                Border = new BorderInfo(BorderSide.All, 1, Color.Black)
             };
 
-            // ----- Header row -----
-            Row header = table.Rows.Add();
-            Cell h1 = header.Cells.Add("Product");
-            Cell h2 = header.Cells.Add("Quantity");
-            Cell h3 = header.Cells.Add("Price");
+            // Define column widths (optional)
+            // Here we create two columns: 200 and 200 points wide
+            table.ColumnWidths = "200 200";
 
-            // Style header cells (bold white text on gray background)
-            foreach (Cell c in header.Cells)
-            {
-                c.DefaultCellTextState = new TextState
-                {
-                    Font = FontRepository.FindFont("Helvetica-Bold"),
-                    FontSize = 12,
-                    ForegroundColor = Aspose.Pdf.Color.White
-                };
-                c.BackgroundColor = Aspose.Pdf.Color.Gray;
-            }
+            // Add first row (header)
+            Row headerRow = table.Rows.Add();
+            // Header cell 1
+            Cell headerCell1 = headerRow.Cells.Add();
+            headerCell1.BackgroundColor = Color.LightGray;
+            headerCell1.Paragraphs.Add(new TextFragment("Product"));
+            // Header cell 2
+            Cell headerCell2 = headerRow.Cells.Add();
+            headerCell2.BackgroundColor = Color.LightGray;
+            headerCell2.Paragraphs.Add(new TextFragment("Price"));
 
-            // ----- Data rows -----
-            Row data1 = table.Rows.Add();
-            data1.Cells.Add("Widget A");
-            data1.Cells.Add("10");
-            data1.Cells.Add("$25");
+            // Add a second row (data)
+            Row dataRow = table.Rows.Add();
+            Cell dataCell1 = dataRow.Cells.Add();
+            dataCell1.Paragraphs.Add(new TextFragment("Widget A"));
+            Cell dataCell2 = dataRow.Cells.Add();
+            dataCell2.Paragraphs.Add(new TextFragment("$49.99"));
 
-            Row data2 = table.Rows.Add();
-            data2.Cells.Add("Widget B");
-            data2.Cells.Add("5");
-            data2.Cells.Add("$40");
-
-            // Add the table to the page's paragraph collection
+            // Add the table to the page's paragraphs collection
             page.Paragraphs.Add(table);
 
-            // Save the PDF – guard against missing libgdiplus on non‑Windows platforms
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                doc.Save(outputPath);
-                Console.WriteLine($"PDF with table saved to '{outputPath}'.");
-            }
-            else
-            {
-                try
-                {
-                    doc.Save(outputPath);
-                    Console.WriteLine($"PDF with table saved to '{outputPath}'. (Saved on non‑Windows platform – ensure libgdiplus is installed if you encounter runtime issues.)");
-                }
-                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
-                {
-                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. The PDF could not be saved.");
-                }
-            }
+            // Save the document
+            doc.Save(outputPath);
         }
-    }
 
-    // Helper to detect a nested DllNotFoundException (e.g., missing libgdiplus)
-    private static bool ContainsDllNotFound(Exception? ex)
-    {
-        while (ex != null)
-        {
-            if (ex is DllNotFoundException)
-                return true;
-            ex = ex.InnerException;
-        }
-        return false;
+        Console.WriteLine($"PDF with table saved to '{outputPath}'.");
     }
 }

@@ -1,65 +1,77 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class Program
+class RemoveTableColumn
 {
     static void Main()
     {
-        // Create a sample PDF containing a table with three columns
-        using (Document doc = new Document())
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const int columnIndexToRemove = 1; // zero‑based index of the column to delete
+
+        if (!File.Exists(inputPath))
         {
-            Page page = doc.Pages.Add();
-            Table table = new Table();
-            table.ColumnWidths = "100 100 100";
-
-            // Header row
-            Row header = table.Rows.Add();
-            Cell headerCell1 = header.Cells.Add("Header 1");
-            Cell headerCell2 = header.Cells.Add("Header 2");
-            Cell headerCell3 = header.Cells.Add("Header 3");
-
-            // Data rows
-            for (int i = 1; i <= 3; i++)
-            {
-                Row row = table.Rows.Add();
-                row.Cells.Add("R" + i + "C1");
-                row.Cells.Add("R" + i + "C2");
-                row.Cells.Add("R" + i + "C3");
-            }
-
-            page.Paragraphs.Add(table);
-            doc.Save("input.pdf");
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // Reopen the PDF and remove the second column from the table
-        using (Document doc = new Document("input.pdf"))
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            Page page = doc.Pages[1];
-            Table targetTable = null;
-            foreach (BaseParagraph paragraph in page.Paragraphs)
+            // Find tables on the first page
+            TableAbsorber absorber = new TableAbsorber();
+            absorber.Visit(doc.Pages[1]);
+
+            if (absorber.TableList.Count == 0)
             {
-                if (paragraph is Table)
-                {
-                    targetTable = (Table)paragraph;
-                    break;
-                }
+                Console.WriteLine("No tables found on the first page.");
+                doc.Save(outputPath);
+                return;
             }
 
-            if (targetTable != null)
+            // Work with the first detected table
+            var absorbedTable = absorber.TableList[0];
+
+            // Build a new Table without the unwanted column
+            Table newTable = new Table();
+
+            foreach (var absorbedRow in absorbedTable.RowList)
             {
-                // Delete the cell at column index 1 (second column) from each row
-                foreach (Row row in targetTable.Rows)
+                Row newRow = new Row();
+
+                for (int i = 0; i < absorbedRow.CellList.Count; i++)
                 {
-                    Cell cellToRemove = row.Cells[1];
-                    row.Cells.Remove(cellToRemove);
+                    // Skip the column that must be removed
+                    if (i == columnIndexToRemove)
+                        continue;
+
+                    var absorbedCell = absorbedRow.CellList[i];
+                    Cell newCell = new Cell();
+
+                    // Concatenate all text fragments of the original cell
+                    string cellText = string.Empty;
+                    foreach (var fragment in absorbedCell.TextFragments)
+                        cellText += fragment.Text;
+
+                    // Add the text to the new cell as a TextFragment
+                    if (!string.IsNullOrEmpty(cellText))
+                        newCell.Paragraphs.Add(new TextFragment(cellText));
+
+                    newRow.Cells.Add(newCell);
                 }
 
-                // Update column widths for the remaining two columns
-                targetTable.ColumnWidths = "150 150";
+                newTable.Rows.Add(newRow);
             }
 
-            doc.Save("output.pdf");
+            // Replace the original table with the modified one
+            absorber.Replace(doc.Pages[1], absorbedTable, newTable);
+
+            // Save the updated document
+            doc.Save(outputPath);
         }
+
+        Console.WriteLine($"Column {columnIndexToRemove} removed and saved to '{outputPath}'.");
     }
 }

@@ -1,11 +1,10 @@
 using System;
 using System.IO;
 using System.Data;
-using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // TableAbsorber and related types are in this namespace
 
-class Program
+class TableExtractionExample
 {
     static void Main()
     {
@@ -17,31 +16,34 @@ class Program
             return;
         }
 
-        // Open the PDF document inside a using block for deterministic disposal
+        // Load the PDF document (lifecycle rule: use Document constructor inside a using block)
         using (Document doc = new Document(inputPath))
         {
             // Create a TableAbsorber to find tables in the document
             TableAbsorber absorber = new TableAbsorber();
 
-            // Extract tables from the whole document
+            // Extract tables from the whole document (Visit(Document) overload)
             absorber.Visit(doc);
 
             // Iterate over each detected table
-            for (int t = 0; t < absorber.TableList.Count; t++)
+            int tableIndex = 0;
+            foreach (var absorbedTable in absorber.TableList)
             {
-                var absorbedTable = absorber.TableList[t];
-
-                // Determine the maximum number of cells in any row (to define columns)
-                int maxColumns = absorbedTable.RowList
-                    .Max(r => r.CellList.Count);
+                // Determine the maximum number of columns in this table
+                int maxColumns = 0;
+                foreach (var row in absorbedTable.RowList)
+                {
+                    if (row.CellList.Count > maxColumns)
+                        maxColumns = row.CellList.Count;
+                }
 
                 // Create a DataTable to hold the extracted data
-                DataTable dataTable = new DataTable($"Table_{t + 1}");
+                DataTable dataTable = new DataTable($"Table_{tableIndex}");
 
                 // Add columns to the DataTable
-                for (int c = 0; c < maxColumns; c++)
+                for (int col = 0; col < maxColumns; col++)
                 {
-                    dataTable.Columns.Add($"Column{c + 1}", typeof(string));
+                    dataTable.Columns.Add($"Column{col + 1}", typeof(string));
                 }
 
                 // Populate rows
@@ -49,27 +51,30 @@ class Program
                 {
                     DataRow dataRow = dataTable.NewRow();
 
-                    for (int c = 0; c < row.CellList.Count; c++)
+                    int colIndex = 0;
+                    foreach (var cell in row.CellList)
                     {
-                        var cell = row.CellList[c];
-
                         // Concatenate all text fragments inside the cell
-                        string cellText = string.Concat(
-                            cell.TextFragments.Select(tf => tf.Text));
+                        string cellText = string.Empty;
+                        foreach (var fragment in cell.TextFragments)
+                        {
+                            cellText += fragment.Text;
+                        }
 
-                        dataRow[c] = cellText;
+                        dataRow[colIndex] = cellText;
+                        colIndex++;
                     }
 
+                    // Remaining columns (if any) stay null
                     dataTable.Rows.Add(dataRow);
                 }
 
-                // Example output: write table contents to console
-                Console.WriteLine($"--- Extracted Table {t + 1} ---");
-                foreach (DataRow dr in dataTable.Rows)
-                {
-                    Console.WriteLine(string.Join(" | ", dr.ItemArray));
-                }
-                Console.WriteLine();
+                // Example usage: output basic info about the extracted table
+                Console.WriteLine($"Extracted Table {tableIndex}: {dataTable.Rows.Count} rows, {dataTable.Columns.Count} columns.");
+
+                // TODO: further processing of 'dataTable' as needed (e.g., export to CSV, database, etc.)
+
+                tableIndex++;
             }
         }
     }

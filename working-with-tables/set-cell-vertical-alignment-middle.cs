@@ -1,77 +1,68 @@
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
 using Aspose.Pdf;                     // Core PDF API
-using Aspose.Pdf.Text;                // For TextFragment
+using Aspose.Pdf.Text;                // For text fragments (if needed)
 
-class Program
+class SetCellVerticalAlignment
 {
     static void Main()
     {
-        const string outputPath = "vertical_alignment_table.pdf";
-
-        // Create a new PDF document and ensure deterministic disposal
+        // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a blank page (first page, 1‑based indexing)
+            // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Create a table with one column
+            // Create a table with 2 columns and 2 rows
             Table table = new Table
             {
-                ColumnWidths = "200" // width of the single column
+                ColumnWidths = "200 200",   // Define column widths
+                Border = new BorderInfo(BorderSide.All, 1, Color.Black)
             };
-
-            // Add a row to the table
-            Row row = table.Rows.Add();
-
-            // Create a cell and set its vertical alignment to Middle (Center)
-            Cell cell = new Cell();
-            cell.VerticalAlignment = VerticalAlignment.Center; // Middle alignment
-
-            // Add some multi‑line text to demonstrate vertical centering
-            TextFragment tf = new TextFragment("Line 1\nLine 2\nLine 3");
-            tf.TextState.FontSize = 12;
-            tf.TextState.Font = FontRepository.FindFont("Helvetica");
-            cell.Paragraphs.Add(tf);
-
-            // Append the cell to the row
-            row.Cells.Add(cell);
-
-            // Add the table to the page
             page.Paragraphs.Add(table);
 
-            // Save the PDF – guard against missing GDI+ (libgdiplus) on non‑Windows platforms
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                doc.Save(outputPath);
-                Console.WriteLine($"PDF saved to '{outputPath}'.");
-            }
-            else
-            {
-                try
-                {
-                    doc.Save(outputPath);
-                    Console.WriteLine($"PDF saved to '{outputPath}'.");
-                }
-                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
-                {
-                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. " +
-                                      "The PDF was not saved, but the program ran without crashing.");
-                }
-            }
-        }
-    }
+            // ---- First row ----
+            Row row1 = table.Rows.Add();
 
-    // Helper method to detect a nested DllNotFoundException (e.g., missing libgdiplus)
-    private static bool ContainsDllNotFound(Exception? ex)
-    {
-        while (ex != null)
-        {
-            if (ex is DllNotFoundException)
-                return true;
-            ex = ex.InnerException;
+            // First cell: set vertical alignment to Middle (Center)
+            Cell cell11 = new Cell
+            {
+                // Add some text to the cell
+                Paragraphs = { new TextFragment("Top") },
+                // Align content vertically to the middle of the cell
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            row1.Cells.Add(cell11);
+
+            // Second cell: also middle-aligned
+            Cell cell12 = new Cell
+            {
+                Paragraphs = { new TextFragment("Bottom") },
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            row1.Cells.Add(cell12);
+
+            // ---- Second row ----
+            Row row2 = table.Rows.Add();
+
+            Cell cell21 = new Cell
+            {
+                Paragraphs = { new TextFragment("Middle") },
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            row2.Cells.Add(cell21);
+
+            Cell cell22 = new Cell
+            {
+                Paragraphs = { new TextFragment("Middle") },
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            row2.Cells.Add(cell22);
+
+            // Save the PDF to a file
+            const string outputPath = "CellVerticalAlignment_Middle.pdf";
+            doc.Save(outputPath);
+            Console.WriteLine($"PDF saved to '{outputPath}'.");
         }
-        return false;
     }
 }

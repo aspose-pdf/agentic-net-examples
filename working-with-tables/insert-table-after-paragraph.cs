@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -7,77 +6,51 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string searchText = "Insert table after this paragraph";
+        const string marker = "InsertTableHere";
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document and add a page with a marker paragraph.
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            Page page = doc.Pages.Add();
+            // Add a paragraph that contains the marker text.
+            TextFragment markerParagraph = new TextFragment(marker);
+            page.Paragraphs.Add(markerParagraph);
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
-        using (Document doc = new Document(inputPath))
-        {
-            // Assume the paragraph is on the first page; adjust as needed
-            Page page = doc.Pages[1];
-
-            // Locate the paragraph by its text content
-            int paragraphIndex = -1;
-            for (int i = 0; i < page.Paragraphs.Count; i++)
+            // Locate the paragraph index that contains the marker.
+            int paragraphIndex = FindParagraphIndex(page, marker);
+            if (paragraphIndex < 0)
             {
-                // Paragraphs collection holds BaseParagraph objects; we are interested in TextFragment
-                if (page.Paragraphs[i] is TextFragment tf && tf.Text.Contains(searchText))
-                {
-                    paragraphIndex = i;
-                    break;
-                }
-            }
-
-            if (paragraphIndex == -1)
-            {
-                Console.Error.WriteLine("Target paragraph not found.");
+                Console.WriteLine("Marker paragraph not found. No table inserted.");
+                doc.Save(outputPath);
                 return;
             }
 
-            // Create a simple table (you can customize rows/columns as required)
-            Table table = new Table
-            {
-                // Example: set a light gray background and a thin border
-                BackgroundColor = Aspose.Pdf.Color.LightGray,
-                Border = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Black),
-                // ColumnWidths is a string; specify widths separated by commas or spaces
-                ColumnWidths = "200 200"
-            };
+            // Build a simple table with two columns.
+            Table table = new Table();
+            table.ColumnWidths = "100 100"; // two equal columns
+            Row row = table.Rows.Add();
+            row.Cells.Add("Cell 1");
+            row.Cells.Add("Cell 2");
 
-            // Add a header row
-            Row header = table.Rows.Add();
-            Cell headerCell1 = new Cell();
-            headerCell1.Paragraphs.Add(new TextFragment("Header 1"));
-            Cell headerCell2 = new Cell();
-            headerCell2.Paragraphs.Add(new TextFragment("Header 2"));
-            header.Cells.Add(headerCell1);
-            header.Cells.Add(headerCell2);
-            header.DefaultCellTextState = new TextState { FontSize = 12, FontStyle = FontStyles.Bold };
-
-            // Add a data row
-            Row data = table.Rows.Add();
-            Cell dataCell1 = new Cell();
-            dataCell1.Paragraphs.Add(new TextFragment("Cell A1"));
-            Cell dataCell2 = new Cell();
-            dataCell2.Paragraphs.Add(new TextFragment("Cell B1"));
-            data.Cells.Add(dataCell1);
-            data.Cells.Add(dataCell2);
-            data.DefaultCellTextState = new TextState { FontSize = 10 };
-
-            // Insert the table immediately after the located paragraph
+            // Insert the table after the located paragraph.
             page.Paragraphs.Insert(paragraphIndex + 1, table);
 
-            // Save the modified document (lifecycle rule: use Save within the using block)
+            // Save the modified PDF.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Table inserted and document saved to '{outputPath}'.");
+        Console.WriteLine($"Table inserted and saved to '{outputPath}'.");
+    }
+
+    // Returns the zero‑based index of the first paragraph containing the given text, or -1 if not found.
+    static int FindParagraphIndex(Page page, string searchText)
+    {
+        for (int i = 0; i < page.Paragraphs.Count; i++)
+        {
+            if (page.Paragraphs[i] is TextFragment tf && tf.Text.Contains(searchText))
+                return i;
+        }
+        return -1;
     }
 }
