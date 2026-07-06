@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
@@ -17,50 +17,43 @@ class Program
             return;
         }
 
-        // Dictionary to hold email addresses found on each page (page number -> list of emails)
-        var emailsByPage = new Dictionary<int, List<string>>();
+        // Regular expression that matches typical e‑mail addresses
+        Regex emailRegex = new Regex(@"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", RegexOptions.IgnoreCase);
 
-        // Regular expression for email addresses
-        Regex emailPattern = new Regex(@"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", RegexOptions.IgnoreCase);
+        // Dictionary to hold page‑wise matches
+        var results = new Dictionary<int, List<string>>();
 
-        // TextFragmentAbsorber configured to use regular expressions
-        TextFragmentAbsorber absorber = new TextFragmentAbsorber(emailPattern, new TextSearchOptions(true));
-
-        // Load the PDF document (using block ensures proper disposal)
+        // Open the PDF document (using ensures proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            // Pages are 1‑based in Aspose.Pdf
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                Page page = doc.Pages[pageNum];
+                // Create an absorber that searches using the e‑mail regex
+                TextFragmentAbsorber absorber = new TextFragmentAbsorber(emailRegex, new TextSearchOptions(true));
 
-                // Apply the absorber to the current page
-                page.Accept(absorber);
+                // Perform the search on the current page
+                doc.Pages[i].Accept(absorber);
 
-                // Collect matched email addresses from this page
-                var emails = new List<string>();
-                foreach (TextFragment fragment in absorber.TextFragments)
+                // Gather all matched text fragments
+                var pageMatches = new List<string>();
+                foreach (TextFragment tf in absorber.TextFragments)
                 {
-                    // The fragment text is the matched email address
-                    emails.Add(fragment.Text);
+                    pageMatches.Add(tf.Text);
                 }
 
-                // Store results if any were found
-                if (emails.Count > 0)
+                if (pageMatches.Count > 0)
                 {
-                    emailsByPage[pageNum] = emails;
+                    results[i] = pageMatches;
                 }
-
-                // Reset absorber for the next page
-                absorber.Reset();
             }
         }
 
-        // Output the collected email addresses
-        foreach (var kvp in emailsByPage)
+        // Display the collected e‑mail addresses
+        foreach (var kvp in results)
         {
             Console.WriteLine($"Page {kvp.Key}:");
-            foreach (string email in kvp.Value)
+            foreach (var email in kvp.Value)
             {
                 Console.WriteLine($"  {email}");
             }

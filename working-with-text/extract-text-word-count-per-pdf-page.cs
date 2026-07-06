@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using System.Text;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -9,7 +9,7 @@ class Program
     static void Main()
     {
         const string inputPdfPath = "input.pdf";
-        const string outputCsvPath = "statistics.csv";
+        const string outputCsvPath = "page_word_counts.csv";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -17,39 +17,34 @@ class Program
             return;
         }
 
-        // Load PDF document (using rule: document-disposal-with-using)
+        // Open the PDF document inside a using block for deterministic disposal
         using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Prepare CSV writer
-            using (StreamWriter csvWriter = new StreamWriter(outputCsvPath, false, Encoding.UTF8))
+            // Prepare to write CSV output
+            using (StreamWriter csvWriter = new StreamWriter(outputCsvPath, false))
             {
-                // CSV header
+                // Write CSV header
                 csvWriter.WriteLine("PageNumber,WordCount");
 
-                // Iterate pages (1‑based indexing per rule)
+                // Iterate pages (1‑based indexing)
                 for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
                 {
-                    Page page = pdfDoc.Pages[pageIndex];
-
-                    // Extract text from the current page (rule: use TextAbsorber)
+                    // Extract text from the current page
                     TextAbsorber absorber = new TextAbsorber();
-                    page.Accept(absorber);
+                    pdfDoc.Pages[pageIndex].Accept(absorber);
                     string pageText = absorber.Text ?? string.Empty;
 
-                    // Simple word count: split on any whitespace
-                    int wordCount = 0;
-                    if (!string.IsNullOrWhiteSpace(pageText))
-                    {
-                        string[] words = pageText.Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
-                        wordCount = words.Length;
-                    }
+                    // Count words – split on any whitespace characters
+                    int wordCount = pageText
+                        .Split((char[])null, StringSplitOptions.RemoveEmptyEntries)
+                        .Length;
 
-                    // Write statistics for this page
+                    // Write statistics to CSV
                     csvWriter.WriteLine($"{pageIndex},{wordCount}");
                 }
             }
         }
 
-        Console.WriteLine($"Word count statistics saved to '{outputCsvPath}'.");
+        Console.WriteLine($"Word count per page saved to '{outputCsvPath}'.");
     }
 }

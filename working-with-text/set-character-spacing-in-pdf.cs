@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.InteropServices;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -9,58 +8,30 @@ class Program
     {
         const string outputPath = "output.pdf";
 
-        // Create a new PDF document inside a using block for proper disposal
+        // Create a new PDF document and ensure proper disposal
         using (Document doc = new Document())
         {
-            // Add a blank page (pages are 1‑based)
+            // Add a blank page to the document
             Page page = doc.Pages.Add();
 
-            // Create a TextFragment with the text to display and set its position
-            TextFragment fragment = new TextFragment("Aspose.Pdf Character Spacing Example")
-            {
-                Position = new Position(100, 700)
-            };
+            // Create a text fragment with the desired content
+            TextFragment fragment = new TextFragment("Hello Aspose PDF!");
 
-            // Configure the TextState (CharacterSpacing controls inter‑character gaps)
-            fragment.TextState.CharacterSpacing = 2.0f; // increase spacing by 2 points between characters
+            // Set character spacing on the TextState before adding the fragment
+            fragment.TextState.CharacterSpacing = 2.0f; // increase spacing between characters
+
+            // Optional styling (font, size, color)
             fragment.TextState.Font = FontRepository.FindFont("Helvetica");
             fragment.TextState.FontSize = 24;
             fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
 
-            // Add the fragment to the page's paragraphs collection
+            // Add the configured text fragment to the page
             page.Paragraphs.Add(fragment);
 
-            // Guard Document.Save on non‑Windows platforms where libgdiplus may be missing
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                doc.Save(outputPath);
-                Console.WriteLine($"PDF saved to '{outputPath}'.");
-            }
-            else
-            {
-                try
-                {
-                    doc.Save(outputPath);
-                    Console.WriteLine($"PDF saved to '{outputPath}'. (saved on non‑Windows platform)");
-                }
-                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
-                {
-                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. " +
-                                      "The PDF was not saved, but the code executed correctly.");
-                }
-            }
+            // Save the PDF document
+            doc.Save(outputPath);
         }
-    }
 
-    // Helper method to walk nested exceptions and detect a missing native GDI+ library
-    private static bool ContainsDllNotFound(Exception? ex)
-    {
-        while (ex != null)
-        {
-            if (ex is DllNotFoundException)
-                return true;
-            ex = ex.InnerException;
-        }
-        return false;
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

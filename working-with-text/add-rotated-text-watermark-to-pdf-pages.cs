@@ -7,9 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "watermarked.pdf";
-        const string watermarkText = "CONFIDENTIAL";
 
         if (!File.Exists(inputPath))
         {
@@ -17,33 +16,29 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Iterate over all pages (1‑based indexing)
+            foreach (Page page in doc.Pages)
             {
-                Page page = doc.Pages[i];
+                // Create a text fragment that will serve as the watermark
+                TextFragment watermark = new TextFragment("CONFIDENTIAL");
+                // Position the text (coordinates are in points)
+                watermark.Position = new Position(200, 400);
+                // Set visual appearance
+                watermark.TextState.Font = FontRepository.FindFont("Helvetica");
+                watermark.TextState.FontSize = 72;
+                watermark.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
+                // Rotate the text (e.g., 45 degrees)
+                watermark.TextState.Rotation = 45;
 
-                // Create a TextFragment that will serve as the watermark
-                TextFragment tf = new TextFragment(watermarkText);
-
-                // Position the fragment at the centre of the page
-                tf.Position = new Position(page.PageInfo.Width / 2, page.PageInfo.Height / 2);
-
-                // Configure visual appearance
-                tf.TextState.FontSize = 72;
-                tf.TextState.Font = FontRepository.FindFont("Helvetica");
-                // Use a semi‑transparent gray color (alpha 80 out of 255)
-                tf.TextState.ForegroundColor = Color.FromArgb(80, 128, 128, 128);
-                tf.TextState.Rotation = 45; // rotate 45 degrees
-
-                // Append the fragment to the current page using TextBuilder
+                // Append the text fragment to the current page using TextBuilder
                 TextBuilder builder = new TextBuilder(page);
-                builder.AppendText(tf);
+                builder.AppendText(watermark);
             }
 
-            // Save the modified PDF
+            // Save the modified document as PDF
             doc.Save(outputPath);
         }
 

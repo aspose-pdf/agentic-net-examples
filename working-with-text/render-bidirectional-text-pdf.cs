@@ -1,6 +1,4 @@
 using System;
-using System.IO;
-using System.Runtime.InteropServices;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -10,74 +8,42 @@ class Program
     {
         const string outputPath = "bidi_output.pdf";
 
-        // Create a new PDF document
+        // Create a new PDF document and ensure deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a blank page
+            // Add a single page to the document
             Page page = doc.Pages.Add();
 
-            // Create a TextFragment with mixed LTR and RTL Unicode characters
-            // Arabic word "مرحبا" (Hello) followed by English "World"
-            // Use Unicode directional marks (RLE ... PDF) to force RTL rendering
-            string bidiText = "\u202Bمرحبا World\u202C";
+            // Construct a Unicode string that mixes right‑to‑left (Arabic) and left‑to‑right (English) text.
+            // The Unicode control characters U+202B (RLE) and U+202C (PDF) enforce right‑to‑left embedding.
+            string bidiText = "\u202B" +               // Right‑to‑left embedding start
+                              "مرحبا بالعالم " +      // Arabic phrase: “Hello World”
+                              "\u202C" +               // Pop directional formatting (end embedding)
+                              "Hello World";           // English phrase
 
+            // Create a TextFragment containing the bidirectional text
             TextFragment fragment = new TextFragment(bidiText);
 
-            // Position the fragment (X = 50, Y = 700). The Position property is mutable.
-            fragment.Position = new Position(50, 700);
+            // Position the fragment on the page (coordinates are from the bottom‑left corner)
+            fragment.Position = new Aspose.Pdf.Text.Position(100, 700);
 
-            // Configure the TextState for bidirectional rendering and styling.
-            // In recent Aspose.Pdf versions the Bidi flag is exposed as IsBidirectional.
-            // If the property does not exist, the Unicode directional marks are sufficient.
-            fragment.TextState.Font = FontRepository.FindFont("Arial"); // Font that supports Arabic glyphs
-            fragment.TextState.FontSize = 24;
-            fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-            // Enable explicit bidi processing when the API provides the property.
-            // This line is safe – it will be ignored if the property is not present.
-            try
-            {
-                // Reflection is used to avoid compile‑time errors on versions where the property is absent.
-                var prop = typeof(TextState).GetProperty("IsBidirectional");
-                if (prop != null && prop.CanWrite)
-                {
-                    prop.SetValue(fragment.TextState, true);
-                }
-            }
-            catch { /* ignore any reflection issues */ }
+            // Configure the visual appearance via TextState
+            TextState ts = fragment.TextState;
+            ts.Font = FontRepository.FindFont("Arial");   // Use a font that supports Arabic glyphs
+            ts.FontSize = 20;
+            ts.ForegroundColor = Aspose.Pdf.Color.Black;
 
-            // Add the fragment to the page
+            // If the TextState class in the used version exposes a Direction property,
+            // it can be set to enforce right‑to‑left rendering:
+            // ts.Direction = Aspose.Pdf.Direction.R2L;
+
+            // Add the fragment to the page's paragraph collection
             page.Paragraphs.Add(fragment);
 
-            // Save the document – guard against missing GDI+ on non‑Windows platforms
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                doc.Save(outputPath);
-                Console.WriteLine($"PDF saved to '{outputPath}'.");
-            }
-            else
-            {
-                try
-                {
-                    doc.Save(outputPath);
-                    Console.WriteLine($"PDF saved to '{outputPath}'.");
-                }
-                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
-                {
-                    Console.WriteLine("GDI+ (libgdiplus) is not available on this platform. PDF was not saved.");
-                }
-            }
+            // Save the resulting PDF
+            doc.Save(outputPath);
         }
-    }
 
-    // Helper to detect missing native GDI+ library
-    static bool ContainsDllNotFound(Exception ex)
-    {
-        while (ex != null)
-        {
-            if (ex is DllNotFoundException)
-                return true;
-            ex = ex.InnerException;
-        }
-        return false;
+        Console.WriteLine($"Bidirectional PDF saved to '{outputPath}'.");
     }
 }
