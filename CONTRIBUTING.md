@@ -34,7 +34,7 @@ mkdir -p /tmp/aspose-validate
 cd /tmp/aspose-validate
 dotnet new console --framework net10.0
 cp /path/to/your-example.cs Program.cs
-dotnet add package Aspose.PDF --version 26.5.0
+dotnet add package Aspose.PDF --version 26.6.0
 dotnet build --nologo /p:WarningLevel=0
 dotnet run --no-build || true   # runtime failure on missing input is OK
 ```

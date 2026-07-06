@@ -1,0 +1,187 @@
+{
+  "name": "Aspose.PDF for .NET Examples Agent",
+  "description": "AI agent that generates, compiles, and validates C# code examples for Aspose.PDF for .NET 26.6.0. 2,684 build-verified examples across 34 categories.",
+  "version": "26.6.0",
+  "url": "https://github.com/aspose-pdf/agentic-net-examples.git",
+  "api_base_url": "http://172.20.1.175:7050",
+  "mcp_endpoint": "http://172.20.1.175:7050/mcp/generate",
+  "openapi_url": "http://172.20.1.175:7050/openapi.json",
+  "docs_url": "http://172.20.1.175:7050/docs",
+  "capabilities": [
+    "Generate verified C# code examples for Aspose.PDF for .NET",
+    "Browse build-validated examples organised by category (text, tables, forms, security, ...)",
+    "Look up category-specific anti-patterns and API surface via per-category AGENTS.md",
+    "Programmatically enumerate examples via index.json (root + per category)"
+  ],
+  "tools": [
+    {
+      "name": "agent_generate",
+      "description": "Generate + validate-revise-retry C# example via /mcp/agent/generate (server-side retry loop, max_attempts up to 3)"
+    },
+    {
+      "name": "agent_run",
+      "description": "Older agent runner via /mcp/agent/run -- kept for compatibility with clients that haven't migrated to agent/generate"
+    },
+    {
+      "name": "generate",
+      "description": "Single-shot generation via /mcp/generate (no server-side retry) -- the bare endpoint"
+    },
+    {
+      "name": "retrieve",
+      "description": "Retrieve relevant Aspose.PDF API knowledge-base chunks via /mcp/retrieve (embedding + keyword hybrid)"
+    }
+  ],
+  "categories": [
+    {
+      "name": "Accessibility and tagged PDFs",
+      "examples": 45
+    },
+    {
+      "name": "Basic operations",
+      "examples": 57
+    },
+    {
+      "name": "Compare PDF",
+      "examples": 28
+    },
+    {
+      "name": "Conversion",
+      "examples": 102
+    },
+    {
+      "name": "Document",
+      "examples": 122
+    },
+    {
+      "name": "Facades AcroForms",
+      "examples": 41
+    },
+    {
+      "name": "Facades annotations",
+      "examples": 107
+    },
+    {
+      "name": "Facades bookmarks",
+      "examples": 35
+    },
+    {
+      "name": "Facades convert documents",
+      "examples": 40
+    },
+    {
+      "name": "Facades documents",
+      "examples": 101
+    },
+    {
+      "name": "Facades edit document",
+      "examples": 213
+    },
+    {
+      "name": "Facades extract images and text",
+      "examples": 84
+    },
+    {
+      "name": "Facades fill forms",
+      "examples": 35
+    },
+    {
+      "name": "Facades forms",
+      "examples": 88
+    },
+    {
+      "name": "Facades metadata",
+      "examples": 40
+    },
+    {
+      "name": "Facades pages",
+      "examples": 117
+    },
+    {
+      "name": "Facades secure documents",
+      "examples": 39
+    },
+    {
+      "name": "Facades sign documents",
+      "examples": 35
+    },
+    {
+      "name": "Facades stamps",
+      "examples": 47
+    },
+    {
+      "name": "Facades texts and images",
+      "examples": 29
+    },
+    {
+      "name": "Facades XMP metadata",
+      "examples": 45
+    },
+    {
+      "name": "Graphs ZUGFeRD operators",
+      "examples": 89
+    },
+    {
+      "name": "Pages",
+      "examples": 99
+    },
+    {
+      "name": "Parse PDF",
+      "examples": 64
+    },
+    {
+      "name": "Securing and signing PDF",
+      "examples": 84
+    },
+    {
+      "name": "Stamping",
+      "examples": 50
+    },
+    {
+      "name": "Working with annotations",
+      "examples": 162
+    },
+    {
+      "name": "Working with attachments",
+      "examples": 49
+    },
+    {
+      "name": "Working with forms",
+      "examples": 239
+    },
+    {
+      "name": "Working with graphs",
+      "examples": 79
+    },
+    {
+      "name": "Working with images",
+      "examples": 72
+    },
+    {
+      "name": "Working with tables",
+      "examples": 98
+    },
+    {
+      "name": "Working with text",
+      "examples": 76
+    },
+    {
+      "name": "Working with XML",
+      "examples": 73
+    }
+  ],
+  "product": {
+    "name": "Aspose.PDF for .NET",
+    "nuget_package": "Aspose.PDF",
+    "nuget_version": "26.6.0",
+    "target_framework": "net10.0"
+  },
+  "links": {
+    "github": "https://github.com/aspose-pdf/agentic-net-examples.git",
+    "index": "https://github.com/aspose-pdf/agentic-net-examples.git/blob/main/index.json",
+    "llm_txt": "https://github.com/aspose-pdf/agentic-net-examples.git/blob/main/llm.txt",
+    "agents_md": "https://github.com/aspose-pdf/agentic-net-examples.git/blob/main/AGENTS.md",
+    "documentation": "https://docs.aspose.com/pdf/net/",
+    "api_reference": "https://reference.aspose.com/pdf/net/",
+    "metrics": "https://metrics.aspose.com/agents/sections/examples"
+  }
+}
