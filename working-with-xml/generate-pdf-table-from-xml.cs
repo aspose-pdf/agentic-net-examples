@@ -4,83 +4,59 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class XmlReportToPdf
+class ReportGenerator
 {
     static void Main()
     {
-        // Paths for the input XML data and the output PDF report
-        const string xmlPath   = "report_data.xml";
-        const string pdfPath   = "report.pdf";
+        // Paths for the source XML data and the output PDF report
+        const string xmlPath = "reportData.xml";
+        const string pdfPath = "report.pdf";
 
-        // Verify that the XML file exists
         if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"Error: XML file not found at '{xmlPath}'.");
+            Console.Error.WriteLine($"XML data file not found: {xmlPath}");
             return;
         }
 
-        // Load the XML into a DataSet. The XML is expected to contain a single table.
-        DataSet dataSet = new DataSet();
-        try
+        // Load the XML file using XmlLoadOptions (required for Aspose.Pdf)
+        XmlLoadOptions xmlLoadOptions = new XmlLoadOptions();
+        using (Document doc = new Document(xmlPath, xmlLoadOptions))
         {
+            // Parse the same XML into a DataSet to obtain a DataTable
+            // (DataSet.ReadXml can read the XML structure into relational tables)
+            DataSet dataSet = new DataSet();
             dataSet.ReadXml(xmlPath);
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error reading XML: {ex.Message}");
-            return;
-        }
-
-        // Ensure that at least one DataTable was loaded
-        if (dataSet.Tables.Count == 0)
-        {
-            Console.Error.WriteLine("Error: No tables found in the XML file.");
-            return;
-        }
-
-        // Use the first DataTable as the source for the PDF table
-        DataTable sourceTable = dataSet.Tables[0];
-
-        // Create a new PDF document inside a using block for deterministic disposal
-        using (Document pdfDocument = new Document())
-        {
-            // Add a blank page to the document
-            Page page = pdfDocument.Pages.Add();
-
-            // Create a Table object (inherits from BaseParagraph)
-            Table pdfTable = new Table
+            if (dataSet.Tables.Count == 0)
             {
-                // Optional visual settings
-                Border = new BorderInfo(BorderSide.All, 0.5f),
-                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f),
-                DefaultCellPadding = new MarginInfo(5, 5, 5, 5),
-                // Align the table to the left margin of the page
-                HorizontalAlignment = HorizontalAlignment.Left,
-                // Position the table on the page (coordinates are in points)
-                // Top-left corner of the table
-                // Adjust as needed for your layout
-                // Here we start 50 points from the left and 750 points from the bottom
-                // (Aspose.Pdf uses bottom-left origin)
-                // The Table will automatically expand vertically based on content
-                // No need to set Width explicitly unless a fixed width is required
-                // Example: ColumnWidths = "100 150 200"
+                Console.Error.WriteLine("No tables found in the XML data.");
+                return;
+            }
+
+            DataTable dataTable = dataSet.Tables[0]; // Use the first table
+
+            // Create a new page for the report
+            Page page = doc.Pages.Add();
+
+            // Create a Table object and set basic appearance
+            Aspose.Pdf.Table table = new Aspose.Pdf.Table
+            {
+                // Adjust columns to fit the content automatically
+                ColumnAdjustment = ColumnAdjustment.AutoFitToContent,
+                // Optional: set a border for visual clarity
+                Border = new BorderInfo(BorderSide.All, 1, Aspose.Pdf.Color.Black)
             };
 
-            // Import the DataTable into the PDF table.
-            // Parameters:
-            //   sourceTable          – the DataTable to import
-            //   true                 – import column names as the first row
-            //   0                    – zero‑based index of the first row in the target table
-            //   0                    – zero‑based index of the first column in the target table
-            pdfTable.ImportDataTable(sourceTable, true, 0, 0);
+            // Import the DataTable into the Aspose.Pdf.Table
+            // The first row will contain column names, start at row 0, column 0.
+            table.ImportDataTable(dataTable, true, 0, 0);
 
-            // Add the populated table to the page's paragraph collection
-            page.Paragraphs.Add(pdfTable);
+            // Add the table to the page's paragraphs collection
+            page.Paragraphs.Add(table);
 
-            // Save the PDF document to the specified file path
-            pdfDocument.Save(pdfPath);
+            // Save the resulting PDF document
+            doc.Save(pdfPath);
         }
 
-        Console.WriteLine($"PDF report generated successfully at '{pdfPath}'.");
+        Console.WriteLine($"Report generated successfully: {pdfPath}");
     }
 }

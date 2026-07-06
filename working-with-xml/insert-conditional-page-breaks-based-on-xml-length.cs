@@ -1,15 +1,15 @@
 using System;
 using System.IO;
-using System.Xml.Linq;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string xmlPath = "input.xml";
-        const string outputPdf = "output.pdf";
-        const int lengthThreshold = 5000; // characters per page before inserting a break
+        const string xmlPath      = "input.xml";
+        const string outputPdf    = "output.pdf";
+        const int   maxCharsPerPage = 1000; // threshold for page break
 
         if (!File.Exists(xmlPath))
         {
@@ -17,34 +17,38 @@ class Program
             return;
         }
 
-        // Load the XML content into a PDF document using XmlLoadOptions
-        XmlLoadOptions xmlLoad = new XmlLoadOptions();
-        using (Document pdfDoc = new Document(xmlPath, xmlLoad))
+        // Load XML into a PDF document using XmlLoadOptions (load rule)
+        using (Document doc = new Document(xmlPath, new XmlLoadOptions()))
         {
-            // Parse the XML to evaluate content length
-            XDocument xdoc = XDocument.Load(xmlPath);
-            int accumulatedLength = 0;
-
-            // Iterate over top‑level elements (adjust as needed for your XML structure)
-            foreach (var element in xdoc.Root.Elements())
+            // Iterate over pages (1‑based indexing)
+            // Use a while loop because inserting pages changes the page count
+            int pageIndex = 1;
+            while (pageIndex <= doc.Pages.Count)
             {
-                // Accumulate the length of the element's textual content
-                accumulatedLength += element.Value?.Length ?? 0;
+                // Extract text from the current page
+                TextAbsorber absorber = new TextAbsorber();
+                doc.Pages[pageIndex].Accept(absorber);
+                string pageText = absorber.Text ?? string.Empty;
 
-                // When the threshold is exceeded, insert a new empty page
-                if (accumulatedLength > lengthThreshold)
+                // If the text length exceeds the threshold, insert a blank page before the next page
+                if (pageText.Length > maxCharsPerPage)
                 {
-                    // Insert after the current last page (Pages are 1‑based)
-                    pdfDoc.Pages.Insert(pdfDoc.Pages.Count + 1);
-                    // Reset the counter for the next segment
-                    accumulatedLength = 0;
+                    // Insert an empty page after the current page
+                    // Insert method inserts at the specified position; we add after current page
+                    doc.Pages.Insert(pageIndex + 1);
+                    // Skip the newly inserted blank page
+                    pageIndex += 2;
+                }
+                else
+                {
+                    pageIndex++;
                 }
             }
 
-            // Save the resulting PDF with the inserted page breaks
-            pdfDoc.Save(outputPdf);
+            // Save the modified PDF (save rule)
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF with conditional page breaks saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF saved to '{outputPdf}'.");
     }
 }
