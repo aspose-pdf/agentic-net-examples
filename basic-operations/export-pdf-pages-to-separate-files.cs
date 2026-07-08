@@ -6,40 +6,40 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";               // source PDF
-        const string outputDir = "SplitPages";               // folder for individual pages
+        const string inputPath = "input.pdf";
+        const string outputDir = "Pages";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Load the source document inside a using block for deterministic disposal
-        using (Document sourceDoc = new Document(inputPdf))
+        // Load the source PDF document
+        using (Document srcDoc = new Document(inputPath))
         {
-            // Iterate using 1‑based page indexing (Aspose.Pdf uses 1‑based indexes)
-            for (int i = 1; i <= sourceDoc.Pages.Count; i++)
+            int pageCount = srcDoc.Pages.Count; // 1‑based page count
+
+            // Iterate over each page (1‑based indexing)
+            for (int i = 1; i <= pageCount; i++)
             {
-                // Create a new empty document for the current page
+                // Create a new empty PDF document for the current page
                 using (Document singlePageDoc = new Document())
                 {
-                    // Add the i‑th page from the source document
-                    singlePageDoc.Pages.Add(sourceDoc.Pages[i]);
+                    // Add the current page to the new document
+                    singlePageDoc.Pages.Add(srcDoc.Pages[i]);
 
-                    // Build the output file name (e.g., Page_1.pdf)
+                    // Build the output file name for this page
                     string outPath = Path.Combine(outputDir, $"Page_{i}.pdf");
 
-                    // Save the single‑page document as PDF
+                    // Save the single‑page PDF (PDF format does not require SaveOptions)
                     singlePageDoc.Save(outPath);
                     Console.WriteLine($"Saved page {i} → {outPath}");
                 }
             }
         }
-
-        Console.WriteLine("All pages have been exported as separate PDF files.");
     }
 }

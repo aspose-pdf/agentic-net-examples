@@ -19,22 +19,14 @@ class Program
         // Load the existing PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Bind a FormEditor to the document for form manipulation
+            // Initialize FormEditor with the loaded document
             using (FormEditor formEditor = new FormEditor(doc))
             {
                 // Add a push button named "ResetForm" on page 1
-                // Coordinates are supplied as floats (left, bottom, right, top)
-                formEditor.AddField(
-                    FieldType.PushButton,
-                    "ResetForm",
-                    1,
-                    100f,
-                    500f,
-                    200f,
-                    540f);
+                // Adjust the rectangle coordinates as needed
+                formEditor.AddField(FieldType.PushButton, "ResetForm", 1, 100, 100, 200, 130);
 
-                // Attach JavaScript that clears all form fields when the button is clicked
-                // The PDF JavaScript method resetForm() resets the entire form
+                // Attach JavaScript to clear all form fields when the button is clicked
                 formEditor.AddFieldScript("ResetForm", "this.resetForm();");
 
                 // Save the modified PDF

@@ -8,42 +8,50 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string tempPath = "temp_reordered.pdf";
+        const string intermediatePath = "intermediate.pdf";
         const string outputPath = "reordered.pdf";
 
+        // Ensure the source file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {inputPath}");
             return;
         }
 
-        // Get total number of pages (1‑based indexing)
-        int pageCount;
-        using (Document doc = new Document(inputPath))
+        // Determine the original page count (1‑based indexing)
+        int originalPageCount;
+        using (Document srcDoc = new Document(inputPath))
         {
-            pageCount = doc.Pages.Count;
+            originalPageCount = srcDoc.Pages.Count;
         }
 
-        // Insert the last page at the beginning of the document
+        // -----------------------------------------------------------------
+        // Step 1: Insert the last page (originalPageCount) at the beginning
+        // -----------------------------------------------------------------
         PdfFileEditor editor = new PdfFileEditor();
-        bool insertOk = editor.Insert(inputPath, 0, inputPath, pageCount, pageCount, tempPath);
-        if (!insertOk)
-        {
-            Console.Error.WriteLine("Failed to insert the last page at the beginning.");
-            return;
-        }
+        // InsertLocation = 1 means the new page will become the first page.
+        // The port file is the same as the source file; we copy only the last page.
+        editor.Insert(
+            inputPath,                // inputFile
+            1,                        // insertLocation (before page 1)
+            inputPath,                // portFile (source of pages to insert)
+            originalPageCount,        // startPage (last page)
+            originalPageCount,        // endPage   (last page)
+            intermediatePath);        // outputFile (temporary result)
 
-        // After insertion the original last page is now at position pageCount + 1
-        bool deleteOk = editor.Delete(tempPath, new int[] { pageCount + 1 }, outputPath);
-        if (!deleteOk)
-        {
-            Console.Error.WriteLine("Failed to delete the original last page.");
-            return;
-        }
+        // -----------------------------------------------------------------
+        // Step 2: Delete the original last page, which is now the last page
+        //         of the intermediate document (position originalPageCount + 1)
+        // -----------------------------------------------------------------
+        int pageToDelete = originalPageCount + 1; // the duplicated last page at the end
+        editor.Delete(
+            intermediatePath,                 // inputFile
+            new int[] { pageToDelete },       // pages to delete
+            outputPath);                      // final output file
 
-        // Remove the temporary file
-        try { File.Delete(tempPath); } catch { }
+        // Optional cleanup of the intermediate file
+        try { File.Delete(intermediatePath); } catch { /* ignore */ }
 
-        Console.WriteLine($"Reordered PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Pages reordered: last page moved to the beginning. Output saved to '{outputPath}'.");
     }
 }

@@ -16,19 +16,19 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Generate a new UUID to replace the placeholder text
+        string uuid = Guid.NewGuid().ToString();
+
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Initialize the content editor facade
+            // Create a PdfContentEditor facade and bind it to the loaded document
             using (PdfContentEditor editor = new PdfContentEditor())
             {
-                // Bind the document to the editor
                 editor.BindPdf(doc);
 
-                // Generate a new UUID
-                string uuid = Guid.NewGuid().ToString();
-
-                // Replace the exact text "InvoiceNumber" on page 6 with the UUID
+                // Replace the exact case‑sensitive string "InvoiceNumber" on page 6
+                // Page numbers are 1‑based in Aspose.Pdf, so page 6 is specified as 6
                 editor.ReplaceText("InvoiceNumber", 6, uuid);
             }
 
@@ -36,6 +36,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Replacement complete. Saved to '{outputPath}'.");
+        Console.WriteLine($"Replaced 'InvoiceNumber' with UUID on page 6 and saved to '{outputPath}'.");
     }
 }

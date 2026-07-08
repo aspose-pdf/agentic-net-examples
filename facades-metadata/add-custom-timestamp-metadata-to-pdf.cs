@@ -11,26 +11,29 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF using the PdfFileInfo facade
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
+        // Use PdfFileInfo facade to work with PDF metadata
+        using (PdfFileInfo pdfInfo = new PdfFileInfo())
         {
-            // Set a custom metadata field "LastUpdated" with the current UTC timestamp
-            string utcNow = DateTime.UtcNow.ToString("o"); // ISO 8601 format
+            // Bind the existing PDF document
+            pdfInfo.BindPdf(inputPath);
+
+            // Set a custom metadata field "LastUpdated" with the current UTC timestamp (ISO 8601 format)
+            string utcNow = DateTime.UtcNow.ToString("o");
             pdfInfo.SetMetaInfo("LastUpdated", utcNow);
 
             // Save the updated PDF to a new file
             bool saved = pdfInfo.SaveNewInfo(outputPath);
             if (!saved)
             {
-                Console.Error.WriteLine("Failed to save the updated PDF.");
+                Console.Error.WriteLine("Failed to save updated PDF.");
                 return;
             }
         }
 
-        Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with updated metadata to '{outputPath}'.");
     }
 }

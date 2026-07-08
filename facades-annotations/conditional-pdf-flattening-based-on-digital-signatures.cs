@@ -8,41 +8,46 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "flattened_output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Use PdfFileSignature facade to detect existing digital signatures
-            using (PdfFileSignature sigFacade = new PdfFileSignature())
+            // Load the PDF document (lifecycle rule: using block for disposal)
+            using (Document doc = new Document(inputPath))
             {
-                sigFacade.BindPdf(inputPath);
+                // Initialize PdfFileSignature facade to inspect digital signatures
+                PdfFileSignature signatureChecker = new PdfFileSignature();
+                signatureChecker.BindPdf(inputPath);
 
-                bool hasSignature = sigFacade.ContainsSignature();
+                // Check if the PDF contains any digital signatures
+                bool hasSignature = signatureChecker.ContainsSignature();
 
                 if (hasSignature)
                 {
-                    // PDF contains a digital signature – skip flattening to preserve validity
-                    Console.WriteLine("Document contains digital signatures; flattening skipped.");
+                    Console.WriteLine("Document contains digital signatures; flattening is skipped to preserve signature validity.");
                 }
                 else
                 {
-                    // No signatures – safe to flatten form fields and annotations
-                    doc.Flatten();
+                    // No signatures present – safe to flatten form fields
+                    doc.Flatten(); // removes all form fields and replaces them with their appearances
                     Console.WriteLine("Document flattened successfully.");
                 }
+
+                // Save the (potentially flattened) document (save rule: direct Save for PDF)
+                doc.Save(outputPath);
             }
 
-            // Save the (possibly flattened) document
-            doc.Save(outputPath);
+            Console.WriteLine($"Output saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Processing completed. Output saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

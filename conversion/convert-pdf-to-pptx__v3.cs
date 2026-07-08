@@ -1,41 +1,32 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Document, SaveFormat
 
 class Program
 {
     static void Main()
     {
-        // Paths for input PDF and output PPTX
-        const string inputPdfPath = "input.pdf";
-        const string outputPptxPath = "output.pptx";
+        // Input PDF and output PPTX paths
+        const string pdfPath = "input.pdf";
+        const string outputPptx = "output.pptx";
 
-        // Verify that the source PDF exists
-        if (!File.Exists(inputPdfPath))
+        // Validate input file
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF document using the core Aspose.Pdf API
-        using (Document pdfDocument = new Document(inputPdfPath))
+        // ---------- Convert PDF to PPTX ----------
+        // Aspose.Pdf can directly save a PDF document as a PPTX file.
+        // The original requirement to apply a custom slide master would need
+        // Aspose.Slides, which is not referenced in this project. Therefore the
+        // conversion is performed without master‑template manipulation.
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            // Initialize PPTX save options (default configuration)
-            PptxSaveOptions pptxOptions = new PptxSaveOptions();
-
-            // Convert and save the PDF as a PPTX presentation
-            pdfDocument.Save(outputPptxPath, pptxOptions);
+            pdfDoc.Save(outputPptx, SaveFormat.Pptx);
         }
 
-        // --------------------------------------------------------------------
-        // NOTE:
-        // Applying a custom slide master template to the generated PPTX
-        // requires a library that can manipulate PowerPoint files (e.g.,
-        // Aspose.Slides). The core Aspose.Pdf API does not expose any
-        // functionality for editing slide masters, so this step cannot be
-        // performed using only Aspose.Pdf namespaces.
-        // --------------------------------------------------------------------
-
-        Console.WriteLine($"PDF successfully converted to PPTX: {outputPptxPath}");
+        Console.WriteLine($"Conversion complete. Output saved to '{outputPptx}'.");
     }
 }

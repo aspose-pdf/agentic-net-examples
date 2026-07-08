@@ -7,46 +7,48 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPdf = "input.pdf";
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "SvgPages";
 
-        // Page number to extract vector graphics from (1‑based indexing)
-        const int pageNumber = 1;
-
-        // Directory where extracted SVG files will be saved
-        const string outputDir = "ExtractedSvgs";
-
-        // Validate input file existence
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
         // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document (core API only)
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Verify the requested page exists
-            if (pageNumber < 1 || pageNumber > doc.Pages.Count)
+            // Iterate through all pages (1‑based indexing)
+            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
             {
-                Console.Error.WriteLine($"Page {pageNumber} is out of range. Document has {doc.Pages.Count} pages.");
-                return;
+                Page page = pdfDoc.Pages[pageNum];
+
+                // Build the SVG file name for this page
+                string svgPath = Path.Combine(outputFolder, $"page_{pageNum}.svg");
+
+                // Try to save vector graphics preserving the original coordinate system.
+                // This method returns false if the page contains no vector path operators.
+                bool saved = page.TrySaveVectorGraphics(svgPath);
+
+                if (saved)
+                {
+                    Console.WriteLine($"Page {pageNum} vector graphics saved to: {svgPath}");
+                }
+                else
+                {
+                    // If no vector graphics are present, optionally extract using SvgExtractor.
+                    // This demonstrates the alternative approach with explicit options.
+                    var extractor = new SvgExtractor();
+                    extractor.Extract(page, svgPath);
+                    Console.WriteLine($"Page {pageNum} has no direct vector paths; full page SVG saved to: {svgPath}");
+                }
             }
-
-            // Get the target page (Aspose.Pdf uses 1‑based page indexing)
-            Page page = doc.Pages[pageNumber];
-
-            // Create an SvgExtractor instance (default options)
-            SvgExtractor extractor = new SvgExtractor();
-
-            // Extract all vector graphics on the page to separate SVG files in the output directory
-            // This method creates one SVG file per vector graphic element.
-            extractor.Extract(page, outputDir);
         }
 
-        Console.WriteLine($"Vector graphics from page {pageNumber} have been extracted to '{outputDir}'.");
+        Console.WriteLine("Vector graphics extraction completed.");
     }
 }

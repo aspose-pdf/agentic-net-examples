@@ -15,23 +15,22 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (wrapped in using for deterministic disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Use a memory stream to capture the JSON output
+            // MemoryStream will receive the JSON output
             using (MemoryStream jsonStream = new MemoryStream())
             {
-                // Export all form fields to JSON and write to the stream
+                // Export all form fields to JSON; writes directly into the stream
                 doc.Form.ExportToJson(jsonStream);
 
                 // Reset stream position before reading
                 jsonStream.Position = 0;
 
-                // Convert the JSON bytes to a string
+                // Convert the UTF‑8 bytes in the stream to a string
                 string json = new StreamReader(jsonStream, Encoding.UTF8).ReadToEnd();
 
-                // Output the JSON string
-                Console.WriteLine("Exported Form Data (JSON):");
+                // The JSON string now contains all extracted form data
                 Console.WriteLine(json);
             }
         }

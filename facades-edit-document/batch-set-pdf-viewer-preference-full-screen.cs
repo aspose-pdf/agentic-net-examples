@@ -6,38 +6,38 @@ class Program
 {
     static void Main()
     {
-        // Directory containing PDF files
-        const string inputDirectory = @"C:\PdfFiles";
+        // Directory containing source PDF files
+        const string inputDirectory = "input_pdfs";
+        // Directory where modified PDFs will be saved
+        const string outputDirectory = "output_pdfs";
 
         if (!Directory.Exists(inputDirectory))
         {
-            Console.Error.WriteLine($"Directory not found: {inputDirectory}");
+            Console.Error.WriteLine($"Input directory not found: {inputDirectory}");
             return;
         }
 
-        // Process each PDF file in the directory
-        foreach (string pdfPath in Directory.GetFiles(inputDirectory, "*.pdf"))
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDirectory);
+
+        // Process each PDF file in the input directory
+        foreach (string sourcePath in Directory.GetFiles(inputDirectory, "*.pdf"))
         {
-            try
+            string fileName = Path.GetFileName(sourcePath);
+            string destinationPath = Path.Combine(outputDirectory, fileName);
+
+            // Use PdfContentEditor to modify viewer preferences
+            using (PdfContentEditor editor = new PdfContentEditor())
             {
-                // Initialize the facade for editing PDF viewer preferences
-                PdfContentEditor editor = new PdfContentEditor();
-
-                // Bind the existing PDF file
-                editor.BindPdf(pdfPath);
-
+                // Load the PDF file
+                editor.BindPdf(sourcePath);
                 // Set the viewer preference to full‑screen mode
                 editor.ChangeViewerPreference(ViewerPreference.PageModeFullScreen);
-
-                // Save changes (overwrites the original file)
-                editor.Save(pdfPath);
-
-                Console.WriteLine($"Updated viewer preference for: {Path.GetFileName(pdfPath)}");
+                // Save the modified PDF
+                editor.Save(destinationPath);
             }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
-            }
+
+            Console.WriteLine($"Processed: {fileName}");
         }
     }
 }

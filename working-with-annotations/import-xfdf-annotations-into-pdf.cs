@@ -7,39 +7,42 @@ class Program
 {
     static void Main()
     {
-        // Paths to the source PDF and the output PDF
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "output_with_annotations.pdf";
+        // Paths
+        const string pdfPath   = "input.pdf";
+        const string outPath   = "output.pdf";
 
         // XFDF data as a string (replace with actual XFDF content)
         string xfdfString = @"<?xml version=""1.0"" encoding=""UTF-8""?>
-<xfdf xmlns=""http://ns.adobe.com/xfdf/"">
+<xfdf xmlns=""http://ns.adobe.com/xfdf/"" xml:space=""preserve"">
   <annots>
-    <text page=""1"" rect=""100,500,200,550"" title=""Note"" contents=""Sample annotation""/>
+    <!-- Example annotation -->
+    <highlight page=""1"" color=""255,255,0"">
+      <rect>100 500 200 520</rect>
+    </highlight>
   </annots>
 </xfdf>";
 
-        // Ensure the input PDF exists
-        if (!File.Exists(inputPdfPath))
+        // Ensure the source PDF exists
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF document, import annotations from the XFDF string, and save the result
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF document (lifecycle rule: using block)
+        using (Document doc = new Document(pdfPath))
         {
             // Convert the XFDF string to a UTF‑8 memory stream
             using (MemoryStream xfdfStream = new MemoryStream(Encoding.UTF8.GetBytes(xfdfString)))
             {
                 // Import annotations from the XFDF stream into the document
-                pdfDoc.ImportAnnotationsFromXfdf(xfdfStream);
+                doc.ImportAnnotationsFromXfdf(xfdfStream);
             }
 
-            // Save the modified PDF
-            pdfDoc.Save(outputPdfPath);
+            // Save the modified PDF (lifecycle rule: using block)
+            doc.Save(outPath);
         }
 
-        Console.WriteLine($"Annotations imported and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Annotations imported and saved to '{outPath}'.");
     }
 }

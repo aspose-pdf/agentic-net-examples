@@ -1,7 +1,9 @@
 using System;
 using System.IO;
+using System.Drawing;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades; // for FormattedText, EncodingType, Stamp
 
 class Program
 {
@@ -12,38 +14,57 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        Document doc = new Document(inputPath);
-
-        // Prepare the text stamp (rotated 30°) that will be applied to odd‑numbered pages
-        TextStamp oddPageStamp = new TextStamp("Rotated Stamp");
-        oddPageStamp.TextState.Font = FontRepository.FindFont("Helvetica");
-        oddPageStamp.TextState.FontSize = 24;
-        oddPageStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black; // fully‑qualified Aspose color
-        oddPageStamp.RotateAngle = 30f;                     // 30° rotation (correct property)
-        oddPageStamp.HorizontalAlignment = HorizontalAlignment.Left;   // left margin
-        oddPageStamp.VerticalAlignment = VerticalAlignment.Center;    // roughly middle of page height
-        oddPageStamp.XIndent = 10f;                     // distance from left edge
-        oddPageStamp.YIndent = 0f;                      // no vertical offset (adjust if needed)
-        oddPageStamp.Background = false;               // foreground stamp (correct property)
-        oddPageStamp.Opacity = 1.0f;
-
-        // Apply the stamp to every odd‑numbered page (1‑based indexing)
-        for (int i = 1; i <= doc.Pages.Count; i++)
+        // Determine total number of pages
+        int pageCount;
+        using (Document doc = new Document(inputPath))
         {
-            if (i % 2 == 1) // odd page
-            {
-                doc.Pages[i].AddStamp(oddPageStamp);
-            }
+            pageCount = doc.Pages.Count;
         }
 
-        // Save the modified PDF
-        doc.Save(outputPath);
+        // Build an array containing all odd‑numbered pages (1‑based indexing)
+        int oddCount = (pageCount + 1) / 2;
+        int[] oddPages = new int[oddCount];
+        int idx = 0;
+        for (int i = 1; i <= pageCount; i += 2)
+        {
+            oddPages[idx++] = i;
+        }
 
-        Console.WriteLine($"Rotated stamp applied to odd pages. Output saved to '{outputPath}'.");
+        // Initialize the PdfFileStamp facade and bind the source PDF
+        PdfFileStamp fileStamp = new PdfFileStamp();
+        fileStamp.BindPdf(inputPath);
+
+        // Create a formatted text object (use System.Drawing.Color and fully‑qualified FormattedText)
+        Aspose.Pdf.Facades.FormattedText ft = new Aspose.Pdf.Facades.FormattedText(
+            "Sample Aspose.Pdf.Facades.Stamp",   // text
+            System.Drawing.Color.Black,            // text color
+            "Helvetica",                         // font name
+            Aspose.Pdf.Facades.EncodingType.Winansi,
+            false,                                 // embed font flag
+            12f);                                  // font size (float)
+
+        // Bind the formatted text to a stamp
+        Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
+        stamp.BindLogo(ft);
+
+        // Rotate the stamp by 30 degrees
+        stamp.Rotation = 30f;
+
+        // Position the stamp near the left margin (X = 10). Y = 0 places it at the bottom; adjust as needed.
+        stamp.SetOrigin(10f, 0f);
+
+        // Apply the stamp only to odd‑numbered pages
+        stamp.Pages = oddPages;
+
+        // Add the stamp to the document and save the result
+        fileStamp.AddStamp(stamp);
+        fileStamp.Save(outputPath);
+        fileStamp.Close();
+
+        Console.WriteLine($"Rotated text stamp applied to odd pages. Output saved to '{outputPath}'.");
     }
 }

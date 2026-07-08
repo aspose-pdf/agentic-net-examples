@@ -1,29 +1,29 @@
 using System;
 using System.IO;
 using Aspose.Pdf.Facades;
+using System.Drawing.Imaging; // ImageFormat for JPEG
 
-class Program
+class PdfToJpegPreview
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputFolder = "PreviewImages";
+        const string inputPdfPath  = "input.pdf";          // source PDF
+        const string outputFolder  = "PreviewImages";     // folder for JPEGs
 
-        // Verify input file exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
         // Ensure output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Use PdfConverter (Facade) inside a using block for deterministic disposal
-        using (PdfConverter converter = new PdfConverter())
+        // Use PdfConverter (Facade) to convert pages to JPEG
+        using (Aspose.Pdf.Facades.PdfConverter converter = new Aspose.Pdf.Facades.PdfConverter())
         {
-            // Bind the source PDF
-            converter.BindPdf(inputPdf);
+            // Bind the PDF file
+            converter.BindPdf(inputPdfPath);
 
             // Set the page range for preview (pages 1 to 3)
             converter.StartPage = 1;   // minimal value is 1
@@ -32,20 +32,19 @@ class Program
             // Prepare the converter
             converter.DoConvert();
 
-            int pageNumber = 1;
-            // Iterate through generated images
+            int imageIndex = 1;
             while (converter.HasNextImage())
             {
-                // Build output file name (JPEG is the default format)
-                string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.jpg");
+                // Build output file name: e.g., PreviewImages/page1.jpg
+                string outputPath = Path.Combine(outputFolder, $"page{imageIndex}.jpg");
 
-                // Save the current page as a JPEG image
-                converter.GetNextImage(outputPath);
+                // Save the next image as JPEG (default format is JPEG)
+                converter.GetNextImage(outputPath, ImageFormat.Jpeg);
 
-                pageNumber++;
+                imageIndex++;
             }
         }
 
-        Console.WriteLine("PDF preview images (pages 1‑3) have been saved as JPEG files.");
+        Console.WriteLine("Preview JPEG images have been created.");
     }
 }

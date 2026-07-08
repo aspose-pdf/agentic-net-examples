@@ -6,36 +6,39 @@ class Program
 {
     static void Main()
     {
-        const string encryptedPdfPath = "encrypted.pdf";   // input encrypted PDF
-        const string userPassword     = "user123";        // password to open the PDF
-        const string outputPdfPath    = "decrypted.pdf";  // path for the unprotected PDF
+        const string encryptedPath = "encrypted.pdf";
+        const string decryptedPath = "decrypted.pdf";
+        const string userPassword   = "user123";
 
-        if (!File.Exists(encryptedPdfPath))
+        // Verify the encrypted file exists
+        if (!File.Exists(encryptedPath))
         {
-            Console.Error.WriteLine($"File not found: {encryptedPdfPath}");
+            Console.Error.WriteLine($"File not found: {encryptedPath}");
             return;
         }
 
         try
         {
-            // Open the encrypted document using the user password
-            using (Document doc = new Document(encryptedPdfPath, userPassword))
+            // Open the encrypted PDF with the user password
+            using (Document doc = new Document(encryptedPath, userPassword))
             {
-                // Decrypt the document (removes encryption)
+                // Decrypt the document (no parameters required)
                 doc.Decrypt();
 
                 // Save the unprotected version
-                doc.Save(outputPdfPath);
+                doc.Save(decryptedPath);
             }
 
-            Console.WriteLine($"Decrypted PDF saved to '{outputPdfPath}'.");
+            Console.WriteLine($"Decrypted PDF saved to '{decryptedPath}'.");
         }
-        catch (InvalidPasswordException)
+        catch (InvalidPasswordException ex)
         {
-            Console.Error.WriteLine("Invalid password provided.");
+            // Thrown when the supplied password is incorrect
+            Console.Error.WriteLine($"Invalid password: {ex.Message}");
         }
         catch (Exception ex)
         {
+            // General error handling
             Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }

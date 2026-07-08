@@ -6,35 +6,30 @@ class Program
 {
     static void Main()
     {
-        // Input PDF (already filled or to be filled)
-        const string inputPath  = "input.pdf";
-        // Desired output path – original layout will be kept
-        const string outputPath = "output_filled.pdf";
+        // Paths for the source PDF (already filled or to be filled) and the destination PDF
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "filled_output.pdf";
 
-        if (!File.Exists(inputPath))
+        // Ensure the source file exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {inputPdfPath}");
             return;
         }
 
-        // Initialize the Form facade and bind the PDF
-        Form form = new Form();
-        form.BindPdf(inputPath);
-
-        // OPTIONAL: fill form fields (example – fill every field with a placeholder value)
-        foreach (string fieldName in form.FieldNames)
+        // Use the Form facade to work with AcroForm fields.
+        // The Form constructor binds the PDF document internally.
+        using (Form pdfForm = new Form(inputPdfPath))
         {
-            // Adjust as needed; here we simply set a generic text
-            form.FillField(fieldName, "Sample value");
+            // Example of filling a text field; replace with actual field names as needed.
+            // pdfForm.FillField("FullName", "John Doe");
+            // pdfForm.FillField("Date", DateTime.Today.ToShortDateString());
+
+            // Save the PDF using the facade's Save method.
+            // This preserves the original layout and all existing content.
+            pdfForm.Save(outputPdfPath);
         }
 
-        // Save the PDF using the facade's Save method.
-        // This writes the document to the specified path while preserving the original layout.
-        form.Save(outputPath);
-
-        // Release resources held by the facade
-        form.Close();
-
-        Console.WriteLine($"PDF saved to '{outputPath}' with original layout preserved.");
+        Console.WriteLine($"PDF saved to '{outputPdfPath}'.");
     }
 }

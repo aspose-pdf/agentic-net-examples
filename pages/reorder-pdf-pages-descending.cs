@@ -11,35 +11,31 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load source PDF
-        using (Document srcDoc = new Document(inputPath))
+        // Load the source PDF
+        using (Document sourceDoc = new Document(inputPath))
         {
-            // Create a new empty PDF document
-            using (Document destDoc = new Document())
+            // Create a new empty PDF document to hold pages in descending order
+            using (Document targetDoc = new Document())
             {
-                // Remove the automatically created blank page
-                if (destDoc.Pages.Count > 0)
-                    destDoc.Pages.Delete(1);
-
-                // Add pages from source in descending order
-                for (int i = srcDoc.Pages.Count; i >= 1; i--)
+                // Pages are 1‑based; iterate from last to first
+                for (int i = sourceDoc.Pages.Count; i >= 1; i--)
                 {
-                    // Insert the page at the end of the destination collection
-                    destDoc.Pages.Add(srcDoc.Pages[i]);
+                    // Add a copy of each page to the target document
+                    targetDoc.Pages.Add(sourceDoc.Pages[i]);
                 }
 
-                // Optional: reorganize the page tree for better performance
-                destDoc.PageNodesToBalancedTree();
+                // Optional: balance the page tree for better performance
+                targetDoc.PageNodesToBalancedTree();
 
                 // Save the reordered PDF
-                destDoc.Save(outputPath);
+                targetDoc.Save(outputPath);
             }
         }
 
-        Console.WriteLine($"Pages reordered descending and saved to '{outputPath}'.");
+        Console.WriteLine($"Reordered PDF saved to '{outputPath}'.");
     }
 }

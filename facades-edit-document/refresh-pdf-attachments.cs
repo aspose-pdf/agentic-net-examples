@@ -1,60 +1,60 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF that may contain attachments
-        const string inputPdf  = "input.pdf";
-        // Output PDF after clearing and adding new attachments
-        const string outputPdf = "output.pdf";
+        const string inputPdfPath  = "input.pdf";          // Existing PDF
+        const string outputPdfPath = "output_with_attachments.pdf";
 
-        // Files to be attached to the PDF (path and description)
-        var newAttachments = new (string Path, string Description)[]
+        // Verify the source PDF exists
+        if (!File.Exists(inputPdfPath))
         {
-            ("file1.docx", "First document attachment"),
-            ("image1.png",  "Sample image attachment"),
-            ("data.csv",    "CSV data attachment")
-        };
-
-        // Validate input PDF existence
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Validate each attachment file existence before processing
-        foreach (var (path, _) in newAttachments)
+        // Define the new attachment files (ensure they exist)
+        string[] attachmentFiles = new string[]
         {
-            if (!File.Exists(path))
+            "attachment1.pdf",
+            "attachment2.docx",
+            "attachment3.png"
+        };
+
+        // Verify each attachment file exists before proceeding
+        foreach (string attPath in attachmentFiles)
+        {
+            if (!File.Exists(attPath))
             {
-                Console.Error.WriteLine($"Attachment file not found: {path}");
+                Console.Error.WriteLine($"Attachment file not found: {attPath}");
                 return;
             }
         }
 
-        // Use PdfContentEditor (a facade) to manipulate attachments
+        // Use PdfContentEditor facade to manipulate attachments
         using (PdfContentEditor editor = new PdfContentEditor())
         {
             // Bind the existing PDF document
-            editor.BindPdf(inputPdf);
+            editor.BindPdf(inputPdfPath);
 
             // Remove all existing attachments
             editor.DeleteAttachments();
 
             // Add the fresh set of attachments
-            foreach (var (path, description) in newAttachments)
+            foreach (string attPath in attachmentFiles)
             {
-                editor.AddDocumentAttachment(path, description);
+                string description = Path.GetFileNameWithoutExtension(attPath);
+                editor.AddDocumentAttachment(attPath, description);
             }
 
             // Save the modified PDF
-            editor.Save(outputPdf);
+            editor.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Attachments refreshed. Output saved to '{outputPdf}'.");
+        Console.WriteLine($"Attachments refreshed. Output saved to '{outputPdfPath}'.");
     }
 }

@@ -6,78 +6,57 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";          // source PDF
-        const string outputRoot = "Attachments";      // root folder for extracted files
+        const string inputPath = "input.pdf";
+        const string outputRoot = "Attachments";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Ensure the root output directory exists
+        // Ensure the root folder for extracted attachments exists
         Directory.CreateDirectory(outputRoot);
 
         try
         {
-            // Load the PDF document (lifecycle rule: use using for deterministic disposal)
-            using (Document doc = new Document(inputPdf))
+            // Load the PDF document (wrapped in using for deterministic disposal)
+            using (Document doc = new Document(inputPath))
             {
-                // In recent Aspose.Pdf versions attachments are exposed via the EmbeddedFiles collection
-                if (doc.EmbeddedFiles == null || doc.EmbeddedFiles.Count == 0)
-                {
-                    Console.WriteLine("No attachments found in the PDF.");
-                    return;
-                }
-
                 int index = 1;
-                // Iterate over each embedded file (attachment) in the document using reflection –
-                // this avoids a direct compile‑time dependency on the EmbeddedFile type which may
-                // reside in a version‑specific namespace.
-                foreach (var embedded in doc.EmbeddedFiles)
-                {
-                    // ----- Resolve attachment name -----
-                    var nameProp = embedded.GetType().GetProperty("Name");
-                    string attachmentName = nameProp?.GetValue(embedded) as string;
-                    if (string.IsNullOrWhiteSpace(attachmentName))
-                        attachmentName = $"Attachment_{index}";
 
-                    // Create a subfolder for this attachment (one folder per attachment)
-                    string baseName = Path.GetFileNameWithoutExtension(attachmentName);
-                    if (string.IsNullOrWhiteSpace(baseName))
-                        baseName = $"Attachment_{index}";
-                    string subFolder = Path.Combine(outputRoot, baseName);
+                // Iterate over each embedded file in the PDF
+                foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
+                {
+                    if (fileSpec == null || fileSpec.Contents == null)
+                        continue; // skip invalid entries
+
+                    // Create a unique subfolder for this attachment
+                    string safeName = SanitizeFileName(fileSpec.Name);
+                    string subFolder = Path.Combine(outputRoot, $"Attachment_{index}_{safeName}");
                     Directory.CreateDirectory(subFolder);
 
-                    // ----- Resolve attachment data -----
-                    string outPath = Path.Combine(subFolder, attachmentName);
-                    // Prefer a Data stream if the property exists
-                    var dataProp = embedded.GetType().GetProperty("Data");
-                    var dataStream = dataProp?.GetValue(embedded) as Stream;
-                    if (dataStream != null)
+                    // Determine the file name to write (fallback if name is missing)
+                    string fileName = string.IsNullOrEmpty(fileSpec.Name)
+                        ? $"attachment_{index}"
+                        : fileSpec.Name;
+
+                    string filePath = Path.Combine(subFolder, fileName);
+
+                    // Write the embedded file's binary content to disk
+                    using (Stream content = fileSpec.Contents)
                     {
-                        using (FileStream fs = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+                        // Ensure the stream is at the beginning
+                        if (content.CanSeek)
+                            content.Position = 0;
+
+                        using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
                         {
-                            dataStream.CopyTo(fs);
-                        }
-                    }
-                    else
-                    {
-                        // Fallback – some versions expose a Save(string) method
-                        var saveMethod = embedded.GetType().GetMethod("Save", new[] { typeof(string) });
-                        if (saveMethod != null)
-                        {
-                            saveMethod.Invoke(embedded, new object[] { outPath });
-                        }
-                        else
-                        {
-                            Console.Error.WriteLine($"Unable to extract attachment: {attachmentName}");
-                            index++;
-                            continue;
+                            content.CopyTo(fs);
                         }
                     }
 
-                    Console.WriteLine($"Extracted: {attachmentName} -> {outPath}");
+                    Console.WriteLine($"Extracted '{fileName}' to '{subFolder}'");
                     index++;
                 }
             }
@@ -86,5 +65,17 @@ class Program
         {
             Console.Error.WriteLine($"Error: {ex.Message}");
         }
+    }
+
+    // Removes characters that are invalid in file or folder names
+    static string SanitizeFileName(string name)
+    {
+        if (string.IsNullOrEmpty(name))
+            return string.Empty;
+
+        foreach (char c in Path.GetInvalidFileNameChars())
+            name = name.Replace(c, '_');
+
+        return name;
     }
 }

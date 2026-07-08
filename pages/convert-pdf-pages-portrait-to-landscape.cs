@@ -7,15 +7,15 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_landscape.pdf";
+        const string outputPath = "landscape_output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (using the required lifecycle rule)
         using (Document doc = new Document(inputPath))
         {
             // Iterate through all pages (1‑based indexing)
@@ -23,7 +23,7 @@ class Program
             {
                 Page page = doc.Pages[i];
 
-                // Calculate current width and height from MediaBox
+                // Calculate current width and height from the MediaBox
                 double width  = page.MediaBox.URX - page.MediaBox.LLX;
                 double height = page.MediaBox.URY - page.MediaBox.LLY;
 
@@ -31,7 +31,7 @@ class Program
                 page.SetPageSize(height, width);
             }
 
-            // Save the modified document as PDF
+            // Save the modified document (using the required lifecycle rule)
             doc.Save(outputPath);
         }
 

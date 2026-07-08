@@ -18,28 +18,25 @@ class Program
             return;
         }
 
-        // Create a privilege object that allows printing and editing (modify contents)
+        // Combine privileges: allow printing and editing (modify contents)
         DocumentPrivilege privilege = DocumentPrivilege.ForbidAll;
-        privilege.AllowPrint          = true;   // enable printing
-        privilege.AllowModifyContents = true;   // enable editing of page contents
+        privilege.AllowPrint          = true; // enable printing
+        privilege.AllowModifyContents = true; // enable editing of content
 
-        // Encrypt the PDF using RC4 with a 128‑bit key
-        using (PdfFileSecurity security = new PdfFileSecurity(inputPath, outputPath))
-        {
-            bool success = security.EncryptFile(
-                userPassword,
-                ownerPassword,
-                privilege,
-                KeySize.x128,      // 128‑bit key size
-                Algorithm.RC4);    // RC4 algorithm
+        // Initialize the facade with source and destination files
+        PdfFileSecurity fileSecurity = new PdfFileSecurity(inputPath, outputPath);
 
-            if (!success)
-            {
-                Console.Error.WriteLine("Encryption failed.");
-                return;
-            }
-        }
+        // Encrypt using RC4 with a 128‑bit key
+        bool encrypted = fileSecurity.EncryptFile(
+            userPassword,
+            ownerPassword,
+            privilege,
+            KeySize.x128,
+            Algorithm.RC4);
 
-        Console.WriteLine($"PDF encrypted successfully: {outputPath}");
+        if (encrypted)
+            Console.WriteLine($"Encryption succeeded. Output saved to '{outputPath}'.");
+        else
+            Console.Error.WriteLine("Encryption failed.");
     }
 }

@@ -1,82 +1,87 @@
 using System;
 using System.IO;
 using System.Net.Http;
-using System.Threading;
+using System.Threading.Tasks;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
-    static void Main()
+    // Entry point – async to allow awaiting network calls
+    static async Task Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output.pdf";
-        const string attachmentUrl = "https://example.com/file.pdf";
-        const int maxRetryAttempts = 3;
-        const int retryDelayMilliseconds = 2000;
+        const string inputPdfPath   = "input.pdf";          // source PDF
+        const string outputPdfPath  = "output.pdf";         // result PDF
+        const string attachmentUrl  = "https://example.com/file.bin"; // network file
+        const string attachmentName = "file.bin";           // name stored in PDF
+        const string description    = "Network attachment"; // optional description
 
+        // Verify source PDF exists
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Use PdfContentEditor facade to modify the PDF
-        using (PdfContentEditor editor = new PdfContentEditor())
+        // Obtain the network stream with retry logic
+        using (Stream attachmentStream = await GetStreamWithRetryAsync(
+                   attachmentUrl, maxRetries: 3, delayMs: 2000))
         {
-            // Load the source PDF
-            editor.BindPdf(inputPdfPath);
-
-            Stream attachmentStream = null;
-
-            // Retry logic for downloading the attachment stream
-            for (int attempt = 1; attempt <= maxRetryAttempts; attempt++)
+            if (attachmentStream == null)
             {
-                try
-                {
-                    using (HttpClient client = new HttpClient())
-                    {
-                        // Set a per‑request timeout (e.g., 10 seconds)
-                        client.Timeout = TimeSpan.FromSeconds(10);
-                        // Synchronously get the stream (blocking call)
-                        attachmentStream = client.GetStreamAsync(attachmentUrl).GetAwaiter().GetResult();
-                    }
-
-                    // Successfully obtained the stream; exit the retry loop
-                    break;
-                }
-                catch (Exception ex) when (ex is TaskCanceledException || ex is HttpRequestException)
-                {
-                    // Handle timeout or network errors
-                    Console.Error.WriteLine($"Attempt {attempt} failed: {ex.Message}");
-                    if (attempt == maxRetryAttempts)
-                    {
-                        Console.Error.WriteLine("All retry attempts exhausted. Attachment will not be added.");
-                        attachmentStream = null;
-                    }
-                    else
-                    {
-                        // Wait before the next retry
-                        Thread.Sleep(retryDelayMilliseconds);
-                    }
-                }
+                Console.Error.WriteLine("Failed to download attachment after retries.");
+                return;
             }
 
-            if (attachmentStream != null)
+            // Load the PDF and add the attachment using Aspose.Pdf.Facades
+            using (Document pdfDoc = new Document(inputPdfPath)) // lifecycle rule: using
             {
-                // Ensure the stream is at the beginning
-                if (attachmentStream.CanSeek)
-                    attachmentStream.Position = 0;
+                PdfContentEditor editor = new PdfContentEditor();
+                editor.BindPdf(pdfDoc); // bind the in‑memory document
 
-                // Add the attachment without a visible annotation
-                editor.AddDocumentAttachment(attachmentStream, "attachment.pdf", "Network attachment");
+                // Add the attachment (no visual annotation) from the stream
+                editor.AddDocumentAttachment(attachmentStream, attachmentName, description);
 
-                // Save the modified PDF
+                // Save the modified PDF (lifecycle rule: using, then Save)
                 editor.Save(outputPdfPath);
-                Console.WriteLine($"Attachment added and PDF saved to '{outputPdfPath}'.");
-
-                // Clean up the attachment stream
-                attachmentStream.Dispose();
             }
+
+            Console.WriteLine($"Attachment added and saved to '{outputPdfPath}'.");
         }
+    }
+
+    // Helper: download a stream with simple retry on timeout
+    static async Task<Stream> GetStreamWithRetryAsync(string url, int maxRetries, int delayMs)
+    {
+        using HttpClient httpClient = new HttpClient();
+
+        for (int attempt = 1; attempt <= maxRetries; attempt++)
+        {
+            try
+            {
+                // Per‑request timeout (10 seconds)
+                httpClient.Timeout = TimeSpan.FromSeconds(10);
+                // HttpClient returns a stream that the caller must dispose
+                return await httpClient.GetStreamAsync(url);
+            }
+            catch (TaskCanceledException ex) when (!ex.CancellationToken.IsCancellationRequested)
+            {
+                // Timeout occurred
+                Console.Error.WriteLine($"Attempt {attempt}: request timed out.");
+            }
+            catch (Exception ex)
+            {
+                // Non‑timeout error – abort retries
+                Console.Error.WriteLine($"Attempt {attempt}: {ex.Message}");
+                break;
+            }
+
+            // Wait before next retry (if any attempts remain)
+            if (attempt < maxRetries)
+                await Task.Delay(delayMs);
+        }
+
+        // All attempts failed
+        return null;
     }
 }

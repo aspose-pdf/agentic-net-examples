@@ -6,33 +6,37 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf  = "input.pdf";   // PDF containing the "Email" field
+        const string outputPdf = "output.pdf";  // PDF with validation script added
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Open the PDF for form editing; output will be written to outputPath
-        using (FormEditor formEditor = new FormEditor(inputPath, outputPath))
+        // Initialize FormEditor with input and output files
+        using (FormEditor formEditor = new FormEditor(inputPdf, outputPdf))
         {
             // JavaScript that validates the field value against a simple e‑mail regex.
-            // If the value does not match, an alert is shown and the field change is rejected.
+            // It runs when the field loses focus (on blur) and shows an alert if the value is invalid.
             string emailValidationScript = @"
-if (!/^[\w\.-]+@[\w\.-]+\.[A-Za-z]{2,}$/.test(event.value)) {
-    app.alert('Invalid email address');
-    event.rc = false;
-}";
+                var email = this.getField('Email').value;
+                var pattern = /^[\w\.-]+@([\w-]+\.)+[\w-]{2,4}$/;
+                if (!pattern.test(email)) {
+                    app.alert('Please enter a valid e‑mail address.');
+                    this.getField('Email').setFocus();
+                }
+            ";
 
-            // Attach the validation script to the existing field named "Email"
-            formEditor.SetFieldScript("Email", emailValidationScript);
+            // Attach the script to the "Email" field.
+            // The script will be executed on the field's "Validate" event.
+            formEditor.AddFieldScript("Email", emailValidationScript);
 
-            // Persist the changes to the output PDF
+            // Save the modified PDF.
             formEditor.Save();
         }
 
-        Console.WriteLine($"Email field validation added and saved to '{outputPath}'.");
+        Console.WriteLine($"Email field validation script added. Output saved to '{outputPdf}'.");
     }
 }

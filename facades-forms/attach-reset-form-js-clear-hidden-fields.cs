@@ -6,44 +6,42 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string resetButtonName = "ResetBtn"; // name of the push‑button field
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF into the FormEditor facade
+        // Load the PDF and bind the FormEditor facade
         using (FormEditor formEditor = new FormEditor())
         {
-            formEditor.BindPdf(inputPdf);
+            formEditor.BindPdf(inputPath);
 
-            // JavaScript that resets the whole form and then clears hidden fields.
-            // Replace "Hidden1" and "Hidden2" with the actual hidden field names.
+            // JavaScript that resets the form and clears hidden fields
             string js = @"
-                // Reset all form fields
+                // Reset all fields to their default values
                 this.resetForm();
 
-                // List of hidden fields to clear
-                var hiddenFields = ['Hidden1', 'Hidden2'];
-
-                // Iterate and clear each hidden field
-                for (var i = 0; i < hiddenFields.length; i++) {
-                    var f = this.getField(hiddenFields[i]);
-                    if (f) { f.value = ''; }
+                // Clear values of hidden fields
+                var fieldNames = this.getFieldNames();
+                for (var i = 0; i < fieldNames.length; i++) {
+                    var f = this.getField(fieldNames[i]);
+                    if (f.display == display.hidden) {
+                        f.value = '';
+                    }
                 }
             ";
 
-            // Attach the script to the specified push‑button field
-            formEditor.SetFieldScript(resetButtonName, js);
+            // Attach the script to the button named "ResetForm"
+            formEditor.AddFieldScript("ResetForm", js);
 
-            // Save the modified PDF
-            formEditor.Save(outputPdf);
+            // Save the updated PDF
+            formEditor.Save(outputPath);
         }
 
-        Console.WriteLine($"JavaScript attached and PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"JavaScript attached and saved to '{outputPath}'.");
     }
 }

@@ -7,10 +7,10 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "renamed_fields.pdf";
-        const string oldFieldName = "CustomerID";
-        const string newFieldName = "Cust_ID";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "renamed.pdf";
+        const string oldFieldName = "oldField";
+        const string newFieldName = "newField";
 
         if (!File.Exists(inputPath))
         {
@@ -18,43 +18,38 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            Form form = doc.Form;
-
-            // Verify that the field to be renamed exists
-            if (!form.HasField(oldFieldName))
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
             {
-                Console.Error.WriteLine($"Field '{oldFieldName}' not found.");
-                return;
+                // Verify that the field exists
+                if (!doc.Form.HasField(oldFieldName))
+                {
+                    Console.WriteLine($"Field '{oldFieldName}' not found.");
+                }
+                else
+                {
+                    // Retrieve the field (WidgetAnnotation) and cast to Field
+                    var field = doc.Form[oldFieldName] as Field;
+                    if (field != null)
+                    {
+                        // Rename the field
+                        field.Name = newFieldName;            // Annotation name
+                        field.PartialName = newFieldName;     // Partial name (optional)
+                        field.MappingName = newFieldName;     // Mapping name for export (optional)
+                    }
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Retrieve the existing field (cast from WidgetAnnotation to Field)
-            Field oldField = doc.Form[oldFieldName] as Field;
-            if (oldField == null)
-            {
-                Console.Error.WriteLine($"Field '{oldFieldName}' is not a form field.");
-                return;
-            }
-
-            // Add a copy of the field with the new name on the same page
-            // Field.PageIndex is zero‑based; Add expects a 1‑based page number
-            int pageNumber = oldField.PageIndex + 1;
-            Field newField = form.Add(oldField, newFieldName, pageNumber);
-
-            // Optionally copy additional properties (e.g., MappingName) if needed
-            newField.MappingName = oldField.MappingName;
-            newField.AlternateName = oldField.AlternateName;
-            newField.Value = oldField.Value;
-
-            // Delete the original field
-            form.Delete(oldFieldName);
-
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Renamed field saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Field renamed from '{oldFieldName}' to '{newFieldName}'. Saved as '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

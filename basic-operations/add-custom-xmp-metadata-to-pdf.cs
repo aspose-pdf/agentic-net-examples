@@ -18,31 +18,40 @@ class Program
         // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a simple XMP metadata block with a custom field
-            string xmpXml =
-                @"<?xpacket begin='﻿' id='W5M0MpCehiHzreSzNTczkc9d'?>
+            // Prepare a simple XMP metadata packet (XML format)
+            string xmpXml = @"<?xpacket begin='﻿' id='W5M0MpCehiHzreSzNTczkc9d'?>
 <x:xmpmeta xmlns:x='adobe:ns:meta/'>
   <rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'>
-    <rdf:Description rdf:about='' xmlns:custom='http://example.com/custom/'>
-      <custom:MyCustomField>CustomValue</custom:MyCustomField>
+    <rdf:Description rdf:about=''
+        xmlns:dc='http://purl.org/dc/elements/1.1/'>
+      <dc:title>
+        <rdf:Alt>
+          <rdf:li xml:lang='x-default'>Custom XMP Title</rdf:li>
+        </rdf:Alt>
+      </dc:title>
+      <dc:creator>
+        <rdf:Seq>
+          <rdf:li>John Doe</rdf:li>
+        </rdf:Seq>
+      </dc:creator>
     </rdf:Description>
   </rdf:RDF>
 </x:xmpmeta>
 <?xpacket end='w'?>";
 
-            // Convert the XML string to a memory stream
+            // Convert the XML string to a stream
             using (MemoryStream xmpStream = new MemoryStream())
             using (StreamWriter writer = new StreamWriter(xmpStream))
             {
                 writer.Write(xmpXml);
                 writer.Flush();
-                xmpStream.Position = 0; // Reset position before reading
+                xmpStream.Position = 0; // Reset stream position before reading
 
                 // Set the XMP metadata on the document
                 doc.SetXmpMetadata(xmpStream);
             }
 
-            // Save the document, preserving all other metadata (DocumentInfo, etc.)
+            // Save the document, preserving the newly added XMP metadata
             doc.Save(outputPath);
         }
 

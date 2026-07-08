@@ -1,40 +1,38 @@
 using System;
 using System.IO;
-using System.Drawing; // for System.Drawing.Rectangle
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using System.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_with_popup.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "popup_output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF and edit it using PdfContentEditor (facade API)
+        // Use PdfContentEditor (Facade) to add a popup annotation
         using (PdfContentEditor editor = new PdfContentEditor())
         {
-            // Bind the existing PDF file
+            // Load the existing PDF document
             editor.BindPdf(inputPath);
 
-            // Define the rectangle where the popup annotation will be placed.
-            // System.Drawing.Rectangle expects (x, y, width, height) as integers.
-            System.Drawing.Rectangle popupRect = new System.Drawing.Rectangle(100, 700, 100, 100);
+            // Define the annotation rectangle (position and size) using System.Drawing.Rectangle
+            System.Drawing.Rectangle rect = new System.Drawing.Rectangle(100, 500, 200, 100);
 
-            // Create a popup annotation.
-            // Parameters: rectangle, contents, open (false = hidden until hover/click), page number (1‑based)
-            editor.CreatePopup(popupRect, "This is a helpful note that appears on hover.", false, 1);
+            // Create a popup annotation with the desired note.
+            // Parameters: rectangle, contents, open flag (false = not initially open), page number (1‑based)
+            editor.CreatePopup(rect, "This is a helpful note that appears when you hover over the area.", false, 1);
 
             // Save the modified PDF
             editor.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with popup annotation saved to '{outputPath}'.");
+        Console.WriteLine($"Popup annotation added. Saved to '{outputPath}'.");
     }
 }

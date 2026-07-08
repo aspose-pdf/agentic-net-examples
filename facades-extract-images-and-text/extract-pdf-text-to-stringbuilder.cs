@@ -7,16 +7,19 @@ class Program
 {
     static void Main()
     {
-        // Path to the source PDF file
-        const string pdfPath = "input.pdf";
+        // Input PDF file path
+        const string inputPdf = "input.pdf";
 
-        // StringBuilder to hold the extracted text for further manipulation
-        StringBuilder extractedTextBuilder = new StringBuilder();
+        // Output text file path (after manipulation)
+        const string outputTxt = "extracted.txt";
 
-        // Ensure the PDF file exists before processing
-        if (!File.Exists(pdfPath))
+        // StringBuilder to hold extracted text for further processing
+        StringBuilder sb = new StringBuilder();
+
+        // Ensure the input file exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
@@ -24,30 +27,34 @@ class Program
         using (PdfExtractor extractor = new PdfExtractor())
         {
             // Bind the PDF document to the extractor
-            extractor.BindPdf(pdfPath);
+            extractor.BindPdf(inputPdf);
 
-            // Perform text extraction using Unicode encoding (default)
+            // Extract text using Unicode encoding (default)
             extractor.ExtractText();
 
-            // Save the extracted text into a memory stream
+            // Retrieve the extracted text into a memory stream
             using (MemoryStream ms = new MemoryStream())
             {
+                // Save extracted text to the stream
                 extractor.GetText(ms);
 
-                // Convert the memory stream bytes to a string (Unicode)
-                string pageText = Encoding.Unicode.GetString(ms.ToArray());
+                // Reset stream position before reading
+                ms.Position = 0;
 
-                // Append the extracted text to the StringBuilder
-                extractedTextBuilder.Append(pageText);
+                // Convert the stream bytes to a string (Unicode)
+                string extractedText = Encoding.Unicode.GetString(ms.ToArray());
+
+                // Append the text to the StringBuilder for further manipulation
+                sb.Append(extractedText);
             }
         }
 
-        // At this point, extractedTextBuilder contains the full PDF text.
-        // Example: further manipulation or writing to disk
-        Console.WriteLine("Extracted Text:");
-        Console.WriteLine(extractedTextBuilder.ToString());
+        // Example manipulation: trim leading/trailing whitespace
+        string processedText = sb.ToString().Trim();
 
-        // Optionally, write the text to a file
-        // File.WriteAllText("output.txt", extractedTextBuilder.ToString(), Encoding.Unicode);
+        // Write the processed text to disk
+        File.WriteAllText(outputTxt, processedText, Encoding.Unicode);
+
+        Console.WriteLine($"Text extracted and saved to '{outputTxt}'.");
     }
 }

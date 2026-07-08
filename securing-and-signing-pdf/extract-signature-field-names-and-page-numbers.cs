@@ -9,37 +9,34 @@ class Program
     {
         const string inputPath = "input.pdf";
 
-        // Verify the file exists before attempting to load it
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the form object; it may be null if the PDF has no AcroForm
-            Form form = doc.Form;
-            if (form == null || form.Count == 0)
+            // Ensure the document contains a form
+            if (doc.Form == null || doc.Form.Count == 0)
             {
-                Console.WriteLine("No form fields present in the document.");
+                Console.WriteLine("No form fields found in the document.");
                 return;
             }
 
             Console.WriteLine("Signature fields found:");
 
-            // Iterate over all fields in the form
-            foreach (Field field in form)
+            // Iterate over all fields and select only SignatureField instances
+            foreach (var field in doc.Form.Fields)
             {
-                // Identify signature fields via type checking
-                if (field is SignatureField sigField)
+                if (field is SignatureField signature)
                 {
-                    // FullName provides the fully qualified field name; fallback to Name if null
-                    string fieldName = sigField.FullName ?? sigField.Name ?? "(unnamed)";
+                    // FullName provides the qualified field name
+                    string fieldName = signature.FullName;
 
-                    // PageIndex is 1‑based according to Aspose.Pdf rules
-                    int pageNumber = sigField.PageIndex;
+                    // PageIndex is 1‑based according to Aspose.Pdf conventions
+                    int pageNumber = signature.PageIndex;
 
                     Console.WriteLine($"- Name: {fieldName}, Page: {pageNumber}");
                 }

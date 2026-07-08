@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_centerwindow.pdf";
+        const string outputPath = "output_centered.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,19 +16,22 @@ class Program
             return;
         }
 
-        // Use PdfContentEditor facade to modify viewer preferences
-        using (PdfContentEditor editor = new PdfContentEditor())
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Load the source PDF
-            editor.BindPdf(inputPath);
+            // Create a PdfContentEditor facade to modify viewer preferences
+            PdfContentEditor editor = new PdfContentEditor();
 
-            // Set the CenterWindow flag (true) using the ViewerPreference constant
+            // Bind the loaded document to the editor
+            editor.BindPdf(doc);
+
+            // Set the CenterWindow flag to true
             editor.ChangeViewerPreference(ViewerPreference.CenterWindow);
 
             // Save the modified PDF
             editor.Save(outputPath);
 
-            // Close the facade (optional, Dispose will be called by using)
+            // Close the editor (optional, releases resources)
             editor.Close();
         }
 

@@ -7,61 +7,56 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_with_video.pdf";
-        const string videoFile = "sample_video.mp4";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_with_video.pdf";
+        const string videoPath  = "sample.mp4";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            return;
+        }
+        if (!File.Exists(videoPath))
+        {
+            Console.Error.WriteLine($"Video file not found: {videoPath}");
             return;
         }
 
-        if (!File.Exists(videoFile))
-        {
-            Console.Error.WriteLine($"Video file not found: {videoFile}");
-            return;
-        }
+        // Placeholder video dimensions – replace with actual values if known
+        const double videoWidthPx  = 640;
+        const double videoHeightPx = 360;
+        double aspect = videoWidthPx / videoHeightPx; // width / height
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
-        using (Document doc = new Document(inputPdf))
+        using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            foreach (Page page in doc.Pages)
             {
-                Page page = doc.Pages[i];
+                // Desired annotation width: half of page width
+                double rectWidth  = page.PageInfo.Width / 2;
+                double rectHeight = rectWidth / aspect; // maintain aspect ratio
 
-                // Page dimensions
-                double pageWidth  = page.PageInfo.Width;
-                double pageHeight = page.PageInfo.Height;
-
-                // Desired annotation width (e.g., 50% of page width)
-                double annWidth = pageWidth * 0.5;
-
-                // Assume a 16:9 video aspect ratio
-                double aspectRatio = 9.0 / 16.0;
-                double annHeight = annWidth * aspectRatio;
-
-                // Center the annotation on the page
-                double llx = (pageWidth  - annWidth)  / 2.0;
-                double lly = (pageHeight - annHeight) / 2.0;
-                double urx = llx + annWidth;
-                double ury = lly + annHeight;
+                // Position rectangle with a margin from top‑left corner
+                double llx = 50;                                 // left
+                double lly = page.PageInfo.Height - rectHeight - 50; // bottom
+                double urx = llx + rectWidth;                    // right
+                double ury = lly + rectHeight;                   // top
 
                 // Fully qualified rectangle to avoid ambiguity
                 Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
 
-                // Create the screen annotation with the video file
-                ScreenAnnotation screenAnn = new ScreenAnnotation(page, rect, videoFile);
+                // Create screen annotation that plays the video
+                ScreenAnnotation screen = new ScreenAnnotation(page, rect, videoPath);
+                screen.Title    = "Video Annotation";
+                screen.Contents = "Click to play video";
 
                 // Add the annotation to the page
-                page.Annotations.Add(screenAnn);
+                page.Annotations.Add(screen);
             }
 
-            // Save the modified PDF (lifecycle rule: save inside using)
-            doc.Save(outputPdf);
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with video annotations saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF saved with video annotations to '{outputPath}'.");
     }
 }

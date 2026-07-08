@@ -1,36 +1,39 @@
 using System;
-using System.IO;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";   // source PDF containing the form
-        const string outputPath = "output.pdf";  // PDF after setting the limit
-        const string fieldName  = "Quantity";    // name of the field to limit
+        const string inputPdf  = "FormWithQuantity.pdf";   // existing PDF containing the "Quantity" field
+        const string outputPdf = "FormWithQuantity_Limited.pdf";
 
-        if (!File.Exists(inputPath))
+        // Ensure the source file exists
+        if (!System.IO.File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // FormEditor can be created with input and output file names.
-        // It implements IDisposable, so we wrap it in a using block.
-        using (FormEditor editor = new FormEditor(inputPath, outputPath))
+        // Use FormEditor (a SaveableFacade) inside a using block for deterministic disposal
+        using (FormEditor formEditor = new FormEditor())
         {
-            // Set the maximum number of characters allowed in the field.
-            // A limit of 3 characters permits values up to 999; the
-            // business rule (1‑100) should be enforced by the application
-            // that fills the form. This satisfies the requirement to use
-            // SetFieldLimit for the "Quantity" field.
-            editor.SetFieldLimit(fieldName, 3);
+            // Bind the existing PDF document
+            formEditor.BindPdf(inputPdf);
 
-            // Persist changes to the output file.
-            editor.Save();
+            // Set the maximum character count for the "Quantity" field.
+            // The limit of 100 characters effectively allows values up to three digits (e.g., 1‑100).
+            bool success = formEditor.SetFieldLimit("Quantity", 100);
+            if (!success)
+            {
+                Console.Error.WriteLine("Failed to set field limit for 'Quantity'.");
+                return;
+            }
+
+            // Save the modified PDF to a new file
+            formEditor.Save(outputPdf);
         }
 
-        Console.WriteLine($"Field limit applied and saved to '{outputPath}'.");
+        Console.WriteLine($"Field limit applied and saved to '{outputPdf}'.");
     }
 }

@@ -2,58 +2,50 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-class Program
+class BatchPageDeletion
 {
     static void Main()
     {
-        // Directory containing the source PDFs
-        const string inputDir = "InputPdfs";
+        // Directory containing the PDF files to process
+        const string inputDirectory = @"C:\PdfFiles";
         // Directory where the processed PDFs will be saved
-        const string outputDir = "OutputPdfs";
-
-        // Pages to delete (1‑based indexing). Adjust as needed.
-        int[] pagesToDelete = new int[] { 2, 3 };
-
-        if (!Directory.Exists(inputDir))
-        {
-            Console.Error.WriteLine($"Input directory not found: {inputDir}");
-            return;
-        }
+        const string outputDirectory = @"C:\PdfFiles\Processed";
 
         // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(outputDirectory);
 
-        // Get all PDF files in the input directory (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(inputDir, "*.pdf", SearchOption.TopDirectoryOnly);
+        // Define the pages to delete (1‑based indexing, as required by PdfFileEditor)
+        // Example: delete pages 2 and 3 from each document
+        int[] pagesToDelete = new int[] { 2, 3 };
 
-        // PdfFileEditor is a facade that works directly with file paths.
-        // It does not implement IDisposable, so a simple instance is sufficient.
-        PdfFileEditor editor = new PdfFileEditor();
+        // Get all PDF files in the input directory
+        string[] pdfFiles = Directory.GetFiles(inputDirectory, "*.pdf", SearchOption.TopDirectoryOnly);
+
+        // Initialize the facade once and reuse it for all files
+        PdfFileEditor pdfEditor = new PdfFileEditor();
 
         foreach (string inputPath in pdfFiles)
         {
-            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(inputPath);
-            string outputPath = Path.Combine(outputDir, $"{fileNameWithoutExt}_trimmed.pdf");
-
             try
             {
-                // Delete the specified pages and write the result to outputPath.
-                // The Delete method returns true on success.
-                bool result = editor.Delete(inputPath, pagesToDelete, outputPath);
+                // Build the output file path – same name, placed in the output folder
+                string fileName = Path.GetFileNameWithoutExtension(inputPath);
+                string outputPath = Path.Combine(outputDirectory, fileName + "_trimmed.pdf");
 
-                if (result)
-                {
-                    Console.WriteLine($"Successfully processed: {fileNameWithoutExt}.pdf → {Path.GetFileName(outputPath)}");
-                }
-                else
-                {
-                    Console.Error.WriteLine($"Deletion failed for: {fileNameWithoutExt}.pdf");
-                }
+                // Delete the specified pages and save the result
+                // Delete returns true on success; we ignore the return value here
+                pdfEditor.Delete(inputPath, pagesToDelete, outputPath);
+
+                Console.WriteLine($"Processed: {Path.GetFileName(inputPath)} → {Path.GetFileName(outputPath)}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing {fileNameWithoutExt}.pdf: {ex.Message}");
+                // Log any errors but continue processing remaining files
+                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
             }
         }
+
+        // No need to dispose PdfFileEditor (it does not implement IDisposable)
+        Console.WriteLine("Batch deletion completed.");
     }
 }

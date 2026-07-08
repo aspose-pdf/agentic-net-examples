@@ -1,35 +1,36 @@
 using System;
 using System.IO;
-using System.Drawing;
-using Aspose.Pdf.Facades;
+using System.Drawing;               // Rectangle for the clickable area
+using Aspose.Pdf.Facades;           // PdfContentEditor facade
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string url = "https://www.example.com";
+        const string url        = "https://www.example.com";
 
+        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Edit the PDF using PdfContentEditor facade
+        // Edit the PDF using the Facades API
         using (PdfContentEditor editor = new PdfContentEditor())
         {
             // Load the existing PDF
             editor.BindPdf(inputPath);
 
-            // Define the clickable area (x, y, width, height)
-            Rectangle rect = new Rectangle(100, 500, 200, 50);
+            // Define the rectangle (left, top, width, height) that will act as the link area
+            Rectangle linkRect = new Rectangle(100, 500, 200, 50);
 
-            // Add a web link on the first page
-            editor.CreateWebLink(rect, url, 1);
+            // Create a web link on page 1 (pages are 1‑based)
+            editor.CreateWebLink(linkRect, url, 1);
 
-            // Save the updated PDF
+            // Save the modified document
             editor.Save(outputPath);
         }
 

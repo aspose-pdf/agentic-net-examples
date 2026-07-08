@@ -18,12 +18,11 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Delete pages 5 through 10 in a single operation.
-            // PageCollection.Delete(int[]) removes all specified pages at once.
+            // Pages are 1‑based. Delete pages 5 through 10 in a single call.
             int[] pagesToDelete = { 5, 6, 7, 8, 9, 10 };
             doc.Pages.Delete(pagesToDelete);
 
-            // Save the modified PDF
+            // Save the resulting PDF
             doc.Save(outputPath);
         }
 

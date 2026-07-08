@@ -7,37 +7,44 @@ class Program
 {
     static void Main()
     {
-        // Input PDF (encrypted), its password, attachment file and output PDF paths
-        const string inputPdfPath   = "secured.pdf";
-        const string userPassword   = "userPass";
-        const string attachmentPath = "attachment.txt";
-        const string outputPdfPath  = "output.pdf";
+        const string inputPdf   = "secured_input.pdf";   // Encrypted PDF file
+        const string outputPdf  = "output_with_attachment.pdf";
+        const string attachment = "attachment_file.pdf"; // File to attach
+        const string password   = "userPassword";       // User (or owner) password
 
-        // Validate files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(attachmentPath))
-        {
-            Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Open the encrypted PDF using its password
-        using (Document doc = new Document(inputPdfPath, userPassword))
+        if (!File.Exists(attachment))
         {
-            // Initialize the Facade editor with the opened document
-            PdfContentEditor editor = new PdfContentEditor(doc);
-
-            // Add the file attachment (no visual annotation)
-            editor.AddDocumentAttachment(attachmentPath, "Sample attachment description");
-
-            // Save the modified PDF
-            editor.Save(outputPdfPath);
+            Console.Error.WriteLine($"Attachment file not found: {attachment}");
+            return;
         }
 
-        Console.WriteLine($"Attachment added and saved to '{outputPdfPath}'.");
+        try
+        {
+            // Open the encrypted PDF using the password.
+            using (Document doc = new Document(inputPdf, password))
+            {
+                // Initialize the content editor with the opened document.
+                using (PdfContentEditor editor = new PdfContentEditor(doc))
+                {
+                    // Add the file attachment (no visual annotation is created).
+                    editor.AddDocumentAttachment(attachment, "Attached file description");
+
+                    // Save the modified PDF.
+                    editor.Save(outputPdf);
+                }
+            }
+
+            Console.WriteLine($"Attachment added and saved to '{outputPdf}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

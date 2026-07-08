@@ -7,10 +7,10 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";          // source PDF with form fields
-        const string outputPdf  = "signed_locked.pdf"; // result PDF
-        const string certPath   = "certificate.pfx";   // signing certificate
-        const string certPass   = "password";          // certificate password
+        const string inputPdf   = "input.pdf";
+        const string outputPdf  = "signed_locked.pdf";
+        const string certPath   = "certificate.pfx";
+        const string certPwd    = "password";
 
         if (!File.Exists(inputPdf))
         {
@@ -27,51 +27,48 @@ class Program
         using (Document doc = new Document(inputPdf))
         {
             // -------------------------------------------------
-            // 1. Locate the signature field (assumed to exist)
+            // 1. Create a signature field (if not already present)
             // -------------------------------------------------
-            const string signatureFieldName = "Signature1";
-            if (!doc.Form.HasField(signatureFieldName))
-            {
-                Console.Error.WriteLine($"Signature field '{signatureFieldName}' not found.");
-                return;
-            }
-
-            SignatureField sigField = (SignatureField)doc.Form[signatureFieldName];
+            // Define the rectangle where the signature will appear
+            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 300, 150);
+            // Add the signature field to the first page
+            SignatureField sigField = new SignatureField(doc.Pages[1], sigRect);
+            doc.Form.Add(sigField);
 
             // -------------------------------------------------
-            // 2. Create a concrete Signature object (PKCS7) and sign the field
+            // 2. Sign the document using a certificate
             // -------------------------------------------------
-            PKCS7 pkcs7 = new PKCS7(certPath, certPass);
-            // Optional: set additional signature properties
-            pkcs7.Reason = "Document approved";
-            pkcs7.Location = "Office";
-            pkcs7.ContactInfo = "contact@example.com";
-
+            // Use a concrete signature class (PKCS7) – Signature is abstract
+            PKCS7 pkcs7 = new PKCS7(certPath, certPwd);
+            pkcs7.Reason   = "Document signed";
+            pkcs7.Location = "My Company";
+            // Apply the signature to the field
             sigField.Sign(pkcs7);
 
             // -------------------------------------------------
             // 3. Lock specific form fields after signing
             // -------------------------------------------------
-            string[] fieldsToLock = { "Field1", "Field2", "Field3" };
+            string[] fieldsToLock = { "Name", "Date", "Amount" };
             foreach (string fieldName in fieldsToLock)
             {
-                if (doc.Form.HasField(fieldName))
+                // The Form indexer returns a WidgetAnnotation; cast to Field
+                Field field = doc.Form[fieldName] as Field;
+                if (field != null)
                 {
-                    // The Field base class provides the ReadOnly property
-                    doc.Form[fieldName].ReadOnly = true;
+                    field.ReadOnly = true;
                 }
                 else
                 {
-                    Console.WriteLine($"Warning: field '{fieldName}' not found.");
+                    Console.WriteLine($"Field '{fieldName}' not found in the form.");
                 }
             }
 
             // -------------------------------------------------
-            // 4. Save the modified PDF
+            // 4. Save the signed and locked PDF
             // -------------------------------------------------
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Signed PDF with locked fields saved to '{outputPdf}'.");
+        Console.WriteLine($"Signed PDF saved to '{outputPdf}'. Specified fields are now read‑only.");
     }
 }

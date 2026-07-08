@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,29 +15,22 @@ class Program
             return;
         }
 
-        // Load the PDF document with deterministic disposal
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+            foreach (Page page in doc.Pages)
             {
                 // Create a page number stamp; default format is "#"
                 PageNumberStamp stamp = new PageNumberStamp();
-
-                // Center the stamp horizontally on the page
-                stamp.HorizontalAlignment = Aspose.Pdf.HorizontalAlignment.Center;
-
-                // Position the stamp at the bottom of the page (can adjust margin if needed)
-                stamp.VerticalAlignment = Aspose.Pdf.VerticalAlignment.Bottom;
-
-                // Ensure numbering starts at 1 (default, set explicitly for clarity)
-                stamp.StartingNumber = 1;
+                stamp.StartingNumber = 1;                     // start numbering at 1
+                stamp.HorizontalAlignment = HorizontalAlignment.Center; // center horizontally
 
                 // Add the stamp to the current page
-                doc.Pages[i].AddStamp(stamp);
+                page.AddStamp(stamp);
             }
 
-            // Save the modified PDF
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 

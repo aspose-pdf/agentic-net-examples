@@ -6,8 +6,14 @@ class Program
 {
     static void Main()
     {
-        const string xmlPath = "input.xml";
-        const string pdfPath = "output.pdf";
+        // Directory containing the XML source file
+        string dataDir = @"YOUR_DATA_DIRECTORY";
+
+        // Input XML file path
+        string xmlPath = Path.Combine(dataDir, "input.xml");
+
+        // Desired output PDF file path
+        string pdfPath = Path.Combine(dataDir, "output.pdf");
 
         if (!File.Exists(xmlPath))
         {
@@ -15,16 +21,16 @@ class Program
             return;
         }
 
-        // Load options for XML without a custom XSLT (default transformation)
+        // Load options for XML without providing an XSL file (default transformation)
         XmlLoadOptions loadOptions = new XmlLoadOptions();
 
-        // Convert XML to PDF using the load options
+        // Load the XML and convert it to a PDF document
         using (Document pdfDoc = new Document(xmlPath, loadOptions))
         {
-            // Save the resulting PDF
+            // Save the generated PDF
             pdfDoc.Save(pdfPath);
         }
 
-        Console.WriteLine($"PDF created at '{pdfPath}'.");
+        Console.WriteLine($"PDF successfully created at: {pdfPath}");
     }
 }

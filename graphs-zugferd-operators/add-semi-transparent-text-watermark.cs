@@ -1,43 +1,63 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // required for TextState and FontRepository
 
-public class Program
+class Program
 {
-    public static void Main()
+    static void Main()
     {
-        // Create a sample PDF document
-        using (Document sampleDoc = new Document())
+        const string inputPath = "input.pdf";
+        const string outputPath = "watermarked.pdf";
+        const string watermarkText = "CONFIDENTIAL";
+
+        if (!File.Exists(inputPath))
         {
-            Page samplePage = sampleDoc.Pages.Add();
-            TextFragment sampleFragment = new TextFragment("This is a sample PDF document.");
-            samplePage.Paragraphs.Add(sampleFragment);
-            sampleDoc.Save("input.pdf");
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // Open the PDF and add a semi‑transparent text watermark behind the content on each page
-        using (Document doc = new Document("input.pdf"))
+        // Load the PDF document (lifecycle rule: use Document constructor)
+        using (Document doc = new Document(inputPath))
         {
+            // Iterate over all pages (pages are 1‑based)
             foreach (Page page in doc.Pages)
             {
-                WatermarkArtifact watermark = new WatermarkArtifact();
-                watermark.IsBackground = true; // place behind existing content
-                watermark.Opacity = 0.3f; // semi‑transparent
+                // Create a watermark artifact
+                WatermarkArtifact artifact = new WatermarkArtifact();
 
-                // Center the watermark on the page
-                watermark.ArtifactHorizontalAlignment = HorizontalAlignment.Center;
-                watermark.ArtifactVerticalAlignment = VerticalAlignment.Center;
+                // Set the watermark text
+                artifact.Text = watermarkText;
 
-                // Define the appearance of the watermark text
-                TextState textState = new TextState("Arial", 72);
-                textState.ForegroundColor = Aspose.Pdf.Color.Gray;
-                watermark.SetTextAndState("CONFIDENTIAL", textState);
+                // Define text appearance (font, size, color)
+                TextState textState = new TextState
+                {
+                    Font = FontRepository.FindFont("Helvetica"),
+                    FontSize = 72,
+                    ForegroundColor = Aspose.Pdf.Color.Gray
+                };
+                artifact.TextState = textState;
 
-                // Attach the watermark artifact to the page
-                page.Artifacts.Add(watermark);
+                // Place the artifact behind existing page content
+                artifact.IsBackground = true;
+
+                // Make the watermark semi‑transparent
+                artifact.Opacity = 0.3;
+
+                // Position the watermark at the centre of the page.
+                // WatermarkArtifact.Position expects a Point, not a Rectangle.
+                double pageWidth = page.PageInfo.Width;
+                double pageHeight = page.PageInfo.Height;
+                artifact.Position = new Aspose.Pdf.Point(pageWidth / 2, pageHeight / 2);
+
+                // Add the artifact to the page
+                page.Artifacts.Add(artifact);
             }
 
-            doc.Save("output.pdf");
+            // Save the modified document (lifecycle rule: use Document.Save)
+            doc.Save(outputPath);
         }
+
+        Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
     }
 }

@@ -8,46 +8,45 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file
         const string inputPdf = "input.pdf";
-
-        // Directory where extracted BMP images will be saved
         const string outputDir = "ExtractedImages";
 
+        // Verify source PDF exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Ensure the output directory exists
+        // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Use PdfExtractor (Facade) to extract images
+        // Use PdfExtractor (Facade) to pull images from the PDF
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the PDF document
+            // Bind the PDF file
             extractor.BindPdf(inputPdf);
 
-            // Extract images from the document.
-            // This extracts the images as they are stored in the PDF,
-            // preserving original resolution and color depth.
+            // Keep default resolution (original image resolution is preserved)
+            // If you need to change it, set extractor.Resolution = new Resolution(dpi);
+
+            // Extract images from the document
             extractor.ExtractImage();
 
             int imageIndex = 1;
+            // Iterate through all extracted images
             while (extractor.HasNextImage())
             {
-                // Build the output BMP file name
-                string outputPath = Path.Combine(outputDir, $"image{imageIndex}.bmp");
+                // Build output BMP file path
+                string outPath = Path.Combine(outputDir, $"image_{imageIndex}.bmp");
 
-                // Save the next image as BMP.
-                // The overload with ImageFormat preserves the original image data.
-                extractor.GetNextImage(outputPath, ImageFormat.Bmp);
+                // Save the current image as BMP, preserving its original color depth
+                extractor.GetNextImage(outPath, ImageFormat.Bmp);
 
                 imageIndex++;
             }
         }
 
-        Console.WriteLine($"Image extraction completed. BMP files saved to '{outputDir}'.");
+        Console.WriteLine("All images have been extracted as BMP files.");
     }
 }

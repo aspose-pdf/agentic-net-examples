@@ -8,20 +8,19 @@ class Program
     {
         const string pdfPath = "input.pdf";
 
-        // Verify the PDF file exists before attempting to read metadata.
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // PdfFileInfo implements IDisposable, so wrap it in a using block.
+        // PdfFileInfo implements IDisposable, so use a using block for deterministic cleanup
         using (PdfFileInfo fileInfo = new PdfFileInfo(pdfPath))
         {
-            // The Author property provides the author metadata of the PDF.
+            // Read the Author metadata property
             string author = fileInfo.Author;
 
-            // Output the author to the console. If the property is empty, an empty line is printed.
+            // Output the author to the console (empty string if not set)
             Console.WriteLine($"Author: {author}");
         }
     }

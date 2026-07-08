@@ -1,51 +1,42 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf  = "input.pdf";   // PDF containing the "Score" field
+        const string outputPdf = "output.pdf";  // PDF after applying restrictions
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // FormEditor works with two files: source and destination.
+        // It implements IDisposable, so wrap it in a using block.
+        using (FormEditor formEditor = new FormEditor(inputPdf, outputPdf))
         {
-            // Retrieve the field named "Score" and configure it
-            if (doc.Form["Score"] is NumberField scoreField)
-            {
-                // Allow only digits
-                scoreField.AllowedChars = "0123456789";
+            // Limit the field to a maximum of 3 characters (enough for 0‑100).
+            // This also ensures only digits can be entered because the field is a NumberField.
+            formEditor.SetFieldLimit("Score", 3);
 
-                // Limit the maximum number of characters to 3 (covers 0‑100)
-                scoreField.MaxLen = 3;
-            }
-            else
-            {
-                Console.Error.WriteLine("Field 'Score' not found or is not a NumberField.");
-                return;
-            }
+            // Add JavaScript validation to enforce the numeric range 0‑100.
+            // The script runs when the field loses focus.
+            string js = @"
+                if (event.value < 0 || event.value > 100) {
+                    app.alert('Score must be between 0 and 100');
+                    event.rc = false; // reject the entered value
+                }
+            ";
+            formEditor.AddFieldScript("Score", js);
 
-            // Use FormEditor to enforce the character limit (redundant safety)
-            using (FormEditor formEditor = new FormEditor())
-            {
-                formEditor.BindPdf(doc);
-                // Set maximum character count to 3
-                formEditor.SetFieldLimit("Score", 3);
-                // Save the modified PDF
-                formEditor.Save(outputPath);
-            }
+            // Persist changes to the output file.
+            formEditor.Save();
         }
 
-        Console.WriteLine($"PDF saved with 'Score' field restricted to integers 0‑100 at '{outputPath}'.");
+        Console.WriteLine($"Field \"Score\" configured and saved to '{outputPdf}'.");
     }
 }

@@ -2,7 +2,8 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations; // for DefaultAppearance
+using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Text; // needed for DefaultAppearance and Color
 
 class Program
 {
@@ -18,33 +19,26 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the form field by name and cast to TextBoxField (or RichTextBoxField as needed)
+            // Retrieve the form field by name
             TextBoxField txtField = doc.Form[fieldName] as TextBoxField;
             if (txtField == null)
             {
-                Console.Error.WriteLine($"Text field '{fieldName}' not found or not a TextBoxField.");
+                Console.Error.WriteLine($"Text field '{fieldName}' not found.");
                 return;
             }
 
-            // Set global font size limits for all fields (optional, -1 disables the check)
-            Field.MinFontSize = 10; // minimal readable size
-            Field.MaxFontSize = 24; // maximal size to avoid overflow
+            // Set the default appearance (font name, size, and color)
+            // Use the constructor because DefaultAppearance.Font is read‑only
+            DefaultAppearance appearance = new DefaultAppearance("Helvetica", 14, System.Drawing.Color.Black);
+            txtField.DefaultAppearance = appearance;
 
-            // Create a DefaultAppearance with desired font, size, and color
-            // Note: DefaultAppearance.Font is read‑only; use the constructor overload.
-            DefaultAppearance appearance = new DefaultAppearance("Helvetica", 14, System.Drawing.Color.Blue);
-            txtField.DefaultAppearance = appearance; // apply to the field
-
-            // Optionally, set the field's style (e.g., bold/italic) via RichTextBoxField if needed
-            // RichTextBoxField richField = txtField as RichTextBoxField;
-            // if (richField != null)
-            // {
-            //     // CSS‑like style string: font-weight:bold; font-style:italic;
-            //     richField.Style = "font-weight:bold; font-style:italic;";
-            // }
+            // Optionally enforce minimum/maximum font size checks
+            // -1 disables the check; here we allow any size
+            Field.MinFontSize = -1;
+            Field.MaxFontSize = -1;
 
             // Save the modified PDF
             doc.Save(outputPath);

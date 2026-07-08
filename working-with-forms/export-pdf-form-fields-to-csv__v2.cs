@@ -7,68 +7,61 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputCsv = "form_fields.csv";
+        const string inputPdfPath = "input.pdf";
+        const string outputCsvPath = "form_fields.csv";
 
-        // Verify input file exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        try
+        // Load the PDF document
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Load the PDF document (lifecycle rule: use Document constructor)
-            using (Document doc = new Document(inputPdf))
+            // Open a CSV writer
+            using (StreamWriter writer = new StreamWriter(outputCsvPath, false))
             {
-                // Check that the document actually contains a form
-                if (doc.Form == null || doc.Form.Count == 0)
+                // Write CSV header
+                writer.WriteLine("FullName,PartialName,Value,PageIndex,Rect");
+
+                // Iterate over all form fields
+                foreach (Field field in doc.Form.Fields)
                 {
-                    Console.WriteLine("No form fields found in the PDF.");
-                    return;
-                }
+                    // Common field properties
+                    string fullName = field.FullName ?? string.Empty;
+                    string partialName = field.PartialName ?? string.Empty;
+                    string value = field.Value?.ToString() ?? string.Empty;
 
-                // Create a StreamWriter for the CSV output (standard .NET I/O)
-                using (StreamWriter writer = new StreamWriter(outputCsv, false, System.Text.Encoding.UTF8))
-                {
-                    // Write CSV header
-                    writer.WriteLine("FieldName,Value");
+                    // A Field itself is a WidgetAnnotation, so we can access visual properties directly
+                    int pageIndex = field.PageIndex; // 1‑based page index
+                    Aspose.Pdf.Rectangle rect = field.Rect;
+                    string rectStr = $"{rect.LLX},{rect.LLY},{rect.URX},{rect.URY}";
 
-                    // Iterate over each form field
-                    foreach (Field field in doc.Form)
-                    {
-                        // Retrieve the field's full name and its current value
-                        string name = field.FullName ?? string.Empty;
-                        string value = field.Value?.ToString() ?? string.Empty;
+                    // Escape commas and quotes for CSV compliance
+                    string escFullName = EscapeCsv(fullName);
+                    string escPartialName = EscapeCsv(partialName);
+                    string escValue = EscapeCsv(value);
+                    string escRect = EscapeCsv(rectStr);
 
-                        // Escape values that may contain commas, quotes or line breaks
-                        name = EscapeCsv(name);
-                        value = EscapeCsv(value);
-
-                        // Write a CSV line
-                        writer.WriteLine($"{name},{value}");
-                    }
+                    // Write CSV line for this field
+                    writer.WriteLine($"{escFullName},{escPartialName},{escValue},{pageIndex},{escRect}");
                 }
             }
+        }
 
-            Console.WriteLine($"Form fields exported successfully to '{outputCsv}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"Form fields exported to '{outputCsvPath}'.");
     }
 
-    // Helper method to escape CSV fields according to RFC 4180
-    static string EscapeCsv(string text)
+    // Helper to escape CSV fields containing commas, quotes or new lines
+    static string EscapeCsv(string field)
     {
-        if (text.Contains("\""))
-            text = text.Replace("\"", "\"\"");
+        if (field.Contains('"'))
+            field = field.Replace("\"", "\"\"");
 
-        if (text.Contains(",") || text.Contains("\"") || text.Contains("\n") || text.Contains("\r"))
-            text = $"\"{text}\"";
+        if (field.Contains(',') || field.Contains('"') || field.Contains('\n'))
+            field = $"\"{field}\"";
 
-        return text;
+        return field;
     }
 }

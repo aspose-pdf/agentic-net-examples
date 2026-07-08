@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,30 +15,16 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPath))
-            {
-                // Delete the third page (pages are 1‑based)
-                if (doc.Pages.Count >= 3)
-                {
-                    doc.Pages.Delete(3);
-                }
-                else
-                {
-                    Console.WriteLine("Document has fewer than 3 pages; no page deleted.");
-                }
+            // Page numbers are 1‑based; delete the third page
+            doc.Pages.Delete(3);
 
-                // Save the modified document
-                doc.Save(outputPath);
-            }
+            // Save the modified document (PDF format is implicit)
+            doc.Save(outputPath);
+        }
 
-            Console.WriteLine($"Third page removed and saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"Third page removed. Result saved to '{outputPath}'.");
     }
 }

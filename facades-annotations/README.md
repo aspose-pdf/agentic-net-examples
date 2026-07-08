@@ -1,119 +1,120 @@
 # Facades annotations
 
-> **Facades annotations** in PDF using C# / .NET -- **106** verified, compile-tested examples for **Aspose.PDF for .NET** 26.5.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Facades annotations** in PDF using C# / .NET -- **107** verified, compile-tested examples for **Aspose.PDF for .NET** 26.6.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `facades-annotations`
-- Examples: 106
-- NuGet: `Aspose.PDF 26.5.0` -- target `net10.0`
+- Examples: 107
+- NuGet: `Aspose.PDF 26.6.0` -- target `net10.0`
 
 ## Examples
 
-- [`add-custom-annotation-flags.cs`](./add-custom-annotation-flags.cs) -- Add custom annotation flags
-- [`annotation-operations-logging.cs`](./annotation-operations-logging.cs) -- Annotation operations logging
-- [`annotation-summary-report.cs`](./annotation-summary-report.cs) -- Annotation summary report
+- [`add-custom-annotation-flags-to-pdf.cs`](./add-custom-annotation-flags-to-pdf.cs) -- Add custom annotation flags to pdf
+- [`add-custom-metadata-to-pdf-annotation.cs`](./add-custom-metadata-to-pdf-annotation.cs) -- Add custom metadata to pdf annotation
+- [`annotation-diagnostic-workflow.cs`](./annotation-diagnostic-workflow.cs) -- Annotation diagnostic workflow
 - [`apply-read-only-flag-to-pdf-annotations.cs`](./apply-read-only-flag-to-pdf-annotations.cs) -- Apply read only flag to pdf annotations
-- [`async-process-pdf-annotations.cs`](./async-process-pdf-annotations.cs) -- Async process pdf annotations
-- [`audit-pdf-annotations-to-json.cs`](./audit-pdf-annotations-to-json.cs) -- Audit pdf annotations to json
-- [`backup-pdf-delete-all-annotations.cs`](./backup-pdf-delete-all-annotations.cs) -- Backup pdf delete all annotations
-- [`backup-pdf-flatten-form-fields.cs`](./backup-pdf-flatten-form-fields.cs) -- Backup pdf flatten form fields
-- [`batch-delete-pdf-annotations-retain-types.cs`](./batch-delete-pdf-annotations-retain-types.cs) -- Batch delete pdf annotations retain types
-- [`batch-delete-pdf-annotations-with-progress.cs`](./batch-delete-pdf-annotations-with-progress.cs) -- Batch delete pdf annotations with progress
+- [`async-pdf-annotation-operations.cs`](./async-pdf-annotation-operations.cs) -- Async pdf annotation operations
+- [`backup-pdf-before-flattening.cs`](./backup-pdf-before-flattening.cs) -- Backup pdf before flattening
+- [`backup-pdf-delete-annotations.cs`](./backup-pdf-delete-annotations.cs) -- Backup pdf delete annotations
+- [`batch-add-text-annotation-to-pdfs.cs`](./batch-add-text-annotation-to-pdfs.cs) -- Batch add text annotation to pdfs
+- [`batch-annotation-deletion-retain-types.cs`](./batch-annotation-deletion-retain-types.cs) -- Batch annotation deletion retain types
+- [`batch-delete-pdf-annotations-progress.cs`](./batch-delete-pdf-annotations-progress.cs) -- Batch delete pdf annotations progress
 - [`batch-delete-stamp-annotations.cs`](./batch-delete-stamp-annotations.cs) -- Batch delete stamp annotations
-- [`batch-flatten-annotations-skip-readonly.cs`](./batch-flatten-annotations-skip-readonly.cs) -- Batch flatten annotations skip readonly
+- [`batch-export-delete-archive-pdf-annotations.cs`](./batch-export-delete-archive-pdf-annotations.cs) -- Batch export delete archive pdf annotations
 - [`batch-flatten-pdf-annotations-cancellation.cs`](./batch-flatten-pdf-annotations-cancellation.cs) -- Batch flatten pdf annotations cancellation
 - [`batch-flatten-pdf-annotations.cs`](./batch-flatten-pdf-annotations.cs) -- Batch flatten pdf annotations
-- [`batch-import-xfdf-annotations-into-matching-pdfs.cs`](./batch-import-xfdf-annotations-into-matching-pdfs.cs) -- Batch import xfdf annotations into matching pdfs
-- [`batch-process-pdfs-azure-blob-pdfannotationeditor.cs`](./batch-process-pdfs-azure-blob-pdfannotationeditor.cs) -- Batch process pdfs azure blob pdfannotationeditor
+- [`batch-import-xfdf-annotations-into-pdfs.cs`](./batch-import-xfdf-annotations-into-pdfs.cs) -- Batch import xfdf annotations into pdfs
+- [`batch-remove-annotations-report.cs`](./batch-remove-annotations-report.cs) -- Batch remove annotations report
 - [`batch-update-annotation-author.cs`](./batch-update-annotation-author.cs) -- Batch update annotation author
 - [`benchmark-deleteannotations-vs-deleteannotation.cs`](./benchmark-deleteannotations-vs-deleteannotation.cs) -- Benchmark deleteannotations vs deleteannotation
 - [`check-duplicate-annotation-names.cs`](./check-duplicate-annotation-names.cs) -- Check duplicate annotation names
+- [`clone-and-recolor-pdf-annotation.cs`](./clone-and-recolor-pdf-annotation.cs) -- Clone and recolor pdf annotation
 - [`clone-modify-pdf-annotation.cs`](./clone-modify-pdf-annotation.cs) -- Clone modify pdf annotation
-- [`clone-text-annotation-change-color.cs`](./clone-text-annotation-change-color.cs) -- Clone text annotation change color
 - [`concurrent-import-delete-pdf.cs`](./concurrent-import-delete-pdf.cs) -- Concurrent import delete pdf
 - [`conditional-pdf-flattening-based-on-digital-signatures.cs`](./conditional-pdf-flattening-based-on-digital-signatures.cs) -- Conditional pdf flattening based on digital signatures
 - [`copy-annotations-to-multiple-pdfs.cs`](./copy-annotations-to-multiple-pdfs.cs) -- Copy annotations to multiple pdfs
+- [`count-annotations-before-after-deletion.cs`](./count-annotations-before-after-deletion.cs) -- Count annotations before after deletion
 - [`count-pdf-annotation-types.cs`](./count-pdf-annotation-types.cs) -- Count pdf annotation types
-- [`delete-all-annotations-and-verify-count.cs`](./delete-all-annotations-and-verify-count.cs) -- Delete all annotations and verify count
-- [`delete-all-annotations-from-pdf.cs`](./delete-all-annotations-from-pdf.cs) -- Delete all annotations from pdf
 - [`delete-all-annotations-from-pdfs.cs`](./delete-all-annotations-from-pdfs.cs) -- Delete all annotations from pdfs
 - [`delete-annotation-by-name.cs`](./delete-annotation-by-name.cs) -- Delete annotation by name
-- [`delete-annotation-with-error-handling.cs`](./delete-annotation-with-error-handling.cs) -- Delete annotation with error handling
-- [`delete-annotations-by-author.cs`](./delete-annotations-by-author.cs) -- Delete annotations by author
+- [`delete-annotations-by-color.cs`](./delete-annotations-by-color.cs) -- Delete annotations by color
 - [`delete-annotations-export-xfdf.cs`](./delete-annotations-export-xfdf.cs) -- Delete annotations export xfdf
+- [`delete-annotations-with-pdfannotationeditor.cs`](./delete-annotations-with-pdfannotationeditor.cs) -- Delete annotations with pdfannotationeditor
 - [`delete-flatten-annotations-pdf.cs`](./delete-flatten-annotations-pdf.cs) -- Delete flatten annotations pdf
-- [`delete-named-annotation.cs`](./delete-named-annotation.cs) -- Delete named annotation
 - [`delete-pdf-annotation-by-name.cs`](./delete-pdf-annotation-by-name.cs) -- Delete pdf annotation by name
-- [`delete-pdf-annotations-with-logging.cs`](./delete-pdf-annotations-with-logging.cs) -- Delete pdf annotations with logging
-- [`delete-pdf-annotations.cs`](./delete-pdf-annotations.cs) -- Delete pdf annotations
-- [`delete-selected-annotations.cs`](./delete-selected-annotations.cs) -- Delete selected annotations
-- [`delete-specific-annotation-types-from-pdf.cs`](./delete-specific-annotation-types-from-pdf.cs) -- Delete specific annotation types from pdf
+- [`delete-pdf-annotation-with-error-handling.cs`](./delete-pdf-annotation-with-error-handling.cs) -- Delete pdf annotation with error handling
+- [`delete-pdf-annotations-by-author.cs`](./delete-pdf-annotations-by-author.cs) -- Delete pdf annotations by author
+- [`delete-pdf-annotations-from-config.cs`](./delete-pdf-annotations-from-config.cs) -- Delete pdf annotations from config
+- [`delete-pdf-annotations-in-folder.cs`](./delete-pdf-annotations-in-folder.cs) -- Delete pdf annotations in folder
+- [`delete-specific-annotation.cs`](./delete-specific-annotation.cs) -- Delete specific annotation
 - [`delete-text-annotations-from-pdf.cs`](./delete-text-annotations-from-pdf.cs) -- Delete text annotations from pdf
-- [`diagnostic-annotation-workflow.cs`](./diagnostic-annotation-workflow.cs) -- Diagnostic annotation workflow
-- [`export-annotations-to-xfdf-empty-pdf.cs`](./export-annotations-to-xfdf-empty-pdf.cs) -- Export annotations to xfdf empty pdf
-- [`export-delete-archive-annotations.cs`](./export-delete-archive-annotations.cs) -- Export delete archive annotations
-- [`export-import-pdf-annotations-xfdf.cs`](./export-import-pdf-annotations-xfdf.cs) -- Export import pdf annotations xfdf
+- [`export-annotations-no-annotations-xfdf.cs`](./export-annotations-no-annotations-xfdf.cs) -- Export annotations no annotations xfdf
+- [`export-annotations-to-xfdf-gzip.cs`](./export-annotations-to-xfdf-gzip.cs) -- Export annotations to xfdf gzip
+- [`export-annotations-to-xfdf-stream.cs`](./export-annotations-to-xfdf-stream.cs) -- Export annotations to xfdf stream
+- [`export-highlight-annotations-to-xfdf.cs`](./export-highlight-annotations-to-xfdf.cs) -- Export highlight annotations to xfdf
 - [`export-pdf-annotations-pretty-xfdf.cs`](./export-pdf-annotations-pretty-xfdf.cs) -- Export pdf annotations pretty xfdf
-- [`export-pdf-annotations-to-xfdf-and-log.cs`](./export-pdf-annotations-to-xfdf-and-log.cs) -- Export pdf annotations to xfdf and log
+- [`export-pdf-annotations-to-csv.cs`](./export-pdf-annotations-to-csv.cs) -- Export pdf annotations to csv
 - [`export-pdf-annotations-to-xfdf-custom-namespace.cs`](./export-pdf-annotations-to-xfdf-custom-namespace.cs) -- Export pdf annotations to xfdf custom namespace
-- [`export-pdf-annotations-to-xfdf-gzip.cs`](./export-pdf-annotations-to-xfdf-gzip.cs) -- Export pdf annotations to xfdf gzip
+- [`export-pdf-annotations-to-xfdf-with-logging.cs`](./export-pdf-annotations-to-xfdf-with-logging.cs) -- Export pdf annotations to xfdf with logging
 - [`export-pdf-annotations-to-xfdf.cs`](./export-pdf-annotations-to-xfdf.cs) -- Export pdf annotations to xfdf
 - [`export-pdf-annotations-to-xfdf__v2.cs`](./export-pdf-annotations-to-xfdf__v2.cs) -- Export pdf annotations to xfdf  v2
-- [`export-pdf-annotations-to-xfdf__v3.cs`](./export-pdf-annotations-to-xfdf__v3.cs) -- Export pdf annotations to xfdf  v3
-- [`extract-annotation-rectangles.cs`](./extract-annotation-rectangles.cs) -- Extract annotation rectangles
-- [`extract-group-pdf-annotations-by-author.cs`](./extract-group-pdf-annotations-by-author.cs) -- Extract group pdf annotations by author
+- [`export-pdf-annotations-xfdf-import.cs`](./export-pdf-annotations-xfdf-import.cs) -- Export pdf annotations xfdf import
+- [`extract-annotation-rectangles-to-pdf.cs`](./extract-annotation-rectangles-to-pdf.cs) -- Extract annotation rectangles to pdf
+- [`extract-pdf-annotation-comments-summary.cs`](./extract-pdf-annotation-comments-summary.cs) -- Extract pdf annotation comments summary
 - [`extract-pdf-annotation-details.cs`](./extract-pdf-annotation-details.cs) -- Extract pdf annotation details
-- [`extract-pdf-annotations-summary.cs`](./extract-pdf-annotations-summary.cs) -- Extract pdf annotations summary
-- [`filter-exported-annotations-by-type-highlight-and-write-them-to-an-xfdf-file-using-exportannotations-overload.cs`](./filter-exported-annotations-by-type-highlight-and-write-them-to-an-xfdf-file-using-exportannotations-overload.cs) -- Filter exported annotations by type highlight and write them to an xfdf file using exportannotations overload
+- [`extract-pdf-annotations-to-json.cs`](./extract-pdf-annotations-to-json.cs) -- Extract pdf annotations to json
 - [`flatten-annotations-first-five-pages.cs`](./flatten-annotations-first-five-pages.cs) -- Flatten annotations first five pages
-- [`flatten-annotations-network-share.cs`](./flatten-annotations-network-share.cs) -- Flatten annotations network share
-- [`flatten-pdf-add-flattened-date-metadata.cs`](./flatten-pdf-add-flattened-date-metadata.cs) -- Flatten pdf add flattened date metadata
+- [`flatten-pdf-add-custom-metadata.cs`](./flatten-pdf-add-custom-metadata.cs) -- Flatten pdf add custom metadata
 - [`flatten-pdf-annotations-from-stream.cs`](./flatten-pdf-annotations-from-stream.cs) -- Flatten pdf annotations from stream
 - [`flatten-pdf-annotations-log-size-reduction.cs`](./flatten-pdf-annotations-log-size-reduction.cs) -- Flatten pdf annotations log size reduction
+- [`flatten-pdf-annotations-nightly.cs`](./flatten-pdf-annotations-nightly.cs) -- Flatten pdf annotations nightly
+- [`flatten-pdf-annotations-skip-readonly.cs`](./flatten-pdf-annotations-skip-readonly.cs) -- Flatten pdf annotations skip readonly
+- [`flatten-pdf-annotations-verbose.cs`](./flatten-pdf-annotations-verbose.cs) -- Flatten pdf annotations verbose
 - [`flatten-pdf-annotations-verify.cs`](./flatten-pdf-annotations-verify.cs) -- Flatten pdf annotations verify
 - [`flatten-pdf-annotations-verify__v2.cs`](./flatten-pdf-annotations-verify__v2.cs) -- Flatten pdf annotations verify  v2
 - [`flatten-pdf-annotations.cs`](./flatten-pdf-annotations.cs) -- Flatten pdf annotations
 - [`flatten-pdf-annotations__v2.cs`](./flatten-pdf-annotations__v2.cs) -- Flatten pdf annotations  v2
-- [`flatten-pdfs-to-custom-output-directory.cs`](./flatten-pdfs-to-custom-output-directory.cs) -- Flatten pdfs to custom output directory
-- [`folder-watcher-flatten-annotations.cs`](./folder-watcher-flatten-annotations.cs) -- Folder watcher flatten annotations
+- [`flatten-pdfs-save-to-custom-output-directory.cs`](./flatten-pdfs-save-to-custom-output-directory.cs) -- Flatten pdfs save to custom output directory
+- [`generate-annotation-summary-report.cs`](./generate-annotation-summary-report.cs) -- Generate annotation summary report
+- [`generate-pdf-annotation-report-by-author.cs`](./generate-pdf-annotation-report-by-author.cs) -- Generate pdf annotation report by author
 - [`get-annotation-count-per-pdf-page.cs`](./get-annotation-count-per-pdf-page.cs) -- Get annotation count per pdf page
-- [`get-pdf-annotation-names-by-author.cs`](./get-pdf-annotation-names-by-author.cs) -- Get pdf annotation names by author
+- [`get-annotation-names-by-author.cs`](./get-annotation-names-by-author.cs) -- Get annotation names by author
+- [`import-annotations-without-overwrite.cs`](./import-annotations-without-overwrite.cs) -- Import annotations without overwrite
 - [`import-xfdf-annotations-into-multiple-pdfs.cs`](./import-xfdf-annotations-into-multiple-pdfs.cs) -- Import xfdf annotations into multiple pdfs
 - [`import-xfdf-annotations-into-pdf.cs`](./import-xfdf-annotations-into-pdf.cs) -- Import xfdf annotations into pdf
 - [`import-xfdf-annotations-into-pdf__v2.cs`](./import-xfdf-annotations-into-pdf__v2.cs) -- Import xfdf annotations into pdf  v2
-- [`import-xfdf-annotations-to-specific-pdf-pages.cs`](./import-xfdf-annotations-to-specific-pdf-pages.cs) -- Import xfdf annotations to specific pdf pages
-- [`import-xfdf-into-pdf-and-cleanup.cs`](./import-xfdf-into-pdf-and-cleanup.cs) -- Import xfdf into pdf and cleanup
-- [`list-annotation-names-in-pdf.cs`](./list-annotation-names-in-pdf.cs) -- List annotation names in pdf
-- [`list-pdf-annotations-to-csv.cs`](./list-pdf-annotations-to-csv.cs) -- List pdf annotations to csv
-- [`log-annotation-modification-timestamp.cs`](./log-annotation-modification-timestamp.cs) -- Log annotation modification timestamp
-- [`log-file-sizes-before-after-annotation-flattening.cs`](./log-file-sizes-before-after-annotation-flattening.cs) -- Log file sizes before after annotation flattening
-- [`manage-pdf-annotations-verbose.cs`](./manage-pdf-annotations-verbose.cs) -- Manage pdf annotations verbose
-- [`measure-flatten-annotations-performance.cs`](./measure-flatten-annotations-performance.cs) -- Measure flatten annotations performance
-- [`merge-annotation-layers.cs`](./merge-annotation-layers.cs) -- Merge annotation layers
+- [`import-xfdf-annotations-with-page-range.cs`](./import-xfdf-annotations-with-page-range.cs) -- Import xfdf annotations with page range
+- [`import-xfdf-data-into-pdf-cleanup.cs`](./import-xfdf-data-into-pdf-cleanup.cs) -- Import xfdf data into pdf cleanup
+- [`list-annotation-names-pdf.cs`](./list-annotation-names-pdf.cs) -- List annotation names pdf
+- [`log-annotation-operation-durations.cs`](./log-annotation-operation-durations.cs) -- Log annotation operation durations
+- [`log-file-sizes-after-flattening-pdf-annotations.cs`](./log-file-sizes-after-flattening-pdf-annotations.cs) -- Log file sizes after flattening pdf annotations
+- [`log-pdf-annotation-deletions.cs`](./log-pdf-annotation-deletions.cs) -- Log pdf annotation deletions
+- [`measure-annotation-flattening-time.cs`](./measure-annotation-flattening-time.cs) -- Measure annotation flattening time
 - [`merge-multiple-xfdf-files-into-pdf.cs`](./merge-multiple-xfdf-files-into-pdf.cs) -- Merge multiple xfdf files into pdf
-- [`modify-annotation-author-on-page.cs`](./modify-annotation-author-on-page.cs) -- Modify annotation author on page
+- [`merge-pdf-annotation-layers.cs`](./merge-pdf-annotation-layers.cs) -- Merge pdf annotation layers
+- [`modify-annotation-author-on-pdf-page.cs`](./modify-annotation-author-on-pdf-page.cs) -- Modify annotation author on pdf page
 - [`modify-annotation-subject-color.cs`](./modify-annotation-subject-color.cs) -- Modify annotation subject color
-- [`modify-annotation-subject.cs`](./modify-annotation-subject.cs) -- Modify annotation subject
-- [`modify-pdf-annotations-retry-backoff.cs`](./modify-pdf-annotations-retry-backoff.cs) -- Modify pdf annotations retry backoff
 - [`parallel-delete-pdf-annotations.cs`](./parallel-delete-pdf-annotations.cs) -- Parallel delete pdf annotations
-- [`pdf-annotation-helper-bind-delete-flatten-save.cs`](./pdf-annotation-helper-bind-delete-flatten-save.cs) -- Pdf annotation helper bind delete flatten save
+- [`pdf-annotation-deletion-tool.cs`](./pdf-annotation-deletion-tool.cs) -- Pdf annotation deletion tool
+- [`pdf-annotation-flattener-service.cs`](./pdf-annotation-flattener-service.cs) -- Pdf annotation flattener service
 - [`pdf-annotation-helper.cs`](./pdf-annotation-helper.cs) -- Pdf annotation helper
-- [`pdf-annotation-removal-report.cs`](./pdf-annotation-removal-report.cs) -- Pdf annotation removal report
-- [`pdf-annotation-utility.cs`](./pdf-annotation-utility.cs) -- Pdf annotation utility
-- [`pdfannotationeditor-binding-health-check.cs`](./pdfannotationeditor-binding-health-check.cs) -- Pdfannotationeditor binding health check
-- [`preserve-existing-annotations-while-importing.cs`](./preserve-existing-annotations-while-importing.cs) -- Preserve existing annotations while importing
+- [`pdf-annotation-helper__v2.cs`](./pdf-annotation-helper__v2.cs) -- Pdf annotation helper  v2
+- [`pdf-annotation-operations-cli.cs`](./pdf-annotation-operations-cli.cs) -- Pdf annotation operations cli
 - [`remove-all-annotations-from-pdf.cs`](./remove-all-annotations-from-pdf.cs) -- Remove all annotations from pdf
 - [`remove-all-annotations-from-pdf__v2.cs`](./remove-all-annotations-from-pdf__v2.cs) -- Remove all annotations from pdf  v2
 - [`remove-all-annotations-from-pdf__v3.cs`](./remove-all-annotations-from-pdf__v3.cs) -- Remove all annotations from pdf  v3
-- [`remove-annotations-by-color.cs`](./remove-annotations-by-color.cs) -- Remove annotations by color
-- [`remove-link-annotations-from-pdf-pages.cs`](./remove-link-annotations-from-pdf-pages.cs) -- Remove link annotations from pdf pages
-- [`remove-old-pdf-annotations.cs`](./remove-old-pdf-annotations.cs) -- Remove old pdf annotations
-- [`rename-pdf-annotation-names.cs`](./rename-pdf-annotation-names.cs) -- Rename pdf annotation names
-- [`retry-annotation-deletion-pdf.cs`](./retry-annotation-deletion-pdf.cs) -- Retry annotation deletion pdf
+- [`remove-link-annotations-from-specific-pdf-pages.cs`](./remove-link-annotations-from-specific-pdf-pages.cs) -- Remove link annotations from specific pdf pages
+- [`remove-old-annotations-from-pdf.cs`](./remove-old-annotations-from-pdf.cs) -- Remove old annotations from pdf
+- [`rename-pdf-annotation-names-with-prefix.cs`](./rename-pdf-annotation-names-with-prefix.cs) -- Rename pdf annotation names with prefix
+- [`retry-annotation-modification-exponential-backoff.cs`](./retry-annotation-modification-exponential-backoff.cs) -- Retry annotation modification exponential backoff
+- [`retry-delete-pdf-annotation.cs`](./retry-delete-pdf-annotation.cs) -- Retry delete pdf annotation
 - [`set-annotation-open-flag.cs`](./set-annotation-open-flag.cs) -- Set annotation open flag
 - [`test-export-annotations-unbound-pdfannotationeditor.cs`](./test-export-annotations-unbound-pdfannotationeditor.cs) -- Test export annotations unbound pdfannotationeditor
 - [`update-annotation-modified-date.cs`](./update-annotation-modified-date.cs) -- Update annotation modified date
-- [`validate-exported-xfdf-against-schema.cs`](./validate-exported-xfdf-against-schema.cs) -- Validate exported xfdf against schema
-- [`validate-pdf-integrity-after-annotation-modifications.cs`](./validate-pdf-integrity-after-annotation-modifications.cs) -- Validate pdf integrity after annotation modifications
+- [`update-annotation-modified-timestamp.cs`](./update-annotation-modified-timestamp.cs) -- Update annotation modified timestamp
+- [`update-annotation-subject-using-pdfannotationeditor.cs`](./update-annotation-subject-using-pdfannotationeditor.cs) -- Update annotation subject using pdfannotationeditor
+- [`validate-pdf-integrity-annotation-modifications.cs`](./validate-pdf-integrity-annotation-modifications.cs) -- Validate pdf integrity annotation modifications
+- [`validate-xfdf-against-schema.cs`](./validate-xfdf-against-schema.cs) -- Validate xfdf against schema
+- [`verify-pdfannotationeditor-binding.cs`](./verify-pdfannotationeditor-binding.cs) -- Verify pdfannotationeditor binding
 
 ## See Also
 

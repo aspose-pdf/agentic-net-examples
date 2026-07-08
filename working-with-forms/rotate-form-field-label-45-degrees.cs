@@ -9,7 +9,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "rotated_label.pdf";
-        const string fieldName = "myLabel";
+        const string fieldName = "LabelField"; // name of the form field to rotate
 
         if (!File.Exists(inputPath))
         {
@@ -17,25 +17,35 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Retrieve the form field by its name (assumed to be a TextBoxField)
-            var field = doc.Form[fieldName] as TextBoxField;
-            if (field == null)
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
             {
-                Console.Error.WriteLine($"Form field '{fieldName}' not found or not a TextBoxField.");
-                return;
+                // Ensure the form exists and contains the specified field
+                if (doc.Form != null && doc.Form[fieldName] != null)
+                {
+                    // Retrieve the form field (generic FormField)
+                    var field = doc.Form[fieldName];
+
+                    // Rotate the field's rectangle by 45 degrees
+                    // Rectangle.Rotate(int angle) rotates the rectangle coordinates
+                    field.Rect.Rotate(45);
+                }
+                else
+                {
+                    Console.WriteLine($"Form field '{fieldName}' not found.");
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Rotate the field's rectangle by 45 degrees
-            // Rectangle.Rotate(int) accepts an angle in degrees (0‑360)
-            field.Rect.Rotate(45);
-
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Rotated label saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Saved rotated label PDF to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

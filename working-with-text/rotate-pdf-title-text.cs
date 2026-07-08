@@ -3,71 +3,56 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-namespace PdfTitleRotatorApp
+public static class PdfTitleRotator
 {
-    public static class PdfTitleRotator
+    /// <summary>
+    /// Rotates all occurrences of the document title text by 45 degrees and saves the PDFs.
+    /// </summary>
+    /// <param name="pdfPaths">Array of PDF file paths to process.</param>
+    public static void RotateTitleText(string[] pdfPaths)
     {
-        /// <summary>
-        /// Rotates all text fragments (commonly the title) in each PDF by 45 degrees and saves the result.
-        /// </summary>
-        /// <param name="pdfPaths">Array of input PDF file paths.</param>
-        /// <param name="outputDirectory">Directory where rotated PDFs will be saved.</param>
-        public static void RotateTitleText(string[] pdfPaths, string outputDirectory)
-        {
-            // Ensure the output directory exists.
-            Directory.CreateDirectory(outputDirectory);
+        if (pdfPaths == null) throw new ArgumentNullException(nameof(pdfPaths));
 
-            foreach (string inputPath in pdfPaths)
+        foreach (string inputPath in pdfPaths)
+        {
+            if (string.IsNullOrWhiteSpace(inputPath) || !File.Exists(inputPath))
+                continue; // skip invalid entries
+
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                if (!File.Exists(inputPath))
+                // Retrieve the document title from metadata; if not set, skip this file
+                string title = doc.Info.Title;
+                if (string.IsNullOrWhiteSpace(title))
                 {
-                    Console.Error.WriteLine($"File not found: {inputPath}");
+                    // No title metadata – still save to preserve original formatting
+                    doc.Save(inputPath);
                     continue;
                 }
 
-                // Load the PDF document inside a using block for deterministic disposal.
-                using (Document doc = new Document(inputPath))
+                // Find all occurrences of the title text in the document
+                TextFragmentAbsorber absorber = new TextFragmentAbsorber(title);
+                doc.Pages.Accept(absorber);
+
+                // Rotate each found title fragment by 45 degrees
+                foreach (TextFragment fragment in absorber.TextFragments)
                 {
-                    // Absorb all text fragments from the document.
-                    TextFragmentAbsorber absorber = new TextFragmentAbsorber();
-                    doc.Pages.Accept(absorber);
-
-                    // Rotate each text fragment by 45 degrees.
-                    foreach (TextFragment fragment in absorber.TextFragments)
-                    {
-                        // TextState.Rotation expects a float angle in degrees.
-                        fragment.TextState.Rotation = 45;
-                    }
-
-                    // Construct the output file path.
-                    string outputPath = Path.Combine(outputDirectory, Path.GetFileName(inputPath));
-
-                    // Save the modified document.
-                    doc.Save(outputPath);
-                    Console.WriteLine($"Rotated PDF saved to: {outputPath}");
+                    // TextState.Rotation accepts any angle (in degrees)
+                    fragment.TextState.Rotation = 45;
                 }
+
+                // Save the modified document (overwrites the original file)
+                doc.Save(inputPath);
             }
         }
     }
+}
 
-    class Program
+public class Program
+{
+    public static void Main(string[] args)
     {
-        /// <summary>
-        /// Entry point required for a console application.
-        /// Usage: PdfTitleRotatorApp <outputDirectory> <pdfPath1> [pdfPath2] ...
-        /// </summary>
-        static void Main(string[] args)
-        {
-            if (args.Length < 2)
-            {
-                Console.WriteLine("Usage: PdfTitleRotatorApp <outputDirectory> <pdfPath1> [pdfPath2] ...");
-                return;
-            }
-
-            string outputDirectory = args[0];
-            string[] pdfPaths = args[1..]; // C# 8 range operator to get remaining arguments
-
-            PdfTitleRotator.RotateTitleText(pdfPaths, outputDirectory);
-        }
+        // Example usage: pass PDF file paths as command‑line arguments
+        PdfTitleRotator.RotateTitleText(args);
     }
 }

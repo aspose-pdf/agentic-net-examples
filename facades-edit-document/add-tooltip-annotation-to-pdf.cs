@@ -1,13 +1,13 @@
 using System;
 using System.IO;
-using System.Drawing;               // needed for System.Drawing.Rectangle
-using Aspose.Pdf.Facades;          // PdfContentEditor resides here
+using System.Drawing; // needed for System.Drawing.Rectangle
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "tooltip_output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,28 +16,25 @@ class Program
             return;
         }
 
-        // Use PdfContentEditor (facade) to edit the PDF
-        using (PdfContentEditor editor = new PdfContentEditor())
-        {
-            // Load the existing PDF document
-            editor.BindPdf(inputPath);
+        // Bind the PDF to the editor
+        PdfContentEditor editor = new PdfContentEditor();
+        editor.BindPdf(inputPath);
 
-            // Define the annotation rectangle (position and size)
-            // Here we place a small square at (100,500) with width=20, height=20
-            Rectangle rect = new Rectangle(100, 500, 20, 20);
+        // Define the annotation rectangle (x, y, width, height) using System.Drawing.Rectangle
+        System.Drawing.Rectangle rect = new System.Drawing.Rectangle(100, 500, 20, 20);
 
-            // Title appears in the annotation window (if opened)
-            // Contents is shown as a tooltip when the mouse hovers over the annotation
-            string title    = "Info";
-            string contents = "This is additional information displayed as a tooltip.";
+        // Title appears as tooltip, contents as popup text
+        string title = "Info";
+        string contents = "Additional information displayed on hover.";
+        bool open = false;               // do not open the popup by default
+        string icon = "Note";            // icon type for the annotation
+        int pageNumber = 1;              // first page (1‑based indexing)
 
-            // open = false so the annotation is not displayed open by default
-            // icon = "Note" (any of the supported icon names can be used)
-            editor.CreateText(rect, title, contents, false, "Note", 1);
+        // Create a text annotation (tooltip) on the specified page
+        editor.CreateText(rect, title, contents, open, icon, pageNumber);
 
-            // Save the modified PDF
-            editor.Save(outputPath);
-        }
+        // Save the modified PDF
+        editor.Save(outputPath);
 
         Console.WriteLine($"Tooltip annotation added. Saved to '{outputPath}'.");
     }

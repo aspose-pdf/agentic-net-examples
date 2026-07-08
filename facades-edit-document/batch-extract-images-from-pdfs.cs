@@ -7,9 +7,9 @@ class Program
     static void Main()
     {
         // Folder containing the PDF files to process
-        const string inputFolder = @"C:\PdfCollection";
+        const string inputFolder = "pdfs";
         // Root folder where extracted images will be saved
-        const string outputRoot = @"C:\ExtractedImages";
+        const string outputRoot = "extracted_images";
 
         if (!Directory.Exists(inputFolder))
         {
@@ -17,44 +17,34 @@ class Program
             return;
         }
 
-        // Ensure the root output folder exists
+        // Ensure the root output directory exists
         Directory.CreateDirectory(outputRoot);
 
-        // Get all PDF files in the input folder (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
-        if (pdfFiles.Length == 0)
+        // Process each PDF file in the input folder
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            Console.WriteLine("No PDF files found.");
-            return;
-        }
+            // Create a subfolder named after the PDF (without extension)
+            string pdfFileName = Path.GetFileNameWithoutExtension(pdfPath);
+            string pdfOutputDir = Path.Combine(outputRoot, pdfFileName);
+            Directory.CreateDirectory(pdfOutputDir);
 
-        foreach (string pdfPath in pdfFiles)
-        {
-            // Create a subfolder named after the PDF file (without extension)
-            string pdfName = Path.GetFileNameWithoutExtension(pdfPath);
-            string pdfOutputFolder = Path.Combine(outputRoot, pdfName);
-            Directory.CreateDirectory(pdfOutputFolder);
-
-            // Use PdfExtractor to pull images from the current PDF
+            // Use PdfExtractor to extract images from the current PDF
             using (PdfExtractor extractor = new PdfExtractor())
             {
-                extractor.BindPdf(pdfPath);
-                extractor.ExtractImage();
+                extractor.BindPdf(pdfPath);      // Load the PDF
+                extractor.ExtractImage();        // Prepare image extraction
 
                 int imageIndex = 1;
                 while (extractor.HasNextImage())
                 {
-                    // Build the output file name (e.g., image-1.png, image-2.jpg, etc.)
-                    // The original image format is preserved when we omit the ImageFormat argument.
-                    string imageFile = Path.Combine(pdfOutputFolder, $"image-{imageIndex}");
-                    extractor.GetNextImage(imageFile);
+                    // Save each extracted image as a JPEG file
+                    string imagePath = Path.Combine(pdfOutputDir, $"image-{imageIndex}.jpg");
+                    extractor.GetNextImage(imagePath); // Returns bool; ignored here
                     imageIndex++;
                 }
             }
 
-            Console.WriteLine($"Extracted images from '{pdfName}.pdf' to '{pdfOutputFolder}'.");
+            Console.WriteLine($"Images extracted from '{pdfPath}' to '{pdfOutputDir}'.");
         }
-
-        Console.WriteLine("Batch image extraction completed.");
     }
 }

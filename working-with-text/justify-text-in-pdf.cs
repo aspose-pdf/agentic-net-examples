@@ -1,7 +1,7 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
-using System.Runtime.InteropServices;
 
 class Program
 {
@@ -9,39 +9,29 @@ class Program
     {
         const string outputPath = "justified.pdf";
 
-        // Create a new PDF document (lifecycle rule: use using for disposal)
+        // Create a new PDF document and ensure proper disposal
         using (Document doc = new Document())
         {
-            // Add a blank page
+            // Add a single page
             Page page = doc.Pages.Add();
 
-            // Create a TextFragment with sample text
-            TextFragment tf = new TextFragment(
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
-                "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-            );
+            // Sample text to be justified
+            string text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
+                          "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
 
-            // Set justification by configuring TextState.HorizontalAlignment to Justify
-            tf.TextState.HorizontalAlignment = HorizontalAlignment.Justify;
+            // Create a TextFragment with the sample text
+            TextFragment fragment = new TextFragment(text);
 
-            // Optional: set font, size, and color (using Aspose.Pdf APIs)
-            tf.TextState.Font = FontRepository.FindFont("Helvetica");
-            tf.TextState.FontSize = 12;
-            tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+            // Set horizontal alignment to Justify during creation
+            fragment.TextState.HorizontalAlignment = HorizontalAlignment.Justify;
 
-            // Add the TextFragment to the page's paragraph collection
-            page.Paragraphs.Add(tf);
+            // Add the fragment to the page
+            page.Paragraphs.Add(fragment);
 
-            // Guard Document.Save on macOS where libgdiplus may be missing
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            {
-                Console.WriteLine("libgdiplus is required for PDF creation on macOS. Skipping save.");
-            }
-            else
-            {
-                doc.Save(outputPath);
-                Console.WriteLine($"PDF saved to {outputPath}");
-            }
+            // Save the document
+            doc.Save(outputPath);
         }
+
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

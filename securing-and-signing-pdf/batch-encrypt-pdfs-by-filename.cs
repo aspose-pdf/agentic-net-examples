@@ -1,12 +1,12 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core Aspose.Pdf namespace (contains Document, Permissions, CryptoAlgorithm)
+using Aspose.Pdf;
 
-class Program
+class BatchEncryptPdf
 {
     static void Main()
     {
-        // Folder containing the PDFs to encrypt
+        // Folder containing PDF files to encrypt
         const string inputFolder = @"C:\PdfFolder";
         // Folder where encrypted PDFs will be saved
         const string outputFolder = @"C:\PdfFolder\Encrypted";
@@ -17,38 +17,36 @@ class Program
             return;
         }
 
-        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Enumerate all PDF files in the input folder (non‑recursive)
-        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Enumerate all PDF files (case‑insensitive) in the input folder
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+
+        foreach (string pdfPath in pdfFiles)
         {
             try
             {
-                // Derive a password from the file name (without extension)
+                // Derive password from file name (without extension)
                 string password = Path.GetFileNameWithoutExtension(pdfPath);
 
-                // Load the PDF document
+                // Define output file name
+                string encryptedPath = Path.Combine(outputFolder,
+                    Path.GetFileNameWithoutExtension(pdfPath) + "_encrypted.pdf");
+
+                // Open the document, encrypt, and save
                 using (Document doc = new Document(pdfPath))
                 {
-                    // Define permissions (example: allow printing and content extraction)
+                    // Permissions: allow printing and content extraction (adjust as needed)
                     Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-                    // Encrypt using the derived password for both user and owner,
-                    // AES‑256 algorithm (preferred per encryption rule)
-                    doc.Encrypt(userPassword: password,
-                                ownerPassword: password,
-                                permissions: perms,
-                                cryptoAlgorithm: CryptoAlgorithm.AESx256);
+                    // Encrypt with user and owner passwords (both set to the derived password)
+                    doc.Encrypt(password, password, perms, CryptoAlgorithm.AESx256);
 
-                    // Build the output file path (same name, placed in the output folder)
-                    string outputPath = Path.Combine(outputFolder, Path.GetFileName(pdfPath));
-
-                    // Save the encrypted PDF (PDF format, no SaveOptions needed)
-                    doc.Save(outputPath);
+                    // Save encrypted PDF
+                    doc.Save(encryptedPath);
                 }
 
-                Console.WriteLine($"Encrypted: {Path.GetFileName(pdfPath)} → {outputFolder}");
+                Console.WriteLine($"Encrypted: {Path.GetFileName(pdfPath)} → {encryptedPath}");
             }
             catch (Exception ex)
             {

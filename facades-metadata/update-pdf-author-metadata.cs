@@ -6,9 +6,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string newAuthor = "John Doe";
+        const string newAuthor  = "John Doe";
 
         if (!File.Exists(inputPath))
         {
@@ -16,17 +16,15 @@ class Program
             return;
         }
 
-        // Load the PDF file information
+        // Load the PDF file info, modify the Author, and save the updated PDF.
         using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
         {
-            // Update the Author metadata
-            pdfInfo.Author = newAuthor;
+            pdfInfo.Author = newAuthor;                     // Set new Author value
+            bool saved = pdfInfo.SaveNewInfo(outputPath);   // Persist changes
 
-            // Save the updated PDF to a new file
-            bool saved = pdfInfo.SaveNewInfo(outputPath);
             Console.WriteLine(saved
                 ? $"Author updated successfully. Saved to '{outputPath}'."
-                : "Failed to save the updated PDF.");
+                : $"Failed to save updated PDF to '{outputPath}'.");
         }
     }
 }

@@ -15,17 +15,17 @@ class Program
             return;
         }
 
-        // Load the PDF form using the Facades Form class
+        // Open the PDF form using the Facades API
         using (Form form = new Form(inputPdf))
         {
             // Retrieve the current value of the "Notes" field
-            object notesObj = form.GetField("Notes");
-            string notesText = notesObj?.ToString() ?? string.Empty;
+            object notesValue = form.GetField("Notes");
+            string notesText = notesValue?.ToString() ?? string.Empty;
 
             // Copy the retrieved text into the "Summary" field
             form.FillField("Summary", notesText);
 
-            // Save the modified PDF to a new file
+            // Save the modified document
             form.Save(outputPdf);
         }
 

@@ -1,42 +1,59 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // PDF containing a submit button
-        const string outputPdf = "output_with_confirm.pdf";
-        const string submitButtonName = "SubmitBtn";   // exact name of the push‑button field
-        const string submitUrl = "https://example.com/submit";
+        const string outputPdf = "output.pdf"; // PDF with confirmation script added
 
-        if (!File.Exists(inputPdf))
+        // 1. Create a minimal source PDF in memory (so we never depend on an external file).
+        using (var sourceStream = new MemoryStream())
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
-            return;
+            // Create a blank PDF with one page.
+            using (var doc = new Document())
+            {
+                doc.Pages.Add(); // add a default A4 page
+                // Save the document to the memory stream.
+                doc.Save(sourceStream);
+            }
+
+            // Reset the stream position before reading it again.
+            sourceStream.Position = 0;
+
+            // 2. JavaScript that shows a confirmation dialog before submitting the form.
+            // app.alert returns 4 when the user clicks "Yes" in a 3‑button dialog.
+            string confirmScript = "if(app.alert('Are you sure you want to submit?', 3) == 4) this.submitForm();";
+
+            // 3. Use FormEditor with the stream overload to avoid file‑system dependencies.
+            using (FormEditor editor = new FormEditor())
+            {
+                // Bind the PDF from the memory stream.
+                editor.BindPdf(sourceStream);
+
+                // Add a submit button on page 1 (coordinates are in points).
+                // Signature of AddSubmitBtn: (string fieldName, int pageNumber, string fieldName, string buttonLabel,
+                //                           float llx, float lly, float urx, float ury)
+                editor.AddSubmitBtn(
+                    "SubmitBtn",   // field/button name
+                    1,              // page number (1‑based)
+                    "SubmitBtn",   // field name (same as above)
+                    "Submit",      // button label displayed on the PDF
+                    100f,
+                    100f,
+                    200f,
+                    150f);
+
+                // Attach the JavaScript to the button.
+                editor.AddFieldScript("SubmitBtn", confirmScript);
+
+                // Save the modified PDF directly to disk.
+                editor.Save(outputPdf);
+            }
         }
 
-        // Bind the existing PDF to the FormEditor facade
-        FormEditor formEditor = new FormEditor();
-        formEditor.BindPdf(inputPdf);
-
-        // Ensure the button performs a submit to the desired URL
-        formEditor.SetSubmitUrl(submitButtonName, submitUrl);
-
-        // JavaScript that shows a confirmation dialog.
-        // app.alert returns 4 when the user clicks "Yes" in a question dialog (type 3).
-        string confirmJs = @"
-if (app.alert('Are you sure you want to submit the form?', 3) == 4) {
-    this.submitForm();
-}";
-        // Attach the script to the button (replaces any existing script)
-        formEditor.SetFieldScript(submitButtonName, confirmJs);
-
-        // Save the modified PDF
-        formEditor.Save(outputPdf);
-        formEditor.Close();
-
-        Console.WriteLine($"PDF saved with confirmation script: {outputPdf}");
+        Console.WriteLine($"PDF with confirmation dialog saved to '{outputPdf}'.");
     }
 }

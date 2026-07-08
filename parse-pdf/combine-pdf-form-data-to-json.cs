@@ -2,20 +2,21 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using Aspose.Pdf;
+using System.Text.Json;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF files containing form data
+        // Input PDF files containing form fields
         string[] pdfFiles = { "form1.pdf", "form2.pdf", "form3.pdf" };
-        // Output JSON file that will contain an array of form data objects
-        const string outputJsonPath = "combined_forms.json";
+        // Output file that will contain a JSON array with all form data
+        string outputJson = "combined_forms.json";
 
-        // Collect JSON objects exported from each PDF
-        List<string> jsonObjects = new List<string>();
+        // List to hold each PDF's exported JSON as a JsonElement
+        var combined = new List<JsonElement>();
 
-        foreach (string pdfPath in pdfFiles)
+        foreach (var pdfPath in pdfFiles)
         {
             if (!File.Exists(pdfPath))
             {
@@ -23,31 +24,37 @@ class Program
                 continue;
             }
 
-            // Load the PDF document (using the standard Document constructor)
+            // Load the PDF document (lifecycle rule: using ensures disposal)
             using (Document doc = new Document(pdfPath))
             {
-                // Export form fields to a memory stream in JSON format
+                // Export the form fields to a memory stream in JSON format
                 using (MemoryStream ms = new MemoryStream())
                 {
                     doc.Form.ExportToJson(ms);
-                    ms.Position = 0; // Reset stream position for reading
+                    ms.Position = 0; // Reset stream for reading
 
-                    using (StreamReader reader = new StreamReader(ms))
+                    // Parse the exported JSON and add its root element to the list
+                    using (JsonDocument jsonDoc = JsonDocument.Parse(ms))
                     {
-                        string json = reader.ReadToEnd().Trim();
-                        // Ensure each exported JSON fragment is a valid JSON object
-                        if (!json.StartsWith("{")) json = $"{{{json}}}";
-                        jsonObjects.Add(json);
+                        // Clone the root element because JsonDocument will be disposed
+                        combined.Add(jsonDoc.RootElement.Clone());
                     }
                 }
             }
         }
 
-        // Combine individual JSON objects into a single JSON array
-        string combinedJson = "[" + string.Join(",", jsonObjects) + "]";
-
         // Write the combined JSON array to the output file
-        File.WriteAllText(outputJsonPath, combinedJson);
-        Console.WriteLine($"Combined form data saved to '{outputJsonPath}'.");
+        using (FileStream outStream = new FileStream(outputJson, FileMode.Create, FileAccess.Write))
+        using (Utf8JsonWriter writer = new Utf8JsonWriter(outStream, new JsonWriterOptions { Indented = true }))
+        {
+            writer.WriteStartArray();
+            foreach (var element in combined)
+            {
+                element.WriteTo(writer);
+            }
+            writer.WriteEndArray();
+        }
+
+        Console.WriteLine($"Combined JSON saved to '{outputJson}'.");
     }
 }

@@ -1,110 +1,111 @@
 # Working with tables
 
-> **Working with tables** in PDF using C# / .NET -- **97** verified, compile-tested examples for **Aspose.PDF for .NET** 26.5.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Working with tables** in PDF using C# / .NET -- **98** verified, compile-tested examples for **Aspose.PDF for .NET** 26.6.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `working-with-tables`
-- Examples: 97
-- NuGet: `Aspose.PDF 26.5.0` -- target `net10.0`
+- Examples: 98
+- NuGet: `Aspose.PDF 26.6.0` -- target `net10.0`
 
 ## Examples
 
-- [`add-auto-numbered-column-to-pdf-table.cs`](./add-auto-numbered-column-to-pdf-table.cs) -- Add auto numbered column to pdf table
-- [`add-centered-paragraph-cell.cs`](./add-centered-paragraph-cell.cs) -- Add centered paragraph cell
-- [`add-checkbox-in-table-cell.cs`](./add-checkbox-in-table-cell.cs) -- Add checkbox in table cell
-- [`add-double-border-table.cs`](./add-double-border-table.cs) -- Add double border table
+- [`add-centered-paragraph-to-table-cell.cs`](./add-centered-paragraph-to-table-cell.cs) -- Add centered paragraph to table cell
+- [`add-checkbox-to-table-cell.cs`](./add-checkbox-to-table-cell.cs) -- Add checkbox to table cell
 - [`add-footnote-references-in-table-cells.cs`](./add-footnote-references-in-table-cells.cs) -- Add footnote references in table cells
-- [`add-gradient-background-to-table.cs`](./add-gradient-background-to-table.cs) -- Add gradient background to table
 - [`add-hyperlink-to-table-cell.cs`](./add-hyperlink-to-table-cell.cs) -- Add hyperlink to table cell
 - [`add-list-inside-table-cell.cs`](./add-list-inside-table-cell.cs) -- Add list inside table cell
-- [`add-multiline-text-cell.cs`](./add-multiline-text-cell.cs) -- Add multiline text cell
-- [`add-numbered-list-in-cell.cs`](./add-numbered-list-in-cell.cs) -- Add numbered list in cell
-- [`add-radio-button-group.cs`](./add-radio-button-group.cs) -- Add radio button group
-- [`add-table-as-paragraph-to-pdf.cs`](./add-table-as-paragraph-to-pdf.cs) -- Add table as paragraph to pdf
-- [`add-table-background-color-opacity.cs`](./add-table-background-color-opacity.cs) -- Add table background color opacity
-- [`add-table-to-pdf-shadow-effect.cs`](./add-table-to-pdf-shadow-effect.cs) -- Add table to pdf shadow effect
+- [`add-multiline-text-to-table-cell.cs`](./add-multiline-text-to-table-cell.cs) -- Add multiline text to table cell
+- [`add-radio-button-group-to-table-cell.cs`](./add-radio-button-group-to-table-cell.cs) -- Add radio button group to table cell
+- [`add-styled-text-to-table-cell.cs`](./add-styled-text-to-table-cell.cs) -- Add styled text to table cell
+- [`add-table-background-color-gradient-workaround.cs`](./add-table-background-color-gradient-workaround.cs) -- Add table background color gradient workaround
+- [`add-table-footer-to-pdf.cs`](./add-table-footer-to-pdf.cs) -- Add table footer to pdf
 - [`add-table-to-specific-pdf-page.cs`](./add-table-to-specific-pdf-page.cs) -- Add table to specific pdf page
-- [`add-table-to-textbox-form-field.cs`](./add-table-to-textbox-form-field.cs) -- Add table to textbox form field
+- [`add-table-to-textboxfield.cs`](./add-table-to-textboxfield.cs) -- Add table to textboxfield
 - [`add-table-with-remaining-page-space.cs`](./add-table-with-remaining-page-space.cs) -- Add table with remaining page space
-- [`add-text-with-font-to-table-cell.cs`](./add-text-with-font-to-table-cell.cs) -- Add text with font to table cell
+- [`add-table-with-semi-transparent-background.cs`](./add-table-with-semi-transparent-background.cs) -- Add table with semi transparent background
 - [`adjust-table-column-widths-proportionally.cs`](./adjust-table-column-widths-proportionally.cs) -- Adjust table column widths proportionally
-- [`apply-different-autofit-behavior-to-tables.cs`](./apply-different-autofit-behavior-to-tables.cs) -- Apply different autofit behavior to tables
+- [`alternating-row-colors-pdf-table.cs`](./alternating-row-colors-pdf-table.cs) -- Alternating row colors pdf table
+- [`apply-different-autofit-behaviors-to-multiple-tables.cs`](./apply-different-autofit-behaviors-to-multiple-tables.cs) -- Apply different autofit behaviors to multiple tables
+- [`apply-shadow-effect-to-pdf-table.cs`](./apply-shadow-effect-to-pdf-table.cs) -- Apply shadow effect to pdf table
 - [`apply-solid-border-to-pdf-table.cs`](./apply-solid-border-to-pdf-table.cs) -- Apply solid border to pdf table
-- [`auto-fit-row-height.cs`](./auto-fit-row-height.cs) -- Auto fit row height
 - [`auto-fit-table-columns-to-content.cs`](./auto-fit-table-columns-to-content.cs) -- Auto fit table columns to content
+- [`auto-fit-table-row-height.cs`](./auto-fit-table-row-height.cs) -- Auto fit table row height
+- [`auto-fit-table-to-page-width.cs`](./auto-fit-table-to-page-width.cs) -- Auto fit table to page width
+- [`auto-numbered-table.cs`](./auto-numbered-table.cs) -- Auto numbered table
 - [`batch-add-table-with-logo-to-pdfs.cs`](./batch-add-table-with-logo-to-pdfs.cs) -- Batch add table with logo to pdfs
 - [`batch-replace-tables-in-multiple-pdfs.cs`](./batch-replace-tables-in-multiple-pdfs.cs) -- Batch replace tables in multiple pdfs
-- [`calculate-rendered-table-width.cs`](./calculate-rendered-table-width.cs) -- Calculate rendered table width
 - [`center-align-table-in-pdf.cs`](./center-align-table-in-pdf.cs) -- Center align table in pdf
-- [`check-pdf-table-is-broken.cs`](./check-pdf-table-is-broken.cs) -- Check pdf table is broken
 - [`conditional-formatting-table-cells.cs`](./conditional-formatting-table-cells.cs) -- Conditional formatting table cells
-- [`count-tables-in-pdf-using-tableabsorber.cs`](./count-tables-in-pdf-using-tableabsorber.cs) -- Count tables in pdf using tableabsorber
+- [`count-tables-in-pdf.cs`](./count-tables-in-pdf.cs) -- Count tables in pdf
+- [`create-and-populate-table-pdf.cs`](./create-and-populate-table-pdf.cs) -- Create and populate table pdf
 - [`create-fixed-width-table.cs`](./create-fixed-width-table.cs) -- Create fixed width table
+- [`create-numbered-list-in-table-cell.cs`](./create-numbered-list-in-table-cell.cs) -- Create numbered list in table cell
 - [`create-pdf-table-dynamic-row-count.cs`](./create-pdf-table-dynamic-row-count.cs) -- Create pdf table dynamic row count
-- [`create-pdf-table-from-xml.cs`](./create-pdf-table-from-xml.cs) -- Create pdf table from xml
-- [`create-pdf-table-with-header.cs`](./create-pdf-table-with-header.cs) -- Create pdf table with header
-- [`create-pdf-table-with-max-column-widths.cs`](./create-pdf-table-with-max-column-widths.cs) -- Create pdf table with max column widths
-- [`create-pdf-table-with-styled-header.cs`](./create-pdf-table-with-styled-header.cs) -- Create pdf table with styled header
+- [`create-pdf-table-from-filtered-dataview.cs`](./create-pdf-table-from-filtered-dataview.cs) -- Create pdf table from filtered dataview
+- [`create-pdf-table-with-styled-header-row.cs`](./create-pdf-table-with-styled-header-row.cs) -- Create pdf table with styled header row
 - [`create-repeating-table-header.cs`](./create-repeating-table-header.cs) -- Create repeating table header
+- [`create-table-double-border.cs`](./create-table-double-border.cs) -- Create table double border
 - [`detect-merged-cells-in-pdf-tables.cs`](./detect-merged-cells-in-pdf-tables.cs) -- Detect merged cells in pdf tables
-- [`detect-tables-on-rotated-pdf-pages.cs`](./detect-tables-on-rotated-pdf-pages.cs) -- Detect tables on rotated pdf pages
-- [`disable-table-splitting-pdf.cs`](./disable-table-splitting-pdf.cs) -- Disable table splitting pdf
-- [`embed-html-in-table-cell.cs`](./embed-html-in-table-cell.cs) -- Embed html in table cell
+- [`determine-table-break-status.cs`](./determine-table-break-status.cs) -- Determine table break status
+- [`embed-html-fragment-in-table-cell.cs`](./embed-html-fragment-in-table-cell.cs) -- Embed html fragment in table cell
 - [`enable-table-splitting-across-pdf-pages.cs`](./enable-table-splitting-across-pdf-pages.cs) -- Enable table splitting across pdf pages
-- [`export-pdf-table-data-to-csv.cs`](./export-pdf-table-data-to-csv.cs) -- Export pdf table data to csv
-- [`export-pdf-table-structure-to-json.cs`](./export-pdf-table-structure-to-json.cs) -- Export pdf table structure to json
+- [`export-pdf-tables-to-csv.cs`](./export-pdf-tables-to-csv.cs) -- Export pdf tables to csv
+- [`export-table-structure-to-json.cs`](./export-table-structure-to-json.cs) -- Export table structure to json
+- [`extract-modify-tables-rotated-pages.cs`](./extract-modify-tables-rotated-pages.cs) -- Extract modify tables rotated pages
 - [`extract-pdf-tables-to-csv.cs`](./extract-pdf-tables-to-csv.cs) -- Extract pdf tables to csv
 - [`extract-pdf-tables-to-datatable.cs`](./extract-pdf-tables-to-datatable.cs) -- Extract pdf tables to datatable
 - [`extract-table-coordinates-from-pdf.cs`](./extract-table-coordinates-from-pdf.cs) -- Extract table coordinates from pdf
 - [`extract-tables-from-pdf.cs`](./extract-tables-from-pdf.cs) -- Extract tables from pdf
 - [`extract-text-from-pdf-tables.cs`](./extract-text-from-pdf-tables.cs) -- Extract text from pdf tables
-- [`import-datatable-images-table.cs`](./import-datatable-images-table.cs) -- Import datatable images table
+- [`generate-pdf-report-multiple-tables.cs`](./generate-pdf-report-multiple-tables.cs) -- Generate pdf report multiple tables
+- [`get-rendered-table-width.cs`](./get-rendered-table-width.cs) -- Get rendered table width
+- [`import-datatable-images-into-pdf-table.cs`](./import-datatable-images-into-pdf-table.cs) -- Import datatable images into pdf table
 - [`import-datatable-into-pdf-table.cs`](./import-datatable-into-pdf-table.cs) -- Import datatable into pdf table
 - [`import-datatable-into-pdf-table__v2.cs`](./import-datatable-into-pdf-table__v2.cs) -- Import datatable into pdf table  v2
 - [`import-filtered-dataview-into-pdf-table.cs`](./import-filtered-dataview-into-pdf-table.cs) -- Import filtered dataview into pdf table
-- [`import-filtered-dataview-into-pdf-table__v2.cs`](./import-filtered-dataview-into-pdf-table__v2.cs) -- Import filtered dataview into pdf table  v2
-- [`insert-column-into-pdf-table.cs`](./insert-column-into-pdf-table.cs) -- Insert column into pdf table
 - [`insert-external-image-into-table-cell.cs`](./insert-external-image-into-table-cell.cs) -- Insert external image into table cell
-- [`insert-image-into-table-cell.cs`](./insert-image-into-table-cell.cs) -- Insert image into table cell
+- [`insert-image-from-memory-stream-into-table-cell.cs`](./insert-image-from-memory-stream-into-table-cell.cs) -- Insert image from memory stream into table cell
+- [`insert-new-column-into-pdf-table.cs`](./insert-new-column-into-pdf-table.cs) -- Insert new column into pdf table
 - [`insert-page-break-after-table-row.cs`](./insert-page-break-after-table-row.cs) -- Insert page break after table row
 - [`insert-svg-image-into-table-cell.cs`](./insert-svg-image-into-table-cell.cs) -- Insert svg image into table cell
 - [`insert-table-after-paragraph.cs`](./insert-table-after-paragraph.cs) -- Insert table after paragraph
+- [`insert-table-after-paragraph__v2.cs`](./insert-table-after-paragraph__v2.cs) -- Insert table after paragraph  v2
 - [`insert-table-at-specific-position.cs`](./insert-table-at-specific-position.cs) -- Insert table at specific position
 - [`insert-table-before-image.cs`](./insert-table-before-image.cs) -- Insert table before image
 - [`insert-table-into-pdf.cs`](./insert-table-into-pdf.cs) -- Insert table into pdf
 - [`map-datatable-columns-to-pdf-table.cs`](./map-datatable-columns-to-pdf-table.cs) -- Map datatable columns to pdf table
-- [`merge-table-cells-colspan.cs`](./merge-table-cells-colspan.cs) -- Merge table cells colspan
-- [`merge-table-cells-using-rowspan.cs`](./merge-table-cells-using-rowspan.cs) -- Merge table cells using rowspan
-- [`offset-table-left-margin.cs`](./offset-table-left-margin.cs) -- Offset table left margin
-- [`pdf-report-multiple-tables.cs`](./pdf-report-multiple-tables.cs) -- Pdf report multiple tables
-- [`pdf-table-alternating-row-colors.cs`](./pdf-table-alternating-row-colors.cs) -- Pdf table alternating row colors
-- [`populate-pdf-table-from-linq-query.cs`](./populate-pdf-table-from-linq-query.cs) -- Populate pdf table from linq query
+- [`merge-table-cells-vertically-rowspan.cs`](./merge-table-cells-vertically-rowspan.cs) -- Merge table cells vertically rowspan
+- [`merge-table-columns-using-cell-colspan.cs`](./merge-table-columns-using-cell-colspan.cs) -- Merge table columns using cell colspan
+- [`offset-table-position.cs`](./offset-table-position.cs) -- Offset table position
+- [`populate-pdf-table-from-linq-datatable.cs`](./populate-pdf-table-from-linq-datatable.cs) -- Populate pdf table from linq datatable
+- [`prevent-table-splitting.cs`](./prevent-table-splitting.cs) -- Prevent table splitting
 - [`remove-all-tables-from-pdf.cs`](./remove-all-tables-from-pdf.cs) -- Remove all tables from pdf
 - [`remove-table-column.cs`](./remove-table-column.cs) -- Remove table column
 - [`remove-table-from-pdf.cs`](./remove-table-from-pdf.cs) -- Remove table from pdf
 - [`remove-tables-containing-keyword.cs`](./remove-tables-containing-keyword.cs) -- Remove tables containing keyword
-- [`render-rotated-table.cs`](./render-rotated-table.cs) -- Render rotated table
-- [`render-table-high-dpi-images.cs`](./render-table-high-dpi-images.cs) -- Render table high dpi images
+- [`render-high-dpi-image-in-table.cs`](./render-high-dpi-image-in-table.cs) -- Render high dpi image in table
+- [`render-table-from-xml-to-pdf.cs`](./render-table-from-xml-to-pdf.cs) -- Render table from xml to pdf
 - [`render-table-on-new-pdf-page.cs`](./render-table-on-new-pdf-page.cs) -- Render table on new pdf page
-- [`reorder-table-columns-in-pdf.cs`](./reorder-table-columns-in-pdf.cs) -- Reorder table columns in pdf
-- [`replace-existing-table-in-pdf.cs`](./replace-existing-table-in-pdf.cs) -- Replace existing table in pdf
+- [`reorder-table-columns.cs`](./reorder-table-columns.cs) -- Reorder table columns
+- [`replace-keyword-in-pdf-table-cells.cs`](./replace-keyword-in-pdf-table-cells.cs) -- Replace keyword in pdf table cells
 - [`replace-merged-table-cells.cs`](./replace-merged-table-cells.cs) -- Replace merged table cells
-- [`replace-text-in-table-cells-pdf.cs`](./replace-text-in-table-cells-pdf.cs) -- Replace text in table cells pdf
-- [`right-align-table-pdf.cs`](./right-align-table-pdf.cs) -- Right align table pdf
-- [`rotate-pdf-page-add-table.cs`](./rotate-pdf-page-add-table.cs) -- Rotate pdf page add table
-- [`serialize-table-to-xml.cs`](./serialize-table-to-xml.cs) -- Serialize table to xml
-- [`set-cell-margins.cs`](./set-cell-margins.cs) -- Set cell margins
+- [`replace-table-in-pdf.cs`](./replace-table-in-pdf.cs) -- Replace table in pdf
+- [`right-align-table.cs`](./right-align-table.cs) -- Right align table
+- [`rotate-page-add-table.cs`](./rotate-page-add-table.cs) -- Rotate page add table
+- [`rotate-table-90-degrees.cs`](./rotate-table-90-degrees.cs) -- Rotate table 90 degrees
+- [`rotate-text-in-table-cell.cs`](./rotate-text-in-table-cell.cs) -- Rotate text in table cell
+- [`set-cell-background-color-in-pdf-table.cs`](./set-cell-background-color-in-pdf-table.cs) -- Set cell background color in pdf table
+- [`set-cell-margins-in-pdf-table.cs`](./set-cell-margins-in-pdf-table.cs) -- Set cell margins in pdf table
 - [`set-cell-vertical-alignment-middle.cs`](./set-cell-vertical-alignment-middle.cs) -- Set cell vertical alignment middle
+- [`set-custom-row-height-in-pdf-table.cs`](./set-custom-row-height-in-pdf-table.cs) -- Set custom row height in pdf table
 - [`set-default-cell-padding-for-pdf-table.cs`](./set-default-cell-padding-for-pdf-table.cs) -- Set default cell padding for pdf table
-- [`set-fixed-row-height-in-pdf-table.cs`](./set-fixed-row-height-in-pdf-table.cs) -- Set fixed row height in pdf table
-- [`set-fixed-row-height.cs`](./set-fixed-row-height.cs) -- Set fixed row height
-- [`set-minimum-column-width-for-pdf-table.cs`](./set-minimum-column-width-for-pdf-table.cs) -- Set minimum column width for pdf table
-- [`set-page-orientation-landscape-table.cs`](./set-page-orientation-landscape-table.cs) -- Set page orientation landscape table
-- [`set-table-autofitbehavior.cs`](./set-table-autofitbehavior.cs) -- Set table autofitbehavior
-- [`set-table-border-thickness.cs`](./set-table-border-thickness.cs) -- Set table border thickness
-- [`set-table-cell-background-color.cs`](./set-table-cell-background-color.cs) -- Set table cell background color
-- [`set-table-width-80-percent.cs`](./set-table-width-80-percent.cs) -- Set table width 80 percent
-- [`set-table-z-index-in-pdf.cs`](./set-table-z-index-in-pdf.cs) -- Set table z index in pdf
-- [`table-with-header-and-repeating-column.cs`](./table-with-header-and-repeating-column.cs) -- Table with header and repeating column
+- [`set-fixed-row-height-table.cs`](./set-fixed-row-height-table.cs) -- Set fixed row height table
+- [`set-landscape-orientation-add-wide-table.cs`](./set-landscape-orientation-add-wide-table.cs) -- Set landscape orientation add wide table
+- [`set-maximum-column-width-pdf-tables.cs`](./set-maximum-column-width-pdf-tables.cs) -- Set maximum column width pdf tables
+- [`set-minimum-column-width.cs`](./set-minimum-column-width.cs) -- Set minimum column width
+- [`set-table-border-thickness-2-points.cs`](./set-table-border-thickness-2-points.cs) -- Set table border thickness 2 points
+- [`set-table-width-percentage.cs`](./set-table-width-percentage.cs) -- Set table width percentage
+- [`set-table-zindex.cs`](./set-table-zindex.cs) -- Set table zindex
+- [`table-with-repeating-header-and-column.cs`](./table-with-repeating-header-and-column.cs) -- Table with repeating header and column
 
 ## See Also
 

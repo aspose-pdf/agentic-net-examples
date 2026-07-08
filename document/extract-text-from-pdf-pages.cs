@@ -7,49 +7,46 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file, output text file and page range
-        const string inputPdfPath  = "input.pdf";
-        const string outputTxtPath = "extracted.txt";
-        const int startPage = 2;   // first page to extract (1‑based)
-        const int endPage   = 5;   // last page to extract (inclusive)
+        const string inputPdf = "input.pdf";
+        const string outputTxt = "extracted.txt";
+        const int startPage = 2; // first page to extract (1‑based)
+        const int endPage = 5;   // last page to extract (inclusive)
 
-        // Verify the source PDF exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         try
         {
-            // Load the PDF document (core API, no Facades)
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Load the PDF document
+            using (Document doc = new Document(inputPdf))
             {
-                // Validate page range
-                int totalPages = pdfDoc.Pages.Count;
-                if (startPage < 1 || endPage > totalPages || startPage > endPage)
+                // Ensure the requested range is within the document bounds
+                int totalPages = doc.Pages.Count;
+                int from = Math.Max(1, startPage);
+                int to   = Math.Min(totalPages, endPage);
+                if (from > to)
                 {
-                    Console.Error.WriteLine("Invalid page range specified.");
+                    Console.Error.WriteLine("Invalid page range.");
                     return;
                 }
 
-                // TextAbsorber collects extracted text
+                // Create a TextAbsorber to collect text
                 TextAbsorber absorber = new TextAbsorber();
 
-                // Extract text from each page in the specified range
-                for (int pageNum = startPage; pageNum <= endPage; pageNum++)
+                // Extract text from each page in the range
+                for (int i = from; i <= to; i++)
                 {
-                    // Accept the absorber for the current page
-                    absorber.Visit(pdfDoc.Pages[pageNum]);
+                    doc.Pages[i].Accept(absorber);
                 }
 
-                // Retrieve the accumulated text
-                string extractedText = absorber.Text ?? string.Empty;
-
-                // Save the text to a plain .txt file
-                File.WriteAllText(outputTxtPath, extractedText);
-                Console.WriteLine($"Text extracted from pages {startPage}-{endPage} to '{outputTxtPath}'.");
+                // Save the extracted text to a plain‑text file
+                File.WriteAllText(outputTxt, absorber.Text);
             }
+
+            Console.WriteLine($"Text extracted to '{outputTxt}'.");
         }
         catch (Exception ex)
         {

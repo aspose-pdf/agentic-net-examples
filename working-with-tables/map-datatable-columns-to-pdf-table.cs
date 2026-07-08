@@ -1,119 +1,100 @@
 using System;
 using System.Data;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
+using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Prepare a sample DataTable
-        DataTable dataTable = new DataTable("Sample");
-        dataTable.Columns.Add("Name", typeof(string));
-        dataTable.Columns.Add("Age", typeof(int));
-        dataTable.Columns.Add("Country", typeof(string));
+        // Sample DataTable with three columns
+        DataTable sourceTable = new DataTable();
+        sourceTable.Columns.Add("ID", typeof(int));
+        sourceTable.Columns.Add("Name", typeof(string));
+        sourceTable.Columns.Add("Amount", typeof(double));
 
-        dataTable.Rows.Add("Alice", 30, "USA");
-        dataTable.Rows.Add("Bob", 25, "Canada");
-        dataTable.Rows.Add("Charlie", 35, "UK");
+        sourceTable.Rows.Add(1, "Alice", 123.45);
+        sourceTable.Rows.Add(2, "Bob",   678.90);
+        sourceTable.Rows.Add(3, "Carol", 234.56);
 
-        // Define a mapping: DataTable column name -> target table column index (0‑based)
-        // Example: target column 0 <- Name, column 1 <- Country, column 2 <- Age
-        var columnMapping = new Dictionary<string, int>
+        // Mapping: source column index -> target table column index
+        // Example: ID (0) -> column 2, Name (1) -> column 0, Amount (2) -> column 1
+        var columnMapping = new Dictionary<int, int>
         {
-            { "Name", 0 },
-            { "Country", 1 },
-            { "Age", 2 }
+            { 0, 2 },
+            { 1, 0 },
+            { 2, 1 }
         };
 
-        // Determine the number of columns in the target table (maximum mapped index + 1)
-        int targetColumnCount = 0;
-        foreach (int idx in columnMapping.Values)
-            if (idx + 1 > targetColumnCount) targetColumnCount = idx + 1;
+        // Determine number of target columns (max mapped index + 1)
+        int targetColumnCount = columnMapping.Values.Max() + 1;
 
-        // Build sourceColumnList ordered by target column index
-        int[] sourceColumnList = new int[targetColumnCount];
-        foreach (var kvp in columnMapping)
+        // Build a reordered DataTable that matches the target column order
+        DataTable reorderedTable = new DataTable();
+
+        // Create columns in target order
+        for (int targetIdx = 0; targetIdx < targetColumnCount; targetIdx++)
         {
-            // Guard against a missing column name – this removes the CS8602 warning.
-            if (!dataTable.Columns.Contains(kvp.Key))
-                throw new ArgumentException($"Column '{kvp.Key}' does not exist in the source DataTable.");
+            // Find source column that maps to this target index
+            int sourceIdx = columnMapping.FirstOrDefault(kv => kv.Value == targetIdx).Key;
 
-            int sourceOrdinal = dataTable.Columns[kvp.Key]!.Ordinal; // safe after the Contains check
-            sourceColumnList[kvp.Value] = sourceOrdinal;
+            // If a mapping exists, copy the column definition and data
+            if (columnMapping.ContainsKey(sourceIdx))
+            {
+                // Preserve original column name for readability
+                string colName = sourceTable.Columns[sourceIdx].ColumnName;
+                reorderedTable.Columns.Add(colName, sourceTable.Columns[sourceIdx].DataType);
+            }
+            else
+            {
+                // No source column mapped to this target position – add an empty placeholder column
+                reorderedTable.Columns.Add($"Placeholder_{targetIdx}", typeof(string));
+            }
         }
 
-        // Build sourceRowList to import all rows
-        int[] sourceRowList = new int[dataTable.Rows.Count];
-        for (int i = 0; i < sourceRowList.Length; i++)
-            sourceRowList[i] = i;
-
-        // Create a new PDF document
-        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document())
+        // Populate rows according to the mapping
+        foreach (DataRow srcRow in sourceTable.Rows)
         {
-            // Add a page
-            Aspose.Pdf.Page page = doc.Pages.Add();
-
-            // Create a table and set basic layout
-            Aspose.Pdf.Table table = new Aspose.Pdf.Table
+            DataRow newRow = reorderedTable.NewRow();
+            for (int targetIdx = 0; targetIdx < targetColumnCount; targetIdx++)
             {
-                // Example: three equal width columns
-                ColumnWidths = "150 150 150",
-                // Optional visual styling
-                Border = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Black),
-                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Gray),
-                DefaultCellPadding = new MarginInfo { Top = 5, Bottom = 5, Left = 5, Right = 5 },
-                DefaultCellTextState = new TextState { FontSize = 12, Font = FontRepository.FindFont("Helvetica") }
-            };
+                int sourceIdx = columnMapping.FirstOrDefault(kv => kv.Value == targetIdx).Key;
+                if (columnMapping.ContainsKey(sourceIdx))
+                {
+                    newRow[targetIdx] = srcRow[sourceIdx];
+                }
+                else
+                {
+                    newRow[targetIdx] = DBNull.Value;
+                }
+            }
+            reorderedTable.Rows.Add(newRow);
+        }
 
-            // Import the DataTable using the column mapping
-            // showColumnNamesAsFirstRow = true (include column headers)
-            // isHtmlSupported = false (plain text)
-            table.ImportDataTable(
-                dataTable,
-                sourceRowList,
-                sourceColumnList,
-                firstFilledRow: 0,
-                firstFilledColumn: 0,
-                showColumnNamesAsFirstRow: true,
-                isHtmlSupported: false);
+        // Create a new PDF document and add a page
+        using (Document doc = new Document())
+        {
+            Page page = doc.Pages.Add();
+
+            // Create a table with the required number of columns
+            Table table = new Table();
+
+            // Define column widths (equal width for simplicity)
+            // Table.ColumnWidths is a string; set it to a space‑separated list of widths
+            table.ColumnWidths = string.Join(" ", Enumerable.Repeat("100", targetColumnCount));
+
+            // Import the reordered DataTable into the Aspose.Pdf.Table
+            // Parameters: (DataTable, isColumnNamesImported, firstFilledRow, firstFilledColumn)
+            table.ImportDataTable(reorderedTable, true, 0, 0);
 
             // Add the table to the page
             page.Paragraphs.Add(table);
 
-            // Save the PDF – guard against missing libgdiplus on macOS/Linux
-            string outputPath = "MappedTable.pdf";
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                doc.Save(outputPath);
-            }
-            else
-            {
-                try
-                {
-                    doc.Save(outputPath);
-                }
-                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
-                {
-                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. PDF was not saved.");
-                }
-            }
+            // Save the PDF
+            doc.Save("MappedTable.pdf");
         }
 
-        Console.WriteLine("PDF generation completed.");
-    }
-
-    // Helper to detect a nested DllNotFoundException (e.g., missing libgdiplus)
-    private static bool ContainsDllNotFound(Exception? ex)
-    {
-        while (ex != null)
-        {
-            if (ex is DllNotFoundException)
-                return true;
-            ex = ex.InnerException;
-        }
-        return false;
+        Console.WriteLine("PDF with mapped table saved as 'MappedTable.pdf'.");
     }
 }

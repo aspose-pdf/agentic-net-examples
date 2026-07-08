@@ -7,44 +7,69 @@ using Aspose.Pdf.Facades;
 
 class Program
 {
-    // Async Main to allow awaiting the download
     static async Task Main()
     {
-        const string inputPdfPath  = "input.pdf";          // Existing PDF to modify
-        const string outputPdfPath = "output.pdf";         // Resulting PDF with attachment
-        const string fileUrl       = "https://example.com/file.bin"; // URL of the file to attach
-        const string attachmentName = "file.bin";          // Name that will appear in the PDF
-        const string description    = "Downloaded attachment"; // Description for the attachment
+        // Paths for the source PDF and the output PDF
+        const string sourcePdfPath = "input.pdf";
+        const string outputPdfPath = "output.pdf";
 
-        // Verify the source PDF exists
-        if (!File.Exists(inputPdfPath))
+        // URL of the file to download and attach (replace with a valid URL)
+        const string fileUrl = "https://example.com/file.bin";
+
+        // Name and description for the attachment inside the PDF
+        const string attachmentName = "file.bin";
+        const string attachmentDescription = "File downloaded from network";
+
+        // Ensure the source PDF exists – create an empty one if it does not.
+        if (!File.Exists(sourcePdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
+            using var emptyDoc = new Document();
+            emptyDoc.Pages.Add(); // add a blank page so the PDF is valid
+            emptyDoc.Save(sourcePdfPath);
+            Console.WriteLine($"Source PDF not found. Created empty placeholder at '{sourcePdfPath}'.");
         }
 
-        // Download the file into a byte array
-        byte[] fileBytes;
-        using (HttpClient httpClient = new HttpClient())
+        // Download the file into a byte array – handle possible HTTP errors gracefully
+        byte[]? fileBytes = null;
+        try
         {
-            fileBytes = await httpClient.GetByteArrayAsync(fileUrl);
+            using var httpClient = new HttpClient();
+            HttpResponseMessage response = await httpClient.GetAsync(fileUrl);
+            response.EnsureSuccessStatusCode(); // throws if status is not 2xx
+            fileBytes = await response.Content.ReadAsByteArrayAsync();
+        }
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine($"Failed to download attachment from '{fileUrl}'. Reason: {ex.Message}");
+            Console.WriteLine("The PDF will be saved without the attachment.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Unexpected error while downloading the file: {ex.Message}");
+            Console.WriteLine("The PDF will be saved without the attachment.");
         }
 
-        // Wrap the byte array in a MemoryStream for Aspose.Pdf.Facades
-        using (MemoryStream attachmentStream = new MemoryStream(fileBytes))
-        // PdfContentEditor implements IDisposable, so use a using block
+        // Initialize the PdfContentEditor facade and bind the source PDF
         using (PdfContentEditor editor = new PdfContentEditor())
         {
-            // Bind the existing PDF document
-            editor.BindPdf(inputPdfPath);
+            editor.BindPdf(sourcePdfPath);
 
-            // Add the attachment without a visible annotation
-            editor.AddDocumentAttachment(attachmentStream, attachmentName, description);
+            // Add the attachment only if we successfully retrieved the bytes
+            if (fileBytes != null && fileBytes.Length > 0)
+            {
+                using var attachmentStream = new MemoryStream(fileBytes);
+                editor.AddDocumentAttachment(attachmentStream, attachmentName, attachmentDescription);
+                Console.WriteLine($"Attachment '{attachmentName}' added to the PDF.");
+            }
+            else
+            {
+                Console.WriteLine("No attachment was added because the download failed or returned empty content.");
+            }
 
             // Save the modified PDF
             editor.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"File attached and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"PDF processing completed. Output file: '{outputPdfPath}'.");
     }
 }

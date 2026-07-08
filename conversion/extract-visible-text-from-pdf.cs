@@ -7,37 +7,40 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file (must exist)
-        const string inputPdfPath = "input.pdf";
-        // Output text file
-        const string outputTxtPath = "extracted_text.txt";
+        const string inputPath = "input.pdf";
+        const string outputPath = "extracted.txt";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        try
         {
-            // Create a TextAbsorber to extract visible text.
-            // Use Pure formatting mode to get readable text without hidden OCR layers.
-            TextAbsorber absorber = new TextAbsorber
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
             {
-                ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure)
-            };
+                // Create a TextAbsorber to extract visible text only
+                TextAbsorber absorber = new TextAbsorber();
 
-            // Apply the absorber to all pages of the document
-            pdfDoc.Pages.Accept(absorber);
+                // Use the Pure formatting mode to get readable text without hidden layers
+                absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
 
-            // Retrieve the extracted text
-            string extractedText = absorber.Text;
+                // Apply the absorber to all pages
+                doc.Pages.Accept(absorber);
 
-            // Write the text to the output file
-            File.WriteAllText(outputTxtPath, extractedText);
+                // Retrieve the extracted text
+                string extractedText = absorber.Text;
+
+                // Save the text to a file
+                File.WriteAllText(outputPath, extractedText);
+                Console.WriteLine($"Text extracted to '{outputPath}'.");
+            }
         }
-
-        Console.WriteLine($"Text extracted to '{outputTxtPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

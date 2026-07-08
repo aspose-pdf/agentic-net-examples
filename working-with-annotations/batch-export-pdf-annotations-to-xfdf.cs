@@ -6,50 +6,45 @@ class Program
 {
     static void Main()
     {
-        // Folder containing the PDF files to process
-        const string inputFolder = @"C:\PdfBatch\Input";
-        // Folder where the XFDF files will be saved
-        const string outputFolder = @"C:\PdfBatch\Xfdf";
+        // Folder containing source PDF files
+        const string inputFolder = "InputPdfs";
+        // Folder where XFDF files will be written
+        const string outputFolder = "OutputXfdf";
 
         if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"Input folder does not exist: {inputFolder}");
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
             return;
         }
 
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
         // Get all PDF files in the input folder (non‑recursive)
         string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-        if (pdfFiles.Length == 0)
-        {
-            Console.WriteLine("No PDF files found to process.");
-            return;
-        }
 
         foreach (string pdfPath in pdfFiles)
         {
             try
             {
-                // Open the PDF document (Document implements IDisposable)
+                // Load the PDF document (wrapped in using for deterministic disposal)
                 using (Document doc = new Document(pdfPath))
                 {
-                    // Build the output XFDF file name – same base name, .xfdf extension
-                    string xfdfFileName = Path.GetFileNameWithoutExtension(pdfPath) + ".xfdf";
-                    string xfdfPath = Path.Combine(outputFolder, xfdfFileName);
+                    // Build the XFDF file name based on the PDF name
+                    string baseName = Path.GetFileNameWithoutExtension(pdfPath);
+                    string xfdfPath = Path.Combine(outputFolder, baseName + ".xfdf");
 
-                    // Export all annotations of the document to the XFDF file
+                    // Export all annotations from the PDF to the XFDF file
                     doc.ExportAnnotationsToXfdf(xfdfPath);
-
-                    Console.WriteLine($"Exported annotations from '{Path.GetFileName(pdfPath)}' to '{xfdfFileName}'.");
                 }
+
+                Console.WriteLine($"Exported: {Path.GetFileName(pdfPath)} → {Path.GetFileName(outputFolder)}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{Path.GetFileName(pdfPath)}': {ex.Message}");
+                // Log any errors but continue processing remaining files
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         }
-
-        Console.WriteLine("Batch export completed.");
     }
 }

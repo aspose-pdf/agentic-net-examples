@@ -8,34 +8,38 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string altText    = "Accessible description of the image";
+        const string altText    = "Description of the image for screen readers";
 
-        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        // Load the PDF document (using statement ensures proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages
-            foreach (Page page in doc.Pages)
+            // Iterate over all pages (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Iterate over all images on the current page
+                Page page = doc.Pages[i];
+
+                // Iterate over each XImage resource on the page
                 foreach (XImage img in page.Resources.Images)
                 {
-                    // Set alternative text for the image.
-                    // The method returns a bool indicating success; we ignore it here.
-                    img.TrySetAlternativeText(altText, page);
+                    // Try to set alternative text; returns true if successful
+                    bool success = img.TrySetAlternativeText(altText, page);
+                    if (!success)
+                    {
+                        Console.WriteLine($"Could not set alt text for an image on page {i}.");
+                    }
                 }
             }
 
-            // Save the modified PDF (lifecycle rule: use Save inside the using block)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with alternative text to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with alternative text: {outputPath}");
     }
 }

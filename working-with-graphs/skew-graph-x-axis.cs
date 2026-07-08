@@ -7,46 +7,42 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
         const string outputPath = "skewed_graph.pdf";
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document and ensure proper disposal
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            // Add a blank page to the document
+            Page page = doc.Pages.Add();
 
-        // Load the existing PDF (lifecycle rule: use Document constructor)
-        using (Document doc = new Document(inputPath))
-        {
-            // Create a graph container (width: 200 points, height: 100 points)
-            Graph graph = new Graph(200, 100);
+            // Create a Graph container (width, height in points)
+            Aspose.Pdf.Drawing.Graph graph = new Aspose.Pdf.Drawing.Graph(400, 200);
 
-            // Create a rectangle shape inside the graph
-            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(0, 0, 150, 70);
-            // Set visual properties via GraphInfo
-            rect.GraphInfo = new GraphInfo
+            // Apply a skew transformation on the X axis (degrees)
+            graph.GraphInfo = new Aspose.Pdf.GraphInfo
             {
-                FillColor = Color.LightGray,
-                Color     = Color.Black,
+                SkewAngleX = 30 // slant the graph 30 degrees on the X axis
+            };
+
+            // Create a rectangle shape to demonstrate the skew effect
+            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(0, 0, 200, 100);
+            rect.GraphInfo = new Aspose.Pdf.GraphInfo
+            {
+                FillColor = Aspose.Pdf.Color.LightGray,
+                Color = Aspose.Pdf.Color.Black,
                 LineWidth = 1
             };
-            // Add the rectangle to the graph
+
+            // Add the rectangle to the graph's shape collection
             graph.Shapes.Add(rect);
 
-            // Apply X‑axis skew to the entire graph (creates a slanted effect)
-            // SkewAngleX is in degrees
-            graph.GraphInfo.SkewAngleX = 30; // 30° skew on X axis
-
-            // Add the graph to the first page of the document
-            Page page = doc.Pages[1];
+            // Add the graph to the page's paragraph collection
             page.Paragraphs.Add(graph);
 
-            // Save the modified PDF (lifecycle rule: use Document.Save)
+            // Save the PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Skewed graph saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

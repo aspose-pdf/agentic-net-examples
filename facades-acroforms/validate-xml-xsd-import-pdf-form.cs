@@ -8,78 +8,75 @@ class Program
 {
     static void Main()
     {
-        const string pdfFormPath   = "FormTemplate.pdf";   // existing PDF form
-        const string xmlDataPath   = "data.xml";           // XML to import
-        const string xsdSchemaPath = "schema.xsd";         // XSD schema
-        const string outputPdfPath = "FormFilled.pdf";     // result PDF
+        const string pdfTemplatePath = "FormTemplate.pdf";   // source PDF with form fields
+        const string pdfOutputPath   = "FormFilled.pdf";    // destination PDF after import
+        const string xmlDataPath    = "data.xml";           // XML file containing form data
+        const string xsdSchemaPath  = "data.xsd";           // XSD schema to validate XML against
 
-        // Validate XML against XSD
-        if (!ValidateXml(xmlDataPath, xsdSchemaPath, out string validationError))
+        // Ensure the XSD schema file exists before attempting validation
+        if (!File.Exists(xsdSchemaPath))
         {
-            Console.Error.WriteLine($"XML validation failed: {validationError}");
+            Console.Error.WriteLine($"Schema file not found: '{xsdSchemaPath}'. Validation cannot be performed.");
             return;
         }
 
-        // Import validated XML into the PDF form
-        using (Form form = new Form())
+        // Validate XML against XSD before importing
+        if (!ValidateXml(xmlDataPath, xsdSchemaPath))
         {
-            // Bind the source PDF form
-            form.BindPdf(pdfFormPath);
+            Console.Error.WriteLine("XML validation failed. Import aborted.");
+            return;
+        }
 
-            // Import XML data
+        // Import validated XML into the PDF form using the correct API
+        using (Form form = new Form(pdfTemplatePath))
+        {
             using (FileStream xmlStream = new FileStream(xmlDataPath, FileMode.Open, FileAccess.Read))
             {
+                // Correct method name: ImportXml
                 form.ImportXml(xmlStream);
             }
 
-            // Save the filled PDF
-            form.Save(outputPdfPath);
+            // Save the resulting PDF using the overload that takes the destination path
+            form.Save(pdfOutputPath);
         }
 
-        Console.WriteLine($"Form successfully filled and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Form data imported successfully to '{pdfOutputPath}'.");
     }
 
-    // Returns true if XML is valid; otherwise false with an error message.
-    private static bool ValidateXml(string xmlPath, string xsdPath, out string errorMessage)
+    // Returns true if the XML file conforms to the XSD schema; otherwise false.
+    static bool ValidateXml(string xmlPath, string xsdPath)
     {
-        // Local variable to capture validation errors (cannot capture 'out' directly in a lambda)
-        string localError = string.Empty;
-        errorMessage = string.Empty;
+        if (!File.Exists(xmlPath))
+        {
+            Console.Error.WriteLine($"XML file not found: '{xmlPath}'.");
+            return false;
+        }
+
+        bool isValid = true;
+        XmlReaderSettings settings = new XmlReaderSettings
+        {
+            ValidationType = ValidationType.Schema
+        };
+        settings.Schemas.Add(null, xsdPath);
+        settings.ValidationEventHandler += (sender, args) =>
+        {
+            Console.Error.WriteLine($"Validation {args.Severity}: {args.Message}");
+            isValid = false;
+        };
+
         try
         {
-            XmlSchemaSet schemas = new XmlSchemaSet();
-            schemas.Add(null, xsdPath);
-
-            XmlReaderSettings settings = new XmlReaderSettings
-            {
-                ValidationType = ValidationType.Schema,
-                Schemas = schemas,
-                // Stop on first error (warnings are also reported)
-                ValidationFlags = XmlSchemaValidationFlags.ReportValidationWarnings
-            };
-            settings.ValidationEventHandler += (sender, args) =>
-            {
-                // Capture the first validation error or warning
-                if (string.IsNullOrEmpty(localError))
-                {
-                    localError = args.Message;
-                }
-            };
-
             using (XmlReader reader = XmlReader.Create(xmlPath, settings))
             {
-                while (reader.Read()) { } // Parse the entire document
+                while (reader.Read()) { /* reading triggers validation */ }
             }
-
-            // Propagate the captured error (if any) to the out parameter
-            errorMessage = localError;
-            // Validation succeeded when no error was captured
-            return string.IsNullOrEmpty(localError);
         }
         catch (Exception ex)
         {
-            errorMessage = ex.Message;
+            Console.Error.WriteLine($"Exception during XML validation: {ex.Message}");
             return false;
         }
+
+        return isValid;
     }
 }

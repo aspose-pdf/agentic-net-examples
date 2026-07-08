@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 
 class Program
 {
@@ -10,6 +9,7 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "flattened.pdf";
 
+        // Verify the source PDF exists.
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
@@ -18,22 +18,13 @@ class Program
 
         try
         {
-            // Load the PDF document
+            // Load the PDF document inside a using block for deterministic disposal.
             using (Document doc = new Document(inputPath))
             {
-                // Fill form fields – cast the returned WidgetAnnotation to a Field
-                Field? nameField = doc.Form["Name"] as Field;
-                if (nameField != null)
-                    nameField.Value = "John Doe";
+                // Flatten all form fields: their values become static content on the pages.
+                doc.Flatten();
 
-                Field? dateField = doc.Form["Date"] as Field;
-                if (dateField != null)
-                    dateField.Value = DateTime.Today.ToShortDateString();
-
-                // Flatten the form – removes interactive fields and writes their values onto the page
-                doc.Form.Flatten();
-
-                // Save the flattened PDF
+                // Save the resulting PDF.
                 doc.Save(outputPath);
             }
 

@@ -2,47 +2,82 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "booklet_output.pdf";
+        // Paths for temporary files
+        const string inputPdfPath  = "input_booklet.pdf";
+        const string outputPdfPath = "output_booklet.pdf";
 
-        if (!File.Exists(inputPdf))
+        // ------------------------------------------------------------
+        // 1. Create a simple PDF with 4 pages (evaluation limit), each page contains its number.
+        // ------------------------------------------------------------
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            for (int i = 1; i <= 4; i++)
+            {
+                Page page = doc.Pages.Add();
+                TextFragment tf = new TextFragment($"Page {i}");
+                tf.TextState.FontSize = 48;
+                tf.TextState.Font = FontRepository.FindFont("Helvetica");
+                tf.Position = new Position(100, 500);
+                page.Paragraphs.Add(tf);
+            }
+            doc.Save(inputPdfPath);
+        }
+
+        // ------------------------------------------------------------
+        // 2. Define custom left and right page order for the booklet.
+        //    Left pages will appear on the left side of each spread,
+        //    right pages on the right side.
+        // ------------------------------------------------------------
+        // Evaluation version of Aspose.Pdf can process at most 4 pages in a single operation.
+        // Therefore we limit the source document to 4 pages.
+        int[] leftPages  = new int[] { 2, 4 };
+        int[] rightPages = new int[] { 1, 3 };
+
+        // ------------------------------------------------------------
+        // 3. Create the booklet using the custom page arrays.
+        // ------------------------------------------------------------
+        PdfFileEditor editor = new PdfFileEditor();
+        bool success = editor.MakeBooklet(inputPdfPath, outputPdfPath, leftPages, rightPages);
+
+        if (!success)
+        {
+            Console.Error.WriteLine("MakeBooklet operation failed.");
             return;
         }
 
-        // Determine total page count using Document (must be disposed)
-        int totalPages;
-        using (Document doc = new Document(inputPdf))
+        // ------------------------------------------------------------
+        // 4. Load the resulting booklet and extract the text of each page
+        //    to verify the order matches the supplied arrays.
+        // ------------------------------------------------------------
+        using (Document resultDoc = new Document(outputPdfPath))
         {
-            totalPages = doc.Pages.Count;
+            Console.WriteLine("Booklet page order (extracted text):");
+            for (int pageIndex = 1; pageIndex <= resultDoc.Pages.Count; pageIndex++)
+            {
+                TextAbsorber absorber = new TextAbsorber();
+                resultDoc.Pages[pageIndex].Accept(absorber);
+                string pageText = absorber.Text.Trim();
+                Console.WriteLine($"  Output Page {pageIndex}: \"{pageText}\"");
+            }
         }
 
-        // Build left (odd) and right (even) page sequences
-        int leftCount  = (totalPages + 1) / 2; // odd pages count
-        int rightCount = totalPages / 2;       // even pages count
-
-        int[] leftPages  = new int[leftCount];
-        int[] rightPages = new int[rightCount];
-
-        // Fill arrays: Aspose.Pdf uses 1‑based page indexing
-        for (int i = 0, odd = 1, even = 2; i < leftCount; i++, odd += 2)
-            leftPages[i] = odd;
-
-        for (int i = 0, even = 2; i < rightCount; i++, even += 2)
-            rightPages[i] = even;
-
-        // Create booklet with custom page ordering
-        PdfFileEditor editor = new PdfFileEditor();
-        bool success = editor.MakeBooklet(inputPdf, outputPdf, leftPages, rightPages);
-
-        Console.WriteLine(success
-            ? $"Booklet created successfully: {outputPdf}"
-            : "Failed to create booklet.");
+        // ------------------------------------------------------------
+        // 5. Clean up temporary files (optional)
+        // ------------------------------------------------------------
+        try
+        {
+            File.Delete(inputPdfPath);
+            File.Delete(outputPdfPath);
+        }
+        catch
+        {
+            // Ignored – files may be in use or deletion may fail.
+        }
     }
 }

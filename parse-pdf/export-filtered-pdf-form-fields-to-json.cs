@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using System.Text.Json;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
@@ -9,9 +9,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputJson = "filtered_fields.json";
-        const string prefix = "Customer_"; // only fields whose names start with this prefix will be exported
+        const string inputPdf   = "input.pdf";          // source PDF with form fields
+        const string outputJson = "filtered_fields.json"; // result JSON file
+        const string prefix     = "Customer_";          // only fields starting with this prefix
 
         if (!File.Exists(inputPdf))
         {
@@ -22,50 +22,55 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPdf))
         {
-            // Ensure the document contains a form
-            if (doc.Form == null || doc.Form.Fields == null)
-            {
-                Console.WriteLine("No form fields found in the document.");
-                return;
-            }
-
-            // Collect field names and values that match the prefix
-            var filtered = new Dictionary<string, object>();
-
+            // Collect matching fields
+            List<Field> matchingFields = new List<Field>();
             foreach (Field field in doc.Form.Fields)
             {
-                // Field.Name may be null for some internal fields; guard against it
-                if (!string.IsNullOrEmpty(field.Name) && field.Name.StartsWith(prefix, StringComparison.Ordinal))
+                if (!string.IsNullOrEmpty(field?.FullName) && field.FullName.StartsWith(prefix, StringComparison.Ordinal))
                 {
-                    // Retrieve the field value; most field types expose a Value property
-                    // For checkboxes/radio buttons the value may be a boolean or string
-                    object value = GetFieldValue(field);
-                    filtered[field.Name] = value;
+                    matchingFields.Add(field);
                 }
             }
 
-            // Serialize the filtered collection to JSON with indentation
-            JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-            string json = JsonSerializer.Serialize(filtered, jsonOptions);
+            // Prepare a simple DTO for JSON serialization
+            var fieldData = new List<object>();
+            foreach (Field field in matchingFields)
+            {
+                // Export the raw value of the field
+                object value = GetFieldValue(field);
+                fieldData.Add(new { Name = field.FullName, Value = value });
+            }
 
-            // Write the JSON to the output file
+            // Serialize to JSON (indented for readability)
+            JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+            string json = JsonSerializer.Serialize(fieldData, jsonOptions);
+
+            // Write JSON to the output file
             File.WriteAllText(outputJson, json);
-            Console.WriteLine($"Filtered fields exported to '{outputJson}'.");
+            Console.WriteLine($"Exported {matchingFields.Count} fields to '{outputJson}'.");
         }
     }
 
-    // Helper method to extract a field's value in a generic way
+    // Helper to extract the value of a form field in a generic way
     private static object GetFieldValue(Field field)
     {
-        // Most concrete field types inherit from Field and expose a Value property.
-        // Use reflection to read it safely without depending on a specific subclass.
-        var valueProp = field.GetType().GetProperty("Value");
-        if (valueProp != null)
+        // Different field types expose their value via different properties
+        switch (field)
         {
-            return valueProp.GetValue(field);
+            case TextBoxField txt:
+                return txt.Value;
+            case CheckboxField chk:
+                return chk.Checked;
+            case RadioButtonField rad:
+                return rad.Value;
+            case ListBoxField lst:
+                return lst.SelectedItems;
+            case ComboBoxField cmb:
+                return cmb.Value;
+            case ButtonField btn:
+                return btn.Value; // usually empty for buttons
+            default:
+                return field.Value; // fallback for other field types
         }
-
-        // Fallback for fields that may not have a Value property (e.g., Button)
-        return null;
     }
 }

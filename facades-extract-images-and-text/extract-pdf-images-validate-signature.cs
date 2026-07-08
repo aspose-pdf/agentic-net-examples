@@ -1,105 +1,91 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Drawing.Imaging;
 using Aspose.Pdf.Facades;
 
 class Program
 {
-    // Mapping of known image file signatures (magic numbers) to image format names.
-    static readonly Dictionary<string, string> ImageSignatures = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+    // Checks the file signature (magic number) of common image formats.
+    // Returns true if the signature matches a known image type, false otherwise.
+    static bool ValidateImageSignature(string filePath)
     {
-        { "FFD8FF", "JPEG" },                                 // JPEG
-        { "89504E470D0A1A0A", "PNG" },                        // PNG
-        { "474946383761", "GIF87a" },                         // GIF87a
-        { "474946383961", "GIF89a" },                         // GIF89a
-        { "424D", "BMP" },                                    // BMP
-        { "49492A00", "TIFF (little endian)" },              // TIFF little endian
-        { "4D4D002A", "TIFF (big endian)" }                  // TIFF big endian
-    };
+        // Read the first 8 bytes (enough for PNG, JPEG, GIF, BMP, TIFF)
+        byte[] header = new byte[8];
+        using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+        {
+            int bytesRead = fs.Read(header, 0, header.Length);
+            if (bytesRead < 4) return false; // too short to be valid
+        }
+
+        // JPEG: FF D8 FF
+        if (header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF)
+            return true;
+
+        // PNG: 89 50 4E 47 0D 0A 1A 0A
+        if (header[0] == 0x89 && header[1] == 0x50 && header[2] == 0x4E && header[3] == 0x47 &&
+            header[4] == 0x0D && header[5] == 0x0A && header[6] == 0x1A && header[7] == 0x0A)
+            return true;
+
+        // GIF87a or GIF89a: 47 49 46 38 37 61 or 47 49 46 38 39 61
+        if (header[0] == 0x47 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x38 &&
+            (header[4] == 0x37 || header[4] == 0x39) && header[5] == 0x61)
+            return true;
+
+        // BMP: 42 4D
+        if (header[0] == 0x42 && header[1] == 0x4D)
+            return true;
+
+        // TIFF (little endian): 49 49 2A 00
+        // TIFF (big endian):    4D 4D 00 2A
+        if ((header[0] == 0x49 && header[1] == 0x49 && header[2] == 0x2A && header[3] == 0x00) ||
+            (header[0] == 0x4D && header[1] == 0x4D && header[2] == 0x00 && header[3] == 0x2A))
+            return true;
+
+        // Unknown or unsupported format
+        return false;
+    }
 
     static void Main()
     {
-        const string pdfPath = "sample.pdf";          // Input PDF containing images
-        const string outputFolder = "ExtractedImages"; // Folder to store extracted images
+        const string inputPdf = "sample.pdf"; // PDF containing images
+        const string outputDir = "ExtractedImages";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
+        Directory.CreateDirectory(outputDir);
 
-        // Extract images using PdfExtractor (Facade API)
+        // Use Aspose.Pdf.Facades.PdfExtractor to extract images
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the PDF file
-            extractor.BindPdf(pdfPath);
+            // Bind the source PDF file
+            extractor.BindPdf(inputPdf);
 
-            // Enable image extraction
+            // Perform the extraction (no ExtractImageMode assignment – see fix)
             extractor.ExtractImage();
 
             int imageIndex = 1;
             while (extractor.HasNextImage())
             {
                 // Build a file name for the extracted image
-                string imagePath = Path.Combine(outputFolder, $"image-{imageIndex}.bin");
+                string imagePath = Path.Combine(outputDir, $"image_{imageIndex}.png");
 
-                // Save the next image to disk
-                extractor.GetNextImage(imagePath);
+                // Save the next image to the file system using PNG format explicitly
+                extractor.GetNextImage(imagePath, ImageFormat.Png);
 
-                // Validate the saved image file by checking its signature
-                if (ValidateImageFile(imagePath, out string detectedFormat))
-                {
-                    Console.WriteLine($"Image {imageIndex}: OK ({detectedFormat}) -> {imagePath}");
-                }
-                else
-                {
-                    Console.WriteLine($"Image {imageIndex}: CORRUPTED or UNKNOWN format -> {imagePath}");
-                }
+                // Validate the saved image's file signature
+                bool isValid = ValidateImageSignature(imagePath);
+                Console.WriteLine(isValid
+                    ? $"Image {imageIndex} saved and validated: {imagePath}"
+                    : $"Image {imageIndex} may be corrupted (invalid signature): {imagePath}");
 
                 imageIndex++;
             }
         }
-    }
 
-    // Reads the first few bytes of a file and determines if they match a known image signature.
-    static bool ValidateImageFile(string filePath, out string format)
-    {
-        format = null;
-
-        // Read up to 8 bytes (the longest signature we check is 8 bytes for PNG)
-        byte[] header = new byte[8];
-        int bytesRead;
-
-        try
-        {
-            using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
-            {
-                bytesRead = fs.Read(header, 0, header.Length);
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Failed to read file '{filePath}': {ex.Message}");
-            return false;
-        }
-
-        // Convert the read bytes to an uppercase hex string without separators
-        string hex = BitConverter.ToString(header, 0, bytesRead).Replace("-", string.Empty).ToUpperInvariant();
-
-        // Check against known signatures (allow partial match for shorter signatures)
-        foreach (var kvp in ImageSignatures)
-        {
-            if (hex.StartsWith(kvp.Key, StringComparison.OrdinalIgnoreCase))
-            {
-                format = kvp.Value;
-                return true;
-            }
-        }
-
-        // No matching signature found
-        return false;
+        Console.WriteLine("Image extraction and validation completed.");
     }
 }

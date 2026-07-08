@@ -18,23 +18,25 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Regular expression to match dates in MM/DD/YYYY format
-            string datePattern = @"\b\d{2}/\d{2}/\d{4}\b";
+            // Wild‑card / regular‑expression pattern to match dates in MM/DD/YYYY format
+            const string datePattern = @"\b\d{2}/\d{2}/\d{4}\b";
 
-            // Search each page individually because the newer API does not expose Document.FindText
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Enable regular‑expression search (RegEx = true)
+            TextSearchOptions options = new TextSearchOptions(true);
+
+            // Create an absorber that will collect all matching fragments
+            TextFragmentAbsorber absorber = new TextFragmentAbsorber(datePattern, options);
+
+            // Apply the absorber to every page in the document
+            foreach (Page page in doc.Pages)
             {
-                // Use the constructor that accepts a pattern and TextSearchOptions (regex enabled)
-                var absorber = new TextFragmentAbsorber(datePattern, new TextSearchOptions(true));
+                page.Accept(absorber);
+            }
 
-                // Apply the absorber to the current page
-                doc.Pages[pageIndex].Accept(absorber);
-
-                // Output each found date together with its page number
-                foreach (TextFragment fragment in absorber.TextFragments)
-                {
-                    Console.WriteLine($"Page {pageIndex}: {fragment.Text}");
-                }
+            // Output each found date
+            foreach (TextFragment fragment in absorber.TextFragments)
+            {
+                Console.WriteLine($"Found date: {fragment.Text}");
             }
         }
     }

@@ -6,31 +6,37 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
+        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Create a PdfFileInfo instance and bind the PDF file
-        using (PdfFileInfo pdfInfo = new PdfFileInfo())
+        // Open the PDF and bind it to a PdfFileInfo instance
+        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
         {
-            pdfInfo.BindPdf(inputPath);
-
             // Read existing metadata
-            Console.WriteLine($"Title: {pdfInfo.Title}");
-            Console.WriteLine($"Author: {pdfInfo.Author}");
-            Console.WriteLine($"Number of pages: {pdfInfo.NumberOfPages}");
-            Console.WriteLine($"PDF version: {pdfInfo.GetPdfVersion()}");
+            Console.WriteLine($"Title:          {pdfInfo.Title}");
+            Console.WriteLine($"Author:         {pdfInfo.Author}");
+            Console.WriteLine($"Subject:        {pdfInfo.Subject}");
+            Console.WriteLine($"Keywords:       {pdfInfo.Keywords}");
+            Console.WriteLine($"CreationDate:   {pdfInfo.CreationDate}");
+            Console.WriteLine($"ModDate:        {pdfInfo.ModDate}");
+            Console.WriteLine($"Producer:       {pdfInfo.Producer}");
+            Console.WriteLine($"Pages:          {pdfInfo.NumberOfPages}");
+            Console.WriteLine($"PDF Version:    {pdfInfo.GetPdfVersion()}");
 
-            // Modify metadata (example)
-            pdfInfo.Title = "Updated Title";
-            pdfInfo.Author = "John Doe";
+            // Modify metadata as needed
+            pdfInfo.Title    = "Updated Document Title";
+            pdfInfo.Author   = "Jane Doe";
+            pdfInfo.Subject  = "Demonstration of PdfFileInfo";
+            pdfInfo.Keywords = "Aspose.Pdf, metadata, example";
 
-            // Save the PDF with updated metadata to a new file
+            // Persist the changes to a new file
             pdfInfo.SaveNewInfo(outputPath);
         }
 

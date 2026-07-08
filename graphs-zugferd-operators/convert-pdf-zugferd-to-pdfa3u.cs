@@ -2,37 +2,38 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-namespace ConvertZugferdToPdfA3u
+class Program
 {
-    class Program
+    static void Main()
     {
-        static void Main(string[] args)
+        const string inputPath = "input.pdf";          // PDF with ZUGFeRD attachment
+        const string outputPath = "output_pdfa3u.pdf"; // Resulting PDF/A‑3U file
+        const string logPath = "conversion_log.txt";   // Log for conversion details
+
+        if (!File.Exists(inputPath))
         {
-            // Step 1: Create a simple PDF file.
-            using (Document sampleDoc = new Document())
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
+        }
+
+        try
+        {
+            // Load the source PDF (ZUGFeRD attachment is kept in the document)
+            using (Document doc = new Document(inputPath))
             {
-                sampleDoc.Pages.Add();
-                sampleDoc.Save("input.pdf");
+                // Convert to PDF/A‑3U. Attachments (including the ZUGFeRD XML) are preserved.
+                // ConvertErrorAction.Delete removes objects that cannot be converted.
+                doc.Convert(logPath, PdfFormat.PDF_A_3U, ConvertErrorAction.Delete);
+
+                // Save the converted document as PDF/A‑3U.
+                doc.Save(outputPath);
             }
 
-            // Step 2: Create a simple ZUGFeRD XML file.
-            string xmlContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Invoice><ID>12345</ID></Invoice>";
-            File.WriteAllText("invoice.xml", xmlContent);
-
-            // Step 3: Open the PDF, attach the XML, and convert to PDF/A-3u.
-            using (Document doc = new Document("input.pdf"))
-            {
-                // Attach the XML file.
-                FileSpecification attachment = new FileSpecification("invoice.xml", "ZUGFeRD Invoice XML");
-                doc.EmbeddedFiles.Add(attachment);
-
-                // Convert to PDF/A-3u.
-                string logFile = "convert.log";
-                doc.Convert(logFile, PdfFormat.PDF_A_3U, ConvertErrorAction.Delete);
-
-                // Save the PDF/A-3u document.
-                doc.Save("output.pdf");
-            }
+            Console.WriteLine($"PDF/A‑3U file saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

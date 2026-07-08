@@ -6,35 +6,42 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input_form.pdf";   // PDF with AcroForm fields
-        const string xmlPath = "data.xml";         // XML containing field values
-        const string outputPath = "filled_form.pdf";
+        const string inputPdfPath  = "template.pdf";   // PDF with form fields
+        const string xmlDataPath   = "data.xml";       // XML containing field values
+        const string outputPdfPath = "filled.pdf";     // Resulting PDF
 
-        // Verify input files exist
-        if (!File.Exists(pdfPath))
+        // Validate input files
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(xmlPath))
+        if (!File.Exists(xmlDataPath))
         {
-            Console.Error.WriteLine($"XML not found: {xmlPath}");
+            Console.Error.WriteLine($"XML data file not found: {xmlDataPath}");
             return;
         }
 
-        // Initialize the Form facade with the source PDF
-        using (Form form = new Form(pdfPath))
+        try
         {
-            // Import field values from the XML stream
-            using (FileStream xmlStream = new FileStream(xmlPath, FileMode.Open, FileAccess.Read))
+            // Initialize the Form facade with the source PDF
+            using (Form form = new Form(inputPdfPath))
             {
-                form.ImportXml(xmlStream);
+                // Import field values from the XML stream
+                using (FileStream xmlStream = new FileStream(xmlDataPath, FileMode.Open, FileAccess.Read))
+                {
+                    form.ImportXml(xmlStream);
+                }
+
+                // Save the updated PDF to the specified output file
+                form.Save(outputPdfPath);
             }
 
-            // Save the updated PDF to a new file
-            form.Save(outputPath);
+            Console.WriteLine($"Form fields imported successfully. Output saved to '{outputPdfPath}'.");
         }
-
-        Console.WriteLine($"Form fields imported and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

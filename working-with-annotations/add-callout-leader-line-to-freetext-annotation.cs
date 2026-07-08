@@ -1,9 +1,9 @@
 using System;
 using System.IO;
-using System.Drawing;                     // Required for DefaultAppearance constructor
+using System.Drawing; // for System.Drawing.Color used by DefaultAppearance
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;                    // For DefaultAppearance
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -21,45 +21,47 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Ensure we have at least one page
-            if (doc.Pages.Count == 0)
+            // Ensure there is at least one page
+            if (doc.Pages.Count < 1)
             {
-                Console.Error.WriteLine("The document has no pages.");
+                Console.Error.WriteLine("Document has no pages.");
                 return;
             }
 
-            // Work with the first page (1‑based indexing)
+            // Choose the first page (1‑based indexing)
             Page page = doc.Pages[1];
 
             // Define the rectangle where the free‑text annotation will appear
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Create DefaultAppearance (font, size, color). The constructor requires System.Drawing.Color.
+            // Create a DefaultAppearance (requires System.Drawing.Color)
             DefaultAppearance appearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
 
             // Create the FreeTextAnnotation
             FreeTextAnnotation freeText = new FreeTextAnnotation(page, rect, appearance)
             {
+                // Visible border and background color (optional)
+                Color = Aspose.Pdf.Color.Yellow,
                 Contents = "Callout example",
-                Color    = Aspose.Pdf.Color.Yellow,               // Border color of the annotation
-                Intent   = FreeTextIntent.FreeTextCallout        // Specify that this is a callout
+                // Set the intent to indicate a callout annotation
+                Intent = FreeTextIntent.FreeTextCallout
             };
 
             // Define the three points for the callout leader line:
-            //   1. Start point (inside the annotation)
-            //   2. Knee point (bend)
-            //   3. End point (target point)
+            // 1. Start point (inside the annotation rectangle)
+            // 2. Knee point (where the line bends)
+            // 3. End point (target point the callout points to)
             freeText.Callout = new Aspose.Pdf.Point[]
             {
-                new Aspose.Pdf.Point(150, 525),   // Inside the annotation rectangle
-                new Aspose.Pdf.Point(200, 600),   // Knee point
-                new Aspose.Pdf.Point(250, 650)    // Target point
+                new Aspose.Pdf.Point(200, 525), // start (center of the annotation)
+                new Aspose.Pdf.Point(250, 600), // knee
+                new Aspose.Pdf.Point(350, 650)  // end (pointing to target)
             };
 
             // Add the annotation to the page
             page.Annotations.Add(freeText);
 
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

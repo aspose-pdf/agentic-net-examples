@@ -1,63 +1,65 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Folder containing PDFs to process
-        const string inputFolder = @"C:\PdfInput";
-        // Folder where updated PDFs will be saved
-        const string outputFolder = @"C:\PdfOutput";
+        // Folder containing source PDFs
+        const string inputFolder = "input_pdfs";
+        // Folder where modified PDFs will be saved
+        const string outputFolder = "output_pdfs";
 
-        // Author names: source (to replace) and destination (new)
-        const string sourceAuthor = "Old Author";
-        const string newAuthor    = "New Author";
+        // Author to replace (set to empty string to affect all authors)
+        const string sourceAuthor = "";
+        // New author name
+        const string destinationAuthor = "New Author";
 
-        // Ensure output folder exists
+        // Ensure the output folder exists
         Directory.CreateDirectory(outputFolder);
 
-        // Get all PDF files in the input folder
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-        if (pdfFiles.Length == 0)
+        // Verify that the input folder exists; if not, inform the user and exit gracefully
+        if (!Directory.Exists(inputFolder))
         {
-            Console.WriteLine("No PDF files found in the input folder.");
+            Console.WriteLine($"Input folder '{inputFolder}' does not exist. Please create it and place PDF files inside before running the program.");
             return;
         }
 
-        foreach (string inputPath in pdfFiles)
+        // Get all PDF files in the input folder
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
+        if (pdfFiles.Length == 0)
         {
-            // Build output file path (same name, different folder)
-            string outputPath = Path.Combine(outputFolder, Path.GetFileName(inputPath));
+            Console.WriteLine($"No PDF files found in '{inputFolder}'. Nothing to process.");
+            return;
+        }
 
-            try
+        // Process each PDF file in the input folder
+        foreach (string pdfPath in pdfFiles)
+        {
+            string fileName = Path.GetFileName(pdfPath);
+            string outputPath = Path.Combine(outputFolder, fileName);
+
+            // Use PdfAnnotationEditor facade to modify annotation authors
+            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
             {
-                // Use PdfAnnotationEditor (facade) inside a using block for deterministic disposal
-                using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-                {
-                    // Bind the source PDF file
-                    editor.BindPdf(inputPath);
+                // Load the PDF
+                editor.BindPdf(pdfPath);
 
-                    // Determine the total number of pages in the document
-                    int pageCount = editor.Document.Pages.Count; // 1‑based indexing
+                // Determine page range (Aspose.Pdf uses 1‑based indexing)
+                int startPage = 1;
+                int endPage = editor.Document.Pages.Count;
 
-                    // Modify the author of all annotations on all pages
-                    editor.ModifyAnnotationsAuthor(1, pageCount, sourceAuthor, newAuthor);
+                // Update the author for all annotations in the specified range
+                editor.ModifyAnnotationsAuthor(startPage, endPage, sourceAuthor, destinationAuthor);
 
-                    // Save the modified PDF to the output location
-                    editor.Save(outputPath);
-                }
-
-                Console.WriteLine($"Processed: {Path.GetFileName(inputPath)} → {outputPath}");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
+                // Save the modified PDF
+                editor.Save(outputPath);
+                // Close the facade (optional, handled by using)
+                editor.Close();
             }
         }
 
-        Console.WriteLine("Batch annotation author update completed.");
+        Console.WriteLine("Annotation authors updated for all PDFs.");
     }
 }

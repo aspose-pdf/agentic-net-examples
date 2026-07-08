@@ -5,57 +5,77 @@ using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Security;
 
-class ValidatePdfSignature
+class Program
 {
     static void Main()
     {
-        const string inputPath = "signed_document.pdf";
+        const string inputPdf = "signed_document.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document (using the standard Document constructor)
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document
+        using (Document doc = new Document(inputPdf))
         {
-            // Iterate over all fields and filter for signature fields
-            foreach (Field field in doc.Form.Fields)
+            // Iterate over all form fields and process signature fields
+            foreach (var field in doc.Form)
             {
                 if (field is SignatureField sigField)
                 {
-                    // Prepare validation options (strict mode, check certificate chain)
-                    ValidationOptions options = new ValidationOptions
+                    // The underlying signature object
+                    Aspose.Pdf.Forms.Signature signature = sigField.Signature;
+
+                    // Set up validation options (strict mode, check certificate chain)
+                    ValidationOptions valOptions = new ValidationOptions
                     {
                         ValidationMode = ValidationMode.Strict,
                         CheckCertificateChain = true
                     };
 
-                    // Perform verification and obtain detailed validation result
-                    ValidationResult validationResult;
-                    bool isSignatureValid = sigField.Signature.Verify(options, out validationResult);
+                    // Verify the signature and obtain detailed validation result
+                    bool isSignatureValid = signature.Verify(valOptions, out ValidationResult valResult);
 
-                    // Retrieve the signing timestamp from the signature
-                    DateTime signingTime = sigField.Signature.Date;
+                    // Retrieve signing time from the signature
+                    DateTime signingTime = signature.Date;
 
-                    // Extract the signing certificate from the signature field
-                    X509Certificate2 signingCert = sigField.ExtractCertificateObject();
-
-                    bool timestampWithinCert = false;
-                    if (signingCert != null)
+                    // Attempt to get the signer's certificate from the validation result
+                    X509Certificate2 signerCert = null;
+                    try
                     {
-                        // Check that the signing timestamp falls within the certificate's validity period
-                        timestampWithinCert = signingTime >= signingCert.NotBefore && signingTime <= signingCert.NotAfter;
+                        // ValidationResult provides the signer's certificate (if available)
+                        signerCert = (X509Certificate2)valResult.GetType()
+                            .GetProperty("SignerCertificate")?.GetValue(valResult);
+                    }
+                    catch
+                    {
+                        // If the property is not present, signerCert remains null
                     }
 
-                    // Output the verification outcome
-                    Console.WriteLine($"Signature '{sigField.PartialName}':");
-                    Console.WriteLine($"  Valid signature          : {isSignatureValid}");
-                    Console.WriteLine($"  Signing time            : {signingTime:u}");
-                    Console.WriteLine($"  Certificate valid period: {signingCert?.NotBefore:u} - {signingCert?.NotAfter:u}");
-                    Console.WriteLine($"  Timestamp within period : {timestampWithinCert}");
-                    Console.WriteLine();
+                    // Determine if the signing timestamp falls within the certificate's validity period
+                    bool isTimestampWithinCertValidity = false;
+                    if (signerCert != null)
+                    {
+                        isTimestampWithinCertValidity =
+                            signingTime >= signerCert.NotBefore && signingTime <= signerCert.NotAfter;
+                    }
+
+                    // Output the verification results
+                    Console.WriteLine($"Signature field: {sigField.FullName}");
+                    Console.WriteLine($"  Signature valid: {isSignatureValid}");
+                    Console.WriteLine($"  Signing time   : {signingTime:u}");
+                    if (signerCert != null)
+                    {
+                        Console.WriteLine($"  Certificate    : {signerCert.Subject}");
+                        Console.WriteLine($"  Cert valid from: {signerCert.NotBefore:u} to {signerCert.NotAfter:u}");
+                        Console.WriteLine($"  Timestamp within certificate validity: {isTimestampWithinCertValidity}");
+                    }
+                    else
+                    {
+                        Console.WriteLine("  Certificate information not available.");
+                    }
                 }
             }
         }

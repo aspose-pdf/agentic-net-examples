@@ -6,10 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string newAuthor = "John Doe";
-        const string newTitle = "Updated PDF Title";
 
         if (!File.Exists(inputPath))
         {
@@ -17,23 +15,30 @@ class Program
             return;
         }
 
-        // Open the PDF with deterministic disposal
-        using (Document pdfDoc = new Document(inputPath))
+        try
         {
-            // Read existing metadata
-            string currentAuthor = pdfDoc.Info.Author;
-            string currentTitle = pdfDoc.Info.Title;
-            Console.WriteLine($"Current Author: {currentAuthor}");
-            Console.WriteLine($"Current Title : {currentTitle}");
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
+            {
+                // Read existing metadata
+                string currentAuthor = doc.Info.Author;
+                string currentTitle  = doc.Info.Title;
+                Console.WriteLine($"Current Author: {currentAuthor}");
+                Console.WriteLine($"Current Title : {currentTitle}");
 
-            // Modify metadata
-            pdfDoc.Info.Author = newAuthor;
-            pdfDoc.Info.Title = newTitle;
+                // Modify metadata fields
+                doc.Info.Author = "New Author Name";
+                doc.Info.Title  = "New Document Title";
 
-            // Save the updated PDF
-            pdfDoc.Save(outputPath);
+                // Save the updated PDF (PDF format, no SaveOptions needed)
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Metadata updated and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Metadata updated and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

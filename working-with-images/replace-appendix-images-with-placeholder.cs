@@ -1,80 +1,54 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath      = "input.pdf";
-        const string outputPath     = "output_protected.pdf";
-        const string placeholderImg = "placeholder.jpg";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string placeholderPath = "placeholder.jpg";
+        const int appendixStartPage = 5; // first page of the appendix (1‑based)
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
 
-        if (!File.Exists(placeholderImg))
+        if (!File.Exists(placeholderPath))
         {
-            Console.Error.WriteLine($"Placeholder image not found: {placeholderImg}");
+            Console.Error.WriteLine($"Placeholder image not found: {placeholderPath}");
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF
         using (Document doc = new Document(inputPath))
         {
-            // Find the first page that contains the word "Appendix"
-            int appendixStartPage = -1;
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Load placeholder image once into a memory stream (JPEG required)
+            using (FileStream placeholderStream = File.OpenRead(placeholderPath))
             {
-                TextAbsorber absorber = new TextAbsorber();
-                absorber.TextSearchOptions = new TextSearchOptions(true); // case‑insensitive
-                doc.Pages[i].Accept(absorber);
-                if (absorber.Text != null && absorber.Text.IndexOf("Appendix", StringComparison.OrdinalIgnoreCase) >= 0)
+                // Iterate over all pages that belong to the appendix
+                for (int pageIndex = appendixStartPage; pageIndex <= doc.Pages.Count; pageIndex++)
                 {
-                    appendixStartPage = i;
-                    break;
-                }
-            }
+                    Page page = doc.Pages[pageIndex];
+                    var images = page.Resources.Images; // XImageCollection
 
-            // If no appendix marker is found, assume no replacement is needed
-            if (appendixStartPage == -1)
-            {
-                Console.WriteLine("No appendix section detected. Saving original document.");
-                doc.Save(outputPath);
-                return;
-            }
-
-            // Replace every image on each appendix page with the placeholder image
-            using (FileStream placeholderStream = File.OpenRead(placeholderImg))
-            {
-                // Keep the placeholder stream open for the duration of replacements
-                for (int pageNum = appendixStartPage; pageNum <= doc.Pages.Count; pageNum++)
-                {
-                    Page page = doc.Pages[pageNum];
-                    // XImageCollection is 1‑based; get the count first
-                    int imageCount = page.Resources.Images.Count;
-                    for (int imgIdx = 1; imgIdx <= imageCount; imgIdx++)
+                    // Replace each image on the page with the placeholder
+                    for (int imgIndex = 1; imgIndex <= images.Count; imgIndex++)
                     {
-                        // Replace the image at the current index with the placeholder
-                        // The Replace method expects a fresh stream for each call, so we create a new MemoryStream copy
+                        // Reset stream position before each replace call
                         placeholderStream.Position = 0;
-                        using (MemoryStream msCopy = new MemoryStream())
-                        {
-                            placeholderStream.CopyTo(msCopy);
-                            msCopy.Position = 0;
-                            page.Resources.Images.Replace(imgIdx, msCopy);
-                        }
+                        images.Replace(imgIndex, placeholderStream);
                     }
                 }
             }
 
             // Save the modified PDF
             doc.Save(outputPath);
-            Console.WriteLine($"Protected PDF saved to '{outputPath}'.");
         }
+
+        Console.WriteLine($"Protected PDF saved to '{outputPath}'.");
     }
 }

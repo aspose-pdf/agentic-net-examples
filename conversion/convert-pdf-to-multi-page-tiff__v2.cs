@@ -16,13 +16,13 @@ class Program
             return;
         }
 
-        // Load the PDF document and convert all pages to a single multi‑page TIFF
+        // Load the PDF document inside a using block for proper disposal
         using (Document pdfDocument = new Document(inputPath))
         {
-            // TiffDevice with default settings (default resolution, no compression, etc.)
+            // Create a TiffDevice with default settings
             TiffDevice tiffDevice = new TiffDevice();
 
-            // Process the whole document and save the result as a TIFF file
+            // Convert all pages of the PDF into a single multi‑page TIFF file
             tiffDevice.Process(pdfDocument, outputPath);
         }
 

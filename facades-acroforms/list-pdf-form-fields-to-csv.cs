@@ -7,46 +7,39 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputCsvPath = "fields_report.csv";
+        const string inputPdf = "input.pdf";
+        const string outputCsv = "fields_report.csv";
 
-        // Ensure the source PDF exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Initialize FormEditor and bind the PDF document
-        using (FormEditor formEditor = new FormEditor())
+        // Load the PDF document
+        using (Document doc = new Document(inputPdf))
         {
-            formEditor.BindPdf(inputPdfPath);
-
-            // Use the Form facade to access form fields
-            using (Form form = new Form(formEditor.Document))
+            // Bind the document to FormEditor as required
+            using (FormEditor formEditor = new FormEditor(doc))
             {
+                // Use the Form facade to obtain field names
+                Form form = new Form(doc);
                 string[] fieldNames = form.FieldNames;
 
-                // Write field names and their types to a CSV file
-                using (StreamWriter writer = new StreamWriter(outputCsvPath))
+                // Write the report to CSV
+                using (StreamWriter writer = new StreamWriter(outputCsv))
                 {
-                    // CSV header
                     writer.WriteLine("FieldName,FieldType");
-
-                    foreach (string fieldName in fieldNames)
+                    foreach (string name in fieldNames)
                     {
                         // Retrieve the field type for each field
-                        FieldType fieldType = form.GetFieldType(fieldName);
-
-                        // Write a CSV line
-                        writer.WriteLine($"{fieldName},{fieldType}");
+                        Aspose.Pdf.Facades.FieldType fieldType = form.GetFieldType(name);
+                        writer.WriteLine($"{name},{fieldType}");
                     }
                 }
-
-                Console.WriteLine($"Form field report saved to '{outputCsvPath}'.");
             }
-
-            // No need to call Save on FormEditor because we are only reading the form structure
         }
+
+        Console.WriteLine($"Form fields report saved to '{outputCsv}'.");
     }
 }

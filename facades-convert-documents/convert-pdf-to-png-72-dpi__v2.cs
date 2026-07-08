@@ -1,63 +1,44 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                     // Document core API
-using Aspose.Pdf.Facades;            // Facade API (PdfConverter)
-using Aspose.Pdf.Devices;            // Resolution class
-using System.Drawing.Imaging;        // ImageFormat enum
+using Aspose.Pdf;
+using Aspose.Pdf.Devices; // for PngDevice and Resolution
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file
-        const string inputPdfPath = "input.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputDir = "OutputImages";
 
-        // Directory where PNG images will be saved
-        const string outputFolder = "output_images";
-
-        // Verify that the source PDF exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Error: File not found – {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputDir);
 
-        // ------------------------------------------------------------
-        // Convert each page of the PDF to a PNG image using PdfConverter
-        // ------------------------------------------------------------
-        // PdfConverter is part of Aspose.Pdf.Facades and works with the
-        // CropBox coordinate type by default (no extra setting required).
-        // The Resolution property controls the DPI; we set it to 72.
-        // ------------------------------------------------------------
-        using (PdfConverter converter = new PdfConverter())
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPdf);
+
+        // Set the desired resolution (72 DPI)
+        var resolution = new Resolution(72);
+        // Create a PNG device with the specified resolution
+        var pngDevice = new PngDevice(resolution);
+
+        // Iterate through all pages and convert each to a PNG image
+        for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
         {
-            // Bind the PDF file to the converter
-            converter.BindPdf(inputPdfPath);
+            string outputPath = Path.Combine(outputDir, $"image{pageNumber}.png");
 
-            // Set the desired resolution (72 DPI)
-            converter.Resolution = new Resolution(72);
-
-            // Prepare the converter for image extraction
-            converter.DoConvert();
-
-            int pageIndex = 1;
-
-            // Extract images while pages remain
-            while (converter.HasNextImage())
+            // Convert the current page to PNG and write directly to file
+            using (FileStream imageStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
             {
-                // Build the output file name for the current page
-                string outputPath = Path.Combine(outputFolder, $"page_{pageIndex}.png");
-
-                // Save the current page as PNG
-                converter.GetNextImage(outputPath, ImageFormat.Png);
-
-                pageIndex++;
+                pngDevice.Process(pdfDocument.Pages[pageNumber], imageStream);
             }
         }
 
-        Console.WriteLine("PDF successfully converted to PNG images.");
+        Console.WriteLine($"PDF pages have been converted to PNG images in '{outputDir}'.");
     }
 }

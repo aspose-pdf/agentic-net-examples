@@ -6,48 +6,47 @@ class Program
 {
     static void Main()
     {
-        // Folder containing the source XML files
-        const string inputFolder = "XmlInput";
-        // Folder where the generated PDFs will be saved
-        const string outputFolder = "PdfOutput";
+        // Folder containing source XML files
+        const string inputFolder = "InputXmlFolder";
+        // Folder where generated PDFs will be placed
+        const string outputFolder = "OutputPdfFolder";
 
-        // Verify input folder exists
         if (!Directory.Exists(inputFolder))
         {
             Console.Error.WriteLine($"Input folder not found: {inputFolder}");
             return;
         }
 
-        // Ensure output folder exists
+        // Ensure output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Prepare load options for XML → PDF conversion
-        XmlLoadOptions loadOptions = new XmlLoadOptions();
+        // Get all XML files in the input folder (non‑recursive)
+        string[] xmlFiles = Directory.GetFiles(inputFolder, "*.xml", SearchOption.TopDirectoryOnly);
 
-        // Process each .xml file in the input folder
-        foreach (string xmlPath in Directory.GetFiles(inputFolder, "*.xml"))
+        foreach (string xmlPath in xmlFiles)
         {
+            // Build output PDF file name (same base name, .pdf extension)
+            string pdfFileName = Path.GetFileNameWithoutExtension(xmlPath) + ".pdf";
+            string pdfPath = Path.Combine(outputFolder, pdfFileName);
+
             try
             {
-                // Determine output PDF file path (same base name, .pdf extension)
-                string pdfFileName = Path.GetFileNameWithoutExtension(xmlPath) + ".pdf";
-                string pdfPath = Path.Combine(outputFolder, pdfFileName);
-
-                // Load XML and convert to PDF using the core Document API
-                using (Document pdfDoc = new Document(xmlPath, loadOptions))
+                // Use a using block for deterministic disposal (rule: document-disposal-with-using)
+                using (Document pdfDoc = new Document())
                 {
-                    // Save the resulting PDF
+                    // Load the XML content into the document (rule: xml-load-use-bindxml-not-document-constructor)
+                    pdfDoc.BindXml(xmlPath);
+
+                    // Save the document as PDF (rule: use Document.Save(string))
                     pdfDoc.Save(pdfPath);
                 }
 
-                Console.WriteLine($"Converted: {xmlPath} → {pdfPath}");
+                Console.WriteLine($"Converted: '{xmlPath}' → '{pdfPath}'");
             }
             catch (Exception ex)
             {
                 Console.Error.WriteLine($"Error processing '{xmlPath}': {ex.Message}");
             }
         }
-
-        Console.WriteLine("Batch conversion completed.");
     }
 }

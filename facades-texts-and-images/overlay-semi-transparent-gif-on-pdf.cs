@@ -1,49 +1,48 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // BlendMode, CompositingParameters
-using Aspose.Pdf.Facades;      // PdfFileMend
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";   // PDF containing the PNG
-        const string outputPdf = "output.pdf";  // Resulting PDF with overlay
-        const string gifPath   = "overlay.gif"; // Semi‑transparent GIF to overlay
+        const string inputPdfPath   = "input.pdf";   // PDF that already contains a PNG image
+        const string overlayGifPath = "overlay.gif"; // Semi‑transparent GIF to overlay
+        const string outputPdfPath  = "output.pdf";
 
-        // Verify required files exist
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath) || !File.Exists(overlayGifPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(gifPath))
-        {
-            Console.Error.WriteLine($"Overlay GIF not found: {gifPath}");
+            Console.Error.WriteLine("Required input files are missing.");
             return;
         }
 
-        // PdfFileMend constructor binds the source PDF and sets the destination file
-        using (PdfFileMend mend = new PdfFileMend(inputPdf, outputPdf))
+        // Load the existing PDF document
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Create compositing parameters – Normal blend preserves the GIF's alpha channel
-            CompositingParameters compParams = new CompositingParameters(BlendMode.Normal);
+            // Initialize PdfFileMend with the loaded document
+            using (PdfFileMend mender = new PdfFileMend(pdfDoc))
+            {
+                // Create compositing parameters – Normal blend mode respects the GIF's alpha channel
+                CompositingParameters compParams = new CompositingParameters(BlendMode.Normal);
 
-            // Define the rectangle where the GIF will be placed (coordinates in points)
-            // Adjust these values to match the location of the existing PNG on the page
-            float lowerLeftX  = 100f; // X‑coordinate of lower‑left corner
-            float lowerLeftY  = 200f; // Y‑coordinate of lower‑left corner
-            float upperRightX = 300f; // X‑coordinate of upper‑right corner
-            float upperRightY = 400f; // Y‑coordinate of upper‑right corner
+                // Define the rectangle where the GIF will be placed (adjust as needed)
+                float lowerLeftX  = 100f; // X coordinate of lower‑left corner
+                float lowerLeftY  = 200f; // Y coordinate of lower‑left corner
+                float upperRightX = 300f; // X coordinate of upper‑right corner
+                float upperRightY = 400f; // Y coordinate of upper‑right corner
 
-            // Add the GIF onto page 1 using the compositing parameters
-            // This overlays the GIF on top of any existing content (e.g., the PNG)
-            mend.AddImage(gifPath, 1, lowerLeftX, lowerLeftY, upperRightX, upperRightY, compParams);
+                // Add the GIF image to page 1 using the compositing parameters
+                using (FileStream gifStream = File.OpenRead(overlayGifPath))
+                {
+                    mender.AddImage(gifStream, 1, lowerLeftX, lowerLeftY, upperRightX, upperRightY, compParams);
+                }
 
-            // Finalize the operation
-            mend.Close();
+                // Save the modified PDF
+                mender.Save(outputPdfPath);
+            }
         }
 
-        Console.WriteLine($"Overlay applied successfully. Output saved to '{outputPdf}'.");
+        Console.WriteLine($"Overlay applied successfully. Output saved to '{outputPdfPath}'.");
     }
 }

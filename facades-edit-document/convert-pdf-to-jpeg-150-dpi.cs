@@ -7,49 +7,43 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file
-        const string inputPdf = "input.pdf";
+        const string inputPdf = "input.pdf";          // source PDF
+        const string outputDir = "Images";            // folder for JPEGs
 
-        // Folder where JPEG images will be saved
-        const string outputFolder = "output_images";
-
-        // Verify input file exists
+        // Verify source PDF exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.WriteLine($"Error: File '{inputPdf}' not found.");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDocument = new Document(inputPdf))
+        // Load the PDF document (wrapped in using for proper disposal)
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Set resolution to 150 DPI (suitable for web use)
-            Resolution resolution = new Resolution(150);
+            // Set desired resolution (150 DPI) and JPEG quality (85)
+            var resolution = new Resolution(150);
+            const int jpegQuality = 85;
 
-            // JpegDevice constructor with resolution and quality (0‑100).
-            // Quality 90 provides good visual quality while keeping file size reasonable.
-            // Note: Aspose.Pdf.JpegDevice does not expose a direct Progressive flag;
-            // progressive JPEG encoding is handled internally when possible.
-            JpegDevice jpegDevice = new JpegDevice(resolution, 90);
+            // JpegDevice does not implement IDisposable and does not expose a Compression property in recent versions.
+            // It is instantiated once and used to render each page to a FileStream.
+            var jpegDevice = new JpegDevice(resolution, jpegQuality);
 
-            // Iterate through all pages (1‑based indexing)
-            for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
+            // Iterate through all pages and save each as a JPEG image
+            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
             {
-                // Build output file name for each page
-                string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.jpg");
+                string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.jpg");
 
-                // Write each page to a JPEG file using a FileStream
-                using (FileStream jpegStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                // Render the page into a file stream
+                using (FileStream outStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
                 {
-                    // Convert the specific page to JPEG and save it to the stream
-                    jpegDevice.Process(pdfDocument.Pages[pageNumber], jpegStream);
+                    jpegDevice.Process(pdfDoc.Pages[pageNumber], outStream);
                 }
             }
         }
 
-        Console.WriteLine("PDF successfully converted to JPEG images.");
+        Console.WriteLine("PDF pages have been converted to JPEG images at 150 DPI.");
     }
 }

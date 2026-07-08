@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";               // source PDF containing RichMediaAnnotations
-        const string outputRoot = "ExtractedMedia";        // base folder for extracted files
+        const string inputPdf  = "input.pdf";
+        const string outputDir = "ExtractedMedia";
 
         if (!File.Exists(inputPdf))
         {
@@ -16,56 +16,55 @@ class Program
             return;
         }
 
-        // Ensure the root output directory exists
-        Directory.CreateDirectory(outputRoot);
+        // Ensure the base output directory exists
+        Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document (using the standard Document constructor)
+        // Load the PDF document (using block ensures proper disposal)
         using (Document doc = new Document(inputPdf))
         {
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageIdx = 1; pageIdx <= doc.Pages.Count; pageIdx++)
+            // Iterate over all pages (1‑based indexing)
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
-                Page page = doc.Pages[pageIdx];
+                Page page = doc.Pages[pageNum];
+                int annotationIndex = 0;
 
-                // Iterate over all annotations on the current page
-                for (int annIdx = 1; annIdx <= page.Annotations.Count; annIdx++)
+                // Iterate over annotations on the current page
+                foreach (Annotation ann in page.Annotations)
                 {
-                    Annotation ann = page.Annotations[annIdx];
-
-                    // Process only RichMediaAnnotation instances
+                    // Identify RichMediaAnnotation instances
                     if (ann is RichMediaAnnotation richMedia)
                     {
-                        // Build a folder hierarchy: OutputRoot/Page_{pageIdx}/Annotation_{annIdx}
-                        string pageFolder = Path.Combine(outputRoot, $"Page_{pageIdx}");
-                        string annotationFolder = Path.Combine(pageFolder, $"Annotation_{annIdx}");
-                        Directory.CreateDirectory(annotationFolder);
+                        annotationIndex++;
 
-                        // Determine a file name based on the annotation's type
-                        string extension = richMedia.Type switch
-                        {
-                            RichMediaAnnotation.ContentType.Audio => ".mp3",
-                            RichMediaAnnotation.ContentType.Video => ".mp4",
-                            _ => ".bin"
-                        };
+                        // Build a folder path: OutputDir/Page_{pageNum}/Annotation_{annotationIndex}
+                        string pageFolder = Path.Combine(outputDir, $"Page_{pageNum}");
+                        string annFolder  = Path.Combine(pageFolder, $"Annotation_{annotationIndex}");
+                        Directory.CreateDirectory(annFolder);
 
-                        // Use the annotation's Name if available; otherwise a default name
-                        string baseName = !string.IsNullOrEmpty(richMedia.Name) ? richMedia.Name : "media";
-                        string outputFile = Path.Combine(annotationFolder, baseName + extension);
+                        // Determine a file name for the embedded media
+                        // Prefer the annotation's Name; fall back to a generic name
+                        string fileName = !string.IsNullOrEmpty(richMedia.Name)
+                                          ? richMedia.Name
+                                          : $"RichMedia_{annotationIndex}";
 
-                        // The Content property returns a stream with the embedded media data
-                        // Copy the stream to the output file
+                        // Append appropriate extension if known (optional)
+                        // Here we simply use .bin for unknown types
+                        string filePath = Path.Combine(annFolder, $"{fileName}.bin");
+
+                        // The Content property returns a Stream containing the media data
+                        // Copy the stream to a file on disk
                         using (Stream contentStream = richMedia.Content)
-                        using (FileStream fileStream = new FileStream(outputFile, FileMode.Create, FileAccess.Write))
+                        using (FileStream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
                         {
                             contentStream.CopyTo(fileStream);
                         }
 
-                        Console.WriteLine($"Extracted: {outputFile}");
+                        Console.WriteLine($"Extracted media to: {filePath}");
                     }
                 }
             }
         }
 
-        Console.WriteLine("Extraction completed.");
+        Console.WriteLine("Media extraction completed.");
     }
 }

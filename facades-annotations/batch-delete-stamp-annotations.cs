@@ -1,55 +1,51 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades; // PdfAnnotationEditor resides here
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Folder containing PDF files
-        const string inputFolder = @"C:\PdfFiles";
-        // Folder to store processed PDFs (can be the same as inputFolder)
-        const string outputFolder = @"C:\PdfFiles\Cleaned";
+        // Input directory containing PDFs
+        const string inputDir = "pdfs";
+        // Output directory for processed PDFs
+        const string outputDir = "output";
 
-        if (!Directory.Exists(inputFolder))
+        if (!Directory.Exists(inputDir))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Input directory not found: {inputDir}");
             return;
         }
 
-        // Ensure output folder exists
-        Directory.CreateDirectory(outputFolder);
+        Directory.CreateDirectory(outputDir);
 
-        // Process each PDF file in the input folder
-        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Process each PDF file in the input directory
+        foreach (string pdfPath in Directory.GetFiles(inputDir, "*.pdf"))
         {
+            string fileName = Path.GetFileName(pdfPath);
+            string outPath = Path.Combine(outputDir, fileName);
+
             try
             {
-                // Determine output file name (same name, different folder)
-                string fileName = Path.GetFileName(inputPath);
-                string outputPath = Path.Combine(outputFolder, fileName);
+                // Initialize the annotation editor and bind the PDF
+                PdfAnnotationEditor editor = new PdfAnnotationEditor();
+                editor.BindPdf(pdfPath);
 
-                // Initialize the annotation editor facade
-                using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-                {
-                    // Load the PDF document
-                    editor.BindPdf(inputPath);
+                // Delete all stamp annotations in the document
+                editor.DeleteAnnotations("Stamp");
 
-                    // Delete all annotations of type "Stamp"
-                    editor.DeleteAnnotations("Stamp");
+                // Save the modified PDF to the output location
+                editor.Save(outPath);
 
-                    // Save the modified document (overwrites or creates new file)
-                    editor.Save(outputPath);
-                }
+                // Release resources held by the editor
+                editor.Close();
 
                 Console.WriteLine($"Processed: {fileName}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing {fileName}: {ex.Message}");
             }
         }
-
-        Console.WriteLine("Batch stamp annotation removal completed.");
     }
 }

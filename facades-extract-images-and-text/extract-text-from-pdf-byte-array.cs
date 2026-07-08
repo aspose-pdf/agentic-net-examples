@@ -8,10 +8,11 @@ class Program
 {
     static void Main(string[] args)
     {
-        // Simple console‑based entry point. The first argument is expected to be the path to a PDF file.
+        // Simple console‑based “endpoint”.
+        // Pass the path to a PDF file as the first argument.
         if (args.Length == 0)
         {
-            Console.Error.WriteLine("Usage: PdfExtractionApp <pdf-file-path>");
+            Console.Error.WriteLine("Usage: AsposePdfApi <pdf-file-path>");
             return;
         }
 
@@ -22,11 +23,9 @@ class Program
             return;
         }
 
-        // Read the PDF into a byte array – this mimics receiving a byte[] payload in a REST call.
         byte[] pdfBytes = File.ReadAllBytes(pdfPath);
         string extractedText = ExtractTextFromPdf(pdfBytes);
 
-        // Serialize the result as JSON (equivalent to returning Ok(new { text = ... }) in ASP.NET).
         var result = new { text = extractedText };
         string json = JsonSerializer.Serialize(result);
         Console.WriteLine(json);
@@ -34,19 +33,15 @@ class Program
 
     private static string ExtractTextFromPdf(byte[] pdfBytes)
     {
-        // The core Aspose.Pdf.Facades extraction logic remains unchanged.
-        using (var inputStream = new MemoryStream(pdfBytes))
-        using (var extractor = new PdfExtractor())
-        {
-            extractor.BindPdf(inputStream);
-            extractor.ExtractText(); // default pure‑text extraction mode
+        // Use Aspose.Pdf.Facades.PdfExtractor to pull text from the PDF.
+        using var extractor = new PdfExtractor();
+        using var pdfStream = new MemoryStream(pdfBytes);
+        extractor.BindPdf(pdfStream);
+        extractor.ExtractText();
 
-            using (var outputStream = new MemoryStream())
-            {
-                extractor.GetText(outputStream);
-                // Aspose returns Unicode (UTF‑16LE) by default; convert to a .NET string.
-                return Encoding.Unicode.GetString(outputStream.ToArray());
-            }
-        }
+        using var textStream = new MemoryStream();
+        extractor.GetText(textStream);
+        // Aspose returns Unicode (UTF‑16LE) bytes.
+        return Encoding.Unicode.GetString(textStream.ToArray());
     }
 }

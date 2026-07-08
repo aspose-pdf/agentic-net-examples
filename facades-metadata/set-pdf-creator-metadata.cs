@@ -6,35 +6,35 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string creator   = "My Custom Creator";
+        const string inputPath  = "input.pdf";   // source PDF
+        const string outputPath = "output.pdf";  // destination PDF
+        const string creator    = "My Custom Creator";
 
-        // Verify the source file exists
-        if (!File.Exists(inputPdf))
+        // Verify input file exists
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF metadata via PdfFileInfo
-        PdfFileInfo pdfInfo = new PdfFileInfo(inputPdf);
-
-        // Assign a custom Creator value
-        pdfInfo.Creator = creator;
-
-        // Persist the updated metadata to a new PDF file
-        bool saved = pdfInfo.SaveNewInfo(outputPdf);
-        if (!saved)
+        try
         {
-            Console.Error.WriteLine("Failed to save the updated PDF.");
-        }
-        else
-        {
-            Console.WriteLine($"Creator set to \"{creator}\" and saved as \"{outputPdf}\".");
-        }
+            // Initialize PdfFileInfo facade with the source PDF
+            using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
+            {
+                // Set the custom Creator metadata
+                pdfInfo.Creator = creator;
 
-        // Release resources held by the facade
-        pdfInfo.Close();
+                // Persist the changes to a new file
+                bool saved = pdfInfo.SaveNewInfo(outputPath);
+                Console.WriteLine(saved
+                    ? $"Creator set and saved to '{outputPath}'."
+                    : "Failed to save the updated PDF.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

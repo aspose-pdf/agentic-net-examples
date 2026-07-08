@@ -7,8 +7,8 @@ class UpdateAttachmentDescription
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // source PDF containing the attachment
-        const string outputPdf = "output.pdf";         // PDF to write after update
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output.pdf";
         const string newDescription = "Updated attachment description";
 
         if (!File.Exists(inputPdf))
@@ -17,11 +17,9 @@ class UpdateAttachmentDescription
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document (using block ensures proper disposal)
         using (Document doc = new Document(inputPdf))
         {
-            bool updated = false;
-
             // Iterate through all pages (1‑based indexing)
             for (int pageIdx = 1; pageIdx <= doc.Pages.Count; pageIdx++)
             {
@@ -30,30 +28,21 @@ class UpdateAttachmentDescription
                 // Annotations collection also uses 1‑based indexing
                 for (int annIdx = 1; annIdx <= page.Annotations.Count; annIdx++)
                 {
-                    // Try to cast the annotation to FileAttachmentAnnotation
-                    if (page.Annotations[annIdx] is FileAttachmentAnnotation fileAnn)
+                    Annotation ann = page.Annotations[annIdx];
+
+                    // Look for a FileAttachmentAnnotation
+                    if (ann is FileAttachmentAnnotation fileAnn && fileAnn.File != null)
                     {
-                        // The File property holds a FileSpecification object
-                        // Its Description property stores the attachment description
+                        // Update the description of the attached file
                         fileAnn.File.Description = newDescription;
-                        updated = true;
-                        // If only one attachment needs updating, break out of loops
-                        break;
                     }
                 }
-
-                if (updated) break;
             }
 
-            if (!updated)
-            {
-                Console.WriteLine("No FileAttachmentAnnotation found in the document.");
-            }
-
-            // Save the modified document (PDF format)
+            // Save the modified PDF
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Document saved as '{outputPdf}'.");
+        Console.WriteLine($"Attachment description updated and saved to '{outputPdf}'.");
     }
 }

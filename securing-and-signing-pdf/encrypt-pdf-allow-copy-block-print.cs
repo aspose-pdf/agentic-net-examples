@@ -6,9 +6,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "encrypted.pdf";
-        const string userPassword = "user123";
+        const string userPassword  = "user123";
         const string ownerPassword = "owner123";
 
         if (!File.Exists(inputPath))
@@ -19,16 +19,12 @@ class Program
 
         try
         {
-            // Load the PDF document
+            // Load the PDF, encrypt it, and save.
             using (Document doc = new Document(inputPath))
             {
-                // Allow copying (content extraction) but block printing
+                // Allow copying (ExtractContent) but do NOT allow printing.
                 Permissions perms = Permissions.ExtractContent;
-
-                // Encrypt using AES-256 algorithm
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
-
-                // Save the encrypted PDF
                 doc.Save(outputPath);
             }
 

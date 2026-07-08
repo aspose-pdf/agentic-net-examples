@@ -1,8 +1,9 @@
 using System;
 using System.IO;
+using System.Drawing.Imaging;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices;
+using Aspose.Pdf.Text; // required for font substitution
 
 class PdfToPngConverter
 {
@@ -10,8 +11,8 @@ class PdfToPngConverter
     {
         const string inputPdfPath = "input.pdf";
         const string outputFolder = "PngPages";
-        const string defaultFont = "Arial"; // fallback font for missing fonts
 
+        // Verify input file exists
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
@@ -21,49 +22,44 @@ class PdfToPngConverter
         // Ensure output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Step 1: Load the source PDF
-        using (Document srcDoc = new Document(inputPdfPath))
+        // ------------------------------------------------------------
+        // Font substitution: replace any missing font with Arial.
+        // Aspose.Pdf does not expose FontSubstitutionEnabled on Document,
+        // so we use the static FontRepository.Substitutions collection.
+        // The wildcard "*" substitutes every missing font with the
+        // specified fallback (Arial). Adjust the source name if you
+        // need a more specific mapping.
+        // ------------------------------------------------------------
+        FontRepository.Substitutions.Add(new SimpleFontSubstitution("*", "Arial"));
+
+        // Load the PDF document (substitution rules are already in place)
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
-            // Step 2: Save a temporary PDF with font substitution enabled
-            // PdfSaveOptions.DefaultFontName is used for missing fonts
-            PdfSaveOptions saveOpts = new PdfSaveOptions
-            {
-                DefaultFontName = defaultFont
-            };
-
-            string tempPdfPath = Path.Combine(outputFolder, "temp_substituted.pdf");
-            srcDoc.Save(tempPdfPath, saveOpts);
-
-            // Step 3: Load the temporary PDF into PdfConverter
+            // Use PdfConverter (Facade) to convert each page to PNG
             using (PdfConverter converter = new PdfConverter())
             {
-                // Bind the PDF file (the one with substituted fonts)
-                converter.BindPdf(tempPdfPath);
+                // Bind the already‑loaded document
+                converter.BindPdf(pdfDocument);
 
-                // Set resolution using the Resolution object (DPI)
-                converter.Resolution = new Resolution(150);
+                // Set the page range to convert (all pages)
+                converter.StartPage = 1;
+                converter.EndPage   = pdfDocument.Pages.Count; // total pages in the document
 
-                // Prepare for conversion
-                converter.DoConvert();
+                int pageNumber = converter.StartPage;
 
-                int pageNumber = 1;
+                // Convert pages one by one while images are available
                 while (converter.HasNextImage())
                 {
-                    string outFile = Path.Combine(outputFolder, $"page_{pageNumber}.png");
-                    // Save the next page; format is inferred from the file extension
-                    converter.GetNextImage(outFile);
-                    Console.WriteLine($"Saved page {pageNumber} → {outFile}");
+                    string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.png");
+
+                    // Save the current page as PNG
+                    converter.GetNextImage(outputPath, ImageFormat.Png);
+
                     pageNumber++;
                 }
-
-                // Release resources used by the converter
-                converter.Close();
             }
-
-            // Clean up the temporary PDF
-            try { File.Delete(tempPdfPath); } catch { /* ignore cleanup errors */ }
         }
 
-        Console.WriteLine("PDF to PNG conversion completed.");
+        Console.WriteLine($"Conversion completed. PNG files are saved in '{outputFolder}'.");
     }
 }

@@ -7,47 +7,62 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "form.pdf";               // Input PDF containing the form
-        const string radioFieldName = "Color";           // Fully‑qualified name of the radio group
+        const string inputPdf = "FormWithRadioButtons.pdf";
+        const string radioFieldName = "ColorChoice"; // replace with the actual field name
 
-        // Expected export values for the radio button options
-        var expected = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        // Expected option names (keys) for the radio button group
+        var expectedOptions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            "White",
-            "Black",
-            "Red"
+            "Red",
+            "Green",
+            "Blue"
         };
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF form using the Facades Form class
-        Form form = new Form(pdfPath);
-
-        // Retrieve the radio button options: dictionary keyed by item name, value = export value
-        Dictionary<string, string> options = form.GetButtonOptionValues(radioFieldName);
-
-        // Collect the actual export values
-        var actual = new HashSet<string>(options.Values, StringComparer.OrdinalIgnoreCase);
-
-        // Compare the actual set with the expected set
-        if (expected.SetEquals(actual))
+        // Open the PDF form using the Facade API
+        Form form = new Form(inputPdf);
+        try
         {
-            Console.WriteLine("Radio button options match the expected set.");
-        }
-        else
-        {
-            Console.WriteLine("Radio button options do NOT match the expected set.");
-            Console.WriteLine("Expected values:");
-            foreach (var val in expected) Console.WriteLine($"  {val}");
-            Console.WriteLine("Actual values:");
-            foreach (var val in actual) Console.WriteLine($"  {val}");
-        }
+            // Retrieve the option values dictionary: key = option name, value = export value
+            Dictionary<string, string> optionValues = form.GetButtonOptionValues(radioFieldName);
 
-        // Clean up the facade
-        form.Close();
+            // Extract the set of option names present in the document
+            var actualOptions = new HashSet<string>(optionValues.Keys, StringComparer.OrdinalIgnoreCase);
+
+            // Compare actual options with expected options
+            bool matches = actualOptions.SetEquals(expectedOptions);
+
+            if (matches)
+            {
+                Console.WriteLine($"Radio button field '{radioFieldName}' contains the expected options.");
+            }
+            else
+            {
+                Console.WriteLine($"Radio button field '{radioFieldName}' does NOT match the expected options.");
+                Console.WriteLine("Missing options:");
+                foreach (var missing in expectedOptions)
+                {
+                    if (!actualOptions.Contains(missing))
+                        Console.WriteLine($"  - {missing}");
+                }
+
+                Console.WriteLine("Unexpected options:");
+                foreach (var extra in actualOptions)
+                {
+                    if (!expectedOptions.Contains(extra))
+                        Console.WriteLine($"  - {extra}");
+                }
+            }
+        }
+        finally
+        {
+            // Release resources held by the Form facade
+            form.Close();
+        }
     }
 }

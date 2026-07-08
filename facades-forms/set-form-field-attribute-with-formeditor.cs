@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -16,22 +17,25 @@ class Program
             return;
         }
 
-        // Bind the PDF to FormEditor
-        using (FormEditor editor = new FormEditor())
+        // Open the PDF document with FormEditor (facade for form operations)
+        using (FormEditor formEditor = new FormEditor())
         {
-            editor.BindPdf(inputPdf);
+            // Bind the source PDF
+            formEditor.BindPdf(inputPdf);
 
-            // NOTE: FormEditor.SetFieldAttribute can only set predefined flags
-            // (NoExport, ReadOnly, Required). It cannot assign arbitrary custom
-            // attributes such as "data-id". Therefore a custom attribute cannot be
-            // set via this method. Below is an example of setting a standard flag.
-            bool success = editor.SetFieldAttribute(fieldName, PropertyFlag.NoExport);
-            Console.WriteLine($"Set NoExport flag on '{fieldName}': {success}");
+            // Set a standard field attribute (e.g., Required) – Aspose.Pdf does not support
+            // arbitrary custom attributes like "data-id". Only predefined flags can be set.
+            // Here we demonstrate setting the Required flag as an example.
+            bool attributeSet = formEditor.SetFieldAttribute(fieldName, PropertyFlag.Required);
+            if (!attributeSet)
+            {
+                Console.Error.WriteLine($"Failed to set attribute on field '{fieldName}'.");
+            }
 
             // Save the modified PDF
-            editor.Save(outputPdf);
+            formEditor.Save(outputPdf);
         }
 
-        Console.WriteLine($"Modified PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF saved to '{outputPdf}'.");
     }
 }

@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string outputPath = "xmp.xml";
+        const string pdfPath = "input.pdf";   // path to the PDF file
+        const string outPath = "xmp.xml";     // where to store the raw XMP XML
 
         if (!File.Exists(pdfPath))
         {
@@ -16,18 +16,18 @@ class Program
             return;
         }
 
-        // Bind the PDF and retrieve the XMP metadata as a byte array
+        // Bind the PDF and retrieve its XMP metadata as a byte array
         using (PdfXmpMetadata xmp = new PdfXmpMetadata())
         {
             xmp.BindPdf(pdfPath);
-            byte[] data = xmp.GetXmpMetadata();
+            byte[] rawData = xmp.GetXmpMetadata();   // XML bytes
 
-            // Convert the byte array to a UTF‑8 string
-            string xml = Encoding.UTF8.GetString(data);
+            // Convert the bytes to a UTF‑8 string
+            string xml = Encoding.UTF8.GetString(rawData);
 
-            // Save the raw XMP XML to a file
-            File.WriteAllText(outputPath, xml, Encoding.UTF8);
-            Console.WriteLine($"XMP metadata saved to '{outputPath}'.");
+            // Save the XML string to a file (optional)
+            File.WriteAllText(outPath, xml, Encoding.UTF8);
+            Console.WriteLine($"XMP metadata extracted to '{outPath}'.");
         }
     }
 }

@@ -9,23 +9,19 @@ class Program
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
+        // Verify the source PDF exists.
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Initialize the facade, bind the source PDF, change the viewer preference,
-        // and save the result.
+        // Initialize the facade, bind the PDF, set the viewer preference, and save.
         PdfContentEditor editor = new PdfContentEditor();
-        editor.BindPdf(inputPath);
-
-        // Hide navigation panels by setting PageMode to UseNone.
-        editor.ChangeViewerPreference(ViewerPreference.PageModeUseNone);
-
-        // Persist the changes.
-        editor.Save(outputPath);
-        editor.Close();
+        editor.BindPdf(inputPath);                                 // Load the PDF.
+        editor.ChangeViewerPreference(ViewerPreference.PageModeUseNone); // Hide navigation panels.
+        editor.Save(outputPath);                                   // Write the modified PDF.
+        editor.Close();                                            // Release resources.
 
         Console.WriteLine($"Viewer preference set to UseNone and saved to '{outputPath}'.");
     }

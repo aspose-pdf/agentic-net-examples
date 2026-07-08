@@ -8,8 +8,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_tagged.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,31 +17,35 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
             // Access the tagged content API
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Get the root structure element (no cast needed)
+            // Set language and title for the tagged document (optional but recommended)
+            tagged.SetLanguage("en-US");
+            tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
+
+            // Get the root structure element (no cast required)
             StructureElement root = tagged.RootElement;
 
             // Create a Span element
             SpanElement span = tagged.CreateSpanElement();
 
-            // Set visible text for the span (optional)
+            // Optional: add visible text to the span
             span.SetText("example");
 
-            // Set hidden pronunciation text via ActualText
+            // Supply hidden pronunciation text via the ActualText property
             span.ActualText = "ɪɡˈzæmpəl";
 
-            // Append the span to the document's structure tree
+            // Attach the span to the document structure
             root.AppendChild(span);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Tagged PDF saved to '{outputPath}'.");
     }
 }

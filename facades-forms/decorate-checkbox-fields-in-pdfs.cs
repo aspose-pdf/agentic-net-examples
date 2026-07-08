@@ -1,51 +1,56 @@
 using System;
 using System.IO;
+using System.Drawing;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input directory containing PDF files
-        const string inputDir = "InputPdfs";
+        // Directory containing the PDF files
+        const string inputDirectory = @"C:\PdfFolder";
         // Output directory for the decorated PDFs
-        const string outputDir = "OutputPdfs";
+        const string outputDirectory = @"C:\PdfFolder\Decorated";
 
-        if (!Directory.Exists(inputDir))
+        if (!Directory.Exists(inputDirectory))
         {
-            Console.Error.WriteLine($"Input directory not found: {inputDir}");
+            Console.Error.WriteLine($"Input directory not found: {inputDirectory}");
             return;
         }
 
-        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(outputDirectory);
 
         // Process each PDF file in the input directory
-        foreach (string pdfPath in Directory.GetFiles(inputDir, "*.pdf"))
+        foreach (string inputPath in Directory.GetFiles(inputDirectory, "*.pdf"))
         {
-            string fileName = Path.GetFileNameWithoutExtension(pdfPath);
-            string outputPath = Path.Combine(outputDir, $"{fileName}_decorated.pdf");
+            string fileName = Path.GetFileNameWithoutExtension(inputPath);
+            string outputPath = Path.Combine(outputDirectory, $"{fileName}_decorated.pdf");
 
-            // Use FormEditor to modify form fields
-            using (FormEditor formEditor = new FormEditor())
+            try
             {
-                // Bind the source PDF
-                formEditor.BindPdf(pdfPath);
+                // Initialize FormEditor with source and destination files
+                using (FormEditor editor = new FormEditor(inputPath, outputPath))
+                {
+                    // Set visual attributes for the fields
+                    editor.Facade = new FormFieldFacade();
+                    editor.Facade.BackgroundColor = Color.LightGray;   // Background of the checkbox
+                    editor.Facade.TextColor       = Color.DarkBlue;   // Check mark color
+                    editor.Facade.BorderColor     = Color.Black;     // Border color
+                    editor.Facade.Alignment       = FormFieldFacade.AlignCenter;
 
-                // Configure visual appearance for the fields
-                formEditor.Facade = new FormFieldFacade();
-                formEditor.Facade.BackgroundColor = System.Drawing.Color.LightGray;   // Field background
-                formEditor.Facade.BorderColor     = System.Drawing.Color.DarkBlue;    // Field border
-                formEditor.Facade.TextColor       = System.Drawing.Color.Black;       // Text (check mark) color
-                formEditor.Facade.Alignment       = FormFieldFacade.AlignCenter;      // Center alignment
+                    // Apply the decoration to all checkbox fields
+                    editor.DecorateField(FieldType.CheckBox);
 
-                // Apply the appearance to all checkbox fields
-                formEditor.DecorateField(Aspose.Pdf.Facades.FieldType.CheckBox);
+                    // Save the modified PDF
+                    editor.Save();
+                }
 
-                // Save the modified PDF
-                formEditor.Save(outputPath);
+                Console.WriteLine($"Decorated PDF saved: {outputPath}");
             }
-
-            Console.WriteLine($"Decorated PDF saved to: {outputPath}");
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
+            }
         }
     }
 }

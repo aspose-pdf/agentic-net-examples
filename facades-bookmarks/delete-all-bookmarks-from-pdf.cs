@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output_no_bookmarks.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,14 +15,21 @@ class Program
             return;
         }
 
-        // Delete all bookmarks using PdfBookmarkEditor (facade API)
-        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
-        {
-            editor.BindPdf(inputPath);   // load the PDF
-            editor.DeleteBookmarks();    // remove every bookmark
-            editor.Save(outputPath);     // save the modified PDF
-        }
+        // Create the bookmark editor
+        PdfBookmarkEditor editor = new PdfBookmarkEditor();
 
-        Console.WriteLine($"All bookmarks deleted. Saved to '{outputPath}'.");
+        // Load the PDF document
+        editor.BindPdf(inputPath);
+
+        // Delete all bookmarks
+        editor.DeleteBookmarks();
+
+        // Save the modified PDF
+        editor.Save(outputPath);
+
+        // Release resources
+        editor.Close();
+
+        Console.WriteLine($"All bookmarks removed. Saved to '{outputPath}'.");
     }
 }

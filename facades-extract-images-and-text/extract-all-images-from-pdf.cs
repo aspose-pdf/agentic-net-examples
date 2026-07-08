@@ -1,45 +1,45 @@
 using System;
 using System.IO;
+using System.Drawing.Imaging;
 using Aspose.Pdf.Facades;
-using System.Drawing.Imaging; // ImageFormat enum for specifying output format
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputDir = "ExtractedImages";
+        // Input PDF file containing images
+        const string inputPdf = "sample.pdf";
 
-        // Verify input file exists
+        // Verify the input file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputDir);
-
-        // Use PdfExtractor (implements IDisposable) within a using block
+        // Use PdfExtractor (a Facade) to extract images from the PDF.
+        // The extractor implements IDisposable, so wrap it in a using block.
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the source PDF
+            // Bind the PDF file to the extractor.
             extractor.BindPdf(inputPdf);
 
-            // Set page range: StartPage = 1, EndPage = 0 (means all pages)
+            // Set the page range.
+            // StartPage = 1 (first page), EndPage = 0 means "all pages".
             extractor.StartPage = 1;
-            extractor.EndPage = 0;
+            extractor.EndPage   = 0;
 
-            // Perform image extraction for the defined range
+            // Perform the image extraction.
             extractor.ExtractImage();
 
+            // Retrieve each extracted image and save it to a separate file.
             int imageIndex = 1;
-            // Iterate through all extracted images
             while (extractor.HasNextImage())
             {
-                string outputPath = Path.Combine(outputDir, $"image-{imageIndex}.png");
-                // Save each image as PNG (any ImageFormat can be used)
-                extractor.GetNextImage(outputPath, ImageFormat.Png);
+                // Save each image as PNG. You can change the format if needed.
+                string outputImage = $"image-{imageIndex}.png";
+                extractor.GetNextImage(outputImage, ImageFormat.Png);
+                Console.WriteLine($"Extracted image saved to: {outputImage}");
                 imageIndex++;
             }
         }

@@ -1,60 +1,61 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // DocumentPrivilege enum
-using Aspose.Pdf.Facades;      // PdfFileSecurity, KeySize, Algorithm
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
-namespace AsposePdfApi
+namespace PdfEncryption
 {
     public static class PdfEncryptionHelper
     {
         /// <summary>
-        /// Encrypts a PDF provided as a stream using RC4‑40 encryption and returns the encrypted PDF as a new stream.
+        /// Encrypts a PDF provided as a stream using RC4‑40 encryption and returns the encrypted PDF as a stream.
         /// </summary>
-        /// <param name="inputPdf">Stream containing the original PDF. Must be readable.</param>
-        /// <param name="userPassword">User password (can be null or empty).</param>
-        /// <param name="ownerPassword">Owner password (can be null or empty).</param>
-        /// <returns>A MemoryStream positioned at the beginning, containing the encrypted PDF.</returns>
-        public static Stream EncryptPdfStreamRc440(Stream inputPdf, string userPassword, string ownerPassword)
+        /// <param name="inputPdf">Stream containing the original PDF.</param>
+        /// <returns>MemoryStream with the RC4‑40 encrypted PDF.</returns>
+        public static Stream EncryptPdfStreamRc440(Stream inputPdf)
         {
-            // Ensure the input stream is positioned at the start.
+            if (inputPdf == null) throw new ArgumentNullException(nameof(inputPdf));
+
+            // Ensure the input stream is positioned at the beginning.
             if (inputPdf.CanSeek)
                 inputPdf.Position = 0;
 
-            // Prepare an output stream that will hold the encrypted PDF.
-            MemoryStream encryptedStream = new MemoryStream();
-
-            // Use the PdfFileSecurity facade to apply encryption.
-            using (PdfFileSecurity security = new PdfFileSecurity())
+            // Load the PDF from the input stream.
+            using (Document doc = new Document(inputPdf))
             {
-                // Bind the source PDF stream to the facade.
-                security.BindPdf(inputPdf);
+                // Initialize the security facade with the loaded document.
+                PdfFileSecurity security = new PdfFileSecurity(doc);
 
-                // Encrypt with RC4‑40. DocumentPrivilege.Print is used as an example;
-                // adjust the privilege as needed for your scenario.
+                // Apply RC4‑40 encryption.
+                // Empty strings are used for user and owner passwords.
+                // DocumentPrivilege.Print is chosen arbitrarily; adjust as needed.
                 security.EncryptFile(
-                    userPassword,
-                    ownerPassword,
-                    DocumentPrivilege.Print,
-                    KeySize.x40,
-                    Algorithm.RC4);
+                    userPassword: string.Empty,
+                    ownerPassword: string.Empty,
+                    privilege: DocumentPrivilege.Print,
+                    keySize: KeySize.x40,
+                    cipher: Algorithm.RC4);
 
-                // Save the encrypted document into the output stream.
+                // Save the encrypted PDF into a memory stream.
+                MemoryStream encryptedStream = new MemoryStream();
                 security.Save(encryptedStream);
-            }
 
-            // Reset the output stream position so the caller can read from the beginning.
-            encryptedStream.Position = 0;
-            return encryptedStream;
+                // Close the facade (optional but good practice).
+                security.Close();
+
+                // Reset the position so the caller can read from the beginning.
+                encryptedStream.Position = 0;
+                return encryptedStream;
+            }
         }
     }
 
-    // Dummy entry point to satisfy the compiler when the project is built as an executable.
-    // The library can still be used from other projects; the Main method does nothing.
-    public class Program
+    // Dummy entry point to satisfy the console‑application project type.
+    internal class Program
     {
-        public static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            // No operation – placeholder for the required entry point.
+            // No operation – the library functionality is accessed via PdfEncryptionHelper.
         }
     }
 }

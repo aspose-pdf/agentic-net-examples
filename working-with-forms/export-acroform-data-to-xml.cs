@@ -6,23 +6,22 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputXmlPath = "formdata.xml";
+        const string inputPath = "input.pdf";
+        const string outputPath = "formdata.xml";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         // Load the PDF document
-        using (Document pdfDocument = new Document(inputPdfPath))
+        using (Document doc = new Document(inputPath))
         {
-            // Export the document (including AcroForm data) to XML
-            XmlSaveOptions xmlOptions = new XmlSaveOptions();
-            pdfDocument.Save(outputXmlPath, xmlOptions);
+            // Export all AcroForm data (annotations) to XFDF (XML) format
+            doc.ExportAnnotationsToXfdf(outputPath);
         }
 
-        Console.WriteLine($"AcroForm data exported to XML file: {outputXmlPath}");
+        Console.WriteLine($"Form data exported to '{outputPath}'.");
     }
 }

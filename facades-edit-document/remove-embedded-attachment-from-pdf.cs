@@ -7,30 +7,53 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
         const string attachmentName = "OldReport.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Bind the PDF to the facade
+        // Bind the PDF using the PdfContentEditor facade
         PdfContentEditor editor = new PdfContentEditor();
-        editor.BindPdf(inputPdf);
+        editor.BindPdf(inputPath);
 
-        // Access the underlying Document to manipulate embedded files
-        Document doc = editor.Document;
+        // Access the embedded files collection via the underlying Document
+        EmbeddedFileCollection attachments = editor.Document.EmbeddedFiles;
 
-        // Delete the specific attachment by name
-        // EmbeddedFiles.Delete(string) removes a single embedded file
-        doc.EmbeddedFiles.Delete(attachmentName);
+        // Determine whether the specified attachment exists using reflection/dynamic to avoid direct type dependency
+        bool exists = false;
+        foreach (var fileObj in attachments)
+        {
+            // Use reflection to get the Name property (the concrete type may be internal)
+            var nameProp = fileObj.GetType().GetProperty("Name");
+            if (nameProp != null)
+            {
+                string name = nameProp.GetValue(fileObj) as string;
+                if (string.Equals(name, attachmentName, StringComparison.OrdinalIgnoreCase))
+                {
+                    exists = true;
+                    break;
+                }
+            }
+        }
+
+        if (exists)
+        {
+            // Delete the specific attachment by name
+            attachments.Delete(attachmentName);
+            Console.WriteLine($"Attachment '{attachmentName}' removed.");
+        }
+        else
+        {
+            Console.WriteLine($"Attachment '{attachmentName}' not found.");
+        }
 
         // Save the modified PDF
-        editor.Save(outputPdf);
-
-        Console.WriteLine($"Attachment \"{attachmentName}\" removed. Saved to \"{outputPdf}\".");
+        editor.Save(outputPath);
+        Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
     }
 }

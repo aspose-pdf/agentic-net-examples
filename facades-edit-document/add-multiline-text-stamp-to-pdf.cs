@@ -7,42 +7,49 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "stamped_output.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Multiline text for the stamp
-        string stampContent = "First line\nSecond line\nThird line";
-
-        // Configure text appearance: Arial, size 14, blue color
-        TextState textState = new TextState
+        // Load the source PDF (required for proper disposal)
+        using (Document doc = new Document(inputPdf))
         {
-            Font = FontRepository.FindFont("Arial"),
-            FontSize = 14,
-            ForegroundColor = Color.Blue
-        };
+            // Prepare text appearance
+            TextState textState = new TextState
+            {
+                Font = FontRepository.FindFont("Arial"),
+                FontSize = 14,
+                ForegroundColor = Aspose.Pdf.Color.Blue
+            };
 
-        // Create a TextStamp with the multiline content and the defined TextState
-        TextStamp textStamp = new TextStamp(stampContent, textState)
-        {
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Center,
-            Opacity = 0.8f
-        };
+            // Multiline content (use newline characters)
+            string multilineText = "First line\nSecond line\nThird line";
 
-        // Load the PDF and apply the stamp to every page using the Document API
-        Document pdfDocument = new Document(inputPath);
-        foreach (Page page in pdfDocument.Pages)
-        {
-            page.AddStamp(textStamp);
+            // Create a TextStamp with the content and the defined TextState
+            TextStamp textStamp = new TextStamp(multilineText, textState)
+            {
+                // Optional: position the stamp (example: 100 points from left, 500 from bottom)
+                XIndent = 100,
+                YIndent = 500,
+                // Ensure the stamp is drawn as text (default is true)
+                Draw = true
+            };
+
+            // Add the stamp to every page of the document
+            foreach (Page page in doc.Pages)
+            {
+                page.AddStamp(textStamp);
+            }
+
+            // Save the stamped PDF
+            doc.Save(outputPdf);
         }
 
-        pdfDocument.Save(outputPath);
-        Console.WriteLine($"Text stamp applied and saved to '{outputPath}'.");
+        Console.WriteLine($"Stamped PDF saved to '{outputPdf}'.");
     }
 }

@@ -1,6 +1,5 @@
 using System;
-using System.IO;
-using System.Runtime.InteropServices;
+using System.Data;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -8,81 +7,74 @@ class ConditionalFormattingExample
 {
     static void Main()
     {
-        // Paths for the output PDF
-        const string outputPath = "ConditionalFormattedTable.pdf";
+        // Input and output paths
+        const string outputPath = "ConditionalFormatting.pdf";
 
-        // Create a new empty PDF document
+        // Create a DataTable with sample numeric data
+        DataTable dt = new DataTable();
+        dt.Columns.Add("Item", typeof(string));
+        dt.Columns.Add("Quantity", typeof(int));
+        dt.Columns.Add("Price", typeof(double));
+
+        dt.Rows.Add("Apple", 10, 0.5);
+        dt.Rows.Add("Banana", 5, 0.3);
+        dt.Rows.Add("Cherry", 20, 1.2);
+        dt.Rows.Add("Date", 2, 2.5);
+        dt.Rows.Add("Elderberry", 15, 0.8);
+
+        // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a page to the document
+            // Add a page to host the table
             Page page = doc.Pages.Add();
 
-            // Create a table with 3 columns
+            // Create a table and import the DataTable (first row will be a header)
             Table table = new Table
             {
-                ColumnWidths = "100 100 100", // equal column widths
-                Border = new BorderInfo(BorderSide.All, 0.5f) // thin border for visibility
+                ColumnWidths = "100 100 100", // three equal columns
+                Border = new BorderInfo(BorderSide.All, 0.5f, Color.Black)
             };
+            table.ImportDataTable(dt, true, 0, 0);
 
-            // Sample numeric data
-            double[,] data = new double[,] {
-                { 45, 78, 12 },
-                { 90, 55, 33 },
-                { 20, 85, 60 }
-            };
+            // Define thresholds
+            const int quantityThreshold = 10; // highlight quantities > 10
+            const double priceThreshold = 1.0;   // highlight prices > 1.0
 
-            // Populate the table with data
-            for (int i = 0; i < data.GetLength(0); i++)
+            // Apply conditional formatting – skip the first (header) row
+            bool firstRow = true;
+            foreach (Row row in table.Rows)
             {
-                Row row = table.Rows.Add();
-                for (int j = 0; j < data.GetLength(1); j++)
+                if (firstRow)
                 {
-                    // Create a cell with the numeric value as text
-                    Cell cell = row.Cells.Add(data[i, j].ToString());
+                    firstRow = false;
+                    continue; // header row
+                }
 
-                    // Conditional formatting: if value exceeds threshold, set background color
-                    const double threshold = 70.0;
-                    if (data[i, j] > threshold)
-                    {
-                        // Use Aspose.Pdf.Color to avoid System.Drawing ambiguity
-                        cell.BackgroundColor = Aspose.Pdf.Color.LightGoldenrodYellow;
-                    }
+                // Quantity cell (second column, index 1)
+                Cell qtyCell = row.Cells[1];
+                // The first paragraph in a cell is a TextFragment after ImportDataTable
+                string qtyText = ((TextFragment)qtyCell.Paragraphs[0]).Text;
+                if (int.TryParse(qtyText, out int qty) && qty > quantityThreshold)
+                {
+                    qtyCell.BackgroundColor = Color.Yellow; // Aspose.Pdf.Color
+                }
+
+                // Price cell (third column, index 2)
+                Cell priceCell = row.Cells[2];
+                string priceText = ((TextFragment)priceCell.Paragraphs[0]).Text;
+                if (double.TryParse(priceText, out double price) && price > priceThreshold)
+                {
+                    priceCell.BackgroundColor = Color.LightYellow; // Aspose.Pdf.Color
                 }
             }
 
             // Add the table to the page
             page.Paragraphs.Add(table);
 
-            // Save the PDF document – guard against missing libgdiplus on non‑Windows platforms
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                doc.Save(outputPath);
-            }
-            else
-            {
-                try
-                {
-                    doc.Save(outputPath);
-                }
-                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
-                {
-                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. PDF saved without GDI+ dependent features.");
-                }
-            }
+            // Save the PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with conditional formatting saved to '{outputPath}'.");
-    }
-
-    // Helper to detect a nested DllNotFoundException (e.g., missing libgdiplus)
-    private static bool ContainsDllNotFound(Exception ex)
-    {
-        while (ex != null)
-        {
-            if (ex is DllNotFoundException)
-                return true;
-            ex = ex.InnerException;
-        }
-        return false;
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

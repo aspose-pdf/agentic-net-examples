@@ -3,43 +3,46 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class Program
+class PdfToJpegConverter
 {
     static void Main()
     {
+        // Input PDF file
         const string inputPdfPath = "input.pdf";
+
+        // Output folder for JPEG images
         const string outputFolder = "Images";
 
-        // Verify input file exists
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
+
+        // Validate input file existence
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Error: File not found – {inputPdfPath}");
             return;
         }
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
-
-        // Use PdfConverter (Facade) to convert each page to JPEG
+        // Use PdfConverter (Facade) to convert each page to a JPEG image
         using (PdfConverter converter = new PdfConverter())
         {
             // Bind the source PDF file
             converter.BindPdf(inputPdfPath);
 
-            // Prepare the converter (required before extracting images)
+            // Prepare the converter (initial work)
             converter.DoConvert();
 
             int pageIndex = 1;
-            // Iterate through all pages and save each as a JPEG image
+            // Iterate over all pages; GetNextImage saves the current page as JPEG
             while (converter.HasNextImage())
             {
                 string outputFile = Path.Combine(outputFolder, $"page_{pageIndex}.jpg");
-                // GetNextImage saves the current page as JPEG using original page dimensions
+                // Saves the current page as JPEG using default settings (preserves page size and color depth)
                 converter.GetNextImage(outputFile);
                 pageIndex++;
             }
         }
 
-        Console.WriteLine("PDF successfully converted to JPEG images.");
+        Console.WriteLine($"Conversion completed. JPEG images saved to '{outputFolder}'.");
     }
 }

@@ -1,64 +1,49 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace
+using Aspose.Pdf;               // Core PDF API
+using Aspose.Pdf.Vector;        // SvgExtractor and related vector graphics API
 
-class Program
+class BatchVectorGraphicsExtractor
 {
     static void Main()
     {
-        // Folder containing the source PDF files
-        const string inputFolder = "InputPdfs";
+        // Folder containing PDF files to process
+        const string inputFolder = @"C:\InputPdfs";
 
-        // Folder where all extracted SVG files will be placed
-        const string outputFolder = "ExtractedSvgs";
+        // Folder where all extracted SVG files will be saved
+        const string outputFolder = @"C:\ExtractedSvgs";
 
-        // Verify input folder exists
-        if (!Directory.Exists(inputFolder))
-        {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
-            return;
-        }
-
-        // Ensure the output folder exists
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Get all PDF files in the input folder (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-
-        foreach (string pdfPath in pdfFiles)
+        // Process each PDF file in the input folder
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            try
+            // Use a using block to guarantee deterministic disposal of the Document
+            using (Document pdfDoc = new Document(pdfPath))
             {
-                // Load the PDF document (lifecycle: create + load)
-                using (Document doc = new Document(pdfPath))
+                // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
+                for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
                 {
-                    // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-                    for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+                    Page page = pdfDoc.Pages[pageIndex];
+
+                    // Check if the page contains vector graphics
+                    if (page.HasVectorGraphics())
                     {
-                        Page page = doc.Pages[pageIndex];
-
-                        // Build a unique SVG file name for each page
+                        // Build a unique SVG file name: <pdfname>_page<index>.svg
                         string svgFileName = $"{Path.GetFileNameWithoutExtension(pdfPath)}_page{pageIndex}.svg";
-                        string svgFullPath = Path.Combine(outputFolder, svgFileName);
+                        string svgPath = Path.Combine(outputFolder, svgFileName);
 
-                        // Try to save vector graphics of the page to an SVG file
-                        // Returns true if vector graphics were present and saved
-                        bool saved = page.TrySaveVectorGraphics(svgFullPath);
-
-                        if (saved)
-                        {
-                            Console.WriteLine($"Extracted SVG: {svgFullPath}");
-                        }
+                        // Try to save the vector graphics of the page as an SVG file.
+                        // The method returns true if graphics were saved; false otherwise.
+                        page.TrySaveVectorGraphics(svgPath);
                     }
-                } // Document disposed here (lifecycle: dispose)
+                }
             }
-            catch (Exception ex)
-            {
-                // Log any errors but continue processing other files
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
-            }
+
+            Console.WriteLine($"Processed: {Path.GetFileName(pdfPath)}");
         }
 
-        Console.WriteLine("Batch extraction of vector graphics completed.");
+        Console.WriteLine("Vector graphics extraction completed.");
     }
 }

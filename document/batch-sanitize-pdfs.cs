@@ -1,64 +1,70 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Sanitization;
 
-class Program
+class PdfSanitizer
 {
     static void Main()
     {
-        // Input folder containing PDFs to be sanitized
-        const string inputDirectory = "input_pdfs";
-
+        // Input folder containing PDFs to sanitize
+        const string inputFolder = @"C:\InputPdfs";
         // Output folder where sanitized PDFs will be saved
-        const string outputDirectory = "sanitized_pdfs";
+        const string outputFolder = @"C:\SanitizedPdfs";
 
-        // Verify input folder exists
-        if (!Directory.Exists(inputDirectory))
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
+
+        // Get all PDF files in the input folder (non‑recursive)
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+
+        foreach (string inputPath in pdfFiles)
         {
-            Console.Error.WriteLine($"Input directory not found: {inputDirectory}");
-            return;
-        }
-
-        // Ensure output folder exists
-        Directory.CreateDirectory(outputDirectory);
-
-        // Process each PDF file in the input folder
-        foreach (string sourcePath in Directory.GetFiles(inputDirectory, "*.pdf"))
-        {
-            string fileName = Path.GetFileName(sourcePath);
-            string destinationPath = Path.Combine(outputDirectory, fileName);
-
             try
             {
-                // Load the PDF document (lifecycle rule: use Document constructor)
-                using (Document doc = new Document(sourcePath))
+                // Load the PDF document inside a using block for deterministic disposal
+                using (Document doc = new Document(inputPath))
                 {
-                    // Remove document metadata
+                    // Remove document metadata (author, title, etc.)
                     doc.RemoveMetadata();
 
-                    // Flatten form fields and annotations
+                    // Remove PDF/A compliance if present
+                    doc.RemovePdfaCompliance();
+
+                    // Remove PDF/UA compliance if present
+                    doc.RemovePdfUaCompliance();
+
+                    // Flatten form fields and annotations (optional but often part of sanitization)
                     doc.Flatten();
 
-                    // Optimize resources (remove unused objects, merge duplicates)
+                    // Optimize resources: remove unused objects and merge duplicates
                     doc.OptimizeResources();
 
-                    // Save the sanitized PDF (lifecycle rule: use Save method)
-                    doc.Save(destinationPath);
+                    // Optional: validate the document after modifications
+                    // The boolean parameter indicates whether to perform a deep check
+                    doc.Check(true);
+
+                    // Build the output file path preserving the original file name
+                    string fileName = Path.GetFileName(inputPath);
+                    string outputPath = Path.Combine(outputFolder, fileName);
+
+                    // Save the sanitized PDF
+                    doc.Save(outputPath);
                 }
 
-                Console.WriteLine($"Sanitized: {fileName}");
+                Console.WriteLine($"Sanitized: {Path.GetFileName(inputPath)}");
             }
-            catch (SanitizationException ex)
+            catch (PdfException ex) // Aspose.Pdf specific exception type
             {
-                // Specific exception for sanitization failures
-                Console.Error.WriteLine($"Sanitization failed for {fileName}: {ex.Message}");
+                // Specific exception for PDF processing failures
+                Console.Error.WriteLine($"Sanitization failed for '{inputPath}': {ex.Message}");
             }
             catch (Exception ex)
             {
-                // General error handling
-                Console.Error.WriteLine($"Error processing {fileName}: {ex.Message}");
+                // General exception handling
+                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
             }
         }
+
+        Console.WriteLine("Batch sanitization completed.");
     }
 }

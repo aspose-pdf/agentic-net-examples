@@ -6,36 +6,31 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";   // source PDF file
-        const string outputPath = "output.pdf";  // destination PDF file
-        const int endPage       = 5;             // split up to this page (inclusive)
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const int endPage = 5; // inclusive end page for the split
 
+        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Open the source PDF as a read‑only stream.
+        // Open input and output streams; they will be disposed automatically
         using (FileStream inputStream = new FileStream(inputPath, FileMode.Open, FileAccess.Read))
-        // Prepare an in‑memory stream for the split result.
-        using (MemoryStream outputStream = new MemoryStream())
+        using (FileStream outputStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
         {
-            // PdfFileEditor provides the stream‑based split operation.
+            // PdfFileEditor does NOT implement IDisposable, so no using block is needed
             PdfFileEditor editor = new PdfFileEditor();
 
-            // Split from the first page to the specified end page.
-            bool success = editor.SplitFromFirst(inputStream, endPage, outputStream);
+            // Split from the first page up to the specified end page
+            bool result = editor.SplitFromFirst(inputStream, endPage, outputStream);
 
-            if (!success)
-            {
-                Console.Error.WriteLine("Failed to split the PDF.");
-                return;
-            }
-
-            // Persist the split PDF to a file (optional step).
-            File.WriteAllBytes(outputPath, outputStream.ToArray());
-            Console.WriteLine($"Split PDF saved to '{outputPath}'.");
+            if (result)
+                Console.WriteLine($"Successfully split pages 1-{endPage} to '{outputPath}'.");
+            else
+                Console.Error.WriteLine("Split operation failed.");
         }
     }
 }

@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 
 class Program
 {
@@ -9,7 +8,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName = "myField";
+        const string fieldName = "OldPhoneNumber";
 
         if (!File.Exists(inputPath))
         {
@@ -17,16 +16,23 @@ class Program
             return;
         }
 
-        // Open the PDF document; using ensures proper disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Delete the form field by its name
-            doc.Form.Delete(fieldName);
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
+            {
+                // Delete the specified form field
+                doc.Form.Delete(fieldName);
 
-            // Save the updated document
-            doc.Save(outputPath);
+                // Save the updated document
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Form field '{fieldName}' deleted. Output saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Field '{fieldName}' deleted and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

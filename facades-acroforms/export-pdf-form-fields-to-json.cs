@@ -1,65 +1,63 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf;
+using System.Text.Json;
 using Aspose.Pdf.Facades;
-using Newtonsoft.Json;
 
-namespace AsposePdfFormJsonExample
+class ExportFormFieldsToJson
 {
-    // Represents a single form field exported as JSON.
-    public class FormField
+    static void Main()
     {
-        public string Name { get; set; }
-        public string Value { get; set; }
-    }
+        const string pdfPath = "input.pdf";
+        const string jsonPath = "form_fields.json";
 
-    class Program
-    {
-        static void Main()
+        if (!File.Exists(pdfPath))
         {
-            const string pdfPath = "input_form.pdf";
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            return;
+        }
 
-            if (!File.Exists(pdfPath))
+        // Load the PDF and bind it to the Form facade
+        using (Form form = new Form(pdfPath))
+        {
+            // Export all form fields to a JSON file (indented for readability)
+            using (FileStream jsonStream = new FileStream(jsonPath, FileMode.Create, FileAccess.Write))
             {
-                Console.Error.WriteLine($"File not found: {pdfPath}");
-                return;
-            }
-
-            // Export form fields to JSON using Aspose.Pdf.Facades.Form.
-            // The Form class can be instantiated directly with the PDF file path.
-            Form form = new Form(pdfPath);
-
-            // Use a memory stream to capture the JSON output.
-            using (MemoryStream jsonStream = new MemoryStream())
-            {
-                // ExportJson writes the fields as indented JSON by default.
                 form.ExportJson(jsonStream, indented: true);
+            }
+        }
 
-                // Reset the stream position before reading.
-                jsonStream.Position = 0;
-
-                // Read the JSON text.
-                string jsonText;
-                using (StreamReader reader = new StreamReader(jsonStream))
+        // Verify the JSON structure by parsing it
+        try
+        {
+            string jsonContent = File.ReadAllText(jsonPath);
+            using (JsonDocument doc = JsonDocument.Parse(jsonContent))
+            {
+                // The exported JSON is expected to be an array of field objects
+                if (doc.RootElement.ValueKind != JsonValueKind.Array)
                 {
-                    jsonText = reader.ReadToEnd();
+                    Console.Error.WriteLine("Unexpected JSON format: root element is not an array.");
                 }
-
-                // Deserialize the JSON into a strongly‑typed list of FormField objects.
-                // The JSON format produced by ExportJson is an array of objects with
-                // "Name" and "Value" properties, which matches the FormField class.
-                List<FormField> fields = JsonConvert.DeserializeObject<List<FormField>>(jsonText);
-
-                // Example processing: display each field name and its value.
-                Console.WriteLine("Exported form fields:");
-                foreach (FormField field in fields)
+                else
                 {
-                    Console.WriteLine($"  {field.Name}: {field.Value}");
+                    Console.WriteLine($"Exported {doc.RootElement.GetArrayLength()} form fields to JSON.");
+                    // Optionally, display the name of each field
+                    foreach (JsonElement field in doc.RootElement.EnumerateArray())
+                    {
+                        if (field.TryGetProperty("FullName", out JsonElement name))
+                        {
+                            Console.WriteLine($"Field: {name.GetString()}");
+                        }
+                    }
                 }
             }
-
-            // No explicit save operation is required here because we only exported data.
+        }
+        catch (JsonException ex)
+        {
+            Console.Error.WriteLine($"Failed to parse JSON: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
         }
     }
 }

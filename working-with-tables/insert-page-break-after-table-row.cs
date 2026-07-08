@@ -1,5 +1,5 @@
 using System;
-using System.Runtime.InteropServices;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -7,85 +7,56 @@ class Program
 {
     static void Main()
     {
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
+        const int targetRowIndex = 3; // zero‑based index of the row after which a page break is required
 
-        // Create a new PDF document and ensure proper disposal
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a page (pages are 1‑based)
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Create a table with three equal columns
-            Table table = new Table
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
+        {
+            // Assume the first page contains the table we want to modify
+            Page page = doc.Pages[1];
+
+            // Find the first Table element on the page (if any)
+            Table table = null;
+            foreach (var element in page.Paragraphs)
             {
-                ColumnWidths = "150 150 150",
-                // Avoid System.Drawing.Color on non‑Windows platforms
-                Border = new BorderInfo(BorderSide.All, 0.5f)
-            };
-            page.Paragraphs.Add(table);
-
-            // Header row
-            Row header = table.Rows.Add();
-            header.DefaultCellTextState.Font = FontRepository.FindFont("Helvetica");
-            header.DefaultCellTextState.FontSize = 12;
-            header.DefaultCellTextState.FontStyle = FontStyles.Bold;
-            header.Cells.Add("Column 1");
-            header.Cells.Add("Column 2");
-            header.Cells.Add("Column 3");
-
-            // Add rows 1‑5
-            for (int i = 1; i <= 5; i++)
-            {
-                Row r = table.Rows.Add();
-                r.Cells.Add($"R{i}C1");
-                r.Cells.Add($"R{i}C2");
-                r.Cells.Add($"R{i}C3");
-            }
-
-            // Insert a page break after the fifth row.
-            // NewPageFragment is not available in the current Aspose.PDF version, so we use a TextFragment
-            // containing a form‑feed character ("\f") which forces a page break when added to the paragraph collection.
-            page.Paragraphs.Add(new TextFragment("\f"));
-
-            // Add rows after the break (rows 7‑10)
-            for (int i = 7; i <= 10; i++)
-            {
-                Row r = table.Rows.Add();
-                r.Cells.Add($"R{i}C1");
-                r.Cells.Add($"R{i}C2");
-                r.Cells.Add($"R{i}C3");
-            }
-
-            // Save the PDF – guard against missing libgdiplus on non‑Windows platforms
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                doc.Save(outputPath);
-                Console.WriteLine($"PDF saved to '{outputPath}'.");
-            }
-            else
-            {
-                try
+                if (element is Table t)
                 {
-                    doc.Save(outputPath);
-                    Console.WriteLine($"PDF saved to '{outputPath}'.");
-                }
-                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
-                {
-                    Console.WriteLine("GDI+ (libgdiplus) is not available on this platform. PDF was not saved.");
+                    table = t;
+                    break;
                 }
             }
-        }
-    }
 
-    // Helper to detect a nested DllNotFoundException (e.g., missing libgdiplus)
-    private static bool ContainsDllNotFound(Exception? ex)
-    {
-        while (ex != null)
-        {
-            if (ex is DllNotFoundException)
-                return true;
-            ex = ex.InnerException;
+            if (table == null)
+            {
+                Console.Error.WriteLine("No table found on the first page.");
+                return;
+            }
+
+            // Validate the target row index
+            if (targetRowIndex < 0 || targetRowIndex >= table.Rows.Count - 1)
+            {
+                Console.Error.WriteLine("Target row index is out of range.");
+                return;
+            }
+
+            // The row after which we want a page break
+            Row nextRow = table.Rows[targetRowIndex + 1];
+
+            // Set IsInNewPage = true to force this row onto a new page
+            nextRow.IsInNewPage = true;
+
+            // Save the modified document
+            doc.Save(outputPath);
         }
-        return false;
+
+        Console.WriteLine($"Document saved with page break after row {targetRowIndex} → '{outputPath}'.");
     }
 }

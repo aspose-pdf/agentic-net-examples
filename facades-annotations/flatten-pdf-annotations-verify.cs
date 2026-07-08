@@ -2,45 +2,47 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "flattened.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Flatten all annotations using the Facades API
+        // Flatten all annotations using the PdfAnnotationEditor facade
         PdfAnnotationEditor editor = new PdfAnnotationEditor();
-        editor.BindPdf(inputPath);                 // load PDF
-        editor.FlatteningAnnotations();            // flatten annotations
-        editor.Save(outputPath);                    // save flattened PDF
-        editor.Close();                            // release resources
+        editor.BindPdf(inputPath);
+        editor.FlatteningAnnotations(); // removes annotation objects by flattening them
+        editor.Save(outputPath);
+        editor.Close(); // release resources held by the facade
 
-        // Verify that no annotation objects remain
-        using (Document doc = new Document(outputPath)) // load the saved PDF
+        // Verify that the resulting PDF contains no annotation objects
+        using (Document doc = new Document(outputPath))
         {
-            bool hasAnnotations = false;
+            bool anyAnnotations = false;
 
-            // Pages are 1‑based in Aspose.Pdf
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            for (int i = 1; i <= doc.Pages.Count; i++) // pages are 1‑based
             {
-                if (doc.Pages[i].Annotations.Count > 0)
+                Page page = doc.Pages[i];
+                if (page.Annotations.Count > 0)
                 {
-                    hasAnnotations = true;
-                    Console.WriteLine($"Page {i} still contains {doc.Pages[i].Annotations.Count} annotation(s).");
+                    anyAnnotations = true;
+                    Console.WriteLine($"Page {i} still has {page.Annotations.Count} annotation(s).");
                 }
             }
 
-            Console.WriteLine(hasAnnotations
-                ? "Annotations were not fully removed after flattening."
-                : "All annotations successfully removed after flattening.");
+            if (!anyAnnotations)
+                Console.WriteLine("Validation succeeded: No annotations remain after flattening.");
+            else
+                Console.WriteLine("Validation failed: Some annotations were not removed.");
         }
     }
 }

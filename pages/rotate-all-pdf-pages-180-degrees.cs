@@ -1,7 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core API
-using Aspose.Pdf.Text;          // For Rotation enum (if needed)
+using Aspose.Pdf;               // Core Aspose.Pdf namespace
+using Aspose.Pdf.Text;          // For Rotation enum (also in Aspose.Pdf)
 
 class Program
 {
@@ -16,15 +16,14 @@ class Program
             return;
         }
 
-        // Load the PDF document (using block ensures proper disposal)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing)
+            // Iterate over all pages (1‑based indexing) and set rotation to 180°
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
-                // Set rotation to 180 degrees (clockwise)
-                page.Rotate = Rotation.on180;
+                page.Rotate = Rotation.on180;   // Rotate clockwise by 180 degrees
             }
 
             // Save the modified document

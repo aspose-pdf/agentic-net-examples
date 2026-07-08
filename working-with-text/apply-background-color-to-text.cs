@@ -1,13 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;   // required for TextFragment, TextState, Position
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -19,18 +19,21 @@ class Program
         // Load the existing PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Create a TextFragment with the desired text
-            TextFragment fragment = new TextFragment("Background highlighted text");
+            // Create a text fragment with the desired content
+            TextFragment fragment = new TextFragment("Highlighted text");
 
-            // Set the background color via TextState before adding to the page
+            // Set the background color of the text via TextState
             fragment.TextState.BackgroundColor = Aspose.Pdf.Color.Yellow;
 
-            // Optionally set the position on the page (coordinates in points)
-            fragment.Position = new Position(100, 700); // X=100, Y=700
+            // Optional: set additional text properties
+            fragment.TextState.FontSize = 14;
+            fragment.TextState.Font = FontRepository.FindFont("Helvetica");
 
-            // Add the fragment to the first page
-            Page page = doc.Pages[1];
-            page.Paragraphs.Add(fragment);
+            // Position the text on the page (coordinates are in points)
+            fragment.Position = new Position(100, 700);
+
+            // Add the fragment to the first page of the document
+            doc.Pages[1].Paragraphs.Add(fragment);
 
             // Save the modified PDF
             doc.Save(outputPath);

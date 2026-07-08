@@ -1,8 +1,6 @@
 using System;
 using System.IO;
-using System.Text;
 using System.Text.Json;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -18,31 +16,47 @@ class Program
             return;
         }
 
-        // Load the PDF document and bind it to the annotation editor.
-        using (Document pdfDoc = new Document(inputPdfPath))
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        try
         {
-            editor.BindPdf(pdfDoc);
-
-            // Export all annotations to an XFDF stream (XML format).
-            using (MemoryStream xfdfStream = new MemoryStream())
+            // Initialize the annotation editor and bind the PDF document
+            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
             {
-                editor.ExportAnnotationsToXfdf(xfdfStream);
-                xfdfStream.Position = 0; // Reset for reading.
+                editor.BindPdf(inputPdfPath);
 
-                // Read the XFDF content as a UTF‑8 string.
-                string xfdfContent = Encoding.UTF8.GetString(xfdfStream.ToArray());
+                // Export all annotations to XFDF using a memory stream
+                using (MemoryStream xfdfStream = new MemoryStream())
+                {
+                    editor.ExportAnnotationsToXfdf(xfdfStream);
+                    xfdfStream.Position = 0;
 
-                // Wrap the XFDF XML inside a simple JSON object.
-                string json = JsonSerializer.Serialize(new { xfdf = xfdfContent }, new JsonSerializerOptions { WriteIndented = true });
+                    // Read the XFDF XML content as a string
+                    string xfdfXml;
+                    using (StreamReader reader = new StreamReader(xfdfStream))
+                    {
+                        xfdfXml = reader.ReadToEnd();
+                    }
 
-                // Write the JSON to the output file.
-                File.WriteAllText(outputJsonPath, json, Encoding.UTF8);
+                    // Wrap the XFDF XML in a simple JSON structure
+                    var jsonWrapper = new
+                    {
+                        xfdf = xfdfXml
+                    };
+
+                    // Serialize to formatted JSON
+                    string json = JsonSerializer.Serialize(
+                        jsonWrapper,
+                        new JsonSerializerOptions { WriteIndented = true });
+
+                    // Write the JSON to the output file
+                    File.WriteAllText(outputJsonPath, json);
+                }
             }
 
-            // Save the (unchanged) PDF if needed; here we only export annotations.
+            Console.WriteLine($"Annotations exported to JSON: '{outputJsonPath}'");
         }
-
-        Console.WriteLine($"Annotations exported to JSON file: {outputJsonPath}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -1,39 +1,51 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
-using System.Drawing; // required for Rectangle and Color in CreateMarkup
+using System.Drawing;               // Required for System.Drawing.Rectangle and Color (used by PdfContentEditor)
+using Aspose.Pdf.Facades;          // Facade classes for PDF manipulation
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "highlighted_output.pdf";
+        // Input PDF path, output PDF path and highlight color
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "highlighted_output.pdf";
 
-        if (!File.Exists(inputPath))
+        // Define the rectangle that covers the text to be highlighted on page 3.
+        // Rectangle constructor: (x, y, width, height) – coordinates are in points.
+        // Adjust these values to match the actual text location.
+        Rectangle highlightRect = new Rectangle(100, 500, 200, 30); // example values
+
+        // Highlight annotation type: 0 = Highlight (per PdfContentEditor.CreateMarkup documentation)
+        const int highlightType = 0;
+
+        // Page number is 1‑based; we need page 3.
+        const int pageNumber = 3;
+
+        // Highlight color – using System.Drawing.Color because CreateMarkup expects it.
+        Color highlightColor = Color.Yellow;
+
+        // Ensure the source file exists.
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Initialize the facade for editing PDF content
+        // Use the facade inside a using block for deterministic disposal.
         using (PdfContentEditor editor = new PdfContentEditor())
         {
-            // Load the PDF document
-            editor.BindPdf(inputPath);
+            // Bind the existing PDF document.
+            editor.BindPdf(inputPdf);
 
-            // Define the rectangle (x, y, width, height) for the highlight on page 3
-            // Adjust coordinates to match the desired text range.
-            Rectangle highlightRect = new Rectangle(100, 500, 200, 50);
+            // Create the highlight markup annotation.
+            // Parameters: rectangle, contents (optional comment), type, page, color.
+            editor.CreateMarkup(highlightRect, "Highlighted text", highlightType, pageNumber, highlightColor);
 
-            // Create a highlight annotation (type = 0) with yellow color.
-            // Parameters: rectangle, contents (optional), type, page number (1‑based), color.
-            editor.CreateMarkup(highlightRect, "Highlighted text", 0, 3, Color.Yellow);
-
-            // Save the modified PDF
-            editor.Save(outputPath);
+            // Save the modified PDF.
+            editor.Save(outputPdf);
         }
 
-        Console.WriteLine($"Highlight annotation added. Saved to '{outputPath}'.");
+        Console.WriteLine($"Highlight annotation added. Saved to '{outputPdf}'.");
     }
 }

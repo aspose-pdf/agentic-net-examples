@@ -1,18 +1,18 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 using Aspose.Pdf.Text;
-using Aspose.Pdf.Annotations; // needed for AnnotationFlags and Border
+using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string searchText = "Target Text";      // text to locate
-        const string tooltip = "This is a tooltip";   // tooltip to show
+        const string outputPath = "output_tooltip.pdf";
+        const string searchText = "Sample Text";          // text to locate
+        const string tooltip = "This is a tooltip text"; // tooltip to show
 
         if (!File.Exists(inputPath))
         {
@@ -23,33 +23,34 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Search for the text and obtain its rectangle
+            // Find the first occurrence of the target text
             TextFragmentAbsorber absorber = new TextFragmentAbsorber(searchText);
             doc.Pages.Accept(absorber);
 
             if (absorber.TextFragments.Count == 0)
             {
-                Console.WriteLine("Text not found.");
-                doc.Save(outputPath); // save unchanged document
+                Console.Error.WriteLine("Text not found in the document.");
                 return;
             }
 
-            // Use the first occurrence
-            TextFragment fragment = absorber.TextFragments[0];
-            Aspose.Pdf.Rectangle textRect = fragment.Rectangle;
+            // Get the rectangle of the found fragment (1‑based indexing)
+            TextFragment fragment = absorber.TextFragments[1];
+            Aspose.Pdf.Rectangle rect = fragment.Rectangle;
+
+            // Determine the page where the fragment resides
+            int pageNumber = fragment.Page.Number; // Use fragment.Page.Number
 
             // Create an invisible button field over the text rectangle
-            ButtonField btn = new ButtonField(doc, textRect);
-            btn.AlternateName = tooltip;               // tooltip text (shown on hover)
-            btn.ReadOnly = true;                       // make it non‑editable
+            ButtonField button = new ButtonField(doc, rect);
+            button.PartialName = "tooltipBtn";          // unique field identifier
+            button.AlternateName = tooltip;               // tooltip text shown by PDF viewers
+            button.Flags = AnnotationFlags.Invisible;    // make it invisible
+            button.Border = new Border(button) { Width = 0 }; // no visible border
 
-            // Make the button invisible
-            btn.Border = new Border(btn) { Width = 0 };
-            btn.Color = Aspose.Pdf.Color.Transparent;
-            btn.Flags = AnnotationFlags.Invisible; // correct enum assignment
-
-            // Add the button to the form
-            doc.Form.Add(btn);
+            // Add the button to the form on the correct page
+            doc.Form.Add(button, pageNumber);
+            // Ensure the button has an appearance (required for some viewers)
+            doc.Form.AddFieldAppearance(button, pageNumber, rect);
 
             // Save the modified PDF
             doc.Save(outputPath);

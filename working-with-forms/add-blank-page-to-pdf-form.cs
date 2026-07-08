@@ -15,17 +15,21 @@ class Program
             return;
         }
 
-        // Load the existing PDF form
+        // Load the existing PDF form (fields are loaded automatically)
         using (Document doc = new Document(inputPath))
         {
-            // Add a new blank page at the end of the document
-            // Page collection uses 1‑based indexing; Add() appends a page.
-            doc.Pages.Add();
+            // Add a new blank page at the end of the document.
+            // This does not affect any existing form fields.
+            Page blankPage = doc.Pages.Add();
 
-            // Save the modified document (PDF format)
+            // Optionally, you could set the page size to match existing pages:
+            // blankPage.PageInfo.Width = doc.Pages[1].PageInfo.Width;
+            // blankPage.PageInfo.Height = doc.Pages[1].PageInfo.Height;
+
+            // Save the modified document, preserving all form fields.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Blank page added. Saved to '{outputPath}'.");
+        Console.WriteLine($"Blank page added successfully. Saved to '{outputPath}'.");
     }
 }

@@ -1,138 +1,132 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging;
 using System.Threading.Tasks;
 using Aspose.Pdf.Facades;
-using Amazon;
-using Amazon.S3;
-using Amazon.S3.Transfer;
+using Aspose.Pdf;
+using Amazon.S3.Model; // <-- added to make PutObjectRequest/PutObjectResponse visible
 
 // ---------------------------------------------------------------------------
-// Minimal AWS SDK stubs – these are compiled only when the real AWS SDK is not
-// referenced. They provide just enough members for the sample code to build
-// and run (the upload will be a no‑op). If the project references the real
-// AWSSDK.S3 package the compiler will use the real types and the stubs will be
-// ignored.
+// Minimal stubs for the AWS SDK (Amazon.S3) so the project can compile without
+// adding the real NuGet package. In a production environment you should replace
+// these stubs with the official AWSSDK.S3 package.
 // ---------------------------------------------------------------------------
-#if !AWS_SDK_PRESENT
-namespace Amazon
-{
-    public class AmazonServiceClient : IDisposable
-    {
-        public void Dispose() { }
-    }
-
-    public class RegionEndpoint
-    {
-        public static RegionEndpoint USEast1 => new RegionEndpoint();
-    }
-}
-
 namespace Amazon.S3
 {
-    public class AmazonS3Config
+    // Simple disposable client that mimics the real AmazonS3Client API used in the
+    // sample. The real client performs network I/O; this stub only satisfies the
+    // compiler and can be extended for unit‑testing if required.
+    public class AmazonS3Client : IDisposable
     {
-        public Amazon.RegionEndpoint RegionEndpoint { get; set; }
-    }
+        public void Dispose() { /* No resources to release in the stub */ }
 
-    public class AmazonS3Client : Amazon.AmazonServiceClient
-    {
-        public AmazonS3Client(AmazonS3Config config) { }
-    }
-
-    public enum S3CannedACL
-    {
-        PublicRead
+        // The real SDK returns a PutObjectResponse; for the stub we return a dummy
+        // object that satisfies the method signature.
+        public Task<PutObjectResponse> PutObjectAsync(PutObjectRequest request)
+        {
+            // In a real implementation the request would be sent to AWS S3.
+            // Here we simply return a completed task.
+            return Task.FromResult(new PutObjectResponse());
+        }
     }
 }
 
-namespace Amazon.S3.Transfer
+namespace Amazon.S3.Model
 {
-    using System.IO;
-    using System.Threading.Tasks;
-
-    public class TransferUtility
+    // Represents the request sent to S3 when uploading an object.
+    public class PutObjectRequest
     {
-        private readonly Amazon.S3.AmazonS3Client _client;
-        public TransferUtility(Amazon.S3.AmazonS3Client client) => _client = client;
-        public Task UploadAsync(TransferUtilityUploadRequest request) => Task.CompletedTask;
-    }
-
-    public class TransferUtilityUploadRequest
-    {
-        public Stream InputStream { get; set; }
         public string BucketName { get; set; }
         public string Key { get; set; }
-        public Amazon.S3.S3CannedACL CannedACL { get; set; }
+        public Stream InputStream { get; set; }
+        public ServerSideEncryptionMethod ServerSideEncryptionMethod { get; set; }
+    }
+
+    // Minimal response class – the real SDK contains many properties, but they are
+    // not needed for the sample code.
+    public class PutObjectResponse { }
+
+    // Server‑side encryption options supported by S3. Only AES256 is used in the
+    // example, but the enum can be expanded if required.
+    public enum ServerSideEncryptionMethod
+    {
+        AES256,
+        // Other values (e.g., AWSKMS) can be added here.
     }
 }
-#endif
 
 class Program
 {
-    // Entry point
-    static async Task Main(string[] args)
+    static async Task Main()
     {
         // Input PDF file path
-        const string inputPdfPath = "input.pdf";
+        const string pdfPath = "input.pdf";
 
-        // AWS S3 configuration
-        const string bucketName = "your-s3-bucket-name";
-        AmazonS3Config s3Config = new AmazonS3Config
-        {
-            RegionEndpoint = RegionEndpoint.USEast1 // adjust region as needed
-        };
-        // Credentials are taken from the default AWS SDK credential chain
-        using AmazonS3Client s3Client = new AmazonS3Client(s3Config);
-        TransferUtility transferUtility = new TransferUtility(s3Client);
+        // Amazon S3 bucket and optional key prefix
+        const string bucketName = "my-s3-bucket";
+        const string keyPrefix = "extracted-images/";
 
-        // Ensure the input file exists
-        if (!File.Exists(inputPdfPath))
+        // Create an S3 client (uses default credentials / region configuration)
+        using Amazon.S3.AmazonS3Client s3Client = new Amazon.S3.AmazonS3Client();
+
+        // Ensure the PDF file exists
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        // Extract images and upload to S3
-        using (PdfExtractor extractor = new PdfExtractor())
+        // Use PdfExtractor to pull images from the PDF
+        using PdfExtractor extractor = new PdfExtractor();
+        extractor.BindPdf(pdfPath);
+
+        // Extract images that are actually used on the pages
+        extractor.ExtractImageMode = ExtractImageMode.ActuallyUsed;
+        extractor.ExtractImage();
+
+        int imageIndex = 1;
+        while (extractor.HasNextImage())
         {
-            extractor.BindPdf(inputPdfPath);
-            extractor.ExtractImage();
-
-            int imageIndex = 1;
-            while (extractor.HasNextImage())
+            // Retrieve the next image into a memory stream (default format is JPEG)
+            using MemoryStream imageStream = new MemoryStream();
+            bool success = extractor.GetNextImage(imageStream);
+            if (!success)
             {
-                using (MemoryStream imageStream = new MemoryStream())
-                {
-                    // Extract the next image as PNG into the memory stream
-                    bool success = extractor.GetNextImage(imageStream, ImageFormat.Png);
-                    if (!success)
-                    {
-                        Console.Error.WriteLine($"Failed to extract image #{imageIndex}");
-                        break;
-                    }
-
-                    // Reset stream position before upload
-                    imageStream.Position = 0;
-
-                    // Define S3 object key (path within the bucket)
-                    string s3Key = $"extracted-images/image-{imageIndex}.png";
-
-                    // Upload the image stream to S3
-                    TransferUtilityUploadRequest uploadRequest = new TransferUtilityUploadRequest
-                    {
-                        InputStream = imageStream,
-                        BucketName = bucketName,
-                        Key = s3Key,
-                        CannedACL = S3CannedACL.PublicRead
-                    };
-
-                    await transferUtility.UploadAsync(uploadRequest);
-                    Console.WriteLine($"Uploaded image #{imageIndex} to s3://{bucketName}/{s3Key}");
-                }
-
-                imageIndex++;
+                Console.Error.WriteLine($"Failed to extract image #{imageIndex}");
+                break;
             }
+
+            // Reset stream position before uploading
+            imageStream.Position = 0;
+
+            // Build the S3 object key (e.g., extracted-images/image_1.jpg)
+            string objectKey = $"{keyPrefix}image_{imageIndex}.jpg";
+
+            // Prepare the PutObject request with server‑side encryption enabled
+            var putRequest = new PutObjectRequest
+            {
+                BucketName = bucketName,
+                Key = objectKey,
+                InputStream = imageStream,
+                ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256
+            };
+
+            try
+            {
+                // Upload the image to S3
+                await s3Client.PutObjectAsync(putRequest);
+                Console.WriteLine($"Uploaded image #{imageIndex} to s3://{bucketName}/{objectKey}");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error uploading image #{imageIndex}: {ex.Message}");
+                // Optionally break or continue based on requirements
+                break;
+            }
+
+            imageIndex++;
         }
+
+        // Close the extractor (handled by using statement)
+        Console.WriteLine("Image extraction and upload completed.");
     }
 }

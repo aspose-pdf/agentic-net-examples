@@ -1,53 +1,53 @@
 # Facades metadata
 
-> **Facades metadata** in PDF using C# / .NET -- **40** verified, compile-tested examples for **Aspose.PDF for .NET** 26.5.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Facades metadata** in PDF using C# / .NET -- **40** verified, compile-tested examples for **Aspose.PDF for .NET** 26.6.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `facades-metadata`
 - Examples: 40
-- NuGet: `Aspose.PDF 26.5.0` -- target `net10.0`
+- NuGet: `Aspose.PDF 26.6.0` -- target `net10.0`
 
 ## Examples
 
+- [`add-custom-metadata-reviewedby-to-pdf.cs`](./add-custom-metadata-reviewedby-to-pdf.cs) -- Add custom metadata reviewedby to pdf
 - [`add-custom-metadata-to-pdf.cs`](./add-custom-metadata-to-pdf.cs) -- Add custom metadata to pdf
-- [`add-custom-metadata-to-pdf__v2.cs`](./add-custom-metadata-to-pdf__v2.cs) -- Add custom metadata to pdf  v2
-- [`add-custom-metadata.cs`](./add-custom-metadata.cs) -- Add custom metadata
 - [`add-custom-timestamp-metadata-to-pdf.cs`](./add-custom-timestamp-metadata-to-pdf.cs) -- Add custom timestamp metadata to pdf
-- [`apply-metadata-parallel-pdf.cs`](./apply-metadata-parallel-pdf.cs) -- Apply metadata parallel pdf
-- [`audit-pdf-metadata-to-csv.cs`](./audit-pdf-metadata-to-csv.cs) -- Audit pdf metadata to csv
+- [`add-department-metadata-to-pdfs.cs`](./add-department-metadata-to-pdfs.cs) -- Add department metadata to pdfs
 - [`backup-pdfs-update-metadata.cs`](./backup-pdfs-update-metadata.cs) -- Backup pdfs update metadata
-- [`check-custom-pdf-metadata-key.cs`](./check-custom-pdf-metadata-key.cs) -- Check custom pdf metadata key
+- [`check-custom-metadata-key.cs`](./check-custom-metadata-key.cs) -- Check custom metadata key
 - [`conditionally-update-pdf-author-metadata.cs`](./conditionally-update-pdf-author-metadata.cs) -- Conditionally update pdf author metadata
-- [`dispose-pdffileinfo-and-document-add-text-stamp.cs`](./dispose-pdffileinfo-and-document-add-text-stamp.cs) -- Dispose pdffileinfo and document add text stamp
+- [`convert-pdf-to-pdfa-1b-with-pdffileinfo.cs`](./convert-pdf-to-pdfa-1b-with-pdffileinfo.cs) -- Convert pdf to pdfa 1b with pdffileinfo
 - [`export-pdf-metadata-to-json.cs`](./export-pdf-metadata-to-json.cs) -- Export pdf metadata to json
-- [`handle-readonly-when-saving-pdf-metadata.cs`](./handle-readonly-when-saving-pdf-metadata.cs) -- Handle readonly when saving pdf metadata
-- [`import-json-metadata-into-pdfs.cs`](./import-json-metadata-into-pdfs.cs) -- Import json metadata into pdfs
-- [`list-custom-pdf-metadata-alphabetically.cs`](./list-custom-pdf-metadata-alphabetically.cs) -- List custom pdf metadata alphabetically
+- [`handle-readonly-file-errors-saving-pdf-metadata.cs`](./handle-readonly-file-errors-saving-pdf-metadata.cs) -- Handle readonly file errors saving pdf metadata
+- [`import-pdf-metadata-from-json.cs`](./import-pdf-metadata-from-json.cs) -- Import pdf metadata from json
 - [`merge-xmp-metadata-with-pdf-fileinfo.cs`](./merge-xmp-metadata-with-pdf-fileinfo.cs) -- Merge xmp metadata with pdf fileinfo
+- [`preserve-pdf-metadata-add-version.cs`](./preserve-pdf-metadata-add-version.cs) -- Preserve pdf metadata add version
 - [`read-pdf-author-metadata.cs`](./read-pdf-author-metadata.cs) -- Read pdf author metadata
 - [`read-pdf-creator-metadata.cs`](./read-pdf-creator-metadata.cs) -- Read pdf creator metadata
-- [`read-pdf-metadata-null-handling.cs`](./read-pdf-metadata-null-handling.cs) -- Read pdf metadata null handling
+- [`read-pdf-metadata-add-blank-page.cs`](./read-pdf-metadata-add-blank-page.cs) -- Read pdf metadata add blank page
+- [`read-pdf-metadata-safely.cs`](./read-pdf-metadata-safely.cs) -- Read pdf metadata safely
 - [`read-pdf-modification-date.cs`](./read-pdf-modification-date.cs) -- Read pdf modification date
-- [`read-pdf-title-metadata-and-log.cs`](./read-pdf-title-metadata-and-log.cs) -- Read pdf title metadata and log
-- [`read-pdf-version-using-aspose-pdf.cs`](./read-pdf-version-using-aspose-pdf.cs) -- Read pdf version using aspose pdf
+- [`read-pdf-title-metadata-log.cs`](./read-pdf-title-metadata-log.cs) -- Read pdf title metadata log
+- [`read-pdf-version-using-aspose-pdf-facade.cs`](./read-pdf-version-using-aspose-pdf-facade.cs) -- Read pdf version using aspose pdf facade
 - [`read-update-pdf-metadata.cs`](./read-update-pdf-metadata.cs) -- Read update pdf metadata
-- [`remove-obsolete-metadata-field.cs`](./remove-obsolete-metadata-field.cs) -- Remove obsolete metadata field
+- [`remove-custom-pdf-metadata-entry.cs`](./remove-custom-pdf-metadata-entry.cs) -- Remove custom pdf metadata entry
+- [`retrieve-custom-pdf-metadata-alphabetically.cs`](./retrieve-custom-pdf-metadata-alphabetically.cs) -- Retrieve custom pdf metadata alphabetically
 - [`retrieve-custom-pdf-metadata-projectcode.cs`](./retrieve-custom-pdf-metadata-projectcode.cs) -- Retrieve custom pdf metadata projectcode
 - [`retrieve-pdf-keywords-metadata.cs`](./retrieve-pdf-keywords-metadata.cs) -- Retrieve pdf keywords metadata
 - [`retrieve-reviewedby-metadata.cs`](./retrieve-reviewedby-metadata.cs) -- Retrieve reviewedby metadata
-- [`set-custom-document-id-pdf.cs`](./set-custom-document-id-pdf.cs) -- Set custom document id pdf
 - [`set-pdf-creator-metadata.cs`](./set-pdf-creator-metadata.cs) -- Set pdf creator metadata
+- [`set-pdf-document-id-using-pdffileinfo.cs`](./set-pdf-document-id-using-pdffileinfo.cs) -- Set pdf document id using pdffileinfo
 - [`set-pdf-keywords-metadata.cs`](./set-pdf-keywords-metadata.cs) -- Set pdf keywords metadata
 - [`set-pdf-language-property.cs`](./set-pdf-language-property.cs) -- Set pdf language property
-- [`set-pdfa-compliance-update-metadata.cs`](./set-pdfa-compliance-update-metadata.cs) -- Set pdfa compliance update metadata
 - [`thread-safe-pdf-metadata-update.cs`](./thread-safe-pdf-metadata-update.cs) -- Thread safe pdf metadata update
 - [`update-pdf-author-metadata.cs`](./update-pdf-author-metadata.cs) -- Update pdf author metadata
 - [`update-pdf-keywords-metadata.cs`](./update-pdf-keywords-metadata.cs) -- Update pdf keywords metadata
+- [`update-pdf-metadata-audit.cs`](./update-pdf-metadata-audit.cs) -- Update pdf metadata audit
+- [`update-pdf-metadata-in-parallel.cs`](./update-pdf-metadata-in-parallel.cs) -- Update pdf metadata in parallel
+- [`update-pdf-metadata-save-new-info.cs`](./update-pdf-metadata-save-new-info.cs) -- Update pdf metadata save new info
 - [`update-pdf-metadata-using-memorystream.cs`](./update-pdf-metadata-using-memorystream.cs) -- Update pdf metadata using memorystream
-- [`update-pdf-metadata-using-pdffileinfo.cs`](./update-pdf-metadata-using-pdffileinfo.cs) -- Update pdf metadata using pdffileinfo
-- [`update-pdf-metadata-version.cs`](./update-pdf-metadata-version.cs) -- Update pdf metadata version
 - [`update-pdf-subject-metadata.cs`](./update-pdf-subject-metadata.cs) -- Update pdf subject metadata
 - [`update-pdf-title-metadata.cs`](./update-pdf-title-metadata.cs) -- Update pdf title metadata
-- [`validate-set-pdf-metadata-with-regex.cs`](./validate-set-pdf-metadata-with-regex.cs) -- Validate set pdf metadata with regex
+- [`validate-pdf-metadata-with-regex.cs`](./validate-pdf-metadata-with-regex.cs) -- Validate pdf metadata with regex
 
 ## See Also
 

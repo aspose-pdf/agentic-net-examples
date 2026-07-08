@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        // Folder containing PDF files
+        // Folder containing source PDFs
         const string inputFolder = "InputPdfs";
         // Folder where extracted text files will be saved
         const string outputFolder = "ExtractedTexts";
@@ -17,27 +17,29 @@ class Program
             return;
         }
 
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Get all PDF files in the input folder (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-
-        foreach (string pdfPath in pdfFiles)
+        // Process each PDF file in the input folder
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
             string baseName = Path.GetFileNameWithoutExtension(pdfPath);
             string txtPath = Path.Combine(outputFolder, baseName + ".txt");
 
             try
             {
-                // Use PdfExtractor to bind the PDF, extract text, and save it to a .txt file
+                // PdfExtractor implements IDisposable, so use a using block
                 using (PdfExtractor extractor = new PdfExtractor())
                 {
+                    // Load the PDF file into the extractor
                     extractor.BindPdf(pdfPath);
-                    extractor.ExtractText();               // Unicode extraction of all pages
-                    extractor.GetText(txtPath);            // Write extracted text to file
+                    // Extract all text (Unicode encoding is default)
+                    extractor.ExtractText();
+                    // Write the extracted text to a .txt file with the same base name
+                    extractor.GetText(txtPath);
                 }
 
-                Console.WriteLine($"Extracted: {pdfPath} -> {txtPath}");
+                Console.WriteLine($"Extracted text: '{pdfPath}' → '{txtPath}'");
             }
             catch (Exception ex)
             {

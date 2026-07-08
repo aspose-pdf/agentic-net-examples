@@ -1,55 +1,62 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core Aspose.Pdf namespace
-using Aspose.Pdf.Text;          // Required for text handling (if needed)
+using Aspose.Pdf;
+using Aspose.Pdf.Drawing;
 
-class ExtractVectorGraphics
+class Program
 {
     static void Main()
     {
-        // Input encrypted PDF path and password
-        const string encryptedPdfPath = "encrypted_input.pdf";
-        const string password = "userOrOwnerPassword";
+        const string inputPath = "encrypted.pdf";
+        const string password   = "userPassword";
+        const string outputDir  = "ExtractedGraphics";
 
-        // Output SVG file that will contain the vector graphics of the PDF
-        const string outputSvgPath = "extracted_vectors.svg";
-
-        // Verify the input file exists
-        if (!File.Exists(encryptedPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {encryptedPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
-        {
-            // Open the encrypted PDF by providing the password to the Document constructor
-            // This constructor automatically decrypts the document for further processing.
-            using (Document pdfDoc = new Document(encryptedPdfPath, password))
-            {
-                // Prepare SVG save options.
-                // SvgSaveOptions is in the Aspose.Pdf namespace (no separate Saving namespace).
-                SvgSaveOptions svgOptions = new SvgSaveOptions
-                {
-                    // Optional: set the page range if you only need specific pages.
-                    // PageIndex = 0;   // first page (zero‑based) – comment out to export all pages
-                    // PageCount = 1;   // number of pages to export
-                };
+        Directory.CreateDirectory(outputDir);
 
-                // Save the entire document (or the selected pages) as SVG.
-                // The resulting SVG contains the vector graphics from the PDF.
-                pdfDoc.Save(outputSvgPath, svgOptions);
+        // Open the encrypted PDF by providing the password to the Document constructor.
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath, password))
+        {
+            // Decrypt the document in memory (optional – required only if you need to save an unprotected copy later).
+            doc.Decrypt();
+
+            int graphicCount = 0;
+
+            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing).
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            {
+                Page page = doc.Pages[pageIndex];
+
+                // Paragraphs collection may contain Graph objects that represent vector graphics.
+                foreach (var paragraph in page.Paragraphs)
+                {
+                    if (paragraph is Aspose.Pdf.Drawing.Graph graph)
+                    {
+                        // Create a new PDF document to hold the extracted graphic.
+                        using (Aspose.Pdf.Document graphicDoc = new Aspose.Pdf.Document())
+                        {
+                            // Add a blank page.
+                            Page newPage = graphicDoc.Pages.Add();
+
+                            // Add the graph to the new page.
+                            newPage.Paragraphs.Add(graph);
+
+                            // Save each graphic as a separate PDF file.
+                            string outPath = System.IO.Path.Combine(outputDir, $"Graphic_{++graphicCount}.pdf");
+                            graphicDoc.Save(outPath);
+                            Console.WriteLine($"Extracted graphic saved to '{outPath}'.");
+                        }
+                    }
+                }
             }
 
-            Console.WriteLine($"Vector graphics extracted to SVG: '{outputSvgPath}'");
-        }
-        catch (InvalidPasswordException ex)
-        {
-            Console.Error.WriteLine($"Invalid password: {ex.Message}");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error extracting vector graphics: {ex.Message}");
+            if (graphicCount == 0)
+                Console.WriteLine("No vector graphics found in the document.");
         }
     }
 }

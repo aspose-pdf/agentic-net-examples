@@ -6,44 +6,54 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath      = "input.pdf";
-        const string outputPdfPath     = "output.pdf";
-        const string highResImagePath  = "highres.png";
+        const string inputPdf  = "input.pdf";          // original PDF with background artifact
+        const string highResImg = "background_highres.jpg"; // higher‑resolution image
+        const string outputPdf = "output.pdf";
 
-        if (!File.Exists(inputPdfPath) || !File.Exists(highResImagePath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine("Input PDF or high‑resolution image not found.");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
+        }
+        if (!File.Exists(highResImg))
+        {
+            Console.Error.WriteLine($"High‑resolution image not found: {highResImg}");
             return;
         }
 
-        // Load the PDF document (using the required lifecycle rule)
-        using (Document doc = new Document(inputPdfPath))
+        // Load the PDF document
+        using (Document doc = new Document(inputPdf))
         {
-            // Iterate through all pages (1‑based indexing)
+            // Iterate through all pages
             foreach (Page page in doc.Pages)
             {
-                // Iterate through all artifacts on the page (1‑based indexing)
+                // Iterate through artifacts on the page
                 for (int i = 1; i <= page.Artifacts.Count; i++)
                 {
-                    Artifact artifact = page.Artifacts[i];
-
-                    // Identify BackgroundArtifact instances
-                    if (artifact is BackgroundArtifact bgArtifact)
+                    Artifact art = page.Artifacts[i];
+                    // Look for a BackgroundArtifact
+                    if (art is BackgroundArtifact bgArtifact)
                     {
-                        // Replace the background image with a higher‑resolution version
-                        // SetImage reads the stream immediately, so the stream can be disposed after the call
-                        using (FileStream imgStream = File.OpenRead(highResImagePath))
+                        // Replace the background image while preserving layout
+                        // Use SetImage to assign the new image stream
+                        using (FileStream imgStream = File.OpenRead(highResImg))
                         {
                             bgArtifact.SetImage(imgStream);
                         }
+
+                        // Alternatively, you could assign directly to BackgroundImage:
+                        // using (FileStream imgStream = File.OpenRead(highResImg))
+                        // {
+                        //     bgArtifact.BackgroundImage = imgStream;
+                        // }
                     }
                 }
             }
 
-            // Save the modified PDF (using the required lifecycle rule)
-            doc.Save(outputPdfPath);
+            // Save the modified PDF
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved with updated background image: {outputPdfPath}");
+        Console.WriteLine($"PDF saved with higher‑resolution background: {outputPdf}");
     }
 }

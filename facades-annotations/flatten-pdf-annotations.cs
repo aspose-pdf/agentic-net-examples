@@ -1,34 +1,38 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "flattened_output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Use PdfAnnotationEditor facade to flatten annotations.
-        // The facade implements IDisposable, so wrap it in a using block.
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Bind the source PDF file.
-            editor.BindPdf(inputPath);
+            // Initialize the annotation editor and bind the loaded document
+            PdfAnnotationEditor editor = new PdfAnnotationEditor();
+            editor.BindPdf(doc);
 
-            // Flatten all annotations in the document.
+            // Flatten all annotations in the document
             editor.FlatteningAnnotations();
 
-            // Save the flattened PDF.
+            // Save the flattened PDF
             editor.Save(outputPath);
+
+            // Close the editor (optional, Dispose will be called by GC)
+            editor.Close();
         }
 
-        Console.WriteLine($"Annotations flattened and saved to '{outputPath}'.");
+        Console.WriteLine($"Flattened PDF saved to '{outputPath}'.");
     }
 }

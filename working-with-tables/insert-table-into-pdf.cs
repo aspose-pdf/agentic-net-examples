@@ -1,85 +1,87 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                     // Core PDF API
-using Aspose.Pdf.Text;                // For text fragments if needed (optional)
+using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class InsertTableExample
 {
     static void Main()
     {
-        // Paths for input and output PDF files
+        // Input PDF path, output PDF path and the page where the table will be placed
         const string inputPdf  = "input.pdf";
         const string outputPdf = "output.pdf";
+        const int    targetPageNumber = 2;          // 1‑based page index
+        const float  tableLeft  = 100f;             // X coordinate (points) – float required by Table.Left
+        const float  tableTop   = 600f;             // Y coordinate (points) – float required by Table.Top
 
-        // Verify that the input file exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the existing PDF document (using statement ensures proper disposal)
+        // Load the existing PDF document
         using (Document doc = new Document(inputPdf))
         {
-            // Choose the page where the table will be inserted (1‑based index)
-            const int targetPageNumber = 1;
+            // Ensure the requested page exists
             if (targetPageNumber < 1 || targetPageNumber > doc.Pages.Count)
             {
-                Console.Error.WriteLine("Invalid target page number.");
+                Console.Error.WriteLine($"Page {targetPageNumber} is out of range.");
                 return;
             }
 
             Page page = doc.Pages[targetPageNumber];
 
             // -------------------------------------------------
-            // Construct the table
+            // Build a simple 3‑column, 2‑row table
             // -------------------------------------------------
-            Table table = new Table();
-
-            // Position the table on the page (coordinates are in points)
-            table.Left = 100f;   // distance from the left edge of the page
-            table.Top  = 500f;   // distance from the bottom edge of the page
-
-            // Optional visual settings (use float literals for widths)
-            table.Border = new BorderInfo(BorderSide.All, 1f, Color.Black);
-            table.DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Color.Gray);
-            table.DefaultCellPadding = new MarginInfo(5f, 5f, 5f, 5f);
-            table.DefaultCellTextState = new TextState
+            Table table = new Table
             {
-                Font = FontRepository.FindFont("Helvetica"),
-                FontSize = 12f,
-                ForegroundColor = Color.Black
+                // Position the table on the page (float values)
+                Left = tableLeft,
+                Top  = tableTop,
+
+                // Optional visual styling
+                Border = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Black),
+                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Gray),
+                DefaultCellPadding = new MarginInfo(5, 5, 5, 5)
             };
 
-            // -------------------------------------------------
-            // Populate the table with rows and cells
-            // -------------------------------------------------
-            // Header row
-            Row header = table.Rows.Add();
-            header.Cells.Add("Product");
-            header.Cells.Add("Quantity");
-            header.Cells.Add("Price");
+            // Define column widths (relative percentages of the table width)
+            table.ColumnWidths = "33 33 34";
 
-            // Data rows
-            Row row1 = table.Rows.Add();
-            row1.Cells.Add("Widget A");
-            row1.Cells.Add("10");
-            row1.Cells.Add("$15.00");
+            // Row 1 – header cells
+            Row headerRow = table.Rows.Add();
+            headerRow.Cells.Add(CreateCell("Product"));
+            headerRow.Cells.Add(CreateCell("Quantity"));
+            headerRow.Cells.Add(CreateCell("Price"));
 
-            Row row2 = table.Rows.Add();
-            row2.Cells.Add("Widget B");
-            row2.Cells.Add("5");
-            row2.Cells.Add("$25.00");
+            // Row 2 – data cells
+            Row dataRow = table.Rows.Add();
+            dataRow.Cells.Add(CreateCell("Widget A"));
+            dataRow.Cells.Add(CreateCell("15"));
+            dataRow.Cells.Add(CreateCell("$12.99"));
 
-            // -------------------------------------------------
-            // Add the table to the page's paragraph collection
-            // -------------------------------------------------
+            // Add the constructed table to the page's paragraph collection
             page.Paragraphs.Add(table);
 
-            // Save the modified PDF (output format is PDF, no extra SaveOptions needed)
+            // Save the modified PDF
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Table inserted and PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Table inserted and saved to '{outputPdf}'.");
+    }
+
+    // Helper method to create a table cell containing a TextFragment
+    private static Cell CreateCell(string text)
+    {
+        // Each cell holds a collection of paragraphs; we add a single TextFragment
+        Cell cell = new Cell();
+        TextFragment tf = new TextFragment(text);
+        tf.TextState.Font = FontRepository.FindFont("Helvetica");
+        tf.TextState.FontSize = 12;
+        tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+        cell.Paragraphs.Add(tf);
+        return cell;
     }
 }

@@ -15,20 +15,21 @@ class Program
             return;
         }
 
-        // Load the PDF document (using block ensures proper disposal)
+        // Load the PDF document (using rule: document-disposal-with-using)
         using (Document doc = new Document(inputPath))
         {
             // Pages collection is 1‑based; iterate through all pages
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
+                Page page = doc.Pages[i];
                 // Resize each page to the predefined A5 size
-                doc.Pages[i].Resize(PageSize.A5);
+                page.Resize(PageSize.A5);
             }
 
-            // Save the modified document
+            // Save the modified document (using rule: document-disposal-with-using)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"All pages resized to A5 and saved as '{outputPath}'.");
+        Console.WriteLine($"All pages resized to A5 and saved to '{outputPath}'.");
     }
 }

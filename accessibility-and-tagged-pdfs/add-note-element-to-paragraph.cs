@@ -1,15 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Tagged;               // ITaggedContent
-using Aspose.Pdf.LogicalStructure;    // StructureElement, ParagraphElement, NoteElement
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_note.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,31 +17,37 @@ class Program
             return;
         }
 
-        // Open the PDF inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
             // Access the tagged content API
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Root element of the logical structure tree
+            // Set language and title (optional)
+            tagged.SetLanguage("en-US");
+            tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
+
+            // Get the root structure element (no cast needed)
             StructureElement root = tagged.RootElement;
 
-            // Create a paragraph element and add it to the root
+            // Create a paragraph element and set its text
             ParagraphElement paragraph = tagged.CreateParagraphElement();
-            paragraph.SetText("This is the main paragraph text.");
-            root.AppendChild(paragraph); // AppendChild with a single argument
+            paragraph.SetText("This is a main paragraph that will contain a note.");
 
-            // Create a note element (footnote/endnote) and set its text
+            // Append the paragraph to the root
+            root.AppendChild(paragraph);
+
+            // Create a note element (supplemental information)
             NoteElement note = tagged.CreateNoteElement();
-            note.SetText("Supplemental information provided as a note.");
+            note.SetText("This is the supplemental note providing additional context.");
 
-            // Attach the note as a child of the paragraph
-            paragraph.AppendChild(note); // Note becomes a child of the paragraph
+            // Append the note as a child of the paragraph
+            paragraph.AppendChild(note); // bool parameter omitted (default true)
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with note saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with note element: {outputPath}");
     }
 }

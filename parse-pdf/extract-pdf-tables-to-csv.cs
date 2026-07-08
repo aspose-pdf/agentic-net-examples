@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Text;
+using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -7,77 +9,113 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputDir = "TablesCsv";
+        // Path to the source PDF file
+        const string inputPdf = "input.pdf";
 
-        if (!File.Exists(inputPath))
+        // Ensure the source PDF exists – if not, create a simple PDF with a table for demo purposes
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
+            CreateSamplePdfWithTable(inputPdf);
+            Console.WriteLine($"Sample PDF created at '{inputPdf}'.");
         }
 
-        // Ensure the output directory exists
+        // Directory where CSV files will be saved
+        const string outputDir = "TablesCsv";
         Directory.CreateDirectory(outputDir);
 
-        try
+        // Open the PDF document inside a using block for proper disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Load the PDF document (wrapped in using for deterministic disposal)
-            using (Document doc = new Document(inputPath))
+            // Create a TableAbsorber to find tables in the document
+            TableAbsorber absorber = new TableAbsorber();
+
+            // Extract tables from the whole document
+            absorber.Visit(doc);
+
+            int tableIndex = 1;
+            // Iterate over each detected table
+            foreach (var absorbedTable in absorber.TableList)
             {
-                // Create a TableAbsorber to find tables in the whole document
-                TableAbsorber absorber = new TableAbsorber();
+                string csvPath = Path.Combine(outputDir, $"Table_{tableIndex}.csv");
 
-                // Extract tables from all pages
-                absorber.Visit(doc);
-
-                // Iterate over each detected table
-                for (int i = 0; i < absorber.TableList.Count; i++)
+                // Write the table data to a CSV file
+                using (StreamWriter writer = new StreamWriter(csvPath, false, Encoding.UTF8))
                 {
-                    var table = absorber.TableList[i];
-                    string csvPath = Path.Combine(outputDir, $"Table_{i + 1}.csv");
-
-                    // Write the table data to a CSV file
-                    using (StreamWriter writer = new StreamWriter(csvPath))
+                    // Iterate rows
+                    foreach (var row in absorbedTable.RowList)
                     {
-                        // Process each row in the table
-                        for (int r = 0; r < table.RowList.Count; r++)
+                        var cellValues = new List<string>();
+
+                        // Iterate cells in the current row
+                        foreach (var cell in row.CellList)
                         {
-                            var row = table.RowList[r];
-                            string[] cells = new string[row.CellList.Count];
-
-                            // Process each cell in the row
-                            for (int c = 0; c < row.CellList.Count; c++)
+                            // Concatenate all text fragments inside the cell
+                            StringBuilder cellText = new StringBuilder();
+                            foreach (var fragment in cell.TextFragments)
                             {
-                                var cell = row.CellList[c];
-                                // Concatenate all text fragments within the cell
-                                string cellText = "";
-                                foreach (var fragment in cell.TextFragments)
-                                {
-                                    cellText += fragment.Text;
-                                }
-
-                                // Escape CSV special characters
-                                cellText = cellText.Replace("\"", "\"\"");
-                                if (cellText.Contains(",") || cellText.Contains("\"") || cellText.Contains("\n"))
-                                {
-                                    cellText = $"\"{cellText}\"";
-                                }
-
-                                cells[c] = cellText;
+                                cellText.Append(fragment.Text);
                             }
 
-                            // Write the CSV line for the current row
-                            writer.WriteLine(string.Join(",", cells));
+                            // Escape the cell text for CSV format
+                            cellValues.Add(EscapeForCsv(cellText.ToString()));
                         }
-                    }
 
-                    Console.WriteLine($"Exported table {i + 1} to {csvPath}");
+                        // Write the CSV line for the current row
+                        writer.WriteLine(string.Join(",", cellValues));
+                    }
                 }
+
+                Console.WriteLine($"Exported table {tableIndex} to '{csvPath}'.");
+                tableIndex++;
             }
         }
-        catch (Exception ex)
+    }
+
+    // Helper method to escape CSV fields according to RFC 4180
+    static string EscapeForCsv(string field)
+    {
+        if (field.Contains('"') || field.Contains(',') || field.Contains('\n') || field.Contains('\r'))
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            field = field.Replace("\"", "\"\"");
+            return $"\"{field}\"";
         }
+        return field;
+    }
+
+    // Creates a minimal PDF containing a single table – used when the input file is missing.
+    static void CreateSamplePdfWithTable(string path)
+    {
+        // Create a new empty document
+        Document doc = new Document();
+        Page page = doc.Pages.Add();
+
+        // Build a simple 3x3 table
+        Table table = new Table
+        {
+            ColumnWidths = "100 100 100",
+            Border = new BorderInfo(BorderSide.All, 0.5f)
+        };
+
+        // Header row
+        Row header = table.Rows.Add();
+        header.Cells.Add("Header 1");
+        header.Cells.Add("Header 2");
+        header.Cells.Add("Header 3");
+        header.BackgroundColor = Color.LightGray;
+
+        // Data rows
+        for (int i = 1; i <= 2; i++)
+        {
+            Row dataRow = table.Rows.Add();
+            dataRow.Cells.Add($"R{i}C1");
+            dataRow.Cells.Add($"R{i}C2");
+            dataRow.Cells.Add($"R{i}C3");
+        }
+
+        // Add the table to the page
+        page.Paragraphs.Add(table);
+
+        // Save the document
+        doc.Save(path);
     }
 }

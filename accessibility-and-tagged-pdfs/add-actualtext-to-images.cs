@@ -17,30 +17,30 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for proper disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Access the tagged content API
+            // Access the tagged‑content API
             ITaggedContent taggedContent = doc.TaggedContent;
 
-            // Root element of the logical structure tree
+            // Root element of the structure tree
             StructureElement root = taggedContent.RootElement;
 
-            // Iterate over all pages and their image resources
+            // Iterate over all pages and their images
             foreach (Page page in doc.Pages)
             {
                 foreach (XImage img in page.Resources.Images)
                 {
-                    // Create a new Figure element (represents an image in the structure)
+                    // Create a Figure element (represents an illustration such as an image)
                     FigureElement figure = taggedContent.CreateFigureElement();
 
                     // Set the ActualText attribute – this is the text a screen reader will read
-                    figure.ActualText = "Descriptive alternative text for the image.";
+                    figure.ActualText = "Description of the image for accessibility";
 
-                    // Bind the figure element to the existing XImage on the page
+                    // Bind the figure element to the XImage resource on the page
                     figure.Tag(img);
 
-                    // Append the figure element to the root of the structure tree
+                    // Attach the figure element to the structure tree
                     root.AppendChild(figure);
                 }
             }

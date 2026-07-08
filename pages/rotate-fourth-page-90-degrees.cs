@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "rotated_page4.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "rotated.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,24 +15,24 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least 4 pages
-            if (doc.Pages.Count < 4)
+            // Ensure the document has at least four pages (1‑based indexing)
+            if (doc.Pages.Count >= 4)
             {
-                Console.Error.WriteLine("The document does not contain a fourth page.");
-                return;
+                // Rotate page 4 by 90 degrees clockwise
+                doc.Pages[4].Rotate = Aspose.Pdf.Rotation.on90;
             }
-
-            // Rotate the fourth page 90 degrees clockwise
-            // Rotation.on90 corresponds to a 90° clockwise rotation
-            doc.Pages[4].Rotate = Rotation.on90;
+            else
+            {
+                Console.Error.WriteLine("The document contains fewer than 4 pages.");
+            }
 
             // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Page 4 rotated and saved to '{outputPath}'.");
+        Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
     }
 }

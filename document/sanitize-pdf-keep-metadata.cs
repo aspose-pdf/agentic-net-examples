@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Security.HiddenDataSanitization;
+using Aspose.Pdf.Optimization;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "sanitized.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "sanitized_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,30 +16,27 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF using the core Document API.
         using (Document doc = new Document(inputPath))
         {
-            // Configure sanitization options:
-            // - Remove hidden annotations, search index, private info, forms, layers, JavaScript.
-            // - Keep metadata (no option removes metadata, so we leave it untouched).
-            HiddenDataSanitizationOptions options = new HiddenDataSanitizationOptions
-            {
-                RemoveAnnotations = true,
-                RemoveSearchIndexAndPrivateInfo = true,
-                FlattenForms = true,
-                FlattenLayers = true,
-                RemoveJavaScriptsAndActions = true,
-                ConvertPagesToImages = false // keep visible content as is
-                // ImageCompressionOptions and ImageDpi can remain default
-            };
+            // Create an optimization strategy that activates all non‑functional options.
+            // Then enable the specific options that remove hidden data but keep metadata.
+            OptimizationOptions opts = OptimizationOptions.All();
 
-            // Create the sanitizer with the configured options
-            HiddenDataSanitizer sanitizer = new HiddenDataSanitizer(options);
+            // Remove private information (page piece info) and any unused objects/streams.
+            // This eliminates most hidden content while preserving document metadata.
+            opts.RemovePrivateInfo   = true;
+            opts.RemoveUnusedObjects = true;
+            opts.RemoveUnusedStreams = true;
 
-            // Apply sanitization to the document
-            sanitizer.Sanitize(doc);
+            // Apply the optimization to the document.
+            doc.OptimizeResources(opts);
 
-            // Save the sanitized PDF
+            // Optionally, disable signature sanitization if signatures should be preserved.
+            // By default it is enabled; setting to false keeps signature fields unchanged.
+            doc.EnableSignatureSanitization = false;
+
+            // Save the sanitized PDF.
             doc.Save(outputPath);
         }
 

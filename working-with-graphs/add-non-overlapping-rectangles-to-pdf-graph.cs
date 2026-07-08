@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
 
@@ -8,47 +8,43 @@ class Program
 {
     static void Main()
     {
-        // Path to output PDF
         const string outputPath = "rectangles_graph.pdf";
 
-        // Create a new PDF document
+        // Create a new PDF document and a single page
         using (Document doc = new Document())
         {
-            // Add a single page
             Page page = doc.Pages.Add();
 
-            // Define graph dimensions (same as page size for simplicity)
-            double graphWidth = page.PageInfo.Width;
-            double graphHeight = page.PageInfo.Height;
+            // Graph container that will hold the rectangle shapes
+            // Use the double‑based constructor as the float overload is obsolete
+            Graph graph = new Graph(500.0, 400.0); // width, height of the graph canvas
 
-            // Create a Graph container to hold drawing shapes (double ctor required)
-            Graph graph = new Graph(graphWidth, graphHeight);
+            // List to keep track of placed bounding rectangles for overlap checking
+            List<Aspose.Pdf.Rectangle> placedBounds = new List<Aspose.Pdf.Rectangle>();
 
-            // List to keep track of rectangle bounds for overlap checking
-            List<Aspose.Pdf.Rectangle> existingBounds = new List<Aspose.Pdf.Rectangle>();
-
-            // Define rectangle specifications (left, bottom, width, height)
-            var rectSpecs = new (double left, double bottom, double width, double height)[]
+            // Define a set of rectangle specifications (position and size)
+            var rectSpecs = new (double x, double y, double w, double h)[]
             {
-                (50, 700, 150, 80),
-                (250, 650, 120, 100),
-                (400, 720, 180, 60),
-                (100, 500, 200, 150),
-                (350, 400, 130, 120)
+                (50, 300, 120, 80),
+                (200, 250, 150, 100),
+                (400, 320, 80, 60),
+                (180, 150, 200, 120),
+                (350, 100, 100, 150)
             };
 
             foreach (var spec in rectSpecs)
             {
-                // Create a bounding rectangle for overlap detection (uses double coordinates)
+                // Create a bounding rectangle for overlap testing (uses double values)
                 Aspose.Pdf.Rectangle bounds = new Aspose.Pdf.Rectangle(
-                    spec.left,
-                    spec.bottom,
-                    spec.left + spec.width,
-                    spec.bottom + spec.height);
+                    spec.x,               // llx
+                    spec.y - spec.h,      // lly (PDF Y origin is bottom‑left)
+                    spec.x + spec.w,      // urx
+                    spec.y                // ury
+                );
 
-                // Check against all existing rectangles
+                // Check against all previously placed rectangles
                 bool overlaps = false;
-                foreach (var existing in existingBounds)
+                foreach (var existing in placedBounds)
                 {
                     if (bounds.IsIntersect(existing))
                     {
@@ -60,14 +56,14 @@ class Program
                 // If no overlap, add the rectangle to the graph and store its bounds
                 if (!overlaps)
                 {
-                    // Create a drawing rectangle shape – parameters must be float
-                    var shape = new Aspose.Pdf.Drawing.Rectangle(
-                        (float)spec.left,
-                        (float)spec.bottom,
-                        (float)spec.width,
-                        (float)spec.height);
+                    // Drawing.Rectangle expects float parameters – cast accordingly
+                    Aspose.Pdf.Drawing.Rectangle shape = new Aspose.Pdf.Drawing.Rectangle(
+                        (float)spec.x,
+                        (float)(spec.y - spec.h),
+                        (float)spec.w,
+                        (float)spec.h);
 
-                    // Set visual appearance via GraphInfo (LineWidth is float)
+                    // Set visual appearance via GraphInfo (LineWidth is a float)
                     shape.GraphInfo = new GraphInfo
                     {
                         FillColor = Aspose.Pdf.Color.LightGray,
@@ -75,52 +71,19 @@ class Program
                         LineWidth = 1f
                     };
 
-                    // Add shape to the graph
                     graph.Shapes.Add(shape);
-
-                    // Store bounds for future overlap checks
-                    existingBounds.Add(bounds);
+                    placedBounds.Add(bounds);
                 }
-                else
-                {
-                    // Overlap detected – you could handle it differently (e.g., log or adjust)
-                    Console.WriteLine($"Rectangle at ({spec.left},{spec.bottom}) overlaps and was skipped.");
-                }
+                // If overlap occurs, the rectangle is simply skipped (could be logged)
             }
 
-            // Add the graph to the page
+            // Add the completed graph to the page
             page.Paragraphs.Add(graph);
 
-            // Save the document – guard against missing libgdiplus on non‑Windows platforms
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                doc.Save(outputPath);
-            }
-            else
-            {
-                try
-                {
-                    doc.Save(outputPath);
-                }
-                catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
-                {
-                    Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. PDF was not saved.");
-                }
-            }
+            // Save the document
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Process completed. PDF path: '{outputPath}'.");
-    }
-
-    // Helper to detect a nested DllNotFoundException (e.g., missing libgdiplus)
-    private static bool ContainsDllNotFound(Exception? ex)
-    {
-        while (ex != null)
-        {
-            if (ex is DllNotFoundException)
-                return true;
-            ex = ex.InnerException;
-        }
-        return false;
+        Console.WriteLine($"PDF with non‑overlapping rectangles saved to '{outputPath}'.");
     }
 }

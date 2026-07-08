@@ -18,14 +18,14 @@ class Program
         // Load the PDF document with deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Rotate pages starting from the last page moving backwards
+            // Rotate pages starting from the last page to the first
             for (int i = doc.Pages.Count; i >= 1; i--)
             {
                 // Apply a 90‑degree clockwise rotation
-                doc.Pages[i].Rotate = Rotation.on90;
+                doc.Pages[i].Rotate = Aspose.Pdf.Rotation.on90;
             }
 
-            // Save the modified PDF
+            // Save the rotated PDF
             doc.Save(outputPath);
         }
 

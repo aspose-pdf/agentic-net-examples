@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations; // needed for WidgetAnnotation
 
 class Program
 {
@@ -16,39 +15,28 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the form fields collection
-            Form form = doc.Form;
-
-            // Iterate through all fields in the form
-            foreach (WidgetAnnotation field in form)
+            // Iterate over all form fields in the document
+            foreach (Field field in doc.Form)
             {
                 // Process only radio button fields
                 if (field is RadioButtonField radioButton)
                 {
-                    // The Options collection holds the display labels for each option
-                    var options = radioButton.Options;
-
-                    // Selected is 1‑based; 0 means no option is selected
+                    // Selected index is 1‑based; 0 means no option is selected
                     int selectedIndex = radioButton.Selected;
 
-                    if (selectedIndex > 0 && selectedIndex <= options.Count)
+                    if (selectedIndex > 0 && selectedIndex <= radioButton.Options.Count)
                     {
-                        // Retrieve the label (Name) of the selected option
-                        string selectedLabel = options[selectedIndex - 1].Name;
-
-                        // The Value property of the option holds the export value
-                        string exportValue = options[selectedIndex - 1].Value;
-
-                        Console.WriteLine($"Radio Button '{radioButton.FullName}':");
-                        Console.WriteLine($"  Selected Option Label : {selectedLabel}");
-                        Console.WriteLine($"  Export Value          : {exportValue}");
+                        // Retrieve the label (option name) corresponding to the selected index
+                        // Options collection holds Option objects; use the Name property for the label
+                        string selectedLabel = radioButton.Options[selectedIndex - 1].Name;
+                        Console.WriteLine($"Radio button '{radioButton.FullName}' selected option: '{selectedLabel}'");
                     }
                     else
                     {
-                        Console.WriteLine($"Radio Button '{radioButton.FullName}' has no selection.");
+                        Console.WriteLine($"Radio button '{radioButton.FullName}' has no selection.");
                     }
                 }
             }

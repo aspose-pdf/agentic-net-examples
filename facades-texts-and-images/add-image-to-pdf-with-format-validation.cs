@@ -7,16 +7,11 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string imagePath = "image.png";
-        const string outputPath = "output.pdf";
+        const string inputPdf   = "input.pdf";          // source PDF
+        const string imagePath  = "picture.png";        // image to add
+        const string outputPdf  = "output.pdf";         // result PDF
 
-        // Verify source files exist
-        if (!File.Exists(pdfPath))
-        {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
-            return;
-        }
+        // Verify that the image file exists
         if (!File.Exists(imagePath))
         {
             Console.Error.WriteLine($"Image file not found: {imagePath}");
@@ -25,23 +20,29 @@ class Program
 
         // Validate image format (allow only JPG, PNG, GIF, BMP, TIFF)
         string ext = Path.GetExtension(imagePath).ToLowerInvariant();
-        string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tif", ".tiff" };
-        if (Array.IndexOf(allowedExtensions, ext) < 0)
+        string[] allowed = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tif", ".tiff" };
+        if (Array.IndexOf(allowed, ext) < 0)
         {
             Console.Error.WriteLine($"Unsupported image format: {ext}");
             return;
         }
 
-        // Add the image to the PDF using PdfFileMend facade
-        using (PdfFileMend pdfMend = new PdfFileMend())
+        // Verify that the source PDF exists
+        if (!File.Exists(inputPdf))
         {
-            // Bind the existing PDF document
-            pdfMend.BindPdf(pdfPath);
+            Console.Error.WriteLine($"PDF file not found: {inputPdf}");
+            return;
+        }
 
-            // Add the image to page 1 with specified rectangle coordinates
-            using (FileStream imgStream = File.OpenRead(imagePath))
+        // Load the PDF document
+        using (Document pdfDoc = new Document(inputPdf))
+        {
+            // Initialize PdfFileMend with the loaded document
+            using (PdfFileMend mend = new PdfFileMend(pdfDoc))
             {
-                bool added = pdfMend.AddImage(imgStream, 1, 10f, 10f, 200f, 200f);
+                // Add the image to page 1 at the desired rectangle (lower‑left X/Y, upper‑right X/Y)
+                // Example coordinates place the image at (10,10) – (100,100)
+                bool added = mend.AddImage(imagePath, 1, 10f, 10f, 100f, 100f);
                 if (!added)
                 {
                     Console.Error.WriteLine("Failed to add the image to the PDF.");
@@ -50,9 +51,9 @@ class Program
             }
 
             // Save the modified PDF
-            pdfMend.Save(outputPath);
+            pdfDoc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Image successfully added. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Image added successfully. Output saved to '{outputPdf}'.");
     }
 }

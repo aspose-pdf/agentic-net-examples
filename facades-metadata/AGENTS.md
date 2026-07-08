@@ -8,7 +8,7 @@ parent: ../agents.md
 
 # AGENTS - facades-metadata
 
-> **Facades metadata** in PDF using C# / .NET -- **40** verified, compile-tested examples for **Aspose.PDF for .NET** 26.5.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Facades metadata** in PDF using C# / .NET -- **40** verified, compile-tested examples for **Aspose.PDF for .NET** 26.6.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 ## Persona
 
@@ -24,14 +24,15 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 ## Required Namespaces
 
 - `using Aspose.Pdf.Facades;` (40/40 files) ← category-specific
-- `using Aspose.Pdf;` (6/40 files)
+- `using Aspose.Pdf;` (7/40 files)
 - `using Aspose.Pdf.Tagged;` (1/40 files)
+- `using Aspose.Pdf.Text;` (1/40 files)
 - `using System;` (40/40 files)
 - `using System.IO;` (37/40 files)
 - `using System.Collections.Generic;` (4/40 files)
+- `using System.Globalization;` (2/40 files)
 - `using System.Text.Json;` (2/40 files)
 - `using System.Threading.Tasks;` (2/40 files)
-- `using System.Globalization;` (1/40 files)
 - `using System.Linq;` (1/40 files)
 - `using System.Text.RegularExpressions;` (1/40 files)
 
@@ -50,36 +51,36 @@ tool.Save("output.pdf");
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [add-custom-metadata-to-pdf](./add-custom-metadata-to-pdf.cs) | Add Custom Metadata to PDF using PdfFileInfo | `PdfFileInfo`, `SetMetaInfo`, `SaveNewInfo` | Demonstrates how to add a custom metadata entry (ProjectCode) to an existing PDF file and save th... |
-| [add-custom-metadata-to-pdf__v2](./add-custom-metadata-to-pdf__v2.cs) | Add Custom Metadata to PDF Using PdfFileInfo Facade | `Document`, `PdfFileInfo`, `SetMetaInfo` | Demonstrates how to add a custom metadata field to a PDF document with the PdfFileInfo facade and... |
-| [add-custom-metadata](./add-custom-metadata.cs) | Add Custom Metadata to Multiple PDFs | `Document`, `PdfFileInfo`, `SetMetaInfo` | Creates sample PDFs, loops through them, adds a custom 'Department' metadata field using PdfFileI... |
-| [add-custom-timestamp-metadata-to-pdf](./add-custom-timestamp-metadata-to-pdf.cs) | Add Custom Timestamp Metadata to PDF | `PdfFileInfo`, `SetMetaInfo`, `SaveNewInfo` | Shows how to set a custom metadata field containing the current UTC timestamp using PdfFileInfo a... |
-| [apply-metadata-parallel-pdf](./apply-metadata-parallel-pdf.cs) | Apply Metadata Changes to Multiple PDFs in Parallel | `PdfFileInfo`, `SaveNewInfo` | Shows how to use Aspose.Pdf.Facades.PdfFileInfo to set title, author, subject, and keywords on se... |
-| [audit-pdf-metadata-to-csv](./audit-pdf-metadata-to-csv.cs) | Audit PDF Metadata Changes and Log to CSV | `PdfFileInfo`, `SaveNewInfo`, `Title` | The example reads a PDF's original metadata with PdfFileInfo, updates several fields, saves a new... |
-| [backup-pdfs-update-metadata](./backup-pdfs-update-metadata.cs) | Backup PDFs and Update Metadata with PdfFileInfo | `PdfFileInfo`, `Title`, `Author` | Creates a backup copy of each PDF in a specified folder and then modifies its metadata (title, au... |
-| [check-custom-pdf-metadata-key](./check-custom-pdf-metadata-key.cs) | Read Custom PDF Metadata Safely | `PdfFileInfo`, `GetMetaInfo` | Demonstrates how to verify the existence of a custom metadata entry ("Confidential") in a PDF fil... |
-| [conditionally-update-pdf-author-metadata](./conditionally-update-pdf-author-metadata.cs) | Conditionally Update PDF Author Metadata | `PdfFileInfo`, `Author`, `SaveNewInfo` | Shows how to read a PDF's Author field with Aspose.Pdf.Facades.PdfFileInfo, set it only when the ... |
-| [dispose-pdffileinfo-and-document-add-text-stamp](./dispose-pdffileinfo-and-document-add-text-stamp.cs) | Dispose PdfFileInfo and Document with Using Blocks and Add T... | `PdfFileInfo`, `Document`, `TextStamp` | Demonstrates using `using` blocks to properly dispose `PdfFileInfo` and `Document` objects, retri... |
-| [export-pdf-metadata-to-json](./export-pdf-metadata-to-json.cs) | Export PDF Metadata to JSON | `PdfFileInfo`, `BindPdf`, `Title` | Shows how to read metadata from each PDF in a folder using Aspose.Pdf.Facades.PdfFileInfo and ser... |
-| [handle-readonly-when-saving-pdf-metadata](./handle-readonly-when-saving-pdf-metadata.cs) | Handle Read‑Only File Attribute When Saving PDF Metadata | `PdfFileInfo`, `Title`, `SaveNewInfo` | Shows how to modify PDF metadata with PdfFileInfo and gracefully recover from an IOException caus... |
-| [import-json-metadata-into-pdfs](./import-json-metadata-into-pdfs.cs) | Import JSON Metadata into PDFs using PdfFileInfo | `PdfFileInfo`, `Author`, `Title` | Shows how to read a JSON file of metadata, apply both standard and custom properties to PDF files... |
-| [list-custom-pdf-metadata-alphabetically](./list-custom-pdf-metadata-alphabetically.cs) | List Custom PDF Metadata Alphabetically | `PdfFileInfo`, `GetMetaInfo`, `Header` | Demonstrates how to retrieve all custom metadata keys from a PDF using the PdfFileInfo facade, so... |
-| [merge-xmp-metadata-with-pdf-fileinfo](./merge-xmp-metadata-with-pdf-fileinfo.cs) | Merge XMP Metadata with PDF FileInfo | `Document`, `PdfFileInfo`, `SaveNewInfoWithXmp` | Shows how to update standard PDF file information (title, author, etc.) and merge those changes w... |
-| [read-pdf-author-metadata](./read-pdf-author-metadata.cs) | Read PDF Author Metadata with PdfFileInfo | `PdfFileInfo`, `Author` | Demonstrates how to open a PDF file with Aspose.Pdf.Facades.PdfFileInfo, retrieve the Author meta... |
-| [read-pdf-creator-metadata](./read-pdf-creator-metadata.cs) | Read PDF Creator Metadata Using PdfFileInfo | `PdfFileInfo`, `Creator` | Demonstrates how to open a PDF with Aspose.Pdf.Facades.PdfFileInfo and retrieve the Creator metad... |
-| [read-pdf-metadata-null-handling](./read-pdf-metadata-null-handling.cs) | Read PDF Metadata with Null Handling using Aspose.Pdf | `PdfFileInfo`, `GetMetaInfo` | Demonstrates how to read standard and custom PDF metadata using Aspose.Pdf's PdfFileInfo facade a... |
-| [read-pdf-modification-date](./read-pdf-modification-date.cs) | Read and Format PDF Modification Date using PdfFileInfo | `PdfFileInfo`, `ModDate` | Demonstrates how to retrieve the ModDate metadata from a PDF with Aspose.Pdf.Facades.PdfFileInfo,... |
-| [read-pdf-title-metadata-and-log](./read-pdf-title-metadata-and-log.cs) | Read PDF Title Metadata and Log It | `PdfFileInfo`, `Title` | Demonstrates how to use Aspose.Pdf.Facades.PdfFileInfo to read the Title metadata from a PDF file... |
-| [read-pdf-version-using-aspose-pdf](./read-pdf-version-using-aspose-pdf.cs) | Read PDF Version Using Aspose.Pdf | `PdfFileInfo`, `GetPdfVersion` | Shows how to retrieve the PDF version string from a file by using Aspose.Pdf.Facades.PdfFileInfo. |
-| [read-update-pdf-metadata](./read-update-pdf-metadata.cs) | Read and Update PDF Metadata with PdfFileInfo | `PdfFileInfo`, `BindPdf`, `Title` | Demonstrates how to bind a PDF file, read its metadata (title, author, page count, version), modi... |
-| [remove-obsolete-metadata-field](./remove-obsolete-metadata-field.cs) | Remove Obsolete Metadata Field from PDF | `PdfFileInfo`, `SetMetaInfo`, `SaveNewInfo` | Demonstrates how to load a PDF with PdfFileInfo, clear a custom metadata entry by setting it to a... |
+| [add-custom-metadata-reviewedby-to-pdf](./add-custom-metadata-reviewedby-to-pdf.cs) | Add Custom Metadata 'ReviewedBy' to PDF | `PdfFileInfo`, `BindPdf`, `SetMetaInfo` | Demonstrates loading a PDF with PdfFileInfo, setting a custom metadata field using SetMetaInfo, a... |
+| [add-custom-metadata-to-pdf](./add-custom-metadata-to-pdf.cs) | Add Custom Metadata to PDF using PdfFileInfo | `PdfFileInfo`, `SetMetaInfo`, `SaveNewInfo` | Demonstrates how to add a custom metadata entry to a PDF file with the PdfFileInfo facade and sav... |
+| [add-custom-timestamp-metadata-to-pdf](./add-custom-timestamp-metadata-to-pdf.cs) | Add Custom Timestamp Metadata to PDF | `PdfFileInfo`, `BindPdf`, `SetMetaInfo` | Demonstrates how to add a custom metadata field containing the current UTC timestamp to a PDF usi... |
+| [add-department-metadata-to-pdfs](./add-department-metadata-to-pdfs.cs) | Add Custom 'Department' Metadata to PDFs | `PdfFileInfo`, `SetMetaInfo`, `SaveNewInfo` | Shows how to iterate over PDF files, set a custom metadata field named "Department" using Aspose.... |
+| [backup-pdfs-update-metadata](./backup-pdfs-update-metadata.cs) | Backup PDFs and Update Metadata with PdfFileInfo | `PdfFileInfo`, `Title`, `Author` | Creates a backup copy of each PDF in a source folder, then modifies its metadata (title, author, ... |
+| [check-custom-metadata-key](./check-custom-metadata-key.cs) | Check for Custom Metadata Key in PDF | `PdfFileInfo`, `GetMetaInfo` | Demonstrates how to verify the existence of a custom metadata entry (e.g., "Confidential") in a P... |
+| [conditionally-update-pdf-author-metadata](./conditionally-update-pdf-author-metadata.cs) | Conditionally Update PDF Author Metadata | `PdfFileInfo`, `Author`, `SaveNewInfo` | Shows how to read a PDF's Author metadata with Aspose.Pdf.Facades, update it only when the field ... |
+| [convert-pdf-to-pdfa-1b-with-pdffileinfo](./convert-pdf-to-pdfa-1b-with-pdffileinfo.cs) | Convert PDF to PDF/A‑1b and Save with PdfFileInfo | `Document`, `Convert`, `IsPdfaCompliant` | Creates a PDF in memory, converts it to PDF/A‑1b using Document.Convert, then uses the PdfFileInf... |
+| [export-pdf-metadata-to-json](./export-pdf-metadata-to-json.cs) | Export PDF Metadata to JSON | `PdfFileInfo`, `BindPdf`, `Title` | Reads metadata from each PDF in a folder using Aspose.Pdf.Facades.PdfFileInfo and writes the coll... |
+| [handle-readonly-file-errors-saving-pdf-metadata](./handle-readonly-file-errors-saving-pdf-metadata.cs) | Handle Read‑Only File Errors When Saving PDF Metadata | `PdfFileInfo`, `SaveNewInfo`, `Title` | Demonstrates how to modify PDF metadata with Aspose.Pdf.Facades.PdfFileInfo and gracefully handle... |
+| [import-pdf-metadata-from-json](./import-pdf-metadata-from-json.cs) | Import PDF Metadata from JSON | `PdfFileInfo`, `SetMetaInfo`, `SaveNewInfo` | Shows how to read metadata values from a JSON file and apply them to a PDF using the PdfFileInfo ... |
+| [merge-xmp-metadata-with-pdf-fileinfo](./merge-xmp-metadata-with-pdf-fileinfo.cs) | Merge XMP Metadata with PDF FileInfo | `PdfFileInfo`, `PdfXmpMetadata`, `XmpValue` | Shows how to combine standard PDF file information with XMP metadata, add a custom XMP property, ... |
+| [preserve-pdf-metadata-add-version](./preserve-pdf-metadata-add-version.cs) | Preserve PDF Metadata and Add Version Field | `PdfFileInfo`, `SetMetaInfo`, `SaveNewInfo` | Demonstrates how to keep all existing PDF metadata while adding or updating a custom "Version" fi... |
+| [read-pdf-author-metadata](./read-pdf-author-metadata.cs) | Read PDF Author Metadata | `PdfFileInfo`, `Author` | Shows how to use Aspose.Pdf.Facades.PdfFileInfo to open a PDF, retrieve the Author metadata prope... |
+| [read-pdf-creator-metadata](./read-pdf-creator-metadata.cs) | Read PDF Creator Metadata with PdfFileInfo | `PdfFileInfo`, `Creator` | Demonstrates how to open a PDF with Aspose.Pdf.Facades.PdfFileInfo, retrieve the Creator metadata... |
+| [read-pdf-metadata-add-blank-page](./read-pdf-metadata-add-blank-page.cs) | Read PDF Metadata and Add a Blank Page with Aspose.Pdf | `PdfFileInfo`, `Document`, `Pages` | Demonstrates how to read basic PDF metadata using PdfFileInfo, obtain the page count, add a new b... |
+| [read-pdf-metadata-safely](./read-pdf-metadata-safely.cs) | Read PDF Metadata Safely with PdfFileInfo | `PdfFileInfo`, `GetMetaInfo`, `Close` | Demonstrates opening a PDF using Aspose.Pdf.Facades.PdfFileInfo, retrieving standard and custom m... |
+| [read-pdf-modification-date](./read-pdf-modification-date.cs) | Read and Format PDF Modification Date | `PdfFileInfo`, `ModDate` | Demonstrates how to use PdfFileInfo to retrieve a PDF's ModDate, parse the PDF date string, and d... |
+| [read-pdf-title-metadata-log](./read-pdf-title-metadata-log.cs) | Read PDF Title Metadata and Write to Log | `PdfFileInfo`, `Title` | Demonstrates how to use Aspose.Pdf.Facades.PdfFileInfo to read the Title metadata from a PDF file... |
+| [read-pdf-version-using-aspose-pdf-facade](./read-pdf-version-using-aspose-pdf-facade.cs) | Read PDF Version Using Aspose.Pdf Facade | `PdfFileInfo`, `GetPdfVersion` | Demonstrates how to initialize the PdfFileInfo facade, retrieve the PDF version string with GetPd... |
+| [read-update-pdf-metadata](./read-update-pdf-metadata.cs) | Read and Update PDF Metadata with PdfFileInfo | `PdfFileInfo`, `Title`, `Author` | Demonstrates how to open a PDF, read its metadata using PdfFileInfo, modify fields such as title ... |
+| [remove-custom-pdf-metadata-entry](./remove-custom-pdf-metadata-entry.cs) | Remove Custom PDF Metadata Entry Using PdfFileInfo | `PdfFileInfo`, `SetMetaInfo`, `SaveNewInfo` | Demonstrates how to clear a specific custom metadata field in a PDF by setting its value to empty... |
+| [retrieve-custom-pdf-metadata-alphabetically](./retrieve-custom-pdf-metadata-alphabetically.cs) | Retrieve and Display Custom PDF Metadata Alphabetically | `PdfFileInfo`, `PdfXmpMetadata`, `BindPdf` | The example shows how to obtain all custom XMP metadata keys from a PDF, sort them alphabetically... |
 | [retrieve-custom-pdf-metadata-projectcode](./retrieve-custom-pdf-metadata-projectcode.cs) | Retrieve Custom PDF Metadata (ProjectCode) | `PdfFileInfo`, `GetMetaInfo` | Demonstrates how to use Aspose.Pdf.Facades.PdfFileInfo to read a custom metadata entry named "Pro... |
-| [retrieve-pdf-keywords-metadata](./retrieve-pdf-keywords-metadata.cs) | Retrieve PDF Keywords Metadata using PdfFileInfo | `PdfFileInfo`, `Keywords`, `Dispose` | Demonstrates how to open a PDF with Aspose.Pdf.Facades.PdfFileInfo, read the Keywords metadata pr... |
-| [retrieve-reviewedby-metadata](./retrieve-reviewedby-metadata.cs) | Retrieve Custom PDF Metadata 'ReviewedBy' Using PdfFileInfo | `PdfFileInfo`, `GetMetaInfo` | The example checks for a PDF file, opens it with PdfFileInfo, and reads the custom metadata prope... |
-| [set-custom-document-id-pdf](./set-custom-document-id-pdf.cs) | Set Custom Document ID in PDF using PdfFileInfo | `PdfFileInfo`, `SetMetaInfo`, `SaveNewInfo` | Demonstrates how to generate a GUID and store it as a custom metadata field in a PDF file using t... |
-| [set-pdf-creator-metadata](./set-pdf-creator-metadata.cs) | Set PDF Creator Metadata Using PdfFileInfo | `PdfFileInfo`, `Creator`, `SaveNewInfo` | Demonstrates how to assign a custom Creator value to a PDF's metadata using Aspose.Pdf.Facades.Pd... |
-| [set-pdf-keywords-metadata](./set-pdf-keywords-metadata.cs) | Set PDF Keywords Metadata Using PdfFileInfo | `PdfFileInfo`, `Keywords`, `SaveNewInfo` | Demonstrates how to assign keyword metadata to a PDF file with Aspose.Pdf.Facades.PdfFileInfo, sa... |
-| [set-pdf-language-property](./set-pdf-language-property.cs) | Set PDF Language Property via PdfFileInfo | `PdfFileInfo`, `Document`, `ITaggedContent` | Shows how to load a PDF with PdfFileInfo, set the document language to "en-US" using the TaggedCo... |
+| [retrieve-pdf-keywords-metadata](./retrieve-pdf-keywords-metadata.cs) | Retrieve PDF Keywords Metadata | `PdfFileInfo`, `Keywords` | Shows how to load a PDF with Aspose.Pdf.Facades.PdfFileInfo and read the Keywords metadata proper... |
+| [retrieve-reviewedby-metadata](./retrieve-reviewedby-metadata.cs) | Retrieve Custom PDF Metadata 'ReviewedBy' | `PdfFileInfo`, `GetMetaInfo` | Shows how to use Aspose.Pdf.Facades.PdfFileInfo to read a custom metadata property named 'Reviewe... |
+| [set-pdf-creator-metadata](./set-pdf-creator-metadata.cs) | Set PDF Creator Metadata with PdfFileInfo | `PdfFileInfo`, `Creator`, `SaveNewInfo` | Demonstrates how to assign a custom Creator value to a PDF using the PdfFileInfo facade and persi... |
+| [set-pdf-document-id-using-pdffileinfo](./set-pdf-document-id-using-pdffileinfo.cs) | Set PDF Document ID Using PdfFileInfo | `Document`, `PdfFileInfo`, `SetMetaInfo` | Demonstrates how to generate a GUID and store it as a custom metadata entry (DocumentId) in a PDF... |
+| [set-pdf-keywords-metadata](./set-pdf-keywords-metadata.cs) | Set PDF Keywords Metadata with PdfFileInfo | `PdfFileInfo`, `Keywords`, `SaveNewInfo` | Demonstrates how to set the Keywords metadata field of a PDF using Aspose.Pdf.Facades.PdfFileInfo... |
+| [set-pdf-language-property](./set-pdf-language-property.cs) | Set PDF Language Property Using PdfFileInfo | `PdfFileInfo`, `Document`, `ITaggedContent` | Demonstrates how to set the natural language of a PDF document to "en-US" using the PdfFileInfo f... |
 | ... | | | *and 10 more files* |
 
 ## Category Statistics
@@ -94,5 +95,5 @@ tool.Save("output.pdf");
 - Review code examples in this folder for facades-metadata patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-06-24 | Run: `20260624_150249_f15775`
+Updated: 2026-07-05 | Run: `20260705_005655_3d29fa`
 <!-- AUTOGENERATED:END -->

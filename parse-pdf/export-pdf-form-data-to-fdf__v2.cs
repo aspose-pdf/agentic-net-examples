@@ -6,29 +6,29 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputFdfPath = "output.fdf";
+        const string pdfPath = "input.pdf";
+        const string fdfPath = "output.fdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
         // Load the PDF document
-        using (Document pdfDocument = new Document(inputPdfPath))
+        using (Document doc = new Document(pdfPath))
         {
-            // Initialize the Form facade (fully qualified, no using Aspose.Pdf.Facades)
-            var formFacade = new Aspose.Pdf.Facades.Form(pdfDocument);
+            // Initialize the Form facade with the loaded document
+            Aspose.Pdf.Facades.Form formFacade = new Aspose.Pdf.Facades.Form(doc);
 
-            // Export form fields to an FDF file via a FileStream
-            using (FileStream fdfStream = new FileStream(outputFdfPath, FileMode.Create, FileAccess.Write))
+            // Export the form fields to an FDF file
+            using (FileStream fdfStream = new FileStream(fdfPath, FileMode.Create, FileAccess.Write))
             {
                 formFacade.ExportFdf(fdfStream);
                 // The using block ensures the stream is closed
             }
         }
 
-        Console.WriteLine($"Form data exported to '{outputFdfPath}'.");
+        Console.WriteLine($"Form data exported to '{fdfPath}'.");
     }
 }

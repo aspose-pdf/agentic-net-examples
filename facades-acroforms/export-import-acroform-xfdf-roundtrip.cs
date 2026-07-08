@@ -1,63 +1,59 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "form.pdf";          // source PDF with AcroForm fields
-        const string xfdfPath      = "form_data.xfdf";    // temporary XFDF file
-        const string outputPdfPath = "form_roundtrip.pdf"; // PDF after import
+        const string inputPdf = "form.pdf";          // source PDF with form fields
+        const string outputPdf = "form_roundtrip.pdf"; // PDF after XFDF round‑trip
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         // ------------------------------------------------------------
-        // 1. Fill the form fields with sample data and export to XFDF
+        // Export form data to XFDF (in memory)
         // ------------------------------------------------------------
-        using (Form formFiller = new Form(inputPdfPath))
+        using (Form exportForm = new Form(inputPdf))
         {
-            // Fill each field with a distinct test value
-            foreach (string fieldName in formFiller.FieldNames)
+            using (MemoryStream xfdfStream = new MemoryStream())
             {
-                formFiller.FillField(fieldName, $"TestValue_{fieldName}");
-            }
+                exportForm.ExportXfdf(xfdfStream);
+                xfdfStream.Position = 0; // reset for reading
 
-            // Export the filled field values to XFDF
-            using (FileStream xfdfOut = new FileStream(xfdfPath, FileMode.Create, FileAccess.Write))
-            {
-                formFiller.ExportXfdf(xfdfOut);
-            }
+                Console.WriteLine($"Exported XFDF size: {xfdfStream.Length} bytes");
 
-            // Persist the filled values back to the original PDF
-            formFiller.Save(); // saves to the bound document (inputPdfPath)
+                // ------------------------------------------------------------
+                // Import the XFDF back into a new PDF (round‑trip)
+                // ------------------------------------------------------------
+                using (Form importForm = new Form(inputPdf, outputPdf))
+                {
+                    importForm.ImportXfdf(xfdfStream);
+                    importForm.Save(); // persist the imported data
+                }
+
+                // ------------------------------------------------------------
+                // Verify that field values are identical before and after
+                // ------------------------------------------------------------
+                using (Form originalForm = new Form(inputPdf))
+                using (Form roundTripForm = new Form(outputPdf))
+                {
+                    foreach (string fieldName in originalForm.FieldNames)
+                    {
+                        object originalValue = originalForm.GetField(fieldName);
+                        object roundTripValue = roundTripForm.GetField(fieldName);
+                        bool match = Equals(originalValue, roundTripValue);
+                        Console.WriteLine($"Field '{fieldName}': original='{originalValue}' | round‑trip='{roundTripValue}' => {(match ? "OK" : "MISMATCH")}");
+                    }
+                }
+            }
         }
 
-        // ------------------------------------------------------------
-        // 2. Import the XFDF back into a fresh copy of the PDF
-        // ------------------------------------------------------------
-        using (Form formImporter = new Form(inputPdfPath))
-        {
-            // Load the previously exported XFDF
-            using (FileStream xfdfIn = new FileStream(xfdfPath, FileMode.Open, FileAccess.Read))
-            {
-                formImporter.ImportXfdf(xfdfIn);
-            }
-
-            // Save the result to a new file for verification
-            formImporter.Save(outputPdfPath);
-
-            // Verify that each field retained the original value
-            Console.WriteLine("Round‑trip verification results:");
-            foreach (string fieldName in formImporter.FieldNames)
-            {
-                object fieldValue = formImporter.GetField(fieldName);
-                Console.WriteLine($"{fieldName} = {fieldValue}");
-            }
-        }
+        Console.WriteLine($"Round‑trip PDF saved as '{outputPdf}'.");
     }
 }

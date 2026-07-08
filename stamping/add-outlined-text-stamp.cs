@@ -1,38 +1,48 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // Required for TextRenderingMode and FontRepository
 
 class Program
 {
     static void Main()
     {
-        // Create a sample PDF with a single blank page
-        using (Document document = new Document())
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+
+        if (!File.Exists(inputPath))
         {
-            document.Pages.Add();
-            document.Save("input.pdf");
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // Open the sample PDF for stamping
-        using (Document document = new Document("input.pdf"))
+        // Load the PDF document (lifecycle rule: use using for disposal)
+        using (Document doc = new Document(inputPath))
         {
-            // Configure text state for outlined effect (simulated with a bold font)
-            TextState textState = new TextState();
-            textState.Font = FontRepository.FindFont("Arial-BoldMT");
-            textState.FontSize = 48;
-            textState.ForegroundColor = Color.Black;
+            // Create a text stamp with the desired text
+            TextStamp stamp = new TextStamp("OUTLINE");
 
-            // Create a text stamp using the configured text state
-            TextStamp textStamp = new TextStamp("Outlined Text", textState);
-            textStamp.HorizontalAlignment = HorizontalAlignment.Center;
-            textStamp.VerticalAlignment = VerticalAlignment.Center;
-            textStamp.Opacity = 1.0f;
+            // Set the rendering mode to StrokeText to produce outlined text
+            stamp.TextState.RenderingMode = TextRenderingMode.StrokeText;
 
-            // Add the stamp to the first page (1‑based indexing)
-            document.Pages[1].AddStamp(textStamp);
+            // Optional: configure font and size
+            stamp.TextState.Font = FontRepository.FindFont("Helvetica");
+            stamp.TextState.FontSize = 48;
 
-            // Save the stamped PDF
-            document.Save("output.pdf");
+            // Ensure the stamp is drawn as graphic operators (required for rendering mode)
+            stamp.Draw = true;
+
+            // Position the stamp on the page (example coordinates)
+            stamp.XIndent = 100; // horizontal position from left
+            stamp.YIndent = 700; // vertical position from bottom
+
+            // Add the stamp to the first page (Page.AddStamp is the correct method)
+            doc.Pages[1].AddStamp(stamp);
+
+            // Save the modified PDF (lifecycle rule: save within using block)
+            doc.Save(outputPath);
         }
+
+        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
     }
 }

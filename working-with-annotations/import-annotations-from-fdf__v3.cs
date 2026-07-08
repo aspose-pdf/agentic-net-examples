@@ -16,24 +16,23 @@ class Program
             Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
-
         if (!File.Exists(fdfPath))
         {
             Console.Error.WriteLine($"FDF not found: {fdfPath}");
             return;
         }
 
-        // Load the PDF document; using ensures proper disposal.
+        // Load the PDF document (disposable)
         using (Document doc = new Document(pdfPath))
         {
-            // Open the FDF file as a stream.
+            // Open the FDF file stream
             using (FileStream fdfStream = File.OpenRead(fdfPath))
             {
-                // Import annotations; page numbers embedded in the FDF are applied automatically.
+                // Import annotations; page numbers in the FDF are applied automatically
                 FdfReader.ReadAnnotations(fdfStream, doc);
             }
 
-            // Save the PDF with the imported annotations.
+            // Save the PDF with imported annotations
             doc.Save(outputPath);
         }
 

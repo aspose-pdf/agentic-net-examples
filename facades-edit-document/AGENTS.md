@@ -8,7 +8,7 @@ parent: ../agents.md
 
 # AGENTS - facades-edit-document
 
-> **Facades edit document** in PDF using C# / .NET -- **215** verified, compile-tested examples for **Aspose.PDF for .NET** 26.5.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Facades edit document** in PDF using C# / .NET -- **213** verified, compile-tested examples for **Aspose.PDF for .NET** 26.6.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 ## Persona
 
@@ -23,31 +23,30 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf.Facades;` (193/215 files) ← category-specific
-- `using Aspose.Pdf;` (126/215 files) ← category-specific
-- `using Aspose.Pdf.Annotations;` (28/215 files)
-- `using Aspose.Pdf.Text;` (14/215 files)
-- `using Aspose.Pdf.Devices;` (9/215 files)
-- `using Aspose.Pdf.Printing;` (4/215 files)
-- `using Aspose.Pdf.Drawing;` (2/215 files)
-- `using System;` (215/215 files)
-- `using System.IO;` (206/215 files)
-- `using System.Drawing;` (29/215 files)
-- `using System.Collections.Generic;` (18/215 files)
-- `using System.Text.Json;` (9/215 files)
-- `using System.Drawing.Imaging;` (5/215 files)
-- `using System.Net.Http;` (3/215 files)
-- `using System.Threading.Tasks;` (3/215 files)
-- `using System.Security.Cryptography;` (2/215 files)
-- `using System.Text;` (2/215 files)
-- `using System.Threading;` (2/215 files)
-- `using System.Xml.Linq;` (2/215 files)
-- `using System.Drawing.Printing;` (1/215 files)
-- `using System.Linq;` (1/215 files)
-- `using System.Reflection;` (1/215 files)
-- `using System.Security.Cryptography.X509Certificates;` (1/215 files)
-- `using System.Xml;` (1/215 files)
-- `using System.Xml.XPath;` (1/215 files)
+- `using Aspose.Pdf.Facades;` (197/213 files) ← category-specific
+- `using Aspose.Pdf;` (137/213 files) ← category-specific
+- `using Aspose.Pdf.Annotations;` (26/213 files)
+- `using Aspose.Pdf.Text;` (14/213 files)
+- `using Aspose.Pdf.Devices;` (6/213 files)
+- `using Aspose.Pdf.Printing;` (4/213 files)
+- `using Aspose.Pdf.Drawing;` (2/213 files)
+- `using Aspose.Pdf.Forms;` (2/213 files)
+- `using System;` (213/213 files)
+- `using System.IO;` (201/213 files)
+- `using System.Drawing;` (34/213 files)
+- `using System.Collections.Generic;` (13/213 files)
+- `using System.Text.Json;` (6/213 files)
+- `using System.Drawing.Imaging;` (5/213 files)
+- `using System.Threading.Tasks;` (4/213 files)
+- `using System.Net.Http;` (3/213 files)
+- `using NUnit.Framework;` (2/213 files)
+- `using System.Collections;` (2/213 files)
+- `using System.Drawing.Printing;` (2/213 files)
+- `using System.Xml;` (2/213 files)
+- `using System.Security.Cryptography;` (1/213 files)
+- `using System.Security.Cryptography.X509Certificates;` (1/213 files)
+- `using System.Threading;` (1/213 files)
+- `using System.Xml.Linq;` (1/213 files)
 
 ## Common Code Pattern
 
@@ -64,40 +63,66 @@ tool.Save("output.pdf");
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [add-and-verify-document-attachment](./add-and-verify-document-attachment.cs) | Add and Verify Document Attachment in PDF | `PdfContentEditor`, `AddDocumentAttachment`, `Save` | Demonstrates attaching a file to a PDF with PdfContentEditor, extracting it using PdfExtractor, a... |
-| [add-attachment-and-verify-name](./add-attachment-and-verify-name.cs) | Add Attachment to PDF and Verify Its Name | `PdfContentEditor`, `AddDocumentAttachment`, `Save` | Demonstrates how to attach a file to a PDF using PdfContentEditor and then retrieve the attachmen... |
-| [add-attachment-md5-checksum-metadata](./add-attachment-md5-checksum-metadata.cs) | Add Attachment with MD5 Checksum Stored in PDF Metadata | `PdfContentEditor`, `BindPdf`, `AddDocumentAttachment` | Shows how to compute an MD5 checksum for a file, attach the file to a PDF, and store the checksum... |
-| [add-attachment-set-viewer-preference](./add-attachment-set-viewer-preference.cs) | Add Attachment and Set Viewer Preference in PDF | `PdfContentEditor`, `BindPdf`, `AddDocumentAttachment` | Shows how to attach a file to a PDF and configure the viewer to open the attachment panel automat... |
-| [add-attachment-set-viewer-preferences-and-encrypt-...](./add-attachment-set-viewer-preferences-and-encrypt-pdf.cs) | Add Attachment, Set Viewer Preferences, and Encrypt PDF | `PdfContentEditor`, `AddDocumentAttachment`, `ChangeViewerPreference` | The example adds a file attachment and custom viewer preferences to an existing PDF, then encrypt... |
-| [add-attachment-to-pdf-preserve-existing](./add-attachment-to-pdf-preserve-existing.cs) | Add Attachment to PDF Without Removing Existing Attachments | `PdfContentEditor`, `BindPdf`, `AddDocumentAttachment` | Demonstrates how to add a new document attachment to an existing PDF using Aspose.Pdf.Facades.Pdf... |
-| [add-attachment-update-moddate](./add-attachment-update-moddate.cs) | Add Attachment and Update Modification Date in PDF | `PdfContentEditor`, `BindPdf`, `AddDocumentAttachment` | Shows how to attach a file to an existing PDF and set the document's modification date to the cur... |
-| [add-bookmark-external-url-to-pdf](./add-bookmark-external-url-to-pdf.cs) | Add Bookmark with External URL to PDF | `PdfContentEditor`, `BindPdf`, `CreateBookmarksAction` | Shows how to create a PDF bookmark that opens an external website (https://example.org) using Asp... |
-| [add-bookmark-to-pdf-page](./add-bookmark-to-pdf-page.cs) | Add Bookmark to PDF Page with Aspose.Pdf | `PdfBookmarkEditor`, `BindPdf`, `CreateBookmarkOfPage` | Shows how to create a bookmark titled "Project Overview" that navigates to page five of a PDF usi... |
-| [add-chapter-section-bookmarks-pdf](./add-chapter-section-bookmarks-pdf.cs) | Add Chapter and Section Bookmarks to PDF | `PdfContentEditor`, `BindPdf`, `CreateBookmarksAction` | Demonstrates using Aspose.Pdf.Facades.PdfContentEditor to create a parent bookmark for a chapter ... |
-| [add-clickable-web-link-to-pdf](./add-clickable-web-link-to-pdf.cs) | Add Clickable Web Link to PDF | `PdfContentEditor`, `BindPdf`, `CreateWebLink` | Shows how to insert a link annotation that opens an external website using the PdfContentEditor f... |
-| [add-confidential-text-stamp-to-pdf](./add-confidential-text-stamp-to-pdf.cs) | Add Confidential Text Stamp with Transparency to PDF | `PdfFileStamp`, `BindPdf`, `FormattedText` | Demonstrates how to create a red "Confidential" text stamp with a semi‑transparent background and... |
-| [add-configurable-text-watermark-to-pdfs](./add-configurable-text-watermark-to-pdfs.cs) | Add Configurable Text Watermark to PDFs in a Folder | `PdfFileStamp`, `BindPdf`, `AddStamp` | Shows how to load watermark settings from a JSON file and apply a text watermark to every PDF in ... |
-| [add-confirmation-dialog-to-pdf-submit-button](./add-confirmation-dialog-to-pdf-submit-button.cs) | Add Confirmation Dialog to PDF Submit Button | `FormEditor`, `BindPdf`, `SetSubmitUrl` | Demonstrates how to attach JavaScript to a push‑button field in a PDF using Aspose.Pdf.Facades so... |
-| [add-custom-project-metadata-to-pdf](./add-custom-project-metadata-to-pdf.cs) | Add Custom Project Metadata to PDF using XMP | `PdfXmpMetadata`, `BindPdf`, `RegisterNamespaceURI` | Demonstrates how to bind a PDF, register a custom XMP namespace, add project identifier and versi... |
-| [add-custom-xmp-metadata-projectid](./add-custom-xmp-metadata-projectid.cs) | Add Custom XMP Metadata (ProjectID) to PDF | `PdfXmpMetadata`, `BindPdf`, `Add` | Shows how to bind an existing PDF, add a custom XMP metadata field named ProjectID with the value... |
-| [add-dashed-line-annotation-to-pdf](./add-dashed-line-annotation-to-pdf.cs) | Add Dashed Line Annotation to PDF | `PdfContentEditor`, `BindPdf`, `CreateLine` | Shows how to create a line annotation with a custom dash pattern on a PDF page using Aspose.Pdf.F... |
-| [add-dashed-rectangle-annotation-opacity](./add-dashed-rectangle-annotation-opacity.cs) | Add Dashed Rectangle Annotation with 75% Opacity | `Document`, `Page`, `Rectangle` | Loads a PDF, creates a red rectangle annotation on the first page with a custom dash pattern and ... |
-| [add-dashed-rectangle-annotation-to-pdf-page](./add-dashed-rectangle-annotation-to-pdf-page.cs) | Add Dashed Rectangle Annotation to PDF Page | `Document`, `Page`, `SquareAnnotation` | Demonstrates how to place a square (rectangle) annotation with a dashed border and 50% opacity on... |
-| [add-document-attachment-and-list-attachments](./add-document-attachment-and-list-attachments.cs) | Add Document Attachment and List Attachments in PDF | `PdfContentEditor`, `BindPdf`, `AddDocumentAttachment` | Demonstrates how to add a file as a document attachment to a PDF using PdfContentEditor and then ... |
-| [add-document-attachment-data-relationship](./add-document-attachment-data-relationship.cs) | Add Document Attachment with Data Relationship to PDF | `PdfContentEditor`, `BindPdf`, `AddDocumentAttachment` | Shows how to attach a file to a PDF using PdfContentEditor and set its AFRelationship to Data for... |
-| [add-document-attachment-to-pdf](./add-document-attachment-to-pdf.cs) | Add Document Attachment to PDF | `PdfContentEditor`, `BindPdf`, `AddDocumentAttachment` | Demonstrates how to attach an external file (Terms.pdf) to an existing PDF document using Aspose.... |
-| [add-document-attachment-to-pdf__v2](./add-document-attachment-to-pdf__v2.cs) | Add Document Attachment to PDF (No Custom MIME Type) | `PdfContentEditor`, `BindPdf`, `AddDocumentAttachment` | Demonstrates attaching a file to an existing PDF using PdfContentEditor and notes that a custom M... |
-| [add-document-attachment-with-creation-date](./add-document-attachment-with-creation-date.cs) | Add Document Attachment with Creation Date to PDF | `Document`, `PdfContentEditor`, `AddDocumentAttachment` | Demonstrates how to attach a PDF file to an existing PDF, assign a description, and set the attac... |
-| [add-document-attachment-with-description](./add-document-attachment-with-description.cs) | Add Document Attachment with Description to PDF | `PdfContentEditor`, `BindPdf`, `AddDocumentAttachment` | Demonstrates how to attach an external PDF file to an existing PDF and set a descriptive label us... |
-| [add-document-attachment-with-error-handling](./add-document-attachment-with-error-handling.cs) | Add Document Attachment to PDF with Error Handling | `PdfContentEditor`, `BindPdf`, `AddDocumentAttachment` | Demonstrates how to attach an external file to a PDF using Aspose.Pdf.Facades.PdfContentEditor wh... |
-| [add-embedded-file-attachment-to-pdf](./add-embedded-file-attachment-to-pdf.cs) | Add Embedded File Attachment to PDF | `PdfContentEditor`, `BindPdf`, `AddDocumentAttachment` | Shows how to embed a file as a document attachment in an existing PDF using Aspose.Pdf.Facades. |
-| [add-encrypted-attachment-to-pdf](./add-encrypted-attachment-to-pdf.cs) | Add Encrypted Attachment to PDF | `PdfContentEditor`, `BindPdf`, `AddDocumentAttachment` | Demonstrates adding a file attachment with a custom description to a PDF and then encrypting the ... |
-| [add-file-attachment-annotation-with-opacity](./add-file-attachment-annotation-with-opacity.cs) | Add File Attachment Annotation with Opacity to PDF Page | `Document`, `Page`, `FileSpecification` | Demonstrates how to attach a file to a specific PDF page using Aspose.Pdf and set the annotation'... |
-| [add-file-attachment-link-annotation](./add-file-attachment-link-annotation.cs) | Add File Attachment Link Annotation to PDF | `PdfContentEditor`, `BindPdf`, `CreateFileAttachment` | Shows how to insert a file‑attachment annotation that opens an attached PDF when the user clicks ... |
-| ... | | | *and 185 more files* |
+| [add-and-verify-document-attachment](./add-and-verify-document-attachment.cs) | Add and Verify Document Attachment in PDF | `BindPdf`, `AddDocumentAttachment`, `Save` | Demonstrates how to attach a file to a PDF using PdfContentEditor, extract the attachment with Pd... |
+| [add-annotation-and-merge-pdfs](./add-annotation-and-merge-pdfs.cs) | Add Annotation and Merge PDFs | `Document`, `TextAnnotation`, `Rectangle` | Shows how to add a text annotation to the first PDF and then concatenate it with a second PDF usi... |
+| [add-attachment-and-list-pdf-attachments](./add-attachment-and-list-pdf-attachments.cs) | Add Attachment to PDF and List Attachments | `PdfContentEditor`, `AddDocumentAttachment`, `Save` | Shows how to embed a file into a PDF using PdfContentEditor and then retrieve all attachment name... |
+| [add-attachment-and-retrieve-name](./add-attachment-and-retrieve-name.cs) | Add Attachment to PDF and Retrieve Its Name | `Document`, `FileSpecification`, `EmbeddedFiles` | Demonstrates how to embed a file as an attachment in a PDF using Aspose.Pdf, save the document, a... |
+| [add-attachment-set-modification-date](./add-attachment-set-modification-date.cs) | Add Attachment and Set Modification Date in PDF | `PdfContentEditor`, `BindPdf`, `AddDocumentAttachment` | Demonstrates how to attach a file to a PDF and update the document's modification date to the cur... |
+| [add-attachment-set-viewer-preference](./add-attachment-set-viewer-preference.cs) | Add Attachment and Set Viewer Preference in PDF | `PdfContentEditor`, `BindPdf`, `AddDocumentAttachment` | Demonstrates how to attach a file to a PDF and configure the viewer to display the attachment pan... |
+| [add-attachment-store-checksum-metadata](./add-attachment-store-checksum-metadata.cs) | Add Attachment and Store Checksum in PDF Metadata | `BindPdf`, `AddDocumentAttachment`, `Save` | Shows how to attach a file to a PDF, retrieve its checksum, and save that checksum as custom meta... |
+| [add-attachment-to-pdf-and-verify](./add-attachment-to-pdf-and-verify.cs) | Add Attachment to PDF and Verify with PdfExtractor | `Document`, `PdfContentEditor`, `AddDocumentAttachment` | Demonstrates how to attach a file to a PDF using the PdfContentEditor facade API and then verify ... |
+| [add-attachment-to-pdf-async](./add-attachment-to-pdf-async.cs) | Add Attachment to PDF Asynchronously | `PdfContentEditor`, `BindPdf`, `AddDocumentAttachment` | Shows how to attach a file to a PDF and save it using Aspose.Pdf's PdfContentEditor on a backgrou... |
+| [add-attachment-viewer-preferences-encrypt-pdf](./add-attachment-viewer-preferences-encrypt-pdf.cs) | Add Attachment and Viewer Preferences, Then Encrypt PDF with... | `Document`, `PdfContentEditor`, `ViewerPreference` | Demonstrates adding a file attachment and setting viewer preferences using PdfContentEditor, foll... |
+| [add-attachment-with-custom-mime-type-to-pdf](./add-attachment-with-custom-mime-type-to-pdf.cs) | Add Attachment with Custom MIME Type to PDF | `Document`, `FileSpecification`, `EmbeddedFilesCollection` | Demonstrates how to embed a file into a PDF document and assign a custom MIME type using Aspose.Pdf. |
+| [add-bookmark-to-pdf-page](./add-bookmark-to-pdf-page.cs) | Add Bookmark to PDF Page | `PdfBookmarkEditor`, `BindPdf`, `CreateBookmarkOfPage` | Shows how to add a "Project Overview" bookmark that links to page 5 of an existing PDF using Aspo... |
+| [add-centered-red-bold-text-stamp](./add-centered-red-bold-text-stamp.cs) | Add Centered Red Bold Text Stamp to PDF Page | `Document`, `TextStamp`, `TextState` | Demonstrates how to place a bold, red, centered text stamp on the fifth page of a PDF using Aspos... |
+| [add-clickable-web-link-to-pdf](./add-clickable-web-link-to-pdf.cs) | Add Clickable Web Link to PDF | `PdfContentEditor`, `BindPdf`, `CreateWebLink` | Shows how to insert a link annotation that opens an external website when clicked, using Aspose.P... |
+| [add-confidential-text-stamp](./add-confidential-text-stamp.cs) | Add Confidential Text Stamp with Red Font and Transparency | `PdfFileStamp`, `Stamp`, `BindLogo` | Demonstrates how to create a red "Confidential" text stamp with semi‑transparent background and a... |
+| [add-confirmation-dialog-to-pdf-submit-button](./add-confirmation-dialog-to-pdf-submit-button.cs) | Add Confirmation Dialog to PDF Submit Button | `Document`, `FormEditor`, `BindPdf` | Demonstrates how to create a PDF in memory, add a submit button, and attach JavaScript that shows... |
+| [add-custom-appearance-stamp](./add-custom-appearance-stamp.cs) | Add Custom Appearance Stamp to PDF | `PdfContentEditor`, `BindPdf`, `CreateRubberStamp` | Shows how to create a rubber‑stamp annotation with a custom appearance stream taken from an exter... |
+| [add-custom-dashed-line-annotation](./add-custom-dashed-line-annotation.cs) | Add Custom Dashed Line Annotation to PDF Diagram | `PdfContentEditor`, `BindPdf`, `CreateLine` | Demonstrates how to use Aspose.Pdf.Facades to add a line annotation with a custom dash pattern to... |
+| [add-custom-xmp-projectid-metadata](./add-custom-xmp-projectid-metadata.cs) | Add Custom XMP ProjectID Metadata to PDF | `Document`, `PdfXmpMetadata`, `BindPdf` | Demonstrates how to bind XMP metadata to a PDF, add a custom field ProjectID with value 12345, an... |
+| [add-dashed-rectangle-annotation-opacity](./add-dashed-rectangle-annotation-opacity.cs) | Add Dashed Rectangle Annotation with Opacity to PDF Page | `Document`, `Page`, `Rectangle` | Demonstrates how to place a rectangle (square) annotation on page six of a PDF, set a dashed bord... |
+| [add-dashed-rectangle-annotation-with-opacity](./add-dashed-rectangle-annotation-with-opacity.cs) | Add Dashed Rectangle Annotation with Opacity to PDF | `Document`, `Page`, `Rectangle` | Shows how to place a rectangle (square) annotation on the first page of a PDF, applying a custom ... |
+| [add-department-xmp-metadata-to-pdf](./add-department-xmp-metadata-to-pdf.cs) | Add Department XMP Metadata to PDF | `PdfXmpMetadata`, `BindPdf`, `Add` | Shows how to bind an existing PDF, add a custom XMP metadata field "Department" with the value "F... |
+| [add-document-attachment-to-multiple-pdfs](./add-document-attachment-to-multiple-pdfs.cs) | Add Document Attachment to Multiple PDFs | `PdfContentEditor`, `BindPdf`, `AddDocumentAttachment` | Demonstrates how to batch‑process a collection of PDF files and add the same document attachment ... |
+| [add-document-attachment-to-pdf](./add-document-attachment-to-pdf.cs) | Add Document Attachment to PDF | `PdfContentEditor`, `BindPdf`, `AddDocumentAttachment` | Demonstrates how to attach an external PDF file to an existing PDF document using Aspose.Pdf.Faca... |
+| [add-document-attachment-with-description](./add-document-attachment-with-description.cs) | Add Document Attachment with Description to PDF | `PdfContentEditor`, `BindPdf`, `AddDocumentAttachment` | Shows how to attach an external PDF file to an existing PDF and assign a descriptive label using ... |
+| [add-document-attachment-with-error-handling](./add-document-attachment-with-error-handling.cs) | Add Document Attachment to PDF with Error Handling | `PdfContentEditor`, `BindPdf`, `AddDocumentAttachment` | Demonstrates how to attach a file to a PDF using Aspose.Pdf's PdfContentEditor facade while check... |
+| [add-embedded-file-attachment-to-pdf](./add-embedded-file-attachment-to-pdf.cs) | Add Embedded File Attachment to PDF | `PdfContentEditor`, `BindPdf`, `AddDocumentAttachment` | Demonstrates how to embed a file as a document attachment in a PDF using Aspose.Pdf's PdfContentE... |
+| [add-encrypted-attachment-with-custom-description](./add-encrypted-attachment-with-custom-description.cs) | Add Encrypted Attachment with Custom Description to PDF | `PdfContentEditor`, `PdfFileSecurity`, `AddDocumentAttachment` | Demonstrates adding a file attachment with a custom description to a PDF and then encrypting the ... |
+| [add-external-url-bookmark-to-pdf](./add-external-url-bookmark-to-pdf.cs) | Add External URL Bookmark to PDF | `PdfContentEditor`, `BindPdf`, `CreateBookmarksAction` | Shows how to insert a bookmark that opens an external website (https://example.org) into an exist... |
+| [add-file-attachment-annotation](./add-file-attachment-annotation.cs) | Add File Attachment Annotation to PDF | `PdfContentEditor`, `BindPdf`, `CreateFileAttachment` | Demonstrates how to embed a file as a clickable attachment annotation on a PDF page using Aspose.... |
+| ... | | | *and 183 more files* |
 
 ## Category Statistics
-- Total examples: 215
+- Total examples: 213
+
+## Category-Specific Tips
+
+### Key API Surface
+- `Aspose.Pdf.DataEditor.CosPdfBoolean`
+- `Aspose.Pdf.DataEditor.CosPdfBoolean.Equals`
+- `Aspose.Pdf.DataEditor.CosPdfBoolean.GetHashCode`
+- `Aspose.Pdf.DataEditor.CosPdfBoolean.ToCosPdfBoolean`
+- `Aspose.Pdf.DataEditor.CosPdfBoolean.ToString`
+- `Aspose.Pdf.DataEditor.CosPdfBoolean.Value`
+- `Aspose.Pdf.DataEditor.CosPdfDictionary`
+- `Aspose.Pdf.DataEditor.CosPdfDictionary.Add`
+- `Aspose.Pdf.DataEditor.CosPdfDictionary.AllKeys`
+- `Aspose.Pdf.DataEditor.CosPdfDictionary.Clear`
+- `Aspose.Pdf.DataEditor.CosPdfDictionary.Contains`
+- `Aspose.Pdf.DataEditor.CosPdfDictionary.ContainsKey`
+- `Aspose.Pdf.DataEditor.CosPdfDictionary.CopyTo`
+- `Aspose.Pdf.DataEditor.CosPdfDictionary.Count`
+- `Aspose.Pdf.DataEditor.CosPdfDictionary.CreateEmptyDictionary`
+
+### Rules
+- Create DictionaryEditor with: new DictionaryEditor(Page page).
+- Create DictionaryEditor with: new DictionaryEditor(Document document).
+- Create DictionaryEditor with: new DictionaryEditor(Resources resources).
+- Use DictionaryEditor.Add() to insert items into the collection.
+- Create CosPdfDictionary with: new CosPdfDictionary(Resources resources).
 
 ## General Tips
 - See parent [AGENTS.md](../AGENTS.md) for:
@@ -108,5 +133,5 @@ tool.Save("output.pdf");
 - Review code examples in this folder for facades-edit-document patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-06-24 | Run: `20260624_150249_f15775`
+Updated: 2026-07-05 | Run: `20260705_005655_3d29fa`
 <!-- AUTOGENERATED:END -->

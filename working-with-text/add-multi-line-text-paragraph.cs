@@ -11,35 +11,31 @@ class Program
         // Create a new PDF document and ensure proper disposal
         using (Document doc = new Document())
         {
-            // Add a blank page to the document
+            // Add a page first (Aspose.Pdf starts with an empty Pages collection)
             Page page = doc.Pages.Add();
 
-            // Create a multi‑line TextParagraph
+            // Create a TextParagraph instance
             TextParagraph paragraph = new TextParagraph();
 
-            // Define the rectangle where the paragraph will be drawn
-            paragraph.Rectangle = new Aspose.Pdf.Rectangle(100, 600, 400, 800);
+            // Define the rectangle where the paragraph will be placed
+            paragraph.Rectangle = new Aspose.Pdf.Rectangle(100, 600, 300, 750);
 
-            // Enable word wrapping by words
+            // Set word‑wrap mode to wrap by words
             paragraph.FormattingOptions.WrapMode = TextFormattingOptions.WordWrapMode.ByWords;
 
-            // Optional visual settings
+            // Optional visual properties
             paragraph.HorizontalAlignment = HorizontalAlignment.Center;
             paragraph.VerticalAlignment = VerticalAlignment.Top;
-            paragraph.Margin = new MarginInfo { Top = 10, Bottom = 10, Left = 5, Right = 5 };
+            paragraph.Margin = new MarginInfo { Top = 5, Bottom = 5, Left = 5, Right = 5 };
 
-            // Begin edit for better performance while adding lines
+            // Begin edit to improve performance while adding lines
             paragraph.BeginEdit();
-
-            // Append multiple lines of text
             paragraph.AppendLine("The quick brown fox jumps over the lazy dog.");
-            paragraph.AppendLine("Line two of the paragraph.");
-            paragraph.AppendLine("Line three of the paragraph.");
-
-            // End edit to finalize layout calculations
+            paragraph.AppendLine("Second line of the paragraph.");
+            paragraph.AppendLine("Third line, demonstrating multi‑line text.");
             paragraph.EndEdit();
 
-            // Use TextBuilder to place the paragraph on the page
+            // Append the paragraph to the page using TextBuilder
             TextBuilder builder = new TextBuilder(page);
             builder.AppendParagraph(paragraph);
 

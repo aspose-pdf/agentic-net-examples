@@ -16,7 +16,7 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Open the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
             // Access the collection of embedded files (attachments)
@@ -26,21 +26,19 @@ class Program
             if (attachmentIndex < 0 || attachmentIndex >= attachments.Count)
             {
                 Console.Error.WriteLine($"Invalid attachment index: {attachmentIndex}");
+                return;
             }
-            else
-            {
-                // Retrieve the attachment name at the specified index
-                string name = attachments[attachmentIndex].Name;
 
-                // Remove the attachment by its name
-                attachments.Delete(name);
-                Console.WriteLine($"Removed attachment '{name}' at index {attachmentIndex}.");
-            }
+            // Retrieve the attachment name at the specified index
+            string nameToDelete = attachments[attachmentIndex].Name;
+
+            // Remove the attachment by its name
+            attachments.Delete(nameToDelete);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Document saved to '{outputPath}'.");
+        Console.WriteLine($"Attachment at index {attachmentIndex} removed. Saved to '{outputPath}'.");
     }
 }

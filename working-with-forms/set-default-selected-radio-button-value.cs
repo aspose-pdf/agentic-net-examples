@@ -7,40 +7,41 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
             // Access the form fields collection
             Form form = doc.Form;
 
-            // Retrieve the radio button field by its full name
+            // Retrieve the radio button field named "PaymentMethod"
             RadioButtonField paymentMethod = form["PaymentMethod"] as RadioButtonField;
-            if (paymentMethod == null)
+
+            if (paymentMethod != null)
+            {
+                // Set the default selected value to the option named "Credit"
+                paymentMethod.Value = "Credit";
+
+                // Optionally ensure that exactly one option is always selected
+                paymentMethod.NoToggleToOff = true;
+            }
+            else
             {
                 Console.Error.WriteLine("Radio button field 'PaymentMethod' not found.");
-                return;
             }
 
-            // Set the default selected value to the option named "Credit"
-            // The Value property accepts the export value (option name) directly.
-            paymentMethod.Value = "Credit";
-
-            // Alternatively, you could set the Selected index if you know it:
-            // paymentMethod.Selected = 2; // example index (1‑based)
-
             // Save the modified PDF
-            doc.Save(outputPdf);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with default payment method set to 'Credit' at '{outputPdf}'.");
+        Console.WriteLine($"PDF saved with default selection to '{outputPath}'.");
     }
 }

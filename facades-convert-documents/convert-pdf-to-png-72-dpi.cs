@@ -7,42 +7,39 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file path
         const string inputPdf = "input.pdf";
+        const string outputDir = "output_images";
 
-        // Output directory for PNG images
-        const string outputDir = "OutputImages";
-
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
-
-        // Verify the input file exists
+        // Verify input file exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Use PdfConverter (implements IDisposable) to convert pages to PNG
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputDir);
+
+        // PdfConverter implements IDisposable – wrap in using for deterministic cleanup
         using (PdfConverter converter = new PdfConverter())
         {
-            // Set low resolution (72 DPI) for quick preview generation
-            converter.Resolution = new Resolution(72);
-
             // Bind the source PDF file
             converter.BindPdf(inputPdf);
 
-            // Prepare the converter for image extraction
+            // Set low resolution (72 DPI) for quick preview images
+            converter.Resolution = new Resolution(72);
+
+            // Prepare the converter (initial work before extracting images)
             converter.DoConvert();
 
-            int pageIndex = 1;
-            // Loop through all pages and save each as a PNG file
+            int pageNumber = 1;
+            // Extract each page as a PNG image
             while (converter.HasNextImage())
             {
-                string outputPath = Path.Combine(outputDir, $"page_{pageIndex}.png");
-                // The format is inferred from the .png extension; no ImageFormat needed
+                string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
+                // GetNextImage infers the image format from the file extension, no ImageFormat needed
                 converter.GetNextImage(outputPath);
-                pageIndex++;
+                pageNumber++;
             }
         }
 

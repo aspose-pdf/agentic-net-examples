@@ -1,51 +1,54 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
-public static class PdfHelper
+public static class PdfFieldFiller
 {
-    // Loads a PDF from a byte array, fills its form fields, and returns the updated PDF as a byte array.
-    public static byte[] FillPdfFields(byte[] pdfBytes, Dictionary<string, string> fieldValues)
+    /// <summary>
+    /// Loads a PDF from a memory stream, fills the specified form fields, and returns the resulting PDF as a byte array.
+    /// </summary>
+    /// <param name="pdfData">Byte array containing the source PDF.</param>
+    /// <param name="fieldValues">Dictionary where the key is the field name and the value is the text to set.</param>
+    /// <returns>Byte array of the PDF with fields filled.</returns>
+    public static byte[] FillFields(byte[] pdfData, Dictionary<string, string> fieldValues)
     {
-        if (pdfBytes == null) throw new ArgumentNullException(nameof(pdfBytes));
-        if (fieldValues == null) throw new ArgumentNullException(nameof(fieldValues));
-
-        // Load the PDF from the input memory stream.
-        using (var inputStream = new MemoryStream(pdfBytes))
+        // Input stream containing the original PDF
+        using (MemoryStream inputStream = new MemoryStream(pdfData))
+        // Load the PDF document from the stream (lifecycle rule: use Document constructor with Stream)
+        using (Document doc = new Document(inputStream))
         {
-            var doc = new Document(inputStream);
-
-            // Populate each form field with the provided value.
-            foreach (var kvp in fieldValues)
+            // Iterate over the provided field values and set them in the form
+            foreach (KeyValuePair<string, string> kvp in fieldValues)
             {
-                // The Form indexer returns a WidgetAnnotation; cast to Field to access the Value property.
-                if (doc.Form[kvp.Key] is Field field && field != null)
+                // The Form indexer returns a WidgetAnnotation; cast it to Aspose.Pdf.Forms.Field
+                Field field = doc.Form[kvp.Key] as Field;
+                if (field != null)
                 {
+                    // Set the field's value
                     field.Value = kvp.Value;
                 }
             }
 
-            // Save the modified PDF into an output memory stream.
-            using (var outputStream = new MemoryStream())
+            // Prepare an output stream to hold the modified PDF
+            using (MemoryStream outputStream = new MemoryStream())
             {
+                // Save the document to the output stream (lifecycle rule: Document.Save(Stream))
                 doc.Save(outputStream);
+
+                // Return the resulting byte array
                 return outputStream.ToArray();
             }
         }
     }
 }
 
+// Dummy entry point to satisfy the compiler when the project is built as an executable.
 public class Program
 {
-    // Dummy entry point to satisfy the compiler for a console application.
     public static void Main(string[] args)
     {
-        // Example usage (commented out – replace with real paths/values as needed).
-        // byte[] pdfBytes = File.ReadAllBytes("template.pdf");
-        // var values = new Dictionary<string, string> { { "FirstName", "John" }, { "LastName", "Doe" } };
-        // byte[] result = PdfHelper.FillPdfFields(pdfBytes, values);
-        // File.WriteAllBytes("filled.pdf", result);
+        // No operation – the library functionality is exposed via PdfFieldFiller.FillFields.
     }
 }

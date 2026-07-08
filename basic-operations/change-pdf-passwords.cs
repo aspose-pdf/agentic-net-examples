@@ -6,11 +6,11 @@ class Program
 {
     static void Main()
     {
-        const string inputPath       = "protected.pdf";
-        const string outputPath      = "protected_updated.pdf";
-        const string ownerPassword   = "owner123";      // current owner password
-        const string newUserPassword = "newUser456";    // new user password to set
-        const string newOwnerPassword = "newOwner789"; // optional new owner password
+        const string inputPath       = "protected.pdf";          // existing password‑protected PDF
+        const string outputPath      = "updated.pdf";            // file to save with new credentials
+        const string oldOwnerPassword = "ownerOld";              // current owner password (must be known)
+        const string newUserPassword  = "userNew";               // desired new user password
+        const string newOwnerPassword = "ownerNew";              // desired new owner password
 
         if (!File.Exists(inputPath))
         {
@@ -20,13 +20,13 @@ class Program
 
         try
         {
-            // Open the encrypted PDF using the owner password (required for password change)
-            using (Document doc = new Document(inputPath, ownerPassword))
+            // Open the PDF using the current owner password.
+            using (Document doc = new Document(inputPath, oldOwnerPassword))
             {
-                // Change passwords: provide current owner password, then new user and owner passwords
-                doc.ChangePasswords(ownerPassword, newUserPassword, newOwnerPassword);
+                // Change passwords: provide the current owner password, then the new user and owner passwords.
+                doc.ChangePasswords(oldOwnerPassword, newUserPassword, newOwnerPassword);
 
-                // Save the PDF with the updated credentials
+                // Save the document with the updated credentials.
                 doc.Save(outputPath);
             }
 

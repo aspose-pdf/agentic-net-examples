@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -7,39 +6,43 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        // Paths to the source PDF (can be empty or existing) and the output PDF
+        const string inputPdf  = "input.pdf";
         const string outputPdf = "output.pdf";
 
-        // If the source PDF does not exist, create a simple one‑page PDF to work with.
-        if (!File.Exists(inputPdf))
+        // Initialize FormEditor without destination (new API).
+        using (FormEditor formEditor = new FormEditor())
         {
-            using (Document doc = new Document())
+            // Bind the source PDF. If the file does not exist, create an empty PDF first.
+            if (!System.IO.File.Exists(inputPdf))
             {
-                doc.Pages.Add();               // add a blank page
-                doc.Save(inputPdf);            // save the placeholder PDF
+                // Create a blank PDF with a single page so that FormEditor can bind to it.
+                using (Document blankDoc = new Document())
+                {
+                    blankDoc.Pages.Add();
+                    blankDoc.Save(inputPdf);
+                }
             }
+            formEditor.BindPdf(inputPdf);
+
+            // Define the radio button options.
+            formEditor.Items = new string[] { "Male", "Female", "Other" };
+
+            // Add a radio button group named "Gender" on page 1.
+            // The third argument ("Male") sets the default selected option.
+            // Coordinates are (llx, lly, urx, ury) in points.
+            formEditor.AddField(
+                FieldType.Radio,   // field type
+                "Gender",          // field name
+                "Male",            // default selected value
+                1,                 // page number (1‑based)
+                100, 700,          // lower‑left corner (x, y)
+                200, 720);         // upper‑right corner (x, y)
+
+            // Persist changes to the output PDF using the new Save overload.
+            formEditor.Save(outputPdf);
         }
 
-        // Open the PDF with FormEditor, add the radio button group, and save the result.
-        using (FormEditor formEditor = new FormEditor(inputPdf, outputPdf))
-        {
-            // Options for the radio button group.
-            formEditor.Items = new[] { "Male", "Female", "Other" };
-            formEditor.RadioHoriz = true;      // arrange horizontally (default is true)
-
-            // Add the radio button field:
-            // FieldType.Radio – type of field
-            // "Gender"        – field name
-            // "Male"          – default selected option
-            // 1               – page number (1‑based)
-            // 100, 700        – lower‑left corner (llx, lly)
-            // 200, 720        – upper‑right corner (urx, ury)
-            formEditor.AddField(FieldType.Radio, "Gender", "Male", 1, 100, 700, 200, 720);
-
-            // Write changes to the output file.
-            formEditor.Save();
-        }
-
-        Console.WriteLine($"Radio button group \"Gender\" added. Output saved to '{outputPdf}'.");
+        Console.WriteLine($"Radio button group 'Gender' added to '{outputPdf}'.");
     }
 }

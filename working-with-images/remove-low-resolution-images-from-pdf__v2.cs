@@ -15,28 +15,33 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
             for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
+                Page page = doc.Pages[pageIndex];
+
                 // Create an absorber that finds image placements on the current page
                 ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
 
-                // Perform the search on the page
-                doc.Pages[pageIndex].Accept(absorber);
+                // Perform the search
+                page.Accept(absorber);
 
                 // Examine each found image placement
                 foreach (ImagePlacement placement in absorber.ImagePlacements)
                 {
-                    // If either horizontal or vertical resolution is below 72 DPI, hide the image
+                    // If either horizontal or vertical DPI is lower than 72, remove the image
                     if (placement.Resolution.X < 72 || placement.Resolution.Y < 72)
                     {
-                        placement.Hide();
+                        placement.Hide(); // Deletes the image from the page
                     }
                 }
             }
+
+            // Clean up any now‑unused resources (optional but recommended)
+            doc.OptimizeResources();
 
             // Save the modified PDF
             doc.Save(outputPath);

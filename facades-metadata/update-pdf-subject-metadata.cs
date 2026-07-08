@@ -6,24 +6,25 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";   // source PDF
-        const string outputPdf = "output.pdf";  // PDF with updated Subject
-        const string newSubject = "Report for Q3 2026";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string newSubject = "Report for Q4 Financial Analysis";
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Initialize PdfFileInfo facade with the source file
-        using (PdfFileInfo info = new PdfFileInfo(inputPdf))
+        // Load the PDF metadata using PdfFileInfo, modify the Subject, and save the updated file.
+        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPdf))
         {
-            // Update the Subject metadata
-            info.Subject = newSubject;
+            // Set the Subject property to reflect the document's purpose.
+            pdfInfo.Subject = newSubject;
 
-            // Save the updated information into a new PDF file
-            bool success = info.SaveNewInfo(outputPdf);
+            // Save the updated metadata into a new PDF file.
+            // SaveNewInfo writes only the changed info without re‑creating the whole document.
+            bool success = pdfInfo.SaveNewInfo(outputPdf);
             Console.WriteLine(success
                 ? $"Subject updated and saved to '{outputPdf}'."
                 : $"Failed to save updated PDF to '{outputPdf}'.");

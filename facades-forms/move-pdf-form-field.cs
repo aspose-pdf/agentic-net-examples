@@ -6,33 +6,35 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Use FormEditor facade to modify the form field
+        // Use FormEditor (a SaveableFacade) to manipulate form fields.
         using (FormEditor formEditor = new FormEditor())
         {
-            // Load the source PDF
-            formEditor.BindPdf(inputPath);
+            // Load the source PDF.
+            formEditor.BindPdf(inputPdf);
 
-            // Move the field named "DateField" to page 2 at (100,200) with width 150 and height 20
-            // llx = 100, lly = 200, urx = llx + width = 250, ury = lly + height = 220
+            // Move the field named "DateField" to the desired rectangle on page 2.
+            // Lower‑left corner (llx, lly) = (100, 200)
+            // Upper‑right corner (urx, ury) = (llx + width, lly + height) = (250, 220)
             bool moved = formEditor.MoveField("DateField", 100f, 200f, 250f, 220f);
+
             if (!moved)
             {
-                Console.Error.WriteLine("Failed to move field 'DateField'.");
+                Console.Error.WriteLine("Failed to move the field 'DateField'.");
             }
 
-            // Save the modified PDF
-            formEditor.Save(outputPath);
+            // Save the modified PDF.
+            formEditor.Save(outputPdf);
         }
 
-        Console.WriteLine($"Field moved and saved to '{outputPath}'.");
+        Console.WriteLine($"Field moved and saved to '{outputPdf}'.");
     }
 }

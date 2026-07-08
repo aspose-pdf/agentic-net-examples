@@ -1,38 +1,45 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Use PdfPageEditor (a SaveableFacade) to edit page transitions.
-        using (PdfPageEditor editor = new PdfPageEditor())
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Bind the source PDF.
-            editor.BindPdf(inputPath);
+            // Initialize the PdfPageEditor facade
+            using (PdfPageEditor editor = new PdfPageEditor())
+            {
+                // Bind the document to the editor
+                editor.BindPdf(doc);
 
-            // Edit only page 2 (Aspose.Pdf uses 1‑based page indexing).
-            editor.ProcessPages = new int[] { 2 };
+                // Edit only page 2 (1‑based indexing)
+                editor.ProcessPages = new int[] { 2 };
 
-            // Set transition type to BoxOut (outward box) and duration to 3 seconds.
-            editor.TransitionType = PdfPageEditor.OUTBOX;   // BoxOut effect
-            editor.TransitionDuration = 3;                  // 3‑second duration
+                // Set transition type to BoxOut (OUTBOX constant)
+                editor.TransitionType = PdfPageEditor.OUTBOX;
 
-            // Apply the changes to the document.
-            editor.ApplyChanges();
+                // Set transition duration to 3 seconds
+                editor.TransitionDuration = 3;
 
-            // Save the modified PDF.
-            editor.Save(outputPath);
+                // Apply the changes
+                editor.ApplyChanges();
+            }
+
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
         Console.WriteLine($"Transition applied and saved to '{outputPath}'.");

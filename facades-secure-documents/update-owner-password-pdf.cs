@@ -2,51 +2,42 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-namespace AsposePdfApi
+class Program
 {
-    class Program
+    static void Main()
     {
-        static void Main()
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string oldOwnerPassword = "oldOwnerPassword";
+        const string newOwnerPassword = "newOwnerPassword";
+
+        if (!File.Exists(inputPath))
         {
-            // Paths to the source (protected) PDF and the destination PDF
-            const string inputPath = "input.pdf";
-            const string outputPath = "output.pdf";
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
+        }
 
-            // Existing owner password of the source PDF
-            const string currentOwnerPassword = "oldOwnerPassword";
-
-            // New owner password to set (user password and privileges remain unchanged)
-            const string newOwnerPassword = "newOwnerPassword";
-
-            // Verify that the input file exists
-            if (!File.Exists(inputPath))
+        try
+        {
+            // Initialize PdfFileSecurity with source and destination files.
+            using (PdfFileSecurity security = new PdfFileSecurity(inputPath, outputPath))
             {
-                Console.Error.WriteLine($"Input file not found: {inputPath}");
-                return;
-            }
-
-            try
-            {
-                // Initialize PdfFileSecurity with source and destination files
-                using (PdfFileSecurity security = new PdfFileSecurity(inputPath, outputPath))
+                // Change only the owner password.
+                // Pass null for newUserPassword to keep the existing user password unchanged.
+                bool changed = security.ChangePassword(oldOwnerPassword, null, newOwnerPassword);
+                if (!changed)
                 {
-                    // Change only the owner password; pass null for newUserPassword to keep the existing user password unchanged.
-                    bool success = security.ChangePassword(currentOwnerPassword, null, newOwnerPassword);
-
-                    if (success)
-                    {
-                        Console.WriteLine($"Owner password updated successfully. Output saved to '{outputPath}'.");
-                    }
-                    else
-                    {
-                        Console.Error.WriteLine("Failed to change the owner password.");
-                    }
+                    Console.Error.WriteLine("Failed to update the owner password.");
+                }
+                else
+                {
+                    Console.WriteLine($"Owner password updated successfully. Output saved to '{outputPath}'.");
                 }
             }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error: {ex.Message}");
-            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

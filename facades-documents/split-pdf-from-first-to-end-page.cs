@@ -8,34 +8,33 @@ class Program
     {
         // Input PDF file path
         const string inputPath = "input.pdf";
-        // Page number up to which the PDF will be split (inclusive)
+        // Output PDF file path – will contain pages 1..endPage
+        const string outputPath = "output.pdf";
+        // Specify the last page to include in the front part (inclusive)
         const int endPage = 5;
-        // Output PDF file path for the front part (pages 1..endPage)
-        const string outputPath = "output_split.pdf";
 
-        // Verify that the source file exists
+        // Verify that the source file exists before attempting the operation
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        try
-        {
-            // PdfFileEditor provides file‑level operations; it does not implement IDisposable
-            PdfFileEditor editor = new PdfFileEditor();
+        // PdfFileEditor does NOT implement IDisposable, so we instantiate it directly
+        PdfFileEditor editor = new PdfFileEditor();
 
-            // Split from the first page to the specified end page and save the result
-            bool success = editor.SplitFromFirst(inputPath, endPage, outputPath);
+        // SplitFromFirst extracts pages from the first page up to 'endPage' and saves them
+        bool result = editor.SplitFromFirst(inputPath, endPage, outputPath);
 
-            if (success)
-                Console.WriteLine($"PDF successfully split. Front part saved to '{outputPath}'.");
-            else
-                Console.Error.WriteLine("PDF split operation failed.");
-        }
-        catch (Exception ex)
+        if (result)
         {
-            Console.Error.WriteLine($"Error during split: {ex.Message}");
+            Console.WriteLine($"Successfully split PDF. Front part saved to '{outputPath}'.");
         }
+        else
+        {
+            Console.Error.WriteLine("Failed to split PDF using PdfFileEditor.SplitFromFirst.");
+        }
+
+        // No explicit disposal required for PdfFileEditor
     }
 }

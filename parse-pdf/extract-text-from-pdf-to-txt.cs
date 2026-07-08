@@ -7,38 +7,31 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputTxtPath = "output.txt";
+        const string inputPdf = "input.pdf";
+        const string outputTxt = "output.txt";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for proper disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document pdfDoc = new Document(inputPdfPath))
-            {
-                // Create a TextAbsorber to collect text from all pages
-                TextAbsorber absorber = new TextAbsorber();
+            // Create a TextAbsorber to extract text from the document
+            TextAbsorber absorber = new TextAbsorber();
 
-                // Accept the absorber for the entire Pages collection (1‑based indexing is handled internally)
-                pdfDoc.Pages.Accept(absorber);
+            // Accept the absorber for all pages (pages are 1‑based)
+            doc.Pages.Accept(absorber);
 
-                // Retrieve the concatenated text
-                string extractedText = absorber.Text ?? string.Empty;
+            // Get the concatenated text from all pages
+            string allText = absorber.Text ?? string.Empty;
 
-                // Write the text to the output .txt file (overwrites if it exists)
-                File.WriteAllText(outputTxtPath, extractedText);
-            }
-
-            Console.WriteLine($"Text extracted and saved to '{outputTxtPath}'.");
+            // Write the extracted text to a .txt file
+            File.WriteAllText(outputTxt, allText);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Extracted text saved to '{outputTxt}'.");
     }
 }

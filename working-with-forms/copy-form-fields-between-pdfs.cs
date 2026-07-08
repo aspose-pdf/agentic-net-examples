@@ -7,53 +7,38 @@ class Program
 {
     static void Main()
     {
-        // Paths for source PDF (with form fields), destination PDF (template), and result PDF
-        const string sourcePdfPath = "source_form.pdf";
-        const string destinationPdfPath = "destination_template.pdf";
-        const string outputPdfPath = "merged_form.pdf";
+        const string sourcePath = "source.pdf";      // PDF containing the original form fields
+        const string destinationPath = "destination.pdf"; // PDF that will receive the fields
+        const string outputPath = "output.pdf";      // Resulting PDF after copying
 
-        // Verify that input files exist
-        if (!File.Exists(sourcePdfPath))
+        // Verify that both input files exist before proceeding.
+        if (!File.Exists(sourcePath))
         {
-            Console.Error.WriteLine($"Source file not found: {sourcePdfPath}");
+            Console.Error.WriteLine($"Source file not found: {sourcePath}");
             return;
         }
-        if (!File.Exists(destinationPdfPath))
+        if (!File.Exists(destinationPath))
         {
-            Console.Error.WriteLine($"Destination file not found: {destinationPdfPath}");
+            Console.Error.WriteLine($"Destination file not found: {destinationPath}");
             return;
         }
 
-        try
+        // Load the source and destination PDFs using the core Document API.
+        Document srcDoc = new Document(sourcePath);
+        Document dstDoc = new Document(destinationPath);
+
+        // Copy all form fields from the source PDF to the destination PDF.
+        // Fields are cloned to avoid linking the original document objects.
+        foreach (Field srcField in srcDoc.Form.Fields)
         {
-            // Load source and destination documents inside using blocks (lifecycle rule)
-            using (Document sourceDoc = new Document(sourcePdfPath))
-            using (Document destDoc = new Document(destinationPdfPath))
-            {
-                // ------------------------------------------------------------
-                // Copy all form fields from source to destination using core API
-                // ------------------------------------------------------------
-                foreach (Field srcField in sourceDoc.Form.Fields)
-                {
-                    // Clone the field – Field implements ICloneable, so we can use Clone()
-                    // The returned object must be cast back to Field.
-                    Field clonedField = (Field)srcField.Clone();
-
-                    // Add the cloned field to the destination document.
-                    // The overload without a page number adds the field to the same page
-                    // as the original field when possible; otherwise it defaults to the first page.
-                    destDoc.Form.Add(clonedField);
-                }
-
-                // Save the resulting PDF (save rule – no extra SaveOptions needed for PDF)
-                destDoc.Save(outputPdfPath);
-            }
-
-            Console.WriteLine($"Form fields copied successfully. Output saved to '{outputPdfPath}'.");
+            // Clone the field so it can be added to another document.
+            Field clonedField = (Field)srcField.Clone();
+            dstDoc.Form.Add(clonedField);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        // Save the modified destination PDF to the specified output file.
+        dstDoc.Save(outputPath);
+
+        Console.WriteLine($"Form fields copied successfully. Output saved to '{outputPath}'.");
     }
 }

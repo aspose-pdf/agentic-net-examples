@@ -7,28 +7,30 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string fieldName  = "EmployeeID";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string fieldName = "EmployeeID";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Open the PDF for form editing
+        // Open the PDF, modify the field, and save the result
         using (FormEditor editor = new FormEditor())
         {
-            editor.BindPdf(inputPath);
+            // Initialize the facade with the source PDF
+            editor.BindPdf(inputPdf);
 
-            // Set the field to be hidden (but still exportable)
+            // Set the field to be hidden (AnnotationFlags.Hidden) while keeping it exportable.
+            // NoExport flag is not applied, so the field will be submitted with form data.
             editor.SetFieldAppearance(fieldName, AnnotationFlags.Hidden);
 
-            // Save the modified PDF
-            editor.Save(outputPath);
+            // Persist the changes to a new file
+            editor.Save(outputPdf);
         }
 
-        Console.WriteLine($"Field '{fieldName}' set to hidden (exportable) and saved to '{outputPath}'.");
+        Console.WriteLine($"Field '{fieldName}' set to hidden and saved to '{outputPdf}'.");
     }
 }

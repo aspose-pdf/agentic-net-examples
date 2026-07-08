@@ -12,48 +12,52 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a PdfPageEditor and bind it to the loaded document
-            using (PdfPageEditor editor = new PdfPageEditor())
+            // Create a PdfPageEditor bound to the loaded document
+            using (PdfPageEditor editor = new PdfPageEditor(doc))
             {
-                editor.BindPdf(doc);
-
                 // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-                for (int i = 1; i <= doc.Pages.Count; i++)
+                for (int pageNumber = 1; pageNumber <= doc.Pages.Count; pageNumber++)
                 {
-                    // Choose a transition type based on page index modulo 3
-                    int transition;
-                    switch ((i - 1) % 3)
+                    // Determine which transition to apply based on (pageIndex‑1) % 3
+                    int mod = (pageNumber - 1) % 3;
+                    int transitionType;
+
+                    switch (mod)
                     {
                         case 0:
-                            transition = PdfPageEditor.BLINDH;   // Vertical blinds
+                            transitionType = PdfPageEditor.BLINDH;   // Vertical blinds
                             break;
                         case 1:
-                            transition = PdfPageEditor.BLINDV;   // Horizontal blinds
+                            transitionType = PdfPageEditor.BLINDV;   // Horizontal blinds
                             break;
                         default:
-                            transition = PdfPageEditor.BTWIPE;   // Bottom‑Top wipe
+                            transitionType = PdfPageEditor.DISSOLVE; // Dissolve effect
                             break;
                     }
 
-                    // Apply the transition only to the current page
-                    editor.ProcessPages = new int[] { i };
-                    editor.TransitionType = transition;
-                    editor.TransitionDuration = 2; // optional: 2 seconds per transition
+                    // Restrict editing to the current page only
+                    editor.ProcessPages = new int[] { pageNumber };
+
+                    // Apply the selected transition type and a fixed duration (seconds)
+                    editor.TransitionType     = transitionType;
+                    editor.TransitionDuration = 2; // 2‑second transition
+
+                    // Commit changes for this page
                     editor.ApplyChanges();
                 }
             }
 
-            // Save the modified PDF (PDF format does not require explicit SaveOptions)
+            // Save the modified document (PDF format)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with page transitions saved to '{outputPath}'.");
+        Console.WriteLine($"Transitions applied and saved to '{outputPath}'.");
     }
 }

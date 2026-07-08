@@ -6,9 +6,12 @@ class Program
 {
     static void Main()
     {
+        // Input PDF (password‑protected) and output text file paths
         const string inputPdf  = "protected.pdf";
         const string outputTxt = "extracted.txt";
-        const string ownerPwd  = "owner123";
+
+        // Owner password for the PDF (full‑access password)
+        const string ownerPassword = "owner123";
 
         if (!File.Exists(inputPdf))
         {
@@ -18,23 +21,23 @@ class Program
 
         try
         {
-            // PdfExtractor implements IDisposable, so wrap it in a using block
+            // Create the extractor facade
             using (PdfExtractor extractor = new PdfExtractor())
             {
-                // Provide the owner password for the encrypted PDF
-                extractor.Password = ownerPwd;
+                // Provide the owner password before binding the PDF
+                extractor.Password = ownerPassword;
 
                 // Bind the encrypted PDF file
                 extractor.BindPdf(inputPdf);
 
-                // Extract all text (Unicode encoding is default)
+                // Extract all text using Unicode encoding (default)
                 extractor.ExtractText();
 
-                // Write the extracted text to a file
+                // Save the extracted text to a file
                 extractor.GetText(outputTxt);
             }
 
-            Console.WriteLine($"Text successfully extracted to '{outputTxt}'.");
+            Console.WriteLine($"Text extracted successfully to '{outputTxt}'.");
         }
         catch (Exception ex)
         {

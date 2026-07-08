@@ -10,54 +10,43 @@ class Program
         // Folder containing PDFs to protect
         const string secureFolder = "secure";
 
-        // The user password that will be applied to every PDF
-        const string userPassword = "MySecretPassword";
+        // Identical user password for all PDFs
+        const string userPassword = "MyUserPass";
 
-        // Owner password can be null or empty – a random one will be generated
-        const string ownerPassword = null;
-
-        // Ensure the folder exists
         if (!Directory.Exists(secureFolder))
         {
             Console.Error.WriteLine($"Folder not found: {secureFolder}");
             return;
         }
 
-        // Process each PDF file in the folder
-        foreach (string inputFile in Directory.GetFiles(secureFolder, "*.pdf"))
+        // Get all PDF files in the folder (non‑recursive)
+        string[] pdfFiles = Directory.GetFiles(secureFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+
+        foreach (string inputPath in pdfFiles)
         {
-            try
+            // Build output file name (original name + "_protected")
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(inputPath);
+            string outputPath = Path.Combine(secureFolder, $"{fileNameWithoutExt}_protected.pdf");
+
+            // PdfFileSecurity loads the input PDF and saves the encrypted output
+            using (PdfFileSecurity fileSecurity = new PdfFileSecurity(inputPath, outputPath))
             {
-                // Build output file name (original name + "_protected.pdf")
-                string outputFile = Path.Combine(
-                    secureFolder,
-                    Path.GetFileNameWithoutExtension(inputFile) + "_protected.pdf");
+                // Encrypt with the user password, no explicit owner password (null → random),
+                // allow printing, and use 256‑bit AES encryption.
+                bool encrypted = fileSecurity.EncryptFile(
+                    userPassword,          // user password
+                    null,                  // owner password (null → random)
+                    DocumentPrivilege.Print, // set desired privilege
+                    KeySize.x256);         // 256‑bit key size
 
-                // Initialize the facade
-                PdfFileSecurity fileSecurity = new PdfFileSecurity();
-
-                // Bind the source PDF
-                fileSecurity.BindPdf(inputFile);
-
-                // Encrypt the PDF with the specified user password,
-                // random owner password, Print privilege and 256‑bit AES encryption
-                fileSecurity.EncryptFile(
-                    userPassword,
-                    ownerPassword,
-                    DocumentPrivilege.Print,
-                    KeySize.x256);
-
-                // Save the encrypted PDF
-                fileSecurity.Save(outputFile);
-
-                // Release resources held by the facade
-                fileSecurity.Close();
-
-                Console.WriteLine($"Encrypted: {Path.GetFileName(inputFile)} → {Path.GetFileName(outputFile)}");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Failed to encrypt '{Path.GetFileName(inputFile)}': {ex.Message}");
+                if (encrypted)
+                {
+                    Console.WriteLine($"Encrypted: {outputPath}");
+                }
+                else
+                {
+                    Console.Error.WriteLine($"Failed to encrypt: {inputPath}");
+                }
             }
         }
     }

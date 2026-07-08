@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using Aspose.Pdf.Facades;
@@ -8,12 +7,12 @@ class Program
 {
     static void Main()
     {
-        // Paths to the source PDF form, the JSON data file and the output PDF
-        const string inputPdfPath  = "form_template.pdf";
-        const string jsonDataPath  = "field_values.json";
-        const string outputPdfPath = "filled_form.pdf";
+        // Paths – adjust as needed
+        const string inputPdfPath  = "template.pdf";   // PDF with form fields
+        const string outputPdfPath = "filled.pdf";     // Resulting PDF
+        const string jsonDataPath  = "data.json";      // JSON file: { "FieldName":"Value", ... }
 
-        // Verify that the required files exist
+        // Ensure the input files exist
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
@@ -25,45 +24,31 @@ class Program
             return;
         }
 
-        // Load the JSON file into a dictionary of fieldName => fieldValue
-        Dictionary<string, string> fieldValues;
-        try
+        // Load the PDF form using the Facades Form class
+        using (Form form = new Form(inputPdfPath))
         {
-            string jsonContent = File.ReadAllText(jsonDataPath);
-            fieldValues = JsonSerializer.Deserialize<Dictionary<string, string>>(jsonContent);
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Failed to read or parse JSON: {ex.Message}");
-            return;
-        }
-
-        // Use Aspose.Pdf.Facades.Form to open the PDF and fill fields
-        try
-        {
-            // Form implements IDisposable via SaveableFacade, so we wrap it in a using block
-            using (Form form = new Form(inputPdfPath))
+            // Parse the JSON mapping of field names to values
+            using (FileStream jsonStream = File.OpenRead(jsonDataPath))
             {
-                // Iterate over each entry in the JSON dictionary and fill the corresponding field
-                foreach (KeyValuePair<string, string> kvp in fieldValues)
+                JsonDocument jsonDoc = JsonDocument.Parse(jsonStream);
+                foreach (JsonProperty prop in jsonDoc.RootElement.EnumerateObject())
                 {
-                    // FillField returns true if the field was found and filled successfully
-                    bool filled = form.FillField(kvp.Key, kvp.Value);
+                    string fieldName  = prop.Name;
+                    string fieldValue = prop.Value.GetString() ?? string.Empty;
+
+                    // Fill each field – Form.FillField expects the full field name
+                    bool filled = form.FillField(fieldName, fieldValue);
                     if (!filled)
                     {
-                        Console.WriteLine($"Warning: Field \"{kvp.Key}\" not found in the PDF form.");
+                        Console.WriteLine($"Warning: field \"{fieldName}\" not found or could not be filled.");
                     }
                 }
-
-                // Save the updated PDF to the specified output path
-                form.Save(outputPdfPath);
             }
 
-            Console.WriteLine($"Form fields filled and saved to \"{outputPdfPath}\".");
+            // Save the updated PDF
+            form.Save(outputPdfPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error processing PDF form: {ex.Message}");
-        }
+
+        Console.WriteLine($"Form fields populated and saved to '{outputPdfPath}'.");
     }
 }

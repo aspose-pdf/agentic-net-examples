@@ -1,27 +1,30 @@
 using System;
+using System.IO;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string pdfPath = "input.pdf";
 
-        // Verify the PDF file exists before proceeding.
-        if (!System.IO.File.Exists(inputPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Initialize PdfFileInfo facade with the PDF file.
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
+        // Initialize the PdfFileInfo facade for the PDF document
+        using (PdfFileInfo pdfInfo = new PdfFileInfo(pdfPath))
         {
-            // Retrieve the custom metadata value for "ProjectCode".
+            // Retrieve the custom metadata value for "ProjectCode"
             string projectCode = pdfInfo.GetMetaInfo("ProjectCode");
 
-            // Display the retrieved value (empty string if the key does not exist).
-            Console.WriteLine($"ProjectCode: {projectCode}");
+            // Display the result
+            if (string.IsNullOrEmpty(projectCode))
+                Console.WriteLine("ProjectCode metadata not found.");
+            else
+                Console.WriteLine($"ProjectCode: {projectCode}");
         }
     }
 }

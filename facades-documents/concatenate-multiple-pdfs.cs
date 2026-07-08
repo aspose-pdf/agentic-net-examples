@@ -1,24 +1,24 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main(string[] args)
     {
-        // Expect at least two arguments: one or more input PDFs and one output PDF.
-        if (args.Length < 2)
+        // Expect at least two input PDFs and one output path
+        if (args == null || args.Length < 3)
         {
-            Console.Error.WriteLine("Usage: <program> <input1.pdf> [<input2.pdf> ...] <output.pdf>");
+            Console.Error.WriteLine("Usage: <input1.pdf> <input2.pdf> [<inputN.pdf> ...] <output.pdf>");
             return;
         }
 
-        // The last argument is the output file; all preceding arguments are input files.
-        string outputPath = args[args.Length - 1];
-        string[] inputFiles = new string[args.Length - 1];
-        Array.Copy(args, inputFiles, args.Length - 1);
+        // All arguments except the last one are input files
+        string[] inputFiles = args.Take(args.Length - 1).ToArray();
+        string outputFile = args[args.Length - 1];
 
-        // Verify that each input file exists.
+        // Verify that each input file exists
         foreach (string file in inputFiles)
         {
             if (!File.Exists(file))
@@ -30,28 +30,20 @@ class Program
 
         try
         {
-            // PdfFileEditor does NOT implement IDisposable, so do NOT wrap it in a using block.
+            // PdfFileEditor does not implement IDisposable, so no using block
             PdfFileEditor editor = new PdfFileEditor();
 
-            // Concatenate the input PDFs into the specified output PDF.
-            bool success = editor.Concatenate(inputFiles, outputPath);
+            // Concatenate the input PDFs into the output PDF
+            bool success = editor.Concatenate(inputFiles, outputFile);
 
             if (success)
-            {
-                Console.WriteLine($"Successfully concatenated {inputFiles.Length} files into '{outputPath}'.");
-            }
+                Console.WriteLine($"Successfully concatenated {inputFiles.Length} files into '{outputFile}'.");
             else
-            {
-                Console.Error.WriteLine("Concatenation failed. Check the editor's LastException for details.");
-                if (editor.LastException != null)
-                {
-                    Console.Error.WriteLine($"Error: {editor.LastException.Message}");
-                }
-            }
+                Console.Error.WriteLine("Concatenation failed.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
+            Console.Error.WriteLine($"Error during concatenation: {ex.Message}");
         }
     }
 }

@@ -7,58 +7,55 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";   // existing PDF or create a new one
+        const string inputPath = "input.pdf";
         const string outputPath = "output_with_popup.pdf";
 
-        // Ensure the input file exists; if not, create a blank PDF with one page.
         if (!File.Exists(inputPath))
         {
-            using (Document blank = new Document())
-            {
-                blank.Pages.Add();
-                blank.Save(inputPath);
-            }
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // Open the document inside a using block for deterministic disposal.
+        // Load the existing PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Get the first page (1‑based indexing).
+            // Use the first page (Aspose.Pdf uses 1‑based indexing)
             Page page = doc.Pages[1];
 
-            // Define the rectangle for the parent markup annotation (a sticky note).
+            // Rectangle for the parent markup annotation (a sticky‑note icon)
             Aspose.Pdf.Rectangle parentRect = new Aspose.Pdf.Rectangle(100, 700, 120, 720);
 
-            // Create a TextAnnotation (sticky note) on the page.
-            TextAnnotation textAnn = new TextAnnotation(page, parentRect)
+            // Create a TextAnnotation that will act as the parent annotation
+            TextAnnotation parentAnn = new TextAnnotation(page, parentRect)
             {
                 Title    = "Note",
-                Contents = "Click to see more details.",
+                Contents = "Click to view additional information",
                 Color    = Aspose.Pdf.Color.Yellow,
-                Icon     = TextIcon.Note,
-                Open     = false   // Do not open the popup automatically.
+                Icon     = TextIcon.Comment   // optional visual icon
             };
 
-            // Define the rectangle for the popup annotation (size of the popup window).
-            Aspose.Pdf.Rectangle popupRect = new Aspose.Pdf.Rectangle(150, 750, 350, 850);
+            // Rectangle for the popup window (size and position of the popup)
+            Aspose.Pdf.Rectangle popupRect = new Aspose.Pdf.Rectangle(150, 650, 350, 800);
 
-            // Create the PopupAnnotation and associate it with the parent annotation.
+            // Create the PopupAnnotation that holds the extra notes
             PopupAnnotation popup = new PopupAnnotation(page, popupRect)
             {
-                Contents = "Additional notes displayed in the popup window.",
-                Open     = false   // Popup is hidden until the parent annotation is selected.
+                Contents = "Here are the additional notes displayed in the popup window.",
+                // RichText can be used for formatted content if needed
+                // RichText = "Additional <b>notes</b> with formatting.",
+                Open = false   // start closed; opens when the parent annotation is selected
             };
 
-            // Link the popup to its parent markup annotation.
-            textAnn.Popup = popup;          // Alternatively: popup.Parent = textAnn;
+            // Link the popup to its parent markup annotation
+            parentAnn.Popup = popup;   // alternatively: popup.Parent = parentAnn;
 
-            // Add the parent annotation (which now carries the popup) to the page.
-            page.Annotations.Add(textAnn);
+            // Add the parent annotation to the page (the popup is automatically associated)
+            page.Annotations.Add(parentAnn);
 
-            // Save the modified document.
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with popup annotation saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with popup annotation: {outputPath}");
     }
 }

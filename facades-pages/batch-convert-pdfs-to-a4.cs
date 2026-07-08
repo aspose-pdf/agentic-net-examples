@@ -2,67 +2,53 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices; // for PageSize enum
 
 class BatchA4Converter
 {
     static void Main()
     {
-        // Input folder containing PDFs to be processed
-        const string inputFolder = "InputPdfs";
-        // Output folder where resized PDFs will be saved
-        const string outputFolder = "OutputA4Pdfs";
-
-        // Verify input folder exists
-        if (!Directory.Exists(inputFolder))
+        // Input PDF files (could be populated dynamically)
+        string[] inputFiles = new string[]
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
-            return;
-        }
+            "doc1.pdf",
+            "doc2.pdf",
+            "doc3.pdf"
+        };
 
-        // Create output folder if it does not exist
-        Directory.CreateDirectory(outputFolder);
+        // Directory where converted PDFs will be saved
+        string outputDirectory = "ConvertedA4";
+        Directory.CreateDirectory(outputDirectory);
 
-        // Get all PDF files in the input folder (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
-        if (pdfFiles.Length == 0)
+        foreach (string inputPath in inputFiles)
         {
-            Console.WriteLine("No PDF files found to process.");
-            return;
-        }
-
-        foreach (string inputPath in pdfFiles)
-        {
-            // Build output file path preserving original file name
-            string fileName = Path.GetFileName(inputPath);
-            string outputPath = Path.Combine(outputFolder, fileName);
-
-            try
+            if (!File.Exists(inputPath))
             {
-                // PdfPageEditor is a Facade that can modify page size
-                using (PdfPageEditor editor = new PdfPageEditor())
-                {
-                    // Bind the source PDF file
-                    editor.BindPdf(inputPath);
-
-                    // Set the target page size to A4 (210mm x 297mm)
-                    editor.PageSize = PageSize.A4;
-
-                    // ProcessPages defaults to all pages when left null,
-                    // so we do not need to assign it explicitly.
-
-                    // Save the modified PDF to the output location
-                    editor.Save(outputPath);
-                }
-
-                Console.WriteLine($"Converted to A4: {outputPath}");
+                Console.Error.WriteLine($"File not found: {inputPath}");
+                continue;
             }
-            catch (Exception ex)
+
+            // Build output file name (original name + "_A4.pdf")
+            string outputPath = Path.Combine(
+                outputDirectory,
+                Path.GetFileNameWithoutExtension(inputPath) + "_A4.pdf");
+
+            // Use PdfPageEditor (a SaveableFacade) to change page size to A4
+            using (PdfPageEditor editor = new PdfPageEditor())
             {
-                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
-            }
-        }
+                // Bind the source PDF
+                editor.BindPdf(inputPath);
 
-        Console.WriteLine("Batch conversion completed.");
+                // Set the desired page size (A4)
+                editor.PageSize = PageSize.A4;
+
+                // Apply the changes to all pages (default behavior)
+                editor.ApplyChanges();
+
+                // Save the modified document
+                editor.Save(outputPath);
+            }
+
+            Console.WriteLine($"Converted '{inputPath}' to A4 -> '{outputPath}'");
+        }
     }
 }

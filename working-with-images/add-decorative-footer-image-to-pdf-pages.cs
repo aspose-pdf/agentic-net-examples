@@ -6,9 +6,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";          // source PDF
-        const string outputPath = "output_footer.pdf";  // result PDF
-        const string footerImgPath = "footer.png";      // decorative footer image
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string footerImagePath = "footer.png";
 
         if (!File.Exists(inputPath))
         {
@@ -16,40 +16,42 @@ class Program
             return;
         }
 
-        if (!File.Exists(footerImgPath))
+        if (!File.Exists(footerImagePath))
         {
-            Console.Error.WriteLine($"Footer image not found: {footerImgPath}");
+            Console.Error.WriteLine($"Footer image not found: {footerImagePath}");
             return;
         }
 
-        // Load the PDF document (using rule: create/load with using)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing)
-            foreach (Page page in doc.Pages)
+            // Iterate over all pages (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Ensure a Footer object exists for the page
-                if (page.Footer == null)
-                    page.Footer = new HeaderFooter();
+                Page page = doc.Pages[i];
 
-                // Create an Image object for the footer
-                Image footerImage = new Image
-                {
-                    File = footerImgPath,
-                    // Scale the image proportionally to 80% of the page width
-                    FixWidth = page.PageInfo.Width * 0.8,
-                    FixHeight = 0,                     // 0 preserves aspect ratio
-                    HorizontalAlignment = HorizontalAlignment.Center
-                };
+                // Determine page width and a reasonable footer height (10% of page height)
+                double pageWidth  = page.PageInfo.Width;
+                double footerHeight = page.PageInfo.Height * 0.10;
 
-                // Add the image to the footer's paragraph collection
-                page.Footer.Paragraphs.Add(footerImage);
+                // Define a rectangle that spans the full page width at the bottom.
+                // The rectangle's height is set to the desired footer height.
+                // AddImage will keep the image's aspect ratio and center it within this rectangle.
+                Aspose.Pdf.Rectangle footerRect = new Aspose.Pdf.Rectangle(
+                    0,                     // llx (left)
+                    0,                     // lly (bottom)
+                    pageWidth,             // urx (right)
+                    footerHeight           // ury (top)
+                );
+
+                // Add the image to the page. autoAdjustRectangle = true (default) preserves proportions.
+                page.AddImage(footerImagePath, footerRect);
             }
 
-            // Save the modified PDF (using rule: save within using block)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Footer image added to each page. Saved as '{outputPath}'.");
+        Console.WriteLine($"PDF with decorative footer saved to '{outputPath}'.");
     }
 }

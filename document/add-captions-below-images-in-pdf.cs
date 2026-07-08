@@ -3,7 +3,7 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class Program
+class AddCaptionsToImages
 {
     static void Main()
     {
@@ -16,40 +16,42 @@ class Program
             return;
         }
 
-        // Open the PDF document inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing)
-            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
-            {
-                Page page = doc.Pages[pageNum];
-                int imageIndex = 0;
+            int imageCounter = 1;
 
-                // Iterate over all images on the current page
+            // Iterate through all pages
+            foreach (Page page in doc.Pages)
+            {
+                // Iterate through all images on the current page
                 foreach (XImage img in page.Resources.Images)
                 {
-                    imageIndex++;
+                    // Create a styled caption text
+                    TextState captionState = new TextState
+                    {
+                        Font = FontRepository.FindFont("Helvetica"),
+                        FontSize = 10,
+                        ForegroundColor = Aspose.Pdf.Color.Gray
+                    };
 
-                    // Create a styled text paragraph to serve as the caption
-                    TextParagraph caption = new TextParagraph();
+                    // Build the caption paragraph
+                    TextParagraph captionParagraph = new TextParagraph
+                    {
+                        // Position the caption below the image.
+                        // Here we use a simple heuristic: place it 20 points below the image's bottom.
+                        // Since XImage does not expose its exact location, we use a fixed position.
+                        Rectangle = new Aspose.Pdf.Rectangle(50, 50, 550, 70),
+                        HorizontalAlignment = HorizontalAlignment.Center
+                    };
+                    captionParagraph.FormattingOptions.WrapMode = TextFormattingOptions.WordWrapMode.ByWords;
+                    captionParagraph.AppendLine($"Figure {imageCounter}: Image description", captionState);
 
-                    // Position the caption near the bottom left of the page.
-                    // Adjust the rectangle as needed for your layout.
-                    caption.Rectangle = new Aspose.Pdf.Rectangle(50, 50, 250, 70);
-
-                    // Enable word wrapping
-                    caption.FormattingOptions.WrapMode = TextFormattingOptions.WordWrapMode.ByWords;
-
-                    // Center the caption horizontally within the rectangle
-                    caption.HorizontalAlignment = HorizontalAlignment.Center;
-
-                    // Add the caption text (you can customize the text as required)
-                    string captionText = $"Image {imageIndex} on page {pageNum}";
-                    caption.AppendLine(captionText);
-
-                    // Append the paragraph to the page using TextBuilder
+                    // Append the caption to the page
                     TextBuilder builder = new TextBuilder(page);
-                    builder.AppendParagraph(caption);
+                    builder.AppendParagraph(captionParagraph);
+
+                    imageCounter++;
                 }
             }
 
@@ -57,6 +59,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with captions saved to '{outputPath}'.");
+        Console.WriteLine($"Captions added. Saved to '{outputPath}'.");
     }
 }

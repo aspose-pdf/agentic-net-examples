@@ -1,54 +1,57 @@
 using System;
 using System.IO;
-using System.Net.Http;
-using System.Threading.Tasks;
+using System.Xml;
 using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
-    // Entry point
-    static async Task Main()
+    static void Main()
     {
-        const string pdfTemplatePath = "template.pdf";      // PDF with form fields
-        const string outputPdfPath   = "filled_form.pdf";   // Resulting PDF
-        const string xmlDataUrl      = "https://example.com/formdata.xml"; // URL returning XML
+        const string pdfPath   = "input.pdf";   // source PDF with form fields
+        const string xmlPath   = "data.xml";    // XML file containing form data
+        const string outputPdf = "filled_output.pdf";
 
-        // Verify the template PDF exists
-        if (!File.Exists(pdfTemplatePath))
+        // Verify input files exist
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Template PDF not found: {pdfTemplatePath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            return;
+        }
+        if (!File.Exists(xmlPath))
+        {
+            Console.Error.WriteLine($"XML not found: {xmlPath}");
             return;
         }
 
-        // Download the XML form data as a stream
-        using (HttpClient httpClient = new HttpClient())
+        try
         {
-            try
+            // Load the PDF document (lifecycle: load)
+            using (Document pdfDoc = new Document(pdfPath))
             {
-                using (Stream xmlStream = await httpClient.GetStreamAsync(xmlDataUrl))
+                // Load the XML data into an XmlDocument
+                XmlDocument xmlData = new XmlDocument();
+                xmlData.Load(xmlPath);
+
+                // If the PDF contains an XFA form, assign the XML data to it.
+                // This updates matching fields automatically.
+                if (pdfDoc.Form.HasXfa)
                 {
-                    // Load the PDF document that contains the interactive form
-                    using (Document pdfDoc = new Document(pdfTemplatePath))
-                    {
-                        // Import the XML data into the PDF.
-                        // BindXml reads the XML and populates the form fields (XFA or AcroForm).
-                        pdfDoc.BindXml(xmlStream);
-
-                        // Save the updated PDF
-                        pdfDoc.Save(outputPdfPath);
-                    }
-
-                    Console.WriteLine($"Form data imported and saved to '{outputPdfPath}'.");
+                    pdfDoc.Form.AssignXfa(xmlData);
                 }
+                else
+                {
+                    Console.WriteLine("PDF does not contain an XFA form; no data imported.");
+                }
+
+                // Save the updated PDF (lifecycle: save)
+                pdfDoc.Save(outputPdf);
+                Console.WriteLine($"Form data imported and saved to '{outputPdf}'.");
             }
-            catch (HttpRequestException ex)
-            {
-                Console.Error.WriteLine($"Failed to download XML data: {ex.Message}");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
-            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

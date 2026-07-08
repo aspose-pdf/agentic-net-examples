@@ -6,32 +6,33 @@ class Program
 {
     static void Main()
     {
+        // Input PDF containing at least five pages
         const string inputPath  = "input.pdf";
+        // Output PDF after page 5 has been removed
         const string outputPath = "output.pdf";
 
-        // Verify that the source PDF exists
+        // Verify the source file exists before proceeding
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        try
+        // PdfFileEditor provides high‑level operations on PDF files.
+        // The Delete method removes pages specified by a 1‑based page number array
+        // and writes the result directly to the output file.
+        PdfFileEditor editor = new PdfFileEditor();
+
+        // Delete page 5
+        bool deleted = editor.Delete(inputPath, new int[] { 5 }, outputPath);
+
+        if (deleted)
         {
-            // PdfFileEditor does NOT implement IDisposable, so no using block is needed
-            PdfFileEditor editor = new PdfFileEditor();
-
-            // Delete page number 5 (pages are 1‑based) and save the result
-            bool deleted = editor.Delete(inputPath, new int[] { 5 }, outputPath);
-
-            if (deleted)
-                Console.WriteLine($"Page 5 removed successfully. Output saved to '{outputPath}'.");
-            else
-                Console.Error.WriteLine("Failed to delete the specified page.");
+            Console.WriteLine($"Page 5 successfully deleted. Output saved to '{outputPath}'.");
         }
-        catch (Exception ex)
+        else
         {
-            Console.Error.WriteLine($"Error during deletion: {ex.Message}");
+            Console.Error.WriteLine("Failed to delete the specified page.");
         }
     }
 }

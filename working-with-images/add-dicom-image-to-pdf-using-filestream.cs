@@ -6,47 +6,39 @@ class Program
 {
     static void Main()
     {
-        // Path to the DICOM file (binary image data)
-        const string dicomPath = "input.dcm";
+        // Paths for the source DICOM image and the output PDF.
+        const string dicomImagePath = "medical_image.dcm"; // replace with actual image file
+        const string outputPdfPath  = "output.pdf";
 
-        // Path where the resulting PDF will be saved
-        const string outputPdf = "output.pdf";
-
-        // Verify that the DICOM file exists
-        if (!File.Exists(dicomPath))
+        // Ensure the image file exists.
+        if (!File.Exists(dicomImagePath))
         {
-            Console.Error.WriteLine($"File not found: {dicomPath}");
+            Console.Error.WriteLine($"Image file not found: {dicomImagePath}");
             return;
         }
 
-        // Open the DICOM file as a read‑only stream
-        using (FileStream dicomStream = File.OpenRead(dicomPath))
-        // Create a new PDF document (empty)
+        // Create a new PDF document and add a single page.
         using (Document pdfDoc = new Document())
         {
-            // Add a single page to the document (pages are 1‑based)
             pdfDoc.Pages.Add();
 
-            // Create an Image object and assign the DICOM stream to it
-            Image dicomImage = new Image
+            // Load the image via a FileStream and assign it to an Image object.
+            using (FileStream imgStream = File.OpenRead(dicomImagePath))
             {
-                // The ImageStream property accepts any image data stream,
-                // including DICOM binary data.
-                ImageStream = dicomStream
-            };
+                Image img = new Image();          // parameterless constructor
+                img.ImageStream = imgStream;      // set the stream containing the image data
+                // Optionally, you can set the image dimensions or scaling here.
+                // img.FixWidth  = 300;
+                // img.FixHeight = 400;
 
-            // Optionally set explicit dimensions (in points) for the image.
-            // Uncomment and adjust as needed.
-            // dicomImage.FixWidth = 400;
-            // dicomImage.FixHeight = 400;
+                // Add the image to the first page.
+                pdfDoc.Pages[1].Paragraphs.Add(img);
+            }
 
-            // Add the image to the first page's paragraph collection.
-            pdfDoc.Pages[1].Paragraphs.Add(dicomImage);
-
-            // Save the PDF document to the specified file.
-            pdfDoc.Save(outputPdf);
+            // Save the PDF document.
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF with DICOM image saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF with DICOM image saved to '{outputPdfPath}'.");
     }
 }

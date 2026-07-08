@@ -1,69 +1,62 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "output.pdf";
-        const string svgImagePath  = "image.svg";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string svgPath = "image.svg";
 
-        if (!File.Exists(inputPdfPath))
+        // Verify that the source PDF and SVG files exist
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
+        }
+        if (!File.Exists(svgPath))
+        {
+            Console.Error.WriteLine($"SVG file not found: {svgPath}");
             return;
         }
 
-        if (!File.Exists(svgImagePath))
+        // Load the existing PDF document
+        using (Document doc = new Document(inputPdf))
         {
-            Console.Error.WriteLine($"SVG image not found: {svgImagePath}");
-            return;
-        }
-
-        // Load the existing PDF (lifecycle rule: use using)
-        using (Document doc = new Document(inputPdfPath))
-        {
-            // Ensure there is at least one page to place the table
-            Page page = doc.Pages[1];
-
-            // Create a table with a single column
+            // Create a table with a single column (width can be adjusted as needed)
             Table table = new Table
             {
-                // Set column width (adjust as needed)
-                ColumnWidths = "300"
+                ColumnWidths = "200"
             };
 
-            // Add a row to the table
+            // Add one row to the table
             Row row = table.Rows.Add();
 
-            // Add a cell to the row
+            // Add one cell to the row
             Cell cell = row.Cells.Add();
 
-            // Insert the SVG image into the cell using the Image class
-            // (ImageFragment does not exist, so we use Image)
+            // Create an Image object that points to the SVG file
             Image svgImage = new Image
             {
-                // Path to the SVG file
-                File = svgImagePath
+                File = svgPath
+                // Optional: set explicit dimensions if required
+                // Width = 150;
+                // Height = 150;
             };
 
-            // Optionally set image dimensions (in points)
-            // svgImage.FixWidth = 200;
-            // svgImage.FixHeight = 150;
-
-            // Add the image to the cell's paragraph collection
+            // Insert the SVG image into the cell's paragraph collection
             cell.Paragraphs.Add(svgImage);
 
-            // Add the table to the page
-            page.Paragraphs.Add(table);
+            // Add the table to the first page of the document
+            doc.Pages[1].Paragraphs.Add(table);
 
-            // Save the modified PDF (lifecycle rule: use using)
-            doc.Save(outputPdfPath);
+            // Save the modified PDF
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved with SVG image in table cell: {outputPdfPath}");
+        Console.WriteLine($"SVG image inserted into table cell and saved to '{outputPdf}'.");
     }
 }

@@ -14,21 +14,14 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document within a using block for proper disposal
-            using (Document doc = new Document(inputPath))
-            {
-                // Check if the PDF has been saved with incremental updates
-                bool hasIncremental = doc.HasIncrementalUpdate();
+            // Determine whether the PDF contains incremental updates
+            bool hasIncremental = doc.HasIncrementalUpdate();
 
-                // Output the result
-                Console.WriteLine($"Has incremental updates: {hasIncremental}");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            // Report the result
+            Console.WriteLine($"Has incremental updates: {hasIncremental}");
         }
     }
 }

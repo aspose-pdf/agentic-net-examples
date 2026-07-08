@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Text;
 using Aspose.Pdf;
 using Aspose.Pdf.Tagged;
 using Aspose.Pdf.LogicalStructure;
@@ -9,39 +8,42 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputTxtPath = "notes.txt";
+        const string inputPdf  = "input.pdf";
+        const string outputTxt = "notes.txt";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         // Load the PDF document
-        using (Document doc = new Document(inputPdfPath))
+        using (Document doc = new Document(inputPdf))
         {
             // Access tagged content (structure tree)
-            ITaggedContent taggedContent = doc.TaggedContent;
-            StructureElement root = taggedContent.RootElement;
+            ITaggedContent tagged = doc.TaggedContent;
 
-            // Find all Note elements recursively
-            var noteElements = root.FindElements<NoteElement>(true);
+            // Get the root of the structure tree
+            StructureElement root = tagged.RootElement;
+
+            // Find all NoteElement instances in the structure (recursive)
+            var notes = root.FindElements<NoteElement>(true);
 
             // Concatenate the actual text of each note
-            StringBuilder sb = new StringBuilder();
-            foreach (NoteElement note in noteElements)
+            string concatenated = string.Empty;
+            foreach (NoteElement note in notes)
             {
+                // Use ActualText property which holds the note's content
                 if (!string.IsNullOrEmpty(note.ActualText))
                 {
-                    sb.AppendLine(note.ActualText);
+                    concatenated += note.ActualText + Environment.NewLine;
                 }
             }
 
-            // Write the concatenated notes to a plain text file
-            File.WriteAllText(outputTxtPath, sb.ToString());
+            // Save the concatenated text to a plain text file
+            File.WriteAllText(outputTxt, concatenated);
         }
 
-        Console.WriteLine($"Extracted notes saved to '{outputTxtPath}'.");
+        Console.WriteLine($"All notes extracted to '{outputTxt}'.");
     }
 }

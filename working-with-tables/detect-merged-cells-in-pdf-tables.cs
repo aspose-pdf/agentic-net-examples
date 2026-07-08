@@ -19,56 +19,46 @@ class Program
         // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a TableAbsorber and enable the FlowEngine to get span information
+            // Create a TableAbsorber and enable the FlowEngine to detect merged cells
             TableAbsorber absorber = new TableAbsorber
             {
                 UseFlowEngine = true
             };
 
-            // Extract tables from the whole document
+            // Extract tables from the entire document
             absorber.Visit(doc);
 
-            // Iterate over all detected tables
-            for (int t = 0; t < absorber.TableList.Count; t++)
+            int tableIndex = 0;
+            foreach (var table in absorber.TableList)
             {
-                var table = absorber.TableList[t];
-                bool hasMergedCells = false;
-
-                // Examine each cell in the table
+                tableIndex++;
+                int rowIndex = 0;
                 foreach (var row in table.RowList)
                 {
+                    rowIndex++;
+                    int colIndex = 0;
                     foreach (var cell in row.CellList)
                     {
-                        // ColSpan is always available
-                        int colSpan = cell.ColSpan;
+                        colIndex++;
 
-                        // RowSpan may not be present on AbsorbedCell; use reflection to read it if it exists
-                        int rowSpan = 0;
+                        // Default span values
+                        int rowSpan = 1;
+                        int colSpan = cell.ColSpan; // ColSpan is always available
+
+                        // RowSpan may not exist on AbsorbedCell; retrieve via reflection if present
                         PropertyInfo rowSpanProp = cell.GetType().GetProperty("RowSpan");
                         if (rowSpanProp != null && rowSpanProp.PropertyType == typeof(int))
                         {
                             rowSpan = (int)rowSpanProp.GetValue(cell);
                         }
 
-                        // If either span is greater than 1, the cell is merged
-                        if (colSpan > 1 || rowSpan > 1)
+                        // Report cells that span more than one row or column
+                        if (rowSpan > 1 || colSpan > 1)
                         {
-                            hasMergedCells = true;
-                            break;
+                            Console.WriteLine(
+                                $"Merged cell detected: Table {tableIndex}, Page {table.PageNum}, Row {rowIndex}, Column {colIndex}, RowSpan={rowSpan}, ColSpan={colSpan}");
                         }
                     }
-
-                    if (hasMergedCells) break;
-                }
-
-                // Output the result for the current table
-                if (hasMergedCells)
-                {
-                    Console.WriteLine($"Table {t + 1} on page {table.PageNum} contains merged cells.");
-                }
-                else
-                {
-                    Console.WriteLine($"Table {t + 1} on page {table.PageNum} has no merged cells.");
                 }
             }
         }

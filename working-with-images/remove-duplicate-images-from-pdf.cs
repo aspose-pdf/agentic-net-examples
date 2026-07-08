@@ -3,7 +3,6 @@ using System.IO;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // for ImageDeleteAction enum
 
 class Program
 {
@@ -18,64 +17,59 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
         {
-            // Dictionary to keep track of image hashes and the first image name that produced the hash
-            var hashToImageName = new Dictionary<string, string>();
+            // Dictionary to keep track of unique image hashes and their resource names
+            var uniqueImages = new Dictionary<string, string>();
 
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Iterate over all pages (1‑based indexing)
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
-                Page page = doc.Pages[pageIndex];
-                var images = page.Resources.Images;
+                Aspose.Pdf.Page page = doc.Pages[pageNum];
+                var imagesToDelete = new List<string>();
 
-                // Collect names of duplicate images to delete after the enumeration
-                var duplicatesToDelete = new List<string>();
-
-                // Enumerate each XImage on the current page
-                foreach (XImage img in images)
+                // Iterate over images on the current page
+                foreach (Aspose.Pdf.XImage img in page.Resources.Images)
                 {
-                    // Extract the raw image bytes by saving the XImage into a memory stream
-                    byte[] rawBytes;
-                    using (MemoryStream ms = new MemoryStream())
+                    // Extract raw image bytes by saving to a memory stream
+                    byte[] imageBytes;
+                    using (var ms = new MemoryStream())
                     {
-                        img.Save(ms);               // XImage.Save writes the image data to the stream
-                        rawBytes = ms.ToArray();
+                        img.Save(ms);
+                        imageBytes = ms.ToArray();
                     }
 
-                    // Compute a SHA‑256 hash of the image bytes for fast comparison
-                    string hash;
-                    using (SHA256 sha = SHA256.Create())
-                    {
-                        hash = BitConverter.ToString(sha.ComputeHash(rawBytes));
-                    }
+                    // Compute a hash of the image data (SHA‑256)
+                    string hash = BitConverter.ToString(SHA256.Create().ComputeHash(imageBytes));
 
-                    // If the hash already exists, the image is a duplicate
-                    if (hashToImageName.TryGetValue(hash, out string existingName))
+                    if (!uniqueImages.ContainsKey(hash))
                     {
-                        // Schedule this duplicate image for removal.
-                        // Use ImageDeleteAction.Check to ensure the image is removed only if no other page references it.
-                        duplicatesToDelete.Add(img.Name);
+                        // First occurrence of this image – store its name
+                        uniqueImages[hash] = img.Name;
                     }
                     else
                     {
-                        // First occurrence of this image – store its hash and name
-                        hashToImageName[hash] = img.Name;
+                        // Duplicate image found – schedule it for removal
+                        imagesToDelete.Add(img.Name);
                     }
                 }
 
-                // Remove the duplicate images from the page's image collection
-                foreach (string imgName in duplicatesToDelete)
+                // Delete the duplicate images from the page's resources
+                foreach (string imgName in imagesToDelete)
                 {
-                    page.Resources.Images.Delete(imgName, ImageDeleteAction.Check);
+                    // Use ImageDeleteAction.Check to delete only if no other page references it
+                    page.Resources.Images.Delete(imgName, Aspose.Pdf.ImageDeleteAction.Check);
                 }
             }
 
-            // Save the modified document
+            // Optional: run the built‑in optimizer to clean up any remaining unused resources
+            doc.OptimizeResources();
+
+            // Save the cleaned document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Duplicate images removed. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Duplicate images removed. Saved to '{outputPath}'.");
     }
 }

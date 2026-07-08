@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations; // needed for Border class
 
 class Program
 {
@@ -10,7 +9,7 @@ class Program
     {
         const string inputPdf = "input.pdf";
         const string outputPdf = "output.pdf";
-        const string logFile = "field_modifications.log";
+        const string logFile = "form_modifications.log";
 
         if (!File.Exists(inputPdf))
         {
@@ -18,50 +17,65 @@ class Program
             return;
         }
 
-        // Open the PDF document (lifecycle rule: use using)
+        // Load the PDF document
         using (Document doc = new Document(inputPdf))
         {
-            // Open the audit log for appending
-            using (StreamWriter log = new StreamWriter(logFile, true))
+            Form form = doc.Form;
+
+            // Open the log file (append mode) and record each change
+            using (StreamWriter log = new StreamWriter(logFile, append: true))
             {
-                // -------------------------------------------------
-                // Add a new text box field to the document
-                // -------------------------------------------------
-                TextBoxField txtField = new TextBoxField(doc);
-                txtField.PartialName = "SampleTextBox";
-                txtField.Rect = new Aspose.Pdf.Rectangle(100, 500, 300, 530);
-                txtField.Value = "Initial value";
-                txtField.Color = Aspose.Pdf.Color.LightGray;
-
-                // Add the field to page 1 (Form.Add overload)
-                doc.Form.Add(txtField, 1);
-                log.WriteLine($"{DateTime.Now:u} Added TextBoxField '{txtField.PartialName}' on page 1 at {txtField.Rect}");
-
-                // -------------------------------------------------
-                // Update the field's value
-                // -------------------------------------------------
-                txtField.Value = "Updated value";
-                log.WriteLine($"{DateTime.Now:u} Updated TextBoxField '{txtField.PartialName}' value to '{txtField.Value}'");
-
-                // -------------------------------------------------
-                // Change visual appearance (border)
-                // -------------------------------------------------
-                // Border requires the parent annotation (the field) in its constructor.
-                txtField.Border = new Border(txtField)
+                // 1. Modify the value of an existing field
+                const string existingFieldName = "CustomerName";
+                if (form.HasField(existingFieldName))
                 {
-                    Width = 1
-                };
-                // Border color is controlled by the field's own Color property; already set to LightGray.
-                log.WriteLine($"{DateTime.Now:u} Set border for TextBoxField '{txtField.PartialName}' (Width=1)");
+                    // The Form indexer returns a WidgetAnnotation; cast to Field
+                    Field? field = form[existingFieldName] as Field;
+                    if (field != null)
+                    {
+                        string oldValue = field.Value?.ToString() ?? string.Empty;
+                        string newValue = "John Doe";
+                        field.Value = newValue;
+                        log.WriteLine($"{DateTime.UtcNow:u} Set Value - Field: {existingFieldName}, Old: '{oldValue}', New: '{newValue}'");
+                    }
+                }
 
-                // -------------------------------------------------
-                // Save the modified PDF (lifecycle rule: use Save)
-                // -------------------------------------------------
-                doc.Save(outputPdf);
-                log.WriteLine($"{DateTime.Now:u} Saved modified PDF to '{outputPdf}'");
+                // 2. Add a new text box field to page 1
+                TextBoxField newField = new TextBoxField(doc)
+                {
+                    PartialName = "NewComment",
+                    Rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550),
+                    Value = "Initial comment"
+                };
+                form.Add(newField, 1); // page numbers are 1‑based
+                log.WriteLine($"{DateTime.UtcNow:u} Add Field - Name: {newField.PartialName}, Page: 1, Rect: {newField.Rect}");
+
+                // 3. Delete an existing field
+                const string fieldToDelete = "ObsoleteField";
+                if (form.HasField(fieldToDelete))
+                {
+                    form.Delete(fieldToDelete);
+                    log.WriteLine($"{DateTime.UtcNow:u} Delete Field - Name: {fieldToDelete}");
+                }
+
+                // 4. Change the ReadOnly flag of a field
+                const string roFieldName = "Agreement";
+                if (form.HasField(roFieldName))
+                {
+                    Field? roField = form[roFieldName] as Field;
+                    if (roField != null)
+                    {
+                        bool oldFlag = roField.ReadOnly;
+                        roField.ReadOnly = false;
+                        log.WriteLine($"{DateTime.UtcNow:u} Set ReadOnly - Field: {roFieldName}, Old: {oldFlag}, New: false");
+                    }
+                }
             }
+
+            // Save the modified PDF
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine("Form field modifications have been logged.");
+        Console.WriteLine("Form modifications have been logged and the PDF saved.");
     }
 }

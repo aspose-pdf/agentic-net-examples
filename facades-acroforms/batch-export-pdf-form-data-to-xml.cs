@@ -1,57 +1,56 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades; // Contains FormEditor and Form classes
 
 class Program
 {
     static void Main()
     {
-        // Directory containing the source PDF forms
-        const string inputFolder = "FormPdfs";
-        // Directory where the exported XML files will be saved
+        // Folder containing source PDF forms
+        const string inputFolder = "InputPdfs";
+        // Folder where exported XML files will be saved
         const string outputFolder = "ExportedXml";
 
-        if (!Directory.Exists(inputFolder))
-        {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
-            return;
-        }
-
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Get all PDF files in the input folder
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-        if (pdfFiles.Length == 0)
+        // Verify that the input directory exists; create it if it does not.
+        // This prevents a DirectoryNotFoundException when the folder is missing.
+        if (!Directory.Exists(inputFolder))
         {
-            Console.WriteLine("No PDF files found to process.");
+            Console.WriteLine($"Input folder '{inputFolder}' does not exist. Creating an empty folder.");
+            Directory.CreateDirectory(inputFolder);
+            // No PDFs to process, exit gracefully.
             return;
         }
 
-        foreach (string pdfPath in pdfFiles)
+        // Process each PDF file in the input folder
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            try
+            // Derive XML file name from PDF file name
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
+            string xmlPath = Path.Combine(outputFolder, fileNameWithoutExt + ".xml");
+
+            // Use FormEditor to open the PDF (wrapped in using for deterministic disposal)
+            using (FormEditor editor = new FormEditor())
             {
-                // Determine output XML file name (same base name as PDF)
-                string xmlFileName = Path.GetFileNameWithoutExtension(pdfPath) + ".xml";
-                string xmlPath = Path.Combine(outputFolder, xmlFileName);
+                // Bind the PDF document to the editor
+                editor.BindPdf(pdfPath);
 
-                // Use the Form facade to bind the PDF and export its form data to XML
-                using (Form form = new Form())
+                // Export the form data to XML using the Form facade
+                // Form can be constructed from the Document that FormEditor works on
+                using (Form form = new Form(editor.Document))
                 {
-                    form.BindPdf(pdfPath);
-
+                    // Create the output XML file stream
                     using (FileStream xmlStream = new FileStream(xmlPath, FileMode.Create, FileAccess.Write))
                     {
+                        // Export form fields (excluding button values) to the XML stream
                         form.ExportXml(xmlStream);
                     }
                 }
+            }
 
-                Console.WriteLine($"Exported form data: '{pdfPath}' -> '{xmlPath}'");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
-            }
+            Console.WriteLine($"Exported: {pdfPath} -> {xmlPath}");
         }
     }
 }

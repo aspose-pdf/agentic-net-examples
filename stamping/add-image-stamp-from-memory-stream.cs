@@ -2,42 +2,58 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-namespace AddImageStampFromMemoryStreamExample
+class Program
 {
-    class Program
+    static void Main()
     {
-        static void Main(string[] args)
+        const string pdfPath      = "input.pdf";   // source PDF
+        const string imagePath    = "logo.png";    // image to stamp
+        const string outputPath   = "output.pdf";  // stamped PDF
+
+        // Ensure source files exist
+        if (!File.Exists(pdfPath))
         {
-            // Step 1: Create a sample PDF file (self‑contained example)
-            using (Document sampleDoc = new Document())
-            {
-                sampleDoc.Pages.Add();
-                sampleDoc.Save("input.pdf");
-            }
-
-            // Step 2: Load the PDF we just created
-            using (Document pdfDoc = new Document("input.pdf"))
-            {
-                // Prepare a tiny PNG image in a memory stream (1x1 pixel transparent PNG)
-                string base64Png = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+X9WcAAAAASUVORK5CYII=";
-                byte[] imageBytes = Convert.FromBase64String(base64Png);
-                using (MemoryStream imageStream = new MemoryStream(imageBytes))
-                {
-                    // Create an ImageStamp from the memory stream
-                    ImageStamp imageStamp = new ImageStamp(imageStream);
-                    // Optional: set size and alignment of the stamp
-                    imageStamp.Width = 100;
-                    imageStamp.Height = 100;
-                    imageStamp.HorizontalAlignment = HorizontalAlignment.Center;
-                    imageStamp.VerticalAlignment = VerticalAlignment.Center;
-
-                    // Add the stamp to the first page (page indexing is 1‑based)
-                    pdfDoc.Pages[1].AddStamp(imageStamp);
-                }
-
-                // Save the resulting PDF
-                pdfDoc.Save("output.pdf");
-            }
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            return;
         }
+        if (!File.Exists(imagePath))
+        {
+            Console.Error.WriteLine($"Image not found: {imagePath}");
+            return;
+        }
+
+        // Load the PDF document (creation & loading rule)
+        using (Document doc = new Document(pdfPath))
+        {
+            // Load image into a memory stream
+            using (FileStream fileStream = File.OpenRead(imagePath))
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                fileStream.CopyTo(memoryStream);
+                memoryStream.Position = 0; // reset for reading
+
+                // Create an ImageStamp from the memory stream (constructor rule)
+                ImageStamp imgStamp = new ImageStamp(memoryStream)
+                {
+                    // Position the stamp at the center of each page
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment   = VerticalAlignment.Center,
+                    // Optional visual settings
+                    Opacity = 0.6,
+                    Background = false
+                };
+
+                // Apply the stamp to every page in the document
+                foreach (Page page in doc.Pages)
+                {
+                    page.AddStamp(imgStamp);
+                }
+            }
+
+            // Save the modified PDF (saving rule)
+            doc.Save(outputPath);
+        }
+
+        Console.WriteLine($"Image stamp applied and saved to '{outputPath}'.");
     }
 }

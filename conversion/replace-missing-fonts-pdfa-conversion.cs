@@ -9,6 +9,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output_pdfa.pdf";
+        const string conversionLog = "conversion_log.xml";
 
         if (!File.Exists(inputPath))
         {
@@ -19,24 +20,23 @@ class Program
         // Load the source PDF
         using (Document doc = new Document(inputPath))
         {
-            // Add custom font substitution rules (fallback fonts)
-            // Example: replace missing "TimesNewRomanPSMT" with "Arial"
-            FontRepository.Substitutions.Add(new SimpleFontSubstitution("TimesNewRomanPSMT", "Arial", false));
-            // Add additional substitutions as needed, e.g.:
-            // FontRepository.Substitutions.Add(new SimpleFontSubstitution("Helvetica", "LiberationSans", false));
+            // ---------------------------------------------------------------
+            // Configure font substitution: replace missing fonts with fallback fonts
+            // ---------------------------------------------------------------
+            // Example: if the source PDF uses "MissingFont", replace it with "Arial"
+            FontRepository.Substitutions.Add(
+                new SimpleFontSubstitution("MissingFont", "Arial"));
 
-            // Configure PDF/A conversion options
-            PdfFormatConversionOptions conversionOptions = new PdfFormatConversionOptions(PdfFormat.PDF_A_1B);
-            // Enable default substitution strategy for fonts that cannot be embedded
-            conversionOptions.FontEmbeddingOptions.UseDefaultSubstitution = true;
+            // ---------------------------------------------------------------
+            // Convert to PDF/A-1B (PDF/A compliance) using Document.Convert overload
+            // ---------------------------------------------------------------
+            // The Convert method creates a conversion log and applies the required PDF/A rules.
+            doc.Convert(conversionLog, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
 
-            // Perform the conversion to PDF/A
-            doc.Convert(conversionOptions);
-
-            // Save the converted document
+            // Save the resulting PDF/A document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF/A conversion completed: {outputPath}");
+        Console.WriteLine($"PDF/A conversion completed. Output saved to '{outputPath}'.");
     }
 }

@@ -7,11 +7,11 @@ class Program
     static void Main()
     {
         // Paths of the PDFs to be bundled into the portfolio
-        string[] pdfFiles = { "file1.pdf", "file2.pdf", "file3.pdf" };
-        const string outputPortfolio = "portfolio.pdf";
+        string[] sourceFiles = { "file1.pdf", "file2.pdf", "file3.pdf" };
+        const string portfolioPath = "portfolio.pdf";
 
-        // Ensure all source files exist before proceeding
-        foreach (var file in pdfFiles)
+        // Verify that all source files exist before proceeding
+        foreach (string file in sourceFiles)
         {
             if (!File.Exists(file))
             {
@@ -23,25 +23,28 @@ class Program
         // Create an empty PDF document that will become the portfolio container
         using (Document portfolioDoc = new Document())
         {
-            // Initialise the collection that holds embedded files (portfolio entries)
+            // Ensure the document has a Collection (portfolio) object
             if (portfolioDoc.Collection == null)
                 portfolioDoc.Collection = new Collection();
 
             // Add each PDF as an embedded file in the portfolio
-            foreach (var file in pdfFiles)
+            foreach (string file in sourceFiles)
             {
                 var fileSpec = new FileSpecification(file, Path.GetFileName(file))
                 {
-                    // Load the file bytes into the Contents stream of the specification
+                    // Load the file content into the specification
                     Contents = new MemoryStream(File.ReadAllBytes(file))
                 };
                 portfolioDoc.Collection.Add(fileSpec);
             }
 
-            // Save the resulting portfolio PDF
-            portfolioDoc.Save(outputPortfolio);
+            // Optional: set document metadata
+            portfolioDoc.Info.Title = "PDF Portfolio";
+
+            // Save the resulting PDF portfolio
+            portfolioDoc.Save(portfolioPath);
         }
 
-        Console.WriteLine($"PDF portfolio created at '{outputPortfolio}'.");
+        Console.WriteLine($"PDF portfolio created at '{portfolioPath}'.");
     }
 }

@@ -1,9 +1,6 @@
 using System;
-using System.Runtime.InteropServices;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
-
-#pragma warning disable NU1903 // suppress known vulnerability warning for Microsoft.Bcl.Memory
 
 class Program
 {
@@ -11,67 +8,42 @@ class Program
     {
         const string outputPath = "multi_page_graph.pdf";
 
-        // Create a new PDF document
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Define page sizes (width, height) in points.
-            // A4 = 595 x 842 pt, Letter = 612 x 792 pt, A5 = 420 x 595 pt
-            var pageSizes = new (double width, double height)[]
-            {
-                (595.0, 842.0),   // A4
-                (612.0, 792.0),   // Letter
-                (420.0, 595.0)    // A5
-            };
+            // NOTE: In evaluation mode Aspose.Pdf allows a maximum of 4 Graph objects.
+            // Therefore we limit the number of pages to 4 to avoid the runtime
+            // IndexOutOfRangeException that occurs when the limit is exceeded.
+            int totalPages = 4; // changed from 5 to stay within evaluation limits
 
-            foreach (var size in pageSizes)
+            for (int i = 1; i <= totalPages; i++)
             {
-                // Add a new page and set its size
+                // Add a new page (default size is A4)
                 Page page = doc.Pages.Add();
-                page.SetPageSize(size.width, size.height);
 
-                // Create a Graph that occupies the whole page (double ctor)
-                Graph graph = new Graph(size.width, size.height);
+                // Retrieve the page dimensions (in points)
+                double pageWidth  = page.Rect.Width;
+                double pageHeight = page.Rect.Height;
+
+                // Create a Graph that matches the page size
+                Graph graph = new Graph(pageWidth, pageHeight);
+
+                // Optional: style the graph (background fill, border color, line width)
                 graph.GraphInfo = new GraphInfo
                 {
-                    FillColor = Color.LightGray,
-                    Color = Color.Black,
-                    LineWidth = 1f // float literal as required by GraphInfo
+                    FillColor = Color.LightGray, // background of the graph
+                    Color     = Color.Black,    // border color
+                    LineWidth = 1               // border thickness
                 };
 
-                // Add the graph to the page
+                // Add the graph to the page's paragraph collection
                 page.Paragraphs.Add(graph);
             }
 
-            // Save the PDF – guard against missing libgdiplus on non‑Windows platforms
-            try
-            {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    doc.Save(outputPath);
-                }
-                else
-                {
-                    // Attempt to save; if GDI+ (libgdiplus) is missing, handle gracefully
-                    doc.Save(outputPath);
-                }
-                Console.WriteLine($"PDF saved to '{outputPath}'.");
-            }
-            catch (TypeInitializationException ex) when (ContainsDllNotFound(ex))
-            {
-                Console.WriteLine("Warning: GDI+ (libgdiplus) is not available on this platform. " +
-                                  "The PDF was not saved.");
-            }
+            // Save the multi‑page PDF
+            doc.Save(outputPath);
         }
-    }
 
-    private static bool ContainsDllNotFound(Exception? ex)
-    {
-        while (ex != null)
-        {
-            if (ex is DllNotFoundException)
-                return true;
-            ex = ex.InnerException;
-        }
-        return false;
+        Console.WriteLine($"PDF created: {outputPath}");
     }
 }

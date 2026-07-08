@@ -1,55 +1,50 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Aspose.Pdf namespace contains Document and XmlSaveOptions
 
 class Program
 {
     static void Main()
     {
         // Directory containing source PDF files
-        const string inputDir = "input_pdfs";
-
+        const string inputDirectory = "InputPdfs";
         // Directory where XML files will be written
-        const string outputDir = "output_xml";
+        const string outputDirectory = "OutputXml";
 
-        // Verify input directory exists
-        if (!Directory.Exists(inputDir))
+        // Validate input directory
+        if (!Directory.Exists(inputDirectory))
         {
-            Console.Error.WriteLine($"Input directory not found: {inputDir}");
+            Console.Error.WriteLine($"Input directory not found: {inputDirectory}");
             return;
         }
 
         // Ensure output directory exists
-        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(outputDirectory);
 
-        // Get all PDF files in the input directory (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(inputDir, "*.pdf", SearchOption.TopDirectoryOnly);
-
-        foreach (string pdfPath in pdfFiles)
+        // Process each PDF file in the input directory
+        foreach (string pdfPath in Directory.GetFiles(inputDirectory, "*.pdf"))
         {
-            // Preserve original file name, change extension to .xml
-            string baseName = Path.GetFileNameWithoutExtension(pdfPath);
-            string xmlPath = Path.Combine(outputDir, baseName + ".xml");
-
             try
             {
-                // Load PDF and automatically dispose it after use
-                using (Document doc = new Document(pdfPath))
-                {
-                    // Use XmlSaveOptions because we are saving to a non‑PDF format
-                    XmlSaveOptions xmlOptions = new XmlSaveOptions();
+                // Preserve original file name (without extension) for the XML output
+                string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
+                string xmlPath = Path.Combine(outputDirectory, fileNameWithoutExt + ".xml");
 
-                    // Save as XML preserving the original base name
-                    doc.Save(xmlPath, xmlOptions);
+                // Load PDF and save as XML using XmlSaveOptions
+                using (Document pdfDocument = new Document(pdfPath))
+                {
+                    XmlSaveOptions xmlOptions = new XmlSaveOptions(); // default options
+                    pdfDocument.Save(xmlPath, xmlOptions);
                 }
 
-                Console.WriteLine($"Converted: {pdfPath} → {xmlPath}");
+                Console.WriteLine($"Converted: {pdfPath} -> {xmlPath}");
             }
             catch (Exception ex)
             {
-                // Log any conversion errors but continue processing other files
-                Console.Error.WriteLine($"Error converting '{pdfPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         }
+
+        Console.WriteLine("Batch conversion completed.");
     }
 }

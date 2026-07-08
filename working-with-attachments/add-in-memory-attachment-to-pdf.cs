@@ -1,47 +1,39 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.AI; // Attachment class (kept for completeness, not used directly)
 
 class Program
 {
     static void Main()
     {
-        // Prepare the attachment content in a memory stream (no disk I/O)
-        using (MemoryStream attachmentStream = new MemoryStream())
+        // Create a new PDF document (in memory)
+        using (Document pdfDoc = new Document())
         {
-            // Example content – write some text into the stream
-            using (StreamWriter writer = new StreamWriter(attachmentStream, leaveOpen: true))
+            // Add a blank page so the PDF is not empty
+            pdfDoc.Pages.Add();
+
+            // ----- Prepare attachment data in a MemoryStream -----
+            // Example: attachment content is a simple text string
+            byte[] attachmentBytes = System.Text.Encoding.UTF8.GetBytes(
+                "This is the content of the attachment stored in memory."
+            );
+
+            // MemoryStream holds the attachment without touching the file system
+            using (MemoryStream attachmentStream = new MemoryStream(attachmentBytes))
             {
-                writer.Write("This is an attachment created entirely in memory.");
-                writer.Flush();
-                // Reset position so it can be read from the beginning later
-                attachmentStream.Position = 0;
+                // Create a FileSpecification with a display name and optional description.
+                // The constructor does NOT accept a Stream, so we set the Contents property
+                // after construction.
+                FileSpecification fileSpec = new FileSpecification("Attachment.txt", "In‑memory attachment");
+                fileSpec.Contents = attachmentStream; // assign the stream containing the file data
+
+                // Add the file specification to the PDF's embedded files collection.
+                pdfDoc.EmbeddedFiles.Add(fileSpec);
             }
 
-            // Create a new PDF document (in‑memory)
-            using (Document pdfDoc = new Document())
-            {
-                // Add a blank page so the PDF is not empty
-                pdfDoc.Pages.Add();
-
-                // The FileSpecification overload that accepts a Stream comes first,
-                // followed by the file name (string).
-                FileSpecification fileSpec = new FileSpecification(attachmentStream, "SampleAttachment.txt");
-
-                // Add the file specification to the document's embedded files collection
-                pdfDoc.EmbeddedFiles.Add("SampleAttachment.txt", fileSpec);
-
-                // Save the resulting PDF into another memory stream (still no disk writes)
-                using (MemoryStream outputPdf = new MemoryStream())
-                {
-                    pdfDoc.Save(outputPdf);
-
-                    // For demonstration purposes only: write the PDF bytes to disk
-                    // In a real scenario you could return the stream, send it over a network, etc.
-                    File.WriteAllBytes("ResultWithAttachment.pdf", outputPdf.ToArray());
-                }
-            }
+            // ----- Save the PDF (still without any intermediate files) -----
+            // The resulting PDF will contain the in‑memory attachment.
+            pdfDoc.Save("output_with_attachment.pdf");
         }
     }
 }

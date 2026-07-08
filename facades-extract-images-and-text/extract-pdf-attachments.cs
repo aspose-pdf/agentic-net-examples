@@ -1,62 +1,67 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf.Facades;
 
-class AttachmentExtractor
+class Program
 {
     static void Main()
     {
-        // Path to the source PDF file containing attachments
-        const string pdfPath = "input.pdf";
+        // Input PDF containing attachments
+        const string inputPdfPath = "input.pdf";
 
-        // Directory where extracted attachments will be saved
-        const string outputDir = "Attachments";
+        // Directory where extracted files will be saved
+        const string outputDirectory = "ExtractedAttachments";
 
-        // Validate input PDF file
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Error: PDF file not found – {pdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
         // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(outputDirectory);
 
-        // Use PdfExtractor (facade) to extract attachments
-        using (PdfExtractor extractor = new PdfExtractor())
+        try
         {
-            // Bind the PDF document to the extractor
-            extractor.BindPdf(pdfPath);
-
-            // Extract all attachments from the bound PDF
-            extractor.ExtractAttachment();
-
-            // Retrieve the list of attachment names
-            IList<string> attachmentNames = extractor.GetAttachNames();
-
-            // Retrieve the attachment data as memory streams
-            MemoryStream[] attachmentStreams = extractor.GetAttachment();
-
-            // Write each attachment to a file in the output directory
-            for (int i = 0; i < attachmentStreams.Length; i++)
+            // Initialize the PdfExtractor facade
+            using (PdfExtractor extractor = new PdfExtractor())
             {
-                string fileName = attachmentNames[i];
-                string outputPath = Path.Combine(outputDir, fileName);
+                // Bind the source PDF file
+                extractor.BindPdf(inputPdfPath);
 
-                // Ensure the stream is positioned at the beginning
-                attachmentStreams[i].Position = 0;
+                // Extract all attachments from the PDF
+                extractor.ExtractAttachment();
 
-                // Save the stream to a file
-                using (FileStream fileStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                // Get the list of attachment names
+                IList<string> attachmentNames = extractor.GetAttachNames();
+
+                // Get the attachment streams (one stream per attachment)
+                MemoryStream[] attachmentStreams = extractor.GetAttachment();
+
+                // Write each attachment to the output directory
+                for (int i = 0; i < attachmentStreams.Length; i++)
                 {
-                    attachmentStreams[i].CopyTo(fileStream);
+                    string fileName = attachmentNames[i];
+                    string outputPath = Path.Combine(outputDirectory, fileName);
+
+                    // Reset stream position before reading
+                    attachmentStreams[i].Position = 0;
+
+                    using (FileStream fileStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                    {
+                        attachmentStreams[i].CopyTo(fileStream);
+                    }
+
+                    Console.WriteLine($"Extracted: {outputPath}");
                 }
-
-                Console.WriteLine($"Extracted: {fileName} → {outputPath}");
             }
-        }
 
-        Console.WriteLine("All attachments have been extracted.");
+            Console.WriteLine("All attachments have been extracted successfully.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during extraction: {ex.Message}");
+        }
     }
 }

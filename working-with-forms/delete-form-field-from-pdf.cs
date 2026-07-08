@@ -6,8 +6,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
+        const string fieldName  = "MyField"; // name of the form field to delete
 
         if (!File.Exists(inputPath))
         {
@@ -15,23 +16,16 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPath))
-            {
-                // Delete the form field named "OldPhoneNumber"
-                doc.Form.Delete("OldPhoneNumber");
+            // Delete the form field by its name
+            doc.Form.Delete(fieldName);
 
-                // Save the modified document
-                doc.Save(outputPath);
-            }
+            // Save the modified PDF
+            doc.Save(outputPath);
+        }
 
-            Console.WriteLine($"Form field deleted. Saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"Field '{fieldName}' deleted. Saved to '{outputPath}'.");
     }
 }

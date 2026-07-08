@@ -15,29 +15,35 @@ public static class PdfEncryptionHelper
     {
         // Load the PDF from the input byte array using a MemoryStream.
         using (MemoryStream inputStream = new MemoryStream(pdfBytes))
+        // Create a Document instance from the stream (lifecycle rule: use constructor).
         using (Document doc = new Document(inputStream))
         {
             // Define desired permissions (example: allow printing and content extraction).
-            Permissions permissions = Permissions.PrintDocument | Permissions.ExtractContent;
+            Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-            // Encrypt the document. Owner password is left empty (can be set to a different value if needed).
-            doc.Encrypt(userPassword, string.Empty, permissions, CryptoAlgorithm.AESx256);
+            // Encrypt the document.
+            // Owner password is left empty; CryptoAlgorithm.AESx256 is the recommended algorithm.
+            doc.Encrypt(userPassword, string.Empty, perms, CryptoAlgorithm.AESx256);
 
-            // Save the encrypted PDF to an output MemoryStream.
+            // Save the encrypted document to a new MemoryStream.
             using (MemoryStream outputStream = new MemoryStream())
             {
-                doc.Save(outputStream);
-                return outputStream.ToArray();
+                doc.Save(outputStream); // Save without SaveOptions writes PDF regardless of extension.
+                return outputStream.ToArray(); // Return the encrypted PDF bytes.
             }
         }
     }
 }
 
-// Added entry point to satisfy the compiler for an executable project.
 public class Program
 {
+    // Entry point required for a console‑application project.
     public static void Main(string[] args)
     {
-        // No operation – the library functionality is exposed via PdfEncryptionHelper.
+        // The Main method can remain empty or contain demo code.
+        // Example (commented out) showing how to use the helper:
+        // byte[] originalPdf = File.ReadAllBytes("input.pdf");
+        // byte[] encryptedPdf = PdfEncryptionHelper.EncryptPdf(originalPdf, "myPassword");
+        // File.WriteAllBytes("encrypted.pdf", encryptedPdf);
     }
 }

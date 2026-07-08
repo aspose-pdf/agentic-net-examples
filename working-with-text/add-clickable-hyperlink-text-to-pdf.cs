@@ -11,45 +11,39 @@ class Program
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Ensure the input file exists
+        // Verify input file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Open the existing PDF document
+        // Load the existing PDF document (create rule)
         using (Document doc = new Document(inputPath))
         {
-            // Get the first page (1‑based indexing)
+            // Get the first page (pages are 1‑based)
             Page page = doc.Pages[1];
 
-            // Create a TextFragment that will hold the main text
-            TextFragment tf = new TextFragment("Click here");
-            tf.Position = new Position(100, 600); // Position on the page
+            // Create a text fragment that will hold the segment
+            TextFragment tf = new TextFragment();
+            tf.Position = new Position(100, 600); // place the text on the page
 
-            // Optional: set visual appearance of the fragment
-            tf.TextState.Font = Aspose.Pdf.Text.FontRepository.FindFont("Helvetica");
-            tf.TextState.FontSize = 12;
-            tf.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
-
-            // Create a TextSegment (optional, could use the default segment)
+            // Create a text segment with the visible text
             TextSegment segment = new TextSegment("Click here");
-            // Assign a web hyperlink to the segment
+            // Assign a web hyperlink to the segment (URI action)
             segment.Hyperlink = new WebHyperlink("https://www.example.com");
 
-            // Replace the default segment with the hyperlink segment
-            tf.Segments.Clear();               // remove the auto‑created segment
-            tf.Segments.Add(segment);          // add our hyperlink segment
+            // Add the segment to the fragment's segment collection
+            tf.Segments.Add(segment);
 
-            // Append the TextFragment to the page using TextBuilder
+            // Append the fragment (with the clickable segment) to the page
             TextBuilder builder = new TextBuilder(page);
             builder.AppendText(tf);
 
-            // Save the modified PDF
+            // Save the modified PDF (save rule)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with clickable text: '{outputPath}'");
+        Console.WriteLine($"PDF saved with clickable text: {outputPath}");
     }
 }

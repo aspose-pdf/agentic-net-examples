@@ -1,55 +1,59 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades; // Facade APIs for stamping
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string targetPdf      = "target.pdf";      // PDF to receive the disclaimer
-        const string disclaimerPdf  = "disclaimer.pdf";  // PDF containing the legal disclaimer (use first page)
-        const string outputPdf      = "target_with_disclaimer.pdf";
+        // Path to the PDF that contains the legal disclaimer (single‑page PDF)
+        const string disclaimerPdf = "disclaimer.pdf";
 
-        // Validate input files
-        if (!File.Exists(targetPdf))
-        {
-            Console.Error.WriteLine($"Target PDF not found: {targetPdf}");
-            return;
-        }
+        // Folder containing the target PDFs to be stamped
+        const string inputFolder = "InputPdfs";
+
+        // Folder where stamped PDFs will be saved
+        const string outputFolder = "StampedPdfs";
+
         if (!File.Exists(disclaimerPdf))
         {
-            Console.Error.WriteLine($"Disclaimer PDF not found: {disclaimerPdf}");
+            Console.Error.WriteLine($"Disclaimer file not found: {disclaimerPdf}");
             return;
         }
 
-        // Initialize the PdfFileStamp facade
-        PdfFileStamp fileStamp = new PdfFileStamp();
+        if (!Directory.Exists(inputFolder))
+        {
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            return;
+        }
 
-        // Bind the target PDF – this is the document that will be modified
-        fileStamp.BindPdf(targetPdf);
+        Directory.CreateDirectory(outputFolder);
 
-        // Create a Stamp object that will use the first page of the disclaimer PDF
-        Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
+        // Process each PDF file in the input folder
+        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        {
+            string fileName = Path.GetFileNameWithoutExtension(inputPath);
+            string outputPath = Path.Combine(outputFolder, $"{fileName}_stamped.pdf");
 
-        // Bind the disclaimer PDF page (page numbers are 1‑based)
-        stamp.BindPdf(disclaimerPdf, 1);
+            // Configure PdfFileStamp with input and output files
+            using (PdfFileStamp fileStamp = new PdfFileStamp())
+            {
+                fileStamp.InputFile = inputPath;
+                fileStamp.OutputFile = outputPath;
 
-        // Apply the stamp only to the first page of the target document
-        stamp.Pages = new int[] { 1 };
+                // Create a stamp that uses the first page of the disclaimer PDF
+                Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
+                stamp.BindPdf(disclaimerPdf, 1);          // use page 1 of disclaimer.pdf
+                stamp.IsBackground = false;               // overlay on top of existing content
+                stamp.Opacity = 1.0f;                     // fully opaque
+                stamp.Pages = new int[] { 1 };            // apply only to the first page
 
-        // Set the stamp as a background (appears behind existing content)
-        stamp.IsBackground = true;
+                // Add the stamp to the document and finalize
+                fileStamp.AddStamp(stamp);
+                fileStamp.Close(); // saves the result to OutputFile
+            }
 
-        // Add the stamp to the facade
-        fileStamp.AddStamp(stamp);
-
-        // Save the result to the output file
-        fileStamp.Save(outputPdf);
-
-        // Close the facade (releases internal resources)
-        fileStamp.Close();
-
-        Console.WriteLine($"Disclaimer applied. Output saved to '{outputPdf}'.");
+            Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
+        }
     }
 }

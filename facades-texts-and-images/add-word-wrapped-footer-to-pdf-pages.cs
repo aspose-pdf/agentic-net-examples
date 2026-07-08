@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text;   // FormattedText resides here
+using Aspose.Pdf.Text;   // for EncodingType
 
 class Program
 {
@@ -17,23 +17,34 @@ class Program
             return;
         }
 
-        // Create the formatted text that will appear in the footer.
-        // Constructor parameters: text, text color (System.Drawing.Color), font name,
-        // encoding, embed font flag, font size.
-        FormattedText footer = new FormattedText(
-            "This is a sample footer that will wrap word by word across the page width.",
-            System.Drawing.Color.Gray,
-            "Helvetica",
-            EncodingType.Winansi,
-            false,
-            10);   // font size 10 points
+        // Load the PDF via the facade (no need for a Document instance here)
+        PdfFileStamp stamp = new PdfFileStamp();
+        stamp.BindPdf(inputPdf);
 
-        // PdfFileStamp adds headers/footers to every page of the document.
-        // The second argument is the bottom margin (distance from the page bottom).
-        PdfFileStamp fileStamp = new PdfFileStamp(inputPdf, outputPdf);
-        fileStamp.AddFooter(footer, 20);   // 20 points bottom margin
-        fileStamp.Close();                 // Persist changes and release resources
+        // Create formatted text for the footer.
+        // FormattedText constructor requires System.Drawing.Color for the text color.
+        FormattedText footerText = new FormattedText(
+            "This is a sample footer that demonstrates word‑by‑word wrapping. " +
+            "If the text is longer than the page width, it will wrap automatically " +
+            "according to the left and right margins provided.",
+            System.Drawing.Color.DarkGray,   // text color
+            "Helvetica",                     // font name
+            EncodingType.Winansi,            // encoding
+            false,                           // embed font (false = use system font)
+            9);                              // font size
 
-        Console.WriteLine($"Footer added successfully. Output saved to '{outputPdf}'.");
+        // Define margins: bottom margin positions the footer, left/right margins define the wrap width.
+        float bottomMargin = 20f;   // distance from the bottom edge of the page
+        float leftMargin   = 50f;   // left side margin for the footer text
+        float rightMargin  = 50f;   // right side margin for the footer text
+
+        // Add the footer to every page of the document.
+        stamp.AddFooter(footerText, bottomMargin, leftMargin, rightMargin);
+
+        // Save the result and release resources.
+        stamp.Save(outputPdf);
+        stamp.Close();
+
+        Console.WriteLine($"Footer added and saved to '{outputPdf}'.");
     }
 }

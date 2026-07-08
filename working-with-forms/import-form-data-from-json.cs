@@ -1,23 +1,21 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core PDF API
-using Aspose.Pdf.Forms;        // Form handling (Form, Field, etc.)
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string pdfPath   = "input.pdf";      // PDF with form fields
-        const string jsonPath  = "data.json";      // JSON array with field values
-        const string outputPdf = "filled_output.pdf";
+        const string pdfPath   = "input.pdf";   // source PDF with form fields
+        const string jsonPath  = "data.json";   // JSON array containing field values
+        const string outputPath = "output.pdf"; // PDF after bulk import
 
-        // Verify input files exist
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
+
         if (!File.Exists(jsonPath))
         {
             Console.Error.WriteLine($"JSON not found: {jsonPath}");
@@ -26,18 +24,20 @@ class Program
 
         try
         {
-            // Load the PDF document (using block ensures proper disposal)
+            // Load the PDF document
             using (Document doc = new Document(pdfPath))
             {
-                // Bulk import of form field values from the JSON file.
-                // ImportFromJson reads the JSON and updates matching fields.
-                doc.Form.ImportFromJson(jsonPath);
+                // Open the JSON file as a stream and import all form fields at once
+                using (FileStream jsonStream = new FileStream(jsonPath, FileMode.Open, FileAccess.Read))
+                {
+                    doc.Form.ImportFromJson(jsonStream);
+                }
 
-                // Save the updated document.
-                doc.Save(outputPdf);
+                // Save the updated PDF
+                doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Form data imported and saved to '{outputPdf}'.");
+            Console.WriteLine($"Form data imported successfully. Saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

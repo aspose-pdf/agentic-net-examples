@@ -8,80 +8,82 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "signed_output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (lifecycle rule: use Document constructor)
         using (Document doc = new Document(inputPath))
         {
-            // Define the rectangle for the signature field (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 100, 300, 200);
+            // Ensure the document has at least one page
+            Page page = doc.Pages[1];
 
-            // Add a signature field to the first page
-            SignatureField signatureField = new SignatureField(doc, rect);
-            doc.Pages[1].Annotations.Add(signatureField);
+            // Define the rectangle where the signature field will appear
+            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Retrieve a certificate with a private key from the smart card
-            X509Certificate2 cert = GetCertificateFromSmartCard();
-            if (cert == null)
+            // Create a signature field and add it to the form fields collection
+            SignatureField signatureField = new SignatureField(page, rect)
             {
-                Console.Error.WriteLine("No suitable certificate with a private key found on the smart card.");
+                Name = "Signature1"
+            };
+            doc.Form.Add(signatureField);
+
+            // Retrieve a certificate with a private key from the smart card.
+            // The OS will prompt for the PIN when the private key is accessed.
+            X509Certificate2 certificate = GetCertificateFromSmartCard();
+
+            if (certificate == null)
+            {
+                Console.Error.WriteLine("No certificate with a private key was found on the smart card.");
                 return;
             }
 
-            // Create an ExternalSignature using the certificate.
-            // Accessing the private key will trigger the OS PIN prompt.
-            ExternalSignature externalSignature = new ExternalSignature(cert)
+            // Create an ExternalSignature that uses the smart‑card certificate.
+            ExternalSignature externalSignature = new ExternalSignature(certificate)
             {
-                Reason = "Document approval",
-                Location = Environment.MachineName,
-                ContactInfo = Environment.UserName
+                Reason      = "Document signed with smart card",
+                Location    = Environment.MachineName,
+                ContactInfo = "user@example.com"
             };
 
-            // Sign the PDF using the signature field
+            // Sign the PDF using the signature field (lifecycle rule: use Sign method)
             signatureField.Sign(externalSignature);
 
-            // Save the signed PDF
+            // Save the signed PDF (lifecycle rule: use Document.Save)
             doc.Save(outputPath);
         }
 
         Console.WriteLine($"Signed PDF saved to '{outputPath}'.");
     }
 
-    // Helper: selects the first certificate in the current user's "My" store that has a private key.
-    // Accessing the private key forces the OS to request the smart card PIN.
-    static X509Certificate2 GetCertificateFromSmartCard()
+    // Helper method to obtain the first certificate with a private key from the CurrentUser store.
+    // Adjust the selection logic as needed (e.g., by subject name or thumbprint).
+    private static X509Certificate2 GetCertificateFromSmartCard()
     {
-        using (X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser))
+        X509Certificate2 result = null;
+        X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+        try
         {
-            store.Open(OpenFlags.ReadOnly | OpenFlags.OpenExistingOnly);
+            store.Open(OpenFlags.ReadOnly);
             foreach (X509Certificate2 cert in store.Certificates)
             {
                 if (cert.HasPrivateKey)
                 {
-                    try
-                    {
-                        // Attempt to acquire the private key; this will prompt for the PIN if needed.
-                        var key = cert.GetRSAPrivateKey();
-                        if (key != null)
-                        {
-                            return cert;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        // If the user cancels the PIN prompt or another error occurs, continue searching.
-                        Console.Error.WriteLine($"Unable to access private key: {ex.Message}");
-                    }
+                    result = cert;
+                    break; // Use the first matching certificate
                 }
             }
         }
-        return null;
+        finally
+        {
+            store.Close();
+        }
+        return result;
     }
 }

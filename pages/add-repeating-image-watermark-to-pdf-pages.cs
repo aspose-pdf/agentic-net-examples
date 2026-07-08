@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -9,7 +9,7 @@ class Program
     {
         const string inputPdf  = "input.pdf";          // source PDF
         const string outputPdf = "watermarked.pdf";    // result PDF
-        const string watermarkImage = "watermark.png"; // image to repeat
+        const string watermarkImage = "logo.png";      // image to repeat
 
         if (!File.Exists(inputPdf))
         {
@@ -23,51 +23,49 @@ class Program
             return;
         }
 
-        // Load the PDF document (using rule: load)
+        // Load the PDF document (using rule: wrap in using for deterministic disposal)
         using (Document doc = new Document(inputPdf))
         {
-            // Iterate over all pages (1‑based indexing)
+            // Iterate over all pages
             foreach (Page page in doc.Pages)
             {
                 // Page dimensions (points)
                 double pageWidth  = page.PageInfo.Width;
                 double pageHeight = page.PageInfo.Height;
 
-                // Desired size of each watermark instance
-                const double stampWidth  = 100; // points
-                const double stampHeight = 100; // points
+                // Load the image once to obtain its size
+                ImageStamp sampleStamp = new ImageStamp(watermarkImage);
+                double imgWidth  = sampleStamp.Width  > 0 ? sampleStamp.Width  : 100; // fallback width
+                double imgHeight = sampleStamp.Height > 0 ? sampleStamp.Height : 100; // fallback height
 
-                // Spacing between watermarks
-                const double stepX = 150; // horizontal step
-                const double stepY = 150; // vertical step
+                // Define spacing between repeated watermarks
+                double hSpacing = imgWidth  + 50; // horizontal gap
+                double vSpacing = imgHeight + 50; // vertical gap
 
-                // Grid loop: place a stamp at each (x, y) coordinate
-                for (double y = 0; y < pageHeight; y += stepY)
+                // Loop to place stamps in a grid
+                for (double y = 0; y < pageHeight; y += vSpacing)
                 {
-                    for (double x = 0; x < pageWidth; x += stepX)
+                    for (double x = 0; x < pageWidth; x += hSpacing)
                     {
-                        // Create a new ImageStamp for each position
+                        // Create a new stamp for each position
                         ImageStamp stamp = new ImageStamp(watermarkImage)
                         {
+                            // Place the stamp at (x, y) from the bottom‑left corner
+                            XIndent = x,
+                            YIndent = y,
                             // Draw behind page content
                             Background = true,
-                            // Semi‑transparent
-                            Opacity    = 0.2,
-                            // Fixed size
-                            Width      = stampWidth,
-                            Height     = stampHeight,
-                            // Position on the page
-                            XIndent    = x,
-                            YIndent    = y
+                            // Optional: make the watermark semi‑transparent
+                            Opacity = 0.3f
                         };
 
-                        // Add the stamp to the current page (per‑page call)
+                        // Add the stamp to the current page
                         page.AddStamp(stamp);
                     }
                 }
             }
 
-            // Save the modified PDF (using rule: save)
+            // Save the modified PDF (using rule: Document.Save)
             doc.Save(outputPdf);
         }
 

@@ -2,46 +2,53 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-public static class PdfAnnotationHelper
+public static class PdfAnnotationFlattener
 {
     /// <summary>
     /// Flattens all annotations in a PDF provided as a stream and returns a new stream containing the modified PDF.
+    /// No file system access is performed.
     /// </summary>
-    /// <param name="pdfInput">Input PDF stream (must be readable and seekable).</param>
+    /// <param name="inputPdfStream">Stream containing the source PDF. The stream must be readable and seekable.</param>
     /// <returns>A MemoryStream with the flattened PDF. Caller is responsible for disposing the returned stream.</returns>
-    public static Stream FlattenAnnotations(Stream pdfInput)
+    public static MemoryStream FlattenAnnotations(Stream inputPdfStream)
     {
-        if (pdfInput == null) throw new ArgumentNullException(nameof(pdfInput));
+        if (inputPdfStream == null)
+            throw new ArgumentNullException(nameof(inputPdfStream));
+
         // Ensure the input stream is positioned at the beginning.
-        if (pdfInput.CanSeek) pdfInput.Position = 0;
+        if (inputPdfStream.CanSeek)
+            inputPdfStream.Position = 0;
 
         // Output stream will hold the result.
-        MemoryStream outputStream = new MemoryStream();
+        MemoryStream outputPdfStream = new MemoryStream();
 
-        // Use PdfAnnotationEditor from Aspose.Pdf.Facades to work with annotations.
+        // PdfAnnotationEditor is a facade that works directly with streams.
+        // It implements IDisposable, so we use a using block for deterministic cleanup.
         using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            // Bind the input PDF stream to the editor.
-            editor.BindPdf(pdfInput);
+            // Bind the PDF from the input stream.
+            editor.BindPdf(inputPdfStream);
 
             // Flatten all annotations in the document.
             editor.FlatteningAnnotations();
 
-            // Save the modified document to the output stream.
-            editor.Save(outputStream);
+            // Save the modified PDF into the output stream.
+            editor.Save(outputPdfStream);
         }
 
-        // Reset the output stream position for the caller to read from the beginning.
-        if (outputStream.CanSeek) outputStream.Position = 0;
-        return outputStream;
+        // Reset the position of the output stream so callers can read from the start.
+        if (outputPdfStream.CanSeek)
+            outputPdfStream.Position = 0;
+
+        return outputPdfStream;
     }
 }
 
-// Dummy entry point required for compilation as a console application.
+// Dummy entry point required for console‑type projects.
 public class Program
 {
     public static void Main(string[] args)
     {
-        // Intentionally left blank. The library functionality is exposed via PdfAnnotationHelper.
+        // Intentionally left blank – the library method can be called from other code.
     }
 }

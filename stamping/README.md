@@ -1,63 +1,63 @@
 # Stamping
 
-> **Stamping** in PDF using C# / .NET -- **50** verified, compile-tested examples for **Aspose.PDF for .NET** 26.5.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Stamping** in PDF using C# / .NET -- **50** verified, compile-tested examples for **Aspose.PDF for .NET** 26.6.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `stamping`
 - Examples: 50
-- NuGet: `Aspose.PDF 26.5.0` -- target `net10.0`
+- NuGet: `Aspose.PDF 26.6.0` -- target `net10.0`
 
 ## Examples
 
-- [`add-bottom-left-text-stamp.cs`](./add-bottom-left-text-stamp.cs) -- Add bottom left text stamp
-- [`add-confidential-text-stamp.cs`](./add-confidential-text-stamp.cs) -- Add confidential text stamp
-- [`add-custom-page-stamp.cs`](./add-custom-page-stamp.cs) -- Add custom page stamp
-- [`add-diagonal-image-watermark.cs`](./add-diagonal-image-watermark.cs) -- Add diagonal image watermark
-- [`add-diagonal-watermark.cs`](./add-diagonal-watermark.cs) -- Add diagonal watermark
-- [`add-faint-page-stamp.cs`](./add-faint-page-stamp.cs) -- Add faint page stamp
-- [`add-full-page-watermark.cs`](./add-full-page-watermark.cs) -- Add full page watermark
-- [`add-image-stamp-alt-text.cs`](./add-image-stamp-alt-text.cs) -- Add image stamp alt text
-- [`add-image-stamp-alternative-text.cs`](./add-image-stamp-alternative-text.cs) -- Add image stamp alternative text
-- [`add-image-stamp-annotation.cs`](./add-image-stamp-annotation.cs) -- Add image stamp annotation
-- [`add-image-stamp-custom-position.cs`](./add-image-stamp-custom-position.cs) -- Add image stamp custom position
-- [`add-image-stamp-encrypted-pdf.cs`](./add-image-stamp-encrypted-pdf.cs) -- Add image stamp encrypted pdf
-- [`add-image-stamp-flatten.cs`](./add-image-stamp-flatten.cs) -- Add image stamp flatten
-- [`add-image-stamp-form.cs`](./add-image-stamp-form.cs) -- Add image stamp form
+- [`add-auto-adjusting-text-stamp-to-pdf.cs`](./add-auto-adjusting-text-stamp-to-pdf.cs) -- Add auto adjusting text stamp to pdf
+- [`add-bold-outlined-text-stamp.cs`](./add-bold-outlined-text-stamp.cs) -- Add bold outlined text stamp
+- [`add-confidential-text-stamp-to-pdf.cs`](./add-confidential-text-stamp-to-pdf.cs) -- Add confidential text stamp to pdf
+- [`add-custom-page-stamp-to-pdf.cs`](./add-custom-page-stamp-to-pdf.cs) -- Add custom page stamp to pdf
+- [`add-custom-text-stamp-to-first-page.cs`](./add-custom-text-stamp-to-first-page.cs) -- Add custom text stamp to first page
+- [`add-diagonal-image-watermark-to-pdf.cs`](./add-diagonal-image-watermark-to-pdf.cs) -- Add diagonal image watermark to pdf
+- [`add-diagonal-text-stamp-watermark.cs`](./add-diagonal-text-stamp-watermark.cs) -- Add diagonal text stamp watermark
+- [`add-fixed-size-image-stamp-to-pdf.cs`](./add-fixed-size-image-stamp-to-pdf.cs) -- Add fixed size image stamp to pdf
+- [`add-full-page-image-watermark-to-pdf.cs`](./add-full-page-image-watermark-to-pdf.cs) -- Add full page image watermark to pdf
+- [`add-fully-opaque-image-stamp-watermark.cs`](./add-fully-opaque-image-stamp-watermark.cs) -- Add fully opaque image stamp watermark
+- [`add-image-background-floatingbox-page-4.cs`](./add-image-background-floatingbox-page-4.cs) -- Add image background floatingbox page 4
+- [`add-image-stamp-alt-text-page-3.cs`](./add-image-stamp-alt-text-page-3.cs) -- Add image stamp alt text page 3
+- [`add-image-stamp-and-flatten-annotations.cs`](./add-image-stamp-and-flatten-annotations.cs) -- Add image stamp and flatten annotations
+- [`add-image-stamp-as-background-to-pdf.cs`](./add-image-stamp-as-background-to-pdf.cs) -- Add image stamp as background to pdf
 - [`add-image-stamp-from-memory-stream.cs`](./add-image-stamp-from-memory-stream.cs) -- Add image stamp from memory stream
-- [`add-image-stamp-keep-javascript.cs`](./add-image-stamp-keep-javascript.cs) -- Add image stamp keep javascript
-- [`add-image-stamp-pdfa1b.cs`](./add-image-stamp-pdfa1b.cs) -- Add image stamp pdfa1b
+- [`add-image-stamp-percentage-position.cs`](./add-image-stamp-percentage-position.cs) -- Add image stamp percentage position
 - [`add-image-stamp-preserve-acroform.cs`](./add-image-stamp-preserve-acroform.cs) -- Add image stamp preserve acroform
+- [`add-image-stamp-preserve-annotations.cs`](./add-image-stamp-preserve-annotations.cs) -- Add image stamp preserve annotations
 - [`add-image-stamp-preserve-bookmarks.cs`](./add-image-stamp-preserve-bookmarks.cs) -- Add image stamp preserve bookmarks
-- [`add-image-stamp-preserve-embedded.cs`](./add-image-stamp-preserve-embedded.cs) -- Add image stamp preserve embedded
+- [`add-image-stamp-preserve-embedded-files.cs`](./add-image-stamp-preserve-embedded-files.cs) -- Add image stamp preserve embedded files
+- [`add-image-stamp-preserve-javascript.cs`](./add-image-stamp-preserve-javascript.cs) -- Add image stamp preserve javascript
 - [`add-image-stamp-preserve-page-labels.cs`](./add-image-stamp-preserve-page-labels.cs) -- Add image stamp preserve page labels
-- [`add-image-stamp-signed-pdf.cs`](./add-image-stamp-signed-pdf.cs) -- Add image stamp signed pdf
-- [`add-image-stamp-top-right.cs`](./add-image-stamp-top-right.cs) -- Add image stamp top right
-- [`add-image-stamp-xmp.cs`](./add-image-stamp-xmp.cs) -- Add image stamp xmp
-- [`add-image-stamp.cs`](./add-image-stamp.cs) -- Add image stamp
-- [`add-low-quality-image-stamp.cs`](./add-low-quality-image-stamp.cs) -- Add low quality image stamp
-- [`add-multi-line-text-stamp.cs`](./add-multi-line-text-stamp.cs) -- Add multi line text stamp
-- [`add-opaque-image-stamp.cs`](./add-opaque-image-stamp.cs) -- Add opaque image stamp
+- [`add-image-stamp-preserve-xmp-metadata.cs`](./add-image-stamp-preserve-xmp-metadata.cs) -- Add image stamp preserve xmp metadata
+- [`add-image-stamp-to-encrypted-pdf.cs`](./add-image-stamp-to-encrypted-pdf.cs) -- Add image stamp to encrypted pdf
+- [`add-image-stamp-to-pdf-page.cs`](./add-image-stamp-to-pdf-page.cs) -- Add image stamp to pdf page
+- [`add-image-stamp-to-pdf-preserve-form-fields.cs`](./add-image-stamp-to-pdf-preserve-form-fields.cs) -- Add image stamp to pdf preserve form fields
+- [`add-image-stamp-to-signed-pdf.cs`](./add-image-stamp-to-signed-pdf.cs) -- Add image stamp to signed pdf
+- [`add-image-stamp-top-right-corner.cs`](./add-image-stamp-top-right-corner.cs) -- Add image stamp top right corner
+- [`add-image-stamp-with-alt-text-pdfa1b.cs`](./add-image-stamp-with-alt-text-pdfa1b.cs) -- Add image stamp with alt text pdfa1b
+- [`add-image-stamp-with-opacity-to-pdf-pages.cs`](./add-image-stamp-with-opacity-to-pdf-pages.cs) -- Add image stamp with opacity to pdf pages
+- [`add-image-stamp-with-unicode-alt-text.cs`](./add-image-stamp-with-unicode-alt-text.cs) -- Add image stamp with unicode alt text
+- [`add-low-quality-image-stamp-to-pdf.cs`](./add-low-quality-image-stamp-to-pdf.cs) -- Add low quality image stamp to pdf
+- [`add-multi-line-text-stamp-custom-line-spacing.cs`](./add-multi-line-text-stamp-custom-line-spacing.cs) -- Add multi line text stamp custom line spacing
 - [`add-outlined-text-stamp.cs`](./add-outlined-text-stamp.cs) -- Add outlined text stamp
-- [`add-page-stamp-background.cs`](./add-page-stamp-background.cs) -- Add page stamp background
-- [`add-page-stamp-range.cs`](./add-page-stamp-range.cs) -- Add page stamp range
-- [`add-rotated-page-stamp.cs`](./add-rotated-page-stamp.cs) -- Add rotated page stamp
-- [`add-rtl-text-stamp.cs`](./add-rtl-text-stamp.cs) -- Add rtl text stamp
-- [`add-semi-transparent-logo-stamp.cs`](./add-semi-transparent-logo-stamp.cs) -- Add semi transparent logo stamp
-- [`add-text-stamp-all-pages.cs`](./add-text-stamp-all-pages.cs) -- Add text stamp all pages
-- [`add-text-stamp-auto-adjust.cs`](./add-text-stamp-auto-adjust.cs) -- Add text stamp auto adjust
-- [`add-text-stamp-background.cs`](./add-text-stamp-background.cs) -- Add text stamp background
-- [`add-text-stamp-fill-stroke.cs`](./add-text-stamp-fill-stroke.cs) -- Add text stamp fill stroke
-- [`add-text-stamp.cs`](./add-text-stamp.cs) -- Add text stamp
-- [`add-upside-down-image-stamp.cs`](./add-upside-down-image-stamp.cs) -- Add upside down image stamp
-- [`apply-image-stamp-all-pages.cs`](./apply-image-stamp-all-pages.cs) -- Apply image stamp all pages
-- [`create-pdf-page-stamp.cs`](./create-pdf-page-stamp.cs) -- Create pdf page stamp
-- [`fit-image-stamp-rectangle.cs`](./fit-image-stamp-rectangle.cs) -- Fit image stamp rectangle
-- [`fixed-size-image-stamp.cs`](./fixed-size-image-stamp.cs) -- Fixed size image stamp
-- [`image-background-floatingbox.cs`](./image-background-floatingbox.cs) -- Image background floatingbox
-- [`image-stamp-percentage-offset.cs`](./image-stamp-percentage-offset.cs) -- Image stamp percentage offset
-- [`pdf-page-background-stamp.cs`](./pdf-page-background-stamp.cs) -- Pdf page background stamp
-- [`rotate-image-stamp.cs`](./rotate-image-stamp.cs) -- Rotate image stamp
-- [`rotate-text-stamp.cs`](./rotate-text-stamp.cs) -- Rotate text stamp
-- [`scale-image-stamp-full-width.cs`](./scale-image-stamp-full-width.cs) -- Scale image stamp full width
+- [`add-page-stamp-to-specific-pdf-pages.cs`](./add-page-stamp-to-specific-pdf-pages.cs) -- Add page stamp to specific pdf pages
+- [`add-rotated-image-stamp-to-pdf-pages.cs`](./add-rotated-image-stamp-to-pdf-pages.cs) -- Add rotated image stamp to pdf pages
+- [`add-rotated-text-watermark.cs`](./add-rotated-text-watermark.cs) -- Add rotated text watermark
+- [`add-rtl-text-stamp-to-pdf.cs`](./add-rtl-text-stamp-to-pdf.cs) -- Add rtl text stamp to pdf
+- [`add-semi-transparent-logo-stamp-to-first-pdf-page.cs`](./add-semi-transparent-logo-stamp-to-first-pdf-page.cs) -- Add semi transparent logo stamp to first pdf page
+- [`add-text-stamp-to-all-pdf-pages.cs`](./add-text-stamp-to-all-pdf-pages.cs) -- Add text stamp to all pdf pages
+- [`add-text-stamp-with-background-box.cs`](./add-text-stamp-with-background-box.cs) -- Add text stamp with background box
+- [`add-upside-down-image-stamp-to-pdf.cs`](./add-upside-down-image-stamp-to-pdf.cs) -- Add upside down image stamp to pdf
+- [`apply-image-stamp-to-all-pdf-pages.cs`](./apply-image-stamp-to-all-pdf-pages.cs) -- Apply image stamp to all pdf pages
+- [`apply-pdf-page-background-stamp.cs`](./apply-pdf-page-background-stamp.cs) -- Apply pdf page background stamp
+- [`bottom-left-text-stamp-with-margin.cs`](./bottom-left-text-stamp-with-margin.cs) -- Bottom left text stamp with margin
+- [`create-page-stamp-from-pdf-template.cs`](./create-page-stamp-from-pdf-template.cs) -- Create page stamp from pdf template
+- [`fit-image-stamp-within-rectangle.cs`](./fit-image-stamp-within-rectangle.cs) -- Fit image stamp within rectangle
+- [`place-image-stamp-custom-coordinates.cs`](./place-image-stamp-custom-coordinates.cs) -- Place image stamp custom coordinates
+- [`rotate-image-stamp-in-pdf.cs`](./rotate-image-stamp-in-pdf.cs) -- Rotate image stamp in pdf
+- [`scale-image-stamp-to-full-page-width.cs`](./scale-image-stamp-to-full-page-width.cs) -- Scale image stamp to full page width
 
 ## See Also
 

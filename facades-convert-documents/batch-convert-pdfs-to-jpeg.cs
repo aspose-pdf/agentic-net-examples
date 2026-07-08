@@ -1,53 +1,53 @@
 using System;
 using System.IO;
 using Aspose.Pdf.Facades;
+using System.Drawing.Imaging;
 
-class Program
+class PdfToJpegBatchConverter
 {
     static void Main()
     {
         // Folder containing source PDF files
-        const string inputFolder = "InputPdfs";
+        const string inputFolder = @"C:\InputPdfs";
         // Folder where JPEG images will be saved
-        const string outputFolder = "OutputImages";
+        const string outputFolder = @"C:\OutputJpegs";
 
-        if (!Directory.Exists(inputFolder))
-        {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
-            return;
-        }
-
-        // Ensure the output root folder exists
+        // Ensure the output folder exists
         Directory.CreateDirectory(outputFolder);
 
-        // Get all PDF files in the input folder
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
-        foreach (string pdfPath in pdfFiles)
+        // Enumerate all PDF files in the input folder
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            // Create a sub‑folder for each PDF to keep its pages separate
-            string pdfName = Path.GetFileNameWithoutExtension(pdfPath);
-            string pdfOutputDir = Path.Combine(outputFolder, pdfName);
+            // Create a subfolder for each PDF to keep its pages separate
+            string pdfNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
+            string pdfOutputDir = Path.Combine(outputFolder, pdfNameWithoutExt);
             Directory.CreateDirectory(pdfOutputDir);
 
-            // Convert each page of the current PDF to a JPEG image
+            // Use PdfConverter from Aspose.Pdf.Facades to convert pages to JPEG
             using (PdfConverter converter = new PdfConverter())
             {
-                // Load the PDF
+                // Bind the PDF file to the converter
                 converter.BindPdf(pdfPath);
-                // Prepare the converter
+                // Prepare the converter for image extraction
                 converter.DoConvert();
 
                 int pageIndex = 1;
+                // Loop through all pages and save each as a JPEG image
                 while (converter.HasNextImage())
                 {
-                    // Default image format is JPEG, so no ImageFormat enum is needed
-                    string imagePath = Path.Combine(pdfOutputDir, $"page_{pageIndex}.jpg");
-                    converter.GetNextImage(imagePath);
+                    string jpegPath = Path.Combine(pdfOutputDir, $"page_{pageIndex}.jpg");
+                    // GetNextImage saves the image in JPEG format by default
+                    converter.GetNextImage(jpegPath);
                     pageIndex++;
                 }
+
+                // Release resources held by the converter
+                converter.Close();
             }
 
-            Console.WriteLine($"Converted '{pdfPath}' to {pdfFiles.Length} JPEG images.");
+            Console.WriteLine($"Converted '{pdfPath}' to JPEG images in '{pdfOutputDir}'.");
         }
+
+        Console.WriteLine("Batch conversion completed.");
     }
 }

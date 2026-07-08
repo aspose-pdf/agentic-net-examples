@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output_A3.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,22 +16,24 @@ class Program
             return;
         }
 
-        // PdfPageEditor is a facade that allows page size modification.
+        // Load the PDF and edit its pages using the Facades API.
+        // PdfPageEditor implements IDisposable, so wrap it in a using block.
         using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // Load the source PDF.
+            // Bind the source PDF file.
             editor.BindPdf(inputPath);
 
-            // Set the output page size to A3 (420 mm × 297 mm).
+            // Set the desired output page size to A3.
+            // PageSize.A3 corresponds to 420 mm × 297 mm.
             editor.PageSize = PageSize.A3;
 
-            // Apply the changes to all pages.
+            // Apply the changes to the document.
             editor.ApplyChanges();
 
-            // Save the resulting PDF.
+            // Save the modified PDF to the specified output path.
             editor.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with A3 page size to '{outputPath}'.");
+        Console.WriteLine($"PDF page size changed to A3 and saved as '{outputPath}'.");
     }
 }

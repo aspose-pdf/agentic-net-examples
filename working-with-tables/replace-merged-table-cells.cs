@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -16,66 +17,93 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Work with the first page (1‑based indexing)
-            Aspose.Pdf.Page page = doc.Pages[1];
-
-            // Find tables on the page
-            TableAbsorber absorber = new TableAbsorber();
-            absorber.Visit(page);
-
-            // Ensure at least one table was found
-            if (absorber.TableList.Count == 0)
+            // Iterate through all pages (1‑based indexing)
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                Console.WriteLine("No tables found on the page.");
-                doc.Save(outputPath);
-                return;
-            }
+                Aspose.Pdf.Page page = doc.Pages[pageIndex];
 
-            // Get the first absorbed table (the one we will replace)
-            AbsorbedTable oldTable = absorber.TableList[0];
-
-            // Create a new table that will replace the old one
-            Table newTable = new Table();
-
-            // Iterate through each row of the absorbed table
-            foreach (var absorbedRow in oldTable.RowList)
-            {
-                // Add a new row to the replacement table
-                Row newRow = newTable.Rows.Add();
-
-                // Iterate through each cell in the absorbed row
-                foreach (AbsorbedCell absorbedCell in absorbedRow.CellList)
+                // Create a TableAbsorber and enable the FlowEngine to obtain ColSpan information
+                TableAbsorber absorber = new TableAbsorber
                 {
-                    // If the cell spans multiple columns, split it into separate cells
-                    int span = absorbedCell.ColSpan > 1 ? absorbedCell.ColSpan : 1;
+                    UseFlowEngine = true
+                };
 
-                    for (int i = 0; i < span; i++)
+                // Extract tables from the current page
+                absorber.Visit(page);
+
+                // Work on a copy of the TableList to avoid collection modification issues
+                List<AbsorbedTable> tables = new List<AbsorbedTable>(absorber.TableList);
+
+                foreach (AbsorbedTable oldTable in tables)
+                {
+                    // Determine if the table contains any merged (col‑spanned) cells
+                    bool hasMergedCell = false;
+                    foreach (AbsorbedRow row in oldTable.RowList)
                     {
-                        // Add a new cell to the current row
-                        Cell newCell = newRow.Cells.Add();
-
-                        // Copy the text of the original cell into the first split cell only
-                        if (i == 0 && absorbedCell.TextFragments.Count > 0)
+                        foreach (AbsorbedCell cell in row.CellList)
                         {
-                            // Use the first text fragment as the cell content
-                            string cellText = absorbedCell.TextFragments[0].Text;
-                            TextFragment tf = new TextFragment(cellText);
-                            newCell.Paragraphs.Add(tf);
+                            if (cell.ColSpan > 1)
+                            {
+                                hasMergedCell = true;
+                                break;
+                            }
                         }
+                        if (hasMergedCell) break;
                     }
+
+                    if (!hasMergedCell)
+                        continue; // No merged cells – nothing to replace
+
+                    // Build a new Table that mirrors the old one but with split cells
+                    Table newTable = new Table();
+
+                    // Preserve the original table position (cast double → float)
+                    Aspose.Pdf.Rectangle rect = oldTable.Rectangle;
+                    newTable.Left = (float)rect.LLX;
+                    newTable.Top  = (float)rect.URY; // Top is the upper‑right Y coordinate
+
+                    // Recreate rows and cells
+                    foreach (AbsorbedRow oldRow in oldTable.RowList)
+                    {
+                        Row newRow = new Row();
+
+                        foreach (AbsorbedCell oldCell in oldRow.CellList)
+                        {
+                            // Extract the first text fragment (if any) as the cell content
+                            string cellText = string.Empty;
+                            if (oldCell.TextFragments.Count > 0)
+                                cellText = oldCell.TextFragments[0].Text;
+
+                            int span = oldCell.ColSpan;
+
+                            // If the cell spans multiple columns, create separate cells
+                            // each containing the same text. Otherwise create a single cell.
+                            for (int i = 0; i < Math.Max(span, 1); i++)
+                            {
+                                Cell newCell = new Cell();
+                                // Add the text to the cell's paragraph collection
+                                newCell.Paragraphs.Add(new TextFragment(cellText));
+                                // Ensure the cell does not span any columns
+                                newCell.ColSpan = 1;
+                                newRow.Cells.Add(newCell);
+                            }
+                        }
+
+                        newTable.Rows.Add(newRow);
+                    }
+
+                    // Replace the absorbed table with the newly constructed table using the absorber instance
+                    absorber.Replace(page, oldTable, newTable);
                 }
             }
-
-            // Replace the old table with the newly constructed table
-            absorber.Replace(page, oldTable, newTable);
 
             // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Table with merged cells replaced and saved to '{outputPath}'.");
+        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }
