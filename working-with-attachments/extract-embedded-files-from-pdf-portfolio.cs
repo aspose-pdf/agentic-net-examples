@@ -2,76 +2,68 @@ using System;
 using System.IO;
 using Aspose.Pdf; // Core Aspose.Pdf namespace
 
-class PortfolioExtractor
+class Program
 {
     static void Main()
     {
-        // Input PDF portfolio file
-        const string inputPdfPath = "portfolio.pdf";
+        // Input PDF Portfolio file
+        const string inputPdf = "portfolio.pdf";
 
-        // Output base directory where extracted files will be placed
-        const string outputBaseDir = "ExtractedFiles";
+        // Root directory where extracted files will be written
+        const string outputRoot = "ExtractedFiles";
 
-        // Validate input file existence
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Ensure the output base directory exists
-        Directory.CreateDirectory(outputBaseDir);
+        // Ensure the root output directory exists
+        Directory.CreateDirectory(outputRoot);
 
         try
         {
-            // Load the PDF document (portfolio) using a using block for deterministic disposal
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Load the PDF Portfolio inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPdf))
             {
-                // The EmbeddedFiles collection holds all files embedded in the portfolio
-                if (pdfDoc.EmbeddedFiles == null || pdfDoc.EmbeddedFiles.Count == 0)
+                // Iterate over all embedded files in the portfolio using reflection
+                foreach (var embedded in doc.EmbeddedFiles)
                 {
-                    Console.WriteLine("No embedded files found in the PDF portfolio.");
-                    return;
-                }
-
-                // Iterate over each embedded file using reflection to avoid direct dependency on the EmbeddedFile type
-                foreach (var embedded in pdfDoc.EmbeddedFiles)
-                {
-                    // Retrieve the file name (may contain sub‑folder structure)
+                    // Retrieve the file name via reflection (property "Name")
                     var nameProp = embedded.GetType().GetProperty("Name");
                     string relativePath = nameProp?.GetValue(embedded) as string ?? "UnnamedFile";
 
-                    // Determine any sub‑folder hierarchy encoded in the name
-                    string subFolder = Path.GetDirectoryName(relativePath) ?? string.Empty;
+                    // Determine the full path on disk where the file will be saved
+                    string fullPath = Path.Combine(outputRoot, relativePath);
 
-                    // Build the full directory path where this file will be saved
-                    string targetDir = Path.Combine(outputBaseDir, subFolder);
-                    Directory.CreateDirectory(targetDir); // Create subfolders as needed
-
-                    // Build the full file path (including file name)
-                    string targetFilePath = Path.Combine(targetDir, Path.GetFileName(relativePath));
+                    // Ensure the directory hierarchy exists
+                    string? directory = Path.GetDirectoryName(fullPath);
+                    if (!string.IsNullOrEmpty(directory))
+                    {
+                        Directory.CreateDirectory(directory);
+                    }
 
                     // Invoke the Save(string) method via reflection
                     var saveMethod = embedded.GetType().GetMethod("Save", new[] { typeof(string) });
                     if (saveMethod != null)
                     {
-                        saveMethod.Invoke(embedded, new object[] { targetFilePath });
-                        Console.WriteLine($"Extracted: {targetFilePath}");
+                        saveMethod.Invoke(embedded, new object[] { fullPath });
+                        Console.WriteLine($"Extracted: {fullPath}");
                     }
                     else
                     {
-                        // Fallback: try to obtain the raw stream from the FileSpecification if Save is unavailable
+                        // Fallback: try to copy the raw stream if Save method is unavailable
                         var fileSpecProp = embedded.GetType().GetProperty("FileSpecification");
                         var fileSpec = fileSpecProp?.GetValue(embedded);
                         var contentsProp = fileSpec?.GetType().GetProperty("Contents");
                         var contents = contentsProp?.GetValue(fileSpec) as Stream;
                         if (contents != null)
                         {
-                            using (var outStream = File.Create(targetFilePath))
+                            using (var outStream = File.Create(fullPath))
                             {
                                 contents.CopyTo(outStream);
                             }
-                            Console.WriteLine($"Extracted (stream fallback): {targetFilePath}");
+                            Console.WriteLine($"Extracted (stream): {fullPath}");
                         }
                         else
                         {
@@ -81,7 +73,7 @@ class PortfolioExtractor
                 }
             }
 
-            Console.WriteLine("All embedded files have been extracted successfully.");
+            Console.WriteLine("All embedded files have been processed.");
         }
         catch (Exception ex)
         {

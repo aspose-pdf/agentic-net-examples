@@ -6,38 +6,36 @@ class Program
 {
     static void Main()
     {
-        const string outputPdf = "portfolio.pdf";
-        const string imagePath = "image.png";
+        // Paths for the image to embed and the output PDF portfolio
+        const string imagePath   = "image.png";
+        const string outputPath  = "portfolio.pdf";
+        const string displayName = "MyImage.png"; // Name shown in the portfolio
 
+        // Ensure the image file exists before proceeding
         if (!File.Exists(imagePath))
         {
-            Console.Error.WriteLine($"Image not found: {imagePath}");
+            Console.Error.WriteLine($"Image file not found: {imagePath}");
             return;
         }
 
-        // Create a new PDF document and enable portfolio (collection) mode
+        // Create a new PDF document (will become a portfolio after embedding files)
         using (Document doc = new Document())
         {
-            doc.Collection = new Collection();   // marks the PDF as a portfolio
-            doc.Pages.Add();                     // optional blank page
-
-            // Embed the image file and set its display name in the portfolio
-            using (FileStream imgStream = File.OpenRead(imagePath))
+            // Create a FileSpecification for the image.
+            // The constructor takes a stream containing the file data and a display name.
+            using (FileStream imgStream = new FileStream(imagePath, FileMode.Open, FileAccess.Read))
             {
-                // Create a file specification from the image stream
-                FileSpecification fileSpec = new FileSpecification(imgStream, Path.GetFileName(imagePath));
+                FileSpecification fileSpec = new FileSpecification(imgStream, displayName);
 
-                // The key used in the EmbeddedFiles collection becomes the display name
-                string displayName = "My Embedded Image.png";
-
-                // Add the file specification to the portfolio
+                // Add the file to the EmbeddedFiles collection.
+                // Using the overload with a key sets the display name shown in the portfolio.
                 doc.EmbeddedFiles.Add(displayName, fileSpec);
             }
 
-            // Save the PDF portfolio
-            doc.Save(outputPdf);
+            // Save the PDF portfolio.
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Portfolio saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF portfolio created: {outputPath}");
     }
 }

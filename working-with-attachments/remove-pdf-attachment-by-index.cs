@@ -6,9 +6,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const int attachmentIndex = 0; // zero‑based index of the attachment to remove
+        const string inputPath = "input.pdf";   // PDF containing attachments
+        const string outputPath = "output.pdf"; // PDF after removal
+        const int attachmentIndex = 0;           // zero‑based index to remove
 
         if (!File.Exists(inputPath))
         {
@@ -16,24 +16,45 @@ class Program
             return;
         }
 
-        // Open the PDF inside a using block for deterministic disposal
+        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
         using (Document doc = new Document(inputPath))
         {
             // Access the collection of embedded files (attachments)
             EmbeddedFileCollection attachments = doc.EmbeddedFiles;
 
-            // Validate the index against the collection count
+            // Validate index against the collection count
             if (attachmentIndex < 0 || attachmentIndex >= attachments.Count)
             {
                 Console.Error.WriteLine($"Invalid attachment index: {attachmentIndex}");
                 return;
             }
 
-            // Retrieve the attachment name at the specified index
-            string nameToDelete = attachments[attachmentIndex].Name;
+            // Retrieve the attachment name at the specified zero‑based index using reflection
+            // This avoids a direct compile‑time dependency on the EmbeddedFile type.
+            string nameToRemove = null;
+            int current = 0;
+            foreach (var item in attachments)
+            {
+                if (current == attachmentIndex)
+                {
+                    var nameProp = item.GetType().GetProperty("Name");
+                    if (nameProp != null)
+                    {
+                        nameToRemove = nameProp.GetValue(item) as string;
+                    }
+                    break;
+                }
+                current++;
+            }
 
-            // Remove the attachment by its name
-            attachments.Delete(nameToDelete);
+            if (string.IsNullOrEmpty(nameToRemove))
+            {
+                Console.Error.WriteLine($"Could not determine name of attachment at index {attachmentIndex}.");
+                return;
+            }
+
+            // Remove the attachment by its name (the collection only supports Delete(string))
+            attachments.Delete(nameToRemove);
 
             // Save the modified PDF
             doc.Save(outputPath);

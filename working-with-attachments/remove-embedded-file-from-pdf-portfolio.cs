@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
 
 class Program
@@ -9,7 +8,7 @@ class Program
     {
         const string inputPath = "portfolio.pdf";
         const string outputPath = "portfolio_updated.pdf";
-        // Index of the embedded file to remove (0‑based for the collection enumeration)
+        // Index of the embedded file to remove (0‑based)
         int indexToRemove = 2;
 
         if (!File.Exists(inputPath))
@@ -18,31 +17,36 @@ class Program
             return;
         }
 
-        // Load the PDF document (portfolio) inside a using block for proper disposal
+        // Load the PDF portfolio
         using (Document doc = new Document(inputPath))
         {
             // Access the collection of embedded files
-            var embeddedFiles = doc.EmbeddedFiles;
+            EmbeddedFileCollection embeddedFiles = doc.EmbeddedFiles;
 
-            if (embeddedFiles == null || embeddedFiles.Count == 0)
+            // Aspose uses 1‑based indexing for EmbeddedFileCollection
+            int aspIndex = indexToRemove + 1;
+
+            // Validate the requested index
+            if (aspIndex < 1 || aspIndex > embeddedFiles.Count)
             {
-                Console.WriteLine("No embedded files found in the PDF portfolio.");
+                Console.Error.WriteLine("Invalid index for embedded file collection.");
+                return;
+            }
+
+            // Retrieve the FileSpecification at the requested position
+            FileSpecification spec = embeddedFiles[aspIndex];
+            string fileName = spec?.Name;
+
+            if (!string.IsNullOrEmpty(fileName))
+            {
+                // Delete the embedded file by its name
+                embeddedFiles.Delete(fileName);
+                Console.WriteLine($"Deleted embedded file '{fileName}' at index {indexToRemove}.");
             }
             else
             {
-                // Validate the requested index
-                if (indexToRemove < 0 || indexToRemove >= embeddedFiles.Count)
-                {
-                    Console.WriteLine($"Index {indexToRemove} is out of range. Embedded file count: {embeddedFiles.Count}");
-                }
-                else
-                {
-                    // Retrieve the key (file name) at the specified index
-                    string key = embeddedFiles.Keys.ElementAt(indexToRemove);
-                    // Delete the embedded file by its key
-                    embeddedFiles.DeleteByKey(key);
-                    Console.WriteLine($"Deleted embedded file '{key}' at index {indexToRemove}.");
-                }
+                Console.Error.WriteLine("Failed to obtain the file name of the embedded file.");
+                return;
             }
 
             // Save the modified PDF

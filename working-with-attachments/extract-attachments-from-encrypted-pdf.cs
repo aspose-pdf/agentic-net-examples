@@ -4,57 +4,56 @@ using Aspose.Pdf;
 
 class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
-        // Resolve the PDF path – first try the argument (if supplied), otherwise look in the executable folder.
-        string encryptedPdfPath = args.Length > 0 ? args[0] : Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "encrypted.pdf");
-        const string password = "user123";               // password to open the PDF
-        const string outputFolder = "Attachments";       // folder to store extracted files
+        const string inputPdf   = "encrypted.pdf";   // Encrypted PDF path
+        const string password   = "userPassword";   // Decryption password
+        const string outputDir  = "ExtractedAttachments";
 
-        // Verify that the encrypted PDF actually exists before attempting to open it.
-        if (!File.Exists(encryptedPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.WriteLine($"Error: Could not find the encrypted PDF at '{encryptedPdfPath}'.");
-            Console.WriteLine("Place the file in the specified location or pass its full path as a command‑line argument.");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Ensure the output directory exists.
-        Directory.CreateDirectory(outputFolder);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDir);
 
-        // Open the encrypted PDF with the supplied password. The Document constructor that accepts (string filename, string password) loads the file.
-        // Decrypt() removes encryption; after this the document can be accessed normally.
-        using (Document doc = new Document(encryptedPdfPath, password))
+        try
         {
-            // Decrypt the document (no parameters).
-            doc.Decrypt();
-
-            // Iterate over all embedded file attachments.
-            // EmbeddedFiles is a collection of FileSpecification objects.
-            for (int i = 1; i <= doc.EmbeddedFiles.Count; i++) // 1‑based indexing as required by Aspose.Pdf
+            // Open the encrypted PDF using the password
+            using (Document doc = new Document(inputPdf, password))
             {
-                FileSpecification spec = doc.EmbeddedFiles[i];
-                string fileName = spec.Name; // original attachment name
+                // Decrypt the document (required before accessing embedded files)
+                doc.Decrypt();
 
-                // Build full path for the extracted file.
-                string outputPath = Path.Combine(outputFolder, fileName);
+                // Iterate over embedded files (attachments) using reflection to avoid a direct
+                // dependency on the EmbeddedFile type, which may vary between Aspose.Pdf versions.
+                foreach (var embedded in doc.EmbeddedFiles)
+                {
+                    // Retrieve the file name via the "Name" property.
+                    var nameProp = embedded.GetType().GetProperty("Name");
+                    var saveMethod = embedded.GetType().GetMethod("Save", new[] { typeof(string) });
 
-                // Save the attachment to disk using the Contents stream of the FileSpecification.
-                if (spec.Contents != null)
-                {
-                    using (FileStream outStream = File.Create(outputPath))
-                    {
-                        spec.Contents.CopyTo(outStream);
-                    }
-                    Console.WriteLine($"Extracted: {fileName} → {outputPath}");
-                }
-                else
-                {
-                    Console.WriteLine($"Attachment '{fileName}' does not contain a content stream.");
+                    if (nameProp == null || saveMethod == null)
+                        continue; // Skip if the expected members are not present.
+
+                    string attachmentName = nameProp.GetValue(embedded) as string;
+                    if (string.IsNullOrEmpty(attachmentName))
+                        continue;
+
+                    string attachmentPath = Path.Combine(outputDir, attachmentName);
+                    // Invoke the Save(string) method to write the attachment to disk.
+                    saveMethod.Invoke(embedded, new object[] { attachmentPath });
+                    Console.WriteLine($"Extracted: {attachmentName}");
                 }
             }
-        }
 
-        Console.WriteLine("Attachment extraction completed.");
+            Console.WriteLine("Attachment extraction completed.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -6,39 +6,41 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "portfolio.pdf";   // output PDF portfolio
-        const string excelPath = "report.xlsx";   // Excel workbook to embed
-        const string description = "Quarterly financial report";
+        const string inputPdfPath = "portfolio_input.pdf";   // Existing PDF (can be empty)
+        const string excelPath = "report.xlsx";           // Excel workbook to embed
+        const string outputPdfPath = "portfolio_with_excel.pdf";
+        const string description = "Quarterly financial report – Excel workbook";
 
-        // Verify the Excel file exists before proceeding
+        // Verify files exist
+        if (!File.Exists(inputPdfPath))
+        {
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
+        }
         if (!File.Exists(excelPath))
         {
             Console.Error.WriteLine($"Excel file not found: {excelPath}");
             return;
         }
 
-        // Create a new PDF document (empty) and ensure deterministic disposal
-        using (Document pdfDoc = new Document())
+        // Load the PDF (portfolio) and embed the Excel file
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Add a blank page – a PDF portfolio must contain at least one page
-            pdfDoc.Pages.Add();
-
-            // Ensure the document has a Collection object (required for portfolios)
-            if (pdfDoc.Collection == null)
-                pdfDoc.Collection = new Collection();
-
-            // Create a FileSpecification for the Excel workbook, set its description
-            // and the file contents, then add it to the collection.
-            var fileSpec = new FileSpecification(excelPath, description)
+            // Open the Excel file as a stream and create a FileSpecification with description
+            using (FileStream excelStream = File.OpenRead(excelPath))
             {
-                Contents = new MemoryStream(File.ReadAllBytes(excelPath))
-            };
-            pdfDoc.Collection.Add(fileSpec);
+                // The first argument is the name that will appear in the PDF portfolio
+                FileSpecification fileSpec = new FileSpecification("report.xlsx", description);
+                // Assign the file contents via the stream
+                fileSpec.Contents = excelStream;
+                // Add the file specification to the PDF's embedded files collection
+                pdfDoc.EmbeddedFiles.Add(fileSpec);
+            }
 
-            // Save the resulting PDF portfolio.
-            pdfDoc.Save(pdfPath);
+            // Save the updated PDF portfolio
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF portfolio created: {pdfPath}");
+        Console.WriteLine($"Excel workbook embedded successfully into '{outputPdfPath}'.");
     }
 }
