@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_pdfa.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "pdfa_compliant.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,57 +15,39 @@ class Program
             return;
         }
 
-        // Load the source PDF inside a using block for deterministic disposal
+        // Load the source PDF (using the standard load constructor)
         using (Document doc = new Document(inputPath))
         {
-            // ------------------------------------------------------------
-            // Add standard document information (optional but useful)
-            // ------------------------------------------------------------
-            doc.Info.Title    = "Sample PDF/A Document";
-            doc.Info.Creator  = "MyApp 1.0";
-            doc.Info.Author   = "John Doe";
-            doc.Info.ModDate  = DateTime.Now;
-            doc.Info.CreationDate = DateTime.Now;
+            // Basic document info (optional but useful)
+            doc.Info.Title = "PDF/A Compliant Document";
+            doc.Info.Creator = "MyApp 1.0";
+            doc.Info.Producer = "Aspose.Pdf";
 
-            // ------------------------------------------------------------
-            // Prepare XMP metadata required for PDF/A compliance.
-            // We add the DocumentID and CreatorTool entries.
-            // ------------------------------------------------------------
-            string xmpXml =
-@"<?xpacket begin='﻿' id='W5M0MpCehiHzreSzNTczkc9d'?>
-<x:xmpmeta xmlns:x='adobe:ns:meta/'>
-  <rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'>
-    <rdf:Description rdf:about=''
-                     xmlns:xmp='http://ns.adobe.com/xap/1.0/'>
-      <xmp:DocumentID>uuid:12345678-1234-1234-1234-123456789abc</xmp:DocumentID>
-      <xmp:CreatorTool>MyApp 1.0</xmp:CreatorTool>
-    </rdf:Description>
-  </rdf:RDF>
-</x:xmpmeta>
-<?xpacket end='w'?>";
+            // -----------------------------------------------------------------
+            // Add required XMP metadata entries for PDF/A compliance
+            // -----------------------------------------------------------------
+            // The Metadata property gives direct access to the native XMP dictionary.
+            // Add standard XMP properties.
+            doc.Metadata.Add("xmp:CreateDate", DateTime.UtcNow);
+            doc.Metadata.Add("xmp:ModifyDate", DateTime.UtcNow);
+            doc.Metadata.Add("xmp:MetadataDate", DateTime.UtcNow);
+            doc.Metadata.Add("xmp:CreatorTool", "MyApp 1.0");
+            doc.Metadata.Add("xmp:DocumentID", "uuid:" + Guid.NewGuid().ToString());
 
-            // Convert the XML string to a memory stream
-            using (MemoryStream xmpStream = new MemoryStream())
-            {
-                using (StreamWriter writer = new StreamWriter(xmpStream, System.Text.Encoding.UTF8, 1024, true))
-                {
-                    writer.Write(xmpXml);
-                }
-                xmpStream.Position = 0; // Reset position before passing to the API
+            // -----------------------------------------------------------------
+            // Add PDF/A extension schema entries (pdfaid) required for PDF/A-1a
+            // -----------------------------------------------------------------
+            // Directly add the pdfaid properties – Aspose.Pdf embeds them in the
+            // appropriate PDF/A extension schema when they are present.
+            doc.Metadata.Add("pdfaid:part", "1");          // PDF/A‑1
+            doc.Metadata.Add("pdfaid:conformance", "A"); // PDF/A‑1a
 
-                // Attach the XMP metadata to the document
-                doc.SetXmpMetadata(xmpStream);
-            }
-
-            // ------------------------------------------------------------
-            // PDF/A specific flag – allow XRef gaps (required for PDF/A‑1b)
-            // ------------------------------------------------------------
-            doc.IsXrefGapsAllowed = true;
-
-            // Save the resulting PDF (PDF/A compliant) to the output file
+            // -----------------------------------------------------------------
+            // Save the PDF. The XMP metadata added above will be embedded.
+            // -----------------------------------------------------------------
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF/A document saved to '{outputPath}'.");
+        Console.WriteLine($"PDF/A compliant file saved to '{outputPath}'.");
     }
 }

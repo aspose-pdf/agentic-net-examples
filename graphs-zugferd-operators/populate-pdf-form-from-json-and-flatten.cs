@@ -1,14 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string jsonFile = "data.json";
-        const string outputPdf = "output_flattened.pdf";
+        const string inputPdf  = "input.pdf";
+        const string jsonPath  = "data.json";
+        const string outputPdf = "filled_flattened.pdf";
 
         if (!File.Exists(inputPdf))
         {
@@ -16,9 +17,9 @@ class Program
             return;
         }
 
-        if (!File.Exists(jsonFile))
+        if (!File.Exists(jsonPath))
         {
-            Console.Error.WriteLine($"JSON data file not found: {jsonFile}");
+            Console.Error.WriteLine($"JSON data file not found: {jsonPath}");
             return;
         }
 
@@ -27,17 +28,17 @@ class Program
             // Load the PDF document inside a using block for deterministic disposal
             using (Document doc = new Document(inputPdf))
             {
-                // Populate form fields from the JSON source
-                doc.Form.ImportFromJson(jsonFile);
+                // Populate form fields from the JSON file
+                doc.Form.ImportFromJson(jsonPath);
 
-                // Flatten the form so fields become static content and cannot be edited
+                // Flatten the form so that field values become part of the page content
                 doc.Form.Flatten();
 
-                // Save the modified PDF
+                // Save the resulting PDF
                 doc.Save(outputPdf);
             }
 
-            Console.WriteLine($"PDF with populated and flattened form saved to '{outputPdf}'.");
+            Console.WriteLine($"Form filled and flattened PDF saved to '{outputPdf}'.");
         }
         catch (Exception ex)
         {

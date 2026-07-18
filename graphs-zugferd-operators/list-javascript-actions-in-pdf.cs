@@ -1,8 +1,9 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
-class ListJavaScriptActions
+class Program
 {
     static void Main()
     {
@@ -14,49 +15,70 @@ class ListJavaScriptActions
             return;
         }
 
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // ----- Document‑level JavaScript -----
-            // JavaScriptCollection is not enumerable; iterate via its Keys collection.
+            // -----------------------------------------------------------------
+            // 1. Document‑level JavaScript collection (Document.JavaScript)
+            // -----------------------------------------------------------------
+            Console.WriteLine("Document‑level JavaScript scripts:");
             if (doc.JavaScript != null && doc.JavaScript.Keys.Count > 0)
             {
+                // JavaScriptCollection is not enumerable – iterate via its Keys collection
                 foreach (string key in doc.JavaScript.Keys)
                 {
                     string script = doc.JavaScript[key];
-                    Console.WriteLine($"Document‑level script (key: '{key}'):");
-                    Console.WriteLine(script);
-                    Console.WriteLine(new string('-', 40));
+                    Console.WriteLine($"- [{key}] {script}");
                 }
             }
             else
             {
-                Console.WriteLine("No document‑level JavaScript found.");
+                Console.WriteLine("- none");
             }
 
-            // ----- Page‑level JavaScript -----
-            foreach (Page page in doc.Pages)
+            // -----------------------------------------------------------------
+            // 2. Document actions that may contain JavaScript (Document.Actions)
+            // -----------------------------------------------------------------
+            DocumentActionCollection actions = doc.Actions;
+
+            PrintActionScript("AfterPrinting",  actions.AfterPrinting);
+            PrintActionScript("AfterSaving",    actions.AfterSaving);
+            PrintActionScript("BeforeClosing", actions.BeforeClosing);
+            PrintActionScript("BeforePrinting",actions.BeforePrinting);
+            PrintActionScript("BeforeSaving",  actions.BeforeSaving);
+
+            // -----------------------------------------------------------------
+            // 3. Page‑level scripts (OnOpen / OnClose)
+            // -----------------------------------------------------------------
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // OnOpen action – may be a JavaScriptAction (use runtime type check to avoid the missing namespace)
-                var onOpen = page.Actions?.OnOpen;
-                if (onOpen != null && onOpen.GetType().Name == "JavaScriptAction")
-                {
-                    // Cast to dynamic to access the JavaScript property at runtime
-                    dynamic jsAction = onOpen;
-                    Console.WriteLine($"Page {page.Number} OnOpen script:");
-                    Console.WriteLine((string)jsAction.JavaScript);
-                    Console.WriteLine(new string('-', 40));
-                }
+                Page page = doc.Pages[i];
 
-                // OnClose action – may be a JavaScriptAction
-                var onClose = page.Actions?.OnClose;
-                if (onClose != null && onClose.GetType().Name == "JavaScriptAction")
-                {
-                    dynamic jsAction = onClose;
-                    Console.WriteLine($"Page {page.Number} OnClose script:");
-                    Console.WriteLine((string)jsAction.JavaScript);
-                    Console.WriteLine(new string('-', 40));
-                }
+                // PageActionCollection only exposes OnOpen and OnClose actions.
+                if (page.Actions?.OnOpen != null)
+                    PrintActionScript($"Page {i} OnOpen", page.Actions.OnOpen);
+
+                if (page.Actions?.OnClose != null)
+                    PrintActionScript($"Page {i} OnClose", page.Actions.OnClose);
             }
+        }
+    }
+
+    // Helper to output JavaScript from a PdfAction if it is a JavascriptAction.
+    static void PrintActionScript(string actionName, PdfAction action)
+    {
+        if (action == null) return;
+
+        if (action is JavascriptAction js)
+        {
+            Console.WriteLine($"{actionName} JavaScript: {js.Script}");
+        }
+        else
+        {
+            // For non‑JavaScript actions, attempt to retrieve the ECMAScript string.
+            string ecma = action.GetECMAScriptString();
+            if (!string.IsNullOrEmpty(ecma))
+                Console.WriteLine($"{actionName} ECMAScript: {ecma}");
         }
     }
 }

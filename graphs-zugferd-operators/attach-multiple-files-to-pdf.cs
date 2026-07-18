@@ -3,79 +3,85 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
-class Program
+class AttachMultipleFiles
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        // Input PDF and output PDF paths
+        const string inputPdf  = "input.pdf";
         const string outputPdf = "output.pdf";
 
-        // Define the files to attach together with their MIME types and descriptions
-        var attachments = new (string Path, string Mime, string Description)[]
+        // Files to attach with their MIME types and descriptions
+        var attachments = new[]
         {
-            ("file1.txt", "text/plain", "First text file"),
-            ("image1.png", "image/png", "Sample image"),
-            ("data.csv",  "text/csv",  "CSV data file")
+            new { Path = "file1.txt",  Mime = "text/plain",          Description = "Text file attachment" },
+            new { Path = "image1.jpg", Mime = "image/jpeg",          Description = "JPEG image attachment" },
+            new { Path = "doc1.pdf",   Mime = "application/pdf",    Description = "PDF document attachment" }
         };
 
-        // Verify input PDF exists
+        // Ensure the source PDF exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Source PDF not found: {inputPdf}");
             return;
         }
 
-        // Verify each attachment file exists
-        foreach (var att in attachments)
+        // Load the PDF document (lifecycle rule: load)
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            if (!File.Exists(att.Path))
-            {
-                Console.Error.WriteLine($"Attachment not found: {att.Path}");
-                return;
-            }
-        }
+            // Choose the page where the annotations will be placed (first page in this example)
+            Page page = pdfDoc.Pages[1];
 
-        // Load the PDF inside a using block (ensures proper disposal)
-        using (Document doc = new Document(inputPdf))
-        {
-            // Choose a page to place the annotations (first page in this example)
-            Page page = doc.Pages[1];
-
-            // Base rectangle coordinates for the first annotation
-            double llx = 100, lly = 700, urx = 150, ury = 750;
-            double verticalOffset = 0;
+            // Position for each attachment annotation (stacked vertically)
+            double yTop = 800; // start from top of the page
+            const double xLeft = 50;
+            const double width  = 30;
+            const double height = 30;
+            const double verticalSpacing = 40;
 
             foreach (var att in attachments)
             {
-                // Create a FileSpecification with description (MIME type is not settable via API)
-                FileSpecification fileSpec = new FileSpecification(att.Path, att.Description);
-
-                // Position rectangle for this annotation (stacked vertically)
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(
-                    llx,
-                    lly - verticalOffset,
-                    urx,
-                    ury - verticalOffset);
-
-                // Create the file attachment annotation
-                FileAttachmentAnnotation fileAnn = new FileAttachmentAnnotation(page, rect, fileSpec)
+                if (!File.Exists(att.Path))
                 {
-                    // Optional visual settings
-                    Icon = FileIcon.PushPin,
-                    Title = Path.GetFileName(att.Path)
+                    Console.Error.WriteLine($"Attachment file not found: {att.Path}");
+                    continue; // skip missing files
+                }
+
+                // Create a FileSpecification for the attachment using the constructor that accepts path and description
+                FileSpecification fileSpec = new FileSpecification(att.Path, att.Description);
+                // NOTE: The MimeType property is not available in the current Aspose.Pdf version, so it is omitted.
+
+                // Define the rectangle for the annotation (border area)
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(
+                    xLeft,
+                    yTop - height,
+                    xLeft + width,
+                    yTop
+                );
+
+                // Create the FileAttachment annotation
+                FileAttachmentAnnotation fileAnnot = new FileAttachmentAnnotation(page, rect, fileSpec)
+                {
+                    // Subject is displayed as the attachment description in PDF viewers
+                    Subject = att.Description,
+                    // Title appears in the annotation popup window
+                    Title   = Path.GetFileName(att.Path)
                 };
 
-                // Add the annotation to the page
-                page.Annotations.Add(fileAnn);
+                // Use the FileIcon enum instead of a raw string
+                fileAnnot.Icon = FileIcon.PushPin;
 
-                // Increment offset for the next annotation
-                verticalOffset += 60;
+                // Add the annotation to the page
+                page.Annotations.Add(fileAnnot);
+
+                // Move down for the next annotation
+                yTop -= verticalSpacing;
             }
 
-            // Save the modified PDF (PDF format is the default)
-            doc.Save(outputPdf);
+            // Save the modified PDF (lifecycle rule: save)
+            pdfDoc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved with attachments: {outputPdf}");
+        Console.WriteLine($"Attachments added and saved to '{outputPdf}'.");
     }
 }

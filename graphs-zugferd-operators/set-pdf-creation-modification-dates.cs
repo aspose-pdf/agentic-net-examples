@@ -6,24 +6,27 @@ class Program
 {
     static void Main()
     {
+        // Input and output PDF paths
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
+        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the existing PDF, modify its metadata, and save it
+        // Load the PDF, set creation/modification dates, and save
         using (Document doc = new Document(inputPath))
         {
-            // Set creation and modification dates to the current time
-            DateTime now = DateTime.Now;
-            doc.Info.CreationDate = now;
-            doc.Info.ModDate      = now;
+            // Set the document creation date to the current UTC time
+            doc.Info.CreationDate = DateTime.UtcNow;
 
-            // Save the updated document
+            // Set the document modification date to the current UTC time
+            doc.Info.ModDate = DateTime.UtcNow;
+
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 

@@ -15,17 +15,17 @@ class Program
             return;
         }
 
-        // Load the existing ZUGFeRD PDF, modify metadata, and save.
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Add custom metadata entries.
+            // Add custom metadata entries
             doc.Metadata.Add("ProjectCode", "PRJ-2023-001");
             doc.Metadata.Add("Department", "Finance");
 
-            // Save the PDF with the new metadata.
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Metadata added and saved to '{outputPath}'.");
+        Console.WriteLine($"Custom metadata added and saved to '{outputPath}'.");
     }
 }

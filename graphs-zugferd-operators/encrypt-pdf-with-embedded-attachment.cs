@@ -1,47 +1,66 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text; // for Permissions enum
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output_encrypted.pdf";
-        const string attachmentPath = "secret.txt";
-        const string userPassword = "user123";
-        const string ownerPassword = "owner123";
+        const string inputPdfPath   = "input.pdf";          // existing PDF
+        const string attachmentPath = "secret.txt";         // file to attach
+        const string outputPdfPath  = "output_encrypted.pdf";
 
-        if (!File.Exists(inputPdf) || !File.Exists(attachmentPath))
+        const string userPassword  = "user123";            // password required to open
+        const string ownerPassword = "owner123";           // owner password
+
+        // Verify source files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine("Required files not found.");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
+        }
+        if (!File.Exists(attachmentPath))
+        {
+            Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
             return;
         }
 
-        // Load the existing PDF document
-        using (Document doc = new Document(inputPdf))
+        try
         {
-            // Read attachment data
-            byte[] attachmentData = File.ReadAllBytes(attachmentPath);
+            // Load the existing PDF document
+            using (Document doc = new Document(inputPdfPath))
+            {
+                // ------------------------------------------------------------
+                // Add the attachment to the PDF.
+                // The attachment is added to the document's EmbeddedFiles collection.
+                // The content will be encrypted together with the document when we
+                // apply password protection below.
+                // ------------------------------------------------------------
+                // Create a FileSpecification using the file path and a description.
+                var fileSpec = new FileSpecification(attachmentPath, "Attachment");
+                // Assign the file's bytes to the Contents stream.
+                fileSpec.Contents = new MemoryStream(File.ReadAllBytes(attachmentPath));
+                // Add the file specification to the PDF.
+                doc.EmbeddedFiles.Add(fileSpec);
 
-            // Create a FileSpecification for the embedded file
-            var fileSpec = new FileSpecification(Path.GetFileName(attachmentPath), "Encrypted attachment");
-            // Assign the file contents via a memory stream
-            fileSpec.Contents = new MemoryStream(attachmentData);
+                // ------------------------------------------------------------
+                // Encrypt the entire PDF (including attachments) using AES-256.
+                // Permissions can be adjusted as needed; here we allow printing
+                // and content extraction for the user password.
+                // ------------------------------------------------------------
+                Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-            // Add the embedded file to the PDF
-            doc.EmbeddedFiles.Add(fileSpec);
+                // Save the encrypted PDF. The attachment's stream is now protected.
+                doc.Save(outputPdfPath);
+            }
 
-            // Define permissions (allow printing, extracting, and modifying content)
-            Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent | Permissions.ModifyContent;
-
-            // Encrypt the document (including the embedded file) with user/owner passwords using AES‑256
-            doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
-
-            // Save the encrypted PDF (attachment content is encrypted as part of the document)
-            doc.Save(outputPdf);
+            Console.WriteLine($"Encrypted PDF with attachment saved to '{outputPdfPath}'.");
         }
-
-        Console.WriteLine($"Encrypted PDF with attachment saved to '{outputPdf}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

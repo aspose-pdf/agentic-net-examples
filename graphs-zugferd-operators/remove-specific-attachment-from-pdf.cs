@@ -1,32 +1,38 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Provides Document and EmbeddedFileCollection
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // PDF containing attachments
-        const string outputPdf = "output.pdf";         // PDF after removal
-        const string attachmentToRemove = "example.txt"; // Exact filename of the attachment to delete
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string attachmentName = "myfile.txt"; // name of the attachment to remove
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        try
         {
-            // Delete the specified attachment by its filename.
-            // The EmbeddedFiles collection exposes Delete(string name).
-            doc.EmbeddedFiles.Delete(attachmentToRemove);
+            // Load the PDF document (lifecycle rule: use Document constructor)
+            using (Document doc = new Document(inputPath))
+            {
+                // Remove the specific embedded file by its filename (EmbeddedFileCollection.Delete)
+                doc.EmbeddedFiles.Delete(attachmentName);
 
-            // Save the modified PDF. No SaveOptions needed because we keep PDF format.
-            doc.Save(outputPdf);
+                // Save the modified PDF (lifecycle rule: use Document.Save)
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Attachment '{attachmentName}' removed. Saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Attachment \"{attachmentToRemove}\" removed. Saved to '{outputPdf}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -18,41 +18,35 @@ class Program
             return;
         }
 
-        // Load the PDF document (using statement ensures proper disposal)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+            // Pages are 1‑based in Aspose.Pdf
             for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
                 Page page = doc.Pages[pageIndex];
-                OperatorCollection operators = page.Contents;
+                // In recent Aspose.Pdf versions the low‑level operators are accessed via the Contents collection
+                OperatorCollection contents = page.Contents;
 
-                // Scan the operator list for ShowText (Tj) operators
-                for (int i = 0; i < operators.Count; i++)
+                // Iterate over the low‑level operators on the page (1‑based indexing)
+                for (int opIndex = 1; opIndex <= contents.Count; opIndex++)
                 {
-                    if (operators[i] is ShowText showTextOp)
+                    // Identify ShowText (Tj) operators
+                    if (contents[opIndex] is ShowText showText)
                     {
-                        // Check if the operator's text contains the target string
-                        if (!string.IsNullOrEmpty(showTextOp.Text) && showTextOp.Text.Contains(searchText))
+                        // Replace occurrences of the target string
+                        if (!string.IsNullOrEmpty(showText.Text) && showText.Text.Contains(searchText))
                         {
-                            // Build the replacement string
-                            string newText = showTextOp.Text.Replace(searchText, replaceText);
-
                             // Create a new ShowText operator with the replaced text
-                            ShowText newOp = new ShowText(newText)
-                            {
-                                // Preserve the original operator index (optional but keeps ordering)
-                                Index = showTextOp.Index
-                            };
-
-                            // Replace the old operator with the new one in the collection
-                            operators[i] = newOp;
+                            ShowText newOp = new ShowText(showText.Text.Replace(searchText, replaceText));
+                            // Substitute the old operator with the new one
+                            contents[opIndex] = newOp;
                         }
                     }
                 }
             }
 
-            // Save the modified PDF (PDF format is the default when no SaveOptions are supplied)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

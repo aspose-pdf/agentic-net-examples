@@ -1,38 +1,34 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core Aspose.Pdf namespace (contains Document, Permissions, CryptoAlgorithm)
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "zugferd_input.pdf";   // original ZUGFeRD PDF
-        const string outputPath = "zugferd_encrypted.pdf"; // encrypted result
+        const string inputPath = "input.pdf";
+        const string outputPath = "encrypted.pdf";
+        const string userPassword = "user123";
+        const string ownerPassword = "owner123";
 
-        const string userPassword  = "user123";   // password required to open the PDF
-        const string ownerPassword = "owner123";  // password required to change permissions
-
-        // Verify that the source file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document (no special load options needed for a standard PDF)
+            // Load the ZUGFeRD PDF
             using (Document doc = new Document(inputPath))
             {
-                // Define the permissions you want to allow for the user password.
-                // Here we allow printing and content extraction; adjust as needed.
+                // Set desired permissions (e.g., allow printing and content extraction)
                 Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-                // Encrypt the document using the recommended AES‑256 algorithm.
-                // This overload matches the rule: Encrypt(string, string, Permissions, CryptoAlgorithm)
+                // Encrypt with user and owner passwords using AES-256
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-                // Save the encrypted PDF. The Save method writes a PDF regardless of the file extension.
+                // Save the encrypted PDF
                 doc.Save(outputPath);
             }
 

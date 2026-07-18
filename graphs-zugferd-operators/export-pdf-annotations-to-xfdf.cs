@@ -7,29 +7,30 @@ class Program
     static void Main()
     {
         const string inputPdf  = "input.pdf";
-        const string outputFdf = "annotations.xfdf";
+        const string outputXfdf = "annotations.xfdf";
 
-        // Verify input file exists
+        // Verify that the source PDF exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
         try
         {
-            // Load the PDF document inside a using block for deterministic disposal
+            // Load the PDF document (lifecycle: load)
             using (Document doc = new Document(inputPdf))
             {
-                // Export all annotations to an XFDF file
-                doc.ExportAnnotationsToXfdf(outputFdf);
-            }
+                // Export all annotations to an XFDF file (operation)
+                doc.ExportAnnotationsToXfdf(outputXfdf);
+            } // Document is disposed here (lifecycle: disposal)
 
-            Console.WriteLine($"Annotations exported successfully to '{outputFdf}'.");
+            Console.WriteLine($"Annotations successfully exported to '{outputXfdf}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during export: {ex.Message}");
+            // Handle any errors that may occur during processing
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }
