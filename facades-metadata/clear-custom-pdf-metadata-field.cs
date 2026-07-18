@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,7 +15,7 @@ class Program
             return;
         }
 
-        // Open the PDF with the PdfFileInfo facade
+        // Load the PDF using the PdfFileInfo facade
         using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
         {
             // Set the custom metadata entry "ObsoleteField" to an empty value

@@ -8,7 +8,6 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string newKeywords = "example, Aspose, PDF";
 
         if (!File.Exists(inputPath))
         {
@@ -16,15 +15,20 @@ class Program
             return;
         }
 
-        // Open the PDF file as a stream and bind it to PdfFileInfo
+        // Open the PDF file as a stream
         using (FileStream pdfStream = File.OpenRead(inputPath))
-        using (PdfFileInfo info = new PdfFileInfo(pdfStream))
         {
-            // Update the Keywords metadata
-            info.Keywords = newKeywords;
+            // Initialize PdfFileInfo with the PDF stream
+            PdfFileInfo fileInfo = new PdfFileInfo(pdfStream);
 
-            // Save the updated PDF to a new file
-            info.SaveNewInfo(outputPath);
+            // Update the Keywords metadata
+            fileInfo.Keywords = "Updated, Keywords, Example";
+
+            // Save the PDF with the updated metadata to a new file
+            fileInfo.SaveNewInfo(outputPath);
+
+            // Release resources held by the facade
+            fileInfo.Close();
         }
 
         Console.WriteLine($"Keywords updated and saved to '{outputPath}'.");

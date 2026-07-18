@@ -6,35 +6,26 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";   // source PDF
-        const string outputPath = "output.pdf";  // destination PDF
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
         const string creator    = "My Custom Creator";
 
-        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        try
+        // Load the PDF file info, set the Creator property, and save the updated file.
+        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
         {
-            // Initialize PdfFileInfo facade with the source PDF
-            using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
-            {
-                // Set the custom Creator metadata
-                pdfInfo.Creator = creator;
+            pdfInfo.Creator = creator;                     // Assign custom Creator value
+            bool saved = pdfInfo.SaveNewInfo(outputPath);  // Persist changes to a new file
 
-                // Persist the changes to a new file
-                bool saved = pdfInfo.SaveNewInfo(outputPath);
-                Console.WriteLine(saved
-                    ? $"Creator set and saved to '{outputPath}'."
-                    : "Failed to save the updated PDF.");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            if (saved)
+                Console.WriteLine($"Creator set and saved to '{outputPath}'.");
+            else
+                Console.Error.WriteLine("Failed to save updated PDF.");
         }
     }
 }

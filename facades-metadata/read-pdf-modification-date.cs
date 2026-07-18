@@ -7,53 +7,51 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "sample.pdf";
+        const string inputPath = "sample.pdf";
 
-        // Verify that the PDF file exists before attempting to open it.
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.WriteLine($"Error: The file '{pdfPath}' was not found.");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Initialize PdfFileInfo facade for the PDF file.
-        // Using the constructor that accepts the file path ensures the object is properly initialized.
-        using (PdfFileInfo info = new PdfFileInfo(pdfPath))
+        // Initialize PdfFileInfo with the PDF file
+        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
         {
-            // Retrieve the ModDate string (e.g., "D:20230702120000+00'00'")
-            string rawModDate = info.ModDate;
+            // Retrieve the ModDate string from the PDF metadata
+            string modDateStr = pdfInfo.ModDate;
 
-            // Remove the leading "D:" if present.
-            if (rawModDate.StartsWith("D:", StringComparison.OrdinalIgnoreCase))
-                rawModDate = rawModDate.Substring(2);
-
-            // PDF date format can include timezone like "+05'30'". Replace the apostrophes for parsing.
-            string cleaned = rawModDate.Replace("'", string.Empty);
-
-            // Define possible date patterns (with and without timezone).
-            string[] patterns =
+            if (string.IsNullOrWhiteSpace(modDateStr))
             {
-                "yyyyMMddHHmmsszzz",   // with timezone offset (e.g., +05:30)
-                "yyyyMMddHHmmsszz",    // with timezone offset without colon
-                "yyyyMMddHHmmss",      // without timezone
-                "yyyyMMdd"             // date only
+                Console.WriteLine("ModDate is not set in the PDF.");
+                return;
+            }
+
+            // PDF dates are typically in the format "D:yyyyMMddHHmmssK"
+            // Attempt to parse using known patterns; fallback to generic parsing
+            DateTime modDate;
+            string[] patterns = {
+                "D:yyyyMMddHHmmsszzz",
+                "D:yyyyMMddHHmmss",
+                "yyyyMMddHHmmss",
+                "yyyy-MM-ddTHH:mm:ss"
             };
 
-            if (DateTime.TryParseExact(
-                    cleaned,
-                    patterns,
-                    CultureInfo.InvariantCulture,
-                    DateTimeStyles.AssumeUniversal,
-                    out DateTime modDate))
+            bool parsed = DateTime.TryParseExact(
+                modDateStr,
+                patterns,
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal,
+                out modDate);
+
+            if (!parsed && !DateTime.TryParse(modDateStr, out modDate))
             {
-                // Output formatted date.
-                Console.WriteLine("Modification Date: " + modDate.ToString("yyyy-MM-dd HH:mm:ss"));
+                Console.WriteLine($"Unable to parse ModDate: {modDateStr}");
+                return;
             }
-            else
-            {
-                // Fallback to the raw string if parsing fails.
-                Console.WriteLine("Modification Date (raw): " + info.ModDate);
-            }
+
+            // Output the modification date in a readable format
+            Console.WriteLine($"Modification date: {modDate:yyyy-MM-dd HH:mm:ss}");
         }
     }
 }

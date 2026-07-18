@@ -6,21 +6,21 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
+        const string inputPath = "input.pdf";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // PdfFileInfo implements IDisposable, so use a using block for deterministic cleanup
-        using (PdfFileInfo fileInfo = new PdfFileInfo(pdfPath))
+        // Initialize PdfFileInfo facade with the PDF file
+        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
         {
             // Read the Author metadata property
-            string author = fileInfo.Author;
+            string author = pdfInfo.Author;
 
-            // Output the author to the console (empty string if not set)
+            // Output the author to the console
             Console.WriteLine($"Author: {author}");
         }
     }

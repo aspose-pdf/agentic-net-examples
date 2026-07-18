@@ -9,22 +9,25 @@ class Program
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
+        // Verify source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF with the PdfFileInfo facade
+        // Load the PDF using the PdfFileInfo facade (implements IDisposable)
         using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
         {
-            // Add a custom metadata entry named "ProjectCode"
-            pdfInfo.SetMetaInfo("ProjectCode", "ABC123");
+            // Add or update the custom metadata field "Version"
+            // Existing custom metadata is left untouched.
+            pdfInfo.SetMetaInfo("Version", "1.0");
 
-            // Save the updated PDF to a new file
+            // Save the PDF with the updated metadata.
+            // SaveNewInfo writes only the changed metadata and preserves all other info.
             bool saved = pdfInfo.SaveNewInfo(outputPath);
             Console.WriteLine(saved
-                ? $"Custom metadata added and saved to '{outputPath}'."
+                ? $"Metadata updated successfully. Output saved to '{outputPath}'."
                 : "Failed to save the updated PDF.");
         }
     }

@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,17 +15,18 @@ class Program
             return;
         }
 
-        // Load the PDF with the PdfFileInfo facade
+        // Load the PDF using PdfFileInfo facade
         using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
         {
-            // Add a custom metadata entry named "ProjectCode"
-            pdfInfo.SetMetaInfo("ProjectCode", "ABC123");
+            // Add custom metadata field "LastUpdated" with current UTC timestamp (ISO 8601)
+            string utcNow = DateTime.UtcNow.ToString("o");
+            pdfInfo.SetMetaInfo("LastUpdated", utcNow);
 
             // Save the updated PDF to a new file
             bool saved = pdfInfo.SaveNewInfo(outputPath);
             Console.WriteLine(saved
-                ? $"Custom metadata added and saved to '{outputPath}'."
-                : "Failed to save the updated PDF.");
+                ? $"Metadata updated and saved to '{outputPath}'."
+                : $"Failed to save updated PDF to '{outputPath}'.");
         }
     }
 }

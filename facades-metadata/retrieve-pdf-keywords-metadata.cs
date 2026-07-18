@@ -1,25 +1,25 @@
 using System;
+using System.IO;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPdf = "sample.pdf";
 
-        if (!System.IO.File.Exists(inputPath))
+        // Verify that the PDF file exists before creating PdfFileInfo
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.WriteLine($"Error: File '{inputPdf}' not found.");
             return;
         }
 
-        // Load PDF metadata using PdfFileInfo facade
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
+        // Initialize PdfFileInfo with a valid file path
+        using (PdfFileInfo fileInfo = new PdfFileInfo(inputPdf))
         {
-            // Retrieve the Keywords property
-            string keywords = pdfInfo.Keywords;
-
-            // Output the Keywords value (empty if not set)
+            // Retrieve the Keywords metadata (empty string if not set)
+            string keywords = fileInfo.Keywords ?? string.Empty;
             Console.WriteLine($"Keywords: {keywords}");
         }
     }

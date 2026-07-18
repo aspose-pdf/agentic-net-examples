@@ -17,13 +17,12 @@ class Program
         // Initialize the PdfFileInfo facade with the PDF file
         using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
         {
-            // Get the PDF version string
+            // Retrieve the PDF version string
             string pdfVersion = pdfInfo.GetPdfVersion();
 
-            // Example usage: display the version
+            // Store the version for later use (example: display it)
             Console.WriteLine($"PDF version: {pdfVersion}");
-
-            // The variable pdfVersion can be used later in the program as needed
+            // The variable 'pdfVersion' can now be used elsewhere in the program
         }
     }
 }

@@ -1,35 +1,38 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;   // PdfFileInfo resides here
-using Aspose.Pdf;          // optional, for Document if needed later
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string keywords   = "Aspose PDF, Metadata, Keywords";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string keywords = "Aspose, PDF, Metadata";
 
-        // Ensure the source PDF exists
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF, set the Keywords metadata, and save the updated file
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
+        // Set the Keywords metadata and save to a new file
+        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPdf))
         {
-            pdfInfo.Keywords = keywords;                     // set Keywords field
-            bool saved = pdfInfo.SaveNewInfo(outputPath);    // persist changes
-            Console.WriteLine(saved ? "Keywords saved successfully." : "Failed to save Keywords.");
+            pdfInfo.Keywords = keywords;
+            bool success = pdfInfo.SaveNewInfo(outputPdf);
+            if (!success)
+            {
+                Console.Error.WriteLine("Failed to save the PDF with updated metadata.");
+                return;
+            }
         }
 
-        // Verify that the Keywords were written by reading them back
-        using (PdfFileInfo verifyInfo = new PdfFileInfo(outputPath))
+        // Verify that the Keywords were saved correctly
+        using (PdfFileInfo verifyInfo = new PdfFileInfo(outputPdf))
         {
-            Console.WriteLine($"Keywords after save: {verifyInfo.Keywords}");
+            string savedKeywords = verifyInfo.Keywords;
+            Console.WriteLine($"Keywords after save: '{savedKeywords}'");
         }
     }
 }

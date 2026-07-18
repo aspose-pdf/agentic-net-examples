@@ -5,56 +5,58 @@ using Aspose.Pdf.Facades;
 
 class Program
 {
+    // Regular expression that metadata values must match.
+    // Adjust the pattern as needed for your validation rules.
+    private const string MetadataPattern = @"^[A-Za-z0-9\s\-\_]+$";
+
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output_validated.pdf";
 
-        // Example regex: allow alphanumeric characters and spaces, 1‑100 characters long
-        const string metaPattern = @"^[A-Za-z0-9\s]{1,100}$";
-
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load PDF metadata via PdfFileInfo facade
-        using (PdfFileInfo info = new PdfFileInfo(inputPath))
+        // Create and load the PDF file info facade.
+        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPdf))
         {
-            // Title
-            string title = "Sample Document Title";
-            if (Regex.IsMatch(title, metaPattern))
-                info.Title = title;
-            else
-                Console.WriteLine("Title does not match the required pattern.");
-
-            // Author
+            // Example metadata values to set.
+            string title  = "Sample Document Title";
             string author = "John Doe";
-            if (Regex.IsMatch(author, metaPattern))
-                info.Author = author;
-            else
-                Console.WriteLine("Author does not match the required pattern.");
-
-            // Subject
             string subject = "Demo Subject";
-            if (Regex.IsMatch(subject, metaPattern))
-                info.Subject = subject;
-            else
-                Console.WriteLine("Subject does not match the required pattern.");
 
-            // Keywords (comma‑separated alphanumeric tokens)
-            string keywords = "keyword1,keyword2,keyword3";
-            const string keywordsPattern = @"^([A-Za-z0-9]+,?)*$";
-            if (Regex.IsMatch(keywords, keywordsPattern))
-                info.Keywords = keywords;
+            // Validate each value against the regular expression before assigning.
+            if (IsValidMetadata(title))
+                pdfInfo.Title = title;
             else
-                Console.WriteLine("Keywords do not match the required pattern.");
+                Console.WriteLine("Title does not match the required pattern and will not be set.");
 
-            // Persist changes to a new PDF file
-            info.SaveNewInfo(outputPath);
+            if (IsValidMetadata(author))
+                pdfInfo.Author = author;
+            else
+                Console.WriteLine("Author does not match the required pattern and will not be set.");
+
+            if (IsValidMetadata(subject))
+                pdfInfo.Subject = subject;
+            else
+                Console.WriteLine("Subject does not match the required pattern and will not be set.");
+
+            // Save the updated PDF with the new metadata.
+            pdfInfo.SaveNewInfo(outputPdf);
         }
 
-        Console.WriteLine($"Metadata validated and saved to '{outputPath}'.");
+        Console.WriteLine($"Metadata validation complete. Output saved to '{outputPdf}'.");
+    }
+
+    // Helper method to validate a metadata string against the defined regex.
+    private static bool IsValidMetadata(string value)
+    {
+        if (string.IsNullOrEmpty(value))
+            return false;
+
+        return Regex.IsMatch(value, MetadataPattern);
     }
 }

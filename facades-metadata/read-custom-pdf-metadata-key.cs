@@ -15,20 +15,20 @@ class Program
             return;
         }
 
-        // PdfFileInfo provides access to custom metadata via GetMetaInfo
+        // PdfFileInfo is a facade for accessing PDF metadata
         using (PdfFileInfo pdfInfo = new PdfFileInfo(pdfPath))
         {
-            // Attempt to read the custom metadata key "Confidential"
+            // Retrieve the custom metadata value for the key "Confidential"
+            // GetMetaInfo returns an empty string if the key does not exist
             string confidentialValue = pdfInfo.GetMetaInfo("Confidential");
 
-            // GetMetaInfo returns an empty string if the key does not exist
-            if (string.IsNullOrEmpty(confidentialValue))
+            if (!string.IsNullOrEmpty(confidentialValue))
             {
-                Console.WriteLine("Custom metadata 'Confidential' does not exist.");
+                Console.WriteLine($"Confidential: {confidentialValue}");
             }
             else
             {
-                Console.WriteLine($"Confidential: {confidentialValue}");
+                Console.WriteLine("Custom metadata key \"Confidential\" not found.");
             }
         }
     }
