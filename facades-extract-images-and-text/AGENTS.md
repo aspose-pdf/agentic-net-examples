@@ -8,7 +8,7 @@ parent: ../agents.md
 
 # AGENTS - facades-extract-images-and-text
 
-> **Facades extract images and text** in PDF using C# / .NET -- **84** verified, compile-tested examples for **Aspose.PDF for .NET** 26.6.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Facades extract images and text** in PDF using C# / .NET -- **83** verified, compile-tested examples for **Aspose.PDF for .NET** 26.7.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 ## Persona
 
@@ -23,40 +23,33 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf.Facades;` (84/84 files) ← category-specific
-- `using Aspose.Pdf;` (34/84 files)
-- `using Aspose.Pdf.Text;` (7/84 files)
-- `using Aspose.Pdf.AI;` (1/84 files)
-- `using Aspose.Pdf.Devices;` (1/84 files)
-- `using Aspose.Pdf.Drawing;` (1/84 files)
-- `using Aspose.Pdf.Multithreading;` (1/84 files)
-- `using System;` (84/84 files)
-- `using System.IO;` (83/84 files)
-- `using System.Text;` (27/84 files)
-- `using System.Collections.Generic;` (17/84 files)
-- `using System.Drawing.Imaging;` (17/84 files)
-- `using System.Drawing;` (6/84 files)
-- `using System.Threading.Tasks;` (6/84 files)
-- `using System.Text.Json;` (4/84 files)
-- `using System.Threading;` (3/84 files)
-- `using Azure.Storage.Blobs;` (2/84 files)
-- `using System.IO.Compression;` (2/84 files)
-- `using System.Security.Cryptography;` (2/84 files)
-- `using Amazon.S3.Model;` (1/84 files)
-- `using Azure.Data.Tables;` (1/84 files)
-- `using Azure.Storage.Blobs.Models;` (1/84 files)
-- `using DocumentFormat.OpenXml;` (1/84 files)
-- `using DocumentFormat.OpenXml.Drawing;` (1/84 files)
-- `using DocumentFormat.OpenXml.Drawing.Pictures;` (1/84 files)
-- `using DocumentFormat.OpenXml.Packaging;` (1/84 files)
-- `using DocumentFormat.OpenXml.Wordprocessing;` (1/84 files)
-- `using Microsoft.Extensions.Logging;` (1/84 files)
-- `using Npgsql;` (1/84 files)
-- `using System.Diagnostics;` (1/84 files)
-- `using System.Drawing.Drawing2D;` (1/84 files)
-- `using System.Net.NetworkInformation;` (1/84 files)
-- `using System.Runtime.CompilerServices;` (1/84 files)
-- `using System.Runtime.Versioning;` (1/84 files)
+- `using Aspose.Pdf.Facades;` (83/83 files) ← category-specific
+- `using Aspose.Pdf;` (22/83 files)
+- `using Aspose.Pdf.Text;` (4/83 files)
+- `using Aspose.Pdf.Drawing;` (2/83 files)
+- `using Aspose.Pdf.AI;` (1/83 files)
+- `using Aspose.Pdf.Devices;` (1/83 files)
+- `using System;` (83/83 files)
+- `using System.IO;` (82/83 files)
+- `using System.Text;` (19/83 files)
+- `using System.Drawing.Imaging;` (17/83 files)
+- `using System.Collections.Generic;` (15/83 files)
+- `using System.Drawing;` (8/83 files)
+- `using System.Threading.Tasks;` (7/83 files)
+- `using System.Text.Json;` (4/83 files)
+- `using Azure.Storage.Blobs;` (3/83 files)
+- `using System.Threading;` (3/83 files)
+- `using Amazon.S3;` (2/83 files)
+- `using Amazon.S3.Model;` (2/83 files)
+- `using NUnit.Framework;` (2/83 files)
+- `using System.IO.Compression;` (2/83 files)
+- `using System.Security.Cryptography;` (2/83 files)
+- `using Amazon;` (1/83 files)
+- `using Google.Cloud.Storage.V1;` (1/83 files)
+- `using Microsoft.Azure.WebJobs;` (1/83 files)
+- `using Microsoft.Extensions.Logging;` (1/83 files)
+- `using System.Diagnostics;` (1/83 files)
+- `using System.Net;` (1/83 files)
 
 ## Common Code Pattern
 
@@ -73,40 +66,40 @@ tool.Save("output.pdf");
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [async-pdf-text-image-extraction](./async-pdf-text-image-extraction.cs) | Asynchronous PDF Text and Image Extraction with Aspose.Pdf | `PdfExtractor`, `BindPdf`, `ExtractText` | Demonstrates how to extract PDF text and images asynchronously using Aspose.Pdf.Facades.PdfExtrac... |
-| [batch-extract-text-from-pdfs](./batch-extract-text-from-pdfs.cs) | Batch Extract Text from PDFs to Matching Text Files | `PdfExtractor`, `BindPdf`, `ExtractText` | Shows how to loop through a directory of PDF documents, extract their text with Aspose.Pdf.Facade... |
-| [batch-extract-text-from-pdfs__v2](./batch-extract-text-from-pdfs__v2.cs) | Batch Extract Text from PDFs using PdfExtractor | `PdfExtractor`, `BindPdf`, `ExtractText` | Demonstrates how to use Aspose.Pdf.Facades.PdfExtractor to extract text from every PDF in a folde... |
-| [cancel-pdf-text-extraction](./cancel-pdf-text-extraction.cs) | Cancel PDF Text Extraction with CancellationToken | `Document`, `PdfExtractor`, `BindPdf` | Demonstrates extracting text from a PDF using Aspose.Pdf's PdfExtractor while allowing the operat... |
-| [check-pdf-contains-text](./check-pdf-contains-text.cs) | Check if PDF Contains Text via MemoryStream | `PdfExtractor`, `BindPdf`, `ExtractText` | Shows how to use Aspose.Pdf.Facades.PdfExtractor to extract text into a MemoryStream and determin... |
-| [check-pdf-for-text-and-images](./check-pdf-for-text-and-images.cs) | Check PDF for Text and Images using PdfExtractor | `PdfExtractor`, `BindPdf`, `ExtractText` | Demonstrates how to use Aspose.Pdf.Facades.PdfExtractor to determine whether a PDF contains both ... |
-| [configurable-pdf-extraction](./configurable-pdf-extraction.cs) | Configurable PDF Text, Image, and Attachment Extraction | `PdfExtractor`, `BindPdf`, `ExtractText` | Demonstrates how to extract text, images, and attachments from a PDF using Aspose.Pdf's PdfExtrac... |
-| [create-contact-sheet-pdf](./create-contact-sheet-pdf.cs) | Create Contact Sheet PDF from Extracted Images | `PdfExtractor`, `ExtractImage`, `HasNextImage` | Extracts all images from an input PDF and generates a new PDF that shows those images as thumbnai... |
-| [create-pdf-summary-from-first-three-pages](./create-pdf-summary-from-first-three-pages.cs) | Create PDF Summary from First Three Pages | `PdfExtractor`, `Document`, `TextFragment` | Extracts text from the first three pages of a PDF using PdfExtractor and generates a new PDF that... |
-| [detect-text-only-pdf-by-extracting-images](./detect-text-only-pdf-by-extracting-images.cs) | Detect Text‑Only PDF by Extracting Images | `PdfExtractor`, `BindPdf`, `ExtractImage` | Demonstrates using Aspose.Pdf.Facades.PdfExtractor to extract images from a PDF and determine if ... |
-| [error-handling-pdfextractor-bindpdf](./error-handling-pdfextractor-bindpdf.cs) | Error Handling for PdfExtractor BindPdf | `PdfExtractor`, `BindPdf`, `InvalidPdfFileFormatException` | Demonstrates how to bind a PDF with PdfExtractor and catch specific Aspose.Pdf exceptions that oc... |
-| [export-pdf-images-to-jpeg-quality-85](./export-pdf-images-to-jpeg-quality-85.cs) | Export PDF Images to JPEG with Quality 85 | `PdfConverter`, `BindPdf`, `DoConvert` | Demonstrates how to extract all images from a PDF file and save them as JPEG files using Aspose.P... |
-| [extract-all-images-from-pdf](./extract-all-images-from-pdf.cs) | Extract All Images from PDF Using PdfExtractor | `PdfExtractor`, `BindPdf`, `StartPage` | Shows how to extract every image from a PDF file with Aspose.Pdf.Facades.PdfExtractor by setting ... |
-| [extract-images-and-compress-png](./extract-images-and-compress-png.cs) | Extract Images from PDF and Compress as PNG | `PdfExtractor`, `BindPdf`, `ExtractImage` | Demonstrates extracting rendered images from a PDF using Aspose.Pdf.Facades.PdfExtractor and re‑e... |
-| [extract-images-by-keyword](./extract-images-by-keyword.cs) | Extract Images from Pages Containing a Keyword | `PdfExtractor`, `BindPdf`, `StartPage` | Demonstrates scanning each PDF page for a specific keyword and extracting only the images from pa... |
-| [extract-images-create-sprite-sheet](./extract-images-create-sprite-sheet.cs) | Extract Images from PDF and Create Sprite Sheet | `PdfExtractor`, `BindPdf`, `ExtractImage` | Demonstrates extracting all images from a PDF using Aspose.Pdf.Facades.PdfExtractor and combining... |
-| [extract-images-defined-in-resources](./extract-images-defined-in-resources.cs) | Extract Images Defined in PDF Resources | `PdfExtractor`, `BindPdf`, `ExtractImageMode` | Shows how to set the ImageExtractionMode to DefinedInResources and use PdfExtractor to retrieve i... |
-| [extract-images-from-encrypted-pdf](./extract-images-from-encrypted-pdf.cs) | Extract Images from Encrypted PDF | `PdfExtractor`, `Password`, `BindPdf` | Shows how to open a password‑protected PDF using Aspose.Pdf.Facades.PdfExtractor, extract all emb... |
-| [extract-images-from-first-pdf-page](./extract-images-from-first-pdf-page.cs) | Extract Images from First PDF Page to Byte Arrays | `PdfExtractor`, `BindPdf`, `StartPage` | Demonstrates how to use Aspose.Pdf.Facades to extract all images from the first page of a PDF and... |
-| [extract-images-from-pdf-pages-png](./extract-images-from-pdf-pages-png.cs) | Extract Images from Specific PDF Pages as PNG | `PdfExtractor`, `BindPdf`, `ExtractImage` | Shows how to use PdfExtractor to pull only the images from pages 5 through 10 of a PDF and save e... |
-| [extract-images-from-pdf-to-csv](./extract-images-from-pdf-to-csv.cs) | Extract Images from PDF and Generate CSV Report | `PdfExtractor`, `BindPdf`, `ExtractImage` | Shows how to use Aspose.Pdf.Facades.PdfExtractor to pull images from each PDF page, save them as ... |
-| [extract-images-from-pdf-to-zip](./extract-images-from-pdf-to-zip.cs) | Extract Images from PDF and Save to ZIP | `PdfExtractor`, `BindPdf`, `ExtractImage` | Shows how to use Aspose.Pdf.Facades.PdfExtractor to extract all images from a PDF document and pa... |
-| [extract-images-from-pdf-upload-to-s3](./extract-images-from-pdf-upload-to-s3.cs) | Extract Images from PDF and Upload to Amazon S3 | `PdfExtractor`, `BindPdf`, `ExtractImage` | Demonstrates extracting each image from a PDF using Aspose.Pdf's PdfExtractor and uploading the i... |
-| [extract-images-from-pdf-using-pdfextractor](./extract-images-from-pdf-using-pdfextractor.cs) | Extract Images from PDF Using PdfExtractor with Automatic Di... | `PdfExtractor`, `BindPdf`, `ExtractImage` | Demonstrates binding a PDF to Aspose.Pdf.Facades.PdfExtractor, extracting all images, and saving ... |
-| [extract-images-from-pdf-with-guid-filenames](./extract-images-from-pdf-with-guid-filenames.cs) | Extract Images from PDF with GUID Filenames | `PdfExtractor`, `BindPdf`, `ExtractImage` | Demonstrates how to extract all images from a PDF using Aspose.Pdf.Facades.PdfExtractor and save ... |
+| [async-extract-text-and-images-from-pdf](./async-extract-text-and-images-from-pdf.cs) | Asynchronously Extract Text and Images from PDF | `PdfExtractor`, `BindPdf`, `ExtractText` | Demonstrates how to use Aspose.Pdf.Facades.PdfExtractor with async/await to extract all text, per... |
+| [async-pdf-text-extraction-with-cancellation](./async-pdf-text-extraction-with-cancellation.cs) | Asynchronous PDF Text Extraction with Cancellation Support | `PdfExtractor`, `BindPdf`, `ExtractText` | Demonstrates extracting text from a PDF using Aspose.Pdf's PdfExtractor while honoring a Cancella... |
+| [batch-extract-text-from-pdfs](./batch-extract-text-from-pdfs.cs) | Batch Extract Text from PDFs to Text Files | `PdfExtractor`, `BindPdf`, `ExtractText` | Shows how to iterate over a directory of PDF files, extract their text using Aspose.Pdf.Facades.P... |
+| [batch-extract-text-from-pdfs__v2](./batch-extract-text-from-pdfs__v2.cs) | Batch Extract Text from PDFs using PdfExtractor | `PdfExtractor`, `BindPdf`, `ExtractText` | Shows how to use Aspose.Pdf.Facades.PdfExtractor to extract text from every PDF in a folder and w... |
+| [batch-pdf-text-extraction-azure-blob](./batch-pdf-text-extraction-azure-blob.cs) | Batch PDF Text Extraction from Azure Blob Storage | `PdfExtractor`, `BindPdf`, `ExtractText` | Demonstrates how to enumerate PDF files in an Azure Blob container, extract their text using Aspo... |
+| [check-pdf-contains-text](./check-pdf-contains-text.cs) | Check if PDF Contains Text Using PdfExtractor | `PdfExtractor`, `BindPdf`, `ExtractText` | Shows how to bind a PDF to Aspose.Pdf.Facades.PdfExtractor, extract its text into a MemoryStream,... |
+| [check-pdf-for-text-and-images](./check-pdf-for-text-and-images.cs) | Check PDF for Text and Images using PdfExtractor | `PdfExtractor`, `BindPdf`, `ExtractText` | Shows how to use Aspose.Pdf.Facades.PdfExtractor to determine whether a PDF file contains both te... |
+| [check-pdf-text-only-by-extracting-images](./check-pdf-text-only-by-extracting-images.cs) | Check if PDF is Text‑Only by Extracting Images | `PdfExtractor`, `BindPdf`, `ExtractImage` | Demonstrates how to use Aspose.Pdf.Facades.PdfExtractor to detect images in a PDF and determine w... |
+| [configurable-pdf-extraction](./configurable-pdf-extraction.cs) | Configurable PDF Text, Image, and Attachment Extraction | `PdfExtractor`, `BindPdf`, `ExtractText` | Shows how to read a JSON configuration file to enable or disable extraction of text, images, and ... |
+| [convert-pdf-to-multi-page-tiff](./convert-pdf-to-multi-page-tiff.cs) | Convert PDF to Multi‑Page TIFF for Archival | `PdfConverter`, `BindPdf`, `DoConvert` | Demonstrates how to bind a PDF, configure lossless TIFF settings, and save all pages as a single ... |
+| [create-a-rest-api-endpoint-that-receives-a-pdf-byt...](./create-a-rest-api-endpoint-that-receives-a-pdf-byte-array-and-returns-extracted-text-as-json.cs) | Create A Rest Api Endpoint That Receives A Pdf Byte Array An... | `PdfExtractor` | Create A Rest Api Endpoint That Receives A Pdf Byte Array And Returns Extracted Text As Json |
+| [create-contact-sheet-pdf](./create-contact-sheet-pdf.cs) | Create Contact Sheet PDF from Extracted Images | `PdfExtractor`, `BindPdf`, `ExtractImage` | Extracts all images from a source PDF and assembles them into a contact sheet PDF with thumbnails... |
+| [create-pdf-summary-from-first-three-pages](./create-pdf-summary-from-first-three-pages.cs) | Create PDF Summary from First Three Pages | `PdfExtractor`, `BindPdf`, `ExtractText` | Demonstrates extracting text from the first three pages of a PDF using PdfExtractor and generatin... |
+| [export-pdf-images-to-jpeg-quality-85](./export-pdf-images-to-jpeg-quality-85.cs) | Export PDF Images to JPEG with Quality 85 | `PdfConverter`, `BindPdf`, `DoConvert` | Shows how to extract all images from a PDF and save them as JPEG files with a quality setting of ... |
+| [extract-all-images-from-pdf](./extract-all-images-from-pdf.cs) | Extract All Images from PDF Using PdfExtractor | `PdfExtractor`, `BindPdf`, `ExtractImage` | Demonstrates how to extract images from every page of a PDF using Aspose.Pdf's PdfExtractor, sett... |
+| [extract-embedded-attachments-from-pdf](./extract-embedded-attachments-from-pdf.cs) | Extract Embedded Attachments from PDF | `PdfExtractor`, `BindPdf`, `ExtractAttachment` | Demonstrates how to use Aspose.Pdf.Facades to extract all file attachments embedded in a PDF and ... |
+| [extract-images-and-create-thumbnails](./extract-images-and-create-thumbnails.cs) | Extract Images from PDF and Create Thumbnails | `PdfExtractor`, `BindPdf`, `ExtractImage` | Demonstrates extracting all images from a PDF using Aspose.Pdf.Facades.PdfExtractor and generatin... |
+| [extract-images-by-keyword](./extract-images-by-keyword.cs) | Extract Images from PDF Pages Containing a Keyword | `Document`, `PdfExtractor`, `TextFragmentAbsorber` | Shows how to search each PDF page for a specific keyword using TextFragmentAbsorber and then extr... |
+| [extract-images-create-pdf-portfolio](./extract-images-create-pdf-portfolio.cs) | Create PDF Portfolio from Extracted Images | `PdfExtractor`, `Document`, `Page` | Demonstrates how to extract all images from an existing PDF using the PdfExtractor facade and ass... |
+| [extract-images-create-sprite-sheet](./extract-images-create-sprite-sheet.cs) | Extract Images from PDF and Create Sprite Sheet | `PdfExtractor`, `BindPdf`, `ExtractImage` | Shows how to extract all images from a PDF into memory streams and merge them horizontally into a... |
+| [extract-images-defined-in-resources](./extract-images-defined-in-resources.cs) | Extract Images Defined in Resources from PDF | `PdfExtractor`, `BindPdf`, `ExtractImageMode` | Demonstrates setting the ImageExtractionMode to DefinedInResources and extracting all resource‑ba... |
+| [extract-images-from-a-pdf-and-embed-them-into-an-h...](./extract-images-from-a-pdf-and-embed-them-into-an-html-report-using-base64-data-uris.cs) | Extract Images From A Pdf And Embed Them Into An Html Report... | `StringBuilder`, `PdfExtractor` | Extract Images From A Pdf And Embed Them Into An Html Report Using Base64 Data Uris |
+| [extract-images-from-encrypted-pdf](./extract-images-from-encrypted-pdf.cs) | Extract Images from Encrypted PDF | `PdfExtractor`, `Password`, `BindPdf` | Shows how to open a password‑protected PDF with Aspose.Pdf.Facades.PdfExtractor, extract all embe... |
+| [extract-images-from-first-pdf-page](./extract-images-from-first-pdf-page.cs) | Extract Images from First PDF Page to Byte Arrays | `PdfExtractor`, `BindPdf`, `ExtractImage` | Demonstrates how to use Aspose.Pdf.Facades.PdfExtractor to pull all images from the first page of... |
+| [extract-images-from-pdf-pages-png](./extract-images-from-pdf-pages-png.cs) | Extract Images from Specific PDF Pages as PNG | `PdfExtractor`, `BindPdf`, `ExtractImage` | Demonstrates how to use Aspose.Pdf's PdfExtractor to extract only images from pages 5‑10 of a PDF... |
+| [extract-images-from-pdf-png](./extract-images-from-pdf-png.cs) | Extract Images from PDF and Save as PNG | `PdfExtractor`, `BindPdf`, `ExtractImage` | Demonstrates using Aspose.Pdf.Facades.PdfExtractor to extract all images from a PDF and save each... |
+| [extract-images-from-pdf-to-base64-json](./extract-images-from-pdf-to-base64-json.cs) | Extract Images from PDF to Base64 JSON | `PdfExtractor`, `BindPdf`, `ExtractImage` | The example uses Aspose.Pdf.Facades.PdfExtractor to pull all images from a PDF, converts each ima... |
+| [extract-images-from-pdf-using-pdfextractor](./extract-images-from-pdf-using-pdfextractor.cs) | Extract Images from PDF Using PdfExtractor with Automatic Di... | `PdfExtractor`, `BindPdf`, `ExtractImage` | Shows how to extract all images from a PDF file using Aspose.Pdf.Facades.PdfExtractor inside a us... |
+| [extract-images-from-pdf-with-guid-filenames](./extract-images-from-pdf-with-guid-filenames.cs) | Extract Images from PDF with GUID Filenames | `PdfExtractor`, `BindPdf`, `ExtractImage` | Demonstrates how to use Aspose.Pdf's PdfExtractor to extract all images from a PDF and save each ... |
 | [extract-images-from-pdf](./extract-images-from-pdf.cs) | Extract Images from PDF to Temporary Folder | `PdfExtractor`, `BindPdf`, `ExtractImage` | Demonstrates how to use Aspose.Pdf's PdfExtractor to extract all images from a PDF using the defa... |
-| [extract-images-from-specific-pdf-page](./extract-images-from-specific-pdf-page.cs) | Extract Images from a Specific PDF Page | `PdfExtractor`, `BindPdf`, `StartPage` | Shows how to extract all images from a single PDF page using Aspose.Pdf.Facades.PdfExtractor by s... |
-| [extract-images-markdown-gallery](./extract-images-markdown-gallery.cs) | Extract Images from PDF and Create Markdown Gallery | `PdfExtractor`, `BindPdf`, `ExtractImageMode` | Shows how to use Aspose.Pdf's PdfExtractor to pull images from a PDF, save them as files, and gen... |
-| [extract-images-ocr-pdf](./extract-images-ocr-pdf.cs) | Extract Images from PDF and Perform OCR | `PdfExtractor`, `BindPdf`, `ExtractImage` | The example extracts all images from a PDF using Aspose.Pdf.Facades and then runs OCR on each ima... |
-| [extract-images-original-format](./extract-images-original-format.cs) | Extract Images from PDF in Original Format | `PdfExtractor`, `BindPdf`, `ExtractImageMode` | Shows how to use Aspose.Pdf.Facades.PdfExtractor to extract images from a PDF while preserving th... |
-| ... | | | *and 54 more files* |
+| ... | | | *and 53 more files* |
 
 ## Category Statistics
-- Total examples: 84
+- Total examples: 83
 
 ## Category-Specific Tips
 
@@ -145,5 +138,5 @@ tool.Save("output.pdf");
 - Review code examples in this folder for facades-extract-images-and-text patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-07-05 | Run: `20260705_005655_3d29fa`
+Updated: 2026-07-17 | Run: `20260717_171638_da3b3e`
 <!-- AUTOGENERATED:END -->

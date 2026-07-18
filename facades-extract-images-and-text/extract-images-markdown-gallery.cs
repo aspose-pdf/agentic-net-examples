@@ -1,59 +1,63 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                 // For ExtractImageMode enum
-using Aspose.Pdf.Facades;        // For PdfExtractor
+using System.Collections.Generic;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string imagesFolder = "images";
-        const string markdownFile = "gallery.md";
+        const string inputPdf = "input.pdf";          // source PDF
+        const string imagesFolder = "images";         // folder to store extracted images
+        const string markdownFile = "gallery.md";     // output markdown file
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Ensure the folder for extracted images exists
+        // Ensure the images folder exists
         Directory.CreateDirectory(imagesFolder);
 
-        // Use PdfExtractor inside a using block for deterministic disposal
+        // Use PdfExtractor (Facade) to extract images
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the source PDF
+            // Bind the PDF file
             extractor.BindPdf(inputPdf);
 
-            // Extract only images that are actually shown on the pages (optional)
-            extractor.ExtractImageMode = ExtractImageMode.ActuallyUsed;
+            // Optional: set resolution for clearer images (default is 150)
+            extractor.Resolution = 150;
 
-            // Start the extraction process
+            // Start the image extraction process
             extractor.ExtractImage();
 
             int imageIndex = 1;
-
-            // Open the markdown file for writing
-            using (StreamWriter mdWriter = new StreamWriter(markdownFile, false))
+            List<string> markdownLines = new List<string>
             {
-                // Loop through all extracted images
-                while (extractor.HasNextImage())
-                {
-                    string imageFileName = $"image-{imageIndex}.png";
-                    string imagePath = Path.Combine(imagesFolder, imageFileName);
+                "# Image Gallery",
+                ""
+            };
 
-                    // Save the next image to a file (default format based on extension)
-                    extractor.GetNextImage(imagePath);
+            // Retrieve each image until none are left
+            while (extractor.HasNextImage())
+            {
+                // Build a file name for the extracted image
+                string imagePath = Path.Combine(imagesFolder, $"image-{imageIndex}.jpg");
 
-                    // Write a markdown image link (relative path)
-                    mdWriter.WriteLine($"![]({Path.Combine(imagesFolder, imageFileName)})");
+                // Save the next image to the file (default format is JPEG)
+                extractor.GetNextImage(imagePath);
 
-                    imageIndex++;
-                }
+                // Add a markdown entry for the image
+                markdownLines.Add($"![Image {imageIndex}]({imagePath})");
+
+                imageIndex++;
             }
+
+            // Write the markdown content to the output file
+            File.WriteAllLines(markdownFile, markdownLines);
         }
 
-        Console.WriteLine($"Markdown gallery created at '{markdownFile}'.");
+        Console.WriteLine($"Image extraction complete. Markdown gallery saved to '{markdownFile}'.");
     }
 }

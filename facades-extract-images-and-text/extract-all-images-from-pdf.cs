@@ -1,49 +1,69 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging;
+using System.Drawing;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file containing images
-        const string inputPdf = "sample.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputFolder = "ExtractedImages";
+        Directory.CreateDirectory(outputFolder);
 
-        // Verify the input file exists
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
-            return;
-        }
+        // Create a sample PDF that contains at least one raster image.
+        CreateSamplePdfWithImage(inputPdf);
 
-        // Use PdfExtractor (a Facade) to extract images from the PDF.
-        // The extractor implements IDisposable, so wrap it in a using block.
+        // Extract images from the generated PDF.
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the PDF file to the extractor.
             extractor.BindPdf(inputPdf);
-
-            // Set the page range.
-            // StartPage = 1 (first page), EndPage = 0 means "all pages".
+            // StartPage = 1, EndPage = 0 means "all pages".
             extractor.StartPage = 1;
-            extractor.EndPage   = 0;
-
-            // Perform the image extraction.
+            extractor.EndPage = 0;
             extractor.ExtractImage();
 
-            // Retrieve each extracted image and save it to a separate file.
             int imageIndex = 1;
             while (extractor.HasNextImage())
             {
-                // Save each image as PNG. You can change the format if needed.
-                string outputImage = $"image-{imageIndex}.png";
-                extractor.GetNextImage(outputImage, ImageFormat.Png);
-                Console.WriteLine($"Extracted image saved to: {outputImage}");
+                string outputPath = Path.Combine(outputFolder, $"image-{imageIndex}.png");
+                extractor.GetNextImage(outputPath);
                 imageIndex++;
             }
         }
 
         Console.WriteLine("Image extraction completed.");
+    }
+
+    private static void CreateSamplePdfWithImage(string path)
+    {
+        // Build a simple bitmap in memory (red square).
+        using (Bitmap bmp = new Bitmap(100, 100))
+        {
+            using (Graphics g = Graphics.FromImage(bmp))
+            {
+                // Fully qualify the Color to avoid ambiguity with Aspose.Pdf.Color.
+                g.Clear(System.Drawing.Color.Red);
+            }
+
+            using (MemoryStream imgStream = new MemoryStream())
+            {
+                bmp.Save(imgStream, System.Drawing.Imaging.ImageFormat.Png);
+                imgStream.Position = 0;
+
+                // Create a PDF and place the bitmap on the first page.
+                using (Document doc = new Document())
+                {
+                    Page page = doc.Pages.Add();
+                    Aspose.Pdf.Image pdfImage = new Aspose.Pdf.Image
+                    {
+                        ImageStream = imgStream
+                    };
+                    page.Paragraphs.Add(pdfImage);
+                    doc.Save(path);
+                }
+            }
+        }
     }
 }

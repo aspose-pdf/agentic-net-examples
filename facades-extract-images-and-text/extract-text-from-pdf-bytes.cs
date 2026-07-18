@@ -3,55 +3,64 @@ using System.IO;
 using System.Text;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text; // <-- added namespace for TextFragment
+using Aspose.Pdf.Text; // <-- required for TextFragment
 
-class PdfTextExtractor
+class PdfTextExtractorFromBytes
 {
-    // Extracts all text from a PDF provided as a byte array.
-    // Returns the extracted text as a string.
-    public static string ExtractTextFromPdfBytes(byte[] pdfBytes)
+    static void Main()
     {
-        if (pdfBytes == null || pdfBytes.Length == 0)
-            throw new ArgumentException("PDF byte array is null or empty.", nameof(pdfBytes));
+        // Create a simple PDF in memory and obtain its bytes
+        byte[] pdfData = CreateSamplePdf();
 
-        // Wrap the byte array in a memory stream (no disk I/O).
-        using (MemoryStream pdfStream = new MemoryStream(pdfBytes))
-        using (PdfExtractor extractor = new PdfExtractor())
+        // Extract text from the PDF byte array without writing to disk
+        string extractedText = ExtractTextFromPdfBytes(pdfData);
+
+        Console.WriteLine("Extracted Text:");
+        Console.WriteLine(extractedText);
+    }
+
+    // Generates a one‑page PDF containing a single line of text and returns the bytes
+    private static byte[] CreateSamplePdf()
+    {
+        using (var doc = new Document())
         {
-            // Bind the PDF data from the stream.
-            extractor.BindPdf(pdfStream);
+            // Add a page
+            var page = doc.Pages.Add();
 
-            // Perform text extraction using the default Unicode encoding.
-            extractor.ExtractText();
+            // Add a text fragment
+            var tf = new TextFragment("Hello, Aspose.PDF!");
+            page.Paragraphs.Add(tf);
 
-            // Capture the extracted text into another memory stream.
-            using (MemoryStream textStream = new MemoryStream())
+            // Save to a memory stream
+            using (var ms = new MemoryStream())
             {
-                extractor.GetText(textStream);
-
-                // Convert the raw bytes (Unicode) to a .NET string.
-                return Encoding.Unicode.GetString(textStream.ToArray());
+                doc.Save(ms);
+                return ms.ToArray();
             }
         }
     }
 
-    // Example usage – creates a PDF in memory, extracts its text, and prints it.
-    static void Main()
+    private static string ExtractTextFromPdfBytes(byte[] pdfBytes)
     {
-        // Create a simple PDF document entirely in memory.
-        byte[] pdfBytes;
-        using (MemoryStream ms = new MemoryStream())
+        // Input stream containing the PDF data
+        using (var inputStream = new MemoryStream(pdfBytes))
+        // Facade for extracting text
+        using (var extractor = new PdfExtractor())
         {
-            Document doc = new Document();
-            Page page = doc.Pages.Add();
-            page.Paragraphs.Add(new TextFragment("Hello Aspose PDF!"));
-            doc.Save(ms);
-            pdfBytes = ms.ToArray();
-        }
+            // Bind the PDF from the stream
+            extractor.BindPdf(inputStream);
 
-        // Extract text from the in‑memory PDF bytes.
-        string text = ExtractTextFromPdfBytes(pdfBytes);
-        Console.WriteLine("Extracted Text:");
-        Console.WriteLine(text);
+            // Perform text extraction (Unicode encoding by default)
+            extractor.ExtractText();
+
+            // Capture the extracted text into an output stream
+            using (var outputStream = new MemoryStream())
+            {
+                extractor.GetText(outputStream);
+
+                // Convert the output bytes (Unicode) to a string
+                return Encoding.Unicode.GetString(outputStream.ToArray());
+            }
+        }
     }
 }

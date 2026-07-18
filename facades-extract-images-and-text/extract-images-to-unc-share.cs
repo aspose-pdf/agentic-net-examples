@@ -1,119 +1,77 @@
 using System;
 using System.IO;
-using System.Net.NetworkInformation;
 using Aspose.Pdf.Facades;
 
 class Program
 {
-    static void Main()
+    // ---------------------------------------------------------------------
+    // RULE: When working with UNC paths, always validate that the share is
+    // reachable before attempting to create directories or write files.
+    // If the UNC share cannot be accessed, fall back to a local temporary
+    // folder so the application does not crash with an IOException.
+    // ---------------------------------------------------------------------
+    private static string GetWritableFolder(string uncPath)
     {
-        // Path to the source PDF file
-        const string pdfPath = @"C:\Input\sample.pdf";
+        // If the UNC path is empty or null, skip validation.
+        if (string.IsNullOrWhiteSpace(uncPath))
+            return Path.Combine(Path.GetTempPath(), "ExtractedImages");
 
-        // Primary UNC path to the network share where images will be saved
-        const string primaryUncFolder = @"\\Server\Share\Images";
-
-        // Fallback local folder (used when the UNC share is unavailable)
-        string fallbackFolder = Path.Combine(Path.GetTempPath(), "ExtractedImages");
-
-        // Verify that the PDF exists
-        if (!File.Exists(pdfPath))
-        {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
-            return;
-        }
-
-        // Resolve the destination folder – try the UNC share first, otherwise use the fallback
-        string destFolder = ResolveDestinationFolder(primaryUncFolder, fallbackFolder);
-
-        // Initialize the PdfExtractor facade
-        PdfExtractor extractor = new PdfExtractor();
-
-        // Bind the PDF document to the extractor
-        extractor.BindPdf(pdfPath);
-
-        // Extract images from the bound PDF
-        extractor.ExtractImage();
-
-        int imageIndex = 1;
-        // Iterate through all extracted images
-        while (extractor.HasNextImage())
-        {
-            // Build a file name for each image (saved as JPEG by default)
-            string destFile = Path.Combine(destFolder, $"image-{imageIndex}.jpg");
-
-            // Save the current image to the resolved path
-            extractor.GetNextImage(destFile);
-
-            imageIndex++;
-        }
-
-        Console.WriteLine($"Extracted {imageIndex - 1} image(s) to \"{destFolder}\".");
-    }
-
-    /// <summary>
-    /// Returns a writable folder path. Tries the primary UNC folder first; if it cannot be accessed,
-    /// creates and returns a fallback local folder.
-    /// </summary>
-    private static string ResolveDestinationFolder(string primaryUnc, string fallbackLocal)
-    {
         try
         {
-            // Quick reachability test – ping the server part of the UNC path
-            string serverName = GetServerNameFromUnc(primaryUnc);
-            if (!string.IsNullOrEmpty(serverName) && PingHost(serverName))
-            {
-                // Ensure the UNC directory exists (or create it)
-                System.IO.Directory.CreateDirectory(primaryUnc);
-                return primaryUnc;
-            }
+            // Attempt to create the directory. If the share does not exist an
+            // IOException will be thrown. Directory.Exists alone is not enough
+            // because it returns false for inaccessible UNC shares without
+            // throwing.
+            DirectoryInfo di = Directory.CreateDirectory(uncPath);
+            // Verify we can write a test file – this guarantees write access.
+            string testFile = Path.Combine(di.FullName, "__test.tmp");
+            File.WriteAllText(testFile, "test");
+            File.Delete(testFile);
+            return di.FullName;
         }
         catch (IOException)
         {
-            // Swallow – we'll fall back to the local folder
+            // UNC share not reachable – fall back to a local temp folder.
+            string fallback = Path.Combine(Path.GetTempPath(), "ExtractedImages");
+            Directory.CreateDirectory(fallback);
+            Console.WriteLine($"[Warning] UNC path '{uncPath}' is not accessible. Using fallback folder '{fallback}'.");
+            return fallback;
         }
         catch (UnauthorizedAccessException)
         {
-            // Swallow – we'll fall back to the local folder
+            // No write permission – also fall back.
+            string fallback = Path.Combine(Path.GetTempPath(), "ExtractedImages");
+            Directory.CreateDirectory(fallback);
+            Console.WriteLine($"[Warning] No write permission to UNC path '{uncPath}'. Using fallback folder '{fallback}'.");
+            return fallback;
         }
-
-        // If we reach here, use the fallback local folder
-        System.IO.Directory.CreateDirectory(fallbackLocal);
-        return fallbackLocal;
     }
 
-    /// <summary>
-    /// Extracts the server name from a UNC path (e.g., "\\Server\Share" => "Server").
-    /// </summary>
-    private static string GetServerNameFromUnc(string uncPath)
+    static void Main()
     {
-        if (string.IsNullOrWhiteSpace(uncPath))
-            return string.Empty;
+        // Local PDF file to extract images from
+        const string inputPdfPath = @"C:\Docs\sample.pdf";
 
-        // UNC format: \\ServerName\ShareName\Optional\Path
-        // Split on backslash, ignoring empty entries caused by the leading \\.
-        var parts = uncPath.Split(new[] { '\\' }, StringSplitOptions.RemoveEmptyEntries);
-        return parts.Length > 0 ? parts[0] : string.Empty;
-    }
+        // UNC network share where extracted images will be saved
+        // Example: \\fileserver\shared\images
+        const string uncFolder = @"\\fileserver\shared\images";
 
-    /// <summary>
-    /// Sends a single ICMP echo request to verify that the host is reachable.
-    /// Returns true if a reply is received within the timeout.
-    /// </summary>
-    private static bool PingHost(string host)
-    {
-        try
+        // Resolve a folder we can actually write to (UNC or fallback).
+        string destinationFolder = GetWritableFolder(uncFolder);
+
+        // Initialize the PDF extractor
+        PdfExtractor extractor = new PdfExtractor();
+        extractor.BindPdf(inputPdfPath);
+        extractor.ExtractImage();
+
+        int imageIndex = 1;
+        while (extractor.HasNextImage())
         {
-            using (var ping = new Ping())
-            {
-                var reply = ping.Send(host, 1000);
-                return reply != null && reply.Status == IPStatus.Success;
-            }
+            string outputPath = Path.Combine(destinationFolder, $"image-{imageIndex}.jpg");
+            extractor.GetNextImage(outputPath);
+            imageIndex++;
         }
-        catch
-        {
-            // Any exception (e.g., Ping not allowed) is treated as unreachable.
-            return false;
-        }
+
+        Console.WriteLine($"Extraction complete. {imageIndex - 1} image(s) saved to '{destinationFolder}'.");
     }
 }

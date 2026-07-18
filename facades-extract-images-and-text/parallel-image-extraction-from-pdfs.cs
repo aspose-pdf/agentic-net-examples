@@ -1,68 +1,75 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using Aspose.Pdf.Facades;
-using System.Drawing.Imaging;
 
-class Program
+class ParallelImageExtractor
 {
-    // Entry point – runs the parallel extraction
-    static async Task Main(string[] args)
+    // Extracts images from multiple PDF files concurrently.
+    // Each PDF's images are saved into a subfolder named after the PDF (without extension).
+    public static async Task ExtractImagesFromPdfsAsync(string[] pdfFiles, string outputRoot)
     {
-        // List of PDF files to process (adjust paths as needed)
-        string[] pdfFiles = { "doc1.pdf", "doc2.pdf", "doc3.pdf" };
-        // Root folder where all extracted images will be placed
-        string outputRoot = "ExtractedImages";
-
-        // Ensure the root output directory exists
+        // Ensure the root output directory exists.
         Directory.CreateDirectory(outputRoot);
 
-        // Create a task for each PDF file
-        var extractionTasks = new List<Task>();
-        foreach (string pdfPath in pdfFiles)
+        // Create a task for each PDF file.
+        Task[] extractionTasks = new Task[pdfFiles.Length];
+        for (int idx = 0; idx < pdfFiles.Length; idx++)
         {
-            extractionTasks.Add(Task.Run(() => ExtractImagesFromPdf(pdfPath, outputRoot)));
+            string pdfPath = pdfFiles[idx];
+            extractionTasks[idx] = Task.Run(() =>
+            {
+                // Validate input file.
+                if (!File.Exists(pdfPath))
+                {
+                    Console.Error.WriteLine($"File not found: {pdfPath}");
+                    return;
+                }
+
+                // Prepare output subdirectory for this PDF.
+                string pdfNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
+                string pdfOutputDir = Path.Combine(outputRoot, pdfNameWithoutExt);
+                Directory.CreateDirectory(pdfOutputDir);
+
+                // Use PdfExtractor (Facade) to extract images.
+                using (PdfExtractor extractor = new PdfExtractor())
+                {
+                    extractor.BindPdf(pdfPath);          // Bind the source PDF.
+                    extractor.ExtractImage();            // Prepare image extraction.
+
+                    int imageIndex = 1;
+                    while (extractor.HasNextImage())
+                    {
+                        // Save each image as a separate file (default format is PNG/JPEG based on source).
+                        string imageFile = Path.Combine(pdfOutputDir, $"image-{imageIndex}.png");
+                        extractor.GetNextImage(imageFile);
+                        imageIndex++;
+                    }
+                }
+
+                Console.WriteLine($"Completed extraction for: {pdfPath}");
+            });
         }
 
-        // Wait for all extraction tasks to complete
+        // Await all extraction tasks to finish.
         await Task.WhenAll(extractionTasks);
-
-        Console.WriteLine("Image extraction completed for all PDFs.");
     }
 
-    // Extracts all images from a single PDF and saves them to a dedicated folder
-    static void ExtractImagesFromPdf(string pdfPath, string outputRoot)
+    // Example usage.
+    static async Task Main()
     {
-        if (!File.Exists(pdfPath))
+        // List of PDF files to process.
+        string[] pdfFiles = new[]
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
-            return;
-        }
+            "sample1.pdf",
+            "sample2.pdf",
+            "sample3.pdf"
+        };
 
-        // Create a subdirectory for this PDF to avoid filename collisions
-        string pdfName = Path.GetFileNameWithoutExtension(pdfPath);
-        string pdfOutputDir = Path.Combine(outputRoot, pdfName);
-        Directory.CreateDirectory(pdfOutputDir);
+        // Directory where extracted images will be stored.
+        string outputRoot = "ExtractedImages";
 
-        // Use PdfExtractor (a Facade) to pull images from the PDF
-        using (PdfExtractor extractor = new PdfExtractor())
-        {
-            // Bind the source PDF file
-            extractor.BindPdf(pdfPath);
-            // Prepare the extractor to retrieve images
-            extractor.ExtractImage();
-
-            int imageIndex = 1;
-            // Loop while there are more images available
-            while (extractor.HasNextImage())
-            {
-                // Build a unique filename for each extracted image
-                string imageFile = Path.Combine(pdfOutputDir, $"image-{imageIndex}.png");
-                // Save the image as PNG (you can choose other formats via ImageFormat)
-                extractor.GetNextImage(imageFile, ImageFormat.Png);
-                imageIndex++;
-            }
-        }
+        await ExtractImagesFromPdfsAsync(pdfFiles, outputRoot);
+        Console.WriteLine("All image extractions completed.");
     }
 }

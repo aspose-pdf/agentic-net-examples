@@ -1,26 +1,27 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPdf = "input.pdf";
 
-        if (!System.IO.File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // PdfExtractor implements IDisposable via Facade, so use using for deterministic disposal
+        // Initialize the PdfExtractor facade
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the PDF file to the extractor
-            extractor.BindPdf(inputPath);
+            // Bind the PDF document
+            extractor.BindPdf(inputPdf);
 
-            // Extract attachments (required before calling GetAttachNames)
+            // Extract attachment information (required before GetAttachNames)
             extractor.ExtractAttachment();
 
             // Retrieve the list of attachment names
