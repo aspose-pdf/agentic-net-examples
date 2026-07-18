@@ -17,7 +17,7 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
             // Validate the requested page number
@@ -27,10 +27,10 @@ class Program
                 return;
             }
 
-            // Access the target page
+            // Get the target page (Aspose.Pdf uses 1‑based indexing)
             Page page = doc.Pages[targetPageNumber];
 
-            // Iterate through all annotations on the page (1‑based indexing)
+            // Iterate over all annotations on the page (annotation collection is also 1‑based)
             for (int i = 1; i <= page.Annotations.Count; i++)
             {
                 Annotation ann = page.Annotations[i];
@@ -38,7 +38,7 @@ class Program
                 // Adjust opacity only for underline annotations
                 if (ann is UnderlineAnnotation underline)
                 {
-                    underline.Opacity = 0.5; // 50% opacity
+                    underline.Opacity = 0.5; // 50 % opacity
                 }
             }
 
@@ -46,6 +46,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Underline annotation opacity set to 50% and saved to '{outputPath}'.");
+        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }
 }

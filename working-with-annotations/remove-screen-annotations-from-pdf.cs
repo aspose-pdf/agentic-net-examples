@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -9,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_no_screen.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,27 +16,24 @@ class Program
             return;
         }
 
-        // Load the PDF document (deterministic disposal)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based in Aspose.Pdf
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Iterate through all pages (1‑based indexing)
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
-                Page page = doc.Pages[i];
-                AnnotationCollection annotations = page.Annotations;
+                Page page = doc.Pages[pageNum];
+                AnnotationCollection annots = page.Annotations;
 
-                // Gather all ScreenAnnotation instances on this page
-                List<Annotation> toRemove = new List<Annotation>();
-                foreach (Annotation ann in annotations)
+                // Delete ScreenAnnotation instances.
+                // Iterate backwards to avoid index shifting when deleting.
+                for (int i = annots.Count; i >= 1; i--)
                 {
+                    Annotation ann = annots[i];
                     if (ann is ScreenAnnotation)
-                        toRemove.Add(ann);
-                }
-
-                // Remove each collected ScreenAnnotation
-                foreach (Annotation ann in toRemove)
-                {
-                    annotations.Delete(ann);
+                    {
+                        annots.Delete(ann);
+                    }
                 }
             }
 
@@ -45,6 +41,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"All ScreenAnnotations removed. Saved to '{outputPath}'.");
+        Console.WriteLine($"Screen annotations removed. Saved to '{outputPath}'.");
     }
 }

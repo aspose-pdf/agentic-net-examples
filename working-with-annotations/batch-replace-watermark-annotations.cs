@@ -1,71 +1,53 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string logoPath = "logo.png";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        if (!File.Exists(logoPath))
-        {
-            Console.Error.WriteLine($"Logo image not found: {logoPath}");
-            return;
-        }
-
-        // Load the PDF document
+        // Open the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages
-            foreach (Page page in doc.Pages)
+            // Prepare the replacement text that includes the current date
+            string replacementText = $"Confidential - {DateTime.Now:yyyy-MM-dd}";
+            string[] textArray = new[] { replacementText };
+
+            // Define the visual style for the watermark text
+            TextState textState = new TextState
             {
-                // Store indices of WatermarkAnnotation objects to remove after iteration
-                List<int> indicesToRemove = new List<int>();
+                Font = FontRepository.FindFont("Helvetica"),
+                FontSize = 12,
+                ForegroundColor = Aspose.Pdf.Color.Red
+            };
 
-                // Annotations collection uses 1‑based indexing
-                for (int i = 1; i <= page.Annotations.Count; i++)
+            // Iterate through all pages (1‑based indexing)
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            {
+                Page page = doc.Pages[pageIndex];
+
+                // Iterate through all annotations on the page (1‑based indexing)
+                for (int annIndex = 1; annIndex <= page.Annotations.Count; annIndex++)
                 {
-                    Annotation ann = page.Annotations[i];
+                    Annotation ann = page.Annotations[annIndex];
 
-                    // Identify WatermarkAnnotation instances
-                    if (ann is Aspose.Pdf.Annotations.WatermarkAnnotation wmAnn)
+                    // Process only WatermarkAnnotation instances
+                    if (ann is WatermarkAnnotation watermark)
                     {
-                        // Preserve the original opacity
-                        double originalOpacity = wmAnn.Opacity;
-
-                        // Record the index for later removal
-                        indicesToRemove.Add(i);
-
-                        // Create a new WatermarkArtifact with the corporate logo
-                        Aspose.Pdf.WatermarkArtifact artifact = new Aspose.Pdf.WatermarkArtifact();
-                        artifact.SetImage(logoPath);
-                        artifact.Opacity = originalOpacity;
-
-                        // Position the artifact using the same rectangle as the original annotation
-                        Aspose.Pdf.Rectangle rect = wmAnn.Rect;
-                        // Position expects a Point (lower‑left corner of the rectangle)
-                        artifact.Position = new Aspose.Pdf.Point(rect.LLX, rect.LLY);
-
-                        // Add the artifact to the page
-                        page.Artifacts.Add(artifact);
+                        // Replace the existing watermark text with the new text and style
+                        watermark.SetTextAndState(textArray, textState);
                     }
-                }
-
-                // Remove the original WatermarkAnnotations in reverse order to keep indices valid
-                for (int idx = indicesToRemove.Count - 1; idx >= 0; idx--)
-                {
-                    page.Annotations.Delete(indicesToRemove[idx]);
                 }
             }
 
@@ -73,6 +55,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"All WatermarkAnnotations replaced with logo. Saved to '{outputPath}'.");
+        Console.WriteLine($"Watermark annotations updated and saved to '{outputPath}'.");
     }
 }

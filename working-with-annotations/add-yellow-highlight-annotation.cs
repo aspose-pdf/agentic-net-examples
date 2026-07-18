@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "highlighted.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,32 +16,30 @@ class Program
             return;
         }
 
-        // Load the existing PDF document
+        // Load the PDF document (deterministic disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Choose the page where the highlight will be placed (first page in this example)
+            // Get the first page (Aspose.Pdf uses 1‑based indexing)
             Page page = doc.Pages[1];
 
-            // Define the rectangle area for the highlight annotation
-            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
+            // Define the rectangle that the highlight will cover
+            // (left, bottom, right, top) in points
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 520);
 
-            // Create the highlight annotation
+            // Create the highlight annotation and set its visual properties
             HighlightAnnotation highlight = new HighlightAnnotation(page, rect)
             {
-                // Set the annotation color to yellow
-                Color = Aspose.Pdf.Color.Yellow,
-                // Set opacity to 80% (0.8)
-                Opacity = 0.8
+                Color = Aspose.Pdf.Color.Yellow, // yellow color
+                Opacity = 0.8                     // 80 % opacity
             };
 
-            // Add the annotation to the page
+            // Attach the annotation to the page
             page.Annotations.Add(highlight);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Highlight annotation added. Saved to '{outputPath}'.");
+        Console.WriteLine($"Saved highlighted PDF to '{outputPath}'.");
     }
 }

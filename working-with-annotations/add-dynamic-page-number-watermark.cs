@@ -2,7 +2,8 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Facades; // for FormattedText
+using Aspose.Pdf.Text;   // for TextState if needed
 
 class Program
 {
@@ -17,7 +18,7 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
             // Iterate through all pages (1‑based indexing)
@@ -25,27 +26,31 @@ class Program
             {
                 Page page = doc.Pages[i];
 
-                // Define the position of the watermark annotation (bottom‑center)
-                // Rectangle(left, bottom, right, top)
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(
-                    page.PageInfo.Width / 2 - 50,   // left
-                    20,                             // bottom
-                    page.PageInfo.Width / 2 + 50,   // right
-                    40);                            // top
+                // Define the rectangle where the watermark annotation will appear
+                // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(50, 750, 550, 800);
 
-                // Create the WatermarkAnnotation on the current page
+                // Create a WatermarkAnnotation on the current page
                 WatermarkAnnotation watermark = new WatermarkAnnotation(page, rect);
 
-                // Set the dynamic page number placeholder.
-                // The placeholder character '#' will be replaced with the actual page number.
-                // Use SetTextAndState to supply the placeholder string and a default TextState.
-                watermark.SetTextAndState(new string[] { "Page #" }, new TextState());
+                // FormattedText constructor requires System.Drawing.Color for the text color
+                // Use "#" as the placeholder; Aspose.Pdf will replace it with the page number
+                FormattedText ft = new FormattedText(
+                    "#",                         // placeholder for page number
+                    System.Drawing.Color.Black, // text color
+                    "Helvetica",                 // font name
+                    EncodingType.Winansi,        // encoding
+                    false,                       // embedded flag
+                    12);                         // font size
 
-                // Optional: customize appearance (color, opacity, etc.)
-                watermark.Color   = Aspose.Pdf.Color.Gray;
-                watermark.Opacity = 0.5;
+                // Assign the formatted text to the annotation
+                watermark.SetText(ft);
 
-                // Add the annotation to the page
+                // Optional: set appearance properties
+                watermark.Color   = Aspose.Pdf.Color.LightGray; // annotation border color
+                watermark.Opacity = 0.5;                         // semi‑transparent
+
+                // Add the annotation to the page's annotation collection
                 page.Annotations.Add(watermark);
             }
 

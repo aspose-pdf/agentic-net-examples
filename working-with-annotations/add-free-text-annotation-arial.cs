@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using System.Drawing; // Required for DefaultAppearance color
 
 class Program
 {
@@ -16,28 +17,30 @@ class Program
             return;
         }
 
-        // Load the PDF document (using the standard load constructor)
+        // Load the PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Get the first page (page indexing is 1‑based)
+            // Get the first page (Aspose.Pdf uses 1‑based indexing)
             Page page = doc.Pages[1];
 
             // Define the annotation rectangle (fully qualified to avoid ambiguity)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Create DefaultAppearance with Arial, 12‑pt, black color
+            // Create DefaultAppearance with Arial, 12‑point size, black color
+            // (uses the constructor that accepts System.Drawing.Color)
             DefaultAppearance appearance = new DefaultAppearance("Arial", 12, System.Drawing.Color.Black);
 
-            // Create the free‑text annotation on the page
+            // Create the FreeTextAnnotation on the page with the specified appearance
             FreeTextAnnotation freeText = new FreeTextAnnotation(page, rect, appearance)
             {
-                Contents = "Sample free‑text annotation"
+                Contents = "Sample free‑text annotation",          // visible text
+                Color    = Aspose.Pdf.Color.Yellow                // border color (optional)
             };
 
-            // Add the annotation to the page
+            // Add the annotation to the page's annotation collection
             page.Annotations.Add(freeText);
 
-            // Save the modified PDF (Document disposal handled by using)
+            // Save the modified document (no SaveOptions needed for PDF output)
             doc.Save(outputPath);
         }
 

@@ -3,77 +3,55 @@ using System.IO;
 using System.Collections.Generic;
 using Aspose.Pdf;
 
-class BatchXfdfImporter
+class Program
 {
     static void Main()
     {
-        // Directory containing PDF files and their matching XFDF files
-        const string inputDirectory = @"C:\InputFiles";
-        // Path for the final merged PDF
-        const string outputPdfPath = @"C:\Output\merged_output.pdf";
+        // Folder containing PDFs and their matching XFDF files
+        const string inputFolder = "InputFiles";
+        // Path for the merged output PDF
+        const string outputPath = "merged_output.pdf";
 
-        if (!Directory.Exists(inputDirectory))
+        if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"Input directory not found: {inputDirectory}");
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
             return;
         }
 
-        // Collect all PDF files in the directory
-        string[] pdfFiles = Directory.GetFiles(inputDirectory, "*.pdf", SearchOption.TopDirectoryOnly);
+        // Collect all PDF files in the folder (non‑recursive)
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
         if (pdfFiles.Length == 0)
         {
-            Console.Error.WriteLine("No PDF files found in the input directory.");
+            Console.Error.WriteLine("No PDF files found to process.");
             return;
         }
 
-        // List to hold loaded documents
-        List<Document> documents = new List<Document>();
-
-        try
+        // Create the target document that will hold all merged pages
+        using (Document target = new Document())
         {
-            // Load each PDF, import its XFDF annotations (if present), and keep the document alive
+            // Iterate over each source PDF
             foreach (string pdfPath in pdfFiles)
             {
-                // Load the PDF document
-                Document doc = new Document(pdfPath);
-
-                // Determine the corresponding XFDF file (same name, .xfdf extension)
-                string xfdfPath = Path.ChangeExtension(pdfPath, ".xfdf");
-                if (File.Exists(xfdfPath))
+                // Load the source PDF
+                using (Document src = new Document(pdfPath))
                 {
-                    // Import annotations from the XFDF file into the PDF document
-                    doc.ImportAnnotationsFromXfdf(xfdfPath);
-                }
-                else
-                {
-                    Console.WriteLine($"No XFDF file for '{Path.GetFileName(pdfPath)}'; skipping import.");
-                }
+                    // Look for a matching XFDF file (same name, .xfdf extension)
+                    string xfdfPath = Path.ChangeExtension(pdfPath, ".xfdf");
+                    if (File.Exists(xfdfPath))
+                    {
+                        // Import annotations from the XFDF into the source PDF
+                        src.ImportAnnotationsFromXfdf(xfdfPath);
+                    }
 
-                // Keep the document for later merging
-                documents.Add(doc);
+                    // Append all pages from the source PDF to the target document
+                    target.Pages.Add(src.Pages);
+                } // src disposed here – pages have already been copied into target
             }
 
-            // Merge all processed documents into a single PDF
-            // The static MergeDocuments method returns a new Document containing all pages
-            Document mergedDocument = Document.MergeDocuments(documents.ToArray());
+            // Save the merged document with all annotations preserved
+            target.Save(outputPath);
+        } // target disposed here
 
-            // Save the merged PDF
-            mergedDocument.Save(outputPdfPath);
-            mergedDocument.Dispose();
-
-            Console.WriteLine($"Merged PDF saved to '{outputPdfPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during processing: {ex.Message}");
-        }
-        finally
-        {
-            // Ensure all individual documents are disposed to release resources
-            foreach (Document doc in documents)
-            {
-                doc.Dispose();
-            }
-        }
+        Console.WriteLine($"Merged PDF with annotations saved to '{outputPath}'.");
     }
 }

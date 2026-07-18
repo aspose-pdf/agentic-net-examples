@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "highlighted.pdf";
+        const string outputPath = "highlighted_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,26 +16,31 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: using block for disposal)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Select the page to annotate (Aspose.Pdf uses 1‑based indexing)
-            Page page = doc.Pages[1];
+            // Select the page to annotate (first page in this example)
+            Page page = doc.Pages[1]; // 1‑based indexing
 
-            // Define the rectangle area to be highlighted (coordinates in points)
+            // Define the rectangle area to be highlighted
+            // Fully qualify to avoid ambiguity with System.Drawing.Rectangle
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 520);
 
-            // Create a HighlightAnnotation with custom color and opacity
+            // Create the highlight annotation
             HighlightAnnotation highlight = new HighlightAnnotation(page, rect)
             {
-                Color   = Aspose.Pdf.Color.Yellow, // visual highlight color
-                Opacity = 0.5                       // opacity value between 0 (transparent) and 1 (opaque)
+                // Set the highlight color (e.g., yellow)
+                Color = Aspose.Pdf.Color.Yellow,
+                // Set custom opacity (0.0 = fully transparent, 1.0 = fully opaque)
+                Opacity = 0.5,
+                // Optional: add a comment that appears in the annotation popup
+                Contents = "Important text highlighted"
             };
 
-            // Attach the annotation to the page
+            // Add the annotation to the page's annotation collection
             page.Annotations.Add(highlight);
 
-            // Save the modified PDF (lifecycle rule: Document.Save)
+            // Save the modified document
             doc.Save(outputPath);
         }
 

@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -8,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "filtered.pdf";
         const string currentUser = "John Doe";
 
@@ -18,38 +17,31 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document (lifecycle rule: wrap in using)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages in the document
+            // Iterate through all pages
             foreach (Page page in doc.Pages)
             {
-                // Collect annotations that do NOT belong to the current user
-                var toRemove = new List<Annotation>();
-                foreach (Annotation ann in page.Annotations)
+                // Annotations collection uses 1‑based indexing.
+                // Iterate backwards to safely delete items.
+                for (int idx = page.Annotations.Count; idx >= 1; idx--)
                 {
-                    // Title is defined only on markup annotations
+                    Annotation ann = page.Annotations[idx];
+
+                    // Only markup annotations have a Title (the /T entry).
                     if (ann is MarkupAnnotation markup)
                     {
-                        // If the Title (author) does not match the current user, mark for removal
+                        // Remove annotation if its author (Title) does not match the current user.
                         if (!string.Equals(markup.Title, currentUser, StringComparison.Ordinal))
-                            toRemove.Add(ann);
+                        {
+                            page.Annotations.Delete(idx);
+                        }
                     }
-                    else
-                    {
-                        // Non‑markup annotations have no author information – remove them as well
-                        toRemove.Add(ann);
-                    }
-                }
-
-                // Remove the collected annotations from the page
-                foreach (var ann in toRemove)
-                {
-                    page.Annotations.Delete(ann);
                 }
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (lifecycle rule: save inside using)
             doc.Save(outputPath);
         }
 

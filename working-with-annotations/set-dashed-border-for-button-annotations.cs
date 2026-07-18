@@ -8,7 +8,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,31 +17,32 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF document (using statement ensures proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Iterate through all pages (1‑based indexing)
+            foreach (Page page in doc.Pages)
             {
-                Page page = doc.Pages[i];
-
-                // Annotations collection is also 1‑based
-                for (int j = 1; j <= page.Annotations.Count; j++)
+                // Iterate through all annotations on the page (1‑based indexing)
+                for (int idx = 1; idx <= page.Annotations.Count; idx++)
                 {
-                    Annotation ann = page.Annotations[j];
+                    Annotation ann = page.Annotations[idx];
 
                     // Process only button fields
                     if (ann is ButtonField button)
                     {
-                        // Create a Border linked to the button annotation
-                        Border border = new Border(button);
-                        border.Style = BorderStyle.Dashed; // Dashed border style
-                        border.Width = 2;                  // Thickness of 2 points
-                        // Optional dash pattern (on 3, off 3)
-                        border.Dash = new Dash(3, 3);
+                        // Ensure a Border object exists; create one if necessary
+                        if (button.Border == null)
+                        {
+                            button.Border = new Border(button);
+                        }
 
-                        // Assign the configured border back to the button
-                        button.Border = border;
+                        // Set the border style to dashed and thickness to 2 points
+                        button.Border.Style = Aspose.Pdf.Annotations.BorderStyle.Dashed;
+                        button.Border.Width = 2;
+
+                        // Optional: define a dash pattern (on length, off length)
+                        button.Border.Dash = new Dash(3, 3);
                     }
                 }
             }
@@ -50,6 +51,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Button annotation borders updated and saved to '{outputPath}'.");
     }
 }

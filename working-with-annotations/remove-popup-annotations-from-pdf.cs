@@ -8,7 +8,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,33 +17,32 @@ class Program
             return;
         }
 
-        // Load the PDF (lifecycle rule)
+        // Load the PDF document (using statement ensures proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based
+            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
-                AnnotationCollection annColl = page.Annotations;
 
-                // Gather popup annotations first to avoid modifying the collection while iterating
-                List<Annotation> popups = new List<Annotation>();
-                foreach (Annotation ann in annColl)
+                // Collect PopupAnnotation instances first (cannot modify collection during enumeration)
+                List<PopupAnnotation> popups = new List<PopupAnnotation>();
+                foreach (Annotation ann in page.Annotations)
                 {
-                    if (ann is PopupAnnotation)
+                    if (ann is PopupAnnotation popup)
                     {
-                        popups.Add(ann);
+                        popups.Add(popup);
                     }
                 }
 
-                // Delete each popup annotation; parent markup annotations remain intact
-                foreach (Annotation popup in popups)
+                // Delete each popup annotation while preserving its parent markup annotation
+                foreach (PopupAnnotation popup in popups)
                 {
-                    annColl.Delete(popup);
+                    page.Annotations.Delete(popup);
                 }
             }
 
-            // Save the modified PDF (lifecycle rule)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

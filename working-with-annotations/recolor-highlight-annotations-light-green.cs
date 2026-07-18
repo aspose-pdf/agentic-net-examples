@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "highlighted_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,22 +16,23 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Iterate through all pages (1‑based indexing)
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
-                Page page = doc.Pages[pageIndex];
+                Page page = doc.Pages[pageNum];
 
-                // Iterate over all annotations on the page (1‑based indexing)
-                for (int annIndex = 1; annIndex <= page.Annotations.Count; annIndex++)
+                // Annotations collection also uses 1‑based indexing
+                for (int annIdx = 1; annIdx <= page.Annotations.Count; annIdx++)
                 {
-                    Annotation annotation = page.Annotations[annIndex];
+                    Annotation ann = page.Annotations[annIdx];
 
-                    // Change color only for Highlight annotations
-                    if (annotation is HighlightAnnotation highlight)
+                    // Check if the annotation is a HighlightAnnotation
+                    if (ann is HighlightAnnotation highlight)
                     {
+                        // Set the annotation color to LightGreen
                         highlight.Color = Aspose.Pdf.Color.LightGreen;
                     }
                 }
@@ -41,6 +42,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"All highlight annotations recolored to light green and saved to '{outputPath}'.");
+        Console.WriteLine($"All highlight annotations recolored and saved to '{outputPath}'.");
     }
 }

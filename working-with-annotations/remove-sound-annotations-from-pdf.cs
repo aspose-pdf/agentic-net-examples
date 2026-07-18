@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
@@ -8,7 +9,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_without_sound.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,35 +17,29 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Iterate through all pages (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                Page page = doc.Pages[pageIndex];
-                AnnotationCollection annotations = page.Annotations;
-
-                // Collect annotations to delete to avoid modifying the collection during enumeration
-                var toDelete = new System.Collections.Generic.List<Annotation>();
-
-                foreach (Annotation ann in annotations)
+                Page page = doc.Pages[i];
+                // Collect all SoundAnnotation instances on the current page
+                List<Annotation> toDelete = new List<Annotation>();
+                foreach (Annotation ann in page.Annotations)
                 {
-                    // Identify SoundAnnotation instances
                     if (ann is SoundAnnotation)
-                    {
                         toDelete.Add(ann);
-                    }
                 }
 
-                // Delete the identified SoundAnnotations
+                // Delete the collected SoundAnnotations
                 foreach (Annotation ann in toDelete)
                 {
-                    annotations.Delete(ann);
+                    page.Annotations.Delete(ann);
                 }
             }
 
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

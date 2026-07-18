@@ -10,52 +10,47 @@ class Program
         const string outputPdf = "output.pdf";
         const string imagePath = "logo.png";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdf) || !File.Exists(imagePath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine("Input PDF or image file not found.");
             return;
         }
 
-        if (!File.Exists(imagePath))
-        {
-            Console.Error.WriteLine($"Image file not found: {imagePath}");
-            return;
-        }
-
-        // Load the source PDF (document-disposal-with-using rule)
+        // Open the PDF document
         using (Document doc = new Document(inputPdf))
         {
-            // Add the image once to the XImage collection of the first page.
-            // The Add method returns the name of the image resource.
-            string imgName;
+            // Load the image once and add it to the resources of the first page.
+            // The Add method returns the name under which the image is stored.
+            string imageName;
             using (FileStream imgStream = File.OpenRead(imagePath))
             {
-                imgName = doc.Pages[1].Resources.Images.Add(imgStream);
+                imageName = doc.Pages[1].Resources.Images.Add(imgStream);
             }
 
-            // Define a rectangle where the image will be placed on each page.
-            // Fully qualified to avoid ambiguity (rectangle-disambiguation rule).
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 600);
+            // Retrieve the XImage instance by its name for reuse.
+            XImage sharedImage = doc.Pages[1].Resources.Images[imageName];
 
-            // Reuse the same image on all pages.
-            // Page indexing is 1‑based (page-indexing-one-based rule).
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Define the rectangle where the image will be placed on each page.
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(50, 700, 150, 800);
+
+            // Add the same image to every page.
+            foreach (Page page in doc.Pages)
             {
-                Page page = doc.Pages[i];
-
-                // Add the image to the page by referencing the existing resource.
-                // The AddImage overload that takes a stream will reuse the image
-                // already present in the collection (adds a reference, not a duplicate).
-                using (FileStream imgStream = File.OpenRead(imagePath))
+                // Ensure the page's resource collection contains a reference to the shared image.
+                if (!page.Resources.Images.Contains(sharedImage))
                 {
-                    page.AddImage(imgStream, rect);
+                    page.Resources.Images.Add(sharedImage);
                 }
+
+                // Place the image on the page using the same rectangle.
+                // The image data is taken from the shared XImage already present in the resources.
+                page.AddImage(sharedImage.ToStream(), rect);
             }
 
-            // Save the modified PDF (save-to-non-pdf-always-use-save-options rule not needed here)
+            // Save the modified document.
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved with reused image: {outputPdf}");
+        Console.WriteLine($"PDF saved with reused image: '{outputPdf}'.");
     }
 }

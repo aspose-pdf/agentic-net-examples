@@ -1,46 +1,48 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";
-        const string xfdfBackup = "annotations.xfdf";
-        const string outputPdf  = "output.pdf";
+        const string inputPdfPath  = "input.pdf";      // original PDF with annotations
+        const string xfdfPath      = "backup.xfdf";    // XFDF file containing saved annotations
+        const string outputPdfPath = "output.pdf";     // PDF after re‑importing annotations
 
-        if (!File.Exists(inputPdf))
+        // Verify files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-
-        if (!File.Exists(xfdfBackup))
+        if (!File.Exists(xfdfPath))
         {
-            Console.Error.WriteLine($"XFDF backup not found: {xfdfBackup}");
+            Console.Error.WriteLine($"XFDF backup not found: {xfdfPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPdf))
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPdfPath))
             {
-                // Remove all existing annotations from every page
-                foreach (Page page in doc.Pages)
+                // Delete all annotations on each page
+                for (int i = 1; i <= doc.Pages.Count; i++)          // 1‑based page indexing
                 {
-                    page.Annotations.Delete(); // deletes all annotations in the collection
+                    // AnnotationCollection.Delete() removes every annotation on the page
+                    doc.Pages[i].Annotations.Delete();
                 }
 
-                // Import annotations from the XFDF backup file
-                doc.ImportAnnotationsFromXfdf(xfdfBackup);
+                // Re‑import annotations from the XFDF file
+                doc.ImportAnnotationsFromXfdf(xfdfPath);
 
-                // Save the updated PDF
-                doc.Save(outputPdf);
+                // Save the modified document
+                doc.Save(outputPdfPath);
             }
 
-            Console.WriteLine($"Annotations restored and saved to '{outputPdf}'.");
+            Console.WriteLine($"Annotations cleared and restored. Saved to '{outputPdfPath}'.");
         }
         catch (Exception ex)
         {

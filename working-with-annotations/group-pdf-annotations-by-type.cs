@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -16,37 +17,32 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF document (using block ensures proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Dictionary to group annotations by their type
-            var annotationGroups = new Dictionary<AnnotationType, List<Annotation>>();
-
-            // Iterate over all pages (pages collection is 1‑based, but foreach works)
+            // Collect all annotations from all pages
+            List<Annotation> allAnnotations = new List<Annotation>();
             foreach (Page page in doc.Pages)
             {
-                // Iterate over all annotations on the current page
-                foreach (Annotation annotation in page.Annotations)
+                foreach (Annotation ann in page.Annotations)
                 {
-                    // Get the annotation type (enum)
-                    AnnotationType type = annotation.AnnotationType;
-
-                    // Ensure a list exists for this type
-                    if (!annotationGroups.ContainsKey(type))
-                    {
-                        annotationGroups[type] = new List<Annotation>();
-                    }
-
-                    // Add the annotation to the appropriate group
-                    annotationGroups[type].Add(annotation);
+                    allAnnotations.Add(ann);
                 }
             }
 
-            // Reporting: output count of annotations per type
-            Console.WriteLine("Annotation counts by type:");
-            foreach (KeyValuePair<AnnotationType, List<Annotation>> kvp in annotationGroups)
+            // Group annotations by their AnnotationType enum value
+            var groups = allAnnotations
+                .GroupBy(a => a.AnnotationType)
+                .OrderBy(g => g.Key); // optional: sort by enum value
+
+            // Report the grouping
+            Console.WriteLine($"Total annotations found: {allAnnotations.Count}");
+            foreach (var group in groups)
             {
-                Console.WriteLine($"{kvp.Key}: {kvp.Value.Count}");
+                // AnnotationType is an enum; use ToString() for readable name
+                string typeName = group.Key.ToString();
+                int count = group.Count();
+                Console.WriteLine($"{typeName}: {count} instance(s)");
             }
         }
     }
