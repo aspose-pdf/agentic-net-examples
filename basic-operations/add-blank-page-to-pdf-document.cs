@@ -15,16 +15,16 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the existing PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Replace the Author metadata with the current user name
-            doc.Info.Author = Environment.UserName;
+            // Add a new blank page at the end of the document
+            doc.Pages.Add();
 
-            // Save the updated document
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Metadata updated and saved to '{outputPath}'.");
+        Console.WriteLine($"Blank page added and saved to '{outputPath}'.");
     }
 }

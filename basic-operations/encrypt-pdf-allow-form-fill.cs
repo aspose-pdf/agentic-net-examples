@@ -7,7 +7,9 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "encrypted.pdf";
+        const string userPassword  = "user123";
+        const string ownerPassword = "owner123";
 
         if (!File.Exists(inputPath))
         {
@@ -17,17 +19,20 @@ class Program
 
         try
         {
-            // Load the existing PDF document
+            // Load the PDF document
             using (Document doc = new Document(inputPath))
             {
-                // Add a new blank page at the end of the document
-                doc.Pages.Add();
+                // Set permissions to allow only form filling
+                Permissions perms = Permissions.FillForm;
 
-                // Save the updated document
+                // Encrypt with AES-256 algorithm
+                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+
+                // Save the encrypted PDF
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Blank page added and saved to '{outputPath}'.");
+            Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {
