@@ -1,7 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // PropertyFlag enum
-using Aspose.Pdf.Facades;      // FormEditor class
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -9,28 +9,27 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName  = "Agreement";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Open the PDF for form editing; specify source and destination files
-        using (FormEditor editor = new FormEditor(inputPath, outputPath))
+        // FormEditor handles loading and saving internally via its constructor.
+        using (FormEditor formEditor = new FormEditor(inputPath, outputPath))
         {
-            // Mark the field as required (displays the asterisk indicator)
-            bool success = editor.SetFieldAttribute(fieldName, PropertyFlag.Required);
+            // Mark the "Agreement" field as required.
+            bool success = formEditor.SetFieldAttribute("Agreement", PropertyFlag.Required);
             if (!success)
             {
-                Console.Error.WriteLine($"Failed to set Required attribute on field '{fieldName}'.");
+                Console.Error.WriteLine("Unable to set the required attribute on field 'Agreement'.");
             }
 
-            // Persist changes
-            editor.Save();
+            // Persist the changes.
+            formEditor.Save();
         }
 
-        Console.WriteLine($"Field '{fieldName}' set to required. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Field 'Agreement' set to required. Output saved to '{outputPath}'.");
     }
 }

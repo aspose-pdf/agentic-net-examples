@@ -1,14 +1,15 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Forms; // for ButtonField and Form operations
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_no_buttons.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,32 +18,27 @@ class Program
         }
 
         // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        Document doc = new Document(inputPath);
+
+        // Collect the names of all button fields
+        List<string> buttonFieldNames = new List<string>();
+        foreach (var field in doc.Form.Fields)
         {
-            // Facade for editing form fields
-            using (FormEditor formEditor = new FormEditor(doc))
+            if (field is ButtonField)
             {
-                // Facade to query field information
-                Form formFacade = new Form(doc);
-
-                // Iterate over all field names and remove those that are push‑buttons
-                foreach (string fieldName in formFacade.FieldNames)
-                {
-                    // Determine the field type
-                    FieldType fieldType = formFacade.GetFieldType(fieldName);
-
-                    // Remove button (push‑button) fields
-                    if (fieldType == FieldType.PushButton)
-                    {
-                        formEditor.RemoveField(fieldName);
-                    }
-                }
+                buttonFieldNames.Add(field.PartialName);
             }
-
-            // Save the modified PDF
-            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Button fields removed. Output saved to '{outputPath}'.");
+        // Remove each button field from the form
+        foreach (string name in buttonFieldNames)
+        {
+            doc.Form.Delete(name);
+        }
+
+        // Save the updated PDF
+        doc.Save(outputPath);
+
+        Console.WriteLine($"All button fields removed. Saved to '{outputPath}'.");
     }
 }

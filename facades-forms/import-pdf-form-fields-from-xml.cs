@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPdfPath  = "input.pdf";
-        const string xmlInputPath  = "fields.xml";
+        const string xmlPath       = "fields.xml";
         const string outputPdfPath = "output.pdf";
 
         if (!File.Exists(inputPdfPath))
@@ -16,25 +16,23 @@ class Program
             return;
         }
 
-        if (!File.Exists(xmlInputPath))
+        if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"XML file not found: {xmlInputPath}");
+            Console.Error.WriteLine($"XML file not found: {xmlPath}");
             return;
         }
 
-        // Initialize the Form facade with source and destination PDFs
-        using (Form form = new Form(inputPdfPath, outputPdfPath))
+        // Bind the PDF, import XML field values, and save.
+        using (Form form = new Form())
         {
-            // Import field values from the XML stream; field order is preserved
-            using (FileStream xmlStream = new FileStream(xmlInputPath, FileMode.Open, FileAccess.Read))
+            form.BindPdf(inputPdfPath);                     // Load PDF
+            using (FileStream xmlStream = new FileStream(xmlPath, FileMode.Open, FileAccess.Read))
             {
-                form.ImportXml(xmlStream);
+                form.ImportXml(xmlStream);                  // Import fields from XML (order preserved)
             }
-
-            // Persist the changes to the output PDF
-            form.Save();
+            form.Save(outputPdfPath);                       // Save the updated PDF
         }
 
-        Console.WriteLine($"Form fields imported successfully to '{outputPdfPath}'.");
+        Console.WriteLine($"Form fields imported and saved to '{outputPdfPath}'.");
     }
 }

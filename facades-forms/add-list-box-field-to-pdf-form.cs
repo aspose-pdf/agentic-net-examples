@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -7,31 +6,42 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        // Ensure the input file exists
+        if (!System.IO.File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF and edit its form using FormEditor (Facades API)
+        // Use FormEditor to modify the PDF form
         using (FormEditor formEditor = new FormEditor())
         {
-            formEditor.BindPdf(inputPath);
+            // Load the existing PDF
+            formEditor.BindPdf(inputPdf);
 
             // Define the items for the list box
             formEditor.Items = new string[] { "Low", "Medium", "High" };
 
-            // Add a ListBox field named "Priority" with default value "Medium"
-            // Parameters: field type, field name, initial value, page number, llx, lly, urx, ury
-            formEditor.AddField(FieldType.ListBox, "Priority", "Medium", 1, 100, 500, 200, 550);
+            // Add a ListBox field named "Priority" with default selection "Medium"
+            // Parameters: field type, field name, default value, page number, llx, lly, urx, ury
+            formEditor.AddField(
+                FieldType.ListBox,
+                "Priority",
+                "Medium",
+                1,
+                100f,   // lower‑left X
+                500f,   // lower‑left Y
+                200f,   // upper‑right X
+                600f    // upper‑right Y
+            );
 
-            // Save the modified PDF to the output path
-            formEditor.Save(outputPath);
+            // Save the modified PDF
+            formEditor.Save(outputPdf);
         }
 
-        Console.WriteLine($"List field 'Priority' added and saved to '{outputPath}'.");
+        Console.WriteLine($"List field \"Priority\" added and saved to '{outputPdf}'.");
     }
 }

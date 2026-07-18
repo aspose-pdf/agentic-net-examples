@@ -7,27 +7,25 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";   // source PDF containing a form
-        const string outputPdf = "output.pdf";  // PDF with the new combo box
+        const string inputPdf  = "template.pdf";   // existing PDF with a form
+        const string outputPdf = "output.pdf";
 
+        // Verify the input file exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        // FormEditor handles opening the source PDF and writing the result
+        using (FormEditor formEditor = new FormEditor(inputPdf, outputPdf))
         {
-            // Create a FormEditor bound to the loaded document
-            FormEditor formEditor = new FormEditor(doc);
-
-            // Add a combo box field named "State" on page 1.
-            // Rectangle coordinates: lower‑left (100, 500), upper‑right (200, 520)
-            formEditor.AddField(FieldType.ComboBox, "State", 1, 100f, 500f, 200f, 520f);
+            // Add a ComboBox field named "State" on page 1.
+            // Rectangle coordinates: lower‑left (llx,lly) and upper‑right (urx,ury)
+            formEditor.AddField(FieldType.ComboBox, "State", 1, 100, 500, 200, 530);
 
             // US state abbreviations to populate the combo box
-            string[] stateAbbreviations = new string[]
+            string[] states = new string[]
             {
                 "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA",
                 "HI","ID","IL","IN","IA","KS","KY","LA","ME","MD",
@@ -37,13 +35,13 @@ class Program
             };
 
             // Add each abbreviation as an item in the combo box
-            foreach (string abbrev in stateAbbreviations)
+            foreach (string state in states)
             {
-                formEditor.AddListItem("State", abbrev);
+                formEditor.AddListItem("State", state);
             }
 
-            // Save the modified PDF to the output file
-            formEditor.Save(outputPdf);
+            // Persist the changes to the output PDF
+            formEditor.Save();
         }
 
         Console.WriteLine($"Combo box \"State\" added and saved to '{outputPdf}'.");

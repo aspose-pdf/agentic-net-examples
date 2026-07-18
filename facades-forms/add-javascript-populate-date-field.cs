@@ -1,35 +1,37 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output_with_js.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF using the PdfContentEditor facade
-        PdfContentEditor editor = new PdfContentEditor();
-        editor.BindPdf(inputPath);
+        // Use PdfContentEditor facade to add a JavaScript action that runs on document open.
+        using (PdfContentEditor editor = new PdfContentEditor())
+        {
+            // Bind the existing PDF.
+            editor.BindPdf(inputPdf);
 
-        // JavaScript that runs when the document is opened.
-        // It retrieves the field named "Date" and sets its value to the current date.
-        string jsCode = "var f = this.getField('Date'); if (f) { f.value = (new Date()).toLocaleDateString(); }";
+            // JavaScript code: set the value of the field named "Date" to the current date.
+            string jsCode = "this.getField('Date').value = new Date().toLocaleDateString();";
 
-        // Attach the JavaScript to the document Open event
-        editor.AddDocumentAdditionalAction(PdfContentEditor.DocumentOpen, jsCode);
+            // Add the script to the Document Open event.
+            editor.AddDocumentAdditionalAction(PdfContentEditor.DocumentOpen, jsCode);
 
-        // Save the modified PDF
-        editor.Save(outputPath);
-        editor.Close();
+            // Save the modified PDF.
+            editor.Save(outputPdf);
+        }
 
-        Console.WriteLine($"PDF with JavaScript saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with JavaScript to '{outputPdf}'.");
     }
 }

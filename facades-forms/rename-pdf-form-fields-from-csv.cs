@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -10,63 +9,40 @@ class Program
         // Paths – adjust as needed
         const string inputPdfPath  = "input.pdf";
         const string outputPdfPath = "output_renamed.pdf";
-        const string csvPath       = "field_mapping.csv";
+        const string csvMapPath    = "field_mapping.csv";
 
-        if (!File.Exists(inputPdfPath))
+        // Ensure the CSV file exists
+        if (!File.Exists(csvMapPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Mapping file not found: {csvMapPath}");
             return;
         }
 
-        if (!File.Exists(csvPath))
-        {
-            Console.Error.WriteLine($"CSV mapping file not found: {csvPath}");
-            return;
-        }
-
-        // Load mapping from CSV (format: oldFieldName,newFieldName per line, optional header)
-        var renameMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        foreach (var line in File.ReadLines(csvPath))
-        {
-            // Skip empty lines
-            if (string.IsNullOrWhiteSpace(line)) continue;
-
-            // If the line contains a header (e.g., "OldName,NewName") and not a comma-separated pair, ignore it
-            var parts = line.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-            if (parts.Length != 2) continue;
-
-            var oldName = parts[0].Trim();
-            var newName = parts[1].Trim();
-
-            if (!string.IsNullOrEmpty(oldName) && !string.IsNullOrEmpty(newName))
-                renameMap[oldName] = newName;
-        }
-
-        if (renameMap.Count == 0)
-        {
-            Console.WriteLine("No valid field mappings found in CSV.");
-            return;
-        }
-
-        // Use FormEditor to rename fields – it handles both AcroForm and XFA fields
+        // FormEditor handles both opening the source PDF and writing the result
         using (FormEditor formEditor = new FormEditor(inputPdfPath, outputPdfPath))
         {
-            foreach (var kvp in renameMap)
+            // Read each line of the CSV: expected format "oldFieldName,newFieldName"
+            foreach (string line in File.ReadLines(csvMapPath))
             {
-                try
+                // Skip empty lines
+                if (string.IsNullOrWhiteSpace(line))
+                    continue;
+
+                string[] parts = line.Split(',');
+                if (parts.Length < 2)
                 {
-                    // Rename each field according to the mapping
-                    formEditor.RenameField(kvp.Key, kvp.Value);
-                    Console.WriteLine($"Renamed field '{kvp.Key}' to '{kvp.Value}'.");
+                    Console.Error.WriteLine($"Invalid mapping line (ignored): {line}");
+                    continue;
                 }
-                catch (Exception ex)
-                {
-                    // Log but continue with other fields
-                    Console.Error.WriteLine($"Failed to rename '{kvp.Key}': {ex.Message}");
-                }
+
+                string oldName = parts[0].Trim();
+                string newName = parts[1].Trim();
+
+                // Rename the field using the FormEditor API
+                formEditor.RenameField(oldName, newName);
             }
 
-            // Persist changes to the output PDF
+            // Persist the changes to the output PDF
             formEditor.Save();
         }
 
