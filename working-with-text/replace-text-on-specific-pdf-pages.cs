@@ -7,17 +7,18 @@ class Program
 {
     static void Main()
     {
-        // Input and output PDF paths
-        const string inputPath  = "input.pdf";
+        // Input PDF path
+        const string inputPath = "input.pdf";
+        // Output PDF path
         const string outputPath = "output.pdf";
 
         // Text to find and its replacement
-        const string searchText  = "old phrase";
+        const string searchText = "old phrase";
         const string replaceText = "new phrase";
 
-        // Define the page range (1‑based indexing)
-        const int startPage = 2; // inclusive
-        const int endPage   = 5; // inclusive
+        // Page range (1‑based indexing)
+        const int startPage = 2;
+        const int endPage   = 5;
 
         if (!File.Exists(inputPath))
         {
@@ -25,31 +26,30 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the document and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the requested range is within the document bounds
-            int pageCount = doc.Pages.Count;
-            int first = Math.Max(1, startPage);
-            int last  = Math.Min(pageCount, endPage);
+            // Clamp the range to the actual page count
+            int lastPage = Math.Min(endPage, doc.Pages.Count);
+            int firstPage = Math.Max(startPage, 1);
 
             // Iterate over the specified pages
-            for (int i = first; i <= last; i++)
+            for (int pageNum = firstPage; pageNum <= lastPage; pageNum++)
             {
                 // Create an absorber that searches for the target phrase
                 TextFragmentAbsorber absorber = new TextFragmentAbsorber(searchText);
 
                 // Perform the search on the current page
-                doc.Pages[i].Accept(absorber);
+                doc.Pages[pageNum].Accept(absorber);
 
-                // Replace each found occurrence with the new text
+                // Replace each found fragment with the new text
                 foreach (TextFragment fragment in absorber.TextFragments)
                 {
                     fragment.Text = replaceText;
                 }
             }
 
-            // Save the modified document (PDF format)
+            // Save the modified document
             doc.Save(outputPath);
         }
 
