@@ -6,19 +6,18 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input_form.pdf";
-        const string fdfPath = "data.fdf";
-        const string outputPath = "filled_form.pdf";
+        const string pdfPath   = "form.pdf";      // source PDF with form fields
+        const string fdfPath   = "data.fdf";      // FDF file containing field values
+        const string outputPath = "form_filled.pdf";
 
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
-
         if (!File.Exists(fdfPath))
         {
-            Console.Error.WriteLine($"FDF file not found: {fdfPath}");
+            Console.Error.WriteLine($"FDF not found: {fdfPath}");
             return;
         }
 
@@ -27,13 +26,13 @@ class Program
             // Initialize the Form facade with the source PDF
             using (Form form = new Form(pdfPath))
             {
-                // Open the FDF file as a stream and import its data into the PDF form
+                // Open the FDF stream and import the data into the PDF form
                 using (FileStream fdfStream = new FileStream(fdfPath, FileMode.Open, FileAccess.Read))
                 {
                     form.ImportFdf(fdfStream);
                 }
 
-                // Save the updated PDF with imported form data
+                // Save the updated PDF to a new file
                 form.Save(outputPath);
             }
 

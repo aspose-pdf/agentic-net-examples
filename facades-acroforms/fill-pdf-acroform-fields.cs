@@ -1,17 +1,16 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using Aspose.Pdf.Facades;
 
 public static class PdfFormFiller
 {
     /// <summary>
-    /// Fills an AcroForm PDF with the supplied field values and saves the result.
+    /// Fills AcroForm fields in a PDF using Aspose.Pdf.Facades.Form and saves the result.
     /// </summary>
     /// <param name="inputPdfPath">Path to the source PDF containing form fields.</param>
+    /// <param name="fieldValues">Dictionary where key = fully qualified field name, value = field value.</param>
     /// <param name="outputPdfPath">Path where the filled PDF will be saved.</param>
-    /// <param name="fieldValues">Dictionary where key = full field name, value = value to set.</param>
-    public static void FillPdfForm(string inputPdfPath, string outputPdfPath, IDictionary<string, string> fieldValues)
+    public static void FillPdfForm(string inputPdfPath, Dictionary<string, string> fieldValues, string outputPdfPath)
     {
         if (string.IsNullOrEmpty(inputPdfPath))
             throw new ArgumentException("Input PDF path must be provided.", nameof(inputPdfPath));
@@ -22,17 +21,13 @@ public static class PdfFormFiller
         if (fieldValues == null)
             throw new ArgumentNullException(nameof(fieldValues));
 
-        if (!File.Exists(inputPdfPath))
-            throw new FileNotFoundException($"Input PDF not found: {inputPdfPath}");
-
-        // Form implements IDisposable via SaveableFacade, so use a using block for deterministic disposal.
+        // Form implements IDisposable via SaveableFacade, so wrap it in a using block.
         using (Form form = new Form(inputPdfPath))
         {
             // Iterate over the supplied field/value pairs and fill each field.
             foreach (KeyValuePair<string, string> kvp in fieldValues)
             {
-                // FillField returns true if the field exists and was filled successfully.
-                // Ignoring the return value here; you could log or handle failures as needed.
+                // FillField returns a bool indicating success; ignore it here or handle as needed.
                 form.FillField(kvp.Key, kvp.Value);
             }
 
@@ -43,46 +38,41 @@ public static class PdfFormFiller
 }
 
 // ---------------------------------------------------------------------------
-// Minimal entry point required by the project. It simply forwards command line
-// arguments to the PdfFormFiller utility. This satisfies the compiler error
-// CS5001 while keeping the library usable from other code.
+// Minimal console entry point so the project compiles as an executable.
+// This can be removed or replaced with a proper test harness when the code is
+// consumed as a library.
 // ---------------------------------------------------------------------------
 public class Program
 {
     public static void Main(string[] args)
     {
-        // Expected usage: <inputPdf> <outputPdf> [fieldName=fieldValue ...]
+        // Simple demonstration of usage:
+        //   dotnet run input.pdf output.pdf Name=John Age=30
         if (args.Length < 2)
         {
-            Console.WriteLine("Usage: <inputPdf> <outputPdf> [fieldName=fieldValue ...]");
+            Console.WriteLine("Usage: <inputPdfPath> <outputPdfPath> [fieldName=fieldValue ...]");
             return;
         }
 
         string inputPath = args[0];
         string outputPath = args[1];
-        var fieldValues = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        var values = new Dictionary<string, string>();
 
         for (int i = 2; i < args.Length; i++)
         {
-            string arg = args[i];
-            int eqIndex = arg.IndexOf('=');
-            if (eqIndex > 0 && eqIndex < arg.Length - 1)
-            {
-                string key = arg.Substring(0, eqIndex);
-                string value = arg.Substring(eqIndex + 1);
-                fieldValues[key] = value;
-            }
+            var parts = args[i].Split(new[] { '=' }, 2);
+            if (parts.Length == 2)
+                values[parts[0]] = parts[1];
         }
 
         try
         {
-            PdfFormFiller.FillPdfForm(inputPath, outputPath, fieldValues);
-            Console.WriteLine($"PDF form filled successfully. Saved to '{outputPath}'.");
+            PdfFormFiller.FillPdfForm(inputPath, values, outputPath);
+            Console.WriteLine($"PDF form filled and saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine($"Error: {ex.Message}");
-            Environment.Exit(1);
         }
     }
 }

@@ -1,81 +1,59 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Text.Json;
 using Aspose.Pdf.Facades;
 
-class Program
+namespace FormJsonImportExample
 {
-    static void Main()
+    // Sample data class to be serialized to JSON
+    public class Person
     {
-        const string inputPdfPath  = "template.pdf";   // PDF with form fields
-        const string outputPdfPath = "filled.pdf";     // Result PDF
-        const string jsonPath      = "data.json";      // JSON source
+        public string Name { get; set; }
+        public int Age { get; set; }
+    }
 
-        if (!File.Exists(inputPdfPath))
+    class Program
+    {
+        static void Main()
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(jsonPath))
-        {
-            Console.Error.WriteLine($"JSON file not found: {jsonPath}");
-            return;
-        }
+            // Paths to the source PDF form and the output PDF after import
+            const string sourcePdfPath = "inputForm.pdf";
+            const string outputPdfPath = "outputForm.pdf";
 
-        // Load the JSON into a dictionary
-        Dictionary<string, JsonElement> jsonData;
-        using (FileStream jsonStream = File.OpenRead(jsonPath))
-        {
-            jsonData = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(jsonStream);
-        }
-
-        // Initialize the Form facade (input PDF, output PDF)
-        using (Form form = new Form(inputPdfPath, outputPdfPath))
-        {
-            // Retrieve all field names present in the PDF form
-            HashSet<string> pdfFieldNames = new HashSet<string>(form.FieldNames, StringComparer.Ordinal);
-
-            // Filter the JSON data: keep only entries whose keys exist in the PDF form
-            var filteredData = new Dictionary<string, object>();
-            foreach (var kvp in jsonData)
+            // Ensure the source PDF form exists
+            if (!File.Exists(sourcePdfPath))
             {
-                if (pdfFieldNames.Contains(kvp.Key))
+                Console.Error.WriteLine($"Source PDF form not found: {sourcePdfPath}");
+                return;
+            }
+
+            // Create an instance of the data to be imported
+            var personData = new Person
+            {
+                Name = "John Doe",
+                Age = 42
+            };
+
+            // Serialize the object to JSON and write it into a memory stream
+            using (var jsonStream = new MemoryStream())
+            {
+                // Serialize directly into the stream
+                JsonSerializer.Serialize(jsonStream, personData);
+                // Reset stream position for reading
+                jsonStream.Position = 0;
+
+                // Initialize the Form facade with source and destination files
+                using (var form = new Form(sourcePdfPath, outputPdfPath))
                 {
-                    // Preserve the original JSON value (could be string, number, bool, etc.)
-                    filteredData[kvp.Key] = kvp.Value.GetRawText();
+                    // Import the JSON data into the PDF form fields
+                    form.ImportJson(jsonStream);
+
+                    // Save the modified PDF to the output path
+                    form.Save();
                 }
             }
 
-            // Serialize the filtered dictionary back to JSON
-            using (MemoryStream filteredJsonStream = new MemoryStream())
-            {
-                using (Utf8JsonWriter writer = new Utf8JsonWriter(filteredJsonStream, new JsonWriterOptions { Indented = true }))
-                {
-                    writer.WriteStartObject();
-                    foreach (var kvp in filteredData)
-                    {
-                        // Write raw JSON value without additional quoting
-                        writer.WritePropertyName(kvp.Key);
-                        using (JsonDocument doc = JsonDocument.Parse(kvp.Value.ToString()))
-                        {
-                            doc.RootElement.WriteTo(writer);
-                        }
-                    }
-                    writer.WriteEndObject();
-                }
-
-                // Reset stream position before importing
-                filteredJsonStream.Position = 0;
-
-                // Import the filtered JSON into the PDF form; missing fields are ignored automatically
-                form.ImportJson(filteredJsonStream);
-            }
-
-            // Save the updated PDF (output path was specified in the constructor)
-            form.Save();
+            Console.WriteLine($"Form data imported and saved to '{outputPdfPath}'.");
         }
-
-        Console.WriteLine($"Form fields imported and saved to '{outputPdfPath}'.");
     }
 }

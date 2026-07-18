@@ -16,23 +16,23 @@ class Program
         }
 
         // Load the PDF document
-        using (Document doc = new Document(pdfPath))
+        Document doc = new Document(pdfPath);
+
+        // Initialize FormEditor using the BindPdf overload (no string ctor in this version)
+        using (FormEditor formEditor = new FormEditor())
         {
-            // Initialize FormEditor with the loaded document (as required)
-            using (FormEditor editor = new FormEditor(doc))
-            {
-                // Use the Form facade to get the list of field names
-                Form form = new Form(doc);
-                string[] fieldNames = form.FieldNames;
+            formEditor.BindPdf(doc);
+            // No modifications are made, so we just let the using block dispose it.
+        }
 
-                Console.WriteLine("Form field names:");
-                foreach (string name in fieldNames)
-                {
-                    Console.WriteLine(name);
-                }
+        // Retrieve all form field names
+        Form form = new Form(doc);
+        string[] fieldNames = form.FieldNames;
 
-                // No changes made; editor will be disposed automatically
-            }
+        // Display each field name on the console
+        foreach (string name in fieldNames)
+        {
+            Console.WriteLine(name);
         }
     }
 }

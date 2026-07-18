@@ -2,14 +2,14 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "form_template.pdf";   // PDF containing the form
-        const string outputPdfPath = "form_report.pdf";    // PDF report to generate
+        const string inputPdfPath = "form_input.pdf";
+        const string outputPdfPath = "form_report.pdf";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -17,47 +17,78 @@ class Program
             return;
         }
 
-        // Load the source PDF and bind it to a FormEditor facade
-        using (Document srcDoc = new Document(inputPdfPath))
-        using (FormEditor formEditor = new FormEditor(srcDoc))
+        // Load the source PDF that contains the form fields
+        using (Aspose.Pdf.Document sourceDoc = new Aspose.Pdf.Document(inputPdfPath))
         {
-            // Add a new page at the end of the document for the report
-            Page reportPage = srcDoc.Pages.Add();
+            // Wrap the document with the Form facade to access form data
+            Aspose.Pdf.Facades.Form formFacade = new Aspose.Pdf.Facades.Form(sourceDoc);
 
-            // Create a table with three columns: Name, Type, Value
-            Table table = new Table
+            // Retrieve all field names
+            string[] fieldNames = formFacade.FieldNames;
+
+            // Create a new PDF document for the report
+            using (Aspose.Pdf.Document reportDoc = new Aspose.Pdf.Document())
             {
-                // Optional: set column widths (percentage of page width)
-                ColumnWidths = "30 30 40"
-            };
+                // Add a page to the report
+                Aspose.Pdf.Page page = reportDoc.Pages.Add();
 
-            // Add header row
-            Row header = table.Rows.Add();
-            header.BackgroundColor = Color.LightGray;
-            header.Cells.Add("Field Name");
-            header.Cells.Add("Field Type");
-            header.Cells.Add("Field Value");
+                // Create a table with three columns: Name, Type, Value
+                Aspose.Pdf.Table table = new Aspose.Pdf.Table
+                {
+                    ColumnWidths = "150 100 200", // adjust widths as needed
+                    Border = new Aspose.Pdf.BorderInfo(Aspose.Pdf.BorderSide.All, 1f, Aspose.Pdf.Color.Black)
+                };
 
-            // Iterate over each form field and populate the table
-            foreach (Field field in srcDoc.Form.Fields)
-            {
-                string fieldName = field.PartialName;
-                string fieldType = field.GetType().Name; // e.g., TextBoxField, CheckBoxField, etc.
-                string fieldValue = field.Value?.ToString() ?? string.Empty;
+                // Header row
+                Row header = table.Rows.Add();
+                AddCell(header, "Field Name", true);
+                AddCell(header, "Field Type", true);
+                AddCell(header, "Field Value", true);
 
-                Row row = table.Rows.Add();
-                row.Cells.Add(fieldName);
-                row.Cells.Add(fieldType);
-                row.Cells.Add(fieldValue);
+                // Data rows
+                foreach (string fieldName in fieldNames)
+                {
+                    // Get field type and value
+                    string fieldType = formFacade.GetFieldType(fieldName).ToString();
+                    object rawValue = formFacade.GetField(fieldName);
+                    string fieldValue = rawValue != null ? rawValue.ToString() : string.Empty;
+
+                    Row row = table.Rows.Add();
+                    AddCell(row, fieldName, false);
+                    AddCell(row, fieldType, false);
+                    AddCell(row, fieldValue, false);
+                }
+
+                // Add the table to the page
+                page.Paragraphs.Add(table);
+
+                // Save the report
+                reportDoc.Save(outputPdfPath);
             }
 
-            // Add the table to the report page
-            reportPage.Paragraphs.Add(table);
-
-            // Save the resulting PDF (inside the using block to keep the document alive)
-            srcDoc.Save(outputPdfPath);
+            Console.WriteLine($"Form report saved to '{outputPdfPath}'.");
         }
+    }
 
-        Console.WriteLine($"Form report generated: {outputPdfPath}");
+    // Helper method to add a cell with optional header styling
+    private static void AddCell(Row row, string text, bool isHeader)
+    {
+        Cell cell = row.Cells.Add();
+        TextFragment tf = new TextFragment(text);
+        if (isHeader)
+        {
+            tf.TextState.Font = FontRepository.FindFont("Helvetica-Bold");
+            tf.TextState.FontSize = 12;
+            tf.TextState.ForegroundColor = Aspose.Pdf.Color.White;
+            cell.BackgroundColor = Aspose.Pdf.Color.Gray;
+        }
+        else
+        {
+            tf.TextState.Font = FontRepository.FindFont("Helvetica");
+            tf.TextState.FontSize = 10;
+            tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+        }
+        cell.Paragraphs.Add(tf);
+        cell.Border = new Aspose.Pdf.BorderInfo(Aspose.Pdf.BorderSide.All, 0.5f, Aspose.Pdf.Color.LightGray);
     }
 }
