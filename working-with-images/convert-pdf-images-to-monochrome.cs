@@ -20,30 +20,30 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages
+            // Iterate through all pages
             foreach (Page page in doc.Pages)
             {
-                // XImageCollection uses 1‑based indexing
-                int imageIndex = 1;
+                // Access the image collection of the current page
+                var images = page.Resources.Images;
+                int imageCount = images.Count;
 
-                // Iterate over each image resource on the page
-                foreach (XImage xImg in page.Resources.Images)
+                // Replace each image with its grayscale version
+                for (int i = 1; i <= imageCount; i++)
                 {
-                    // Obtain a grayscale version of the image (System.Drawing.Image)
-                    using (System.Drawing.Image grayImg = xImg.Grayscaled)
+                    XImage original = images[i];
+
+                    // Obtain a grayscale System.Drawing.Image (fully qualified to avoid ambiguity)
+                    System.Drawing.Image grayImage = original.Grayscaled;
+
+                    // Write the grayscale image to a memory stream (JPEG format)
+                    using (MemoryStream ms = new MemoryStream())
                     {
-                        // Encode the grayscale image to a JPEG stream
-                        using (MemoryStream grayStream = new MemoryStream())
-                        {
-                            grayImg.Save(grayStream, System.Drawing.Imaging.ImageFormat.Jpeg);
-                            grayStream.Position = 0; // reset for reading
+                        grayImage.Save(ms, ImageFormat.Jpeg);
+                        ms.Position = 0; // Reset stream position for reading
 
-                            // Replace the original image with the grayscale JPEG
-                            page.Resources.Images.Replace(imageIndex, grayStream);
-                        }
+                        // Replace the original image in the collection with the grayscale stream
+                        images.Replace(i, ms);
                     }
-
-                    imageIndex++;
                 }
             }
 

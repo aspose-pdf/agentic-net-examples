@@ -1,66 +1,50 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging;
 using Aspose.Pdf;
 
-class ExtractImages
+class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPdf = "input.pdf";
-
-        // Output directory for extracted PNG images
-        const string outputDir = "ExtractedImages";
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "ExtractedImages";
 
         // Verify input file exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document (lifecycle: using for deterministic disposal)
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Iterate over all pages (1‑based indexing)
-            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            int imageIndex = 1;
+
+            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
             {
-                Page page = doc.Pages[pageNum];
-                int imageCounter = 1;
+                Page page = pdfDoc.Pages[pageNum];
 
-                // Iterate over all XImage resources on the current page
-                foreach (XImage xImg in page.Resources.Images)
+                // Iterate over each image resource on the page
+                foreach (XImage img in page.Resources.Images)
                 {
-                    // Build a unique file name for each image
-                    string imagePath = Path.Combine(
-                        outputDir,
-                        $"page{pageNum}_image{imageCounter}.png");
+                    // Build a unique file name for each extracted image
+                    string outputPath = Path.Combine(outputFolder, $"image_{imageIndex}.png");
 
-                    // XImage.Save only accepts a Stream, so we first write the image to a MemoryStream
-                    // and then re‑encode it as PNG using System.Drawing.
-                    using (MemoryStream tempStream = new MemoryStream())
+                    // Save the image using a FileStream (XImage.Save expects a Stream)
+                    using (FileStream fs = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
                     {
-                        // Save the raw image data to the temporary stream
-                        xImg.Save(tempStream);
-                        tempStream.Position = 0; // rewind
-
-                        // Load the image with System.Drawing and re‑save as PNG
-                        using (System.Drawing.Image sysImg = System.Drawing.Image.FromStream(tempStream))
-                        {
-                            sysImg.Save(imagePath, ImageFormat.Png);
-                        }
+                        img.Save(fs);
                     }
 
-                    Console.WriteLine($"Saved image: {imagePath}");
-                    imageCounter++;
+                    Console.WriteLine($"Extracted image saved to: {outputPath}");
+                    imageIndex++;
                 }
             }
         }
-
-        Console.WriteLine("Image extraction completed.");
     }
 }

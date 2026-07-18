@@ -1,41 +1,51 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;   // Core Aspose.Pdf namespace only
 
 class Program
 {
     static void Main()
     {
-        // Paths for the source DICOM image and the output PDF.
-        const string dicomImagePath = "medical_image.dcm"; // replace with actual image file
-        const string outputPdfPath  = "output.pdf";
+        const string outputPdfPath = "output.pdf";
+        const string dicomFilePath = "image.dcm";
 
-        // Ensure the image file exists.
-        if (!File.Exists(dicomImagePath))
+        // Verify that the DICOM file exists
+        if (!File.Exists(dicomFilePath))
         {
-            Console.Error.WriteLine($"Image file not found: {dicomImagePath}");
+            Console.Error.WriteLine($"DICOM file not found: {dicomFilePath}");
             return;
         }
 
-        // Create a new PDF document and add a single page.
-        using (Document pdfDoc = new Document())
+        // Open the DICOM file as a FileStream
+        using (FileStream dicomStream = File.OpenRead(dicomFilePath))
+        // Create a new PDF document (wrapped in a using for deterministic disposal)
+        using (Aspose.Pdf.Document pdfDoc = new Aspose.Pdf.Document())
         {
+            // Add a blank page to the document
             pdfDoc.Pages.Add();
 
-            // Load the image via a FileStream and assign it to an Image object.
-            using (FileStream imgStream = File.OpenRead(dicomImagePath))
-            {
-                Image img = new Image();          // parameterless constructor
-                img.ImageStream = imgStream;      // set the stream containing the image data
-                // Optionally, you can set the image dimensions or scaling here.
-                // img.FixWidth  = 300;
-                // img.FixHeight = 400;
+            // Create an Image object using the default constructor
+            Aspose.Pdf.Image dicomImage = new Aspose.Pdf.Image();
 
-                // Add the image to the first page.
-                pdfDoc.Pages[1].Paragraphs.Add(img);
-            }
+            // Assign the FileStream to the ImageStream property
+            dicomImage.ImageStream = dicomStream;
 
-            // Save the PDF document.
+            // Optionally, set the image size to fill the whole page
+            // (PageInfo provides the page dimensions)
+            Aspose.Pdf.Rectangle pageRect = new Aspose.Pdf.Rectangle(
+                0,
+                0,
+                pdfDoc.Pages[1].PageInfo.Width,
+                pdfDoc.Pages[1].PageInfo.Height);
+
+            // Position the image using the rectangle
+            dicomImage.FixWidth = pageRect.Width;
+            dicomImage.FixHeight = pageRect.Height;
+
+            // Add the image to the page's paragraph collection
+            pdfDoc.Pages[1].Paragraphs.Add(dicomImage);
+
+            // Save the resulting PDF
             pdfDoc.Save(outputPdfPath);
         }
 

@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output_no_images.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,18 +15,20 @@ class Program
             return;
         }
 
-        // Load the PDF, remove images, and save
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based
+            // Pages are 1‑based; iterate through each page
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
-                // Delete all images on this page
+
+                // Delete all images from the page's image collection
+                // XImageCollection provides a Delete() method that removes every image
                 page.Resources.Images.Delete();
             }
 
-            // Save the modified PDF
+            // Save the modified document (PDF format)
             doc.Save(outputPath);
         }
 

@@ -7,44 +7,35 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_compressed.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output_compressed.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block (ensures proper disposal)
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Configure optimization options.
-            // - CompressObjects packs PDF objects into streams.
-            // - ImageCompressionOptions enables image compression and sets a quality level.
-            //   Images larger than the default threshold will be recompressed as JPEG.
-            OptimizationOptions opt = new OptimizationOptions
-            {
-                CompressObjects = true,
-                RemoveUnusedObjects = true // optional, helps reduce size further
-            };
+            // Configure optimization options
+            OptimizationOptions optOptions = new OptimizationOptions();
 
-            // The ImageCompressionOptions property is read‑only; retrieve the existing instance
-            // and set its individual members.
-            ImageCompressionOptions imgOpt = opt.ImageCompressionOptions;
-            imgOpt.CompressImages = true;      // enable image compression
-            imgOpt.ImageQuality   = 50;        // JPEG quality (0‑100)
-            imgOpt.MaxResolution  = 150;       // downscale images above this DPI
-            // Optional: force JPEG encoding for better compression
-            imgOpt.Encoding = ImageEncoding.Jpeg;
+            // Enable image compression
+            optOptions.ImageCompressionOptions.CompressImages = true;
+            // Set JPEG quality (0‑100). Lower value = higher compression.
+            optOptions.ImageCompressionOptions.ImageQuality = 70;
+            // Optionally limit the maximum resolution of images (in DPI)
+            optOptions.ImageCompressionOptions.MaxResolution = 1500;
 
-            // Apply the optimization to the document.
-            doc.OptimizeResources(opt);
+            // Apply the optimization to the document
+            pdfDoc.OptimizeResources(optOptions);
 
-            // Save the optimized PDF.
-            doc.Save(outputPath);
+            // Save the optimized PDF
+            pdfDoc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Compressed PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Optimized PDF saved to '{outputPdf}'.");
     }
 }

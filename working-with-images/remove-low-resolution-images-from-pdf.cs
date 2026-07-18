@@ -18,27 +18,33 @@ class Program
         // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create an absorber that will collect all image placements in the document
-            ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
-
-            // Perform the search on the whole document
-            absorber.Visit(doc);
-
-            // Iterate over each found image placement
-            foreach (ImagePlacement placement in absorber.ImagePlacements)
+            // Iterate over all pages (1‑based indexing)
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                // Check the horizontal and vertical resolution (DPI)
-                if (placement.Resolution.X < 72 || placement.Resolution.Y < 72)
+                Page page = doc.Pages[pageIndex];
+
+                // Search for image placements on the current page
+                ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
+                page.Accept(absorber);
+
+                // Remove images whose DPI is lower than 72
+                foreach (ImagePlacement imgPlacement in absorber.ImagePlacements)
                 {
-                    // Remove the image from the page
-                    placement.Hide();
+                    // Resolution.X and Resolution.Y represent horizontal and vertical DPI
+                    if (imgPlacement.Resolution.X < 72 || imgPlacement.Resolution.Y < 72)
+                    {
+                        imgPlacement.Hide(); // Delete the image from the page
+                    }
                 }
             }
+
+            // Optional: clean up unused resources after deletions
+            doc.OptimizeResources();
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Images with DPI < 72 removed. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }
