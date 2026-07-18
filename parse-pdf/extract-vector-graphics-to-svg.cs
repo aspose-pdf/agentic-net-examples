@@ -7,44 +7,46 @@ class Program
 {
     static void Main()
     {
+        // Input PDF file path
         const string inputPdf = "input.pdf";
-        const string outputRoot = "ExtractedSvgs";
 
-        // Verify the source PDF exists.
+        // Directory where individual SVG files will be saved
+        const string outputRoot = "ExtractedVectors";
+
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Ensure the root output directory exists.
+        // Ensure the root output directory exists
         Directory.CreateDirectory(outputRoot);
 
-        // Load the PDF document inside a using block for deterministic disposal.
+        // Load the PDF document
         using (Document pdfDoc = new Document(inputPdf))
         {
-            // SvgExtractor handles conversion of vector graphics to SVG.
+            // Create an SvgExtractor instance (default options)
             SvgExtractor extractor = new SvgExtractor();
 
-            // Iterate through all pages (1‑based indexing).
-            for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
+            // Iterate through all pages (1‑based indexing)
+            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
             {
-                Page page = pdfDoc.Pages[pageIndex];
+                Page page = pdfDoc.Pages[pageNum];
 
-                // Skip pages that contain no vector graphics.
+                // Check if the page contains any vector graphics
                 if (!page.HasVectorGraphics())
-                    continue;
+                    continue; // Skip pages without vector graphics
 
-                // Create a sub‑folder for each page to avoid filename clashes.
-                string pageFolder = Path.Combine(outputRoot, $"Page_{pageIndex}");
-                Directory.CreateDirectory(pageFolder);
+                // Create a sub‑directory for this page's SVG files
+                string pageOutputDir = Path.Combine(outputRoot, $"Page_{pageNum}");
+                Directory.CreateDirectory(pageOutputDir);
 
-                // Extract each vector graphic on the page to a separate SVG file.
-                // The method creates files inside the supplied directory.
-                extractor.Extract(page, pageFolder);
+                // Extract each vector graphic on the page to a separate SVG file
+                // The method creates individual SVG files inside the specified directory
+                extractor.Extract(page, pageOutputDir);
             }
         }
 
-        Console.WriteLine("All vector graphics have been extracted to SVG files.");
+        Console.WriteLine($"Vector graphics extraction completed. SVG files are located in '{outputRoot}'.");
     }
 }

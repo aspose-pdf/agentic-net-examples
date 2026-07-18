@@ -1,38 +1,37 @@
 using System;
 using System.IO;
-using System.Text;
 using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string pdfPath = "input.pdf";
+        const string jsonPath = "formdata.json";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF document (wrapped in using for deterministic disposal)
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // MemoryStream will receive the JSON output
-            using (MemoryStream jsonStream = new MemoryStream())
+            // Load the PDF document inside a using block for deterministic disposal.
+            using (Document doc = new Document(pdfPath))
             {
-                // Export all form fields to JSON; writes directly into the stream
-                doc.Form.ExportToJson(jsonStream);
-
-                // Reset stream position before reading
-                jsonStream.Position = 0;
-
-                // Convert the UTF‑8 bytes in the stream to a string
-                string json = new StreamReader(jsonStream, Encoding.UTF8).ReadToEnd();
-
-                // The JSON string now contains all extracted form data
-                Console.WriteLine(json);
+                // Export all form fields to a JSON file.
+                // The ExportToJson(string) overload writes the JSON directly to the specified file.
+                // Aspose.Pdf writes UTF‑8 encoded JSON by default.
+                doc.Form.ExportToJson(jsonPath);
             }
+
+            Console.WriteLine($"Form data successfully exported to '{jsonPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during export: {ex.Message}");
         }
     }
 }
