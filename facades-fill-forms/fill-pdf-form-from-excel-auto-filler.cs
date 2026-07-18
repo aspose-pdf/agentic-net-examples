@@ -3,75 +3,102 @@ using System.Data;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-class Program
+namespace AutoFillerConsoleApp
 {
-    static void Main(string[] args)
+    class Program
     {
-        // Simple console interface: first argument is the path to the Excel file.
-        if (args.Length == 0)
+        /// <summary>
+        /// Entry point.
+        /// Usage: dotnet run <excelFilePath> <outputPdfPath> [templatePdfPath]
+        /// </summary>
+        static void Main(string[] args)
         {
-            Console.WriteLine("Usage: AutoFill <excelFilePath>");
-            return;
-        }
-
-        string excelPath = args[0];
-        if (!File.Exists(excelPath))
-        {
-            Console.WriteLine($"Excel file not found: {excelPath}");
-            return;
-        }
-
-        // Convert the uploaded XLSX file to a DataTable.
-        // In a real project replace this stub with Aspose.Cells or another library.
-        DataTable dataTable = ConvertExcelToDataTable(File.OpenRead(excelPath));
-
-        // Path to the PDF template that contains form fields.
-        const string templatePath = "Templates/Template.pdf";
-        if (!File.Exists(templatePath))
-        {
-            Console.WriteLine($"PDF template not found: {templatePath}");
-            return;
-        }
-
-        // Use AutoFiller to bind the template, import data, and generate the filled PDF.
-        using (AutoFiller autoFiller = new AutoFiller())
-        {
-            autoFiller.BindPdf(templatePath);
-            autoFiller.ImportDataTable(dataTable);
-
-            using (MemoryStream outputStream = new MemoryStream())
+            if (args.Length < 2)
             {
-                autoFiller.Save(outputStream);
-                // Write the filled PDF to disk.
-                File.WriteAllBytes("FilledDocument.pdf", outputStream.ToArray());
-                Console.WriteLine("Filled PDF saved as FilledDocument.pdf");
+                Console.WriteLine("Usage: <excelFilePath> <outputPdfPath> [templatePdfPath]");
+                return;
+            }
+
+            string excelPath = args[0];
+            string outputPdfPath = args[1];
+            string templatePath = args.Length >= 3 ? args[2] : Path.Combine(Directory.GetCurrentDirectory(), "Templates", "template.pdf");
+
+            if (!File.Exists(excelPath))
+            {
+                Console.WriteLine($"Excel file not found: {excelPath}");
+                return;
+            }
+
+            if (!File.Exists(templatePath))
+            {
+                Console.WriteLine($"PDF template not found: {templatePath}");
+                return;
+            }
+
+            // ------------------------------------------------------------
+            // Convert the uploaded Excel file to a DataTable.
+            // This example creates a dummy DataTable; replace with real
+            // Excel parsing logic as needed (e.g., using ClosedXML, EPPlus, etc.).
+            // ------------------------------------------------------------
+            DataTable dataTable = CreateDummyDataTable();
+
+            // ------------------------------------------------------------
+            // Use Aspose.Pdf.Facades.AutoFiller to merge the data into the
+            // PDF template and produce a single merged PDF file.
+            // ------------------------------------------------------------
+            try
+            {
+                using (AutoFiller autoFiller = new AutoFiller())
+                {
+                    // Bind the PDF template file.
+                    autoFiller.BindPdf(templatePath);
+
+                    // Import the DataTable; column names must match field names.
+                    autoFiller.ImportDataTable(dataTable);
+
+                    // Save the merged PDF into a memory stream first (optional).
+                    using (MemoryStream outputStream = new MemoryStream())
+                    {
+                        autoFiller.Save(outputStream);
+                        outputStream.Position = 0;
+                        File.WriteAllBytes(outputPdfPath, outputStream.ToArray());
+                    }
+                }
+
+                Console.WriteLine($"Filled PDF generated successfully at: {outputPdfPath}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error during PDF generation: {ex.Message}");
             }
         }
-    }
 
-    // Placeholder method: implement actual XLSX to DataTable conversion as needed.
-    private static DataTable ConvertExcelToDataTable(Stream excelStream)
-    {
-        // Example stub: create an empty DataTable with expected column names.
-        DataTable table = new DataTable("AutoFillData");
-        table.Columns.Add("CompanyName", typeof(string));
-        table.Columns.Add("ContactName", typeof(string));
-        table.Columns.Add("Address", typeof(string));
-        table.Columns.Add("PostalCode", typeof(string));
-        table.Columns.Add("City", typeof(string));
-        table.Columns.Add("Country", typeof(string));
-        table.Columns.Add("Heading", typeof(string));
+        /// <summary>
+        /// Creates a dummy DataTable that mimics the structure expected by the PDF form.
+        /// Replace this method with real Excel‑to‑DataTable conversion logic.
+        /// </summary>
+        private static DataTable CreateDummyDataTable()
+        {
+            DataTable dt = new DataTable();
+            dt.Columns.Add("CompanyName", typeof(string));
+            dt.Columns.Add("ContactName", typeof(string));
+            dt.Columns.Add("Address", typeof(string));
+            dt.Columns.Add("PostalCode", typeof(string));
+            dt.Columns.Add("City", typeof(string));
+            dt.Columns.Add("Country", typeof(string));
+            dt.Columns.Add("Heading", typeof(string));
 
-        DataRow row = table.NewRow();
-        row["CompanyName"] = "Sample Co.";
-        row["ContactName"] = "John Doe";
-        row["Address"] = "123 Main St.";
-        row["PostalCode"] = "12345";
-        row["City"] = "Metropolis";
-        row["Country"] = "USA";
-        row["Heading"] = "Dear Sample Co.,";
-        table.Rows.Add(row);
+            dt.Rows.Add(
+                "Acme Corp",
+                "John Doe",
+                "123 Main St",
+                "12345",
+                "Metropolis",
+                "USA",
+                "Dear Acme Corp,"
+            );
 
-        return table;
+            return dt;
+        }
     }
 }

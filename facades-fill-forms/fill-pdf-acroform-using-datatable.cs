@@ -18,44 +18,41 @@ class Program
 
         // ------------------------------------------------------------
         // Build a DataTable whose column names exactly match the
-        // AcroForm field names in the PDF (case‑sensitive).
+        // AcroForm field names in the PDF template (case‑sensitive).
         // ------------------------------------------------------------
         DataTable dataTable = new DataTable("FormData");
         dataTable.Columns.Add("FirstName", typeof(string));
         dataTable.Columns.Add("LastName",  typeof(string));
         dataTable.Columns.Add("Address",   typeof(string));
         dataTable.Columns.Add("City",      typeof(string));
-        dataTable.Columns.Add("Country",   typeof(string));
+        dataTable.Columns.Add("PostalCode",typeof(string));
 
-        // Populate the table – replace with real data source as needed.
+        // Add one (or more) rows of data.
         DataRow row = dataTable.NewRow();
         row["FirstName"] = "John";
         row["LastName"]  = "Doe";
-        row["Address"]   = "123 Main St";
-        row["City"]      = "Anytown";
-        row["Country"]   = "USA";
+        row["Address"]   = "123 Main St.";
+        row["City"]      = "Metropolis";
+        row["PostalCode"]= "12345";
         dataTable.Rows.Add(row);
 
         // ------------------------------------------------------------
-        // Use AutoFiller to merge the DataTable into the PDF template.
+        // Use AutoFiller to bind the template, import the DataTable,
+        // and save the filled PDF.
         // ------------------------------------------------------------
-        AutoFiller autoFiller = new AutoFiller();
-        try
-        {
-            // Bind the template PDF.
-            autoFiller.BindPdf(templatePath);
+        Aspose.Pdf.Facades.AutoFiller autoFiller = new Aspose.Pdf.Facades.AutoFiller();
 
-            // Import the DataTable – column names must match field names.
-            autoFiller.ImportDataTable(dataTable);
+        // Bind the PDF template file.
+        autoFiller.BindPdf(templatePath);
 
-            // Save the filled PDF.
-            autoFiller.Save(outputPath);
-        }
-        finally
-        {
-            // Ensure resources are released.
-            autoFiller.Close();
-        }
+        // Import the DataTable; column names must match field names.
+        autoFiller.ImportDataTable(dataTable);
+
+        // Save the resulting PDF.
+        autoFiller.Save(outputPath);
+
+        // Release resources.
+        autoFiller.Close();
 
         Console.WriteLine($"Filled PDF saved to '{outputPath}'.");
     }

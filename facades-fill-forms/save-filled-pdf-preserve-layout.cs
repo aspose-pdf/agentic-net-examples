@@ -6,30 +6,32 @@ class Program
 {
     static void Main()
     {
-        // Paths for the source PDF (already filled or to be filled) and the destination PDF
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "filled_output.pdf";
+        // Paths for the source PDF (already filled or to be filled) and the output PDF
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_filled.pdf";
 
-        // Ensure the source file exists
-        if (!File.Exists(inputPdfPath))
+        // Verify that the source file exists
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Use the Form facade to work with AcroForm fields.
-        // The Form constructor binds the PDF document internally.
-        using (Form pdfForm = new Form(inputPdfPath))
-        {
-            // Example of filling a text field; replace with actual field names as needed.
-            // pdfForm.FillField("FullName", "John Doe");
-            // pdfForm.FillField("Date", DateTime.Today.ToShortDateString());
+        // Initialize the Form facade with the source PDF.
+        // The Form class inherits from SaveableFacade, which provides the Save method.
+        Form formFacade = new Form(inputPath);
 
-            // Save the PDF using the facade's Save method.
-            // This preserves the original layout and all existing content.
-            pdfForm.Save(outputPdfPath);
-        }
+        // OPTIONAL: Fill a form field (replace with actual field name/value as needed).
+        // This operation does not alter the original page layout.
+        formFacade.FillField("FieldName", "FieldValue");
 
-        Console.WriteLine($"PDF saved to '{outputPdfPath}'.");
+        // Save the modified PDF using the facade's Save method.
+        // This preserves the original layout because the facade works on the existing document.
+        formFacade.Save(outputPath);
+
+        // Release resources held by the facade.
+        formFacade.Close();
+
+        Console.WriteLine($"PDF saved successfully to '{outputPath}'.");
     }
 }
