@@ -1,61 +1,49 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices; // Required for JpegDevice
-using Aspose.Pdf.Text;   // needed for TextFragment
+using Aspose.Pdf.Devices;
 
-class PdfToJpegConverter
+class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
+        // Input PDF file path
+        const string inputPdf = "input.pdf";
+        // Output directory for JPEG images
         const string outputDir = "JpegImages";
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
-
-        // If the input PDF does not exist, create a minimal sample PDF so the program can run without error
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            CreateSamplePdf(inputPdfPath);
-            Console.WriteLine($"Sample PDF created at '{inputPdfPath}'.");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
+            return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document pdfDocument = new Document(inputPdfPath))
-        {
-            // JpegDevice uses a resolution (DPI). The default quality is 100, which matches the requirement.
-            // Here we use the default constructor (300 DPI, 100% quality).
-            var jpegDevice = new JpegDevice();
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputDir);
 
-            // Iterate through all pages (1‑based indexing used for user‑friendly output)
+        // Load PDF document inside a using block for proper disposal
+        using (Document pdfDocument = new Document(inputPdf))
+        {
+            // JpegDevice with default resolution (150 DPI) and maximum quality
+            JpegDevice jpegDevice = new JpegDevice();
+
+            // Iterate through all pages (1‑based indexing)
             for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
             {
-                // Build the output file name for the current page
-                string outputFile = Path.Combine(outputDir, $"page_{pageNumber}.jpeg");
+                // Build output file name for each page
+                string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.jpeg");
 
-                // Save the selected page as a JPEG image using JpegDevice
-                using (FileStream imageStream = new FileStream(outputFile, FileMode.Create))
+                // Create a file stream for the JPEG image
+                using (FileStream jpegStream = new FileStream(outputPath, FileMode.Create))
                 {
-                    jpegDevice.Process(pdfDocument.Pages[pageNumber], imageStream);
+                    // Convert the current page to JPEG and write to the stream
+                    jpegDevice.Process(pdfDocument.Pages[pageNumber], jpegStream);
                 }
 
-                Console.WriteLine($"Page {pageNumber} saved as {outputFile}");
+                Console.WriteLine($"Saved page {pageNumber} as JPEG: {outputPath}");
             }
         }
 
         Console.WriteLine("PDF to JPEG conversion completed.");
-    }
-
-    // Helper method to generate a simple PDF when the expected input file is missing
-    private static void CreateSamplePdf(string path)
-    {
-        using (var doc = new Document())
-        {
-            var page = doc.Pages.Add();
-            var fragment = new TextFragment("Sample PDF generated because 'input.pdf' was not found.");
-            page.Paragraphs.Add(fragment);
-            doc.Save(path);
-        }
     }
 }

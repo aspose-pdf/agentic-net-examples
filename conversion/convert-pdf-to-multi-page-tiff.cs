@@ -7,9 +7,7 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file path
         const string inputPdf = "input.pdf";
-        // Output TIFF file path (all pages merged into one file)
         const string outputTiff = "output.tif";
 
         if (!File.Exists(inputPdf))
@@ -18,13 +16,13 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document pdfDocument = new Document(inputPdf))
         {
-            // Define the resolution (DPI) for the resulting TIFF image
+            // Define the resolution for the output TIFF (e.g., 300 DPI)
             Resolution resolution = new Resolution(300);
 
-            // Configure TIFF settings (no compression, default color depth, landscape orientation)
+            // Configure TIFF settings
             TiffSettings tiffSettings = new TiffSettings
             {
                 Compression = CompressionType.None,
@@ -33,13 +31,13 @@ class Program
                 SkipBlankPages = false
             };
 
-            // Create the TIFF device with the specified resolution and settings
+            // Create a TiffDevice with the specified resolution and settings
             TiffDevice tiffDevice = new TiffDevice(resolution, tiffSettings);
 
-            // Convert the entire PDF document to a single multi‑page TIFF file
+            // Convert all pages of the PDF into a single multi‑page TIFF file
             tiffDevice.Process(pdfDocument, outputTiff);
         }
 
-        Console.WriteLine($"PDF successfully converted to TIFF: {outputTiff}");
+        Console.WriteLine($"TIFF file created: {outputTiff}");
     }
 }

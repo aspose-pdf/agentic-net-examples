@@ -6,25 +6,25 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.ps";   // PostScript source file
-        const string outputPath = "output.pdf"; // Destination PDF file
+        const string inputPath  = "input.ps";
+        const string outputPath = "output.pdf";
 
-        // Verify that the source file exists before attempting conversion
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PostScript file with PsLoadOptions (default settings)
-        // The Document constructor performs the conversion to PDF internally.
-        using (Document pdfDocument = new Document(inputPath, new PsLoadOptions()))
+        // Load the PostScript file using the dedicated PsLoadOptions.
+        PsLoadOptions loadOptions = new PsLoadOptions();
+
+        // Wrap the Document in a using block for deterministic disposal.
+        using (Document pdfDocument = new Document(inputPath, loadOptions))
         {
-            // Save the resulting PDF. No SaveOptions are required because
-            // Document.Save(string) always writes PDF when no format is specified.
+            // Saving without explicit SaveOptions always produces a PDF.
             pdfDocument.Save(outputPath);
         }
 
-        Console.WriteLine($"Conversion completed: '{outputPath}'");
+        Console.WriteLine($"PostScript file converted to PDF: '{outputPath}'.");
     }
 }

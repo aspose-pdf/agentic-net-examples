@@ -7,68 +7,67 @@ class Program
 {
     static void Main()
     {
-        // Paths for input PDF and output HTML files
-        const string inputPdfPath   = "input.pdf";
-        const string outputHtmlPath = "output.html";
+        // Input PDF file path
+        const string pdfPath = "input.pdf";
 
-        // Verify that the input PDF exists
-        if (!File.Exists(inputPdfPath))
-        {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
+        // Directory where the HTML file(s) will be saved
+        const string outputDir = "HtmlOutput";
+
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDir);
+
+        // Path for the generated HTML file (single file output)
+        string htmlPath = Path.Combine(outputDir, "output.html");
 
         try
         {
-            // Load the PDF document (using the recommended using block for deterministic disposal)
-            using (Document pdfDocument = new Document(inputPdfPath))
+            // Load the PDF document and optimize it for web delivery
+            using (Document doc = new Document(pdfPath))
             {
+                // Linearize the PDF to improve loading speed
+                doc.Optimize();
+
                 // Configure HTML conversion options
                 HtmlSaveOptions htmlOptions = new HtmlSaveOptions
                 {
-                    // Embed raster images as PNG inside SVG to keep a single HTML file
-                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg,
-                    // Optional: generate only the body content if you need a fragment
-                    // HtmlMarkupGenerationMode = HtmlSaveOptions.HtmlMarkupGenerationModes.WriteOnlyBodyContent
+                    // Embed all resources (images, CSS, fonts) into the HTML file
+                    PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
+
+                    // Optional: generate a fixed‑layout HTML (set to false for flow layout)
+                    FixedLayout = false
                 };
 
-                // Convert PDF to HTML. Wrap in try‑catch because HTML conversion requires GDI+ (Windows only)
-                try
-                {
-                    pdfDocument.Save(outputHtmlPath, htmlOptions);
-                    Console.WriteLine($"PDF successfully converted to HTML: {outputHtmlPath}");
-                }
-                catch (TypeInitializationException)
-                {
-                    Console.Error.WriteLine("HTML conversion requires Windows GDI+. Skipping conversion on this platform.");
-                    return;
-                }
+                // Convert PDF to HTML
+                doc.Save(htmlPath, htmlOptions);
             }
 
-            // ----- Minify the generated HTML -----
-            // Read the HTML content
-            string htmlContent = File.ReadAllText(outputHtmlPath);
+            // Minify the generated HTML to reduce size and improve loading speed
+            string htmlContent = File.ReadAllText(htmlPath);
+            string minifiedHtml = MinifyHtml(htmlContent);
+            File.WriteAllText(htmlPath, minifiedHtml);
 
-            // Remove HTML comments
-            htmlContent = Regex.Replace(htmlContent, @"<!--(.*?)-->", string.Empty, RegexOptions.Singleline);
-
-            // Collapse whitespace between tags and within text nodes
-            // 1. Replace sequences of whitespace characters (space, tab, newline) with a single space
-            htmlContent = Regex.Replace(htmlContent, @"\s+", " ");
-
-            // 2. Remove spaces between tags: > <  => ><
-            htmlContent = Regex.Replace(htmlContent, @">\s+<", "><");
-
-            // Trim leading/trailing whitespace
-            htmlContent = htmlContent.Trim();
-
-            // Write the minified HTML back to the same file (or to a new file if preferred)
-            File.WriteAllText(outputHtmlPath, htmlContent);
-            Console.WriteLine($"HTML minification completed: {outputHtmlPath}");
+            Console.WriteLine("PDF successfully converted to HTML and minified.");
+        }
+        catch (TypeInitializationException)
+        {
+            // HTML conversion relies on GDI+ and is Windows‑only
+            Console.WriteLine("HTML conversion requires Windows (GDI+). Operation skipped.");
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine($"Error: {ex.Message}");
         }
+    }
+
+    // Simple HTML minification: collapse whitespace and remove spaces between tags
+    static string MinifyHtml(string html)
+    {
+        // Replace multiple whitespace characters with a single space
+        string collapsed = Regex.Replace(html, @"\s+", " ");
+
+        // Remove spaces between closing and opening tags
+        string withoutTagSpaces = Regex.Replace(collapsed, @">\s+<", "><");
+
+        return withoutTagSpaces.Trim();
     }
 }

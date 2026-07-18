@@ -1,79 +1,67 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";                 // source PDF
-        const string outputDocxPath = "output.docx";             // converted DOCX
-        const string imagesOutputDir = "ExtractedImages";        // folder for images
+        const string inputPdfPath = "input.pdf";
+        const string outputDocxPath = "output.docx";
+        const string imagesOutputDir = "ExtractedImages";
 
-        // Ensure the images output directory exists
-        Directory.CreateDirectory(imagesOutputDir);
-
-        // ------------------------------------------------------------
-        // Make sure a source PDF is available. If the file is missing we
-        // create a minimal PDF on‑the‑fly so the sample can run without
-        // external resources. This eliminates the FileNotFoundException
-        // that caused the original crash.
-        // ------------------------------------------------------------
+        // Verify input file exists
         if (!File.Exists(inputPdfPath))
         {
-            using (Document placeholder = new Document())
-            {
-                // Add a single blank page
-                Page page = placeholder.Pages.Add();
-
-                // Optionally add a simple shape so the PDF is not completely empty
-                Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
-                Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(100, 500, 200, 100);
-                rect.GraphInfo.Color = Aspose.Pdf.Color.Blue;
-                rect.GraphInfo.FillColor = Aspose.Pdf.Color.LightGray;
-                graph.Shapes.Add(rect);
-                page.Paragraphs.Add(graph);
-
-                placeholder.Save(inputPdfPath);
-                Console.WriteLine($"Placeholder PDF created at '{inputPdfPath}'.");
-            }
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
         }
 
-        // Load the PDF document (wrapped in using for deterministic disposal)
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Ensure the images directory exists
+        Directory.CreateDirectory(imagesOutputDir);
+
+        try
         {
-            // ---------- Convert PDF to DOCX ----------
-            // Configure DOCX save options (use Flow mode for better editability)
-            var docSaveOptions = new DocSaveOptions
+            // Load the PDF document (wrapped in using for deterministic disposal)
+            using (Document pdfDocument = new Document(inputPdfPath))
             {
-                Format = DocSaveOptions.DocFormat.DocX,
-                Mode = DocSaveOptions.RecognitionMode.Flow
-            };
-            pdfDoc.Save(outputDocxPath, docSaveOptions);
-
-            // ---------- Extract embedded images ----------
-            int imageIndex = 0;
-            foreach (Page page in pdfDoc.Pages) // 1‑based page indexing
-            {
-                // Iterate over all images defined in the page resources
-                foreach (XImage img in page.Resources.Images)
+                // ---------- Convert PDF to DOCX ----------
+                // DocSaveOptions must be passed explicitly for non‑PDF output
+                DocSaveOptions docOptions = new DocSaveOptions
                 {
-                    imageIndex++;
-                    // Build a unique file name for each extracted image
-                    string imagePath = System.IO.Path.Combine(imagesOutputDir,
-                        $"image_{imageIndex}.png"); // PNG is a safe default
+                    // Specify DOCX output format
+                    Format = DocSaveOptions.DocFormat.DocX,
+                    // Use Flow mode for better editability
+                    Mode = DocSaveOptions.RecognitionMode.Flow
+                };
+                pdfDocument.Save(outputDocxPath, docOptions);
 
-                    // Save the image to the file system using a stream overload
-                    using (FileStream fs = new FileStream(imagePath, FileMode.Create, FileAccess.Write))
+                // ---------- Extract embedded images ----------
+                int imageCounter = 1;
+                foreach (Page page in pdfDocument.Pages)
+                {
+                    // XImageCollection is iterated directly (no dictionary semantics)
+                    foreach (XImage img in page.Resources.Images)
                     {
-                        img.Save(fs);
+                        // Save each image as PNG using a FileStream (XImage.Save expects a Stream)
+                        string imageFileName = $"image_page{page.Number}_{imageCounter}.png";
+                        string imagePath = Path.Combine(imagesOutputDir, imageFileName);
+
+                        using (FileStream fs = new FileStream(imagePath, FileMode.Create, FileAccess.Write))
+                        {
+                            img.Save(fs);
+                        }
+
+                        imageCounter++;
                     }
                 }
             }
-        }
 
-        Console.WriteLine("Conversion to DOCX completed and images extracted.");
+            Console.WriteLine("PDF successfully converted to DOCX and images extracted.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

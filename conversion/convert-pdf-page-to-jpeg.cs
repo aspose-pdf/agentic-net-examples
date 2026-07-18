@@ -9,11 +9,14 @@ class Program
     {
         // Input PDF file path
         const string inputPdfPath = "input.pdf";
-        // Output JPEG file path (for the selected page)
+
+        // Output JPEG file path (will contain the image of the selected page)
         const string outputJpegPath = "page1.jpg";
+
         // Page number to convert (Aspose.Pdf uses 1‑based indexing)
         const int pageNumber = 1;
 
+        // Verify that the source PDF exists
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"File not found: {inputPdfPath}");
@@ -23,24 +26,28 @@ class Program
         // Load the PDF document inside a using block for deterministic disposal
         using (Document pdfDocument = new Document(inputPdfPath))
         {
-            // Validate the requested page number
+            // Ensure the requested page exists
             if (pageNumber < 1 || pageNumber > pdfDocument.Pages.Count)
             {
-                Console.Error.WriteLine("Invalid page number.");
+                Console.Error.WriteLine($"Invalid page number {pageNumber}. Document has {pdfDocument.Pages.Count} pages.");
                 return;
             }
 
-            // JpegDevice with default resolution (150 DPI) and maximum quality
+            // Retrieve the specific page (1‑based index)
+            Page page = pdfDocument.Pages[pageNumber];
+
+            // Create a JpegDevice with default resolution (150 DPI) and maximum quality
             JpegDevice jpegDevice = new JpegDevice();
 
-            // Create a file stream for the JPEG output
+            // Open a file stream for the output JPEG image
             using (FileStream jpegStream = new FileStream(outputJpegPath, FileMode.Create))
             {
-                // Convert the specified page to JPEG and write to the stream
-                jpegDevice.Process(pdfDocument.Pages[pageNumber], jpegStream);
+                // Convert the selected PDF page to JPEG and write it to the stream
+                jpegDevice.Process(page, jpegStream);
+                // The using statement will automatically close the stream
             }
         }
 
-        Console.WriteLine($"Page {pageNumber} saved as JPEG to '{outputJpegPath}'.");
+        Console.WriteLine($"Page {pageNumber} of '{inputPdfPath}' saved as JPEG to '{outputJpegPath}'.");
     }
 }

@@ -16,7 +16,7 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document (using statement ensures proper disposal)
         using (Document pdfDocument = new Document(inputPath))
         {
             // Create a TiffDevice with default settings
@@ -26,6 +26,6 @@ class Program
             tiffDevice.Process(pdfDocument, outputPath);
         }
 
-        Console.WriteLine($"TIFF saved to '{outputPath}'.");
+        Console.WriteLine($"TIFF image saved to '{outputPath}'.");
     }
 }

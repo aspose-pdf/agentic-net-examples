@@ -3,55 +3,41 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Devices;
 
-class Program
+class BatchPdfToTiff
 {
     static void Main()
     {
         // Directory containing source PDF files
-        string inputDir = @"C:\PdfInput";
-        // Directory where resulting TIFF files will be saved
-        string outputDir = @"C:\TiffOutput";
+        const string inputDirectory = @"C:\PdfInput";
 
-        if (!Directory.Exists(inputDir))
-        {
-            Console.Error.WriteLine($"Input directory not found: {inputDir}");
-            return;
-        }
+        // Directory where the resulting multi‑page TIFF files will be saved
+        const string outputDirectory = @"C:\TiffOutput";
 
-        Directory.CreateDirectory(outputDir);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDirectory);
 
         // Get all PDF files in the input directory
-        string[] pdfFiles = Directory.GetFiles(inputDir, "*.pdf");
-        if (pdfFiles.Length == 0)
-        {
-            Console.WriteLine("No PDF files found to convert.");
-            return;
-        }
-
-        // Prepare TiffDevice with default (no) compression
-        Resolution resolution = new Resolution(300);
-        TiffSettings tiffSettings = new TiffSettings
-        {
-            Compression = CompressionType.None,
-            Depth = ColorDepth.Default,
-            Shape = ShapeType.Landscape,
-            SkipBlankPages = false
-        };
-        TiffDevice tiffDevice = new TiffDevice(resolution, tiffSettings);
+        string[] pdfFiles = Directory.GetFiles(inputDirectory, "*.pdf");
 
         foreach (string pdfPath in pdfFiles)
         {
-            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
-            string tiffPath = Path.Combine(outputDir, fileNameWithoutExt + ".tif");
+            // Derive the output TIFF file name from the PDF file name
+            string tiffFileName = Path.GetFileNameWithoutExtension(pdfPath) + ".tif";
+            string tiffPath = Path.Combine(outputDirectory, tiffFileName);
 
-            // Load PDF document
+            // Load the PDF document (using the standard Document constructor)
             using (Document pdfDocument = new Document(pdfPath))
             {
-                // Convert the whole PDF to a multi‑page TIFF archive
+                // Create a TiffDevice with default settings (default compression is None)
+                TiffDevice tiffDevice = new TiffDevice();
+
+                // Convert the entire PDF to a multi‑page TIFF archive
                 tiffDevice.Process(pdfDocument, tiffPath);
             }
 
-            Console.WriteLine($"Converted: {pdfPath} → {tiffPath}");
+            Console.WriteLine($"Converted '{pdfPath}' to '{tiffPath}'.");
         }
+
+        Console.WriteLine("Batch conversion completed.");
     }
 }

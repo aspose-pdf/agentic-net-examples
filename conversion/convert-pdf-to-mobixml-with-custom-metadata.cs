@@ -6,38 +6,33 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string inputPdf  = "input.pdf";
         const string outputMobi = "output.mobi";
+        const string author    = "John Doe";
+        const string publisher = "Acme Publishing";
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for proper disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Load the source PDF and ensure deterministic disposal
-            using (Document pdfDoc = new Document(inputPdf))
-            {
-                // Set standard metadata
-                pdfDoc.Info.Author = "John Doe";
+            // Set standard author metadata
+            doc.Info.Author = author;
 
-                // Publisher is not a predefined property; add it as custom metadata
-                pdfDoc.Info["Publisher"] = "Acme Publishing";
+            // Set custom publisher metadata (no dedicated property, use custom key)
+            doc.Info["Publisher"] = publisher;
 
-                // Prepare MobiXml save options (default constructor is sufficient)
-                MobiXmlSaveOptions mobiOpts = new MobiXmlSaveOptions();
+            // Create MobiXml save options (default constructor)
+            MobiXmlSaveOptions mobiOptions = new MobiXmlSaveOptions();
 
-                // Save the document as MobiXml using the options
-                pdfDoc.Save(outputMobi, mobiOpts);
-            }
-
-            Console.WriteLine($"PDF successfully converted to MobiXml: {outputMobi}");
+            // Save the document as MobiXml using the options
+            doc.Save(outputMobi, mobiOptions);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF converted to MobiXml with metadata saved to '{outputMobi}'.");
     }
 }

@@ -4,44 +4,37 @@ using Aspose.Pdf;
 
 class Program
 {
-    // Progress handler that writes conversion progress information to the console
-    static void ShowProgress(UnifiedSaveOptions.ProgressEventHandlerInfo info)
+    // Progress handler method – logs conversion progress to the console
+    private static void ShowProgress(UnifiedSaveOptions.ProgressEventHandlerInfo info)
     {
-        // Simple generic logging – the EventType enum values are version‑specific, so we just output the enum name.
-        Console.WriteLine($"{DateTime.Now:T} - Event: {info.EventType}, Value: {info.Value}, MaxValue: {info.MaxValue}");
+        // Example: log total progress percentage
+        Console.WriteLine($"{DateTime.Now:T} - Progress: {info.EventType} = {info.Value}/{info.MaxValue}");
     }
 
     static void Main()
     {
-        const string inputPdf = "input.pdf";   // Path to the source PDF
-        const string outputPptx = "output.pptx"; // Desired PPTX output path
+        const string inputPdf  = "input.pdf";
+        const string outputPptx = "output.pptx";
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Error: File not found – {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for proper disposal
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Load the PDF document and ensure proper disposal
-            using (Document pdfDocument = new Document(inputPdf))
-            {
-                // Initialize PPTX save options and attach the custom progress handler
-                PptxSaveOptions saveOptions = new PptxSaveOptions
-                {
-                    CustomProgressHandler = new PptxSaveOptions.ConversionProgressEventHandler(ShowProgress)
-                };
+            // Initialize PPTX save options
+            PptxSaveOptions saveOptions = new PptxSaveOptions();
 
-                // Save the document as PPTX using the specified options
-                pdfDocument.Save(outputPptx, saveOptions);
-            }
+            // Assign the custom progress handler
+            saveOptions.CustomProgressHandler = new PptxSaveOptions.ConversionProgressEventHandler(ShowProgress);
 
-            Console.WriteLine($"Conversion completed. PPTX saved to '{outputPptx}'.");
+            // Save the document as PPTX using the configured options
+            pdfDoc.Save(outputPptx, saveOptions);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
-        }
+
+        Console.WriteLine($"Conversion completed: {outputPptx}");
     }
 }

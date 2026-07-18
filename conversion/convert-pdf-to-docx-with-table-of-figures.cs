@@ -1,8 +1,9 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
-using Aspose.Pdf.Drawing; // for Color
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
@@ -20,70 +21,79 @@ class Program
         // Load the source PDF
         using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // -----------------------------------------------------------------
-            // Step 1: Extract images and build a table of figures
-            // -----------------------------------------------------------------
-            Table figuresTable = new Table
-            {
-                // Simple two‑column layout: Figure number and Description
-                ColumnWidths = "50 400"
-            };
+            // Access tagged content (creates a tagged structure if none exists)
+            ITaggedContent tagged = pdfDoc.TaggedContent;
+            tagged.SetLanguage("en-US");
+            // Fully qualify System.IO.Path to avoid ambiguity with Aspose.Pdf.Drawing.Path
+            tagged.SetTitle(System.IO.Path.GetFileNameWithoutExtension(inputPdfPath));
+
+            // Root element of the tagged structure
+            StructureElement root = tagged.RootElement;
+
+            // Create a table that will become the Table of Figures
+            TableElement table = tagged.CreateTableElement();
+            table.AlternativeText = "Table of Figures";
+            root.AppendChild(table);
 
             // Header row
-            Row header = figuresTable.Rows.Add();
-            header.Cells.Add("Figure");
-            header.Cells.Add("Description");
-            // Optional: make header bold
-            foreach (Cell cell in header.Cells)
-            {
-                cell.DefaultCellTextState = new TextState
-                {
-                    Font = FontRepository.FindFont("Helvetica"),
-                    FontSize = 12,
-                    FontStyle = FontStyles.Bold,
-                    ForegroundColor = Color.Black
-                };
-            }
+            TableTHeadElement thead = tagged.CreateTableTHeadElement();
+            table.AppendChild(thead);
+            TableTRElement headerRow = tagged.CreateTableTRElement();
+            thead.AppendChild(headerRow);
 
-            int imageIndex = 1;
-            // Iterate all pages and images
+            TableTHElement thFigure = tagged.CreateTableTHElement();
+            thFigure.SetText("Figure");
+            headerRow.AppendChild(thFigure);
+
+            TableTHElement thDesc = tagged.CreateTableTHElement();
+            thDesc.SetText("Description");
+            headerRow.AppendChild(thDesc);
+
+            TableTHElement thPage = tagged.CreateTableTHElement();
+            thPage.SetText("Page");
+            headerRow.AppendChild(thPage);
+
+            // Body of the table
+            TableTBodyElement tbody = tagged.CreateTableTBodyElement();
+            table.AppendChild(tbody);
+
+            int figureIndex = 1;
+
+            // Iterate through pages and their images
             foreach (Page page in pdfDoc.Pages)
             {
                 foreach (XImage img in page.Resources.Images)
                 {
-                    // Create a new row for each image
-                    Row row = figuresTable.Rows.Add();
-                    // Figure number
-                    row.Cells.Add($"Figure {imageIndex}");
-                    // Description – use alternative text if set, otherwise a placeholder
-                    string description = $"Image {imageIndex}";
-                    row.Cells.Add(description);
-                    imageIndex++;
+                    // Create a simple description for the figure
+                    string description = $"Figure {figureIndex}";
+                    // Set alternative text on the image (useful for accessibility)
+                    img.TrySetAlternativeText(description, page);
+
+                    // Add a row for this image
+                    TableTRElement row = tagged.CreateTableTRElement();
+                    tbody.AppendChild(row);
+
+                    // Figure number cell
+                    TableTDElement tdFigure = tagged.CreateTableTDElement();
+                    tdFigure.SetText(figureIndex.ToString());
+                    row.AppendChild(tdFigure);
+
+                    // Description cell
+                    TableTDElement tdDesc = tagged.CreateTableTDElement();
+                    tdDesc.SetText(description);
+                    row.AppendChild(tdDesc);
+
+                    // Page number cell
+                    TableTDElement tdPage = tagged.CreateTableTDElement();
+                    tdPage.SetText(page.Number.ToString());
+                    row.AppendChild(tdPage);
+
+                    figureIndex++;
                 }
             }
 
-            // Insert the table at the end of the first page (or any page you prefer)
-            if (pdfDoc.Pages.Count >= 1)
-            {
-                Page firstPage = pdfDoc.Pages[1]; // 1‑based indexing
-                firstPage.Paragraphs.Add(figuresTable);
-            }
-
-            // -----------------------------------------------------------------
-            // Step 2: Convert the enriched PDF to DOCX
-            // -----------------------------------------------------------------
-            DocSaveOptions saveOptions = new DocSaveOptions
-            {
-                // Export as DOCX (correct enum value)
-                Format = DocSaveOptions.DocFormat.DocX,
-                // Optional: improve bullet detection, etc.
-                RecognizeBullets = true
-                // Note: Mode/RecognitionMode property has been removed in recent versions
-            };
-
-            pdfDoc.Save(outputDocxPath, saveOptions);
+            // Convert the PDF (with the added Table of Figures) to DOCX
+            pdfDoc.Save(outputDocxPath, SaveFormat.DocX);
         }
-
-        Console.WriteLine($"PDF converted to DOCX with table of figures: {outputDocxPath}");
     }
 }

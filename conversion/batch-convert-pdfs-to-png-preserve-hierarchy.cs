@@ -3,62 +3,55 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Devices;
 
-class BatchPdfToPngConverter
+class Program
 {
     static void Main()
     {
-        // Input root folder containing PDFs (can be changed as needed)
-        const string inputRoot = @"C:\InputPdfs";
-        // Output root folder where PNGs will be placed, preserving hierarchy
-        const string outputRoot = @"C:\OutputPngs";
+        // Root folder containing PDF files (adjust as needed)
+        const string sourceRoot = @"C:\InputPdfs";
+        // Destination root where PNG images will be placed, mirroring the source hierarchy
+        const string destRoot = @"C:\OutputPngs";
 
-        if (!Directory.Exists(inputRoot))
+        if (!Directory.Exists(sourceRoot))
         {
-            Console.Error.WriteLine($"Input directory does not exist: {inputRoot}");
+            Console.Error.WriteLine($"Source directory not found: {sourceRoot}");
             return;
         }
 
-        // Find all PDF files recursively
-        string[] pdfFiles = Directory.GetFiles(inputRoot, "*.pdf", SearchOption.AllDirectories);
-        if (pdfFiles.Length == 0)
-        {
-            Console.WriteLine("No PDF files found.");
-            return;
-        }
-
-        // Create a PNG device with desired resolution (e.g., 300 DPI)
-        Resolution resolution = new Resolution(300);
-        PngDevice pngDevice = new PngDevice(resolution); // No using – PngDevice does not implement IDisposable
+        // Resolve all PDF files recursively
+        string[] pdfFiles = Directory.GetFiles(sourceRoot, "*.pdf", SearchOption.AllDirectories);
 
         foreach (string pdfPath in pdfFiles)
         {
-            // Compute relative path to maintain folder hierarchy
-            string relativePath = Path.GetRelativePath(inputRoot, pdfPath);
-            string relativeDir = Path.GetDirectoryName(relativePath) ?? string.Empty;
-            string pdfFileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
+            // Compute relative path to preserve folder hierarchy
+            string relativePath = Path.GetRelativePath(sourceRoot, pdfPath);
+            string relativeDir  = Path.GetDirectoryName(relativePath) ?? string.Empty;
 
-            // Destination directory for this PDF's images
-            string destDir = Path.Combine(outputRoot, relativeDir, pdfFileNameWithoutExt);
-            Directory.CreateDirectory(destDir);
+            // Destination folder for this PDF's images
+            string outputDir = Path.Combine(destRoot, relativeDir);
+            Directory.CreateDirectory(outputDir);
 
-            // Open PDF document
-            using (Document pdfDocument = new Document(pdfPath))
+            // Load PDF document inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(pdfPath))
             {
-                // Iterate through all pages (1‑based indexing)
-                for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
-                {
-                    Page page = pdfDocument.Pages[pageNumber];
-                    string pngPath = Path.Combine(destDir, $"page_{pageNumber}.png");
+                // Configure image resolution (e.g., 300 DPI)
+                Resolution resolution = new Resolution(300);
+                PngDevice pngDevice = new PngDevice(resolution);
 
-                    // Save page as PNG
-                    using (FileStream pngStream = new FileStream(pngPath, FileMode.Create, FileAccess.Write))
+                // Iterate pages using 1‑based indexing
+                for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
+                {
+                    string pngPath = Path.Combine(outputDir, $"page{pageNum}.png");
+
+                    // Save each page as a PNG file
+                    using (FileStream pngStream = new FileStream(pngPath, FileMode.Create))
                     {
-                        pngDevice.Process(page, pngStream);
+                        pngDevice.Process(pdfDoc.Pages[pageNum], pngStream);
                     }
                 }
             }
 
-            Console.WriteLine($"Converted: {pdfPath}");
+            Console.WriteLine($"Converted: {pdfPath} → {outputDir}");
         }
 
         Console.WriteLine("Batch conversion completed.");

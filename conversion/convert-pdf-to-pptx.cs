@@ -1,32 +1,34 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Provides Document, PptxSaveOptions, etc.
+using Aspose.Pdf;               // Core API for Document and save options
+using Aspose.Pdf;               // PptxSaveOptions is in the same namespace
 
 class Program
 {
     static void Main()
     {
-        // Paths for source PDF and destination PPTX.
-        const string inputPdfPath  = "input.pdf";
-        const string outputPptxPath = "output.pptx";
+        // Paths – adjust as needed
+        string dataDir   = "YOUR_DATA_DIRECTORY";
+        string pdfPath   = Path.Combine(dataDir, "input.pdf");
+        string pptxPath  = Path.Combine(dataDir, "output.pptx");
 
-        // Verify that the source file exists.
-        if (!File.Exists(inputPdfPath))
+        // Verify source file exists
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Source PDF not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal.
-        using (Document pdfDocument = new Document(inputPdfPath))
+        // Load the PDF document (lifecycle: create & load)
+        using (Document pdfDocument = new Document(pdfPath))
         {
-            // Initialize default PPTX save options.
-            PptxSaveOptions pptxOptions = new PptxSaveOptions();
+            // Initialize default PPTX save options
+            PptxSaveOptions saveOptions = new PptxSaveOptions();
 
-            // Save the document as PPTX using the explicit save options.
-            pdfDocument.Save(outputPptxPath, pptxOptions);
+            // Save as PPTX (lifecycle: save)
+            pdfDocument.Save(pptxPath, saveOptions);
         }
 
-        Console.WriteLine($"PDF successfully converted to PPTX: {outputPptxPath}");
+        Console.WriteLine($"PDF successfully converted to PPTX: {pptxPath}");
     }
 }
