@@ -1,45 +1,58 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "evenStamped.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output_even_pages.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the source PDF
-        Document doc = new Document(inputPath);
-
-        // Prepare a text stamp that will be reused for every even page
-        TextStamp stamp = new TextStamp("Even Page");
-        stamp.TextState.Font = FontRepository.FindFont("Helvetica");
-        stamp.TextState.FontSize = 36;
-        stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Gray; // fully‑qualified color
-        stamp.HorizontalAlignment = HorizontalAlignment.Left;
-        stamp.VerticalAlignment = VerticalAlignment.Bottom;
-        stamp.Background = true;          // place behind existing content (use Background, not IsBackground)
-        stamp.Opacity = 0.5f;                // semi‑transparent
-
-        // Apply the stamp only to even‑numbered pages (1‑based indexing)
-        for (int i = 1; i <= doc.Pages.Count; i++)
+        // Load the document to determine the total number of pages.
+        using (Document doc = new Document(inputPdf))
         {
-            if (i % 2 == 0) // even page
+            int pageCount = doc.Pages.Count; // 1‑based indexing
+
+            // Build an array containing only the even page numbers.
+            int evenCount = pageCount / 2;
+            int[] evenPages = new int[evenCount];
+            int idx = 0;
+            for (int i = 2; i <= pageCount; i += 2)
             {
-                doc.Pages[i].AddStamp(stamp);
+                evenPages[idx++] = i;
             }
+
+            // Create a text stamp that will be applied to the even pages.
+            FormattedText ft = new FormattedText(
+                "Even Page Aspose.Pdf.Facades.Stamp",                     // text
+                System.Drawing.Color.Gray,             // text color (System.Drawing.Color is required here)
+                "Helvetica",                           // font name
+                EncodingType.Winansi,                  // encoding
+                false,                                 // embed font
+                36);                                   // font size
+
+            Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
+            stamp.BindLogo(ft);          // bind the formatted text to the stamp
+            stamp.IsBackground = true;   // place the stamp behind page content
+            stamp.Pages = evenPages;     // restrict stamping to even pages only
+
+            // Apply the stamp using PdfFileStamp facade.
+            PdfFileStamp fileStamp = new PdfFileStamp();
+            fileStamp.BindPdf(inputPdf);          // load source PDF
+            fileStamp.AddStamp(stamp);            // add the configured stamp
+            fileStamp.Save(outputPdf);            // write result
+            fileStamp.Close();                    // release resources
         }
 
-        // Save the modified PDF
-        doc.Save(outputPath);
-        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Aspose.Pdf.Facades.Stamp applied to even pages. Output saved to '{outputPdf}'.");
     }
 }
