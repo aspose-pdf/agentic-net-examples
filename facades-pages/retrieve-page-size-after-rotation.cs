@@ -2,65 +2,39 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text; // Added for TextFragment
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "rotated_output.pdf";
-        const int pageNumber = 1; // 1‑based index
+        const string inputPath = "sample.pdf";
+        const string outputPath = "rotated.pdf";
 
-        // ------------------------------------------------------------
-        // Ensure a source PDF exists – create a simple one if it does not.
-        // ------------------------------------------------------------
         if (!File.Exists(inputPath))
         {
-            using (Document doc = new Document())
-            {
-                // Add a single page with default size (A4 – 595 x 842 points).
-                Page page = doc.Pages.Add();
-                // Optional: add some visible content so the page is not empty.
-                page.Paragraphs.Add(new TextFragment("Sample page for rotation test"));
-                doc.Save(inputPath);
-                Console.WriteLine($"Created placeholder PDF '{inputPath}'.");
-            }
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // ------------------------------------------------------------
-        // Rotate the page and retrieve its size after rotation.
-        // ------------------------------------------------------------
+        // Bind the PDF to the editor and work within a using block for proper disposal
         using (PdfPageEditor editor = new PdfPageEditor())
         {
             editor.BindPdf(inputPath);
 
-            // Show the current rotation of the target page.
-            int originalRotation = editor.GetPageRotation(pageNumber);
-            Console.WriteLine($"Original rotation of page {pageNumber}: {originalRotation}°");
+            // Retrieve original page size (page numbers are 1‑based)
+            PageSize originalSize = editor.GetPageSize(1);
+            Console.WriteLine($"Original size: {originalSize.Width} x {originalSize.Height}");
 
-            // Restrict the operation to the desired page (good practice).
-            editor.ProcessPages = new int[] { pageNumber };
+            // Rotate page 1 by 90 degrees
+            editor.Rotation = 90;                 // set rotation angle (0, 90, 180, 270)
+            editor.ProcessPages = new int[] { 1 }; // apply rotation only to page 1
+            editor.ApplyChanges();                // commit the rotation
 
-            // Apply a 90° clockwise rotation.
-            editor.Rotation = 90; // valid values: 0, 90, 180, 270
-            editor.ApplyChanges();
+            // Retrieve page size after rotation
+            PageSize rotatedSize = editor.GetPageSize(1);
+            Console.WriteLine($"Rotated size: {rotatedSize.Width} x {rotatedSize.Height}");
 
-            // Retrieve the logical page size after rotation.
-            PageSize size = editor.GetPageSize(pageNumber);
-            // The GetPageSize method returns the media box dimensions *before* rotation.
-            // When the page is rotated by 90° or 270°, width/height are swapped.
-            double effectiveWidth = size.Width;
-            double effectiveHeight = size.Height;
-            int finalRotation = (originalRotation + editor.Rotation) % 360;
-            if (finalRotation == 90 || finalRotation == 270)
-            {
-                // Swap dimensions to reflect the visual orientation.
-                (effectiveWidth, effectiveHeight) = (effectiveHeight, effectiveWidth);
-            }
-            Console.WriteLine($"Size of page {pageNumber} after rotation: {effectiveWidth} x {effectiveHeight}");
-
-            // Save the modified PDF.
+            // Save the modified PDF
             editor.Save(outputPath);
         }
 

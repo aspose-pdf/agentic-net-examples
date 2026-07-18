@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text;
 
 class Program
 {
@@ -17,43 +16,32 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block (document disposal rule)
-        using (Document doc = new Document(inputPath))
+        // Use PdfPageEditor (Facade) to edit page properties.
+        using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // Create a PdfPageEditor facade and bind the loaded document
-            using (PdfPageEditor editor = new PdfPageEditor())
+            // Load the PDF file.
+            editor.BindPdf(inputPath);
+
+            // Get total number of pages (1‑based indexing).
+            int pageCount = editor.Document.Pages.Count;
+
+            // Set a different display duration for each page.
+            for (int i = 1; i <= pageCount; i++)
             {
-                editor.BindPdf(doc);
+                // Restrict editing to the current page.
+                editor.ProcessPages = new int[] { i };
 
-                // Iterate through all pages (1‑based indexing rule)
-                for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
-                {
-                    // Extract text from the current page
-                    TextAbsorber absorber = new TextAbsorber();
-                    doc.Pages[pageNum].Accept(absorber);
-                    string pageText = absorber.Text ?? string.Empty;
+                // Set duration equal to the page index (seconds).
+                editor.DisplayDuration = i;
 
-                    // Simple word count (split on whitespace)
-                    int wordCount = pageText.Split(new char[] { ' ', '\t', '\r', '\n' },
-                                                   StringSplitOptions.RemoveEmptyEntries).Length;
-
-                    // Estimate display duration:
-                    // Assume an average reading speed of 200 words per minute (≈3.33 words per second)
-                    // Duration is rounded up to the next whole second.
-                    double seconds = Math.Ceiling(wordCount / 3.33);
-                    int duration = (int)seconds;
-
-                    // Configure the editor to affect only the current page
-                    editor.ProcessPages = new int[] { pageNum };
-                    editor.DisplayDuration = duration; // set duration for this page
-                    editor.ApplyChanges(); // apply the change
-                }
+                // Apply the change to the selected page.
+                editor.ApplyChanges();
             }
 
-            // Save the modified document (save rule – explicit call inside using)
-            doc.Save(outputPath);
+            // Save the modified PDF.
+            editor.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with per‑page display durations: {outputPath}");
+        Console.WriteLine($"PDF saved with per‑page display durations to '{outputPath}'.");
     }
 }

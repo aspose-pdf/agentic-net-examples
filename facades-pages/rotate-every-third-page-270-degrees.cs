@@ -1,7 +1,6 @@
 using System;
-using System.Collections;
 using System.IO;
-using Aspose.Pdf;
+using System.Linq;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -13,33 +12,31 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Initialize the PdfPageEditor facade and bind the source PDF.
+        // Initialize the PdfPageEditor facade and bind the source PDF
         using (PdfPageEditor editor = new PdfPageEditor())
         {
             editor.BindPdf(inputPath);
 
-            // Retrieve total number of pages (1‑based indexing).
-            int pageCount = editor.GetPages();
+            // Determine total number of pages (1‑based indexing)
+            int totalPages = editor.GetPages();
 
-            // Rotate every third page by 270 degrees.
-            for (int i = 1; i <= pageCount; i++)
-            {
-                if (i % 3 == 0)
-                {
-                    // PageRotations is a Hashtable: key = page number, value = rotation angle.
-                    editor.PageRotations[i] = 270;
-                }
-            }
+            // Select every third page (3, 6, 9, …)
+            int[] thirdPages = Enumerable.Range(1, totalPages)
+                                         .Where(p => p % 3 == 0)
+                                         .ToArray();
 
-            // Apply the rotation changes to the document.
+            // Apply a 270° rotation to the selected pages
+            editor.ProcessPages = thirdPages;   // pages to edit
+            editor.Rotation     = 270;          // allowed values: 0, 90, 180, 270
+
+            // Commit the changes and save the result
             editor.ApplyChanges();
-
-            // Save the modified PDF.
             editor.Save(outputPath);
+            editor.Close();
         }
 
         Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");

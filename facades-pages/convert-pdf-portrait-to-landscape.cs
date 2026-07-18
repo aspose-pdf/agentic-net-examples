@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "portrait.pdf";
+        const string inputPath  = "portrait.pdf";
         const string outputPath = "landscape.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,29 +16,29 @@ class Program
             return;
         }
 
-        // Bind the source PDF to the editor facade
+        // Initialize the PdfPageEditor and bind the source PDF
         using (PdfPageEditor editor = new PdfPageEditor())
         {
             editor.BindPdf(inputPath);
 
-            // Retrieve the original size of the first page (points)
+            // Retrieve the original size of the first page (pages are 1‑based)
             PageSize originalSize = editor.GetPageSize(1);
-            Console.WriteLine($"Original size: {originalSize.Width} x {originalSize.Height} points");
+            Console.WriteLine($"Original size – Width: {originalSize.Width}, Height: {originalSize.Height}");
 
-            // Set the output page size to landscape by swapping width and height
-            editor.PageSize = new PageSize(originalSize.Height, originalSize.Width);
+            // Create a landscape size by swapping width and height
+            PageSize landscapeSize = new PageSize(originalSize.Height, originalSize.Width);
+            editor.PageSize = landscapeSize;
 
-            // Rotate the page 90° so the content remains upright
+            // Rotate the page content 90° so it appears correctly in landscape orientation
             editor.Rotation = 90;
 
             // Apply the modifications to the document
             editor.ApplyChanges();
 
-            // Verify the new page dimensions and rotation
+            // Verify the new page dimensions and orientation
             PageSize newSize = editor.GetPageSize(1);
-            int newRotation = editor.GetPageRotation(1);
-            Console.WriteLine($"New size: {newSize.Width} x {newSize.Height} points");
-            Console.WriteLine($"Rotation after edit: {newRotation} degrees");
+            Console.WriteLine($"New size – Width: {newSize.Width}, Height: {newSize.Height}");
+            Console.WriteLine($"IsLandscape: {newSize.IsLandscape}");
 
             // Save the edited PDF
             editor.Save(outputPath);

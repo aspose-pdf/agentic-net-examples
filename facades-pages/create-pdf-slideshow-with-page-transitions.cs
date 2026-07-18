@@ -1,65 +1,47 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class PdfSlideshowCreator
+class Program
 {
     static void Main()
     {
-        // Input and output PDF file paths
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "slideshow.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "slideshow.pdf";
 
-        // Verify input file exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Example: define transition type and duration for each page.
-        // Transition types are defined as constant fields in PdfPageEditor.
-        // Here we use a simple pattern: alternating between two transitions.
-        // TransitionDuration is in seconds, DisplayDuration is also in seconds.
-        // Adjust the values to match your presentation needs.
-        const int transitionDuration = 2;   // seconds for the transition effect (int required)
-        const int displayDuration    = 5;   // seconds each page stays visible (int required)
-
-        // Create and configure the PdfPageEditor facade
-        using (PdfPageEditor editor = new PdfPageEditor())
+        // Load the source PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Bind the source PDF file
-            editor.BindPdf(inputPdf);
+            // Initialize the PdfPageEditor facade with the loaded document
+            PdfPageEditor editor = new PdfPageEditor(doc);
 
-            // Get total number of pages in the document
-            int pageCount = editor.GetPages();
+            // Set a transition effect (e.g., vertical blinds) for page changes
+            editor.TransitionType = PdfPageEditor.BLINDV; // constant defined in PdfPageEditor
+            editor.TransitionDuration = 2; // transition lasts 2 seconds
 
-            // Apply transition and display settings to each page
-            for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++)
-            {
-                // Specify which page to edit
-                editor.ProcessPages = new int[] { pageNumber };
+            // Set how long each page is displayed during the slideshow
+            editor.DisplayDuration = 5; // each page shown for 5 seconds
 
-                // Choose a transition type based on page number (example pattern)
-                // Available constants: BLINDH, BLINDV, BTWIPE, DGLITTER, DISSOLVE,
-                // INBOX, LRGLITTER, LRWIPE, OUTBOX, RLWIPE, SPLITHIN, SPLITHOUT,
-                // SPLITVIN, SPLITVOUT, TBGLITTER, TBWIPE
-                editor.TransitionType = (pageNumber % 2 == 0) ? PdfPageEditor.BLINDH : PdfPageEditor.DISSOLVE;
+            // Process all pages (null or empty array means all pages)
+            editor.ProcessPages = null;
 
-                // Set the duration of the transition effect (in seconds, int required)
-                editor.TransitionDuration = transitionDuration;
+            // Apply the configured changes to the document
+            editor.ApplyChanges();
 
-                // Set how long the page is displayed before moving to the next one (in seconds, int required)
-                editor.DisplayDuration = displayDuration;
+            // Release resources held by the editor
+            editor.Close();
 
-                // Apply the changes for the current page
-                editor.ApplyChanges();
-            }
-
-            // Save the modified PDF as a slideshow
-            editor.Save(outputPdf);
+            // Save the modified PDF (output format is PDF, so no SaveOptions needed)
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Slideshow PDF created: {outputPdf}");
+        Console.WriteLine($"Slideshow PDF saved to '{outputPath}'.");
     }
 }

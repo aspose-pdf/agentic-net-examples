@@ -7,9 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath      = "sample.pdf";
-        const string previewPath    = "preview_zoom_0_5.pdf";
-        const string finalOutputPath = "final_zoom_1_0.pdf";
+        const string inputPath   = "input.pdf";
+        const string previewPath = "preview.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,26 +16,25 @@ class Program
             return;
         }
 
-        // ---------- Preview: set scale factor to 0.5 (50%) ----------
-        // PdfViewer is a Facades class that supports ScaleFactor for preview purposes.
-        using (PdfViewer viewer = new PdfViewer())
-        {
-            viewer.BindPdf(inputPath);          // load the PDF
-            viewer.ScaleFactor = 0.5f;          // 50 % zoom for preview
-            viewer.Save(previewPath);           // save the preview PDF
-        }
+        // ---------- Preview: set zoom to 0.5 ----------
+        // PdfPageEditor edits page content; the Zoom property controls the scaling factor.
+        // 0.5f corresponds to 50% zoom (preview size).
+        PdfPageEditor previewEditor = new PdfPageEditor();
+        previewEditor.BindPdf(inputPath);
+        previewEditor.Zoom = 0.5f;               // 50 % zoom for preview
+        previewEditor.Save(previewPath);         // save the preview PDF
+        previewEditor.Close();                   // release resources
 
-        // ---------- Final output: set zoom to 1.0 (100%) ----------
-        // PdfPageEditor allows editing page properties such as Zoom.
-        using (PdfPageEditor editor = new PdfPageEditor())
-        {
-            editor.BindPdf(inputPath);          // load the same source PDF
-            editor.Zoom = 1.0f;                 // 100 % zoom for final output
-            editor.ApplyChanges();              // apply the zoom change
-            editor.Save(finalOutputPath);       // save the final PDF
-        }
+        // ---------- Final output: set scale factor to 1.0 ----------
+        // PdfViewer is used for viewing/printing. ScaleFactor = 1.0 means no scaling.
+        PdfViewer finalViewer = new PdfViewer();
+        finalViewer.BindPdf(previewPath);
+        finalViewer.ScaleFactor = 1.0f;          // 100 % scale for final output
+        // Example: print the document (optional). Comment out if not needed.
+        // finalViewer.PrintDocument();
+        finalViewer.Close();                     // release resources
 
-        Console.WriteLine($"Preview saved to '{previewPath}' (zoom 0.5).");
-        Console.WriteLine($"Final output saved to '{finalOutputPath}' (zoom 1.0).");
+        Console.WriteLine($"Preview saved to '{previewPath}' with zoom 0.5.");
+        Console.WriteLine("Final viewer configured with scale factor 1.0.");
     }
 }
