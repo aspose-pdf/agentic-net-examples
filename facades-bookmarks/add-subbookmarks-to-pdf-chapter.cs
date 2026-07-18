@@ -15,47 +15,44 @@ class Program
             return;
         }
 
-        // Bind the PDF and create a hierarchical bookmark structure
+        // Bind the PDF to the bookmark editor
         using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
         {
             editor.BindPdf(inputPath);
 
-            // Parent bookmark representing a chapter
-            Aspose.Pdf.Facades.Bookmark parent = new Aspose.Pdf.Facades.Bookmark
-            {
-                Title      = "Chapter 1",
-                PageNumber = 1,
-                Open       = true   // expanded by default
-            };
-
-            // Child bookmarks representing subsections
-            Aspose.Pdf.Facades.Bookmark sub1 = new Aspose.Pdf.Facades.Bookmark
+            // Create child bookmarks (sub‑sections)
+            Bookmark child1 = new Bookmark
             {
                 Title      = "Section 1.1",
-                PageNumber = 2
+                PageNumber = 6               // destination page for this child
             };
-            Aspose.Pdf.Facades.Bookmark sub2 = new Aspose.Pdf.Facades.Bookmark
+
+            Bookmark child2 = new Bookmark
             {
                 Title      = "Section 1.2",
-                PageNumber = 3
+                PageNumber = 8
             };
 
-            // Assemble the child collection
-            Aspose.Pdf.Facades.Bookmarks children = new Aspose.Pdf.Facades.Bookmarks();
-            children.Add(sub1);
-            children.Add(sub2);
+            // Collect the children in a Bookmarks collection
+            Bookmarks children = new Bookmarks();
+            children.Add(child1);
+            children.Add(child2);
 
-            // Attach children to the parent bookmark
-            parent.ChildItems = children;
+            // Create the parent bookmark (chapter) and attach the children
+            Bookmark parent = new Bookmark
+            {
+                Title      = "Chapter 1",
+                PageNumber = 5,               // destination page for the parent
+                ChildItems = children          // attach child bookmarks
+            };
 
-            // Add the hierarchical bookmark to the document
+            // Add the whole hierarchy to the document
             editor.CreateBookmarks(parent);
 
             // Save the updated PDF
             editor.Save(outputPath);
-            editor.Close();
         }
 
-        Console.WriteLine($"PDF saved with sub‑bookmarks: {outputPath}");
+        Console.WriteLine($"Bookmarks with children saved to '{outputPath}'.");
     }
 }
