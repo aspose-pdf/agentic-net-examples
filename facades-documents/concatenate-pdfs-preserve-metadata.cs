@@ -1,36 +1,53 @@
 using System;
+using System.Globalization;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Files to be concatenated (order matters)
+        // Input PDF files to be concatenated
         string[] inputFiles = { "file1.pdf", "file2.pdf", "file3.pdf" };
-        string outputFile = "merged.pdf";
+        // Output merged PDF file
+        const string outputFile = "merged.pdf";
 
-        // Ensure every source file exists before proceeding
-        foreach (var path in inputFiles)
+        // Verify that all input files exist
+        foreach (string path in inputFiles)
         {
             if (!File.Exists(path))
             {
-                Console.Error.WriteLine($"Source file not found: {path}");
+                Console.Error.WriteLine($"Input file not found: {path}");
                 return;
             }
         }
 
-        // ------------------------------------------------------------
-        // Concatenate PDFs using PdfFileEditor (facade API)
-        // ------------------------------------------------------------
+        // -----------------------------------------------------------------
+        // Preserve original metadata (author, title, etc.) from the first PDF
+        // -----------------------------------------------------------------
+        PdfFileInfo firstInfo = new PdfFileInfo(inputFiles[0]);
+        string author   = firstInfo.Author;
+        string title    = firstInfo.Title;
+        string subject  = firstInfo.Subject;
+        string keywords = firstInfo.Keywords;
+        // PdfFileInfo stores dates as PDF‑date formatted strings (e.g., "yyyyMMddHHmmss")
+        string creationDateStr = firstInfo.CreationDate;
+        string modDateStr      = firstInfo.ModDate;
+
+        // --------------------------------------------------------------
+        // Concatenate PDFs using PdfFileEditor (facade API, not IDisposable)
+        // --------------------------------------------------------------
         PdfFileEditor editor = new PdfFileEditor();
 
-        // Preserve logical structure, outlines and user rights of the first document
-        editor.CopyLogicalStructure = true;
+        // Preserve outlines and logical structure during concatenation
         editor.CopyOutlines = true;
+        editor.CopyLogicalStructure = true;
+
+        // Preserve user rights from the first document (optional)
         editor.PreserveUserRights = true;
 
-        // Perform the concatenation; returns true on success
+        // Perform concatenation; returns true on success
         bool concatenated = editor.Concatenate(inputFiles, outputFile);
         if (!concatenated)
         {
@@ -38,27 +55,35 @@ class Program
             return;
         }
 
-        // ------------------------------------------------------------
-        // Preserve original metadata (author, title, etc.) from the first PDF
-        // ------------------------------------------------------------
-        // Load metadata from the first source PDF
-        PdfFileInfo sourceInfo = new PdfFileInfo(inputFiles[0]);
+        // --------------------------------------------------------------
+        // Apply the preserved metadata to the merged PDF
+        // --------------------------------------------------------------
+        using (Document mergedDoc = new Document(outputFile))
+        {
+            mergedDoc.Info.Author   = author;
+            mergedDoc.Info.Title    = title;
+            mergedDoc.Info.Subject  = subject;
+            mergedDoc.Info.Keywords = keywords;
 
-        // Load metadata from the newly created merged PDF
-        PdfFileInfo mergedInfo = new PdfFileInfo(outputFile);
+            // Convert the PDF‑date strings to DateTime before assigning
+            if (!string.IsNullOrEmpty(creationDateStr) &&
+                DateTime.TryParseExact(creationDateStr, "yyyyMMddHHmmss", CultureInfo.InvariantCulture,
+                                        DateTimeStyles.None, out DateTime creationDt))
+            {
+                mergedDoc.Info.CreationDate = creationDt;
+            }
 
-        // Copy desired metadata fields
-        mergedInfo.Author      = sourceInfo.Author;
-        mergedInfo.Title       = sourceInfo.Title;
-        mergedInfo.Subject     = sourceInfo.Subject;
-        mergedInfo.Keywords    = sourceInfo.Keywords;
-        mergedInfo.Creator     = sourceInfo.Creator;
-        mergedInfo.CreationDate = sourceInfo.CreationDate;
-        mergedInfo.ModDate     = sourceInfo.ModDate;
+            if (!string.IsNullOrEmpty(modDateStr) &&
+                DateTime.TryParseExact(modDateStr, "yyyyMMddHHmmss", CultureInfo.InvariantCulture,
+                                        DateTimeStyles.None, out DateTime modDt))
+            {
+                mergedDoc.Info.ModDate = modDt;
+            }
 
-        // Save the updated metadata back to the merged file
-        mergedInfo.SaveNewInfo(outputFile);
+            // Overwrite the same file with updated metadata
+            mergedDoc.Save(outputFile);
+        }
 
-        Console.WriteLine($"PDFs concatenated successfully. Output saved to '{outputFile}'.");
+        Console.WriteLine($"Successfully concatenated PDFs to '{outputFile}'.");
     }
 }

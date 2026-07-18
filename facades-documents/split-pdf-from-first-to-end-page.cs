@@ -8,33 +8,33 @@ class Program
     {
         // Input PDF file path
         const string inputPath = "input.pdf";
-        // Output PDF file path – will contain pages 1..endPage
-        const string outputPath = "output.pdf";
-        // Specify the last page to include in the front part (inclusive)
-        const int endPage = 5;
+        // Output PDF will contain pages from the first page up to endPage (inclusive)
+        const string outputPath = "split_output.pdf";
+        // Specify the last page to include in the split
+        int endPage = 5;
 
-        // Verify that the source file exists before attempting the operation
+        // Verify that the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // PdfFileEditor does NOT implement IDisposable, so we instantiate it directly
-        PdfFileEditor editor = new PdfFileEditor();
-
-        // SplitFromFirst extracts pages from the first page up to 'endPage' and saves them
-        bool result = editor.SplitFromFirst(inputPath, endPage, outputPath);
-
-        if (result)
+        try
         {
-            Console.WriteLine($"Successfully split PDF. Front part saved to '{outputPath}'.");
-        }
-        else
-        {
-            Console.Error.WriteLine("Failed to split PDF using PdfFileEditor.SplitFromFirst.");
-        }
+            // PdfFileEditor provides file‑level operations such as splitting
+            PdfFileEditor editor = new PdfFileEditor();
 
-        // No explicit disposal required for PdfFileEditor
+            // SplitFromFirst extracts pages 1..endPage and saves them to outputPath
+            bool success = editor.SplitFromFirst(inputPath, endPage, outputPath);
+
+            Console.WriteLine(success
+                ? $"Successfully created '{outputPath}' containing pages 1‑{endPage}."
+                : "Split operation failed.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during split: {ex.Message}");
+        }
     }
 }

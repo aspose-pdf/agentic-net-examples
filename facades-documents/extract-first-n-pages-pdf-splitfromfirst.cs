@@ -6,43 +6,37 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";   // source PDF file
-        const int endPage = 5;                  // split up to this page (inclusive)
-        const string outputPath = "front_part.pdf"; // where to write the result (optional)
+        // Path to the source PDF file
+        const string inputPath = "input.pdf";
+        // Path where the extracted front part will be saved
+        const string outputPath = "front_part.pdf";
+        // The page number up to which the PDF should be split (inclusive)
+        int endPage = 5;
 
+        // Verify that the source file exists before attempting the operation
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Open the source PDF as a read‑only stream
-        using (FileStream sourceStream = new FileStream(inputPath, FileMode.Open, FileAccess.Read))
-        // Prepare an in‑memory stream for the split result
-        using (MemoryStream frontPartStream = new MemoryStream())
+        try
         {
-            // PdfFileEditor does NOT implement IDisposable – do NOT wrap it in a using block
+            // PdfFileEditor does NOT implement IDisposable, so no using block is required
             PdfFileEditor editor = new PdfFileEditor();
 
-            // Split from the first page up to 'endPage' and write the front part into the memory stream
-            bool success = editor.SplitFromFirst(sourceStream, endPage, frontPartStream);
+            // SplitFromFirst extracts pages from the first page up to 'endPage' and saves them
+            bool success = editor.SplitFromFirst(inputPath, endPage, outputPath);
 
-            if (!success)
-            {
-                Console.Error.WriteLine("Split operation failed.");
-                return;
-            }
-
-            // Reset the position so the stream can be read from the beginning
-            frontPartStream.Position = 0;
-
-            // Optionally, save the in‑memory result to a physical file
-            using (FileStream fileOut = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
-            {
-                frontPartStream.CopyTo(fileOut);
-            }
-
-            Console.WriteLine($"Pages 1‑{endPage} extracted to '{outputPath}'.");
+            if (success)
+                Console.WriteLine($"Successfully extracted pages 1-{endPage} to '{outputPath}'.");
+            else
+                Console.WriteLine("SplitFromFirst returned false – operation may have failed.");
+        }
+        catch (Exception ex)
+        {
+            // Catch any unexpected errors and report them
+            Console.Error.WriteLine($"Error during split operation: {ex.Message}");
         }
     }
 }

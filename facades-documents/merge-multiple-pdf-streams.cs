@@ -1,63 +1,48 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class Program
+public static class PdfMerger
 {
-    static void Main()
+    /// <summary>
+    /// Merges multiple PDF streams into a single PDF stream using Aspose.Pdf.Facades.PdfFileEditor.
+    /// </summary>
+    /// <param name="inputStreams">Array of input PDF streams. Each stream must be readable.</param>
+    /// <param name="outputStream">Writable stream where the merged PDF will be written.</param>
+    /// <returns>True if the concatenation succeeded; otherwise, false.</returns>
+    public static bool MergePdfStreams(Stream[] inputStreams, Stream outputStream)
     {
-        // Input PDF files to be merged
-        string[] inputFiles = { "file1.pdf", "file2.pdf", "file3.pdf" };
-        const string outputFile = "merged.pdf";
+        if (inputStreams == null) throw new ArgumentNullException(nameof(inputStreams));
+        if (outputStream == null) throw new ArgumentNullException(nameof(outputStream));
 
-        // ---------------------------------------------------------------------
-        // Ensure that the input files exist.  For a self‑contained example we
-        // create simple one‑page PDFs on the fly if they are missing.
-        // ---------------------------------------------------------------------
-        foreach (var path in inputFiles)
-        {
-            if (!File.Exists(path))
-            {
-                // Create a minimal PDF with a single blank page
-                using (var doc = new Document())
-                {
-                    doc.Pages.Add();
-                    doc.Save(path);
-                }
-            }
-        }
+        // PdfFileEditor does NOT implement IDisposable, so we do NOT wrap it in a using block.
+        PdfFileEditor editor = new PdfFileEditor();
 
-        // Open each input file as a read‑only stream
-        Stream[] inputStreams = new Stream[inputFiles.Length];
-        for (int i = 0; i < inputFiles.Length; i++)
-        {
-            inputStreams[i] = new FileStream(inputFiles[i], FileMode.Open, FileAccess.Read);
-        }
+        // Optional: automatically close the input streams after concatenation.
+        editor.CloseConcatenatedStreams = true;
 
-        // Create the output stream (write‑only)
-        using (FileStream outputStream = new FileStream(outputFile, FileMode.Create, FileAccess.Write))
-        {
-            // PdfFileEditor does NOT implement IDisposable; instantiate directly
-            PdfFileEditor editor = new PdfFileEditor();
+        // Perform concatenation. This overload concatenates an array of streams into a single output stream.
+        bool success = editor.Concatenate(inputStreams, outputStream);
 
-            // Automatically close input streams after concatenation (optional)
-            editor.CloseConcatenatedStreams = true;
+        // No need to call any Save method; Concatenate writes directly to the output stream.
+        return success;
+    }
+}
 
-            // Concatenate all input streams into the output stream
-            bool result = editor.Concatenate(inputStreams, outputStream);
-
-            Console.WriteLine(result ? "PDF streams merged successfully." : "Failed to merge PDF streams.");
-        }
-
-        // If CloseConcatenatedStreams was set to false, ensure remaining streams are closed.
-        // (In this example it is true, but the code is kept for completeness.)
-        foreach (var stream in inputStreams)
-        {
-            if (stream != null && stream.CanRead)
-            {
-                stream.Dispose();
-            }
-        }
+// Entry point required for a console‑type project.
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        // The Main method is intentionally minimal; it only satisfies the compiler.
+        // Real usage can be added here or the class can be referenced from another project.
+        // Example (commented out):
+        // using (FileStream in1 = File.OpenRead("file1.pdf"))
+        // using (FileStream in2 = File.OpenRead("file2.pdf"))
+        // using (FileStream outStream = File.Create("merged.pdf"))
+        // {
+        //     bool result = PdfMerger.MergePdfStreams(new Stream[] { in1, in2 }, outStream);
+        //     Console.WriteLine($"Merge successful: {result}");
+        // }
     }
 }

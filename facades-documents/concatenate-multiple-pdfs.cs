@@ -7,18 +7,18 @@ class Program
 {
     static void Main(string[] args)
     {
-        // Expect at least two input PDFs and one output path
-        if (args == null || args.Length < 3)
+        // Expect at least two arguments: one or more input PDFs and one output PDF.
+        if (args.Length < 2)
         {
-            Console.Error.WriteLine("Usage: <input1.pdf> <input2.pdf> [<inputN.pdf> ...] <output.pdf>");
+            Console.Error.WriteLine("Usage: ConcatenatePdf <input1.pdf> [<input2.pdf> ...] <output.pdf>");
             return;
         }
 
-        // All arguments except the last one are input files
+        // Separate input files and output file.
         string[] inputFiles = args.Take(args.Length - 1).ToArray();
         string outputFile = args[args.Length - 1];
 
-        // Verify that each input file exists
+        // Verify that all input files exist.
         foreach (string file in inputFiles)
         {
             if (!File.Exists(file))
@@ -30,16 +30,20 @@ class Program
 
         try
         {
-            // PdfFileEditor does not implement IDisposable, so no using block
+            // PdfFileEditor does not implement IDisposable, so no using block is required.
             PdfFileEditor editor = new PdfFileEditor();
 
-            // Concatenate the input PDFs into the output PDF
+            // Concatenate the input PDFs into the specified output file.
             bool success = editor.Concatenate(inputFiles, outputFile);
 
             if (success)
+            {
                 Console.WriteLine($"Successfully concatenated {inputFiles.Length} files into '{outputFile}'.");
+            }
             else
-                Console.Error.WriteLine("Concatenation failed.");
+            {
+                Console.Error.WriteLine("Concatenation failed. Check the input files and permissions.");
+            }
         }
         catch (Exception ex)
         {

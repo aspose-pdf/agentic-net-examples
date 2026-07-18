@@ -1,113 +1,89 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string firstPath = "first.pdf";
-        const string secondPath = "second.pdf";
-        const string outputPath = "concatenated.pdf";
+        const string firstPdf  = "first.pdf";
+        const string secondPdf = "second.pdf";
+        const string outputPdf = "concatenated.pdf";
 
-        if (!File.Exists(firstPath) || !File.Exists(secondPath))
+        // Verify input files exist
+        if (!File.Exists(firstPdf) || !File.Exists(secondPdf))
         {
             Console.Error.WriteLine("One or both input PDF files are missing.");
             return;
         }
 
-        // Capture page dimensions from the first PDF
-        List<(double Width, double Height)> firstPageDims = new List<(double, double)>();
-        int firstPageCount;
-        using (Document firstDoc = new Document(firstPath))
-        {
-            firstPageCount = firstDoc.Pages.Count;
-            for (int i = 1; i <= firstPageCount; i++)
-            {
-                var info = firstDoc.Pages[i].PageInfo;
-                firstPageDims.Add((info.Width, info.Height));
-            }
-        }
-
-        // Capture page dimensions from the second PDF
-        List<(double Width, double Height)> secondPageDims = new List<(double, double)>();
-        int secondPageCount;
-        using (Document secondDoc = new Document(secondPath))
-        {
-            secondPageCount = secondDoc.Pages.Count;
-            for (int i = 1; i <= secondPageCount; i++)
-            {
-                var info = secondDoc.Pages[i].PageInfo;
-                secondPageDims.Add((info.Width, info.Height));
-            }
-        }
-
-        // Concatenate the two PDFs using PdfFileEditor
+        // ------------------------------------------------------------
+        // Concatenate the two PDFs using PdfFileEditor (Facades API)
+        // ------------------------------------------------------------
         PdfFileEditor editor = new PdfFileEditor();
-        bool concatResult = editor.Concatenate(firstPath, secondPath, outputPath);
-        if (!concatResult)
+        bool concatSuccess = editor.Concatenate(firstPdf, secondPdf, outputPdf);
+        if (!concatSuccess)
         {
-            Console.Error.WriteLine("Failed to concatenate PDFs.");
+            Console.Error.WriteLine("Concatenation failed.");
             return;
         }
 
-        // Verify that the concatenated PDF preserves the original page order
-        using (Document mergedDoc = new Document(outputPath))
+        // ------------------------------------------------------------
+        // Validate that page order is preserved after concatenation
+        // ------------------------------------------------------------
+        using (Document doc1 = new Document(firstPdf))
+        using (Document doc2 = new Document(secondPdf))
+        using (Document resultDoc = new Document(outputPdf))
         {
-            int mergedPageCount = mergedDoc.Pages.Count;
-            int expectedCount = firstPageCount + secondPageCount;
+            int count1 = doc1.Pages.Count;          // pages in first PDF
+            int count2 = doc2.Pages.Count;          // pages in second PDF
+            int total  = resultDoc.Pages.Count;     // pages in concatenated PDF
 
-            if (mergedPageCount != expectedCount)
+            // Basic count check
+            if (total != count1 + count2)
             {
-                Console.WriteLine($"Page count mismatch: expected {expectedCount}, got {mergedPageCount}.");
+                Console.Error.WriteLine($"Page count mismatch. Expected {count1 + count2}, got {total}.");
                 return;
             }
 
-            bool orderPreserved = true;
-
-            // Verify pages from the first document appear first
-            for (int i = 1; i <= firstPageCount; i++)
+            // Helper to extract text from a specific page
+            string ExtractPageText(Page page)
             {
-                var mergedInfo = mergedDoc.Pages[i].PageInfo;
-                var expected = firstPageDims[i - 1];
-                if (!DimensionsEqual(mergedInfo, expected))
+                TextAbsorber absorber = new TextAbsorber();
+                page.Accept(absorber);
+                return absorber.Text ?? string.Empty;
+            }
+
+            // Compare pages from the first source PDF
+            for (int i = 1; i <= count1; i++)
+            {
+                string srcText   = ExtractPageText(doc1.Pages[i]);
+                string resultText = ExtractPageText(resultDoc.Pages[i]);
+
+                if (!srcText.Equals(resultText, StringComparison.Ordinal))
                 {
-                    orderPreserved = false;
-                    Console.WriteLine($"Page {i} does not match the corresponding page from the first PDF.");
-                    break;
+                    Console.Error.WriteLine($"Mismatch detected on page {i} (first PDF).");
+                    return;
                 }
             }
 
-            // Verify pages from the second document follow
-            if (orderPreserved)
+            // Compare pages from the second source PDF
+            for (int i = 1; i <= count2; i++)
             {
-                for (int i = 1; i <= secondPageCount; i++)
+                int resultPageIndex = count1 + i; // offset in the concatenated document
+                string srcText   = ExtractPageText(doc2.Pages[i]);
+                string resultText = ExtractPageText(resultDoc.Pages[resultPageIndex]);
+
+                if (!srcText.Equals(resultText, StringComparison.Ordinal))
                 {
-                    int mergedIndex = firstPageCount + i;
-                    var mergedInfo = mergedDoc.Pages[mergedIndex].PageInfo;
-                    var expected = secondPageDims[i - 1];
-                    if (!DimensionsEqual(mergedInfo, expected))
-                    {
-                        orderPreserved = false;
-                        Console.WriteLine($"Page {mergedIndex} does not match the corresponding page from the second PDF.");
-                        break;
-                    }
+                    Console.Error.WriteLine($"Mismatch detected on page {resultPageIndex} (second PDF).");
+                    return;
                 }
             }
 
-            Console.WriteLine(orderPreserved
-                ? "Concatenation preserved the original page order."
-                : "Page order was altered after concatenation.");
+            Console.WriteLine("Concatenation validated: page order preserved.");
         }
-    }
-
-    // Helper method to compare page dimensions for equality
-    private static bool DimensionsEqual(PageInfo info, (double Width, double Height) expected)
-    {
-        const double Tolerance = 0.001; // allow minor floating‑point differences
-        return Math.Abs(info.Width - expected.Width) < Tolerance &&
-               Math.Abs(info.Height - expected.Height) < Tolerance;
     }
 }

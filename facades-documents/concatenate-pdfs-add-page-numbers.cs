@@ -7,20 +7,13 @@ class Program
     static void Main()
     {
         // Input PDF files to be concatenated
-        string[] inputFiles = new string[]
-        {
-            "file1.pdf",
-            "file2.pdf",
-            "file3.pdf"
-        };
+        string[] inputFiles = { "file1.pdf", "file2.pdf", "file3.pdf" };
+        // Path for the intermediate concatenated PDF
+        string combinedPath = "combined.pdf";
+        // Path for the final PDF with page numbers
+        string outputPath = "final.pdf";
 
-        // Path for the intermediate concatenated document
-        const string concatenatedPath = "combined.pdf";
-
-        // Final output path with page numbers added
-        const string outputPath = "combined_numbered.pdf";
-
-        // Verify that all input files exist before proceeding
+        // Verify that all input files exist
         foreach (string file in inputFiles)
         {
             if (!File.Exists(file))
@@ -30,49 +23,50 @@ class Program
             }
         }
 
+        // ---------- Concatenate PDFs ----------
+        // PdfFileEditor does NOT implement IDisposable; do NOT wrap in using
+        PdfFileEditor editor = new PdfFileEditor();
         try
         {
-            // ---------- Concatenate PDFs ----------
-            // PdfFileEditor does NOT implement IDisposable, so we instantiate it directly.
-            PdfFileEditor editor = new PdfFileEditor();
-
-            // Concatenate the array of PDFs into a single PDF file.
-            // This uses the built‑in Concatenate(string[], string) method.
-            bool concatResult = editor.Concatenate(inputFiles, concatenatedPath);
+            // Concatenate all input files into a single PDF
+            bool concatResult = editor.Concatenate(inputFiles, combinedPath);
             if (!concatResult)
             {
-                Console.Error.WriteLine("Failed to concatenate PDF files.");
+                Console.Error.WriteLine("Concatenation failed.");
                 return;
             }
-
-            // ---------- Add page numbers ----------
-            // PdfFileStamp implements IDisposable, so we use a using block.
-            using (PdfFileStamp stamp = new PdfFileStamp())
-            {
-                // Bind the previously concatenated PDF.
-                stamp.BindPdf(concatenatedPath);
-
-                // Add page numbers. The character '#' is replaced with the actual page number.
-                // The numbers are placed at the bottom centre of each page by default.
-                stamp.AddPageNumber("#");
-
-                // Save the final document with page numbers.
-                stamp.Save(outputPath);
-            }
-
-            Console.WriteLine($"Successfully created '{outputPath}' with concatenated content and page numbers.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
         }
         finally
         {
-            // Clean up the intermediate file if it exists.
-            if (File.Exists(concatenatedPath))
-            {
-                try { File.Delete(concatenatedPath); } catch { /* ignore cleanup errors */ }
-            }
+            // No resources to dispose for PdfFileEditor, but ensure any streams are closed if used
+            // (none were opened explicitly here)
         }
+
+        // ---------- Add page numbers ----------
+        // PdfFileStamp implements SaveableFacade and can be used with using for deterministic disposal
+        using (PdfFileStamp stamp = new PdfFileStamp(combinedPath, outputPath))
+        {
+            // Optional: set starting page number (default is 1)
+            // stamp.StartingNumber = 1;
+
+            // Add page numbers; "#" will be replaced by the actual page number
+            stamp.AddPageNumber("Page #");
+
+            // Close finalizes the output file
+            stamp.Close();
+        }
+
+        // Clean up intermediate file if desired
+        try
+        {
+            if (File.Exists(combinedPath))
+                File.Delete(combinedPath);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Could not delete intermediate file: {ex.Message}");
+        }
+
+        Console.WriteLine($"PDFs concatenated and numbered successfully: {outputPath}");
     }
 }

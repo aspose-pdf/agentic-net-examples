@@ -1,85 +1,58 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Define the files to be merged
-        string[] inputFiles = { "file1.pdf", "file2.pdf", "file3.pdf" };
-        string outputFile = "merged.pdf";
-
-        Console.WriteLine("Starting PDF concatenation:");
-
-        // ---------------------------------------------------------------------
-        // 1. Validate input files and load them as Document objects.
-        //    Each step is logged so the user can see which file is being processed.
-        // ---------------------------------------------------------------------
-        var documents = new List<Document>();
-        foreach (var input in inputFiles)
+        // Input PDF files to be merged
+        string[] inputFiles = new string[]
         {
-            Console.WriteLine($"Processing input file: {input}");
-            if (!File.Exists(input))
-            {
-                Console.WriteLine($"Error: File not found – {input}");
-                continue; // skip missing files (or you could return to abort)
-            }
+            "file1.pdf",
+            "file2.pdf",
+            "file3.pdf"
+        };
 
-            try
+        // Output merged PDF file
+        string outputFile = "merged_output.pdf";
+
+        // Verify that all input files exist before proceeding
+        foreach (string file in inputFiles)
+        {
+            if (!File.Exists(file))
             {
-                var doc = new Document(input);
-                documents.Add(doc);
-                Console.WriteLine($"Loaded '{input}' successfully (Pages: {doc.Pages.Count}).");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Failed to load '{input}': {ex.Message}");
+                Console.Error.WriteLine($"Input file not found: {file}");
+                return;
             }
         }
 
-        if (documents.Count == 0)
+        // Log each input file name
+        Console.WriteLine("Starting concatenation of the following files:");
+        foreach (string file in inputFiles)
         {
-            Console.WriteLine("No valid input files were found. Exiting.");
-            return;
+            Console.WriteLine($" - {Path.GetFileName(file)}");
         }
 
-        // ---------------------------------------------------------------------
-        // 2. Merge the loaded documents using the Document.Merge overload.
-        //    This approach preserves logical structure and outlines automatically.
-        // ---------------------------------------------------------------------
-        using (var merged = new Document())
+        // Perform concatenation using Aspose.Pdf.Facades.PdfFileEditor
+        PdfFileEditor editor = new PdfFileEditor();
+
+        // Optional: configure editor properties (e.g., copy outlines, logical structure)
+        editor.CopyOutlines = true;
+        editor.CopyLogicalStructure = true;
+
+        bool success = editor.Concatenate(inputFiles, outputFile);
+
+        // Log the result
+        if (success)
         {
-            // Add pages from the first document (if any) to initialise the target.
-            merged.Pages.Add(documents[0].Pages);
-
-            // Merge the remaining documents one‑by‑one, logging each operation.
-            for (int i = 1; i < documents.Count; i++)
-            {
-                Console.WriteLine($"Merging '{inputFiles[i]}' into the output document.");
-                merged.Pages.Add(documents[i].Pages);
-            }
-
-            // Log the output file name before saving.
-            Console.WriteLine($"Saving merged document to: {outputFile}");
-            try
-            {
-                merged.Save(outputFile);
-                Console.WriteLine("Concatenation completed successfully.");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Failed to save merged file: {ex.Message}");
-            }
+            Console.WriteLine($"Concatenation succeeded. Output file: {Path.GetFileName(outputFile)}");
         }
-
-        // ---------------------------------------------------------------------
-        // 3. Clean‑up: dispose all temporary Document instances.
-        // ---------------------------------------------------------------------
-        foreach (var doc in documents)
+        else
         {
-            doc.Dispose();
+            Console.Error.WriteLine("Concatenation failed.");
+            // If needed, retrieve detailed log
+            Console.Error.WriteLine($"Conversion Log: {editor.ConversionLog}");
         }
     }
 }

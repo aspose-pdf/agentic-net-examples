@@ -6,40 +6,32 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPdfPath = "input.pdf";
+        // Input PDF file to be split
+        const string inputPdf = "input.pdf";
 
-        // Output folder where each page PDF will be saved
-        const string outputFolder = "SplitPages";
+        // Directory where individual page PDFs will be saved
+        const string outputDir = "SplitPages";
 
-        // Verify input file exists
-        if (!File.Exists(inputPdfPath))
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDir);
+
+        // Template for the output files.
+        // %NUM% will be replaced with the page number (1‑based) by PdfFileEditor.
+        string fileNameTemplate = Path.Combine(outputDir, "page%NUM%.pdf");
+
+        // Verify the source file exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Source file not found: {inputPdf}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
+        // Use PdfFileEditor from Aspose.Pdf.Facades to split the PDF.
+        // SplitToPages(string, string) writes each page to a separate file
+        // according to the provided template.
+        PdfFileEditor pdfEditor = new PdfFileEditor();
+        pdfEditor.SplitToPages(inputPdf, fileNameTemplate);
 
-        // Build the file name template.
-        // %NUM% will be replaced by the page number (1‑based) by PdfFileEditor.
-        // Example: C:\...\SplitPages\page%NUM%.pdf -> page1.pdf, page2.pdf, ...
-        string fileNameTemplate = Path.Combine(outputFolder, "page%NUM%.pdf");
-
-        try
-        {
-            // PdfFileEditor provides the SplitToPages method for this task.
-            PdfFileEditor editor = new PdfFileEditor();
-
-            // Split the PDF into individual page PDFs using the template.
-            editor.SplitToPages(inputPdfPath, fileNameTemplate);
-
-            Console.WriteLine($"PDF split into individual pages under '{outputFolder}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during split operation: {ex.Message}");
-        }
+        Console.WriteLine($"PDF split into individual pages under '{outputDir}'.");
     }
 }

@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
-using Aspose.Pdf.Facades; // PdfFileEditor resides here
+using Aspose.Pdf.Facades;   // PdfFileEditor resides here
 
 namespace PdfUtilities
 {
@@ -13,68 +12,69 @@ namespace PdfUtilities
     public static class PdfPageRemover
     {
         /// <summary>
-        /// Deletes the given page numbers from each input PDF and writes the result to the output folder.
+        /// Removes the given page numbers from each PDF file supplied.
         /// </summary>
-        /// <param name="inputPdfPaths">Full paths of the source PDF files.</param>
+        /// <param name="inputFiles">Full paths of the source PDF files.</param>
         /// <param name="pagesToRemove">Page numbers to delete (1‑based indexing as required by Aspose.Pdf).</param>
-        /// <param name="outputFolder">Folder where the processed PDFs will be saved.</param>
-        public static void RemovePagesFromMultipleFiles(
-            IEnumerable<string> inputPdfPaths,
-            IEnumerable<int> pagesToRemove,
-            string outputFolder)
+        /// <param name="outputDirectory">Directory where the processed PDFs will be saved.</param>
+        public static void RemovePagesFromFiles(IEnumerable<string> inputFiles, IEnumerable<int> pagesToRemove, string outputDirectory)
         {
-            if (inputPdfPaths == null) throw new ArgumentNullException(nameof(inputPdfPaths));
+            if (inputFiles == null) throw new ArgumentNullException(nameof(inputFiles));
             if (pagesToRemove == null) throw new ArgumentNullException(nameof(pagesToRemove));
-            if (string.IsNullOrWhiteSpace(outputFolder)) throw new ArgumentException("Output folder must be specified.", nameof(outputFolder));
+            if (string.IsNullOrWhiteSpace(outputDirectory)) throw new ArgumentException("Output directory must be provided.", nameof(outputDirectory));
 
             // Ensure the output directory exists
-            Directory.CreateDirectory(outputFolder);
+            Directory.CreateDirectory(outputDirectory);
 
-            // Convert the page list to an array once – PdfFileEditor expects an int[]
-            int[] pagesArray = pagesToRemove.Distinct().OrderBy(p => p).ToArray();
+            // Convert the page numbers to an array once – PdfFileEditor expects an int[]
+            int[] pagesArray = new List<int>(pagesToRemove).ToArray();
 
-            // Process each file in parallel. Each iteration creates its own PdfFileEditor instance.
-            Parallel.ForEach(inputPdfPaths, inputPath =>
+            // Process each file in parallel
+            Parallel.ForEach(inputFiles, inputPath =>
             {
+                // Validate input file existence
+                if (!File.Exists(inputPath))
+                {
+                    Console.Error.WriteLine($"Input file not found: {inputPath}");
+                    return;
+                }
+
+                // Determine output file path (same name with "_trimmed" suffix)
+                string fileName = Path.GetFileNameWithoutExtension(inputPath);
+                string outputPath = Path.Combine(outputDirectory, $"{fileName}_trimmed.pdf");
+
                 try
                 {
-                    if (!File.Exists(inputPath))
-                    {
-                        Console.Error.WriteLine($"Input file not found: {inputPath}");
-                        return;
-                    }
-
-                    // Build output file name: same name with "_trimmed" suffix
-                    string fileName = Path.GetFileNameWithoutExtension(inputPath);
-                    string outputPath = Path.Combine(outputFolder, $"{fileName}_trimmed.pdf");
-
-                    // Create a new PdfFileEditor (no IDisposable)
+                    // PdfFileEditor does NOT implement IDisposable, so we instantiate it directly
                     PdfFileEditor editor = new PdfFileEditor();
 
-                    // Delete the specified pages and save to the output file.
-                    // The Delete method returns a bool indicating success.
+                    // Delete the specified pages and save to the output file
+                    // Delete returns a bool indicating success; we can log if needed
                     bool success = editor.Delete(inputPath, pagesArray, outputPath);
 
-                    if (!success)
+                    if (success)
+                    {
+                        Console.WriteLine($"Processed: {inputPath} -> {outputPath}");
+                    }
+                    else
                     {
                         Console.Error.WriteLine($"Failed to delete pages from: {inputPath}");
                     }
                 }
                 catch (Exception ex)
                 {
-                    // Log any unexpected errors per file
                     Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
                 }
             });
         }
     }
 
-    // Example usage (can be removed or adapted as needed)
+    // Example usage
     class Program
     {
         static void Main()
         {
-            // Example input PDFs
+            // List of PDF files to process
             var pdfFiles = new List<string>
             {
                 @"C:\Docs\Report1.pdf",
@@ -85,13 +85,11 @@ namespace PdfUtilities
             // Pages to remove (e.g., remove pages 2 and 5 from each document)
             var pages = new List<int> { 2, 5 };
 
-            // Destination folder for processed PDFs
-            string outputDir = @"C:\Docs\Processed";
+            // Destination folder for the trimmed PDFs
+            string outputFolder = @"C:\Docs\Trimmed";
 
-            // Perform the parallel removal
-            PdfPageRemover.RemovePagesFromMultipleFiles(pdfFiles, pages, outputDir);
-
-            Console.WriteLine("Processing completed.");
+            // Execute the parallel removal
+            PdfPageRemover.RemovePagesFromFiles(pdfFiles, pages, outputFolder);
         }
     }
 }
