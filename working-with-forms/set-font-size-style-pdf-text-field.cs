@@ -3,7 +3,6 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text; // needed for DefaultAppearance and Color
 
 class Program
 {
@@ -11,39 +10,38 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName  = "MyTextField"; // name of the text field to modify
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
+        // Load the existing PDF document (lifecycle rule)
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the form field by name
-            TextBoxField txtField = doc.Form[fieldName] as TextBoxField;
-            if (txtField == null)
+            // Create a new text box field on the first page
+            // Fully qualify Rectangle to avoid ambiguity
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 300, 650);
+            TextBoxField textField = new TextBoxField(doc.Pages[1], rect)
             {
-                Console.Error.WriteLine($"Text field '{fieldName}' not found.");
-                return;
-            }
+                PartialName = "MyTextField"
+            };
 
-            // Set the default appearance (font name, size, and color)
-            // Use the constructor because DefaultAppearance.Font is read‑only
-            DefaultAppearance appearance = new DefaultAppearance("Helvetica", 14, System.Drawing.Color.Black);
-            txtField.DefaultAppearance = appearance;
+            // Set the default appearance: font name, size, and color
+            textField.DefaultAppearance = new DefaultAppearance("Helvetica", 14, System.Drawing.Color.Blue);
 
-            // Optionally enforce minimum/maximum font size checks
-            // -1 disables the check; here we allow any size
-            Field.MinFontSize = -1;
-            Field.MaxFontSize = -1;
+            // Optionally enforce minimum and maximum font sizes for the field content
+            Field.MinFontSize = 10; // -1 disables the check
+            Field.MaxFontSize = 20; // -1 disables the check
 
-            // Save the modified PDF
+            // Add the field to the document's form collection (lifecycle rule)
+            doc.Form.Add(textField, 1);
+
+            // Save the modified PDF (lifecycle rule)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Font size and style updated. Saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with updated text field: {outputPath}");
     }
 }

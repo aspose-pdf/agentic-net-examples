@@ -8,7 +8,8 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_required.pdf";
+        const string outputPath = "output.pdf";
+        const string fieldName = "myField";
 
         if (!File.Exists(inputPath))
         {
@@ -16,29 +17,25 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
             // Access the form object
             Form form = doc.Form;
 
-            // Specify the name of the field you want to mark as required
-            const string fieldName = "TextField1";
-
-            // Check if the field exists in the form
+            // Verify that the field exists
             if (form.HasField(fieldName))
             {
-                // Retrieve the field. The Form indexer returns a WidgetAnnotation, so cast it to Field.
+                // The Form indexer returns a WidgetAnnotation; cast it to Field
                 Field? field = form[fieldName] as Field;
-
                 if (field != null)
                 {
-                    // Mark the field as required; validation will fail if left empty
+                    // Mark the field as required
                     field.Required = true;
                 }
                 else
                 {
-                    Console.WriteLine($"Field '{fieldName}' exists but could not be cast to a form Field object.");
+                    Console.WriteLine($"Field '{fieldName}' exists but is not a supported form field type.");
                 }
             }
             else
@@ -46,10 +43,10 @@ class Program
                 Console.WriteLine($"Field '{fieldName}' not found in the document.");
             }
 
-            // Save the modified PDF (saving without explicit SaveOptions writes PDF)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with required field saved to '{outputPath}'.");
+        Console.WriteLine($"Document saved with required field: '{outputPath}'.");
     }
 }

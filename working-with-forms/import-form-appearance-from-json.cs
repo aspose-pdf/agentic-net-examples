@@ -6,35 +6,35 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string jsonPath      = "appearance.json";
-        const string outputPdfPath = "output.pdf";
+        const string pdfPath = "target.pdf";
+        const string jsonPath = "appearance.json";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
         if (!File.Exists(jsonPath))
         {
-            Console.Error.WriteLine($"JSON file not found: {jsonPath}");
+            Console.Error.WriteLine($"JSON not found: {jsonPath}");
             return;
         }
 
         try
         {
-            // Load the target PDF
-            using (Document doc = new Document(inputPdfPath))
+            // Load the target PDF.
+            using (Document doc = new Document(pdfPath))
             {
-                // Import form fields (including appearance settings) from the JSON file
+                // Import appearance settings (and field values) from the JSON file.
                 doc.Form.ImportFromJson(jsonPath);
 
-                // Save the updated PDF
-                doc.Save(outputPdfPath);
+                // Save the PDF with the imported appearances.
+                doc.Save(outputPath);
             }
 
-            Console.WriteLine($"PDF with imported appearance saved to '{outputPdfPath}'.");
+            Console.WriteLine($"PDF saved with imported appearances: {outputPath}");
         }
         catch (Exception ex)
         {

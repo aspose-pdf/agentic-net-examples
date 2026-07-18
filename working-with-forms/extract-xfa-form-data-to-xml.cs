@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 using System.Xml;
 
 class Program
@@ -18,7 +19,7 @@ class Program
 
         try
         {
-            // Load the PDF document inside a using block for proper disposal
+            // Load the PDF document
             using (Document doc = new Document(inputPdf))
             {
                 // Verify that the PDF contains an XFA form
@@ -28,11 +29,14 @@ class Program
                     return;
                 }
 
-                // Retrieve the XFA data package (XDP) as an XmlDocument
-                XmlDocument xfaXml = doc.Form.XFA.XDP;
+                // Access the XFA object
+                XFA xfa = doc.Form.XFA;
 
-                // Save the XML representation to a file
-                xfaXml.Save(outputXml);
+                // Retrieve the XDP (XML Data Package) as an XmlDocument
+                XmlDocument xdp = xfa.XDP;
+
+                // Save the XML data to a file
+                xdp.Save(outputXml);
                 Console.WriteLine($"XFA data extracted and saved to '{outputXml}'.");
             }
         }

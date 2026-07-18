@@ -7,39 +7,32 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_tooltip.pdf";
+        const string outputPath = "form_with_tooltip.pdf";
 
-        // If the source PDF does not exist, create a simple one-page document.
-        if (!File.Exists(inputPath))
+        // Create a new PDF document and ensure proper disposal
+        using (Document doc = new Document())
         {
-            using (Document tempDoc = new Document())
+            // Add a blank page (pages are 1‑based)
+            Page page = doc.Pages.Add();
+
+            // Define the rectangle where the text box will appear
+            // (lower‑left X, lower‑left Y, upper‑right X, upper‑right Y)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 300, 630);
+
+            // Create a text box field on the page
+            TextBoxField txtField = new TextBoxField(page, rect)
             {
-                tempDoc.Pages.Add();                     // 1‑based page indexing
-                tempDoc.Save(inputPath);                 // Save as PDF
-            }
-        }
+                // Internal name of the field
+                Name = "PhoneNumber",
 
-        // Open the PDF inside a using block for deterministic disposal.
-        using (Document doc = new Document(inputPath))
-        {
-            // Retrieve the first page (pages are 1‑based).
-            Page page = doc.Pages[1];
+                // Tooltip shown in Adobe Acrobat – set via AlternateName
+                AlternateName = "Enter phone number in format: (123) 456-7890"
+            };
 
-            // Define the field rectangle. Fully qualify to avoid ambiguity.
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 530);
+            // Add the field to the document's form collection
+            doc.Form.Add(txtField);
 
-            // Create a text box field on the page.
-            TextBoxField textField = new TextBoxField(page, rect);
-            textField.Name = "UserNameField";
-
-            // Set the tooltip (displayed as a hover hint in PDF viewers).
-            textField.AlternateName = "Enter your full name (e.g., John Doe)";
-
-            // Add the field to the document's form.
-            doc.Form.Add(textField);
-
-            // Save the modified PDF.
+            // Save the PDF (no SaveOptions needed for PDF output)
             doc.Save(outputPath);
         }
 

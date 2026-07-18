@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input_form.pdf";
-        const string outputPath = "output_with_blank_page.pdf";
+        const string outputPath = "output_form.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,21 +15,17 @@ class Program
             return;
         }
 
-        // Load the existing PDF form (fields are loaded automatically)
+        // Load the existing PDF (which may contain form fields)
         using (Document doc = new Document(inputPath))
         {
             // Add a new blank page at the end of the document.
-            // This does not affect any existing form fields.
-            Page blankPage = doc.Pages.Add();
+            // Page collection uses 1‑based indexing; Add() creates an empty page.
+            doc.Pages.Add();
 
-            // Optionally, you could set the page size to match existing pages:
-            // blankPage.PageInfo.Width = doc.Pages[1].PageInfo.Width;
-            // blankPage.PageInfo.Height = doc.Pages[1].PageInfo.Height;
-
-            // Save the modified document, preserving all form fields.
+            // Save the updated PDF. No SaveOptions are required for PDF output.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Blank page added successfully. Saved to '{outputPath}'.");
+        Console.WriteLine($"Blank page added and saved to '{outputPath}'.");
     }
 }

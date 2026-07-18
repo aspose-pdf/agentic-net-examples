@@ -1,57 +1,52 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;          // Form and related types
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputJsonPath = "formdata.json";
+        const string inputPdf = "input.pdf";
+        const string outputJson = "formData.json";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         // Load the PDF document (using statement ensures proper disposal)
-        using (Document doc = new Document(inputPdfPath))
+        using (Document doc = new Document(inputPdf))
         {
-            // Validate that every required form field has a non‑empty value
-            bool allFieldsValid = true;
+            // Validate required fields
+            bool allValid = true;
 
-            // Iterate over the form fields collection (Field objects), not WidgetAnnotation
+            // Iterate over the form fields collection (Aspose.Pdf.Forms)
             foreach (Field field in doc.Form.Fields)
             {
                 // Only check fields that are marked as required
                 if (field.Required)
                 {
-                    // For most field types the Value property holds the user input
+                    // Field.Value holds the current value; treat null/whitespace as empty
                     string fieldValue = field.Value?.ToString() ?? string.Empty;
-
                     if (string.IsNullOrWhiteSpace(fieldValue))
                     {
                         Console.Error.WriteLine($"Required field '{field.PartialName}' is empty.");
-                        allFieldsValid = false;
+                        allValid = false;
                     }
                 }
             }
 
-            if (!allFieldsValid)
+            if (!allValid)
             {
-                Console.Error.WriteLine("Form validation failed – export aborted.");
+                Console.Error.WriteLine("Form validation failed. Export aborted.");
                 return;
             }
 
-            // All required fields are filled; export the form data to JSON
-            using (FileStream jsonStream = new FileStream(outputJsonPath, FileMode.Create, FileAccess.Write))
-            {
-                doc.Form.ExportToJson(jsonStream);
-            }
-
-            Console.WriteLine($"Form data successfully exported to '{outputJsonPath}'.");
+            // All required fields are filled – export form data to JSON
+            doc.Form.ExportToJson(outputJson);
+            Console.WriteLine($"Form data exported successfully to '{outputJson}'.");
         }
     }
 }

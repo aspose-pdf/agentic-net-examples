@@ -3,15 +3,14 @@ using System.IO;
 using System.Xml;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
 
 class ReplaceXfaWithAcroForm
 {
     static void Main()
     {
-        const string inputPdfPath   = "input_with_xfa.pdf";
+        const string inputPdfPath = "input_with_xfa.pdf";
         const string xmlTemplatePath = "fields_template.xml";
-        const string outputPdfPath  = "output_acroform.pdf";
+        const string outputPdfPath = "output_acroform.pdf";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -25,61 +24,108 @@ class ReplaceXfaWithAcroForm
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
-        using (Document doc = new Document(inputPdfPath))
+        // Load the source PDF
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // If the document contains an XFA form, switch it to a standard AcroForm
-            if (doc.Form.HasXfa)
+            // -----------------------------------------------------------------
+            // 1. Clear existing XFA form (if any)
+            // -----------------------------------------------------------------
+            if (pdfDoc.Form.HasXfa)
             {
-                // Changing the form type removes the dynamic XFA part
-                doc.Form.Type = FormType.Standard;
+                // Assign an empty XFA document to remove the dynamic XFA content
+                XmlDocument emptyXfa = new XmlDocument();
+                emptyXfa.LoadXml("<xfa></xfa>");
+                pdfDoc.Form.AssignXfa(emptyXfa);
             }
 
-            // Load the external XML template that defines the AcroForm fields
-            XmlDocument xmlTemplate = new XmlDocument();
-            xmlTemplate.Load(xmlTemplatePath);
+            // -----------------------------------------------------------------
+            // 2. Load field definitions from the external XML template
+            // -----------------------------------------------------------------
+            XmlDocument fieldDefDoc = new XmlDocument();
+            fieldDefDoc.Load(xmlTemplatePath);
+            XmlNodeList fieldNodes = fieldDefDoc.SelectNodes("//field");
 
-            // Example XML structure:
-            // <fields>
-            //   <field name="FirstName" x="100" y="700" width="200" height="20" />
-            //   <field name="LastName"  x="100" y="660" width="200" height="20" />
-            // </fields>
-
-            XmlNodeList fieldNodes = xmlTemplate.SelectNodes("//field");
-            if (fieldNodes == null)
+            if (fieldNodes != null)
             {
-                Console.Error.WriteLine("No <field> elements found in the XML template.");
-                return;
-            }
-
-            // Create a simple TextBoxField for each <field> node
-            foreach (XmlNode node in fieldNodes)
-            {
-                // Retrieve required attributes; fall back to defaults if missing
-                string fieldName = node.Attributes["name"]?.Value ?? Guid.NewGuid().ToString();
-                double x = double.TryParse(node.Attributes["x"]?.Value, out double xv) ? xv : 100;
-                double y = double.TryParse(node.Attributes["y"]?.Value, out double yv) ? yv : 700;
-                double width  = double.TryParse(node.Attributes["width"]?.Value, out double wv) ? wv : 200;
-                double height = double.TryParse(node.Attributes["height"]?.Value, out double hv) ? hv : 20;
-
-                // Define the rectangle for the field (lower‑left x,y and upper‑right x+width, y+height)
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(x, y, x + width, y + height);
-
-                // Create a TextBoxField on the first page (adjust as needed)
-                TextBoxField txtField = new TextBoxField(doc.Pages[1], rect)
+                foreach (XmlNode node in fieldNodes)
                 {
-                    PartialName = fieldName,
-                    Value = string.Empty // initial empty value
-                };
+                    // -----------------------------------------------------------------
+                    // Basic attribute extraction with null‑safety
+                    // -----------------------------------------------------------------
+                    string name = node.Attributes?["name"]?.Value;
+                    string type = node.Attributes?["type"]?.Value;
+                    if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(type))
+                        continue; // skip malformed entries
 
-                // Add the field to the document's form collection
-                doc.Form.Add(txtField);
+                    int pageNumber = 1;
+                    int.TryParse(node.Attributes?["page"]?.Value, out pageNumber);
+                    if (pageNumber < 1) pageNumber = 1;
+
+                    // Rectangle coordinates (llx, lly, urx, ury) – default to 0 if parsing fails
+                    double llx = 0, lly = 0, urx = 0, ury = 0;
+                    double.TryParse(node.Attributes?["llx"]?.Value, out llx);
+                    double.TryParse(node.Attributes?["lly"]?.Value, out lly);
+                    double.TryParse(node.Attributes?["urx"]?.Value, out urx);
+                    double.TryParse(node.Attributes?["ury"]?.Value, out ury);
+                    Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
+
+                    // Ensure the target page exists
+                    if (pageNumber > pdfDoc.Pages.Count)
+                        continue; // skip invalid page reference
+
+                    Page targetPage = pdfDoc.Pages[pageNumber];
+
+                    // -----------------------------------------------------------------
+                    // 3. Create corresponding AcroForm field based on the type attribute
+                    // -----------------------------------------------------------------
+                    switch (type.ToLowerInvariant())
+                    {
+                        case "textbox":
+                            TextBoxField txtField = new TextBoxField(targetPage, rect);
+                            txtField.PartialName = name;
+                            pdfDoc.Form.Add(txtField);
+                            break;
+
+                        case "checkbox":
+                            CheckboxField chkField = new CheckboxField(targetPage, rect);
+                            chkField.PartialName = name;
+                            pdfDoc.Form.Add(chkField);
+                            break;
+
+                        case "radiobutton":
+                            // RadioButtonField does not have a (Page, Rectangle) ctor – use the page‑only ctor and set Rect manually
+                            RadioButtonField radField = new RadioButtonField(targetPage);
+                            radField.PartialName = name;
+                            radField.Rect = rect;
+                            pdfDoc.Form.Add(radField);
+                            break;
+
+                        case "listbox":
+                            ListBoxField listField = new ListBoxField(targetPage, rect);
+                            listField.PartialName = name;
+                            pdfDoc.Form.Add(listField);
+                            break;
+
+                        case "combobox":
+                            ComboBoxField comboField = new ComboBoxField(targetPage, rect);
+                            comboField.PartialName = name;
+                            pdfDoc.Form.Add(comboField);
+                            break;
+
+                        // Add more field types as needed
+                        default:
+                            Console.WriteLine($"Unsupported field type '{type}' for field '{name}'.");
+                            break;
+                    }
+                }
             }
 
-            // Save the modified PDF (lifecycle rule: save inside using block)
-            doc.Save(outputPdfPath);
+            // -----------------------------------------------------------------
+            // 4. Save the modified PDF (AcroForm only)
+            // -----------------------------------------------------------------
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"AcroForm PDF saved to '{outputPdfPath}'.");
+        Console.WriteLine($"PDF with AcroForm saved to '{outputPdfPath}'.");
     }
 }

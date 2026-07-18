@@ -1,47 +1,43 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        // Path for the generated PDF
-        const string outputPath = "tracking.pdf";
-
-        // Generate a GUID at runtime
+        // Generate a GUID at runtime for tracking
         string trackingGuid = Guid.NewGuid().ToString();
 
-        // Create a new PDF document and ensure proper disposal
+        // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a blank page (required for placing form fields)
+            // Add a blank page (pages are 1‑based)
             Page page = doc.Pages.Add();
 
-            // Define a zero‑size rectangle for the hidden field
+            // Define the rectangle for the hidden text field
             // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(0, 0, 0, 0);
+            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 700, 300, 720);
 
-            // Create a text box field that will hold the GUID
+            // Create a text box field on the page
             TextBoxField hiddenField = new TextBoxField(page, fieldRect)
             {
-                Name = "TrackingId",          // Field name
-                Value = trackingGuid,         // Store the GUID
-                ReadOnly = true               // Prevent user edits
+                // Set the field name (partial name)
+                PartialName = "TrackingId",
+                // Store the GUID as the field value
+                Value = trackingGuid,
+                // Mark the field as hidden using the annotation flag
+                Flags = AnnotationFlags.Hidden
             };
-
-            // Mark the field as hidden using the annotation flag (enum assignment, not int)
-            hiddenField.Flags = AnnotationFlags.Hidden;
 
             // Add the field to the document's form collection
             doc.Form.Add(hiddenField);
 
-            // Save the PDF (no explicit SaveOptions needed for PDF output)
-            doc.Save(outputPath);
+            // Save the PDF (no SaveOptions needed for PDF output)
+            doc.Save("output.pdf");
         }
 
-        Console.WriteLine($"PDF with hidden tracking field saved to '{outputPath}'.");
+        Console.WriteLine("PDF with hidden tracking field created successfully.");
     }
 }

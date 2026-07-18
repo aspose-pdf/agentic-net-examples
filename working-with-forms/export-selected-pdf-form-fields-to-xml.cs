@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Xml.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
@@ -12,55 +12,54 @@ class Program
         const string inputPdf = "input.pdf";
         const string outputXml = "selected_fields.xml";
 
-        // List of form field names that should be exported
-        var fieldsToExport = new List<string>
-        {
-            "FirstName",
-            "LastName",
-            "Email"
-        };
-
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (using statement ensures proper disposal)
         using (Document doc = new Document(inputPdf))
         {
-            // Create the root element for the XML document
-            XElement root = new XElement("FormFields");
+            // Ensure the document actually contains a form (AcroForm).
+            if (doc.Form == null)
+            {
+                Console.Error.WriteLine("The PDF does not contain any form fields.");
+                return;
+            }
+
+            // Names of the form fields that should be exported.
+            string[] fieldsToExport = { "FirstName", "LastName", "Email" };
+
+            // Build a simple XML document that contains only the selected fields.
+            XDocument xmlDoc = new XDocument(new XElement("FormData"));
+            XElement root = xmlDoc.Root;
 
             foreach (string fieldName in fieldsToExport)
             {
-                // Check if the form contains the field
-                if (doc.Form.HasField(fieldName))
+                // Retrieve the field from the AcroForm by matching its PartialName.
+                Field field = doc.Form.Fields.FirstOrDefault(f => f.PartialName == fieldName);
+                if (field != null)
                 {
-                    // Retrieve the field (as a Field object)
-                    Field field = doc.Form[fieldName] as Field;
-                    if (field != null)
-                    {
-                        // Get the field value; convert null to empty string
-                        string value = field.Value?.ToString() ?? string.Empty;
-
-                        // Add an element with the field name and its value
-                        XElement fieldElement = new XElement("Field",
-                            new XAttribute("Name", fieldName),
-                            new XAttribute("Value", value));
-                        root.Add(fieldElement);
-                    }
+                    // The Value property can be null; convert it to a string safely.
+                    string value = field.Value?.ToString() ?? string.Empty;
+                    root.Add(new XElement("Field",
+                                         new XAttribute("Name", fieldName),
+                                         new XAttribute("Value", value)));
                 }
                 else
                 {
-                    Console.WriteLine($"Field not found: {fieldName}");
+                    // If the field is missing we still add an empty entry so the output structure is predictable.
+                    root.Add(new XElement("Field",
+                                         new XAttribute("Name", fieldName),
+                                         new XAttribute("Value", string.Empty)));
                 }
             }
 
-            // Save the XML document
-            XDocument xmlDoc = new XDocument(new XDeclaration("1.0", "utf-8", "yes"), root);
+            // Save the generated XML to the specified file.
             xmlDoc.Save(outputXml);
-            Console.WriteLine($"Selected form fields exported to '{outputXml}'.");
         }
+
+        Console.WriteLine($"Selected form fields have been exported to '{outputXml}'.");
     }
 }

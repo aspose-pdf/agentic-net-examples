@@ -7,38 +7,45 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "filled.pdf";
-        const string fieldName = "myField";          // Name of the text field to fill
-        const string fieldValue = "Hello World";     // Value to set
+        // Paths and field information – adjust as needed
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "filled_output.pdf";
+        const string fieldName     = "MyTextField";   // Exact name of the text field in the PDF
+        const string fieldValue    = "Provided string value";
 
         // Verify input file exists
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document (wrapped in using for proper disposal)
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // The Form indexer returns a WidgetAnnotation; cast it to a Field.
-            Field? field = doc.Form[fieldName] as Field;
-
-            if (field != null)
+            // Load the PDF document (wrapped in using for deterministic disposal)
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                // Set the field's value
-                field.Value = fieldValue;
-            }
-            else
-            {
-                Console.Error.WriteLine($"Field '{fieldName}' not found or is not a form field.");
-            }
+                // Access the form field by name – the Form indexer returns a WidgetAnnotation,
+                // so we need to cast it to Aspose.Pdf.Forms.Field before using the Value property.
+                Field? field = pdfDoc.Form[fieldName] as Field;
+                if (field == null)
+                {
+                    Console.Error.WriteLine($"Field '{fieldName}' not found or is not a form field in the document.");
+                }
+                else
+                {
+                    // Set the field's value
+                    field.Value = fieldValue;
+                }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+                // Save the modified PDF
+                pdfDoc.Save(outputPdfPath);
+                Console.WriteLine($"PDF saved with filled field to '{outputPdfPath}'.");
+            }
         }
-
-        Console.WriteLine($"PDF saved with filled field to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
+        }
     }
 }

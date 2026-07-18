@@ -16,27 +16,24 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
             // Access the form fields collection
             Form form = doc.Form;
 
-            // Retrieve the radio button field named "PaymentMethod"
+            // Find the radio button field named "PaymentMethod"
             RadioButtonField paymentMethod = form["PaymentMethod"] as RadioButtonField;
-
-            if (paymentMethod != null)
-            {
-                // Set the default selected value to the option named "Credit"
-                paymentMethod.Value = "Credit";
-
-                // Optionally ensure that exactly one option is always selected
-                paymentMethod.NoToggleToOff = true;
-            }
-            else
+            if (paymentMethod == null)
             {
                 Console.Error.WriteLine("Radio button field 'PaymentMethod' not found.");
+                return;
             }
+
+            // Set the default selected value to "Credit"
+            // You can set either the Value (export value) or the Selected index.
+            // Here we use the export value, which matches the option name.
+            paymentMethod.Value = "Credit";
 
             // Save the modified PDF
             doc.Save(outputPath);

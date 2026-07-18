@@ -9,8 +9,8 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName = "myTextField";   // name of the existing field
-        const int targetPage = 2;                 // page where the copy will be placed (1‑based)
+        const string fieldName = "myField";      // name of the existing field
+        const int targetPage = 2;                // page number to copy the field to (1‑based)
 
         if (!File.Exists(inputPath))
         {
@@ -18,46 +18,54 @@ class Program
             return;
         }
 
-        // Load the PDF document (using rule: document-disposal-with-using)
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Verify that the form contains the specified field
-            if (!doc.Form.HasField(fieldName))
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
             {
-                Console.Error.WriteLine($"Field '{fieldName}' not found in the document.");
-                return;
+                // Access the form object
+                Form form = doc.Form;
+
+                // Retrieve the field that will be copied – the Form indexer returns a WidgetAnnotation,
+                // so we must cast it to Aspose.Pdf.Forms.Field.
+                Field sourceField = form[fieldName] as Field;
+                if (sourceField == null)
+                {
+                    Console.Error.WriteLine($"Field '{fieldName}' not found or is not a form field.");
+                    return;
+                }
+
+                // Create a copy of the field on the target page with a new partial name.
+                // Form.Add returns a WidgetAnnotation; cast it back to Field.
+                Field copiedField = form.Add(sourceField, fieldName + "_Copy", targetPage) as Field;
+                if (copiedField == null)
+                {
+                    Console.Error.WriteLine("Failed to create a copy of the field.");
+                    return;
+                }
+
+                // Optionally reposition the copied field (example: place it at (100,500))
+                // Preserve the original width and height.
+                Rectangle origRect = sourceField.Rect;
+                Rectangle newRect = new Rectangle(
+                    100,                                 // lower‑left X
+                    500,                                 // lower‑left Y
+                    100 + (origRect.URX - origRect.LLX), // upper‑right X
+                    500 + (origRect.URY - origRect.LLY)  // upper‑right Y
+                );
+
+                // Add the appearance of the copied field on the target page at the new rectangle.
+                form.AddFieldAppearance(copiedField, targetPage, newRect);
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Retrieve the original field instance – the Form indexer returns a WidgetAnnotation,
-            // so we need an explicit cast (or 'as') to Aspose.Pdf.Forms.Field.
-            Field originalField = doc.Form[fieldName] as Field;
-            if (originalField == null)
-            {
-                Console.Error.WriteLine($"Field '{fieldName}' could not be cast to a form Field.");
-                return;
-            }
-
-            // Create a copy of the field on the target page.
-            // The Add(Field, string, int) overload creates a new field based on the supplied one.
-            string copyPartialName = fieldName + "_Copy";
-            Field copiedField = doc.Form.Add(originalField, copyPartialName, targetPage);
-
-            // Optionally set the position of the copied field.
-            // Here we reuse the original rectangle; you can adjust coordinates as needed.
-            Rectangle origRect = originalField.Rect;
-            Rectangle newRect = new Rectangle(
-                origRect.LLX,
-                origRect.LLY,
-                origRect.URX,
-                origRect.URY);
-
-            // Add the appearance of the copied field on the target page.
-            doc.Form.AddFieldAppearance(copiedField, targetPage, newRect);
-
-            // Save the modified PDF (PDF format, no SaveOptions needed)
-            doc.Save(outputPath);
+            Console.WriteLine($"Field '{fieldName}' copied to page {targetPage} and saved as '{outputPath}'.");
         }
-
-        Console.WriteLine($"Field '{fieldName}' copied to page {targetPage} and saved as '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

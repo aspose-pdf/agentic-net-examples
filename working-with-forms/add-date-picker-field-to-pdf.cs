@@ -3,12 +3,13 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_with_datefield.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,32 +18,34 @@ class Program
             return;
         }
 
-        // Load the existing PDF document
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
+            // Access the form object (creates one if it doesn't exist)
+            Form form = doc.Form;
+
             // Define the rectangle where the date field will appear (llx, lly, urx, ury)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 250, 630);
 
             // Create a DateField on the first page
             DateField dateField = new DateField(doc.Pages[1], rect);
+            dateField.Name = "DateField1";               // field name
+            dateField.PartialName = "DateField1";        // partial name (used in JavaScript)
+            dateField.AlternateName = "Select a date";   // tooltip shown in Acrobat
+            dateField.DateFormat = "mm/dd/yyyy";        // display format
 
-            // Set a name for the field (used to reference it later)
-            dateField.Name = "DatePicker";
+            // JavaScript that runs when the field is activated.
+            // It sets the field value to the current date using the specified format.
+            dateField.OnActivated = new JavascriptAction(
+                "event.target.value = util.printd('mm/dd/yyyy', new Date());");
 
-            // Define the display format for the date (e.g., mm/dd/yyyy)
-            dateField.DateFormat = "mm/dd/yyyy";
-
-            // Attach JavaScript that opens the calendar picker when the field is activated
-            // The script uses the built‑in AFDate_FormatEx function to format the selected date
-            dateField.OnActivated = new JavascriptAction("AFDate_FormatEx('mm/dd/yyyy');");
-
-            // Add the field to the document's form collection
-            doc.Form.Add(dateField);
+            // Add the field to the document's form
+            form.Add(dateField);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with date picker saved to '{outputPath}'.");
+        Console.WriteLine($"Date picker field added. Saved to '{outputPath}'.");
     }
 }

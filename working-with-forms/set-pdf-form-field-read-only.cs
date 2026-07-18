@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "readonly_output.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -19,16 +19,19 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document contains a form and the target field exists
-            if (doc.Form != null && doc.Form["CustomerName"] != null)
+            // Access the form field named "EmployeeID"
+            // The Forms collection returns a WidgetAnnotation (base class for form fields)
+            if (doc.Form != null && doc.Form["EmployeeID"] != null)
             {
-                // Retrieve the field (TextBoxField inherits WidgetAnnotation)
-                TextBoxField field = (TextBoxField)doc.Form["CustomerName"];
-                // Mark the field as read‑only to prevent further editing
-                field.ReadOnly = true;
+                // Set the field to read‑only so users cannot modify it
+                doc.Form["EmployeeID"].ReadOnly = true;
+            }
+            else
+            {
+                Console.Error.WriteLine("Field 'EmployeeID' not found in the document.");
             }
 
-            // Save the updated PDF
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
