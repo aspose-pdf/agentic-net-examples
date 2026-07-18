@@ -8,8 +8,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_tagged.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,15 +17,11 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Open the PDF with deterministic disposal
         using (Document doc = new Document(inputPath))
         {
             // Access the tagged content API
             ITaggedContent tagged = doc.TaggedContent;
-
-            // Set language and title for the tagged PDF (optional)
-            tagged.SetLanguage("en-US");
-            tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
             // Get the root structure element (no cast needed)
             StructureElement root = tagged.RootElement;
@@ -33,22 +29,22 @@ class Program
             // Create a TOCI (Table of Contents Item) element
             TOCIElement toci = tagged.CreateTOCIElement();
 
-            // Create a Paragraph element to be placed under the TOCI
+            // Create a paragraph element to be placed under the TOCI
             ParagraphElement paragraph = tagged.CreateParagraphElement();
 
-            // Set the actual text for accessibility
-            paragraph.ActualText = "This is the descriptive paragraph for the TOCI entry.";
+            // Set the actual text for accessibility (screen readers will read this)
+            paragraph.ActualText = "Descriptive paragraph for the TOC entry.";
 
-            // Append the paragraph as a child of the TOCI element
-            toci.AppendChild(paragraph); // bool parameter has default value
+            // Append the paragraph to the TOCI element
+            toci.AppendChild(paragraph); // bool parameter omitted (defaults to true)
 
             // Append the TOCI element to the document root
-            root.AppendChild(toci); // bool parameter has default value
+            root.AppendChild(toci); // bool parameter omitted
 
-            // Save the modified PDF (no PreSave required)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Tagged PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

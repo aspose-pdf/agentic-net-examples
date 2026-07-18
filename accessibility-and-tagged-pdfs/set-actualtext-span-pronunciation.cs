@@ -9,7 +9,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_tagged.pdf";
+        const string outputPath = "output_with_span.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,35 +17,35 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF document (using rule: document-disposal-with-using)
         using (Document doc = new Document(inputPath))
         {
             // Access the tagged content API
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Set language and title for the tagged document (optional but recommended)
+            // Optional: set language and title for the tagged PDF
             tagged.SetLanguage("en-US");
             tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
-            // Get the root structure element (no cast required)
+            // Get the root structure element (no cast needed)
             StructureElement root = tagged.RootElement;
 
             // Create a Span element
             SpanElement span = tagged.CreateSpanElement();
 
-            // Optional: add visible text to the span
-            span.SetText("example");
+            // Set the hidden pronunciation text via ActualText
+            span.ActualText = "pronunciation";
 
-            // Supply hidden pronunciation text via the ActualText property
-            span.ActualText = "ɪɡˈzæmpəl";
+            // Optionally set visible text for the span
+            span.SetText("Visible text");
 
-            // Attach the span to the document structure
-            root.AppendChild(span);
+            // Append the span to the root of the structure tree
+            root.AppendChild(span); // AppendChild with one argument (bool defaults)
 
-            // Save the modified PDF
+            // Save the modified PDF (using rule: document-disposal-with-using)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Tagged PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with Span ActualText to '{outputPath}'.");
     }
 }

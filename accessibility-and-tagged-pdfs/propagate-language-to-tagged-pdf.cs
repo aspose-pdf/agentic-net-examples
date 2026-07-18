@@ -9,7 +9,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_language.pdf";
         const string language   = "en-US";
 
         if (!File.Exists(inputPath))
@@ -21,39 +21,31 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Set the document language (metadata)
+            // Access tagged content API
             ITaggedContent tagged = doc.TaggedContent;
-            tagged.SetLanguage(language);
-
-            // Get the root structure element (no cast needed)
-            StructureElement root = tagged.RootElement;
 
             // Set language on the root element
+            StructureElement root = tagged.RootElement;
             root.Language = language;
 
-            // Recursively propagate the language to all descendants
+            // Propagate language to all descendants
             PropagateLanguage(root, language);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Language '{language}' propagated and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with language '{language}' to '{outputPath}'.");
     }
 
-    // Recursively sets the Language property on the element and all its children
-    static void PropagateLanguage(StructureElement element, string language)
+    // Recursively set the Language property on each structure element
+    static void PropagateLanguage(StructureElement element, string lang)
     {
-        // Set language on the current element
-        element.Language = language;
-
-        // Iterate over child elements
+        element.Language = lang;
         foreach (Element child in element.ChildElements)
         {
-            if (child is StructureElement childStructure)
-            {
-                PropagateLanguage(childStructure, language);
-            }
+            if (child is StructureElement se)
+                PropagateLanguage(se, lang);
         }
     }
 }

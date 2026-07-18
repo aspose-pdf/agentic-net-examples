@@ -3,51 +3,53 @@ using System.IO;
 using System.Xml;
 using System.Xml.Xsl;
 using Aspose.Pdf;
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class ExportStructureTree
 {
     static void Main()
     {
-        // Paths – adjust as needed
+        // Input PDF, XSLT stylesheet and output report paths
         const string pdfPath   = "input.pdf";
         const string xmlPath   = "structure.xml";
         const string xsltPath  = "report.xslt";
         const string reportPath = "report.html";
 
-        // Verify input files exist
+        // Verify files exist
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
         if (!File.Exists(xsltPath))
         {
-            Console.Error.WriteLine($"XSLT file not found: {xsltPath}");
+            Console.Error.WriteLine($"XSLT not found: {xsltPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document
+            // Load PDF document
             using (Document pdfDoc = new Document(pdfPath))
             {
-                // Save the structure tree (document model) to XML
+                // Export the logical structure tree to XML
                 XmlSaveOptions xmlOptions = new XmlSaveOptions();
                 pdfDoc.Save(xmlPath, xmlOptions);
             }
 
-            // Transform the generated XML using the provided XSLT
-            XslCompiledTransform transformer = new XslCompiledTransform();
-            transformer.Load(xsltPath);
+            // Transform the exported XML using the provided XSLT
+            XslCompiledTransform xslt = new XslCompiledTransform();
+            xslt.Load(xsltPath);
 
+            // Prepare XML reader for the saved structure XML
             using (XmlReader xmlReader = XmlReader.Create(xmlPath))
-            using (XmlWriter resultWriter = XmlWriter.Create(reportPath, transformer.OutputSettings))
+            using (XmlWriter resultWriter = XmlWriter.Create(reportPath, xslt.OutputSettings))
             {
-                transformer.Transform(xmlReader, resultWriter);
+                xslt.Transform(xmlReader, resultWriter);
             }
 
-            Console.WriteLine($"Structure XML saved to '{xmlPath}'.");
-            Console.WriteLine($"Report generated at '{reportPath}'.");
+            Console.WriteLine($"Structure tree exported to '{xmlPath}' and transformed to report '{reportPath}'.");
         }
         catch (Exception ex)
         {

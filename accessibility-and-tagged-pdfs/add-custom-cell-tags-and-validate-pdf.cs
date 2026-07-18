@@ -8,9 +8,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "tagged_output.pdf";
-        const string logPath = "validation_log.txt";
+        const string logPath    = "validation_log.txt";
 
         if (!File.Exists(inputPath))
         {
@@ -21,10 +21,10 @@ class Program
         // Load the existing PDF
         using (Document doc = new Document(inputPath))
         {
-            // Enable tagged content and set basic properties
+            // Access tagged‑content API
             ITaggedContent tagged = doc.TaggedContent;
             tagged.SetLanguage("en-US");
-            tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
+            tagged.SetTitle("PDF with custom cell tags");
 
             // Root element of the logical structure tree
             StructureElement root = tagged.RootElement;
@@ -32,67 +32,64 @@ class Program
             // Create a table structure element
             TableElement table = tagged.CreateTableElement();
             table.AlternativeText = "Sample data table with custom tags";
-            root.AppendChild(table);
+            root.AppendChild(table); // attach table to the root
 
-            // Header row (optional)
+            // ----- Create table header row -----
             TableTHeadElement thead = tagged.CreateTableTHeadElement();
             table.AppendChild(thead);
+
             TableTRElement headerRow = tagged.CreateTableTRElement();
             thead.AppendChild(headerRow);
+
+            // Header cells (TH)
             TableTHElement th1 = tagged.CreateTableTHElement();
             th1.SetText("ID");
             headerRow.AppendChild(th1);
-            TableTHElement th2 = tagged.CreateTableTHElement();
-            th2.SetText("Name");
-            headerRow.AppendChild(th2);
-            TableTHElement th3 = tagged.CreateTableTHElement();
-            th3.SetText("Amount");
-            headerRow.AppendChild(th3);
 
-            // Body of the table
+            TableTHElement th2 = tagged.CreateTableTHElement();
+            th2.SetText("Amount");
+            headerRow.AppendChild(th2);
+
+            // ----- Create table body -----
             TableTBodyElement tbody = tagged.CreateTableTBodyElement();
             table.AppendChild(tbody);
 
             // First data row
             TableTRElement row1 = tagged.CreateTableTRElement();
             tbody.AppendChild(row1);
-            TableTDElement td11 = tagged.CreateTableTDElement();
-            td11.SetText("1");
-            td11.SetTag("Number"); // custom tag indicating data type
-            row1.AppendChild(td11);
-            TableTDElement td12 = tagged.CreateTableTDElement();
-            td12.SetText("Alice");
-            td12.SetTag("String");
-            row1.AppendChild(td12);
-            TableTDElement td13 = tagged.CreateTableTDElement();
-            td13.SetText("123.45");
-            td13.SetTag("Currency");
-            row1.AppendChild(td13);
+
+            TableTDElement td1 = tagged.CreateTableTDElement();
+            td1.SetText("001");
+            td1.SetTag("Identifier"); // custom tag for data type
+            row1.AppendChild(td1);
+
+            TableTDElement td2 = tagged.CreateTableTDElement();
+            td2.SetText("1234.56");
+            td2.SetTag("Number"); // custom tag for numeric data
+            row1.AppendChild(td2);
 
             // Second data row
             TableTRElement row2 = tagged.CreateTableTRElement();
             tbody.AppendChild(row2);
-            TableTDElement td21 = tagged.CreateTableTDElement();
-            td21.SetText("2");
-            td21.SetTag("Number");
-            row2.AppendChild(td21);
-            TableTDElement td22 = tagged.CreateTableTDElement();
-            td22.SetText("Bob");
-            td22.SetTag("String");
-            row2.AppendChild(td22);
-            TableTDElement td23 = tagged.CreateTableTDElement();
-            td23.SetText("987.00");
-            td23.SetTag("Currency");
-            row2.AppendChild(td23);
+
+            TableTDElement td3 = tagged.CreateTableTDElement();
+            td3.SetText("002");
+            td3.SetTag("Identifier");
+            row2.AppendChild(td3);
+
+            TableTDElement td4 = tagged.CreateTableTDElement();
+            td4.SetText("7890.12");
+            td4.SetTag("Number");
+            row2.AppendChild(td4);
 
             // Save the modified PDF
             doc.Save(outputPath);
 
-            // Validate the saved PDF (example: PDF/A-1B compliance)
+            // Validate the PDF (e.g., against PDF/A‑1B)
             bool isValid = doc.Validate(logPath, PdfFormat.PDF_A_1B);
             Console.WriteLine(isValid
-                ? $"Validation succeeded. Log written to {logPath}"
-                : $"Validation failed. See log at {logPath}");
+                ? $"PDF is compliant. Validation log saved to '{logPath}'."
+                : $"PDF is NOT compliant. See log at '{logPath}'.");
         }
     }
 }
