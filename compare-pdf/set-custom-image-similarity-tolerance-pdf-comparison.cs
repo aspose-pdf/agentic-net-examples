@@ -2,50 +2,34 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Comparison;
-using System.Drawing.Imaging;
 
 class Program
 {
     static void Main()
     {
-        // Paths to the PDFs to compare
-        const string pdfPath1 = "document1.pdf";
-        const string pdfPath2 = "document2.pdf";
+        const string pdf1Path = "doc1.pdf";
+        const string pdf2Path = "doc2.pdf";
+        const string resultPath = "comparison_result.pdf";
 
-        // Directory where the comparison images will be saved
-        const string outputDirectory = "ComparisonResults";
-
-        // Verify that both source files exist
-        if (!File.Exists(pdfPath1) || !File.Exists(pdfPath2))
+        // Verify input files exist
+        if (!File.Exists(pdf1Path) || !File.Exists(pdf2Path))
         {
             Console.Error.WriteLine("One or both input PDF files were not found.");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDirectory);
-
-        // Load both documents inside using blocks for deterministic disposal
-        using (Document doc1 = new Document(pdfPath1))
-        using (Document doc2 = new Document(pdfPath2))
+        // Load the two PDF documents inside using blocks for deterministic disposal
+        using (Document doc1 = new Document(pdf1Path))
+        using (Document doc2 = new Document(pdf2Path))
         {
-            // Create a graphical comparer instance
+            // Create a graphical comparer and set a custom tolerance (percentage)
             GraphicalPdfComparer comparer = new GraphicalPdfComparer();
+            comparer.Threshold = 5.0; // Ignore differences smaller than 5%
 
-            // Set a custom tolerance (percentage) for image similarity.
-            // This value tells the comparer to ignore differences below the specified threshold.
-            comparer.Threshold = 5.0; // 5 % tolerance
-
-            // Perform the comparison and output the results as PNG images.
-            // Each differing page pair will generate an image file prefixed with "diff_".
-            comparer.CompareDocumentsToImages(
-                doc1,
-                doc2,
-                outputDirectory,
-                "diff_",
-                ImageFormat.Png);
+            // Perform the comparison and save the result as a PDF
+            comparer.CompareDocumentsToPdf(doc1, doc2, resultPath);
         }
 
-        Console.WriteLine("Image comparison completed successfully.");
+        Console.WriteLine($"Comparison completed. Result saved to '{resultPath}'.");
     }
 }

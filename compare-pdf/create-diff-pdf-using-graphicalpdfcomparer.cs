@@ -7,9 +7,14 @@ class Program
 {
     static void Main()
     {
-        const string firstPdfPath  = "input1.pdf";
-        const string secondPdfPath = "input2.pdf";
-        const string resultPdfPath = "visual_diff.pdf";
+        // Paths to the two PDFs to compare
+        const string firstPdfPath  = "doc1.pdf";
+        const string secondPdfPath = "doc2.pdf";
+
+        // Folder where the diff PDF will be saved
+        const string outputFolder = "DiffResults";
+        // Full path of the resulting diff PDF
+        string resultPdfPath = Path.Combine(outputFolder, "diff.pdf");
 
         // Verify that both source files exist
         if (!File.Exists(firstPdfPath) || !File.Exists(secondPdfPath))
@@ -18,25 +23,21 @@ class Program
             return;
         }
 
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
+
         try
         {
             // Load the two documents inside using blocks for deterministic disposal
             using (Document doc1 = new Document(firstPdfPath))
             using (Document doc2 = new Document(secondPdfPath))
             {
-                // Create the comparer instance
+                // Create the comparer and generate the diff PDF
                 GraphicalPdfComparer comparer = new GraphicalPdfComparer();
-
-                // Optional: customize comparer settings
-                // comparer.Color = Aspose.Pdf.Color.Red;
-                // comparer.Resolution = 200; // DPI
-                // comparer.Threshold = 5;    // percent
-
-                // Perform the visual comparison and save the result as a PDF
                 comparer.CompareDocumentsToPdf(doc1, doc2, resultPdfPath);
             }
 
-            Console.WriteLine($"Visual diff PDF generated at '{resultPdfPath}'.");
+            Console.WriteLine($"Diff PDF created at: {resultPdfPath}");
         }
         catch (Exception ex)
         {
