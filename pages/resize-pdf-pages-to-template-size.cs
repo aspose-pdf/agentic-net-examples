@@ -1,19 +1,19 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // for PageSize class
 
 class Program
 {
     static void Main()
     {
-        const string templatePath = "template.pdf";   // reference PDF with desired page size
-        const string inputPath    = "input.pdf";      // PDF to be resized
-        const string outputPath   = "resized_output.pdf";
+        const string referencePath = "template.pdf";   // PDF that defines the desired page size
+        const string inputPath     = "input.pdf";      // PDF whose pages will be resized
+        const string outputPath    = "output_resized.pdf";
 
-        if (!File.Exists(templatePath))
+        // Verify that both files exist before proceeding
+        if (!File.Exists(referencePath))
         {
-            Console.Error.WriteLine($"Template not found: {templatePath}");
+            Console.Error.WriteLine($"Reference PDF not found: {referencePath}");
             return;
         }
         if (!File.Exists(inputPath))
@@ -22,26 +22,30 @@ class Program
             return;
         }
 
-        // Load the template and obtain its first page dimensions
-        PageSize targetSize;
-        using (Document templateDoc = new Document(templatePath))
+        // Load the reference PDF to obtain the target page dimensions
+        using (Document referenceDoc = new Document(referencePath))
         {
-            Page templatePage = templateDoc.Pages[1]; // pages are 1‑based
-            float width  = (float)(templatePage.Rect.URX - templatePage.Rect.LLX);
-            float height = (float)(templatePage.Rect.URY - templatePage.Rect.LLY);
-            targetSize = new PageSize(width, height);
-        }
+            // Use the first page of the reference as the size template
+            Page referencePage = referenceDoc.Pages[1];
+            double targetWidth  = referencePage.Rect.URX - referencePage.Rect.LLX;
+            double targetHeight = referencePage.Rect.URY - referencePage.Rect.LLY;
 
-        // Load the PDF to be resized and apply the target size to each page
-        using (Document doc = new Document(inputPath))
-        {
-            foreach (Page page in doc.Pages)
+            // Create a PageSize instance required by Page.Resize
+            PageSize targetSize = new PageSize((float)targetWidth, (float)targetHeight);
+
+            // Load the PDF that needs to be resized
+            using (Document sourceDoc = new Document(inputPath))
             {
-                page.Resize(targetSize);
-            }
+                // Resize each page to match the reference dimensions
+                for (int i = 1; i <= sourceDoc.Pages.Count; i++)
+                {
+                    Page page = sourceDoc.Pages[i];
+                    page.Resize(targetSize);
+                }
 
-            // Save the resized document
-            doc.Save(outputPath);
+                // Save the resized document
+                sourceDoc.Save(outputPath);
+            }
         }
 
         Console.WriteLine($"Resized PDF saved to '{outputPath}'.");

@@ -15,31 +15,32 @@ class Program
             return;
         }
 
-        // Load the PDF document (using rule for loading)
+        // Load the PDF document (using rule for document disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate pages using 1‑based indexing (global rule)
+            // Pages are 1‑based (rule: page-indexing-one-based)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Calculate current width and height from MediaBox
-                double width  = page.MediaBox.URX - page.MediaBox.LLX;
-                double height = page.MediaBox.URY - page.MediaBox.LLY;
+                // Retrieve current MediaBox dimensions
+                Aspose.Pdf.Rectangle mediaBox = page.MediaBox;
+                double width  = mediaBox.URX - mediaBox.LLX;
+                double height = mediaBox.URY - mediaBox.LLY;
 
-                // If the page is landscape, swap dimensions to make it portrait
+                // If the page is landscape (width > height), swap dimensions
                 if (width > height)
                 {
-                    // SetPageSize expects width then height; provide swapped values
+                    // Set new page size with height as width and width as height
                     page.SetPageSize(height, width);
                 }
                 // If already portrait, no change needed
             }
 
-            // Save the modified document (using rule for saving)
+            // Save the modified document (using rule for document saving)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"All pages converted to portrait orientation. Saved to '{outputPath}'.");
+        Console.WriteLine($"Portrait PDF saved to '{outputPath}'.");
     }
 }

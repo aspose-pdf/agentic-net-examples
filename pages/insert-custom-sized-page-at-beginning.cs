@@ -21,7 +21,7 @@ class Program
             // Insert an empty page at the beginning (position 1, 1‑based indexing)
             Page newPage = doc.Pages.Insert(1);
 
-            // Set the custom page size to 200 × 300 points
+            // Set custom dimensions: 200 × 300 points
             newPage.SetPageSize(200, 300);
 
             // Save the modified document

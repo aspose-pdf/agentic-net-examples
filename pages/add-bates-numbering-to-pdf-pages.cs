@@ -18,18 +18,20 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Add Bates numbering to each page
+            // Add Bates numbering to all pages
+            // StartNumber = 1000, Suffix = "-" creates numbers like "1000-", "1001-", etc.
             doc.Pages.AddBatesNumbering(artifact =>
             {
-                artifact.StartNumber = 1000; // start numbering at 1000
-                artifact.Suffix = "-";       // dash separator after the number
-                // Optional: configure other properties such as alignment, margins, etc.
+                artifact.StartNumber = 1000;
+                artifact.Suffix = "-";
+                // Optional: configure number of digits, alignment, etc.
+                // artifact.NumberOfDigits = 6;
             });
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Bates numbering applied. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Bates numbering added. Saved to '{outputPath}'.");
     }
 }

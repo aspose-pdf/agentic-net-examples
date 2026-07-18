@@ -1,14 +1,13 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core PDF API
-using Aspose.Pdf.Text;          // For Color utilities
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_cmyk_background.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_cmyk.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,25 +15,25 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle: using ensures disposal)
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Define CMYK components (range 0.0 – 1.0)
-            double cyan    = 0.0;   // 0% cyan
-            double magenta = 0.5;   // 50% magenta
-            double yellow  = 0.5;   // 50% yellow
-            double black   = 0.0;   // 0% black
+            // CMYK components (range 0.0 – 1.0). Adjust as needed for print fidelity.
+            double c = 0.30; // Cyan
+            double m = 0.20; // Magenta
+            double y = 0.00; // Yellow
+            double k = 0.10; // Black
 
             // Create a PDF Color from CMYK values
-            Aspose.Pdf.Color cmykColor = Aspose.Pdf.Color.FromCmyk(cyan, magenta, yellow, black);
+            Aspose.Pdf.Color cmykColor = Aspose.Pdf.Color.FromCmyk(c, m, y, k);
 
-            // Apply the background color to every page
-            foreach (Page page in doc.Pages)
+            // Apply the background color to every page (pages are 1‑based)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                page.Background = cmykColor;
+                doc.Pages[i].Background = cmykColor;
             }
 
-            // Save the modified PDF (lifecycle: save inside using block)
+            // Save the modified document (PDF format)
             doc.Save(outputPath);
         }
 

@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 
 class Program
@@ -8,27 +7,29 @@ class Program
     {
         const string inputPath = "input.pdf";
 
-        if (!File.Exists(inputPath))
+        // Verify the input file exists
+        if (!System.IO.File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Use a using block for deterministic disposal (document-disposal-with-using rule)
+        // Load the PDF document (wrapped in using for deterministic disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based (page-indexing-one-based rule)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            int pageCount = doc.Pages.Count;
+            Console.WriteLine($"Document contains {pageCount} pages.");
+
+            // Pages are 1‑based; iterate through each page
+            for (int i = 1; i <= pageCount; i++)
             {
                 Page page = doc.Pages[i];
-                // Rectangle representing the page size (crop box or media box)
-                Aspose.Pdf.Rectangle rect = page.Rect;
+                // The Rect property gives the page rectangle (media box or crop box)
+                var rect = page.Rect;
+                double width = rect.Width;
+                double height = rect.Height;
 
-                // Compute width and height
-                double width  = rect.URX - rect.LLX;
-                double height = rect.URY - rect.LLY;
-
-                Console.WriteLine($"Page {i}: Width = {width} pt, Height = {height} pt");
+                Console.WriteLine($"Page {i}: Width = {width}, Height = {height}");
             }
         }
     }

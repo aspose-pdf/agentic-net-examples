@@ -15,17 +15,16 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
+            // Pages collection is 1‑based; iterate accordingly
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Apply a 90° rotation when the page number is divisible by 3
+                // Apply a 90° rotation to pages whose number is divisible by 3
                 if (i % 3 == 0)
                 {
-                    // Correct enum values use the 'on' prefix
-                    doc.Pages[i].Rotate = Rotation.on90;
+                    Page page = doc.Pages[i];
+                    page.Rotate = Rotation.on90; // 90 degrees clockwise (use 'on' prefix)
                 }
             }
 

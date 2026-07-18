@@ -15,18 +15,18 @@ class Program
             return;
         }
 
-        // Load the PDF document (using rule: document-disposal-with-using)
+        // Load the PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Pages collection is 1‑based; iterate through all pages
+            // Loop through all pages (1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
-                // Resize each page to the predefined A5 size
+                // Resize each page to A5 size
                 page.Resize(PageSize.A5);
             }
 
-            // Save the modified document (using rule: document-disposal-with-using)
+            // Save the modified document (lifecycle rule: explicit save)
             doc.Save(outputPath);
         }
 

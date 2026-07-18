@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_with_header.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,30 +16,34 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Create a HeaderFooter instance for the header
+            // Get the first page (1‑based indexing)
+            Page firstPage = doc.Pages[1];
+
+            // Create a HeaderFooter object for the header
             HeaderFooter header = new HeaderFooter();
 
-            // Configure the margin using MarginInfo (optional adjustments)
-            header.Margin = new MarginInfo();
-            // Example: you can set specific margin parts if needed
-            // header.Margin.TopMarginIfAny = MarginPartStyle.None;
+            // Configure margin information (example: 20 points top margin)
+            // In recent Aspose.Pdf versions MarginInfo uses the properties Top, Bottom, Left, Right
+            header.Margin = new MarginInfo
+            {
+                Top = 20 // set the desired top margin in points
+            };
 
-            // Create a text fragment for the header content
-            TextFragment tf = new TextFragment("Sample Header Text");
-            tf.TextState.Font = FontRepository.FindFont("Helvetica");
-            tf.TextState.FontSize = 12;
-            tf.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
+            // Add a text fragment to the header
+            TextFragment headerText = new TextFragment("Document Header");
+            headerText.TextState.Font = FontRepository.FindFont("Helvetica");
+            headerText.TextState.FontSize = 12;
+            headerText.TextState.ForegroundColor = Aspose.Pdf.Color.DarkGray;
 
-            // Add the text fragment to the header's paragraph collection
-            header.Paragraphs.Add(tf);
+            header.Paragraphs.Add(headerText);
 
-            // Assign the header to the first page (pages are 1‑based)
-            doc.Pages[1].Header = header;
+            // Assign the header to the first page
+            firstPage.Header = header;
 
-            // Save the modified PDF (lifecycle rule: use Save within using)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

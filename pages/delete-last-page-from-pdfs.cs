@@ -7,39 +7,39 @@ class Program
     static void Main()
     {
         // Folder containing PDF files
-        const string inputFolder = @"C:\PdfFolder";
+        const string folderPath = @"C:\PdfFolder";
 
-        if (!Directory.Exists(inputFolder))
+        if (!Directory.Exists(folderPath))
         {
-            Console.Error.WriteLine($"Folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Folder not found: {folderPath}");
             return;
         }
 
-        // Process each *.pdf file in the folder
-        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Process each .pdf file in the folder
+        foreach (string pdfFile in Directory.GetFiles(folderPath, "*.pdf"))
         {
             try
             {
-                // Load the PDF document inside a using block for deterministic disposal
-                using (Document doc = new Document(pdfPath))
+                // Open the PDF document inside a using block for deterministic disposal
+                using (Document doc = new Document(pdfFile))
                 {
                     // Ensure the document has at least one page
                     if (doc.Pages.Count > 0)
                     {
-                        // Pages are 1‑based; delete the last page
+                        // Delete the last page (pages are 1‑based)
                         int lastPageIndex = doc.Pages.Count;
                         doc.Pages.Delete(lastPageIndex);
                     }
 
-                    // Overwrite the original file with the modified document
-                    doc.Save(pdfPath);
+                    // Save the modified document back to the same file
+                    doc.Save(pdfFile);
                 }
 
-                Console.WriteLine($"Processed: {Path.GetFileName(pdfPath)}");
+                Console.WriteLine($"Processed: {Path.GetFileName(pdfFile)}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{pdfFile}': {ex.Message}");
             }
         }
     }
