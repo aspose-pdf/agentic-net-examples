@@ -1,90 +1,74 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;   // Required for TextFragment if needed
+using Aspose.Pdf.Text;
 
-class AddTableToPage
+class Program
 {
     static void Main()
     {
-        // Input and output PDF paths
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_table.pdf";
-
-        // The page number (1‑based) where the table will be inserted
-        const int targetPageNumber = 2;
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const int targetPage = 2; // 1‑based page number
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the existing PDF document inside a using block (ensures disposal)
+        // Load the PDF inside a using block (ensures proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Validate the requested page exists
-            if (targetPageNumber < 1 || targetPageNumber > doc.Pages.Count)
+            // Verify that the requested page exists
+            if (targetPage < 1 || targetPage > doc.Pages.Count)
             {
-                Console.Error.WriteLine($"Page {targetPageNumber} is out of range. Document has {doc.Pages.Count} pages.");
+                Console.Error.WriteLine($"Page {targetPage} is out of range (1‑{doc.Pages.Count}).");
                 return;
             }
 
-            // Retrieve the target page
-            Page page = doc.Pages[targetPageNumber];
+            // Retrieve the target page (Aspose.Pdf uses 1‑based indexing)
+            Page page = doc.Pages[targetPage];
 
-            // -------------------------------------------------
-            // Create a simple table
-            // -------------------------------------------------
-            Table table = new Table();
-
-            // Define column widths (comma‑separated or space‑separated string)
-            // Example: two columns, each 200 points wide
-            table.ColumnWidths = "200 200";
-
-            // Optional: set table border and background
-            table.Border = new BorderInfo(BorderSide.All, 1f, Color.Black);
-            table.BackgroundColor = Color.LightGray;
-
-            // Add header row
-            Row header = table.Rows.Add();
-            header.Cells.Add("Header 1");
-            header.Cells.Add("Header 2");
-            // Make header text bold
-            foreach (Cell cell in header.Cells)
+            // Create a simple 2‑column, 3‑row table
+            Table table = new Table
             {
-                cell.DefaultCellTextState = new TextState
+                // Position the table on the page (coordinates are in points)
+                Left = 50,
+                Top = 700,
+                // Optional visual styling
+                Border = new BorderInfo(BorderSide.All, 1f, Aspose.Pdf.Color.Black),
+                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Gray),
+                DefaultCellPadding = new MarginInfo(5, 5, 5, 5)
+            };
+
+            // Define column widths as percentages (50% each)
+            table.ColumnWidths = "50 50";
+
+            // Populate the table with rows and cells
+            for (int r = 0; r < 3; r++)
+            {
+                Row row = table.Rows.Add();
+                for (int c = 0; c < 2; c++)
                 {
-                    Font = FontRepository.FindFont("Helvetica-Bold"),
-                    FontSize = 12,
-                    ForegroundColor = Color.Black
-                };
+                    // Each cell contains a TextFragment
+                    TextFragment tf = new TextFragment($"R{r + 1}C{c + 1}");
+                    tf.TextState.FontSize = 12;
+                    tf.TextState.Font = FontRepository.FindFont("Helvetica");
+                    tf.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
+
+                    // Add the fragment to the cell
+                    row.Cells.Add(tf);
+                }
             }
 
-            // Add a data row
-            Row data = table.Rows.Add();
-            data.Cells.Add("Value A");
-            data.Cells.Add("Value B");
-            // Set regular text style for data cells
-            foreach (Cell cell in data.Cells)
-            {
-                cell.DefaultCellTextState = new TextState
-                {
-                    Font = FontRepository.FindFont("Helvetica"),
-                    FontSize = 11,
-                    ForegroundColor = Color.Black
-                };
-            }
-
-            // -------------------------------------------------
             // Insert the table into the page's paragraph collection
-            // -------------------------------------------------
             page.Paragraphs.Add(table);
 
             // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Table added to page {targetPageNumber}. Saved as '{outputPath}'.");
+        Console.WriteLine($"Table added to page {targetPage}. Saved as '{outputPath}'.");
     }
 }

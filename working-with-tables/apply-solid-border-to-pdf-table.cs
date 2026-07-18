@@ -3,34 +3,47 @@ using System.IO;
 using Aspose.Pdf;                     // Core PDF API
 using Aspose.Pdf.Text;                // For text handling (optional)
 
-// Create a new PDF document and ensure deterministic disposal
-using (Document doc = new Document())
+class Program
 {
-    // Add a blank page to the document
-    Page page = doc.Pages.Add();
+    static void Main()
+    {
+        // Create a new PDF document and add a blank page
+        using (Document doc = new Document())
+        {
+            Page page = doc.Pages.Add();
 
-    // Create a table instance
-    Table table = new Table();
+            // Create a table with 3 columns
+            Table table = new Table
+            {
+                // Apply a solid black border to the entire table
+                Border = new BorderInfo(BorderSide.All, 1f, Aspose.Pdf.Color.Black),
 
-    // Define three equal column widths (adjust as needed)
-    table.ColumnWidths = "100 100 100";
+                // Optional: include border width in column calculations
+                IsBordersIncluded = true
+            };
 
-    // Add a single row with three cells
-    Row row = table.Rows.Add();
-    row.Cells.Add("Cell 1");
-    row.Cells.Add("Cell 2");
-    row.Cells.Add("Cell 3");
+            // Define column widths (percentage of the page width)
+            table.ColumnWidths = "33 33 34";
 
-    // Apply a solid black border to the entire table
-    // BorderInfo(BorderSide, width, color) creates a uniform border on all sides
-    table.Border = new BorderInfo(Aspose.Pdf.BorderSide.All, 1f, Aspose.Pdf.Color.Black);
+            // Add a header row
+            Row header = table.Rows.Add();
+            header.Cells.Add("Header 1");
+            header.Cells.Add("Header 2");
+            header.Cells.Add("Header 3");
 
-    // Include the border width in column calculations (optional but common)
-    table.IsBordersIncluded = true;
+            // Add a data row
+            Row data = table.Rows.Add();
+            data.Cells.Add("Cell A1");
+            data.Cells.Add("Cell A2");
+            data.Cells.Add("Cell A3");
 
-    // Add the configured table to the page's paragraph collection
-    page.Paragraphs.Add(table);
+            // Add the table to the page's paragraph collection
+            page.Paragraphs.Add(table);
 
-    // Save the PDF document to disk
-    doc.Save("TableWithBorder.pdf");
+            // Save the PDF to disk
+            doc.Save("TableWithBorder.pdf");
+        }
+
+        Console.WriteLine("PDF with bordered table created successfully.");
+    }
 }

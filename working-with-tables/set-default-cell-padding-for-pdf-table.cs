@@ -1,6 +1,6 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 
 class Program
 {
@@ -8,25 +8,27 @@ class Program
     {
         const string outputPath = "table_with_padding.pdf";
 
-        // Create a new PDF document (wrapped in using for proper disposal)
+        // Ensure the Document is disposed properly
         using (Document doc = new Document())
         {
-            // Add a page to the document
+            // Add a new page to the document
             Page page = doc.Pages.Add();
 
-            // Create a table with three columns
+            // Create a table and set the default cell padding for all cells
             Table table = new Table
             {
-                ColumnWidths = "100 100 100"
+                // MarginInfo defines padding for Top, Bottom, Left, Right (in points)
+                DefaultCellPadding = new MarginInfo
+                {
+                    Top = 5,
+                    Bottom = 5,
+                    Left = 5,
+                    Right = 5
+                }
             };
 
-            // Define default cell padding for the entire table
-            MarginInfo padding = new MarginInfo();
-            padding.Top = 5;      // 5 points top padding
-            padding.Bottom = 5;   // 5 points bottom padding
-            padding.Left = 5;     // 5 points left padding
-            padding.Right = 5;    // 5 points right padding
-            table.DefaultCellPadding = padding;
+            // Optional: define column widths (in points or percentages)
+            table.ColumnWidths = "100 100 100";
 
             // Add a header row
             Row header = table.Rows.Add();
@@ -34,14 +36,11 @@ class Program
             header.Cells.Add("Header 2");
             header.Cells.Add("Header 3");
 
-            // Add a few data rows
-            for (int i = 1; i <= 3; i++)
-            {
-                Row row = table.Rows.Add();
-                row.Cells.Add($"Row {i} Col 1");
-                row.Cells.Add($"Row {i} Col 2");
-                row.Cells.Add($"Row {i} Col 3");
-            }
+            // Add a data row
+            Row data = table.Rows.Add();
+            data.Cells.Add("Cell A1");
+            data.Cells.Add("Cell A2");
+            data.Cells.Add("Cell A3");
 
             // Place the table on the page
             page.Paragraphs.Add(table);

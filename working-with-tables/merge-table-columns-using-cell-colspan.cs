@@ -9,36 +9,30 @@ class Program
         // Create a new PDF document and ensure deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a single page to the document
+            // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Create a table with five equal-width columns
+            // Create a table with four equal-width columns
             Table table = new Table
             {
-                ColumnWidths = "100 100 100 100 100",
+                // Column widths are specified in points; four columns of 100 points each
+                ColumnWidths = "100 100 100 100",
+                // Add a thin black border around the table
                 Border = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Black)
             };
             page.Paragraphs.Add(table);
 
-            // Add a row to the table
+            // Add a single row to the table
             Row row = table.Rows.Add();
 
             // Add a cell that will span three adjacent columns
             Cell spanningCell = row.Cells.Add("Spanning Cell");
             spanningCell.ColSpan = 3; // Merge three columns into this cell
-            spanningCell.BackgroundColor = Aspose.Pdf.Color.LightGray;
-            spanningCell.DefaultCellTextState = new TextState
-            {
-                Font = FontRepository.FindFont("Helvetica"),
-                FontSize = 12,
-                ForegroundColor = Aspose.Pdf.Color.Black
-            };
 
-            // Add the remaining cells to complete the row (columns 4 and 5)
-            row.Cells.Add("Cell 4");
-            row.Cells.Add("Cell 5");
+            // Add the remaining cell for the fourth column
+            row.Cells.Add("Normal Cell");
 
-            // Save the PDF to disk
+            // Save the resulting PDF
             doc.Save("TableWithColSpan.pdf");
         }
     }

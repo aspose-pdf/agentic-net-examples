@@ -1,44 +1,50 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing; // for BorderSide enum
 
 class Program
 {
     static void Main()
     {
-        // Create a new PDF document
-        using (Document doc = new Document())
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+
+        if (!File.Exists(inputPath))
         {
-            // Add a page to the document
-            Page page = doc.Pages.Add();
-
-            // Create a table
-            Table table = new Table();
-
-            // Configure the table border to have a thickness of 2 points and black color
-            // BorderInfo does not expose settable Color or Width properties; they must be supplied via the constructor.
-            table.Border = new BorderInfo(BorderSide.All, 2f, Aspose.Pdf.Color.Black);
-
-            // Define column widths (optional, here two equal columns)
-            table.ColumnWidths = "200 200";
-
-            // Add a row with two cells
-            Row row = table.Rows.Add();
-            row.Cells.Add("Cell 1");
-            row.Cells.Add("Cell 2");
-
-            // Add another row
-            Row row2 = table.Rows.Add();
-            row2.Cells.Add("Cell 3");
-            row2.Cells.Add("Cell 4");
-
-            // Add the table to the page's paragraphs collection
-            page.Paragraphs.Add(table);
-
-            // Save the PDF to a file
-            doc.Save("TableWithBorder.pdf");
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        Console.WriteLine("PDF with table border (2 points) saved as 'TableWithBorder.pdf'.");
+        // Load the existing PDF
+        using (Document doc = new Document(inputPath))
+        {
+            // Create a simple table with 2 columns and 2 rows
+            Table table = new Table();
+
+            // Configure the table border thickness to 2 points using the BorderInfo constructor
+            table.Border = new BorderInfo(BorderSide.All, 2f, Aspose.Pdf.Color.Black);
+
+            // Set column widths (optional)
+            table.ColumnWidths = "200 200";
+
+            // First row
+            Row row1 = table.Rows.Add();
+            row1.Cells.Add("Header 1");
+            row1.Cells.Add("Header 2");
+
+            // Second row
+            Row row2 = table.Rows.Add();
+            row2.Cells.Add("Cell A");
+            row2.Cells.Add("Cell B");
+
+            // Add the table to the first page
+            Page page = doc.Pages[1];
+            page.Paragraphs.Add(table);
+
+            // Save the modified PDF
+            doc.Save(outputPath);
+        }
+
+        Console.WriteLine($"Table with 2‑point border saved to '{outputPath}'.");
     }
 }

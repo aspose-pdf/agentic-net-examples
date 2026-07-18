@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -7,42 +6,49 @@ class Program
 {
     static void Main()
     {
-        // Paths for the output PDF
-        const string outputPath = "table_auto_fit.pdf";
+        // Input and output file paths
+        const string outputPath = "table_autofit.pdf";
 
-        // Create a new PDF document inside a using block for deterministic disposal
+        // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a blank page to the document
+            // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Create a table and configure it to stretch across the page width
-            Table table = new Table();
+            // Create a table and set its position on the page
+            Table table = new Table
+            {
+                // Stretch the table to fit the page width using ColumnAdjustment
+                ColumnAdjustment = ColumnAdjustment.AutoFitToWindow,
 
-            // ColumnAdjustment.AutoFitToWindow makes the table fit the page width
-            table.ColumnAdjustment = ColumnAdjustment.AutoFitToWindow;
+                // Optional: set the left and top coordinates
+                Left = 0,
+                Top = 0
+            };
 
-            // Optionally set the left and top positions (in points) of the table
-            table.Left = 0;   // start at the left margin
-            table.Top = 100;  // some offset from the top of the page
+            // Define column widths (optional, can be omitted for auto‑fit)
+            // Here we define three equal columns as an example
+            table.ColumnWidths = "33% 33% 34%";
 
-            // Define the number of columns (e.g., 3) by adding a row with cells
-            // First row – header
-            Row headerRow = table.Rows.Add();
-            headerRow.Cells.Add("Header 1");
-            headerRow.Cells.Add("Header 2");
-            headerRow.Cells.Add("Header 3");
+            // Add a header row
+            Row header = table.Rows.Add();
+            header.Cells.Add("Header 1");
+            header.Cells.Add("Header 2");
+            header.Cells.Add("Header 3");
 
-            // Second row – data
-            Row dataRow = table.Rows.Add();
-            dataRow.Cells.Add("Cell 1");
-            dataRow.Cells.Add("Cell 2");
-            dataRow.Cells.Add("Cell 3");
+            // Add a few data rows
+            for (int i = 1; i <= 5; i++)
+            {
+                Row row = table.Rows.Add();
+                row.Cells.Add($"Row {i} - Col 1");
+                row.Cells.Add($"Row {i} - Col 2");
+                row.Cells.Add($"Row {i} - Col 3");
+            }
 
-            // Add the table to the page's paragraph collection
+            // Add the table to the page's paragraphs collection
             page.Paragraphs.Add(table);
 
-            // Save the document as PDF (no SaveOptions needed for PDF format)
+            // Save the PDF document
             doc.Save(outputPath);
         }
 

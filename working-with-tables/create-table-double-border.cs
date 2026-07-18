@@ -1,7 +1,7 @@
 using System;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
-using Aspose.Pdf.Text; // needed for TextFragment
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -10,43 +10,41 @@ class Program
         // Input and output paths
         const string outputPath = "table_double_border.pdf";
 
-        // Create a new PDF document inside a using block (ensures proper disposal)
+        // Create a new PDF document
         using (Document doc = new Document())
         {
             // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Create a simple 2x2 table
+            // Create a table and set its position and size
             Table table = new Table
             {
-                // Position the table on the page
-                Left = 50,
-                Top = 700,
-                // Define column widths (optional)
-                ColumnWidths = "200 200"
+                // Define column widths (example: two equal columns)
+                ColumnWidths = "200 200",
+                // Set a background color (optional)
+                BackgroundColor = Color.LightGray
             };
 
-            // Add rows and cells with sample text
-            for (int r = 0; r < 2; r++)
-            {
-                Row row = table.Rows.Add();
-                for (int c = 0; c < 2; c++)
-                {
-                    Cell cell = row.Cells.Add();
-                    cell.Paragraphs.Add(new TextFragment($"R{r + 1}C{c + 1}"));
-                }
-            }
+            // Define a double‑like border for the table.
+            // Aspose.Pdf.BorderInfo does not expose a Style property; the double line effect
+            // can be approximated by using a thicker border width. The constructor sets side,
+            // width and color.
+            table.Border = new BorderInfo(BorderSide.All, 2f, Color.DarkBlue);
 
-            // ---------- Apply double‑like border style ----------
-            // Aspose.Pdf.BorderInfo does not expose a Style property or a BorderStyle enum.
-            // To emulate a double border, we set a relatively thick border (e.g., 2 points).
-            // If a true double line is required, it would need to be drawn manually using Graph.
-            var doubleBorder = new BorderInfo(BorderSide.All, 2f, Aspose.Pdf.Color.Black);
-            // Assign the configured BorderInfo to the table
-            table.Border = doubleBorder;
-            // ---------------------------------------------------
+            // Add a header row
+            Row header = table.Rows.Add();
+            Cell headerCell1 = header.Cells.Add("Header 1");
+            Cell headerCell2 = header.Cells.Add("Header 2");
+            // Make header text bold
+            headerCell1.DefaultCellTextState = new TextState { FontStyle = FontStyles.Bold };
+            headerCell2.DefaultCellTextState = new TextState { FontStyle = FontStyles.Bold };
 
-            // Add the table to the page
+            // Add a data row
+            Row dataRow = table.Rows.Add();
+            dataRow.Cells.Add("Value A");
+            dataRow.Cells.Add("Value B");
+
+            // Add the table to the page's paragraphs collection
             page.Paragraphs.Add(table);
 
             // Save the PDF
