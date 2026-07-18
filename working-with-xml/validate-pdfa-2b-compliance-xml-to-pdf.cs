@@ -6,33 +6,41 @@ class Program
 {
     static void Main()
     {
-        const string xmlPath = "input.xml";          // Source XML file
-        const string pdfPath = "output.pdf";         // Destination PDF/A‑2b file
-        const string logPath = "validation.log";    // Validation log file
+        // Input XML file that will be converted to PDF
+        const string xmlInputPath = "input.xml";
+        // Intermediate PDF generated from the XML
+        const string pdfIntermediatePath = "intermediate.pdf";
+        // Log file that will contain validation messages
+        const string validationLogPath = "validation.log";
 
-        if (!File.Exists(xmlPath))
+        // Ensure the XML source exists
+        if (!File.Exists(xmlInputPath))
         {
-            Console.Error.WriteLine($"XML file not found: {xmlPath}");
+            Console.Error.WriteLine($"XML file not found: {xmlInputPath}");
             return;
         }
 
-        // Load the XML content into a PDF document using XmlLoadOptions
-        using (Document doc = new Document(xmlPath, new XmlLoadOptions()))
+        try
         {
-            // Convert the document to PDF/A‑2b format
-            PdfFormatConversionOptions conversionOptions = new PdfFormatConversionOptions(PdfFormat.PDF_A_2B);
-            doc.Convert(conversionOptions);
+            // Load the XML and convert it to PDF using XmlLoadOptions (input‑only format)
+            using (Document doc = new Document(xmlInputPath, new XmlLoadOptions()))
+            {
+                // Save the intermediate PDF
+                doc.Save(pdfIntermediatePath);
 
-            // Validate PDF/A‑2b compliance; results are written to logPath
-            bool isCompliant = doc.Validate(logPath, PdfFormat.PDF_A_2B);
-            Console.WriteLine(isCompliant
-                ? "Document is PDF/A‑2b compliant."
-                : "Document is NOT PDF/A‑2b compliant. See validation.log for details.");
+                // Validate the PDF against PDF/A‑2b compliance.
+                // The Validate method returns true if the document complies.
+                bool isPdfA2bCompliant = doc.Validate(validationLogPath, PdfFormat.PDF_A_2B);
 
-            // Save the compliant PDF/A‑2b document
-            doc.Save(pdfPath);
+                // Additionally, the IsPdfaCompliant property reflects the same status.
+                Console.WriteLine($"IsPdfaCompliant property: {doc.IsPdfaCompliant}");
+                Console.WriteLine($"Validate method result: {isPdfA2bCompliant}");
+                Console.WriteLine($"Validation log written to: {validationLogPath}");
+            }
         }
-
-        Console.WriteLine($"PDF/A‑2b file saved to '{pdfPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during processing: {ex.Message}");
+        }
     }
 }

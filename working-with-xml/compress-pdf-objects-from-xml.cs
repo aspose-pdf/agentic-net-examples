@@ -7,7 +7,9 @@ class Program
 {
     static void Main()
     {
+        // Input XML file that will be converted to PDF
         const string xmlPath = "input.xml";
+        // Output PDF file
         const string pdfPath = "output.pdf";
 
         if (!File.Exists(xmlPath))
@@ -16,18 +18,20 @@ class Program
             return;
         }
 
-        // Load the XML content into a PDF document using XmlLoadOptions
-        using (Document doc = new Document(xmlPath, new XmlLoadOptions()))
+        // Load XML into a PDF document using XmlLoadOptions
+        using (Document pdfDocument = new Document(xmlPath, new XmlLoadOptions()))
         {
-            // Enable compression of PDF objects (including text streams)
-            OptimizationOptions opt = new OptimizationOptions
+            // Create optimization options and enable object stream compression
+            OptimizationOptions optOptions = new OptimizationOptions
             {
-                CompressObjects = true
+                CompressObjects = true   // Pack PDF objects into streams and compress them
             };
-            doc.OptimizeResources(opt);
+
+            // Apply the optimization to the document
+            pdfDocument.OptimizeResources(optOptions);
 
             // Save the compressed PDF
-            doc.Save(pdfPath);
+            pdfDocument.Save(pdfPath);
         }
 
         Console.WriteLine($"Compressed PDF saved to '{pdfPath}'.");

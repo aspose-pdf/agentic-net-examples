@@ -8,44 +8,58 @@ class Program
 {
     static void Main()
     {
-        const string pdfTemplatePath = "template.pdf";   // existing PDF (can be blank)
-        const string xmlDefinitionPath = "formDefinition.xml"; // XML that defines XFA form fields
-        const string outputPdfPath = "filled_form.pdf";
+        const string xmlPath = "formDefinition.xml";
+        const string outputPdf = "output.pdf";
 
-        // Verify input files exist
-        if (!File.Exists(pdfTemplatePath))
+        if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"Template PDF not found: {pdfTemplatePath}");
-            return;
-        }
-        if (!File.Exists(xmlDefinitionPath))
-        {
-            Console.Error.WriteLine($"XML definition not found: {xmlDefinitionPath}");
+            Console.Error.WriteLine($"XML file not found: {xmlPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(pdfTemplatePath))
+        // Load the XML that defines the form fields and their default values
+        XmlDocument xmlDoc = new XmlDocument();
+        xmlDoc.Load(xmlPath);
+
+        // Create a new PDF document and add a blank page to host the form fields
+        using (Document pdfDoc = new Document())
         {
-            // Load the XML that describes the form (XFA)
-            XmlDocument xfaXml = new XmlDocument();
-            xfaXml.Load(xmlDefinitionPath);
+            pdfDoc.Pages.Add();
 
-            // Assign the XFA data to the PDF form
-            doc.Form.AssignXfa(xfaXml);
+            // If the PDF uses XFA, assign the XFA data from the XML
+            pdfDoc.Form.AssignXfa(xmlDoc);
 
-            // Set default values for each form field
-            foreach (Field field in doc.Form.Fields)
+            // Example XML structure:
+            // <Fields>
+            //   <Field name="FirstName" value="John Doe" />
+            //   <Field name="Age" value="30" />
+            // </Fields>
+            XmlNodeList? fieldNodes = xmlDoc.SelectNodes("//Field");
+            if (fieldNodes != null)
             {
-                // Example default: use the field's full name prefixed with "Default_"
-                // Replace with any custom logic as needed
-                field.Value = $"Default_{field.FullName}";
+                foreach (XmlNode node in fieldNodes)
+                {
+                    if (node.Attributes == null) continue;
+
+                    string? fieldName = node.Attributes["name"]?.Value;
+                    string? defaultValue = node.Attributes["value"]?.Value;
+
+                    if (!string.IsNullOrEmpty(fieldName) && defaultValue != null)
+                    {
+                        // Retrieve the field; the indexer returns a WidgetAnnotation, so cast to Field
+                        Field? field = pdfDoc.Form[fieldName] as Field;
+                        if (field != null)
+                        {
+                            field.Value = defaultValue;
+                        }
+                    }
+                }
             }
 
-            // Save the resulting PDF with populated form fields
-            doc.Save(outputPdfPath);
+            // Save the resulting PDF with the populated form fields
+            pdfDoc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF with form fields created and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"PDF with form fields saved to '{outputPdf}'.");
     }
 }

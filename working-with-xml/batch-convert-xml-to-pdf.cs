@@ -1,52 +1,46 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Document, XmlLoadOptions are in this namespace
 
 class Program
 {
     static void Main()
     {
-        // Folder containing source XML files
-        const string inputFolder = "InputXmlFolder";
-        // Folder where generated PDFs will be placed
-        const string outputFolder = "OutputPdfFolder";
+        // Folder containing XML files
+        const string inputFolder = @"C:\XmlInput";
+        // Folder where PDFs will be saved
+        const string outputFolder = @"C:\PdfOutput";
 
+        // Verify that the input directory exists before proceeding
         if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.WriteLine($"Input folder '{inputFolder}' does not exist. Please create the folder and place XML files inside before running the program.");
             return;
         }
 
         // Ensure output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Get all XML files in the input folder (non‑recursive)
-        string[] xmlFiles = Directory.GetFiles(inputFolder, "*.xml", SearchOption.TopDirectoryOnly);
-
-        foreach (string xmlPath in xmlFiles)
+        // Enumerate all .xml files in the input folder
+        foreach (string xmlPath in Directory.EnumerateFiles(inputFolder, "*.xml"))
         {
-            // Build output PDF file name (same base name, .pdf extension)
+            // Derive PDF file name from XML file name
             string pdfFileName = Path.GetFileNameWithoutExtension(xmlPath) + ".pdf";
             string pdfPath = Path.Combine(outputFolder, pdfFileName);
 
-            try
-            {
-                // Use a using block for deterministic disposal (rule: document-disposal-with-using)
-                using (Document pdfDoc = new Document())
-                {
-                    // Load the XML content into the document (rule: xml-load-use-bindxml-not-document-constructor)
-                    pdfDoc.BindXml(xmlPath);
+            // Load XML with default XmlLoadOptions
+            XmlLoadOptions loadOptions = new XmlLoadOptions();
 
-                    // Save the document as PDF (rule: use Document.Save(string))
-                    pdfDoc.Save(pdfPath);
-                }
-
-                Console.WriteLine($"Converted: '{xmlPath}' → '{pdfPath}'");
-            }
-            catch (Exception ex)
+            // Use a using block for deterministic disposal of the Document
+            using (Document pdfDocument = new Document(xmlPath, loadOptions))
             {
-                Console.Error.WriteLine($"Error processing '{xmlPath}': {ex.Message}");
+                // Save as PDF (Document.Save without SaveOptions always writes PDF)
+                pdfDocument.Save(pdfPath);
             }
+
+            Console.WriteLine($"Converted '{xmlPath}' to '{pdfPath}'.");
         }
+
+        Console.WriteLine("Batch conversion completed.");
     }
 }

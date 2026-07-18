@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using System.Xml;
+using System.Xml.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -8,96 +8,75 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";
-        const string outputPdfPath  = "output_with_videos.pdf";
-        const string videoXmlPath   = "videos.xml";
+        const string xmlPath = "input.xml";      // XML describing video locations
+        const string outputPdf = "output.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"XML file not found: {xmlPath}");
             return;
         }
 
-        if (!File.Exists(videoXmlPath))
-        {
-            Console.Error.WriteLine($"Video XML not found: {videoXmlPath}");
-            return;
-        }
+        // Load the XML document (no special load options needed for XML parsing)
+        XDocument xDoc = XDocument.Load(xmlPath);
 
-        try
+        // Create a new PDF document (empty) – you can also load a template PDF if required
+        using (Document pdfDoc = new Document())
         {
-            // Load the source PDF
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Ensure at least one page exists to place annotations
+            if (pdfDoc.Pages.Count == 0)
+                pdfDoc.Pages.Add();
+
+            // Iterate over each <Video> element in the XML
+            foreach (XElement videoElem in xDoc.Descendants("Video"))
             {
-                // Parse the XML that contains video references
-                XmlDocument xmlDoc = new XmlDocument();
-                xmlDoc.Load(videoXmlPath);
+                // Expected attributes: page, x, y, width, height, file
+                int pageNumber = (int?)videoElem.Attribute("page") ?? 1;
+                double llx = (double?)videoElem.Attribute("x") ?? 0;
+                double lly = (double?)videoElem.Attribute("y") ?? 0;
+                double width = (double?)videoElem.Attribute("width") ?? 100;
+                double height = (double?)videoElem.Attribute("height") ?? 100;
+                double urx = llx + width;
+                double ury = lly + height;
+                string videoPath = (string)videoElem.Attribute("file");
 
-                // Expected XML format:
-                // <Videos>
-                //   <Video page="1" x="100" y="500" width="200" height="150" src="sample.mp4" />
-                //   ...
-                // </Videos>
-                XmlNodeList videoNodes = xmlDoc.SelectNodes("//Video");
-                if (videoNodes != null)
+                if (!File.Exists(videoPath))
                 {
-                    foreach (XmlNode node in videoNodes)
-                    {
-                        // Extract attributes with defaults
-                        int pageNumber = int.Parse(node.Attributes["page"]?.Value ?? "1");
-                        double x        = double.Parse(node.Attributes["x"]?.Value ?? "0");
-                        double y        = double.Parse(node.Attributes["y"]?.Value ?? "0");
-                        double width    = double.Parse(node.Attributes["width"]?.Value ?? "200");
-                        double height   = double.Parse(node.Attributes["height"]?.Value ?? "150");
-                        string srcPath  = node.Attributes["src"]?.Value;
-
-                        if (string.IsNullOrEmpty(srcPath) || !File.Exists(srcPath))
-                        {
-                            Console.Error.WriteLine($"Video file not found: {srcPath}");
-                            continue;
-                        }
-
-                        // Ensure the requested page exists
-                        if (pageNumber < 1 || pageNumber > pdfDoc.Pages.Count)
-                        {
-                            Console.Error.WriteLine($"Invalid page number {pageNumber} for video {srcPath}");
-                            continue;
-                        }
-
-                        Page targetPage = pdfDoc.Pages[pageNumber];
-
-                        // Define the rectangle where the annotation will appear
-                        Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(x, y, x + width, y + height);
-
-                        // Create the RichMediaAnnotation
-                        RichMediaAnnotation richMedia = new RichMediaAnnotation(targetPage, rect)
-                        {
-                            // Set the type to Video
-                            Type = RichMediaAnnotation.ContentType.Video,
-                            // Optional: give a tooltip or description
-                            Contents = $"Video: {Path.GetFileName(srcPath)}"
-                        };
-
-                        // Embed the video content
-                        using (FileStream videoStream = File.OpenRead(srcPath))
-                        {
-                            // The first argument is a name for the embedded stream; it can be the file name.
-                            richMedia.SetContent(Path.GetFileName(srcPath), videoStream);
-                        }
-
-                        // Add the annotation to the page
-                        targetPage.Annotations.Add(richMedia);
-                    }
+                    Console.Error.WriteLine($"Video file not found: {videoPath}");
+                    continue;
                 }
 
-                // Save the modified PDF
-                pdfDoc.Save(outputPdfPath);
-                Console.WriteLine($"PDF with embedded videos saved to '{outputPdfPath}'.");
+                // Ensure the target page exists (Aspose.Pdf uses 1‑based indexing)
+                while (pdfDoc.Pages.Count < pageNumber)
+                    pdfDoc.Pages.Add();
+
+                Page page = pdfDoc.Pages[pageNumber];
+
+                // Create the RichMediaAnnotation
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
+                RichMediaAnnotation richMedia = new RichMediaAnnotation(page, rect)
+                {
+                    // Set the annotation type to Video
+                    Type = RichMediaAnnotation.ContentType.Video,
+                    // Optional visual appearance
+                    Color = Aspose.Pdf.Color.LightGray
+                };
+
+                // Embed the video content
+                using (FileStream videoStream = File.OpenRead(videoPath))
+                {
+                    // The first parameter is a name for the content stream; can be any string
+                    richMedia.SetContent(Path.GetFileName(videoPath), videoStream);
+                }
+
+                // Add the annotation to the page
+                page.Annotations.Add(richMedia);
             }
+
+            // Save the resulting PDF
+            pdfDoc.Save(outputPdf);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF with embedded videos saved to '{outputPdf}'.");
     }
 }

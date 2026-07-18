@@ -7,56 +7,51 @@ class Program
 {
     static void Main()
     {
-        // Paths to the source PDF and the XML that defines the page size.
-        const string pdfPath   = "source.pdf";
-        const string xmlPath   = "pagesize.xml";
-        const string outputPdf = "output.pdf";
-
-        if (!File.Exists(pdfPath))
-        {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
-            return;
-        }
+        const string xmlPath   = "pagesize.xml";   // XML defining width and height
+        const string inputPdf  = "input.pdf";      // source PDF
+        const string outputPdf = "output.pdf";     // result PDF
 
         if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"XML not found: {xmlPath}");
+            Console.Error.WriteLine($"XML file not found: {xmlPath}");
+            return;
+        }
+        if (!File.Exists(inputPdf))
+        {
+            Console.Error.WriteLine($"PDF file not found: {inputPdf}");
             return;
         }
 
-        // Load the XML and extract width/height values (assumed to be in points).
+        // Load page size values from XML (expects attributes width and height)
         double width, height;
         try
         {
-            XDocument xDoc = XDocument.Load(xmlPath);
-            XElement sizeElement = xDoc.Root; // e.g. <PageSize width="595" height="842"/>
-            width  = double.Parse(sizeElement.Attribute("width")?.Value ?? "0");
-            height = double.Parse(sizeElement.Attribute("height")?.Value ?? "0");
-
+            XDocument doc = XDocument.Load(xmlPath);
+            XElement sizeElem = doc.Root; // e.g. <PageSize width="595" height="842"/>
+            width  = double.Parse(sizeElem.Attribute("width")?.Value  ?? "0");
+            height = double.Parse(sizeElem.Attribute("height")?.Value ?? "0");
             if (width <= 0 || height <= 0)
-                throw new InvalidDataException("Invalid page size values in XML.");
+                throw new InvalidDataException("Invalid width/height values in XML.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Failed to read page size from XML: {ex.Message}");
+            Console.Error.WriteLine($"Failed to read XML: {ex.Message}");
             return;
         }
 
-        // Open the PDF, adjust each page size, and save the result.
-        using (Document doc = new Document(pdfPath))
+        // Load the PDF, adjust each page size, and save
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Aspose.Pdf uses 1‑based page indexing.
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Page indexing in Aspose.Pdf is 1‑based
+            for (int i = 1; i <= pdfDoc.Pages.Count; i++)
             {
-                Page page = doc.Pages[i];
-                // Set the new size (width and height are in points).
-                page.SetPageSize(width, height);
+                Page page = pdfDoc.Pages[i];
+                page.SetPageSize(width, height); // apply size from XML
             }
 
-            // Save the modified PDF.
-            doc.Save(outputPdf);
+            pdfDoc.Save(outputPdf); // save as PDF (no SaveOptions needed)
         }
 
-        Console.WriteLine($"Page size set to {width}×{height} points and saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF saved with new page size ({width} x {height}) to '{outputPdf}'.");
     }
 }

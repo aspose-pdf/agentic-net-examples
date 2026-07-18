@@ -7,42 +7,41 @@ class Program
 {
     static void Main()
     {
-        // Paths to the XML layout definition and the source PDF
         const string xmlPath = "layout.xml";
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string pdfPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Verify required files exist
+        // Verify input files exist
         if (!File.Exists(xmlPath))
         {
             Console.Error.WriteLine($"XML layout file not found: {xmlPath}");
             return;
         }
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Source PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        // Load the XML and read the orientation attribute (e.g., <Layout orientation="landscape"/>)
+        // Load XML layout and read the orientation attribute
         XDocument layoutDoc = XDocument.Load(xmlPath);
+        // Expected format: <Layout orientation="landscape"/> (default to portrait)
         string orientation = (string)layoutDoc.Root.Attribute("orientation") ?? "portrait";
+        bool isLandscape = string.Equals(orientation, "landscape", StringComparison.OrdinalIgnoreCase);
 
-        // Open the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdf))
+        // Load the PDF document
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            // Apply orientation to each page based on the XML value
-            bool makeLandscape = orientation.Equals("landscape", StringComparison.OrdinalIgnoreCase);
-            foreach (Page page in pdfDoc.Pages)
+            // Apply the orientation to every page in the document
+            for (int i = 1; i <= pdfDoc.Pages.Count; i++)
             {
-                // PageInfo.IsLandscape controls the page orientation
-                page.PageInfo.IsLandscape = makeLandscape;
+                pdfDoc.Pages[i].PageInfo.IsLandscape = isLandscape;
             }
 
             // Save the modified PDF
-            pdfDoc.Save(outputPdf);
+            pdfDoc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPdf}' with {(orientation.Equals("landscape", StringComparison.OrdinalIgnoreCase) ? "landscape" : "portrait")} orientation.");
+        Console.WriteLine($"Saved PDF with {(isLandscape ? "landscape" : "portrait")} orientation to '{outputPath}'.");
     }
 }
