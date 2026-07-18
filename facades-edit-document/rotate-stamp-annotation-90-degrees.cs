@@ -7,57 +7,42 @@ class RotateStampExample
 {
     static void Main()
     {
-        // Paths for the source PDF, the image to be used as a stamp, and the output PDF.
-        const string inputPdfPath   = "input.pdf";
-        const string stampImagePath = "stampImage.png";
-        const string outputPdfPath  = "output_rotated_stamp.pdf";
+        const string inputPdf  = "input.pdf";      // source PDF
+        const string outputPdf = "output.pdf";     // result PDF
+        const string stampImg  = "stamp.png";      // image to be used as stamp
 
-        // Verify that the required files exist.
-        if (!File.Exists(inputPdfPath))
+        // Verify that required files exist
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(stampImagePath))
+        if (!File.Exists(stampImg))
         {
-            Console.Error.WriteLine($"Aspose.Pdf.Facades.Stamp image not found: {stampImagePath}");
+            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
             return;
         }
 
-        // Initialize the PdfFileStamp facade.
-        // The facade does not implement IDisposable, so we manage its lifetime manually.
+        // Initialize the facade for stamping
         PdfFileStamp fileStamp = new PdfFileStamp();
+        fileStamp.BindPdf(inputPdf);               // load source PDF
 
-        try
-        {
-            // Bind the source PDF document to the facade.
-            fileStamp.BindPdf(inputPdfPath);
+        // Create a stamp, bind the image, and rotate it 90° clockwise
+        Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
+        stamp.BindImage(stampImg);                 // use the image as stamp content
+        stamp.Rotation = 90f;                      // rotate 90 degrees clockwise
 
-            // Create a new Aspose.Pdf.Facades.Stamp object.
-            Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
+        // Optionally set position and size (example values)
+        stamp.SetOrigin(100, 100);                 // lower‑left corner of the stamp
+        stamp.SetImageSize(200, 200);              // width and height in points
 
-            // Bind the image that will be used as the stamp content.
-            stamp.BindImage(stampImagePath);
+        // Add the stamp to the PDF
+        fileStamp.AddStamp(stamp);
 
-            // Rotate the stamp 90 degrees clockwise to match the underlying image orientation.
-            // The Rotation property expects a value in degrees.
-            stamp.Rotation = 90f;
+        // Save the result and release resources
+        fileStamp.Save(outputPdf);
+        fileStamp.Close();
 
-            // Optionally, set the stamp to appear on top of the page content.
-            stamp.IsBackground = false;
-
-            // Add the configured stamp to the PDF.
-            fileStamp.AddStamp(stamp);
-
-            // Save the resulting PDF with the rotated stamp.
-            fileStamp.Save(outputPdfPath);
-        }
-        finally
-        {
-            // Ensure resources are released.
-            fileStamp.Close();
-        }
-
-        Console.WriteLine($"PDF saved with rotated stamp: {outputPdfPath}");
+        Console.WriteLine($"Stamp applied with 90° rotation. Output saved to '{outputPdf}'.");
     }
 }

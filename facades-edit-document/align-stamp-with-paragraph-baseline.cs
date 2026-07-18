@@ -1,15 +1,16 @@
 using System;
 using System.IO;
+using System.Drawing; // only for System.Drawing.Color
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Text;
-using System.Drawing;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
+        const string tempPath = "tempStamped.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -18,56 +19,82 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // ------------------------------------------------------------
+        // 1. Determine the baseline position of the first paragraph on page 5
+        // ------------------------------------------------------------
+        double baselineY = 0;
+        double baselineX = 0;
+
         using (Document doc = new Document(inputPath))
         {
-            // -------------------------------------------------
-            // 1. Locate the baseline of the first paragraph on page 5
-            // -------------------------------------------------
-            const int targetPageNumber = 5;
-            TextFragmentAbsorber absorber = new TextFragmentAbsorber();
-            doc.Pages[targetPageNumber].Accept(absorber);
-
-            if (absorber.TextFragments.Count == 0)
+            // Ensure page 5 exists (Aspose.Pdf uses 1‑based indexing)
+            if (doc.Pages.Count < 5)
             {
-                Console.Error.WriteLine("No text found on page 5.");
+                Console.Error.WriteLine("The document has fewer than 5 pages.");
                 return;
             }
 
-            // Use the first fragment as reference (index 0 in the collection)
-            TextFragment fragment = absorber.TextFragments[0];
-            double baselineY = fragment.Position.YIndent;   // baseline Y coordinate
-            double baselineX = fragment.Position.XIndent;   // baseline X coordinate (left edge)
+            // Extract text fragments from page 5 using TextFragmentAbsorber
+            TextFragmentAbsorber absorber = new TextFragmentAbsorber();
+            absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
+            doc.Pages[5].Accept(absorber);
 
-            // -------------------------------------------------
-            // 2. Create a stamp (text) and position it on the baseline
-            // -------------------------------------------------
-            // Facade stamp – requires FormattedText for the visual content
-            Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-            // Use the overload that does NOT require a FontStyle argument
-            FormattedText ft = new FormattedText(
-                "Sample Stamp",
-                System.Drawing.Color.Blue,               // fully‑qualified System.Drawing.Color
-                "Helvetica",
-                Aspose.Pdf.Facades.EncodingType.Winansi,
-                false,
-                12f);
-            stamp.BindLogo(ft);
-            // Set the origin to the baseline coordinates (cast to float as required)
-            stamp.SetOrigin((float)baselineX, (float)baselineY);
-            stamp.IsBackground = false; // place on top of page content
-            stamp.Opacity = 0.8f;
-
-            // -------------------------------------------------
-            // 3. Apply the stamp to the document and save
-            // -------------------------------------------------
-            using (PdfFileStamp fileStamp = new PdfFileStamp(doc))
+            // Use the first fragment as a reference (adjust as needed)
+            if (absorber.TextFragments.Count > 0)
             {
-                fileStamp.AddStamp(stamp);
-                fileStamp.Save(outputPath);
+                // TextFragment collection is zero‑based
+                TextFragment fragment = absorber.TextFragments[0];
+                // Baseline Y is the lower‑left Y of the fragment rectangle
+                baselineY = fragment.Rectangle.LLY;
+                // Baseline X (left side) is the lower‑left X of the fragment rectangle
+                baselineX = fragment.Rectangle.LLX;
             }
-
-            Console.WriteLine($"Stamp added and saved to '{outputPath}'.");
+            else
+            {
+                Console.Error.WriteLine("No text fragments found on page 5.");
+                return;
+            }
         }
+
+        // ------------------------------------------------------------
+        // 2. Add a stamp (a simple text stamp) to the document
+        // ------------------------------------------------------------
+        // Create a Facades Stamp and bind a FormattedText object to it
+        Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
+        Aspose.Pdf.Facades.FormattedText ft = new Aspose.Pdf.Facades.FormattedText(
+            "Aligned Stamp",
+            System.Drawing.Color.Black, // fully‑qualified to avoid ambiguity
+            "Helvetica",
+            Aspose.Pdf.Facades.EncodingType.Winansi,
+            false,
+            12);
+        stamp.BindLogo(ft);
+        // Position will be overridden later, but set an initial origin for completeness
+        stamp.SetOrigin((float)baselineX, (float)baselineY);
+        stamp.Opacity = 0.8f;          // semi‑transparent
+        stamp.IsBackground = false;    // draw on top of content
+
+        // Use PdfFileStamp to embed the stamp into the PDF
+        Aspose.Pdf.Facades.PdfFileStamp fileStamp = new Aspose.Pdf.Facades.PdfFileStamp();
+        fileStamp.BindPdf(inputPath);
+        fileStamp.AddStamp(stamp);
+        fileStamp.Save(tempPath);
+        fileStamp.Close();
+
+        // ------------------------------------------------------------
+        // 3. Reposition the stamp so its baseline matches the paragraph baseline
+        // ------------------------------------------------------------
+        // MoveStamp changes the position of an existing stamp.
+        // Stamp indices are 1‑based; the first stamp added to a page has index 1.
+        Aspose.Pdf.Facades.PdfContentEditor editor = new Aspose.Pdf.Facades.PdfContentEditor();
+        editor.BindPdf(tempPath);
+        editor.MoveStamp(pageNumber: 5, stampIndex: 1, x: (float)baselineX, y: (float)baselineY);
+        editor.Save(outputPath);
+        editor.Close();
+
+        // Optional: clean up the intermediate file
+        try { File.Delete(tempPath); } catch { /* ignore cleanup errors */ }
+
+        Console.WriteLine($"Stamp repositioned and saved to '{outputPath}'.");
     }
 }

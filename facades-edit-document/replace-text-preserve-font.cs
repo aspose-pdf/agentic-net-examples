@@ -7,33 +7,49 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";   // source PDF
-        const string outputPath = "output.pdf";  // result PDF
-        const string srcText    = "Hello World"; // text to replace
-        const string destText   = "Hi Universe"; // replacement text
-        const int    pageNumber = 0; // 0 = all pages, otherwise 1‑based page index
+        // Input PDF, text to find, replacement text, and output PDF paths
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string srcText   = "Hello World";
+        const string destText  = "Hi Universe";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Create a PdfContentEditor and bind it to the loaded document
-            PdfContentEditor editor = new PdfContentEditor();
-            editor.BindPdf(doc);
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPdf))
+            {
+                // Create a PdfContentEditor and bind it to the loaded document
+                PdfContentEditor editor = new PdfContentEditor();
+                editor.BindPdf(doc);
 
-            // Replace text while preserving original font, size and color.
-            // The overload without TextState keeps the original appearance.
-            editor.ReplaceText(srcText, pageNumber, destText);
+                // Replace text on all pages (page index 0 means all pages)
+                // This overload preserves the original font, size, and color
+                bool replaced = editor.ReplaceText(srcText, 0, destText);
 
-            // Save the modified document
-            doc.Save(outputPath);
+                if (replaced)
+                {
+                    Console.WriteLine($"Text \"{srcText}\" was replaced with \"{destText}\".");
+                }
+                else
+                {
+                    Console.WriteLine($"Text \"{srcText}\" not found.");
+                }
+
+                // Save the modified document
+                doc.Save(outputPdf);
+            }
+
+            Console.WriteLine($"Modified PDF saved to '{outputPdf}'.");
         }
-
-        Console.WriteLine($"Text replacement completed. Output saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

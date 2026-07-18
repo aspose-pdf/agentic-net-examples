@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Facades; // Facade namespace is included as requested
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -17,40 +17,46 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a rectangle annotation (square annotation) on the first page
-            // Fully qualified types are used to avoid ambiguity with System.Drawing
-            Page firstPage = doc.Pages[1];
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-
-            // SquareAnnotation represents a rectangular annotation
-            SquareAnnotation square = new SquareAnnotation(firstPage, rect)
+            // Ensure the document has at least 6 pages
+            if (doc.Pages.Count < 6)
             {
-                // Set the border color (optional)
-                Color = Aspose.Pdf.Color.Blue,
-                // Set opacity to 75%
-                Opacity = 0.75f,
-                // Set contents (tooltip) – can be empty if not needed
-                Contents = "Custom dashed rectangle"
-            };
+                Console.Error.WriteLine("The document does not contain page 6.");
+                return;
+            }
 
-            // Configure the border: width and custom dash pattern
-            // Border constructor requires the parent annotation instance
+            // Get page 6 (Aspose.Pdf uses 1‑based indexing)
+            Page page = doc.Pages[6];
+
+            // Define the rectangle area for the annotation (llx, lly, urx, ury)
+            Rectangle rect = new Rectangle(100, 500, 300, 600);
+
+            // Create a square (rectangle) annotation on the specified page
+            SquareAnnotation square = new SquareAnnotation(page, rect);
+
+            // Set 50% opacity
+            square.Opacity = 0.5f;
+
+            // Configure a dashed border: width = 2 points, dash pattern = 3 on, 3 off
+            // Border class resides in Aspose.Pdf.Annotations and requires the parent annotation
             square.Border = new Border(square)
             {
-                Width = 2,                     // border width in points
-                Dash = new Dash(new int[] { 5, 3 }) // dash pattern: 5 points on, 3 points off
+                Width = 2,
+                Dash = new Dash(new int[] { 3, 3 })
             };
 
-            // Add the annotation to the page
-            firstPage.Annotations.Add(square);
+            // Optionally set a visible border color (e.g., black)
+            square.Color = Color.Black;
 
-            // Save the modified PDF (lifecycle rule)
+            // Add the annotation to the page's annotation collection
+            page.Annotations.Add(square);
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Rectangle annotation added and saved to '{outputPath}'.");
+        Console.WriteLine($"Rectangle annotation added to page 6 and saved as '{outputPath}'.");
     }
 }

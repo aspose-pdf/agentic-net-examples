@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -17,14 +16,25 @@ class Program
             return;
         }
 
-        // Initialize the bookmark editor, bind the PDF, delete the specific bookmark, and save.
-        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
+        // Initialize the bookmark editor facade
+        PdfBookmarkEditor editor = new PdfBookmarkEditor();
+        try
         {
-            editor.BindPdf(inputPath);                     // Load the PDF file.
-            editor.DeleteBookmarks(bookmarkTitle);         // Remove the bookmark titled "Draft Outline".
-            editor.Save(outputPath);                       // Persist changes to a new file.
+            // Bind the PDF document to the editor
+            editor.BindPdf(inputPath);
+
+            // Delete the bookmark with the specified title
+            editor.DeleteBookmarks(bookmarkTitle);
+
+            // Save the modified PDF to a new file
+            editor.Save(outputPath);
+        }
+        finally
+        {
+            // Release resources held by the editor
+            editor.Close();
         }
 
-        Console.WriteLine($"Bookmark \"{bookmarkTitle}\" removed. Saved to '{outputPath}'.");
+        Console.WriteLine($"Bookmark '{bookmarkTitle}' removed. Saved to '{outputPath}'.");
     }
 }

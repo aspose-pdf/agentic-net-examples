@@ -1,6 +1,6 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -9,66 +9,73 @@ class Program
     static void Main()
     {
         // Input PNG files – adjust the paths as needed
-        string[] pngFiles = new string[]
-        {
+        string[] pngFiles = {
             "image1.png",
             "image2.png",
             "image3.png"
         };
 
-        // Validate that all input files exist
-        foreach (string file in pngFiles)
-        {
-            if (!File.Exists(file))
-            {
-                Console.Error.WriteLine($"File not found: {file}");
-                return;
-            }
-        }
+        // Output PDF file
+        const string outputPdf = "merged.pdf";
 
-        // List to hold individual PDF streams (one per image)
+        // List to hold individual PDF streams (one page per image)
         List<MemoryStream> pdfPages = new List<MemoryStream>();
 
-        // Convert each PNG to a single‑page PDF stored in memory
+        // Create a one‑page PDF for each PNG image
         foreach (string pngPath in pngFiles)
         {
-            using (Document imgDoc = new Document())
+            if (!File.Exists(pngPath))
             {
-                // Add a new page (default size) and place the image on it
-                Page page = imgDoc.Pages.Add();
+                Console.Error.WriteLine($"File not found: {pngPath}");
+                continue;
+            }
 
+            // MemoryStream will hold the temporary PDF
+            MemoryStream pageStream = new MemoryStream();
+
+            // Use the core Document API inside a using block (lifecycle rule)
+            using (Document doc = new Document())
+            {
+                // Add a new page (default size and margins)
+                Page page = doc.Pages.Add();
+
+                // Create an Image object and set its source file
                 Aspose.Pdf.Image img = new Aspose.Pdf.Image
                 {
                     File = pngPath
                 };
+
+                // Add the image to the page's paragraphs collection
                 page.Paragraphs.Add(img);
 
-                // Save the one‑page PDF to a memory stream
-                MemoryStream ms = new MemoryStream();
-                imgDoc.Save(ms);
-                ms.Position = 0; // Reset stream position for later reading
-                pdfPages.Add(ms);
+                // Save the one‑page PDF into the memory stream
+                doc.Save(pageStream);
             }
+
+            // Reset stream position for later reading
+            pageStream.Position = 0;
+            pdfPages.Add(pageStream);
         }
 
-        // Output PDF file that will contain all pages
-        const string outputPdf = "combined.pdf";
+        if (pdfPages.Count == 0)
+        {
+            Console.Error.WriteLine("No valid PNG images were processed.");
+            return;
+        }
 
-        // Use PdfFileEditor (Facade) to concatenate the in‑memory PDFs
+        // Use PdfFileEditor (a Facades class) to concatenate the page PDFs
         PdfFileEditor editor = new PdfFileEditor();
 
-        // Concatenate accepts an array of streams and an output stream
-        using (FileStream outStream = new FileStream(outputPdf, FileMode.Create, FileAccess.Write))
+        // Output stream for the final merged PDF
+        using (MemoryStream outputStream = new MemoryStream())
         {
-            editor.Concatenate(pdfPages.ToArray(), outStream);
+            // Concatenate all page streams into the output stream
+            editor.Concatenate(pdfPages.ToArray(), outputStream);
+
+            // Write the merged PDF to disk
+            File.WriteAllBytes(outputPdf, outputStream.ToArray());
         }
 
-        // Dispose all temporary memory streams
-        foreach (MemoryStream ms in pdfPages)
-        {
-            ms.Dispose();
-        }
-
-        Console.WriteLine($"Successfully created multi‑page PDF: {outputPdf}");
+        Console.WriteLine($"Merged PDF created at '{outputPdf}'.");
     }
 }

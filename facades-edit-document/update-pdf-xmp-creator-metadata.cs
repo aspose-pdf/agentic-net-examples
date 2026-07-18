@@ -16,21 +16,22 @@ class Program
             return;
         }
 
-        // Load the PDF and bind it to the XMP metadata facade
+        // PdfXmpMetadata is a facade for XMP manipulation.
+        // It implements IDisposable, so wrap it in a using block.
         using (PdfXmpMetadata xmp = new PdfXmpMetadata())
         {
+            // Load the existing PDF.
             xmp.BindPdf(inputPath);
 
-            // Remove existing creator entry if it exists
-            xmp.Remove("dc:creator");
-
-            // Add the new creator value
+            // Update the creator field in the XMP metadata.
+            // The dictionary interface allows adding/replacing entries.
+            // "dc:creator" is the standard XMP key for the creator.
             xmp.Add("dc:creator", newCreator);
 
-            // Save the PDF with updated XMP metadata
+            // Save the PDF with the modified metadata.
             xmp.Save(outputPath);
         }
 
-        Console.WriteLine($"XMP creator updated and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with updated creator saved to '{outputPath}'.");
     }
 }

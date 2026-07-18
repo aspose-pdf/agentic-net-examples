@@ -1,13 +1,13 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;   // PdfContentEditor and ViewerPreference
+using Aspose.Pdf.Facades;   // Facade classes for PDF manipulation
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_prefs.pdf";
+        const string outputPath = "output_with_viewer_prefs.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,18 +15,26 @@ class Program
             return;
         }
 
-        // Initialize the facade, bind the source PDF, set viewer preferences, and save.
+        // PdfContentEditor is a facade for editing PDF viewer preferences.
+        // It does NOT implement IDisposable, so no using block is required.
         PdfContentEditor editor = new PdfContentEditor();
+
+        // Bind the source PDF.
         editor.BindPdf(inputPath);
 
-        // Combine flags: show thumbnails pane (PageModeUseThumbs) and fit window (FitWindow).
-        int viewerPrefs = ViewerPreference.PageModeUseThumbs | ViewerPreference.FitWindow;
+        // Combine viewer preference flags:
+        //   NonFullScreenPageModeUseThumbs – show thumbnail pane.
+        //   FitWindow – resize the window to fit the first displayed page
+        //               (commonly used to achieve a “fit‑width” effect).
+        int viewerPrefs = ViewerPreference.NonFullScreenPageModeUseThumbs |
+                          ViewerPreference.FitWindow;
+
+        // Apply the combined preferences.
         editor.ChangeViewerPreference(viewerPrefs);
 
         // Save the modified PDF.
         editor.Save(outputPath);
-        editor.Close();
 
-        Console.WriteLine($"PDF saved with viewer preferences to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with viewer preferences: {outputPath}");
     }
 }

@@ -2,86 +2,103 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text; // Added namespace for TextFragment
 
 class ImageCatalogGenerator
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";
-        const string outputPdf  = "catalog.pdf";
-        const string tempFolder = "extracted_images";
+        const string inputPdfPath   = "input.pdf";          // source PDF containing images
+        const string outputPdfPath  = "catalog.pdf";        // PDF catalog to be created
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure temporary folder exists
-        Directory.CreateDirectory(tempFolder);
+        // -----------------------------------------------------------------
+        // 1. Extract all images from the source PDF into a temporary folder
+        // -----------------------------------------------------------------
+        string tempImageFolder = Path.Combine(Path.GetTempPath(),
+                                               "PdfImageExtract_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tempImageFolder);
 
-        // -----------------------------------------------------------------
-        // Step 1: Extract all images from the source PDF using PdfExtractor
-        // -----------------------------------------------------------------
+        int imageCounter = 1;
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            extractor.BindPdf(inputPdf);
+            extractor.BindPdf(inputPdfPath);
             extractor.ExtractImage();
 
-            int imageIndex = 1;
             while (extractor.HasNextImage())
             {
-                string imagePath = Path.Combine(tempFolder, $"image_{imageIndex}.jpg");
-                extractor.GetNextImage(imagePath);
-                imageIndex++;
+                string imageFile = Path.Combine(tempImageFolder,
+                                                $"image_{imageCounter}.jpg"); // default JPEG format
+                extractor.GetNextImage(imageFile); // saves next image to file
+                imageCounter++;
             }
         }
 
-        // -----------------------------------------------------------------
-        // Step 2: Create a new PDF document that will serve as the catalog
-        // -----------------------------------------------------------------
-        using (Document catalog = new Document())
+        if (imageCounter == 1)
         {
-            // Get list of extracted image files
-            string[] imageFiles = Directory.GetFiles(tempFolder);
-            foreach (string imgFile in imageFiles)
+            Console.WriteLine("No images were found in the source PDF.");
+            Directory.Delete(tempImageFolder, true);
+            return;
+        }
+
+        // ---------------------------------------------------------------
+        // 2. Build a new PDF that shows each extracted image as a thumbnail
+        // ---------------------------------------------------------------
+        using (Document catalogDoc = new Document())
+        {
+            // Optional: set a title for the catalog PDF
+            catalogDoc.Info.Title = "Image Catalog";
+
+            string[] imageFiles = Directory.GetFiles(tempImageFolder, "*.jpg");
+            Array.Sort(imageFiles); // ensure deterministic order
+
+            foreach (string imgPath in imageFiles)
             {
                 // Add a new page for each thumbnail
-                Page page = catalog.Pages.Add();
+                Page page = catalogDoc.Pages.Add();
 
-                // Create an Image object and point it to the extracted file
-                Aspose.Pdf.Image pdfImage = new Aspose.Pdf.Image
+                // Add the image to the page
+                Aspose.Pdf.Image img = new Aspose.Pdf.Image
                 {
-                    File = imgFile
+                    File = imgPath,
+                    // Scale the image to a thumbnail size (e.g., 200x200 points)
+                    FixWidth = 200,
+                    FixHeight = 200
                 };
+                page.Paragraphs.Add(img);
 
-                // Scale the image to a thumbnail size (e.g., 150x150 points)
-                // Preserve aspect ratio by setting only one dimension if desired
-                pdfImage.FixWidth = 150;
-                pdfImage.FixHeight = 150;
-
-                // Center the thumbnail on the page
-                pdfImage.HorizontalAlignment = HorizontalAlignment.Center;
-                pdfImage.VerticalAlignment   = VerticalAlignment.Center;
-
-                // Add the image to the page's paragraph collection
-                page.Paragraphs.Add(pdfImage);
+                // Add a caption below the thumbnail (optional)
+                TextFragment caption = new TextFragment(Path.GetFileName(imgPath))
+                {
+                    // Center the caption under the image
+                    TextState = { FontSize = 12, ForegroundColor = Aspose.Pdf.Color.Black }
+                };
+                // Position the caption by adding a margin
+                caption.Margin = new MarginInfo { Top = 210 };
+                page.Paragraphs.Add(caption);
             }
 
             // Save the catalog PDF
-            catalog.Save(outputPdf);
+            catalogDoc.Save(outputPdfPath);
         }
 
-        // Optional: clean up extracted images
+        // ---------------------------------------------------------------
+        // 3. Clean up temporary images
+        // ---------------------------------------------------------------
         try
         {
-            Directory.Delete(tempFolder, true);
+            Directory.Delete(tempImageFolder, true);
         }
-        catch
+        catch (Exception ex)
         {
-            // Ignore cleanup errors
+            Console.Error.WriteLine($"Failed to delete temporary folder: {ex.Message}");
         }
 
-        Console.WriteLine($"Image catalog created: {outputPdf}");
+        Console.WriteLine($"Image catalog created successfully at '{outputPdfPath}'.");
     }
 }

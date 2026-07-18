@@ -1,92 +1,112 @@
 using System;
 using System.IO;
-using System.Text.Json;
 using System.Collections.Generic;
+using System.Text.Json;
+using System.Reflection;
 using Aspose.Pdf.Facades;
 
-class Program
+namespace PdfViewerPreferenceApplier
 {
-    // Model for JSON configuration
-    private class ViewerConfig
+    // Represents the overall configuration file structure.
+    public class Config
     {
-        public string[] Preferences { get; set; }
+        public List<FileConfig> Files { get; set; }
     }
 
-    static void Main()
+    // Represents a single PDF processing entry.
+    public class FileConfig
     {
-        const string configPath = "viewerConfig.json";   // JSON file with viewer preferences
-        const string inputFolder = "InputPdfs";          // Folder containing PDFs to process
-        const string outputFolder = "OutputPdfs";        // Folder to save modified PDFs
+        public string InputPath { get; set; }      // Path to the source PDF.
+        public string OutputPath { get; set; }     // Desired output PDF path.
+        public List<string> Preferences { get; set; } // List of ViewerPreference flag names.
+    }
 
-        if (!File.Exists(configPath))
+    class Program
+    {
+        static void Main()
         {
-            Console.Error.WriteLine($"Configuration file not found: {configPath}");
-            return;
-        }
+            const string jsonConfigPath = "viewerPreferences.json";
 
-        // Load and deserialize JSON configuration
-        ViewerConfig config;
-        try
-        {
-            string json = File.ReadAllText(configPath);
-            config = JsonSerializer.Deserialize<ViewerConfig>(json);
-            if (config?.Preferences == null || config.Preferences.Length == 0)
+            if (!File.Exists(jsonConfigPath))
             {
-                Console.Error.WriteLine("No viewer preferences defined in the configuration.");
+                Console.Error.WriteLine($"Configuration file not found: {jsonConfigPath}");
                 return;
             }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Failed to read configuration: {ex.Message}");
-            return;
-        }
 
-        // Resolve ViewerPreference flags from string names
-        int combinedFlags = 0;
-        foreach (string prefName in config.Preferences)
-        {
-            var field = typeof(ViewerPreference).GetField(prefName);
-            if (field == null)
-            {
-                Console.Error.WriteLine($"Unknown ViewerPreference: {prefName}");
-                continue;
-            }
-            combinedFlags |= (int)field.GetValue(null);
-        }
-
-        if (combinedFlags == 0)
-        {
-            Console.Error.WriteLine("No valid viewer preferences were resolved.");
-            return;
-        }
-
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
-
-        // Process each PDF file in the input folder
-        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
-        {
-            string fileName = Path.GetFileName(pdfPath);
-            string outputPath = Path.Combine(outputFolder, fileName);
-
+            // Deserialize the JSON configuration.
+            Config config;
             try
             {
-                // Bind the PDF to the facade
-                PdfContentEditor editor = new PdfContentEditor();
-                editor.BindPdf(pdfPath);
-
-                // Apply the combined viewer preferences
-                editor.ChangeViewerPreference(combinedFlags);
-
-                // Save the modified PDF
-                editor.Save(outputPath);
-
-                Console.WriteLine($"Processed '{fileName}' -> '{outputPath}'");
+                string json = File.ReadAllText(jsonConfigPath);
+                config = JsonSerializer.Deserialize<Config>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{fileName}': {ex.Message}");
+                Console.Error.WriteLine($"Failed to read configuration: {ex.Message}");
+                return;
+            }
+
+            if (config?.Files == null || config.Files.Count == 0)
+            {
+                Console.WriteLine("No files to process.");
+                return;
+            }
+
+            // Process each PDF according to its specified viewer preferences.
+            foreach (var file in config.Files)
+            {
+                if (!File.Exists(file.InputPath))
+                {
+                    Console.Error.WriteLine($"Input PDF not found: {file.InputPath}");
+                    continue;
+                }
+
+                try
+                {
+                    // Create the PdfContentEditor facade.
+                    PdfContentEditor editor = new PdfContentEditor();
+
+                    // Bind the source PDF.
+                    editor.BindPdf(file.InputPath);
+
+                    // Combine the requested ViewerPreference flags.
+                    int combinedPref = 0;
+                    if (file.Preferences != null)
+                    {
+                        foreach (string prefName in file.Preferences)
+                        {
+                            // Use reflection to obtain the constant value from ViewerPreference.
+                            FieldInfo field = typeof(ViewerPreference).GetField(prefName,
+                                BindingFlags.Public | BindingFlags.Static);
+                            if (field != null && field.FieldType == typeof(int))
+                            {
+                                combinedPref |= (int)field.GetValue(null);
+                            }
+                            else
+                            {
+                                Console.Error.WriteLine($"Unknown ViewerPreference: {prefName}");
+                            }
+                        }
+                    }
+
+                    // Apply the combined viewer preference.
+                    editor.ChangeViewerPreference(combinedPref);
+
+                    // Save the modified PDF.
+                    editor.Save(file.OutputPath);
+
+                    // Close the facade (PdfContentEditor does not implement IDisposable).
+                    editor.Close();
+
+                    Console.WriteLine($"Processed '{file.InputPath}' -> '{file.OutputPath}'");
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"Error processing '{file.InputPath}': {ex.Message}");
+                }
             }
         }
     }

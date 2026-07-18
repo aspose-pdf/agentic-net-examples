@@ -1,45 +1,77 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Facades; // PdfContentEditor, ViewerPreference
 
-class Program
+class PdfFullScreenToggler
 {
-    // Toggles the FullScreen viewer preference.
-    // If 'enable' is true, FullScreen is turned on; otherwise it is turned off.
-    static void ToggleFullScreen(string inputPath, string outputPath, bool enable)
+    /// <summary>
+    /// Toggles the FullScreen viewer preference of a PDF.
+    /// </summary>
+    /// <param name="inputPdf">Path to the source PDF.</param>
+    /// <param name="outputPdf">Path where the modified PDF will be saved.</param>
+    /// <param name="enableFullScreen">If true, enable FullScreen mode; otherwise disable it.</param>
+    public static void ToggleFullScreen(string inputPdf, string outputPdf, bool enableFullScreen)
     {
-        // Initialize the facade and bind the source PDF.
-        PdfContentEditor editor = new PdfContentEditor();
-        editor.BindPdf(inputPath);
+        // Ensure the source file exists
+        if (!File.Exists(inputPdf))
+            throw new FileNotFoundException($"Input file not found: {inputPdf}");
 
-        // Retrieve the current viewer preference flags.
-        int currentPref = editor.GetViewerPreference();
+        // PdfContentEditor implements IDisposable, so use a using block for deterministic disposal
+        using (PdfContentEditor editor = new PdfContentEditor())
+        {
+            // Bind the existing PDF document
+            editor.BindPdf(inputPdf);
 
-        // Modify the FullScreen flag using bitwise operations.
-        int newPref = enable
-            ? currentPref | ViewerPreference.PageModeFullScreen          // set flag
-            : currentPref & ~ViewerPreference.PageModeFullScreen;        // clear flag
+            // Retrieve the current viewer preference flags
+            int currentPref = editor.GetViewerPreference();
 
-        // Apply the updated viewer preferences.
-        editor.ChangeViewerPreference(newPref);
+            // Compute the new preference value by setting or clearing the FullScreen flag
+            int newPref;
+            if (enableFullScreen)
+            {
+                // Turn on FullScreen by adding the flag (bitwise OR)
+                newPref = currentPref | ViewerPreference.PageModeFullScreen;
+            }
+            else
+            {
+                // Turn off FullScreen by removing the flag (bitwise AND with complement)
+                newPref = currentPref & ~ViewerPreference.PageModeFullScreen;
+            }
 
-        // Save the modified PDF.
-        editor.Save(outputPath);
+            // Apply the updated viewer preference
+            editor.ChangeViewerPreference(newPref);
+
+            // Save the modified PDF to the specified output path
+            editor.Save(outputPdf);
+        }
     }
 
+    // Example usage
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPath = "sample.pdf";
+        const string outputPathOn = "sample_fullscreen_on.pdf";
+        const string outputPathOff = "sample_fullscreen_off.pdf";
 
-        if (!File.Exists(inputPdf))
+        // -------------------------------------------------------------------
+        // Create a minimal PDF inline so the sandbox has a file to work with.
+        // -------------------------------------------------------------------
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
-            return;
+            using (Document seed = new Document())
+            {
+                seed.Pages.Add(); // add a blank page
+                seed.Save(inputPath);
+            }
         }
 
-        // Example usage: enable FullScreen mode.
-        ToggleFullScreen(inputPdf, outputPdf, true);
-        Console.WriteLine($"FullScreen viewer preference applied. Saved to '{outputPdf}'.");
+        // Enable FullScreen mode
+        ToggleFullScreen(inputPath, outputPathOn, true);
+        Console.WriteLine($"FullScreen enabled: {outputPathOn}");
+
+        // Disable FullScreen mode
+        ToggleFullScreen(inputPath, outputPathOff, false);
+        Console.WriteLine($"FullScreen disabled: {outputPathOff}");
     }
 }

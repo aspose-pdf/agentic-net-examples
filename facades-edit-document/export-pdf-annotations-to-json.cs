@@ -1,62 +1,52 @@
 using System;
 using System.IO;
-using System.Text.Json;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using System.Xml.Linq;
+using System.Text.Json;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputJsonPath = "annotations.json";
+        const string inputPdf = "input.pdf";
+        const string outputJson = "annotations.json";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        try
+        // Load the PDF document (lifecycle rule: use using for disposal)
+        using (Document doc = new Document(inputPdf))
         {
-            // Initialize the annotation editor and bind the PDF document
+            // Initialize the annotation editor and bind the loaded document
             using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
             {
-                editor.BindPdf(inputPdfPath);
+                editor.BindPdf(doc);
 
                 // Export all annotations to XFDF using a memory stream
                 using (MemoryStream xfdfStream = new MemoryStream())
                 {
                     editor.ExportAnnotationsToXfdf(xfdfStream);
-                    xfdfStream.Position = 0;
+                    xfdfStream.Position = 0; // Reset stream for reading
 
-                    // Read the XFDF XML content as a string
-                    string xfdfXml;
-                    using (StreamReader reader = new StreamReader(xfdfStream))
-                    {
-                        xfdfXml = reader.ReadToEnd();
-                    }
+                    // Load the XFDF XML from the stream
+                    XDocument xfdfXml = XDocument.Load(xfdfStream);
+                    string xmlContent = xfdfXml.ToString();
 
-                    // Wrap the XFDF XML in a simple JSON structure
-                    var jsonWrapper = new
-                    {
-                        xfdf = xfdfXml
-                    };
-
-                    // Serialize to formatted JSON
+                    // Wrap the XML string in a simple JSON structure
                     string json = JsonSerializer.Serialize(
-                        jsonWrapper,
+                        new { xfdf = xmlContent },
                         new JsonSerializerOptions { WriteIndented = true });
 
-                    // Write the JSON to the output file
-                    File.WriteAllText(outputJsonPath, json);
+                    // Write the JSON output to the target file
+                    File.WriteAllText(outputJson, json);
                 }
             }
+        }
 
-            Console.WriteLine($"Annotations exported to JSON: '{outputJsonPath}'");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"Annotations exported to JSON file: {outputJson}");
     }
 }

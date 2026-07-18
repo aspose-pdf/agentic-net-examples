@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -17,23 +18,19 @@ class Program
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
+
         if (!File.Exists(attachmentPath))
         {
             Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
             return;
         }
 
-        // Add the attachment using PdfContentEditor (Facades API)
+        // Use PdfContentEditor (Facades API) to bind the PDF, add the attachment, and save
         using (PdfContentEditor editor = new PdfContentEditor())
         {
-            // Bind the existing PDF document
-            editor.BindPdf(inputPdf);
-
-            // Add the attachment with a descriptive label
-            editor.AddDocumentAttachment(attachmentPath, description);
-
-            // Save the updated PDF
-            editor.Save(outputPdf);
+            editor.BindPdf(inputPdf);                                 // Load the PDF
+            editor.AddDocumentAttachment(attachmentPath, description); // Add attachment with description
+            editor.Save(outputPdf);                                   // Save the updated PDF
         }
 
         Console.WriteLine($"Attachment added and saved to '{outputPdf}'.");

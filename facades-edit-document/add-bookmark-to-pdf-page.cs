@@ -6,29 +6,33 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";   // source PDF
-        const string outputPdf = "output.pdf";  // PDF with the new bookmark
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // PdfBookmarkEditor implements IDisposable, so wrap it in a using block.
-        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
+        try
         {
-            // Load the existing PDF.
-            editor.BindPdf(inputPdf);
+            // Initialize the bookmark editor and bind the source PDF.
+            PdfBookmarkEditor editor = new PdfBookmarkEditor();
+            editor.BindPdf(inputPath);
 
             // Create a bookmark titled "Project Overview" that points to page 5.
-            // Page numbers are 1‑based in Aspose.Pdf.
             editor.CreateBookmarkOfPage("Project Overview", 5);
 
-            // Save the modified PDF.
-            editor.Save(outputPdf);
-        }
+            // Save the modified PDF with the new bookmark.
+            editor.Save(outputPath);
+            editor.Close();
 
-        Console.WriteLine($"Bookmark added and saved to '{outputPdf}'.");
+            Console.WriteLine($"Bookmark added and saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

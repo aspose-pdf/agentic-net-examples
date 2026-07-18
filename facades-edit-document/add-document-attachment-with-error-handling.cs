@@ -1,46 +1,44 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath      = "input.pdf";
-        const string outputPdfPath     = "output_with_attachment.pdf";
-        const string attachmentFilePath = "attachment_file.pdf";
-        const string attachmentDesc    = "Sample attachment description";
+        const string pdfPath = "input.pdf";
+        const string attachmentPath = "attachment.pdf";
+        const string description = "Sample attachment description";
+        const string outputPath = "output.pdf";
 
-        // Verify that the source PDF exists
-        if (!File.Exists(inputPdfPath))
+        // Verify source PDF exists
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Error: PDF file not found – '{inputPdfPath}'.");
+            Console.Error.WriteLine($"Error: PDF file not found – '{pdfPath}'.");
             return;
         }
 
-        // Verify that the attachment file exists before calling AddDocumentAttachment
-        if (!File.Exists(attachmentFilePath))
+        // Verify attachment file exists before invoking AddDocumentAttachment
+        if (!File.Exists(attachmentPath))
         {
-            Console.Error.WriteLine($"Error: Attachment file not found – '{attachmentFilePath}'.");
+            Console.Error.WriteLine($"Error: Attachment file not found – '{attachmentPath}'.");
             return;
         }
 
         try
         {
-            // Use the PdfContentEditor facade to bind, modify, and save the PDF
-            using (PdfContentEditor editor = new PdfContentEditor())
-            {
-                editor.BindPdf(inputPdfPath);                                   // load source PDF
-                editor.AddDocumentAttachment(attachmentFilePath, attachmentDesc); // add attachment
-                editor.Save(outputPdfPath);                                      // persist changes
-            }
+            // Initialize the facade, bind the PDF, add the attachment, and save
+            PdfContentEditor editor = new PdfContentEditor();
+            editor.BindPdf(pdfPath);
+            editor.AddDocumentAttachment(attachmentPath, description);
+            editor.Save(outputPath);
 
-            Console.WriteLine($"Attachment added successfully. Output saved to '{outputPdfPath}'.");
+            Console.WriteLine($"Attachment added successfully. Output saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
+            // Generic error handling – logs any unexpected issues
+            Console.Error.WriteLine($"Exception: {ex.Message}");
         }
     }
 }

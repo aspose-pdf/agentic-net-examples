@@ -1,9 +1,8 @@
 using System;
 using System.IO;
-using System.Drawing.Printing;               // For obtaining the default system printer name
-using Aspose.Pdf;                           // Core PDF types
-using Aspose.Pdf.Facades;                   // PdfViewer facade
-using Aspose.Pdf.Printing;                  // PrinterSettings and Duplex enums
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Printing;
+using Aspose.Pdf.Devices; // required for Aspose.Pdf.Devices.Margins
 
 class Program
 {
@@ -11,44 +10,40 @@ class Program
     {
         const string pdfPath = "input.pdf";
 
-        // Verify that the PDF file exists before attempting to print
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // ------------------------------------------------------------
-        // Configure printer settings:
-        //   • Use the default system printer.
-        //   • Enable collated copies.
-        //   • Set the number of copies (example: 2).
-        //   • Enable duplex (double‑sided) printing – vertical flip.
-        // ------------------------------------------------------------
-        Aspose.Pdf.Printing.PrinterSettings printerSettings = new Aspose.Pdf.Printing.PrinterSettings();
-
-        // Obtain the default printer name from the .NET PrintDocument class
-        PrintDocument sysPrintDoc = new PrintDocument();
-        printerSettings.PrinterName = sysPrintDoc.PrinterSettings.PrinterName;
-
-        printerSettings.Collate = true;                     // Collated copies
-        printerSettings.Copies = 2;                         // Number of copies (adjust as needed)
-        printerSettings.Duplex = Aspose.Pdf.Printing.Duplex.Vertical; // Double‑sided (short‑edge flip)
-
-        // ------------------------------------------------------------
-        // Print the PDF using PdfViewer with the configured settings.
-        // ------------------------------------------------------------
-        Aspose.Pdf.Facades.PdfViewer viewer = new Aspose.Pdf.Facades.PdfViewer();
-        try
+        // Initialize PdfViewer and bind the PDF file
+        using (PdfViewer viewer = new PdfViewer())
         {
-            viewer.BindPdf(pdfPath);                         // Load the PDF into the viewer
-            viewer.PrintDocumentWithSettings(printerSettings); // Print with duplex & collated copies
-        }
-        finally
-        {
-            viewer.Close();                                 // Release resources
+            viewer.BindPdf(pdfPath);
+
+            // Configure printer settings – use Aspose.Pdf.Printing types explicitly
+            var printerSettings = new PrinterSettings
+            {
+                // Enable duplex (double‑sided) printing; choose Vertical or Horizontal as needed
+                Duplex = Duplex.Vertical,
+
+                // Number of copies; set Collate to true for collated copies (default is collated, but explicit is clearer)
+                Copies = 2,
+                Collate = true
+            };
+
+            // Optional: configure page settings (paper size, margins, etc.) – also fully qualified
+            var pageSettings = new PageSettings
+            {
+                PaperSize = PaperSizes.A4,
+                // Use Aspose.Pdf.Devices.Margins (not System.Drawing.Printing.Margins) to match the expected type
+                Margins = new Margins(0, 0, 0, 0)
+            };
+
+            // Print the document with the specified settings
+            viewer.PrintDocumentWithSettings(pageSettings, printerSettings);
         }
 
-        Console.WriteLine("Print job submitted successfully.");
+        Console.WriteLine("Print job submitted.");
     }
 }

@@ -9,44 +9,49 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_rotated_annotation.pdf";
+        const string outputPath = "rotated_annotation.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF to ensure proper resource handling (document disposal rule)
+        // Load the PDF document (required by the lifecycle rule)
         using (Document doc = new Document(inputPath))
         {
-            // No direct modifications needed here; the facade will handle stamping.
+            // Initialize PdfFileStamp with input and output files
+            // PdfFileStamp does not implement IDisposable, so we close it manually
+            PdfFileStamp fileStamp = new PdfFileStamp(inputPath, outputPath);
+
+            // Create a text stamp (acts as a text annotation)
+            Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
+
+            // Bind the text to the stamp using FormattedText.
+            // Note: FormattedText uses System.Drawing.Color for the text color.
+            FormattedText ft = new FormattedText(
+                "Diagonal Text",                 // text
+                System.Drawing.Color.Black,      // text color
+                "Helvetica",                     // font name
+                EncodingType.Winansi,            // encoding
+                false,                           // embed font?
+                12);                             // font size
+
+            stamp.BindLogo(ft);
+
+            // Rotate the stamp 90 degrees to align with diagonal content
+            stamp.Rotation = 90f;
+
+            // Optionally set the position of the stamp on the page
+            // (origin is the lower‑left corner of the page)
+            stamp.SetOrigin(100, 500);
+
+            // Add the stamp to the PDF
+            fileStamp.AddStamp(stamp);
+
+            // Finalize and save the output PDF
+            fileStamp.Close();
         }
-
-        // Create a text stamp that will serve as the rotated annotation
-        Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-
-        // FormattedText constructor sets text, color, font, encoding, embed flag, and size
-        FormattedText formattedText = new FormattedText(
-            "Diagonal Text",                     // text content
-            System.Drawing.Color.Black,          // text color (System.Drawing.Color is required here)
-            "Helvetica",                         // font name
-            EncodingType.Winansi,                // encoding
-            false,                               // embed font flag
-            24);                                 // font size
-
-        // Bind the formatted text to the stamp
-        stamp.BindLogo(formattedText);
-
-        // Rotate the stamp 90 degrees to align with diagonal content
-        stamp.Rotation = 90;
-
-        // Apply the stamp using the PdfFileStamp facade
-        PdfFileStamp fileStamp = new PdfFileStamp();
-        fileStamp.BindPdf(inputPath);   // load source PDF
-        fileStamp.AddStamp(stamp);      // add the rotated text stamp
-        fileStamp.Save(outputPath);     // save the result
-        fileStamp.Close();              // close the facade
 
         Console.WriteLine($"Rotated text annotation saved to '{outputPath}'.");
     }
