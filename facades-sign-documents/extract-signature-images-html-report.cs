@@ -1,8 +1,6 @@
 using System;
 using System.IO;
-using System.Text;
 using System.Collections.Generic;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -18,69 +16,74 @@ class Program
             return;
         }
 
-        // Prepare HTML builder
-        StringBuilder htmlBuilder = new StringBuilder();
-        htmlBuilder.AppendLine("<!DOCTYPE html>");
-        htmlBuilder.AppendLine("<html lang=\"en\">");
-        htmlBuilder.AppendLine("<head><meta charset=\"UTF-8\"><title>Signature Images Report</title></head>");
-        htmlBuilder.AppendLine("<body>");
-        htmlBuilder.AppendLine("<h1>Signature Images extracted from PDF</h1>");
+        // Collect HTML fragments for each signature image
+        List<string> imageHtmlBlocks = new List<string>();
 
-        // Use PdfFileSignature facade to extract signature images
-        using (PdfFileSignature pdfSign = new PdfFileSignature())
+        // Use PdfFileSignature facade to work with signatures
+        using (PdfFileSignature pdfSignature = new PdfFileSignature())
         {
             // Bind the PDF file
-            pdfSign.BindPdf(inputPdf);
+            pdfSignature.BindPdf(inputPdf);
 
-            // Retrieve all signature names (including empty fields if needed)
-            IList<SignatureName> signatureNames = pdfSign.GetSignatureNames(true);
+            // Get all signature names (returns IList<SignatureName>)
+            IList<SignatureName> signatureNames = pdfSignature.GetSignatureNames(true);
 
-            if (signatureNames == null || signatureNames.Count == 0)
+            foreach (SignatureName sigInfo in signatureNames)
             {
-                htmlBuilder.AppendLine("<p>No signatures found in the document.</p>");
-            }
-            else
-            {
-                foreach (SignatureName sigInfo in signatureNames)
+                // Extract the signature image using the SignatureName overload
+                using (Stream imgStream = pdfSignature.ExtractImage(sigInfo))
                 {
-                    string sigName = sigInfo.Name; // string representation of the signature field
-
-                    // Extract the image for the current signature using the SignatureName overload
-                    using (Stream imgStream = pdfSign.ExtractImage(sigInfo))
+                    if (imgStream == null)
                     {
-                        if (imgStream != null && imgStream.Length > 0)
-                        {
-                            // Read the image bytes
-                            byte[] imgBytes;
-                            using (MemoryStream ms = new MemoryStream())
-                            {
-                                imgStream.CopyTo(ms);
-                                imgBytes = ms.ToArray();
-                            }
+                        // No image for this signature; skip
+                        continue;
+                    }
 
-                            // Convert to Base64 for embedding in HTML
-                            string base64 = Convert.ToBase64String(imgBytes);
-                            // Assume JPEG output (Aspose returns JPEG by default)
-                            string imgTag = $"<div><h3>Signature: {sigName}</h3>" +
-                                            $"<img src=\"data:image/jpeg;base64,{base64}\" alt=\"{sigName}\" style=\"max-width:600px;\"/>" +
-                                            $"</div>";
-                            htmlBuilder.AppendLine(imgTag);
-                        }
-                        else
-                        {
-                            // No image for this signature
-                            htmlBuilder.AppendLine($"<div><h3>Signature: {sigName}</h3><p>No image available.</p></div>");
-                        }
+                    // Read the stream into a byte array
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        imgStream.CopyTo(ms);
+                        byte[] imgBytes = ms.ToArray();
+
+                        // Convert to Base64 for embedding in HTML
+                        string base64 = Convert.ToBase64String(imgBytes);
+
+                        // Build an <img> tag with data URI
+                        string imgTag = $"<div><h3>Signature: {sigInfo.Name}</h3>" +
+                                        $"<img src=\"data:image/jpeg;base64,{base64}\" " +
+                                        $"style=\"border:1px solid #ccc; max-width:600px;\" />" +
+                                        $"</div>";
+
+                        imageHtmlBlocks.Add(imgTag);
                     }
                 }
             }
         }
 
-        htmlBuilder.AppendLine("</body>");
-        htmlBuilder.AppendLine("</html>");
+        // Assemble final HTML report
+        string htmlContent = "<!DOCTYPE html>\n<html>\n<head>\n" +
+                             "<meta charset=\"UTF-8\">\n" +
+                             "<title>Signature Image Report</title>\n" +
+                             "<style>body {font-family:Arial,Helvetica,sans-serif; margin:20px;}</style>\n" +
+                             "</head>\n<body>\n" +
+                             "<h1>Signature Images Extracted from PDF</h1>\n";
 
-        // Save the HTML report
-        File.WriteAllText(outputHtml, htmlBuilder.ToString(), Encoding.UTF8);
+        if (imageHtmlBlocks.Count == 0)
+        {
+            htmlContent += "<p>No signature images were found in the document.</p>\n";
+        }
+        else
+        {
+            foreach (string block in imageHtmlBlocks)
+            {
+                htmlContent += block + "\n";
+            }
+        }
+
+        htmlContent += "</body>\n</html>";
+
+        // Write the HTML file
+        File.WriteAllText(outputHtml, htmlContent);
         Console.WriteLine($"Signature report generated: {outputHtml}");
     }
 }
