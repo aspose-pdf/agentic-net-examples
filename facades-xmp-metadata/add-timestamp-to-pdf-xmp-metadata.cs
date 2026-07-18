@@ -6,31 +6,26 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_timestamp.pdf";
 
-        // Create a new PDF document and ensure proper disposal
+        // Create a new PDF document and ensure it is disposed properly
         using (Document doc = new Document())
         {
-            // Add a single blank page (required for a valid PDF)
+            // Add a blank page so the PDF is not empty
             doc.Pages.Add();
 
-            // Initialize the XMP metadata facade and bind it to the document
-            using (PdfXmpMetadata xmp = new PdfXmpMetadata())
-            {
-                xmp.BindPdf(doc);
+            // Initialize the XMP metadata facade for this document
+            PdfXmpMetadata xmp = new PdfXmpMetadata();
+            xmp.BindPdf(doc);
 
-                // Generate an ISO‑8601 UTC timestamp
-                string timestamp = DateTime.UtcNow.ToString("o");
+            // Add a custom timestamp property (ISO 8601 format) to the XMP metadata
+            string timestamp = DateTime.UtcNow.ToString("o"); // e.g., 2023-08-15T12:34:56.789Z
+            xmp.Add("xmp:CreateDate", timestamp);
 
-                // Add the timestamp as a custom XMP property (e.g., xmp:CreateDate)
-                xmp.Add("xmp:CreateDate", timestamp);
-
-                // Persist the changes together with the PDF content
-                // PdfXmpMetadata.Save requires the output file path
-                xmp.Save(outputPath);
-            }
+            // Save the PDF; the XMP metadata is embedded automatically
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with timestamp XMP saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with timestamp metadata to '{outputPath}'.");
     }
 }

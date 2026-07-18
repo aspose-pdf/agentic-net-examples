@@ -3,55 +3,56 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class Program
+class PreserveXmpDuringSplit
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputFolder = "SplitPages";
+        const string inputPdfPath = "input.pdf";               // source multi‑page PDF
+        const string outputFolder = "SplitPages";              // folder for split files
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
         // Ensure output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // ----- Preserve XMP metadata -----
-        // Load XMP metadata from the source PDF
-        PdfXmpMetadata xmpMeta = new PdfXmpMetadata();
-        xmpMeta.BindPdf(inputPdf);
-        byte[] xmpBytes = xmpMeta.GetXmpMetadata();
-
-        // ----- Split PDF into single‑page streams -----
-        PdfFileEditor editor = new PdfFileEditor();
-        MemoryStream[] pageStreams = editor.SplitToPages(inputPdf);
-
-        // Process each page stream
-        for (int i = 0; i < pageStreams.Length; i++)
+        // ---------- Extract XMP metadata from the original document ----------
+        byte[] xmpBytes;
+        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
         {
-            // Use a using block for the MemoryStream to ensure it is disposed
-            using (MemoryStream pageStream = pageStreams[i])
-            {
-                // Load the single‑page PDF into a Document
-                using (Document pageDoc = new Document(pageStream))
-                {
-                    // Apply the original XMP metadata to the split document
-                    using (MemoryStream xmpStream = new MemoryStream(xmpBytes))
-                    {
-                        pageDoc.SetXmpMetadata(xmpStream);
-                    }
-
-                    // Save the split page to a file
-                    string outPath = Path.Combine(outputFolder, $"page{i + 1}.pdf");
-                    pageDoc.Save(outPath);
-                    Console.WriteLine($"Saved page {i + 1} → {outPath}");
-                }
-            }
+            xmp.BindPdf(inputPdfPath);
+            xmpBytes = xmp.GetXmpMetadata();   // XML representation of XMP metadata
         }
 
-        Console.WriteLine("Splitting completed with XMP metadata preserved.");
+        // ---------- Split the PDF into single‑page streams ----------
+        PdfFileEditor editor = new PdfFileEditor();
+        MemoryStream[] pageStreams = editor.SplitToPages(inputPdfPath);
+
+        // ---------- Create a PDF for each page, attach the XMP metadata and save ----------
+        for (int i = 0; i < pageStreams.Length; i++)
+        {
+            MemoryStream pageStream = pageStreams[i];
+            pageStream.Position = 0;   // reset to beginning before loading
+
+            using (Document pageDoc = new Document(pageStream))
+            {
+                // Attach the previously extracted XMP metadata
+                using (MemoryStream metaStream = new MemoryStream(xmpBytes))
+                {
+                    pageDoc.SetXmpMetadata(metaStream);
+                }
+
+                // Save the single‑page PDF
+                string outputPath = Path.Combine(outputFolder, $"page{i + 1}.pdf");
+                pageDoc.Save(outputPath);
+                Console.WriteLine($"Saved: {outputPath}");
+            }
+
+            // Dispose the stream that held the page data
+            pageStream.Dispose();
+        }
     }
 }

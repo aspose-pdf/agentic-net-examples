@@ -1,50 +1,55 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
+using System.Xml.Linq;
 using Aspose.Pdf.Facades;
 
-class XmpNamespaceLister
+class Program
 {
-    static void Main()
+    static void Main(string[] args)
     {
-        const string inputPdf = "input.pdf";
+        // Input PDF path – either first command‑line argument or a default file name
+        string inputPath = args.Length > 0 ? args[0] : "input.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Use PdfXmpMetadata facade to access XMP metadata
+        // PdfXmpMetadata implements IDisposable, so use a using block for deterministic cleanup
         using (PdfXmpMetadata xmp = new PdfXmpMetadata())
         {
-            // Bind the PDF file
-            xmp.BindPdf(inputPdf);
+            // Bind the PDF file to the facade
+            xmp.BindPdf(inputPath);
 
-            // Collect distinct namespace prefixes from metadata keys (e.g., "dc:creator")
-            HashSet<string> prefixes = new HashSet<string>(StringComparer.Ordinal);
-            foreach (string key in xmp.Keys)
+            // Retrieve the raw XMP metadata as a byte array
+            byte[] rawData = xmp.GetXmpMetadata();
+
+            if (rawData == null || rawData.Length == 0)
             {
-                int colonPos = key.IndexOf(':');
-                if (colonPos > 0)
-                {
-                    string prefix = key.Substring(0, colonPos);
-                    prefixes.Add(prefix);
-                }
+                Console.WriteLine("No XMP metadata found in the PDF.");
+                return;
             }
 
-            // List each prefix with its corresponding namespace URI
-            Console.WriteLine("XMP Namespaces found in the PDF:");
-            foreach (string prefix in prefixes)
-            {
-                string uri = xmp.GetNamespaceURIByPrefix(prefix);
-                Console.WriteLine($"{prefix} => {uri}");
-            }
+            // Convert the byte array to a UTF‑8 string containing the XML
+            string xmlContent = Encoding.UTF8.GetString(rawData);
 
-            // If no prefixes were found, indicate that the PDF has no XMP namespaces
-            if (prefixes.Count == 0)
+            // Parse the XML using LINQ to XML
+            XDocument xmpDoc = XDocument.Parse(xmlContent);
+
+            // Namespace declarations are represented by attributes where IsNamespaceDeclaration == true
+            var namespaceAttributes = xmpDoc.Root
+                                            .Attributes()
+                                            .Where(a => a.IsNamespaceDeclaration);
+
+            Console.WriteLine("XMP Namespaces present in the PDF:");
+            foreach (var nsAttr in namespaceAttributes)
             {
-                Console.WriteLine("No XMP namespaces detected.");
+                // The default namespace has the name "xmlns", otherwise it's "xmlns:prefix"
+                string prefix = nsAttr.Name.LocalName == "xmlns" ? "(default)" : nsAttr.Name.LocalName;
+                Console.WriteLine($"  Prefix: {prefix}, URI: {nsAttr.Value}");
             }
         }
     }

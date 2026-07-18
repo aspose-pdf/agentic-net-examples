@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputXmp = "output.xmp";
+        const string inputPdf  = "input.pdf";   // source PDF file
+        const string outputXmp = "output.xmp";  // side‑car XMP file
 
         if (!File.Exists(inputPdf))
         {
@@ -15,16 +15,22 @@ class Program
             return;
         }
 
-        // Bind the PDF and extract its XMP metadata as a byte array
-        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
+        try
         {
-            xmp.BindPdf(inputPdf);
-            byte[] data = xmp.GetXmpMetadata(); // full XMP metadata
+            // Create the PdfXmpMetadata facade, bind it to the PDF,
+            // retrieve the XMP metadata as a byte array, and write it to a file.
+            using (PdfXmpMetadata xmp = new PdfXmpMetadata())
+            {
+                xmp.BindPdf(inputPdf);                     // load PDF
+                byte[] data = xmp.GetXmpMetadata();        // export XMP
+                File.WriteAllBytes(outputXmp, data);       // save side‑car file
+            }
 
-            // Save the metadata to a side‑car .xmp file
-            File.WriteAllBytes(outputXmp, data);
+            Console.WriteLine($"XMP metadata exported to '{outputXmp}'.");
         }
-
-        Console.WriteLine($"XMP metadata exported to '{outputXmp}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }
