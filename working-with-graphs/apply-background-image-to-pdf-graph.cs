@@ -8,8 +8,8 @@ class Program
     static void Main()
     {
         // Paths – adjust as needed
-        const string outputPath = "graph_with_background.pdf";
-        const string backgroundImagePath = "background.png";
+        const string backgroundImagePath = "bg.png";
+        const string outputPdfPath = "graph_with_background.pdf";
 
         // Ensure the background image file exists
         if (!File.Exists(backgroundImagePath))
@@ -21,53 +21,62 @@ class Program
         // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a single page
+            // Add a blank page
             Page page = doc.Pages.Add();
 
-            // Apply the background image to the page (covers the whole page)
-            Image pageBg = new Image();
-            pageBg.File = backgroundImagePath;
-            page.BackgroundImage = pageBg;
+            // ------------------------------------------------------------
+            // 1. Apply background image to the page (acts as graph background)
+            // ------------------------------------------------------------
+            Image bgImage = new Image { File = backgroundImagePath };
+            page.BackgroundImage = bgImage; // background image for the page
 
-            // Create a Graph object – width 400pt, height 200pt (use double constructor as required)
+            // ------------------------------------------------------------
+            // 2. Create a Graph (container for vector shapes)
+            // ------------------------------------------------------------
+            // Width = 400 points, Height = 200 points – use double literals as required by the constructor
             Graph graph = new Graph(400.0, 200.0)
             {
-                // Position the graph on the page (left=50pt, top=600pt)
-                Left = 50,
-                Top = 600,
-                // Ensure the graph is drawn above the page background
-                ZIndex = 0
+                // Position the graph on the page (left, top)
+                Left = 100,
+                Top = 500,
+                // Ensure the graph is drawn above the background image
+                ZIndex = 1
             };
 
-            // ---- Add other shapes that should appear on top of the background image ----
-
-            // Example: a red rectangle
-            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(50, 50, 150, 100);
+            // ------------------------------------------------------------
+            // 3. Add a rectangle (acts as a visual element on top of the background)
+            // ------------------------------------------------------------
+            // Use Aspose.Pdf.Drawing.Rectangle (not Aspose.Pdf.Rectangle)
+            var rect = new Aspose.Pdf.Drawing.Rectangle(0f, 0f, 300f, 150f);
             rect.GraphInfo = new GraphInfo
             {
                 FillColor = Color.LightGray,
                 Color = Color.Black,
-                LineWidth = 2f // float literal as required
+                LineWidth = 2f
             };
-            graph.Shapes.Add(rect);
+            graph.Shapes.Add(rect); // added first – will be drawn first within the graph
 
-            // Example: a blue line
-            float[] linePoints = { 200, 150, 350, 150 };
-            Line line = new Line(linePoints);
+            // ------------------------------------------------------------
+            // 4. Add a line (drawn after the rectangle, thus on top)
+            // ------------------------------------------------------------
+            float[] linePoints = { 0f, 0f, 300f, 150f };
+            var line = new Line(linePoints);
             line.GraphInfo = new GraphInfo
             {
-                Color = Color.Blue,
+                Color = Color.Red,
                 LineWidth = 3f
             };
-            graph.Shapes.Add(line);
+            graph.Shapes.Add(line); // added after rectangle, appears on top
 
-            // Add the graph to the page's paragraph collection
+            // ------------------------------------------------------------
+            // 5. Add the graph to the page
+            // ------------------------------------------------------------
             page.Paragraphs.Add(graph);
 
-            // Save the document
-            doc.Save(outputPath);
+            // Save the resulting PDF
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPdfPath}'.");
     }
 }

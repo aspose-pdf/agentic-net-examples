@@ -9,56 +9,53 @@ class Program
     {
         // Input folder containing PDF files
         const string inputFolder = @"C:\InputPdfs";
-        // Output folder where modified PDFs will be saved
+        // Output folder for processed PDFs
         const string outputFolder = @"C:\OutputPdfs";
 
-        // Ensure output directory exists
+        // Ensure output folder exists
         Directory.CreateDirectory(outputFolder);
 
-        // Iterate over all PDF files in the input folder
-        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Get all PDF files in the input folder
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
+
+        foreach (string pdfPath in pdfFiles)
         {
-            // Determine output file path (same file name in output folder)
-            string outputPath = System.IO.Path.Combine(outputFolder, System.IO.Path.GetFileName(inputPath));
-
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
+            // Load each PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(pdfPath))
             {
-                // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-                for (int i = 1; i <= doc.Pages.Count; i++)
+                // Iterate over all pages (1‑based indexing)
+                foreach (Page page in doc.Pages)
                 {
-                    Page page = doc.Pages[i];
+                    // Create a Graph container (size can be adjusted as needed)
+                    // Use double literals as the Graph constructor now expects double values
+                    Graph graph = new Graph(400.0, 200.0);
 
-                    // Create a Graph container sized to the page dimensions
-                    double pageWidth  = page.PageInfo.Width;
-                    double pageHeight = page.PageInfo.Height;
-                    Graph graph = new Graph(pageWidth, pageHeight);
-
-                    // Define the rectangle that will act as the watermark
-                    // Position: 100 points from left, 100 points from bottom,
-                    // Size: 200x100 points
-                    Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(100, 100, 200, 100);
-
-                    // Set visual properties via GraphInfo (FillColor, Border Color, LineWidth)
-                    rect.GraphInfo = new GraphInfo
+                    // Define a rectangle shape that will act as the watermark
+                    // Constructor: left, bottom, width, height (float parameters)
+                    Aspose.Pdf.Drawing.Rectangle rectShape = new Aspose.Pdf.Drawing.Rectangle(0f, 0f, 200f, 100f);
+                    // Set visual properties via GraphInfo
+                    rectShape.GraphInfo = new GraphInfo
                     {
-                        FillColor = Aspose.Pdf.Color.LightGray,
-                        Color     = Aspose.Pdf.Color.Black,
-                        LineWidth = 2
+                        FillColor = Color.LightGray,   // background of the rectangle
+                        Color = Color.Black,           // border color
+                        LineWidth = 2f                 // border thickness (float)
                     };
 
-                    // Add the rectangle shape to the graph
-                    graph.Shapes.Add(rect);
+                    // Add the rectangle to the graph
+                    graph.Shapes.Add(rectShape);
 
-                    // Add the graph to the page's paragraph collection
+                    // Add the graph (containing the rectangle) to the page's content
                     page.Paragraphs.Add(graph);
                 }
 
-                // Save the modified document as PDF (no SaveOptions needed for PDF output)
+                // Build output file path (same name, different folder)
+                string outputPath = System.IO.Path.Combine(outputFolder, System.IO.Path.GetFileName(pdfPath));
+
+                // Save the modified PDF
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Processed: {System.IO.Path.GetFileName(inputPath)} → {outputPath}");
+            Console.WriteLine($"Processed and saved: {System.IO.Path.GetFileName(pdfPath)}");
         }
     }
 }

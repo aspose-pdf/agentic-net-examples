@@ -7,42 +7,49 @@ class Program
 {
     static void Main()
     {
+        const string inputPath = "input.pdf";
         const string outputPath = "skewed_graph.pdf";
 
-        // Create a new PDF document and ensure proper disposal
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a blank page to the document
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Create a Graph container (width, height in points)
-            Aspose.Pdf.Drawing.Graph graph = new Aspose.Pdf.Drawing.Graph(400, 200);
+        // Load the PDF document (use using for proper disposal)
+        using (Document doc = new Document(inputPath))
+        {
+            // Get the first page (page indexing is 1‑based)
+            Page page = doc.Pages[1];
 
-            // Apply a skew transformation on the X axis (degrees)
-            graph.GraphInfo = new Aspose.Pdf.GraphInfo
+            // Create a graph – the constructor now expects double values
+            Graph graph = new Graph(200.0, 100.0);
+
+            // Apply a skew on the X axis (float value)
+            graph.GraphInfo.SkewAngleX = 30f;
+
+            // Optional visual styling for the graph background
+            graph.GraphInfo.FillColor = Color.LightGray;
+            graph.GraphInfo.Color = Color.Black;
+            graph.GraphInfo.LineWidth = 1f;
+
+            // Add a rectangle shape inside the graph to illustrate the skew effect
+            var rect = new Aspose.Pdf.Drawing.Rectangle(0f, 0f, 200f, 100f);
+            rect.GraphInfo = new GraphInfo
             {
-                SkewAngleX = 30 // slant the graph 30 degrees on the X axis
+                FillColor = Color.Yellow,
+                Color = Color.DarkBlue,
+                LineWidth = 2f
             };
-
-            // Create a rectangle shape to demonstrate the skew effect
-            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(0, 0, 200, 100);
-            rect.GraphInfo = new Aspose.Pdf.GraphInfo
-            {
-                FillColor = Aspose.Pdf.Color.LightGray,
-                Color = Aspose.Pdf.Color.Black,
-                LineWidth = 1
-            };
-
-            // Add the rectangle to the graph's shape collection
             graph.Shapes.Add(rect);
 
             // Add the graph to the page's paragraph collection
             page.Paragraphs.Add(graph);
 
-            // Save the PDF document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Skewed graph PDF saved to '{outputPath}'.");
     }
 }

@@ -8,54 +8,55 @@ class Program
     {
         const string outputPath = "barchart.pdf";
 
-        // Create a new PDF document and ensure deterministic disposal
+        // Document lifecycle must be wrapped in a using block
         using (Document doc = new Document())
         {
-            // Add a single page (Pages are 1‑based)
+            // Add a single page to the document
             Page page = doc.Pages.Add();
 
-            // Create a Graph that spans the whole page
-            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
+            // Create a Graph container that will hold the rectangle shapes
+            // Width and height define the drawing area for the graph
+            Graph graph = new Graph(600, 200);
 
-            // Bar‑chart parameters
-            double barWidth   = 30;   // width of each bar
-            double maxHeight  = 200;  // maximum bar height
-            double startX     = 50;   // left margin
-            double startY     = 100;  // baseline for bars
-            double spacing    = 40;   // horizontal distance between bar starts
+            // Parameters for the bar chart
+            double barWidth = 30;               // Width of each bar
+            double barHeight = 20;              // Height of each bar
+            double startX = 50;                 // X coordinate of the first bar
+            double startY = 100;                // Y coordinate (bottom) for all bars
+            double xIncrement = 40;             // Horizontal distance between bars
 
-            // Add ten rectangles with incremental X coordinates
+            // Loop to add ten rectangles (bars) with incremental X positions
             for (int i = 0; i < 10; i++)
             {
-                double left   = startX + i * spacing;
-                double height = maxHeight * (i + 1) / 10.0; // example varying height
+                // Calculate the X position for the current bar
+                double x = startX + i * xIncrement;
 
                 // Create a rectangle shape (left, bottom, width, height)
                 Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(
-                    (float)left,
-                    (float)startY,
-                    (float)barWidth,
-                    (float)height);
+                    (float)x,               // left (X)
+                    (float)startY,          // bottom (Y)
+                    (float)barWidth,        // width
+                    (float)barHeight);      // height
 
-                // Set visual appearance via GraphInfo
+                // Set visual properties via GraphInfo (FillColor, Border Color, LineWidth)
                 rect.GraphInfo = new GraphInfo
                 {
-                    FillColor = Aspose.Pdf.Color.FromRgb(0.2 + i * 0.08, 0.4, 0.6),
-                    Color     = Aspose.Pdf.Color.Black,
+                    FillColor = Aspose.Pdf.Color.LightGray,
+                    Color = Aspose.Pdf.Color.Black,
                     LineWidth = 1
                 };
 
-                // Add the rectangle to the graph
+                // Add the rectangle to the graph's shape collection
                 graph.Shapes.Add(rect);
             }
 
-            // Attach the graph to the page
+            // Add the graph (containing all rectangles) to the page
             page.Paragraphs.Add(graph);
 
-            // Save the PDF
+            // Save the PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Bar chart saved to '{outputPath}'.");
+        Console.WriteLine($"Bar chart PDF saved to '{outputPath}'.");
     }
 }
