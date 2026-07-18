@@ -1,12 +1,12 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades;   // PdfFileSecurity, DocumentPrivilege
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,25 +15,20 @@ class Program
             return;
         }
 
-        // Create a privilege that allows form filling but disables document assembly
+        // Start from a predefined privilege that allows everything,
+        // then adjust the required settings.
         DocumentPrivilege privilege = DocumentPrivilege.AllowAll;
-        privilege.AllowAssembly = false;   // disable assembly
-        privilege.AllowFillIn = true;      // ensure form filling is allowed
+        privilege.AllowAssembly = false;   // disable document assembly (insert/delete/rotate pages, etc.)
+        privilege.AllowFillIn   = true;    // enable filling of form fields
 
-        // Initialize the security facade and bind the source PDF
-        PdfFileSecurity security = new PdfFileSecurity();
-        security.BindPdf(inputPath);
+        // Apply the privilege settings and write the protected PDF.
+        // PdfFileSecurity works directly with file paths.
+        PdfFileSecurity fileSecurity = new PdfFileSecurity(inputPath, outputPath);
+        bool success = fileSecurity.SetPrivilege(privilege);
 
-        // Apply the privilege settings
-        bool result = security.SetPrivilege(privilege);
-        if (!result)
-        {
+        if (success)
+            Console.WriteLine($"Privileges applied successfully. Output saved to '{outputPath}'.");
+        else
             Console.Error.WriteLine("Failed to set document privileges.");
-            return;
-        }
-
-        // Save the PDF with the new privileges
-        security.Save(outputPath);
-        Console.WriteLine($"PDF saved with updated privileges to '{outputPath}'.");
     }
 }

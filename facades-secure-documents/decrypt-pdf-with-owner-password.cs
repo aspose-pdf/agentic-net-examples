@@ -6,9 +6,12 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "encrypted.pdf";   // Path to the encrypted PDF
-        const string outputPath = "decrypted.pdf"; // Path where the decrypted PDF will be saved
-        const string ownerPassword = "ownerpass";  // Owner password for decryption
+        // Paths to the encrypted source PDF and the decrypted output PDF
+        const string inputPath = "encrypted.pdf";
+        const string outputPath = "decrypted.pdf";
+
+        // Owner password used to unlock the PDF
+        const string ownerPassword = "ownerpass";
 
         // Verify that the input file exists before proceeding
         if (!File.Exists(inputPath))
@@ -19,27 +22,27 @@ class Program
 
         try
         {
-            // Initialize the PdfFileSecurity facade with source and destination files
+            // PdfFileSecurity implements IDisposable, so wrap it in a using block
             using (PdfFileSecurity fileSecurity = new PdfFileSecurity(inputPath, outputPath))
             {
                 // Decrypt the PDF using the owner password.
-                // DecryptFile throws an exception on failure; it also returns a bool indicating success.
-                bool success = fileSecurity.DecryptFile(ownerPassword);
+                // DecryptFile returns true on success, otherwise false.
+                bool result = fileSecurity.DecryptFile(ownerPassword);
 
-                if (success)
+                if (result)
                 {
-                    Console.WriteLine($"Decryption succeeded. Output saved to '{outputPath}'.");
+                    Console.WriteLine($"Decryption succeeded. Decrypted file saved as '{outputPath}'.");
                 }
                 else
                 {
-                    Console.WriteLine("Decryption failed (method returned false).");
+                    Console.WriteLine("Decryption failed. Check the owner password and file integrity.");
                 }
             }
         }
         catch (Exception ex)
         {
-            // Handle any errors that occur during the decryption process
-            Console.Error.WriteLine($"Error during decryption: {ex.Message}");
+            // Catch any unexpected errors (e.g., I/O issues, invalid password format)
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

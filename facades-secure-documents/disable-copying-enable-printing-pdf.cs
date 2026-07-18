@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -9,8 +8,6 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string userPassword  = "user123";
-        const string ownerPassword = "owner123";
 
         if (!File.Exists(inputPath))
         {
@@ -21,13 +18,13 @@ class Program
         // Initialize the facade with source and destination files
         using (PdfFileSecurity security = new PdfFileSecurity(inputPath, outputPath))
         {
-            // Disable internal exception handling so that failures throw
-            security.AllowExceptions = false;
+            // Allow printing, disallow copying (Copy is not included in DocumentPrivilege.Print)
+            security.SetPrivilege(DocumentPrivilege.Print);
 
-            // Apply a privilege (e.g., allow printing only). This will throw on failure.
-            security.SetPrivilege(userPassword, ownerPassword, DocumentPrivilege.Print);
+            // Persist the changes to the output file
+            security.Save(outputPath);
         }
 
-        Console.WriteLine($"Privilege applied and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with printing enabled and copying disabled: {outputPath}");
     }
 }
