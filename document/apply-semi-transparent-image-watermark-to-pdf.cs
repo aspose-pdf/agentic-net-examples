@@ -1,49 +1,47 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core Aspose.Pdf namespace
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";      // source PDF
-        const string overlayImg = "overlay.png";   // semi‑transparent PNG to use as watermark
+        const string inputPdf  = "input.pdf";
         const string outputPdf = "watermarked.pdf";
+        const string imagePath = "logo.png";
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(overlayImg))
-        {
-            Console.Error.WriteLine($"Overlay image not found: {overlayImg}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        if (!File.Exists(imagePath))
+        {
+            Console.Error.WriteLine($"Watermark image not found: {imagePath}");
+            return;
+        }
+
+        // Load the PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPdf))
         {
-            // Apply the watermark to each page
+            // Apply the semi‑transparent overlay to each page
             foreach (Page page in doc.Pages)
             {
-                // Create a watermark artifact (artifact is the preferred way to add an image overlay)
+                // Create a watermark artifact (no Rectangle assignment needed)
                 WatermarkArtifact watermark = new WatermarkArtifact();
+                watermark.SetImage(imagePath);          // set the image source
+                watermark.Opacity = 0.3;                // semi‑transparent (30% opacity)
 
-                // Set the image for the artifact
-                watermark.SetImage(overlayImg);
+                // Optional: center the watermark on the page
+                watermark.ArtifactHorizontalAlignment = HorizontalAlignment.Center;
+                watermark.ArtifactVerticalAlignment   = VerticalAlignment.Center;
 
-                // Set desired opacity (0.0 = fully transparent, 1.0 = fully opaque)
-                watermark.Opacity = 0.3;   // 30 % opacity for a semi‑transparent effect
-
-                // Optionally position the watermark (centered by default; can adjust via Position if needed)
-                // watermark.Position = new Position(100, 500); // example positioning
-
-                // Add the artifact to the page's artifact collection
+                // Add the artifact to the page
                 page.Artifacts.Add(watermark);
             }
 
-            // Save the modified PDF (lifecycle rule: save inside using block)
+            // Save the modified PDF (lifecycle rule: use Document.Save)
             doc.Save(outputPdf);
         }
 

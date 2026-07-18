@@ -7,9 +7,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";          // source PDF
-        const string outputPath = "expired_output.pdf"; // PDF with expiration script
-        const string expireDate = "2025-12-31";         // desired expiration date (YYYY-MM-DD)
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_expired.pdf";
+        const string expireDate = "2025-12-31"; // YYYY-MM-DD format
 
         if (!File.Exists(inputPath))
         {
@@ -17,16 +17,16 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Open the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // JavaScript that closes the document if the current date is past the expiration date
+            // JavaScript that closes the document after the specified date
             string js = $"var exp = new Date('{expireDate}'); if (new Date() > exp) this.closeDoc();";
 
-            // Attach the script as a document‑level OpenAction (executed when the document is opened)
+            // Assign the JavaScript to the document's OpenAction (runs when the PDF is opened)
             doc.OpenAction = new JavascriptAction(js);
 
-            // Save the modified PDF (PDF format is implicit)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

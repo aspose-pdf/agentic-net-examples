@@ -9,73 +9,56 @@ class Program
     {
         const string inputPdfPath   = "invoice.pdf";          // existing PDF
         const string zugferdXmlPath = "invoice.xml";          // ZUGFeRD XML file
-        const string outputPdfPath  = "invoice_with_xml.pdf"; // output PDF
+        const string outputPdfPath  = "invoice_with_xml.pdf"; // result PDF
 
-        // Verify source files exist
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
+
         if (!File.Exists(zugferdXmlPath))
         {
             Console.Error.WriteLine($"ZUGFeRD XML not found: {zugferdXmlPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: using block for disposal)
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the existing PDF
+        Document pdfDoc = new Document(inputPdfPath);
+
+        // Create a FileSpecification for the XML attachment using the (filePath, description) constructor
+        FileSpecification fileSpec = new FileSpecification(zugferdXmlPath, Path.GetFileName(zugferdXmlPath));
+
+        // Create an (invisible) file‑attachment annotation on the first page
+        // Use Aspose.Pdf.Rectangle (not System.Drawing.Rectangle) and set size to zero
+        var rect = new Aspose.Pdf.Rectangle(0, 0, 0, 0);
+        FileAttachmentAnnotation attachment = new FileAttachmentAnnotation(pdfDoc.Pages[1], rect, fileSpec)
         {
-            // Create a file specification for the XML attachment
-            FileSpecification xmlFileSpec = new FileSpecification(zugferdXmlPath)
-            {
-                Description = "ZUGFeRD Invoice XML"
-            };
+            Flags = AnnotationFlags.Hidden
+        };
 
-            // Define a rectangle for the attachment annotation (position on page)
-            Rectangle rect = new Rectangle(100, 500, 200, 600);
+        // Add the annotation to the page
+        pdfDoc.Pages[1].Annotations.Add(attachment);
 
-            // Create the file attachment annotation on the first page (note the required FileSpecification argument)
-            FileAttachmentAnnotation attachment = new FileAttachmentAnnotation(pdfDoc.Pages[1], rect, xmlFileSpec)
-            {
-                Name  = "ZUGFeRD",
-                Color = Aspose.Pdf.Color.LightGray
-                // Icon can be set if the enum is available; omitted here to keep compatibility
-            };
+        // Save the PDF with the embedded XML
+        pdfDoc.Save(outputPdfPath);
 
-            // Add the annotation to the page
-            pdfDoc.Pages[1].Annotations.Add(attachment);
-
-            // Save the modified PDF (lifecycle rule: Save inside using)
-            pdfDoc.Save(outputPdfPath);
-        }
-
-        // Verify that the XML attachment is present in the saved PDF
-        using (Document verifyDoc = new Document(outputPdfPath))
+        // Verify that the XML attachment is present using the document's EmbeddedFiles collection
+        Document verifyDoc = new Document(outputPdfPath);
+        bool found = false;
+        EmbeddedFileCollection embeddedFiles = verifyDoc.EmbeddedFiles;
+        for (int i = 1; i <= embeddedFiles.Count; i++)
         {
-            bool xmlFound = false;
-            foreach (Page page in verifyDoc.Pages)
+            FileSpecification spec = embeddedFiles[i];
+            if (string.Equals(spec.Name, Path.GetFileName(zugferdXmlPath), StringComparison.OrdinalIgnoreCase))
             {
-                foreach (Annotation ann in page.Annotations)
-                {
-                    if (ann is FileAttachmentAnnotation fileAnn && fileAnn.File != null)
-                    {
-                        // Compare file names (case‑insensitive) using the Name property of FileSpecification
-                        string attachedName = Path.GetFileName(fileAnn.File.Name);
-                        string expectedName = Path.GetFileName(zugferdXmlPath);
-                        if (string.Equals(attachedName, expectedName, StringComparison.OrdinalIgnoreCase))
-                        {
-                            xmlFound = true;
-                            break;
-                        }
-                    }
-                }
-                if (xmlFound) break;
+                found = true;
+                break;
             }
-
-            Console.WriteLine(xmlFound
-                ? "ZUGFeRD XML successfully embedded."
-                : "Failed to embed ZUGFeRD XML.");
         }
+
+        Console.WriteLine(found
+            ? $"ZUGFeRD XML successfully embedded in '{outputPdfPath}'."
+            : $"Failed to embed ZUGFeRD XML in '{outputPdfPath}'.");
     }
 }

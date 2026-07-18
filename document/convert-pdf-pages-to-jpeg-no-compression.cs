@@ -8,45 +8,42 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputFolder = "Images";
+        const string inputPdf = "input.pdf";
+        const string outputDir = "Images";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
+        Directory.CreateDirectory(outputDir);
 
         // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdfPath))
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // ----- Fixed: use the new OptimizationOptions API -----
-            // Create an OptimizationOptions instance and disable image compression.
-            // This affects PDF saving; raster conversion quality is controlled by the device.
+            // Disable image compression during optimization to keep original image data unchanged
             OptimizationOptions opt = new OptimizationOptions();
-            opt.ImageCompressionOptions.CompressImages = false;
+            opt.CompressImages = false; // do not compress images
+            // Apply the optimization options (no other changes are required)
             pdfDoc.OptimizeResources(opt);
-            // -------------------------------------------------------
 
-            // Create a JPEG device with high quality (100 = no compression loss)
-            Resolution resolution = new Resolution(300); // optional, adjust DPI as needed
-            JpegDevice jpegDevice = new JpegDevice(resolution, quality: 100);
+            // Create a JPEG device with maximum quality (100) and default resolution (150 DPI)
+            JpegDevice jpegDevice = new JpegDevice(quality: 100);
 
             // Iterate through all pages (1‑based indexing)
-            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
+            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
             {
-                string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.jpg");
+                string outPath = Path.Combine(outputDir, $"page_{pageNum}.jpg");
 
-                // Convert the page to JPEG and save to file
-                using (FileStream imageStream = new FileStream(outputPath, FileMode.Create))
+                // Convert the current page to JPEG and save to file
+                using (FileStream outStream = new FileStream(outPath, FileMode.Create))
                 {
-                    jpegDevice.Process(pdfDoc.Pages[pageNumber], imageStream);
+                    jpegDevice.Process(pdfDoc.Pages[pageNum], outStream);
                 }
 
-                Console.WriteLine($"Saved page {pageNumber} as JPEG → {outputPath}");
+                Console.WriteLine($"Saved page {pageNum} as JPEG → {outPath}");
             }
         }
     }
