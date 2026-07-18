@@ -1,8 +1,8 @@
 using System;
 using System.IO;
-using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using System.Security.Cryptography.X509Certificates;
 
 class Program
 {
@@ -13,77 +13,60 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use Document constructor)
+        // Prompt for PIN – the smart‑card driver will request it when the private key is accessed.
+        Console.Write("Enter smart card PIN: ");
+        string pin = Console.ReadLine(); // PIN is not used directly; kept for user interaction.
+
+        // Retrieve a certificate that has a private key from the current user store (smart‑card).
+        X509Certificate2 cert = null;
+        using (X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser))
+        {
+            store.Open(OpenFlags.ReadOnly);
+            foreach (var c in store.Certificates)
+            {
+                if (c.HasPrivateKey)
+                {
+                    cert = c;
+                    break;
+                }
+            }
+        }
+
+        if (cert == null)
+        {
+            Console.Error.WriteLine("No certificate with a private key found in the store.");
+            return;
+        }
+
+        // Load the PDF document (lifecycle rule: use using for deterministic disposal).
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least one page
-            Page page = doc.Pages[1];
+            // Define the rectangle where the signature will appear.
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 100, 300, 150);
 
-            // Define the rectangle where the signature field will appear
-            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-
-            // Create a signature field and add it to the form fields collection
-            SignatureField signatureField = new SignatureField(page, rect)
-            {
-                Name = "Signature1"
-            };
-            doc.Form.Add(signatureField);
-
-            // Retrieve a certificate with a private key from the smart card.
-            // The OS will prompt for the PIN when the private key is accessed.
-            X509Certificate2 certificate = GetCertificateFromSmartCard();
-
-            if (certificate == null)
-            {
-                Console.Error.WriteLine("No certificate with a private key was found on the smart card.");
-                return;
-            }
+            // Create a signature field on the first page and add it to the page annotations.
+            SignatureField signatureField = new SignatureField(doc.Pages[1], rect);
+            doc.Pages[1].Annotations.Add(signatureField);
 
             // Create an ExternalSignature that uses the smart‑card certificate.
-            ExternalSignature externalSignature = new ExternalSignature(certificate)
+            ExternalSignature externalSignature = new ExternalSignature(cert)
             {
-                Reason      = "Document signed with smart card",
-                Location    = Environment.MachineName,
+                Reason      = "Signed with smart card",
+                Location    = "Office",
                 ContactInfo = "user@example.com"
             };
 
-            // Sign the PDF using the signature field (lifecycle rule: use Sign method)
+            // Sign the PDF using the signature field.
             signatureField.Sign(externalSignature);
 
-            // Save the signed PDF (lifecycle rule: use Document.Save)
+            // Save the signed PDF (lifecycle rule: use Document.Save).
             doc.Save(outputPath);
         }
 
         Console.WriteLine($"Signed PDF saved to '{outputPath}'.");
-    }
-
-    // Helper method to obtain the first certificate with a private key from the CurrentUser store.
-    // Adjust the selection logic as needed (e.g., by subject name or thumbprint).
-    private static X509Certificate2 GetCertificateFromSmartCard()
-    {
-        X509Certificate2 result = null;
-        X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
-        try
-        {
-            store.Open(OpenFlags.ReadOnly);
-            foreach (X509Certificate2 cert in store.Certificates)
-            {
-                if (cert.HasPrivateKey)
-                {
-                    result = cert;
-                    break; // Use the first matching certificate
-                }
-            }
-        }
-        finally
-        {
-            store.Close();
-        }
-        return result;
     }
 }

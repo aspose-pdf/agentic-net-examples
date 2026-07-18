@@ -15,27 +15,33 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (wrapped in using for proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            bool anySignature = false;
-            int sigIndex = 1;
+            // Ensure the document contains a form (AcroForm) – signatures are stored as signature fields
+            if (doc.Form == null || doc.Form.Fields == null || doc.Form.Fields.Count() == 0)
+            {
+                Console.WriteLine("No form fields (including signatures) found in the document.");
+                return;
+            }
 
-            // Iterate over all form fields and pick the signature fields
+            bool anySignature = false;
+
+            // Iterate over each field and process only signature fields
             foreach (Field field in doc.Form.Fields)
             {
                 if (field is SignatureField sigField)
                 {
                     anySignature = true;
-                    // The Signature object holds the metadata such as Reason and Location
-                    var signature = sigField.Signature;
-                    string reason   = signature?.Reason   ?? "(no reason)";
-                    string location = signature?.Location ?? "(no location)";
+                    // The underlying PKCS#7 object holds the Reason and Location information
+                    PKCS7 pkcs7 = sigField.Signature as PKCS7;
+                    string reason   = pkcs7?.Reason   ?? "(no reason)";
+                    string location = pkcs7?.Location ?? "(no location)";
 
-                    Console.WriteLine($"Signature {sigIndex}:");
-                    Console.WriteLine($"  Reason   : {reason}");
-                    Console.WriteLine($"  Location : {location}");
-                    sigIndex++;
+                    Console.WriteLine($"Signature field: {sigField.PartialName}");
+                    Console.WriteLine($"  Reason  : {reason}");
+                    Console.WriteLine($"  Location: {location}");
+                    Console.WriteLine();
                 }
             }
 

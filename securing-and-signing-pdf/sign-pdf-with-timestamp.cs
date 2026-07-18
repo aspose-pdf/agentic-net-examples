@@ -2,66 +2,63 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Security; // for DigestHashAlgorithm (enum is in Aspose.Pdf namespace, but this using is safe)
 
 class Program
 {
     static void Main()
     {
-        // Input PDF, output signed PDF, certificate (PFX) and TSA server details
-        const string inputPdfPath   = "input.pdf";
-        const string outputPdfPath  = "signed_output.pdf";
-        const string certificatePath = "certificate.pfx";
-        const string certificatePassword = "pfxPassword";
+        const string inputPath = "input.pdf";
+        const string outputPath = "signed_timestamp.pdf";
+        const string certPath = "certificate.pfx";
+        const string certPassword = "password";
+        const string tsaUrl = "https://tsa.example.com";
+        const string tsaCredentials = "user:pass";
 
-        // Trusted Time‑Stamp Authority (TSA) server URL and optional basic auth credentials
-        const string tsaServerUrl = "https://freetsa.org/tsr"; // example TSA
-        const string tsaBasicAuth = "username:password";      // leave empty if not required
-
-        // Ensure the input files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
-        if (!File.Exists(certificatePath))
+        if (!File.Exists(certPath))
         {
-            Console.Error.WriteLine($"Certificate file not found: {certificatePath}");
+            Console.Error.WriteLine($"Certificate file not found: {certPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdfPath))
+        using (Document doc = new Document(inputPath))
         {
-            // Create a signature field on the first page (adjust rectangle as needed)
-            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 300, 200);
-            SignatureField sigField = new SignatureField(pdfDoc.Pages[1], sigRect)
+            // Define the rectangle for the visible signature (llx, lly, urx, ury)
+            Rectangle rect = new Rectangle(100, 100, 250, 150);
+
+            // Create a signature field and add it to the first page of the document
+            SignatureField sigField = new SignatureField(doc.Pages[1], rect)
             {
                 PartialName = "Signature1"
             };
-            pdfDoc.Form.Add(sigField);
+            doc.Form.Add(sigField, 1);
 
-            // Prepare the PKCS#7 signature object using the certificate
-            PKCS7 pkcs7Signature = new PKCS7(certificatePath, certificatePassword)
+            // Create a PKCS7 signature object using the certificate
+            PKCS7 pkcs7 = new PKCS7(certPath, certPassword)
             {
-                Reason   = "Document approved",
-                Location = "Office",
-                ContactInfo = "contact@example.com"
+                Reason = "Signed with timestamp",
+                ContactInfo = "contact@example.com",
+                Location = "Head Office"
             };
 
-            // Configure timestamp settings (SHA‑256 is the default, can be omitted)
-            pkcs7Signature.TimestampSettings = new TimestampSettings(
-                serverUrl: tsaServerUrl,
-                basicAuthCredentials: tsaBasicAuth,
-                digestHashAlgorithm: DigestHashAlgorithm.Sha256);
+            // Configure timestamp settings
+            TimestampSettings tsSettings = new TimestampSettings(
+                tsaUrl,
+                tsaCredentials,
+                DigestHashAlgorithm.Sha256);
+            pkcs7.TimestampSettings = tsSettings;
 
-            // Sign the document using the signature field
-            sigField.Sign(pkcs7Signature);
+            // Sign the signature field
+            sigField.Sign(pkcs7);
 
             // Save the signed PDF
-            pdfDoc.Save(outputPdfPath);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF signed and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"PDF signed and saved to '{outputPath}'.");
     }
 }

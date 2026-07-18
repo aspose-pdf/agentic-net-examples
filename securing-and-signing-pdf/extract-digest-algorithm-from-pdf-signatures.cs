@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using System.Linq; // Needed for Count() extension method
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Security;
@@ -9,7 +9,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "signed_document.pdf";
+        const string inputPath = "signed.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,10 +17,9 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document contains a form with fields
+            // Use Count() (extension method) because FieldCollection exposes Count as a method, not a property
             if (doc.Form == null || doc.Form.Fields == null || doc.Form.Fields.Count() == 0)
             {
                 Console.WriteLine("No form fields found in the document.");
@@ -28,8 +27,6 @@ class Program
             }
 
             bool anySignature = false;
-
-            // Iterate over each field and process only signature fields
             foreach (Field field in doc.Form.Fields)
             {
                 if (field is SignatureField sigField && sigField.Signature != null)
@@ -37,13 +34,10 @@ class Program
                     anySignature = true;
                     // Retrieve algorithm information for the current signature
                     SignatureAlgorithmInfo algoInfo = sigField.Signature.GetSignatureAlgorithmInfo();
-
-                    // The DigestHashAlgorithm field indicates the hash algorithm used
                     DigestHashAlgorithm digestAlg = algoInfo.DigestHashAlgorithm;
 
-                    // Log the result (signature field name and its digest algorithm)
-                    // Use null‑conditional operator for safety, although PartialName is unlikely to be null
-                    Console.WriteLine($"Signature field '{sigField.PartialName ?? "<unknown>"}': Digest Algorithm = {digestAlg}");
+                    string sigName = string.IsNullOrEmpty(sigField.PartialName) ? "(unnamed)" : sigField.PartialName;
+                    Console.WriteLine($"Signature '{sigName}' uses digest algorithm: {digestAlg}");
                 }
             }
 
