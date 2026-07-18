@@ -6,44 +6,46 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string stampImg  = "stamp.png";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string imagePath  = "stamp.png";
 
-        // Verify required files exist
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(stampImg))
-        {
-            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
-        using (Document doc = new Document(inputPdf))
+        if (!File.Exists(imagePath))
         {
-            // Create an image stamp from the file
-            ImageStamp stamp = new ImageStamp(stampImg);
+            Console.Error.WriteLine($"Stamp image not found: {imagePath}");
+            return;
+        }
 
-            // Set low quality (10 %) to reduce size and improve performance
-            stamp.Quality = 10;               // valid range 0‑100%
-            stamp.Background = false;        // stamp on top (default)
-            stamp.HorizontalAlignment = HorizontalAlignment.Center;
-            stamp.VerticalAlignment   = VerticalAlignment.Center;
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPath))
+        {
+            // Create an image stamp from the specified file
+            ImageStamp imgStamp = new ImageStamp(imagePath);
 
-            // Apply the stamp to every page (Page.AddStamp is the correct method)
-            foreach (Page page in doc.Pages)
+            // Set low quality (10 %) to improve performance on large PDFs
+            imgStamp.Quality = 10;
+
+            // Optional visual settings
+            imgStamp.HorizontalAlignment = HorizontalAlignment.Center;
+            imgStamp.VerticalAlignment   = VerticalAlignment.Center;
+            imgStamp.Opacity = 0.5; // semi‑transparent
+
+            // Apply the stamp to every page in the document
+            foreach (Page page in pdfDoc.Pages)
             {
-                page.AddStamp(stamp);
+                page.AddStamp(imgStamp);
             }
 
-            // Save the modified PDF (lifecycle rule: save inside using block)
-            doc.Save(outputPdf);
+            // Save the modified PDF
+            pdfDoc.Save(outputPath);
         }
 
-        Console.WriteLine($"Low‑quality image stamp applied. Output saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF saved with low‑quality image stamp to '{outputPath}'.");
     }
 }

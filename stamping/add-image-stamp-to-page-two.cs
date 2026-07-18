@@ -7,8 +7,8 @@ class Program
     static void Main()
     {
         const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
         const string stampImg  = "stamp.png";
+        const string outputPdf = "output.pdf";
 
         if (!File.Exists(inputPdf))
         {
@@ -21,7 +21,7 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (deterministic disposal)
         using (Document doc = new Document(inputPdf))
         {
             // Verify that page 2 exists (Aspose.Pdf uses 1‑based indexing)
@@ -37,13 +37,13 @@ class Program
             imgStamp.Opacity = 0.8;   // 80 % opacity
 
             // Add the stamp to page 2
-            Page pageTwo = doc.Pages[2];
+            Aspose.Pdf.Page pageTwo = doc.Pages[2];
             pageTwo.AddStamp(imgStamp);
 
             // Save the modified PDF
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Image stamp applied and saved to '{outputPdf}'.");
+        Console.WriteLine($"Image stamp added and saved to '{outputPdf}'.");
     }
 }

@@ -1,14 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations; // for alignment enums
-using Aspose.Pdf.Text;       // for TextState
+using Aspose.Pdf.Text; // Required for TextStamp
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,21 +16,17 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (wrapped in using for proper disposal)
         using (Document doc = new Document(inputPath))
         {
             // Create a text stamp with the desired content
-            TextStamp stamp = new TextStamp("Bottom‑Left Stamp");
+            TextStamp stamp = new TextStamp("Sample Stamp");
 
-            // Set visual appearance (optional)
-            stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-            stamp.TextState.FontSize = 12;
-
-            // Align to bottom‑left corner with 10‑point margins
+            // Align the stamp to the bottom‑left corner with a 10‑point margin
             stamp.HorizontalAlignment = HorizontalAlignment.Left;
             stamp.VerticalAlignment   = VerticalAlignment.Bottom;
-            stamp.LeftMargin          = 10; // points from the left edge
-            stamp.BottomMargin        = 10; // points from the bottom edge
+            stamp.LeftMargin          = 10; // 10 points from the left edge
+            stamp.BottomMargin        = 10; // 10 points from the bottom edge
 
             // Apply the stamp to every page in the document
             foreach (Page page in doc.Pages)
@@ -43,6 +38,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Text stamp applied and saved to '{outputPath}'.");
+        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
     }
 }

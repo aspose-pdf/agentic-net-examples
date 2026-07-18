@@ -6,11 +6,12 @@ class Program
 {
     static void Main()
     {
+        // Paths for input PDF, output PDF and the image to be used as a stamp
         const string inputPdfPath   = "input.pdf";
-        const string stampImagePath = "stamp.png";
         const string outputPdfPath  = "output.pdf";
+        const string stampImagePath = "stamp.png";
 
-        // Verify required files exist
+        // Ensure the input files exist
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
@@ -22,39 +23,42 @@ class Program
             return;
         }
 
-        // Load the source PDF, extract its XMP metadata, add the image stamp,
-        // then re‑apply the metadata before saving.
-        using (Document doc = new Document(inputPdfPath))
+        // Load the PDF, preserve its XMP metadata, add the image stamp, then save
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Extract existing XMP metadata into a memory stream
+            // ----- Preserve existing XMP metadata -----
+            // Retrieve the XMP metadata into a memory stream
             using (MemoryStream xmpStream = new MemoryStream())
             {
-                doc.GetXmpMetadata(xmpStream);
-                xmpStream.Position = 0; // Reset for later reading
+                pdfDoc.GetXmpMetadata(xmpStream);
+                // Reset the stream position so it can be read again later
+                xmpStream.Position = 0;
 
-                // Create an image stamp from the specified image file
-                ImageStamp imgStamp = new ImageStamp(stampImagePath)
+                // ----- Add image stamp to each page -----
+                foreach (Page page in pdfDoc.Pages)
                 {
-                    // Example visual settings (optional)
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment   = VerticalAlignment.Center,
-                    Opacity             = 0.5f
-                };
+                    // Create a new ImageStamp for the current page
+                    ImageStamp imgStamp = new ImageStamp(stampImagePath)
+                    {
+                        // Example visual settings (optional)
+                        Opacity = 0.5,                                 // 50% transparent
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        VerticalAlignment   = VerticalAlignment.Center
+                    };
 
-                // Apply the stamp to every page in the document
-                foreach (Page page in doc.Pages)
-                {
+                    // Place the stamp on the page
                     page.AddStamp(imgStamp);
                 }
 
-                // Re‑apply the original XMP metadata to the modified document
-                doc.SetXmpMetadata(xmpStream);
+                // ----- Restore the XMP metadata -----
+                // The stream still contains the original metadata; set it back onto the document
+                pdfDoc.SetXmpMetadata(xmpStream);
             }
 
-            // Save the resulting PDF
-            doc.Save(outputPdfPath);
+            // Save the modified PDF (using the standard Save method as required)
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Stamped PDF saved to '{outputPdfPath}'.");
+        Console.WriteLine($"PDF saved with image stamp and original XMP metadata: {outputPdfPath}");
     }
 }

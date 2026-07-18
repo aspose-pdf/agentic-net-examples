@@ -24,22 +24,16 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Create an image stamp
-            ImageStamp imgStamp = new ImageStamp(stampImagePath)
-            {
-                // Position the stamp at the bottom‑right corner
-                HorizontalAlignment = HorizontalAlignment.Right,
-                VerticalAlignment   = VerticalAlignment.Bottom,
-                // Make the stamp semi‑transparent
-                Opacity = 0.5f,
-                // Add a uniform margin around the stamp
-                LeftMargin   = 10,
-                RightMargin  = 10,
-                TopMargin    = 10,
-                BottomMargin = 10
-            };
+            // Create an ImageStamp from the image file
+            ImageStamp imgStamp = new ImageStamp(stampImagePath);
 
-            // Add the stamp to every page; existing JavaScript actions are preserved
+            // Optional stamp appearance settings
+            imgStamp.Background = false;                     // place stamp on top of page content
+            imgStamp.Opacity = 0.5;                          // semi‑transparent
+            imgStamp.HorizontalAlignment = HorizontalAlignment.Center;
+            imgStamp.VerticalAlignment = VerticalAlignment.Center;
+
+            // Apply the stamp to every page; existing JavaScript actions are preserved
             foreach (Page page in doc.Pages)
             {
                 page.AddStamp(imgStamp);

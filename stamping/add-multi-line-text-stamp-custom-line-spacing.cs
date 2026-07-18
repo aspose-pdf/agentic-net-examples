@@ -1,13 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // TextState is defined here
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,33 +16,24 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Define the multi‑line disclaimer text
-            string disclaimer = "This is a disclaimer.\nPlease read carefully.\nContact us for more info.";
+            // Multi‑line disclaimer text (use newline characters for separate lines)
+            string disclaimer = "Disclaimer:\nThis document is confidential.\nDo not distribute.";
 
-            // Configure text appearance and custom line spacing
-            TextState textState = new TextState
-            {
-                Font = FontRepository.FindFont("Helvetica"),
-                FontSize = 12,
-                ForegroundColor = Aspose.Pdf.Color.Black,
-                // Additional spacing added after each line (in points)
-                LineSpacing = 6f
-            };
+            // Create a TextStamp with the disclaimer string
+            TextStamp stamp = new TextStamp(disclaimer);
 
-            // Create a TextStamp with the disclaimer and the configured TextState
-            TextStamp stamp = new TextStamp(disclaimer, textState)
-            {
-                // Position the stamp at the bottom center of each page
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Bottom,
-                BottomMargin        = 20,   // distance from the bottom edge
-                // Optional: make the stamp appear behind page content
-                Background          = false,
-                Opacity             = 1.0f
-            };
+            // Set custom line spacing (points) via the TextState of the stamp
+            stamp.TextState.LineSpacing = 5f; // increase spacing between lines
+
+            // Optional appearance settings
+            stamp.HorizontalAlignment = HorizontalAlignment.Center;
+            stamp.VerticalAlignment   = VerticalAlignment.Bottom;
+            stamp.BottomMargin        = 20;   // distance from the bottom edge
+            stamp.Opacity             = 0.7f; // semi‑transparent
+            stamp.Background          = false; // draw on top of page content
 
             // Apply the stamp to every page in the document
             foreach (Page page in doc.Pages)
@@ -50,10 +41,10 @@ class Program
                 page.AddStamp(stamp);
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (extension .pdf ensures PDF output)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with disclaimer stamp to '{outputPath}'.");
+        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
     }
 }

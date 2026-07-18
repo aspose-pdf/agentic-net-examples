@@ -1,47 +1,54 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;                     // Core PDF API
+using Aspose.Pdf.Annotations;        // For annotation types (if needed)
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";
-        const string stampImagePath = "stamp.png";
-        const string outputPdfPath  = "output.pdf";
+        const string inputPdf  = "input.pdf";      // source PDF with existing annotations
+        const string stampImg  = "stamp.png";      // image to use as stamp
+        const string outputPdf = "output.pdf";     // result PDF
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        if (!File.Exists(stampImagePath))
+        if (!File.Exists(stampImg))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
+            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
             return;
         }
 
-        // Load the existing PDF (preserves all annotations)
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF document (using block ensures proper disposal)
+        using (Document doc = new Document(inputPdf))
         {
-            // Create an image stamp
-            ImageStamp imgStamp = new ImageStamp(stampImagePath)
+            // Create an ImageStamp from the image file
+            ImageStamp imgStamp = new ImageStamp(stampImg)
             {
-                // Position the stamp – centered horizontally, at the bottom of the page
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Bottom,
-                // Make the stamp semi‑transparent
-                Opacity = 0.5f
+                // Position the stamp – you can adjust margins, alignment, opacity, etc.
+                // Here we place it at the top‑right corner with a 20‑point margin.
+                HorizontalAlignment = HorizontalAlignment.Right,
+                VerticalAlignment   = VerticalAlignment.Top,
+                RightMargin         = 20,
+                TopMargin           = 20,
+                Opacity             = 0.5f,          // semi‑transparent
+                // Optional scaling – set Width/Height or Zoom as needed
+                // Width = 100,
+                // Height = 50
             };
 
             // Add the stamp to the first page (page indexing is 1‑based)
-            pdfDoc.Pages[1].AddStamp(imgStamp);
+            Page firstPage = doc.Pages[1];
+            firstPage.AddStamp(imgStamp);   // existing annotations on the page remain unchanged
 
-            // Save the PDF; existing annotations remain intact
-            pdfDoc.Save(outputPdfPath);
+            // Save the modified PDF (annotations are preserved automatically)
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Image stamp added and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Image stamp added and saved to '{outputPdf}'.");
     }
 }

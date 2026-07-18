@@ -1,54 +1,60 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf; // Core PDF API
 
-class Program
+class AddImageStampToSignedPdf
 {
     static void Main()
     {
+        // Input signed PDF, image to be used as stamp, and output PDF path
         const string signedPdfPath   = "signed_input.pdf";
-        const string stampImagePath  = "stamp.png";
+        const string stampImagePath  = "stamp_logo.png";
         const string outputPdfPath   = "signed_with_stamp.pdf";
 
+        // Verify input files exist
         if (!File.Exists(signedPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {signedPdfPath}");
+            Console.Error.WriteLine($"Signed PDF not found: {signedPdfPath}");
             return;
         }
-
         if (!File.Exists(stampImagePath))
         {
             Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
             return;
         }
 
-        // Load the already signed PDF
-        using (Document doc = new Document(signedPdfPath))
+        try
         {
-            // Create an image stamp
-            ImageStamp imgStamp = new ImageStamp(stampImagePath)
+            // Load the already signed PDF (no load options required for PDF)
+            using (Document pdfDoc = new Document(signedPdfPath))
             {
-                // Position the stamp at the centre of the page
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Center,
-                // Make the stamp semi‑transparent so the underlying content remains visible
-                Opacity = 0.5f,
-                // Optional: scale the stamp (e.g., 30% of its original size)
-                Zoom = 0.3f
-            };
+                // Create an ImageStamp from the image file
+                ImageStamp imgStamp = new ImageStamp(stampImagePath);
 
-            // Add the stamp to the first page (Page indexing is 1‑based)
-            Page firstPage = doc.Pages[1];
-            firstPage.AddStamp(imgStamp);
+                // Configure stamp appearance (optional)
+                imgStamp.Opacity = 0.5;                 // semi‑transparent
+                imgStamp.HorizontalAlignment = HorizontalAlignment.Center;
+                imgStamp.VerticalAlignment   = VerticalAlignment.Bottom;
+                imgStamp.BottomMargin = 20;             // distance from bottom edge
 
-            // Save the document.  In the current Aspose.PDF version the
-            // incremental‑update feature is enabled automatically when a
-            // document that already contains a digital signature is modified.
-            // Therefore we omit the non‑existent UpdateMode property.
-            doc.Save(outputPdfPath);
+                // Add the stamp to the first page (pages are 1‑based)
+                pdfDoc.Pages[1].AddStamp(imgStamp);
+
+                // Save the document. In recent Aspose.Pdf versions the default
+                // behaviour preserves existing byte‑range signatures when the
+                // document is saved without specifying a different save mode.
+                // If an older version is used where explicit incremental update
+                // is required, the AppendMode property can be set on PdfSaveOptions.
+                PdfSaveOptions saveOpts = new PdfSaveOptions();
+                // saveOpts.AppendMode = true; // Uncomment if using a version that supports AppendMode
+                pdfDoc.Save(outputPdfPath, saveOpts);
+            }
+
+            Console.WriteLine($"Image stamp added successfully. Output saved to '{outputPdfPath}'.");
         }
-
-        Console.WriteLine($"Stamp added and saved to '{outputPdfPath}' without invalidating the signature.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

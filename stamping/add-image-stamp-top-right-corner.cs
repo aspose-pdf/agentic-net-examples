@@ -6,40 +6,44 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string stampImg  = "logo.png";
-        const string outputPdf = "output.pdf";
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "output.pdf";
+        const string stampImagePath = "logo.png";
 
-        if (!File.Exists(inputPdf) || !File.Exists(stampImg))
+        // Verify that the source PDF and stamp image exist.
+        if (!File.Exists(inputPdfPath) || !File.Exists(stampImagePath))
         {
             Console.Error.WriteLine("Input PDF or stamp image not found.");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using)
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document inside a using block for deterministic disposal.
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Create an image stamp from a file (ImageStamp constructor)
-            ImageStamp imgStamp = new ImageStamp(stampImg);
+            // Create an ImageStamp from the image file.
+            ImageStamp imgStamp = new ImageStamp(stampImagePath);
 
-            // Align to the top‑right corner
-            imgStamp.HorizontalAlignment = HorizontalAlignment.Right;   // right side
-            imgStamp.VerticalAlignment   = VerticalAlignment.Top;      // top side
+            // Align the stamp to the top‑right corner.
+            imgStamp.HorizontalAlignment = HorizontalAlignment.Right;
+            imgStamp.VerticalAlignment   = VerticalAlignment.Top;
 
-            // Set margin offsets (distance from the page edges)
-            imgStamp.RightMargin = 20; // 20 points from the right edge
-            imgStamp.TopMargin   = 20; // 20 points from the top edge
+            // Set margin offsets (e.g., 20 points from the right and top edges).
+            imgStamp.RightMargin = 20;
+            imgStamp.TopMargin   = 20;
 
-            // Apply the stamp to every page
+            // Optional: make the stamp slightly transparent.
+            imgStamp.Opacity = 0.8;
+
+            // Apply the stamp to every page in the document.
             foreach (Page page in doc.Pages)
             {
                 page.AddStamp(imgStamp);
             }
 
-            // Save the modified PDF (lifecycle rule: use using, then Save)
-            doc.Save(outputPdf);
+            // Save the modified PDF.
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Image stamp applied and saved to '{outputPdf}'.");
+        Console.WriteLine($"Image stamp applied and saved to '{outputPdfPath}'.");
     }
 }

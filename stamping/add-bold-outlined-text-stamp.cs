@@ -1,15 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
-using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Text;   // needed for FontRepository, TextState, TextRenderingMode
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_bold_stamp.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -21,34 +20,33 @@ class Program
         using (Document doc = new Document(inputPath))
         {
             // Create a TextStamp with the desired text
-            TextStamp stamp = new TextStamp("Bold Outlined Text")
-            {
-                // Render as graphic operators (required for rendering mode in older versions)
-                Draw = true,
+            TextStamp stamp = new TextStamp("Bold Outline");
 
-                // Center the stamp on each page
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Center
-            };
+            // Render as graphic operators (required for fill‑stroke rendering)
+            stamp.Draw = true;
 
-            // Configure the text appearance – use a bold font to simulate an outlined effect
-            stamp.TextState.Font = FontRepository.FindFont("Helvetica-Bold");
+            // Configure text appearance via TextState
+            stamp.TextState.Font = FontRepository.FindFont("Helvetica");
             stamp.TextState.FontSize = 48;
-            // Fill color (the interior of the characters)
-            stamp.TextState.ForegroundColor = Color.Blue;
-            // Note: StrokeColor and RenderingMode are not available in this version of Aspose.Pdf.
-            // The bold font provides a thicker, pseudo‑outlined appearance.
+            stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;   // fill color
+            stamp.TextState.RenderingMode = TextRenderingMode.FillThenStrokeText; // fill + stroke
+            stamp.OutlineWidth = 1.5;          // stroke thickness
+            stamp.OutlineOpacity = 1.0;        // fully opaque outline
 
-            // Add the stamp to every page in the document
+            // Position the stamp (centered on each page)
+            stamp.HorizontalAlignment = HorizontalAlignment.Center;
+            stamp.VerticalAlignment   = VerticalAlignment.Center;
+
+            // Apply the stamp to every page in the document
             foreach (Page page in doc.Pages)
             {
                 page.AddStamp(stamp);
             }
 
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Stamp added and saved to '{outputPath}'.");
+        Console.WriteLine($"Text stamp with fill‑stroke rendering saved to '{outputPath}'.");
     }
 }
