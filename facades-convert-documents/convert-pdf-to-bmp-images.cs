@@ -1,61 +1,50 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging; // ImageFormat enum
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices; // Resolution
+using System.Drawing.Imaging;               // ImageFormat enum
+using Aspose.Pdf.Facades;               // PdfConverter facade
+using Aspose.Pdf.Devices;               // Resolution
 
-class PdfToBmpConverter
+class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string pdfPath = "input.pdf";
+        const string inputPdf  = "input.pdf";          // source PDF
+        const string outputDir = "BmpImages";          // folder for BMP files
 
-        // Output folder for BMP images
-        const string outputFolder = "BmpImages";
-
-        // Ensure the input file exists
-        if (!File.Exists(pdfPath))
+        // Verify source file exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Error: PDF file not found – {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Create output directory if it does not exist
-        Directory.CreateDirectory(outputFolder);
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputDir);
 
-        // Initialize the PdfConverter facade
-        PdfConverter converter = new PdfConverter();
-
-        // Bind the PDF document to the converter
-        converter.BindPdf(pdfPath);
-
-        // Configure resolution (e.g., 300 DPI)
-        converter.Resolution = new Resolution(300);
-
-        // NOTE: In recent Aspose.Pdf versions the PageCoordinateType enum has been removed.
-        // The default coordinate type is CropBox, which matches the original intent.
-        // If a specific coordinate type is required, it can be set using the integer value
-        // of the underlying enum (0 = MediaBox, 1 = CropBox, etc.).
-        // Example (uncomment if needed and adjust the value):
-        // converter.CoordinateType = (PageCoordinateType)1; // CropBox
-
-        // Prepare the converter for image extraction
-        converter.DoConvert();
-
-        int pageIndex = 1;
-        // Loop through all pages and save each as a BMP image
-        while (converter.HasNextImage())
+        // PdfConverter implements IDisposable – use a using block for deterministic cleanup
+        using (PdfConverter converter = new PdfConverter())
         {
-            string outputPath = Path.Combine(outputFolder, $"page_{pageIndex}.bmp");
-            // Use System.Drawing.Imaging.ImageFormat for BMP
-            converter.GetNextImage(outputPath, ImageFormat.Bmp);
-            pageIndex++;
+            // Bind the PDF file to the converter
+            converter.BindPdf(inputPdf);
+
+            // Configure conversion parameters BEFORE DoConvert()
+            converter.Resolution = new Resolution(300); // 300 DPI
+            // Note: CoordinateType enum is not available in the current Aspose.Pdf version;
+            // the default coordinate system (MediaBox) is sufficient for most scenarios.
+
+            // Initialise the conversion process
+            converter.DoConvert();
+
+            // Extract each page as a BMP image
+            int pageNumber = 1;
+            while (converter.HasNextImage())
+            {
+                string bmpPath = Path.Combine(outputDir, $"page_{pageNumber}.bmp");
+                converter.GetNextImage(bmpPath, ImageFormat.Bmp); // save as BMP using System.Drawing.Imaging.ImageFormat
+                pageNumber++;
+            }
         }
 
-        // Release resources
-        converter.Close();
-
-        Console.WriteLine($"Conversion completed. BMP images saved to '{outputFolder}'.");
+        Console.WriteLine("PDF successfully converted to BMP images.");
     }
 }

@@ -1,47 +1,37 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices;
+using Aspose.Pdf.Devices;   // TiffDevice resides here
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";          // source PDF
-        const string outputDir = "TiffPages";        // folder for TIFF files
+        const string inputPdf  = "input.pdf";          // source PDF
+        const string outputTiff = "pages3to8.tiff";    // result TIFF file
 
-        // Verify that the input file exists before proceeding
         if (!File.Exists(inputPdf))
         {
-            Console.WriteLine($"Input file '{inputPdf}' not found.");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
-
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document (lifecycle rule: wrap in using)
         using (Document pdfDoc = new Document(inputPdf))
         {
-            // Define the page range (1‑based indexing). Guard against PDFs with fewer pages.
-            int startPage = 3;
-            int endPage   = Math.Min(8, pdfDoc.Pages.Count);
-
-            // TiffDevice does NOT implement IDisposable – instantiate it once and reuse.
+            // TiffDevice with default settings:
+            // - Default resolution = 150 DPI
+            // - Default CoordinateType = CropBox (already the default)
             TiffDevice tiffDevice = new TiffDevice();
 
-            for (int pageNumber = startPage; pageNumber <= endPage; pageNumber++)
+            // Create output stream for the TIFF image
+            using (FileStream outStream = new FileStream(outputTiff, FileMode.Create, FileAccess.Write))
             {
-                string tiffPath = Path.Combine(outputDir, $"Page_{pageNumber}.tiff");
-
-                // Use a FileStream so we can control the lifetime of the underlying stream.
-                using (FileStream tiffStream = new FileStream(tiffPath, FileMode.Create, FileAccess.Write))
-                {
-                    tiffDevice.Process(pdfDoc.Pages[pageNumber], tiffStream);
-                }
+                // Convert pages 3 through 8 (inclusive) to TIFF
+                tiffDevice.Process(pdfDoc, 3, 8, outStream);
             }
         }
 
-        Console.WriteLine("Pages 3‑8 have been converted to TIFF images.");
+        Console.WriteLine($"TIFF image created at '{outputTiff}'.");
     }
 }
