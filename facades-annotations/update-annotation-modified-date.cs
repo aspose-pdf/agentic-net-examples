@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
@@ -7,42 +8,41 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Verify that the source PDF exists
-        if (!System.IO.File.Exists(inputPath))
+        if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Create the annotation editor and bind the PDF document
+        // Bind the PDF document to the annotation editor
         using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
             editor.BindPdf(inputPath);
 
-            // The prototype annotation must be instantiated with a Page and a Rectangle.
-            // We use the first page and a zero‑size rectangle because only the Modified
-            // property is relevant for the ModifyAnnotations call.
+            // Obtain a page reference (required for TextAnnotation constructor)
             Page firstPage = editor.Document.Pages[1];
-            Aspose.Pdf.Rectangle dummyRect = new Aspose.Pdf.Rectangle(0, 0, 0, 0);
-            TextAnnotation prototype = new TextAnnotation(firstPage, dummyRect)
+            // Define a rectangle – size can be zero if the annotation is only used for metadata update
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(0, 0, 0, 0);
+
+            // Create a TextAnnotation with the Modified date set to the current time
+            TextAnnotation annotation = new TextAnnotation(firstPage, rect)
             {
-                Modified = DateTime.Now // set to current system time
+                Modified = DateTime.Now
+                // Additional properties (Title, Contents, etc.) can be set here if needed
             };
 
-            // Determine the page range (Aspose.Pdf uses 1‑based indexing)
+            // Apply the modification to all pages (1‑based indexing)
             int startPage = 1;
-            int endPage   = editor.Document.Pages.Count; // all pages
-
-            // Apply the modification to all annotations of the specified type on the range
-            editor.ModifyAnnotations(startPage, endPage, prototype);
+            int endPage = editor.Document.Pages.Count;
+            editor.ModifyAnnotations(startPage, endPage, annotation);
 
             // Save the updated PDF
             editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Annotations' Modified date updated and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with updated annotation saved to '{outputPath}'.");
     }
 }

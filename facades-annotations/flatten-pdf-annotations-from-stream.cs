@@ -2,53 +2,53 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-public static class PdfAnnotationFlattener
+namespace AsposePdfApi
 {
-    /// <summary>
-    /// Flattens all annotations in a PDF provided as a stream and returns a new stream containing the modified PDF.
-    /// No file system access is performed.
-    /// </summary>
-    /// <param name="inputPdfStream">Stream containing the source PDF. The stream must be readable and seekable.</param>
-    /// <returns>A MemoryStream with the flattened PDF. Caller is responsible for disposing the returned stream.</returns>
-    public static MemoryStream FlattenAnnotations(Stream inputPdfStream)
+    public static class PdfAnnotationFlattener
     {
-        if (inputPdfStream == null)
-            throw new ArgumentNullException(nameof(inputPdfStream));
-
-        // Ensure the input stream is positioned at the beginning.
-        if (inputPdfStream.CanSeek)
-            inputPdfStream.Position = 0;
-
-        // Output stream will hold the result.
-        MemoryStream outputPdfStream = new MemoryStream();
-
-        // PdfAnnotationEditor is a facade that works directly with streams.
-        // It implements IDisposable, so we use a using block for deterministic cleanup.
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        /// <summary>
+        /// Flattens all annotations in a PDF provided as a stream and returns a new stream containing the modified PDF.
+        /// </summary>
+        /// <param name="pdfInput">Input stream with the original PDF. The stream will be read from its current position.</param>
+        /// <returns>A MemoryStream containing the PDF with flattened annotations. Caller is responsible for disposing the returned stream.</returns>
+        public static Stream FlattenPdfAnnotations(Stream pdfInput)
         {
-            // Bind the PDF from the input stream.
-            editor.BindPdf(inputPdfStream);
+            if (pdfInput == null) throw new ArgumentNullException(nameof(pdfInput));
 
-            // Flatten all annotations in the document.
-            editor.FlatteningAnnotations();
+            // Ensure the input stream is positioned at the beginning.
+            if (pdfInput.CanSeek)
+                pdfInput.Position = 0;
 
-            // Save the modified PDF into the output stream.
-            editor.Save(outputPdfStream);
+            // Output stream that will hold the flattened PDF.
+            MemoryStream outputStream = new MemoryStream();
+
+            // Use PdfAnnotationEditor from Aspose.Pdf.Facades to work with annotations.
+            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+            {
+                // Bind the input PDF stream to the editor.
+                editor.BindPdf(pdfInput);
+
+                // Flatten all annotations in the document.
+                editor.FlatteningAnnotations();
+
+                // Save the modified PDF to the output stream.
+                editor.Save(outputStream);
+            }
+
+            // Reset the output stream position so it can be read from the beginning.
+            if (outputStream.CanSeek)
+                outputStream.Position = 0;
+
+            return outputStream;
         }
-
-        // Reset the position of the output stream so callers can read from the start.
-        if (outputPdfStream.CanSeek)
-            outputPdfStream.Position = 0;
-
-        return outputPdfStream;
     }
-}
 
-// Dummy entry point required for console‑type projects.
-public class Program
-{
-    public static void Main(string[] args)
+    // Dummy entry point to satisfy the compiler when the project is built as an executable.
+    internal class Program
     {
-        // Intentionally left blank – the library method can be called from other code.
+        private static void Main(string[] args)
+        {
+            // No operation – the library functionality is exposed via PdfAnnotationFlattener.
+        }
     }
 }

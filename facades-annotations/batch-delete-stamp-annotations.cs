@@ -6,46 +6,46 @@ class Program
 {
     static void Main()
     {
-        // Input directory containing PDFs
-        const string inputDir = "pdfs";
-        // Output directory for processed PDFs
-        const string outputDir = "output";
+        // Folder containing PDFs to process
+        const string inputFolder  = @"C:\Pdf\Input";
+        // Folder where cleaned PDFs will be saved
+        const string outputFolder = @"C:\Pdf\Output";
 
-        if (!Directory.Exists(inputDir))
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputFolder);
+
+        // Process each PDF file in the input folder
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            Console.Error.WriteLine($"Input directory not found: {inputDir}");
-            return;
-        }
-
-        Directory.CreateDirectory(outputDir);
-
-        // Process each PDF file in the input directory
-        foreach (string pdfPath in Directory.GetFiles(inputDir, "*.pdf"))
-        {
-            string fileName = Path.GetFileName(pdfPath);
-            string outPath = Path.Combine(outputDir, fileName);
-
             try
             {
-                // Initialize the annotation editor and bind the PDF
-                PdfAnnotationEditor editor = new PdfAnnotationEditor();
-                editor.BindPdf(pdfPath);
+                // Initialize the annotation editor facade
+                using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+                {
+                    // Load the PDF document
+                    editor.BindPdf(pdfPath);
 
-                // Delete all stamp annotations in the document
-                editor.DeleteAnnotations("Stamp");
+                    // Delete all annotations of type "Stamp"
+                    editor.DeleteAnnotations("Stamp");
 
-                // Save the modified PDF to the output location
-                editor.Save(outPath);
+                    // Build output file path (overwrite original name in output folder)
+                    string outPath = Path.Combine(outputFolder, Path.GetFileName(pdfPath));
 
-                // Release resources held by the editor
-                editor.Close();
+                    // Save the modified PDF
+                    editor.Save(outPath);
 
-                Console.WriteLine($"Processed: {fileName}");
+                    // Close the facade (releases any resources)
+                    editor.Close();
+                }
+
+                Console.WriteLine($"Processed: {Path.GetFileName(pdfPath)}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing {fileName}: {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         }
+
+        Console.WriteLine("Batch stamp deletion completed.");
     }
 }

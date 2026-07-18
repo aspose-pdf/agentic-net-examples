@@ -1,70 +1,77 @@
 using System;
 using System.IO;
 using System.Threading;
+using System.Drawing; // needed for Rectangle
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        try
+        if (!File.Exists(inputPath))
         {
-            ModifyAnnotationsWithRetry(inputPdf, outputPdf);
-            Console.WriteLine($"Annotations processed and saved to '{outputPdf}'.");
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Operation failed: {ex.Message}");
-        }
-    }
 
-    // Performs annotation modifications with exponential back‑off retry for transient I/O errors.
-    static void ModifyAnnotationsWithRetry(string inputPath, string outputPath)
-    {
-        const int maxAttempts = 5;          // maximum number of retries
+        const int maxRetries = 5;
         int attempt = 0;
-        int delayMs = 500;                  // initial back‑off delay (ms)
+        int delayMs = 200;
 
         while (true)
         {
             try
             {
-                // Use the Facade to bind, modify, and save the PDF.
-                using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+                // Load the PDF document and bind it to the annotation editor
+                using (Document doc = new Document(inputPath))
+                using (PdfAnnotationEditor annotationEditor = new PdfAnnotationEditor())
                 {
-                    editor.BindPdf(inputPath);
+                    annotationEditor.BindPdf(doc);
 
-                    // Example modification: delete all existing annotations.
-                    editor.DeleteAnnotations();
+                    // Example modification: delete all existing annotations
+                    annotationEditor.DeleteAnnotations();
 
-                    // Save the modified document.
-                    editor.Save(outputPath);
+                    // Add a free‑text annotation on the first page using PdfContentEditor
+                    using (PdfContentEditor contentEditor = new PdfContentEditor())
+                    {
+                        contentEditor.BindPdf(doc);
+                        // System.Drawing.Rectangle expects (x, y, width, height)
+                        System.Drawing.Rectangle rect = new System.Drawing.Rectangle(100, 500, 200, 50);
+                        contentEditor.CreateFreeText(rect, "Sample annotation", 0);
+                    }
+
+                    // Save the modified document
+                    doc.Save(outputPath);
                 }
 
-                // Success – exit the retry loop.
-                break;
+                Console.WriteLine($"Annotations updated and saved to '{outputPath}'.");
+                break; // success
             }
-            catch (IOException ioEx) when (IsTransient(ioEx))
+            catch (IOException ex) when (IsTransient(ex))
             {
-                // Transient file access error – apply exponential back‑off.
                 attempt++;
-                if (attempt >= maxAttempts)
-                    throw; // re‑throw after exceeding retries
+                if (attempt > maxRetries)
+                {
+                    Console.Error.WriteLine($"Transient error persisted after {maxRetries} retries: {ex.Message}");
+                    break;
+                }
 
+                Console.WriteLine($"Transient error (attempt {attempt}), retrying after {delayMs} ms...");
                 Thread.Sleep(delayMs);
-                delayMs *= 2; // exponential increase
+                delayMs *= 2; // exponential backoff
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Unexpected error: {ex.Message}");
+                break;
             }
         }
     }
 
-    // Determines whether an IOException is likely transient (e.g., sharing violation).
-    static bool IsTransient(IOException ex)
-    {
-        // ERROR_SHARING_VIOLATION (0x20) has HResult -2147024864.
-        // Adjust this check as needed for other transient scenarios.
-        return ex.HResult == -2147024864;
-    }
+    // Simple heuristic: treat all IOExceptions as transient for this example
+    static bool IsTransient(IOException ex) => true;
 }

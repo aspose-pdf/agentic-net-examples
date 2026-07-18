@@ -3,63 +3,62 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class BatchXfdfImporter
+class Program
 {
     static void Main()
     {
-        // Folder containing PDFs and matching XFDF files
-        const string inputFolder = "InputFiles";
+        // Folder containing source PDF files
+        const string pdfFolder = "pdfs";
+        // Folder containing XFDF files (same base name as PDFs)
+        const string xfdfFolder = "xfdfs";
         // Folder where PDFs with imported annotations will be saved
-        const string outputFolder = "OutputFiles";
+        const string outputFolder = "output";
 
-        if (!Directory.Exists(inputFolder))
+        // Ensure the required folders exist (create if missing for output, warn for source folders)
+        if (!Directory.Exists(pdfFolder))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.WriteLine($"Source PDF folder '{pdfFolder}' does not exist. Nothing to process.");
             return;
         }
-
+        if (!Directory.Exists(xfdfFolder))
+        {
+            Console.WriteLine($"XFDF folder '{xfdfFolder}' does not exist. Skipping annotation import.");
+            // We can still continue – PDFs will be copied unchanged if desired, but per original logic we exit.
+            return;
+        }
         Directory.CreateDirectory(outputFolder);
 
-        // Process each PDF file in the input folder
-        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Iterate over all PDF files in the source folder
+        foreach (string pdfPath in Directory.GetFiles(pdfFolder, "*.pdf"))
         {
             string baseName = Path.GetFileNameWithoutExtension(pdfPath);
-            string xfdfPath = Path.Combine(inputFolder, baseName + ".xfdf");
+            string xfdfPath = Path.Combine(xfdfFolder, baseName + ".xfdf");
 
             // Skip if there is no matching XFDF file
             if (!File.Exists(xfdfPath))
             {
-                Console.WriteLine($"No XFDF found for '{baseName}.pdf'; skipping.");
+                Console.WriteLine($"No XFDF found for '{baseName}'. Skipping.");
                 continue;
             }
 
-            string outputPdfPath = Path.Combine(outputFolder, baseName + ".pdf");
+            string outputPath = Path.Combine(outputFolder, Path.GetFileName(pdfPath));
 
-            try
+            // Load the PDF document (lifecycle rule: use using for disposal)
+            using (Document doc = new Document(pdfPath))
             {
-                // Load the PDF document
-                using (Document doc = new Document(pdfPath))
+                // Initialize the annotation editor facade
+                using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
                 {
-                    // Initialize the annotation editor facade
-                    using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-                    {
-                        // Bind the PDF to the editor
-                        editor.BindPdf(doc);
-                        // Import all annotations from the XFDF file
-                        editor.ImportAnnotationsFromXfdf(xfdfPath);
-                        // Save the modified PDF
-                        editor.Save(outputPdfPath);
-                    }
+                    // Bind the PDF document to the editor
+                    editor.BindPdf(doc);
+                    // Import all annotations from the matching XFDF file
+                    editor.ImportAnnotationsFromXfdf(xfdfPath);
+                    // Save the updated PDF (lifecycle rule: use Save)
+                    editor.Save(outputPath);
                 }
+            }
 
-                Console.WriteLine($"Imported XFDF into '{outputPdfPath}'.");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{baseName}': {ex.Message}");
-            }
+            Console.WriteLine($"Processed '{baseName}'. Saved to '{outputPath}'.");
         }
-
-        Console.WriteLine("Batch import completed.");
     }
 }

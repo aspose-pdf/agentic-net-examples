@@ -20,18 +20,13 @@ class Program
         Console.WriteLine($"Original file size: {originalSize} bytes");
 
         // Flatten annotations using PdfAnnotationEditor (Facades API)
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-        {
-            editor.BindPdf(inputPath);               // Load the PDF
-            editor.FlatteningAnnotations();          // Flatten all annotations
-            editor.Save(outputPath);                  // Save the flattened PDF
-        }
+        PdfAnnotationEditor editor = new PdfAnnotationEditor();
+        editor.BindPdf(inputPath);
+        editor.FlatteningAnnotations(); // flatten all annotations
+        editor.Save(outputPath);        // save flattened PDF
 
-        // Log new file size after flattening
+        // Log new file size
         long newSize = new FileInfo(outputPath).Length;
         Console.WriteLine($"Flattened file size: {newSize} bytes");
-
-        // Simple audit trail output
-        Console.WriteLine($"Audit: '{inputPath}' ({originalSize} bytes) -> '{outputPath}' ({newSize} bytes)");
     }
 }

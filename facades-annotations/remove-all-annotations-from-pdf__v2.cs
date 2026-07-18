@@ -23,24 +23,14 @@ class Program
             return;
         }
 
-        try
+        // Use PdfAnnotationEditor to bind the PDF, delete all annotations, and save the result
+        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            // Create the annotation editor and bind the source PDF
-            PdfAnnotationEditor editor = new PdfAnnotationEditor();
-            editor.BindPdf(inputPath);
-
-            // Remove all annotations from the document
-            editor.DeleteAnnotations();
-
-            // Save the resulting PDF to the specified output path
-            editor.Save(outputPath);
-
-            // Release resources associated with the editor
-            editor.Close();
+            editor.BindPdf(inputPath);          // Load the PDF document
+            editor.DeleteAnnotations();         // Remove every annotation in the document
+            editor.Save(outputPath);            // Save the modified PDF to the specified output path
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"All annotations removed. Output saved to '{outputPath}'.");
     }
 }
