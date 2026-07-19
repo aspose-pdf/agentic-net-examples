@@ -25,11 +25,8 @@ class Program
                 return;
             }
 
-            // Access the second page
-            Page secondPage = doc.Pages[2];
-
-            // Rotate 90 degrees clockwise (use the correct enum value)
-            secondPage.Rotate = Rotation.on90;
+            // Rotate the second page 90° clockwise
+            doc.Pages[2].Rotate = Rotation.on90;
 
             // Save the modified PDF
             doc.Save(outputPath);

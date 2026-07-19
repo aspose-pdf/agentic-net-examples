@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "rotated.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "rotated_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,27 +15,19 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for proper disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document (using block ensures proper disposal)
-            using (Document doc = new Document(inputPath))
+            // Rotate each page 180 degrees using the correct enum value
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Pages collection is 1‑based; rotate each page 180 degrees
-                for (int i = 1; i <= doc.Pages.Count; i++)
-                {
-                    // Correct enum value uses the "on" prefix
-                    doc.Pages[i].Rotate = Rotation.on180;
-                }
-
-                // Save the rotated document
-                doc.Save(outputPath);
+                doc.Pages[i].Rotate = Rotation.on180;
             }
 
-            Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
+            // Save the rotated document
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
     }
 }
