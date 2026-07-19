@@ -9,7 +9,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_tagged.pdf";
+        const string outputPath = "output.pdf";
         const string defaultLang = "en-US";
 
         if (!File.Exists(inputPath))
@@ -18,41 +18,37 @@ class Program
             return;
         }
 
-        // Load the PDF and work with its tagged content
+        // Load the PDF inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Set the document language if not already set
+            // Set the document language (write‑only) if needed
             ITaggedContent tagged = doc.TaggedContent;
             tagged.SetLanguage(defaultLang);
 
-            // Get the root of the structure tree
+            // Recursively assign language to every structure element that lacks it
             StructureElement root = tagged.RootElement;
+            SetLanguageRecursive(root, defaultLang);
 
-            // Recursively ensure every element has a language attribute
-            SetMissingLanguage(root, defaultLang);
-
-            // Save the modified PDF
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with language attributes to '{outputPath}'.");
     }
 
-    // Recursively set Language on elements that lack it
-    static void SetMissingLanguage(StructureElement element, string language)
+    // Walk the structure tree and set Language where it is null or empty
+    static void SetLanguageRecursive(StructureElement element, string lang)
     {
-        // If Language is null or empty, assign the default language
         if (string.IsNullOrEmpty(element.Language))
         {
-            element.Language = language;
+            element.Language = lang;
         }
 
-        // Iterate over child elements
         foreach (Element child in element.ChildElements)
         {
             if (child is StructureElement se)
             {
-                SetMissingLanguage(se, language);
+                SetLanguageRecursive(se, lang);
             }
         }
     }
