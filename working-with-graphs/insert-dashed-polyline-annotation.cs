@@ -1,56 +1,60 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        // Create a new PDF document and add a blank page
-        using (Document doc = new Document())
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+
+        if (!File.Exists(inputPath))
         {
-            // Add a single page (1‑based indexing)
-            doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
+
+        // Load the PDF document (wrapped in using for proper disposal)
+        using (Document doc = new Document(inputPath))
+        {
+            // Access the first page (Aspose.Pdf uses 1‑based indexing)
             Page page = doc.Pages[1];
 
-            // Define the annotation rectangle (must enclose all vertices)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(50, 450, 350, 650);
+            // Define the annotation rectangle (position on the page)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 400, 200);
 
             // Define the polyline vertices
             Aspose.Pdf.Point[] vertices = new Aspose.Pdf.Point[]
             {
-                new Aspose.Pdf.Point(100, 500),
-                new Aspose.Pdf.Point(150, 600),
-                new Aspose.Pdf.Point(200, 550),
-                new Aspose.Pdf.Point(250, 620),
-                new Aspose.Pdf.Point(300, 500)
+                new Aspose.Pdf.Point(120, 520),
+                new Aspose.Pdf.Point(200, 580),
+                new Aspose.Pdf.Point(300, 540),
+                new Aspose.Pdf.Point(380, 600)
             };
 
             // Create the polyline annotation
             PolylineAnnotation polyline = new PolylineAnnotation(page, rect, vertices)
             {
-                // Set the line color
-                Color = Aspose.Pdf.Color.Blue,
-                // Optional: set opacity (0.0 – 1.0)
-                Opacity = 0.8
+                Color = Aspose.Pdf.Color.Blue,   // Stroke color
+                Contents = "Sample polyline"
             };
 
-            // Apply a dashed border style.
-            // Border requires the parent annotation in its constructor.
+            // Apply a dashed border style
             polyline.Border = new Border(polyline)
             {
-                // Define dash pattern: 5 units on, 3 units off
-                Dash = new Dash(5, 3)
+                Width = 2,                       // Border thickness
+                Dash = new Dash(5, 3)            // 5 units dash, 3 units gap
             };
 
             // Add the annotation to the page
             page.Annotations.Add(polyline);
 
-            // Save the PDF
-            doc.Save("polyline_output.pdf");
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine("Polyline annotation with dashed style saved to 'polyline_output.pdf'.");
+        Console.WriteLine($"Polyline annotation saved to '{outputPath}'.");
     }
 }

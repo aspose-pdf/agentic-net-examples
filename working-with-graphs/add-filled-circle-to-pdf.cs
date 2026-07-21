@@ -6,34 +6,43 @@ class Program
 {
     static void Main()
     {
-        // Create a new PDF document and ensure proper disposal
+        const string outputPath = "circle.pdf";
+
+        // Create a new PDF document and ensure deterministic disposal
         using (Document doc = new Document())
         {
             // Add a blank page to the document
             Page page = doc.Pages.Add();
 
-            // Create a Graph container (width, height) to hold vector shapes
-            Graph graph = new Graph(500, 500); // size of the drawing area
+            // Create a Graph container that covers the whole page
+            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
 
-            // Create a filled circle with specified center (250,250) and radius 100
-            Circle circle = new Circle(250f, 250f, 100f);
+            // Define the circle's center coordinates and radius
+            float centerX = 200f;   // X-coordinate of the center
+            float centerY = 400f;   // Y-coordinate of the center
+            float radius  = 50f;    // Radius of the circle
 
-            // Define visual appearance: fill color, border color, and line width
+            // Instantiate the Circle shape
+            Circle circle = new Circle(centerX, centerY, radius);
+
+            // Set visual styling via GraphInfo (filled circle with outline)
             circle.GraphInfo = new GraphInfo
             {
-                FillColor = Color.LightBlue,   // fill the circle
-                Color = Color.Black,           // border color
-                LineWidth = 1                  // border thickness
+                FillColor = Color.LightBlue, // Fill color
+                Color     = Color.DarkBlue,  // Outline color
+                LineWidth = 2                // Outline thickness
             };
 
             // Add the circle to the graph
             graph.Shapes.Add(circle);
 
-            // Add the graph (with the circle) to the page's content
+            // Add the graph to the page's content
             page.Paragraphs.Add(graph);
 
-            // Save the PDF to a file
-            doc.Save("output.pdf");
+            // Save the PDF document
+            doc.Save(outputPath);
         }
+
+        Console.WriteLine($"PDF with filled circle saved to '{outputPath}'.");
     }
 }

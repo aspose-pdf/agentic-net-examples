@@ -1,69 +1,58 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Drawing;
 
-class InsertImageIntoGraph
+class Program
 {
     static void Main()
     {
-        const string imagePath   = "sample.png";   // external image file
-        const string outputPath  = "result.pdf";   // output PDF
-        const double targetWidth = 200;            // desired width (points)
-        const float  rotateAngle = 45f;            // rotation angle in degrees
+        // Input image file, output PDF, desired position, scale factor and rotation angle
+        const string imagePath   = "logo.png";
+        const string outputPdf   = "graph_with_image.pdf";
+        const double posX        = 100;   // X coordinate (points) from left
+        const double posY        = 500;   // Y coordinate (points) from bottom
+        const double scaleFactor = 0.5;   // 50% of original size
+        const double rotateAngle = 45;    // degrees
 
         // Ensure the image file exists
         if (!File.Exists(imagePath))
         {
-            Console.Error.WriteLine($"Image not found: {imagePath}");
+            Console.Error.WriteLine($"Image file not found: {imagePath}");
             return;
         }
 
-        // Create a new PDF document and add a blank page
-        using (Document doc = new Document())
+        // Create a new PDF document with a single page
+        using (Aspose.Pdf.Document pdfDoc = new Aspose.Pdf.Document())
         {
-            doc.Pages.Add();
-            Page page = doc.Pages[1];
+            pdfDoc.Pages.Add();
 
-            // Load the image as an XImage to obtain its original dimensions
-            string imgName;
+            // Get reference to the first page
+            Aspose.Pdf.Page page = pdfDoc.Pages[1];
+
+            // Create an ImageStamp from the image stream
             using (FileStream imgStream = File.OpenRead(imagePath))
             {
-                imgName = page.Resources.Images.Add(imgStream);
+                Aspose.Pdf.ImageStamp imgStamp = new Aspose.Pdf.ImageStamp(imgStream);
+
+                // Scale proportionally using Zoom (applies to both axes)
+                imgStamp.Zoom = (float)scaleFactor;
+
+                // Set arbitrary rotation angle
+                imgStamp.RotateAngle = (float)rotateAngle;
+
+                // Position the stamp on the page
+                imgStamp.XIndent = (float)posX;
+                imgStamp.YIndent = (float)posY;
+
+                // Add the stamp to the page
+                page.AddStamp(imgStamp);
             }
 
-            XImage xImg = page.Resources.Images[imgName];
-            double originalWidth  = xImg.Width;
-            double originalHeight = xImg.Height;
-
-            // Compute scaling factor to achieve the target width while preserving aspect ratio
-            double scaleFactor = targetWidth / originalWidth;
-            double targetHeight = originalHeight * scaleFactor;
-
-            // Calculate rectangle to position the image at the centre of the page
-            double pageWidth  = page.PageInfo.Width;
-            double pageHeight = page.PageInfo.Height;
-            double llx = (pageWidth  - targetWidth)  / 2;
-            double lly = (pageHeight - targetHeight) / 2;
-            double urx = llx + targetWidth;
-            double ury = lly + targetHeight;
-
-            // Use ImageStamp to place the image with scaling and rotation
-            ImageStamp imgStamp = new ImageStamp(imagePath);
-            imgStamp.Width       = (float)targetWidth;   // set explicit width
-            imgStamp.Height      = (float)targetHeight; // set explicit height (preserves proportion)
-            imgStamp.RotateAngle = rotateAngle;          // arbitrary rotation angle
-            imgStamp.XIndent     = (float)llx;           // horizontal position
-            imgStamp.YIndent     = (float)lly;           // vertical position
-            imgStamp.Background  = false;               // stamp on top of page content
-
-            // Add the stamp to the page
-            page.AddStamp(imgStamp);
-
             // Save the resulting PDF
-            doc.Save(outputPath);
+            pdfDoc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPdf}'.");
     }
 }
