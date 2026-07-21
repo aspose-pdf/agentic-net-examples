@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string logPath   = "compliance_log.txt";
+        const string logPath   = "compliance.log";
 
         // Verify the input file exists
         if (!File.Exists(inputPath))
@@ -16,17 +16,29 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        bool isPdfUaCompliant;
+
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
             // Check PDF/UA compliance via the built‑in property
-            bool isUaCompliant = doc.IsPdfUaCompliant;
+            isPdfUaCompliant = doc.IsPdfUaCompliant;
+        }
 
-            // Output the result to the console
-            Console.WriteLine($"PDF/UA compliant: {isUaCompliant}");
+        // Prepare a log message
+        string logMessage = $"PDF/UA compliant: {isPdfUaCompliant}";
 
-            // Persist the boolean result to a simple log file
-            File.WriteAllText(logPath, $"IsPdfUaCompliant={isUaCompliant}");
+        // Output to console (useful for immediate feedback)
+        Console.WriteLine(logMessage);
+
+        // Persist the result to a log file for further processing
+        try
+        {
+            File.WriteAllText(logPath, logMessage);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to write log file: {ex.Message}");
         }
     }
 }

@@ -21,26 +21,27 @@ class Program
         using (Document doc = new Document(inputPath))
         {
             // Access the tagged‑content API
-            ITaggedContent taggedContent = doc.TaggedContent;
+            ITaggedContent tagged = doc.TaggedContent;
 
-            // Root element of the structure tree
-            StructureElement root = taggedContent.RootElement;
+            // Ensure the document has a root structure element
+            StructureElement root = tagged.RootElement;
 
-            // Iterate over all pages and their images
+            // Iterate over all pages
             foreach (Page page in doc.Pages)
             {
+                // Iterate over each image resource on the page
                 foreach (XImage img in page.Resources.Images)
                 {
-                    // Create a Figure element (represents an illustration such as an image)
-                    FigureElement figure = taggedContent.CreateFigureElement();
+                    // Create a FigureElement (illustration structure element)
+                    FigureElement figure = tagged.CreateFigureElement();
 
                     // Set the ActualText attribute – this is the text a screen reader will read
                     figure.ActualText = "Description of the image for accessibility";
 
-                    // Bind the figure element to the XImage resource on the page
+                    // Bind the FigureElement to the XImage instance
                     figure.Tag(img);
 
-                    // Attach the figure element to the structure tree
+                    // Append the figure element to the document's structure tree
                     root.AppendChild(figure);
                 }
             }

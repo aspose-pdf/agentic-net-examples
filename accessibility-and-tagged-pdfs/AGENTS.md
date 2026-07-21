@@ -8,7 +8,7 @@ parent: ../agents.md
 
 # AGENTS - accessibility-and-tagged-pdfs
 
-> **Accessibility and tagged PDFs** in PDF using C# / .NET -- **45** verified, compile-tested examples for **Aspose.PDF for .NET** 26.6.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Accessibility and tagged PDFs** in PDF using C# / .NET -- **45** verified, compile-tested examples for **Aspose.PDF for .NET** 26.7.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 ## Persona
 
@@ -23,22 +23,21 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf;` (43/45 files) ← category-specific
+- `using Aspose.Pdf;` (44/45 files) ← category-specific
 - `using Aspose.Pdf.Tagged;` (35/45 files) ← category-specific
-- `using Aspose.Pdf.LogicalStructure;` (34/45 files) ← category-specific
-- `using Aspose.Pdf.Annotations;` (2/45 files)
+- `using Aspose.Pdf.LogicalStructure;` (33/45 files) ← category-specific
+- `using Aspose.Pdf.Annotations;` (3/45 files)
+- `using Aspose.Pdf.Text;` (3/45 files)
+- `using Aspose.Pdf.Drawing;` (2/45 files)
 - `using Aspose.Pdf.Forms;` (2/45 files)
-- `using Aspose.Pdf.Text;` (2/45 files)
-- `using Aspose.Pdf.Drawing;` (1/45 files)
 - `using System;` (45/45 files)
-- `using System.IO;` (42/45 files)
-- `using System.Collections.Generic;` (6/45 files)
-- `using System.Linq;` (2/45 files)
+- `using System.IO;` (43/45 files)
+- `using System.Collections.Generic;` (7/45 files)
 - `using System.Text;` (2/45 files)
 - `using System.Text.Json;` (2/45 files)
-- `using System.Xml.Linq;` (2/45 files)
-- `using System.Reflection;` (1/45 files)
+- `using System.Linq;` (1/45 files)
 - `using System.Xml;` (1/45 files)
+- `using System.Xml.Linq;` (1/45 files)
 - `using System.Xml.Xsl;` (1/45 files)
 
 ## Common Code Pattern
@@ -57,36 +56,36 @@ using (Document doc = new Document("input.pdf"))
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [add-actualtext-to-images](./add-actualtext-to-images.cs) | Add ActualText to Images for PDF Accessibility | `Document`, `ITaggedContent`, `StructureElement` | Demonstrates how to add an ActualText attribute to image elements in a PDF using Aspose.Pdf's tag... |
-| [add-caption-note-to-figure-tagged-pdf](./add-caption-note-to-figure-tagged-pdf.cs) | Add Caption Note to a Figure in a Tagged PDF | `Document`, `ITaggedContent`, `SetLanguage` | Demonstrates how to create a Figure element, bind it to an image, and append a Note element as a ... |
-| [add-custom-tags-to-pdf-table-cells](./add-custom-tags-to-pdf-table-cells.cs) | Add Custom Data-Type Tags to PDF Table Cells and Validate PD... | `Document`, `ITaggedContent`, `StructureElement` | The example loads an existing PDF, creates a tagged logical structure with a table, assigns custo... |
-| [add-external-link-with-title-to-tagged-pdf](./add-external-link-with-title-to-tagged-pdf.cs) | Add External Link with Title to Tagged PDF | `Document`, `ITaggedContent`, `StructureElement` | Shows how to insert a LinkElement with a title attribute into a tagged PDF and associate it with ... |
-| [add-figure-title-and-alt-text-to-tagged-pdf](./add-figure-title-and-alt-text-to-tagged-pdf.cs) | Add Figure Title and Alt Text to Tagged PDF | `Document`, `ITaggedContent`, `SetLanguage` | Demonstrates how to create a figure element in a tagged PDF, set its Title and AlternativeText fo... |
-| [add-note-element-to-paragraph](./add-note-element-to-paragraph.cs) | Add a Note Element to a Paragraph in a Tagged PDF | `Document`, `ITaggedContent`, `StructureElement` | Demonstrates how to create a paragraph in a tagged PDF, add a supplemental note element as its ch... |
-| [add-page-break-to-tagged-pdf](./add-page-break-to-tagged-pdf.cs) | Add Page Break Element to Tagged PDF | `Document`, `ITaggedContent`, `StructureElement` | Demonstrates how to insert a PageBreak element into the logical structure tree of a tagged PDF us... |
-| [add-paragraph-to-toci-tagged-pdf](./add-paragraph-to-toci-tagged-pdf.cs) | Add Paragraph with ActualText under TOCI in Tagged PDF | `Document`, `ITaggedContent`, `StructureElement` | Demonstrates how to create a TOCI (Table of Contents Item) element, add a paragraph with ActualTe... |
-| [add-tagged-table-to-pdf](./add-tagged-table-to-pdf.cs) | Add Tagged Table to PDF | `Document`, `ITaggedContent`, `TableElement` | Demonstrates how to use Aspose.Pdf's Tagged Content API to create a structure‑tree table with 3 r... |
-| [add-textbox-form-field-with-placeholder](./add-textbox-form-field-with-placeholder.cs) | Add Text Box Form Field with Placeholder and Tag as Form Ele... | `Document`, `TextBoxField`, `Rectangle` | Demonstrates how to insert a TextBox form field with placeholder text into an existing PDF and ta... |
-| [apply-custom-row-borders-to-pdf-table](./apply-custom-row-borders-to-pdf-table.cs) | Apply Custom Row Borders to PDF Table | `Document`, `Page`, `Table` | Demonstrates how to set different border styles for table rows in a PDF using Aspose.Pdf, alterna... |
-| [batch-auto-tag-pdfs](./batch-auto-tag-pdfs.cs) | Batch Auto‑Tag PDFs and Save with Suffix | `Document`, `ITaggedContent`, `AutoTaggingSettings` | Demonstrates how to process a folder of PDF files, enable Aspose.Pdf auto‑tagging to add missing ... |
-| [batch-convert-pdfs-to-tagged-pdfa1b](./batch-convert-pdfs-to-tagged-pdfa1b.cs) | Batch Convert PDFs to Tagged PDF/A-1B with Auto‑Tagging | `Document`, `AutoTaggingSettings`, `PdfFormatConversionOptions` | Loads each PDF from an input folder, enables Aspose.Pdf's auto‑tagging engine, converts the docum... |
-| [batch-pdfa1b-validation-xml-dashboard](./batch-pdfa1b-validation-xml-dashboard.cs) | Batch PDF/A-1B Validation with XML Logs and CSV Dashboard | `Document`, `Validate`, `PdfFormat` | The example processes all PDF files in a folder, validates each against PDF/A‑1B using Aspose.Pdf... |
-| [batch-validate-pdfs-xml-logs-summary-csv](./batch-validate-pdfs-xml-logs-summary-csv.cs) | Batch Validate PDFs and Generate XML Logs with Summary CSV | `Document`, `Validate`, `PdfFormat` | The example iterates through all PDF files in a folder, validates each against PDF/A‑1b using Asp... |
-| [check-pdf-ua-compliance-and-log-result](./check-pdf-ua-compliance-and-log-result.cs) | Check PDF/UA Compliance and Log Result | `Document`, `IsPdfUaCompliant` | Demonstrates loading a PDF with Aspose.Pdf, checking its PDF/UA accessibility compliance via the ... |
-| [create-bullet-numbered-lists-tagged-pdf](./create-bullet-numbered-lists-tagged-pdf.cs) | Create Bullet and Numbered Lists in a Tagged PDF | `Document`, `ITaggedContent`, `StructureElement` | Demonstrates how to generate a PDF containing both unordered (bullet) and ordered (numbered) list... |
-| [create-form-field-and-associate-tagged-form-elemen...](./create-form-field-and-associate-tagged-form-element.cs) | Create a Form Field and Associate a Tagged /Form Element | `Document`, `TextBoxField`, `Add` | Demonstrates how to add a TextBox form field to a PDF's AcroForm, create a corresponding /Form st... |
-| [create-internal-page-link-tagged-pdf](./create-internal-page-link-tagged-pdf.cs) | Create Internal Page Link with Tagged PDF Role /Link | `Document`, `LinkAnnotation`, `GoToAction` | Demonstrates how to add a link annotation that jumps to another page and associate it with a Tagg... |
-| [create-merged-table-header-th-actualtext](./create-merged-table-header-th-actualtext.cs) | Create Merged Table Header with TH Role and ActualText | `Document`, `ITaggedContent`, `StructureElement` | Demonstrates building a tagged PDF table, merging a header cell across columns, assigning the TH ... |
-| [create-pdf-tagged-heading-language](./create-pdf-tagged-heading-language.cs) | Create PDF with Tagged Heading and Language Attribute | `Document`, `ITaggedContent`, `SetLanguage` | Demonstrates how to create a PDF, enable tagged content, add a level‑1 heading element, and assig... |
-| [create-tagged-pdf-with-toc](./create-tagged-pdf-with-toc.cs) | Create Tagged PDF with Table of Contents | `Document`, `ITaggedContent`, `TOCElement` | Demonstrates how to generate a PDF with logical structure, set accessibility properties, and add ... |
-| [custom-tagged-paragraph-pdf](./custom-tagged-paragraph-pdf.cs) | Create PDF with a Custom Tagged Paragraph | `Document`, `ITaggedContent`, `SetLanguage` | Shows how to generate a tagged PDF and assign a custom tag name to a paragraph element using Aspo... |
-| [enable-auto-tagging-pdf-ua](./enable-auto-tagging-pdf-ua.cs) | Enable Automatic Tagging and Save PDF/UA | `Document`, `ITaggedContent`, `PdfFormatConversionOptions` | Demonstrates how to enable Aspose.Pdf's automatic tagging for PDF/UA compliance, set document lan... |
-| [export-pdf-structure-tree-to-json](./export-pdf-structure-tree-to-json.cs) | Export PDF Structure Tree to JSON | `Document`, `ITaggedContent`, `StructureElement` | Loads a tagged PDF, traverses its logical structure tree, and serializes the hierarchy (type, act... |
-| [export-structure-tree-to-xml-report](./export-structure-tree-to-xml-report.cs) | Export PDF Structure Tree to XML and Generate HTML Report vi... | `Document`, `XmlSaveOptions`, `Save` | Demonstrates how to extract a PDF's tagged structure tree to an XML file using Aspose.Pdf and the... |
-| [extract-notes-from-tagged-pdf](./extract-notes-from-tagged-pdf.cs) | Extract Notes from Tagged PDF to Text File | `Document`, `ITaggedContent`, `StructureElement` | Demonstrates how to traverse the structure tree of a tagged PDF, locate all NoteElement objects, ... |
-| [extract-pdf-links-to-csv](./extract-pdf-links-to-csv.cs) | Extract PDF Link URLs to CSV | `Document`, `Page`, `Annotation` | Demonstrates how to iterate through a PDF, find link annotations, extract their target URLs, and ... |
-| [extract-tagged-pdf-structure-to-json](./extract-tagged-pdf-structure-to-json.cs) | Extract Tagged PDF Structure to JSON | `Document`, `ITaggedContent`, `StructureElement` | Loads a PDF, reads its tagged (accessibility) logical structure, builds a hierarchical POCO repre... |
-| [extract-text-from-tagged-pdf](./extract-text-from-tagged-pdf.cs) | Extract Text from Tagged PDF via Structure Tree | `Document`, `ITaggedContent`, `StructureElement` | The example opens a PDF, accesses its tagged content, recursively walks the logical structure tre... |
+| [add-actualtext-to-images](./add-actualtext-to-images.cs) | Add ActualText to Images for PDF Accessibility | `Document`, `ITaggedContent`, `StructureElement` | Demonstrates how to attach an ActualText attribute to image structure elements in a tagged PDF us... |
+| [add-caption-note-to-figure-in-tagged-pdf](./add-caption-note-to-figure-in-tagged-pdf.cs) | Add Caption Note to Figure in Tagged PDF | `Document`, `ITaggedContent`, `SetLanguage` | Demonstrates how to use Aspose.Pdf's tagged‑content API to create a Figure element, attach a Note... |
+| [add-custom-cell-tags-and-validate-pdf](./add-custom-cell-tags-and-validate-pdf.cs) | Add Custom Data Type Tags to PDF Table Cells and Validate PD... | `Document`, `ITaggedContent`, `StructureElement` | The example loads an existing PDF, creates a tagged table with custom data‑type tags on each cell... |
+| [add-custom-tag-to-paragraph](./add-custom-tag-to-paragraph.cs) | Add Custom Tag to Paragraph in Tagged PDF | `Document`, `ITaggedContent`, `StructureElement` | Demonstrates how to assign a custom tag name to a paragraph element in a tagged PDF using Aspose.... |
+| [add-external-link-with-title-to-tagged-pdf](./add-external-link-with-title-to-tagged-pdf.cs) | Add External Link with Title to a Tagged PDF | `Document`, `ITaggedContent`, `StructureElement` | Demonstrates how to insert a clickable link with visible text and a title attribute into a tagged... |
+| [add-figure-title-to-tagged-pdf](./add-figure-title-to-tagged-pdf.cs) | Add Figure Title to Tagged PDF | `Document`, `ITaggedContent`, `SetLanguage` | Demonstrates how to use Aspose.Pdf's Tagged Content API to create a figure element, assign a conc... |
+| [add-internal-link-element-to-tagged-pdf](./add-internal-link-element-to-tagged-pdf.cs) | Add Internal Link Element to Tagged PDF | `Document`, `ITaggedContent`, `LinkElement` | Demonstrates how to create a structure element with the /Link role in a tagged PDF, bind it to a ... |
+| [add-missing-language-attributes-to-pdf-structure](./add-missing-language-attributes-to-pdf-structure.cs) | Add Missing Language Attributes to PDF Structure Elements | `Document`, `ITaggedContent`, `SetLanguage` | Demonstrates how to set a default language for a PDF and recursively assign language attributes t... |
+| [add-note-element-to-paragraph](./add-note-element-to-paragraph.cs) | Add Note Element to Paragraph in Tagged PDF | `Document`, `ITaggedContent`, `StructureElement` | Demonstrates how to create a note (footnote/endnote) element and attach it as a child of a paragr... |
+| [add-page-break-to-tagged-pdf](./add-page-break-to-tagged-pdf.cs) | Add Page Break to Tagged PDF Logical Structure | `Document`, `ITaggedContent`, `SetLanguage` | Shows how to insert a page‑break element into the logical structure tree of a tagged PDF using As... |
+| [add-paragraph-to-toci-element-actualtext](./add-paragraph-to-toci-element-actualtext.cs) | Add Paragraph to TOCI Element with ActualText for Accessibil... | `Document`, `ITaggedContent`, `StructureElement` | Demonstrates how to create a TOCI (Table of Contents Item) element, add a paragraph beneath it, a... |
+| [add-tagged-form-field-with-placeholder](./add-tagged-form-field-with-placeholder.cs) | Add Tagged Form Field with Placeholder to PDF | `Document`, `Page`, `TextBoxField` | Loads an existing PDF, creates a TextBox form field with placeholder text, tags it with a /Form s... |
+| [add-tagged-table-to-pdf](./add-tagged-table-to-pdf.cs) | Add Tagged Table to PDF Document | `Document`, `ITaggedContent`, `StructureElement` | Demonstrates how to create a three‑row, four‑column table in a tagged PDF using Aspose.Pdf's logi... |
+| [apply-custom-row-borders-to-pdf-table](./apply-custom-row-borders-to-pdf-table.cs) | Apply Custom Row Borders to PDF Table | `Document`, `Page`, `Table` | Demonstrates how to set different border styles for table rows and cells in a PDF based on the ro... |
+| [batch-convert-untagged-pdfs-to-tagged](./batch-convert-untagged-pdfs-to-tagged.cs) | Batch Convert Untagged PDFs to Tagged PDFs with Auto‑Tagging | `Document`, `PdfFormatConversionOptions`, `PdfFormat` | Demonstrates how to process a folder of untagged PDF files, enable auto‑tagging, convert them to ... |
+| [batch-pdf-validation-dashboard](./batch-pdf-validation-dashboard.cs) | Batch PDF Validation and Dashboard Generation | `Document`, `Validate`, `Page` | Validates multiple PDFs for PDF/A‑1B compliance, writes XML logs for each file, and creates a sum... |
+| [batch-tag-pdfs-in-folder](./batch-tag-pdfs-in-folder.cs) | Batch Tag PDFs in a Folder | `Document`, `AutoTaggingSettings`, `ITaggedContent` | The example iterates through all PDF files in a directory, enables automatic tagging for missing ... |
+| [batch-validate-pdfs-xml-logs-summary-csv](./batch-validate-pdfs-xml-logs-summary-csv.cs) | Batch Validate PDFs and Generate XML Logs with Summary CSV | `Document`, `Validate`, `PdfFormat` | The example loads each PDF in a folder, validates it against PDF/A‑1B using Aspose.Pdf, saves an ... |
+| [check-pdf-ua-compliance-and-log-result](./check-pdf-ua-compliance-and-log-result.cs) | Check PDF/UA Compliance and Log Result | `Document`, `IsPdfUaCompliant` | Shows how to load a PDF with Aspose.Pdf, evaluate its PDF/UA compliance via Document.IsPdfUaCompl... |
+| [convert-pdf-to-pdf-ua-with-auto-tagging](./convert-pdf-to-pdf-ua-with-auto-tagging.cs) | Convert PDF to PDF/UA with Automatic Tagging | `Document`, `PdfFormatConversionOptions`, `PdfFormat` | Shows how to convert an existing PDF to a PDF/UA‑1 compliant document by enabling automatic taggi... |
+| [create-form-field-tag-accessibility](./create-form-field-tag-accessibility.cs) | Create Form Field and Tag it for Accessibility | `Document`, `TextBoxField`, `TaggedContent` | Shows how to add a TextBox form field to a PDF, register it in the AcroForm, and associate it wit... |
+| [create-merged-table-header-tagged-pdf](./create-merged-table-header-tagged-pdf.cs) | Create Merged Table Header with TH Role and ActualText in Ta... | `Document`, `ITaggedContent`, `StructureElement` | Loads an existing PDF, builds a tagged table with a header row where the first TH cell spans two ... |
+| [create-nested-table-in-paragraph](./create-nested-table-in-paragraph.cs) | Create Nested Table Inside Paragraph for Tagged PDF | `Document`, `ITaggedContent`, `ParagraphElement` | Shows how to build a tagged PDF where a paragraph contains an outer table, and one of its cells h... |
+| [create-pdf-with-tagged-heading](./create-pdf-with-tagged-heading.cs) | Create PDF with Tagged Heading and Language | `Document`, `ITaggedContent`, `SetLanguage` | Shows how to create a new PDF, add a level‑1 heading structure element, set document‑level and el... |
+| [create-tagged-list-in-pdf](./create-tagged-list-in-pdf.cs) | Create Tagged List in PDF | `Document`, `ITaggedContent`, `ListElement` | Demonstrates how to add a logical list structure with list items, labels, and body paragraphs to ... |
+| [create-tagged-pdf-with-toc](./create-tagged-pdf-with-toc.cs) | Create Tagged PDF with Table of Contents | `Document`, `ITaggedContent`, `HeaderElement` | Demonstrates how to generate a PDF with tagged content, add heading elements, and build a logical... |
+| [export-pdf-structure-tree-to-json](./export-pdf-structure-tree-to-json.cs) | Export PDF Structure Tree to JSON | `Document`, `ITaggedContent`, `StructTreeRootElement` | Shows how to load a PDF, access its tagged (logical) structure, and serialize the structure tree ... |
+| [export-pdf-structure-tree-to-xml-xsl-report](./export-pdf-structure-tree-to-xml-xsl-report.cs) | Export PDF Structure Tree to XML and Generate Report via XSL... | `Document`, `XmlSaveOptions`, `SaveOptions` | Shows how to export a PDF's logical structure tree to an XML file using Aspose.Pdf and then apply... |
+| [export-tagged-pdf-content-to-json](./export-tagged-pdf-content-to-json.cs) | Export Tagged PDF Content to JSON | `Document`, `ITaggedContent`, `StructureElement` | Demonstrates how to read the logical structure of a tagged PDF using Aspose.Pdf, convert the hier... |
+| [extract-note-elements-to-text](./extract-note-elements-to-text.cs) | Extract Note Elements from Tagged PDF and Save to Text | `Document`, `ITaggedContent`, `StructureElement` | Loads a PDF, accesses its tagged content, finds all NoteElement objects, concatenates their Actua... |
 | ... | | | *and 15 more files* |
 
 ## Category Statistics
@@ -134,5 +133,5 @@ using (Document doc = new Document("input.pdf"))
 - Review code examples in this folder for accessibility-and-tagged-pdfs patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-07-05 | Run: `20260705_005655_3d29fa`
+Updated: 2026-07-17 | Run: `20260717_171638_da3b3e`
 <!-- AUTOGENERATED:END -->
