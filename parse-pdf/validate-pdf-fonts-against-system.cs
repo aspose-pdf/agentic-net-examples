@@ -16,29 +16,32 @@ class Program
             return;
         }
 
-        // Ensure system fonts are loaded (optional but speeds up IsAccessible checks)
-        FontRepository.LoadFonts();
+        // List to hold names of fonts that are not installed on the system
+        List<string> missingFonts = new List<string>();
 
-        // Collect names of fonts that are not installed on the system
-        var missingFonts = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Open the PDF document
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
         {
-            // Absorb all text fragments from the whole document
-            TextFragmentAbsorber absorber = new TextFragmentAbsorber();
-            doc.Pages.Accept(absorber);
-
-            // Iterate over each text fragment and examine its font
-            foreach (TextFragment fragment in absorber.TextFragments)
+            // Iterate over all pages (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                Font font = fragment.TextState.Font;
-                if (font != null && !font.IsAccessible)
+                Aspose.Pdf.Page page = doc.Pages[i];
+
+                // Get the font collection from the page resources
+                Aspose.Pdf.Text.FontCollection fonts = page.Resources.Fonts;
+
+                // Examine each font used on the page
+                foreach (Aspose.Pdf.Text.Font font in fonts)
                 {
-                    // Font.IsAccessible indicates the font is not installed
-                    // Use Font.FontName if available; fallback to ToString()
-                    string fontName = font.FontName ?? font.ToString();
-                    missingFonts.Add(fontName);
+                    // If the font is not accessible (not installed), record its name
+                    if (!font.IsAccessible)
+                    {
+                        string fontName = font.FontName ?? "(Unnamed Font)";
+                        if (!missingFonts.Contains(fontName))
+                        {
+                            missingFonts.Add(fontName);
+                        }
+                    }
                 }
             }
         }
@@ -46,7 +49,7 @@ class Program
         // Report the results
         if (missingFonts.Count == 0)
         {
-            Console.WriteLine("All fonts used in the document are installed on this system.");
+            Console.WriteLine("All fonts used in the document are installed on the system.");
         }
         else
         {

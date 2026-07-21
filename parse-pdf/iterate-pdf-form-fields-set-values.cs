@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output_filled.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,31 +16,30 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
             // Iterate over each form field in the document
-            foreach (Field field in doc.Form.Fields)
+            foreach (Field field in doc.Form)
             {
-                // Display field name and current value
-                Console.WriteLine($"Field Name: {field.FullName}, Value: {field.Value}");
+                // Example processing based on field type
+                if (field is TextBoxField txt)
+                {
+                    txt.Value = "Sample text";
+                }
+                else if (field is CheckboxField chk)
+                {
+                    chk.Checked = true;
+                }
+                else if (field is RadioButtonField rad)
+                {
+                    // Use the string value of the first option
+                    if (rad.Options != null && rad.Options.Count > 0)
+                        rad.Value = rad.Options[0].Value; // Fixed conversion
+                }
 
-                // Example processing: set default values based on field type
-                if (field is TextBoxField txtField)
-                {
-                    txtField.Value = "Sample Text";
-                }
-                else if (field is CheckboxField chkField)
-                {
-                    chkField.Checked = true;
-                }
-                else if (field is RadioButtonField radField)
-                {
-                    // Select the first option (index 0) if available
-                    if (radField.Options.Count > 0)
-                        radField.Selected = 0; // Selected expects an integer index
-                }
-                // Additional field types can be handled here
+                // Log field name and its current value
+                Console.WriteLine($"Field: {field.FullName}, Value: {field.Value}");
             }
 
             // Save the modified PDF

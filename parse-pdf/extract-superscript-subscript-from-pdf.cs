@@ -1,80 +1,71 @@
 using System;
 using System.IO;
-using System.Linq;
-using System.Collections.Generic;
+using System.Text;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class Program
+class SuperscriptSubscriptExtractor
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputTxtPath = "extracted.txt";
+        // Input PDF file path
+        const string inputPath = "input.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        // Verify the file exists
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Absorb all text fragments from the whole document
+            // TextFragmentAbsorber extracts text fragments together with their formatting
             TextFragmentAbsorber absorber = new TextFragmentAbsorber();
-            pdfDoc.Pages.Accept(absorber);
 
-            // Prepare the output text file
-            using (StreamWriter writer = new StreamWriter(outputTxtPath))
+            // Apply the absorber to all pages
+            doc.Pages.Accept(absorber);
+
+            // StringBuilder to collect the output with Unicode markers
+            StringBuilder result = new StringBuilder();
+
+            // Iterate over each extracted fragment
+            foreach (TextFragment fragment in absorber.TextFragments)
             {
-                // Iterate through each page (1‑based indexing)
-                for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
+                // Determine the formatting flags
+                bool isSuperscript = fragment.TextState.Superscript;
+                bool isSubscript   = fragment.TextState.Subscript;
+
+                // Choose markers:
+                //   ^  for superscript
+                //   _  for subscript
+                // If both are false, output the text as‑is.
+                // If a fragment contains multiple characters, apply the same marker to the whole fragment.
+                if (isSuperscript)
                 {
-                    Page page = pdfDoc.Pages[pageIndex];
-
-                    // Gather all text segments that belong to the current page
-                    List<TextSegment> pageSegments = new List<TextSegment>();
-                    foreach (TextFragment fragment in absorber.TextFragments)
-                    {
-                        if (fragment.Page?.Number != pageIndex) continue;
-
-                        foreach (TextSegment segment in fragment.Segments)
-                        {
-                            pageSegments.Add(segment);
-                        }
-                    }
-
-                    if (pageSegments.Count == 0) continue;
-
-                    // Compute average font size and baseline position for the page
-                    double avgFontSize   = pageSegments.Average(s => s.TextState.FontSize);
-                    // Use the lower‑left Y (LLY) of the segment rectangle as baseline Y
-                    double avgBaselineY  = pageSegments.Average(s => s.Rectangle.LLY);
-
-                    // Analyze each segment to decide if it is superscript, subscript or normal
-                    foreach (TextSegment segment in pageSegments)
-                    {
-                        string classification = "Normal";
-
-                        // Heuristic: smaller font size indicates possible super/subscript
-                        if (segment.TextState.FontSize < avgFontSize * 0.8)
-                        {
-                            double deltaY = segment.Rectangle.LLY - avgBaselineY;
-
-                            // Positive delta => higher than baseline => superscript
-                            // Negative delta => lower than baseline => subscript
-                            if (deltaY > 2)          classification = "Superscript";
-                            else if (deltaY < -2)    classification = "Subscript";
-                        }
-
-                        // Write the result to the output file
-                        writer.WriteLine($"Page {pageIndex}: \"{segment.Text}\" - {classification}");
-                    }
+                    result.Append('^');
+                    result.Append(fragment.Text);
+                }
+                else if (isSubscript)
+                {
+                    result.Append('_');
+                    result.Append(fragment.Text);
+                }
+                else
+                {
+                    result.Append(fragment.Text);
                 }
             }
 
-            Console.WriteLine($"Extraction completed. Results saved to '{outputTxtPath}'.");
+            // Output the collected string to console
+            Console.WriteLine("Extracted text with markers:");
+            Console.WriteLine(result.ToString());
+
+            // Optionally, write the result to a text file
+            const string outputPath = "extracted_with_markers.txt";
+            File.WriteAllText(outputPath, result.ToString(), Encoding.UTF8);
+            Console.WriteLine($"Result written to '{outputPath}'.");
         }
     }
 }

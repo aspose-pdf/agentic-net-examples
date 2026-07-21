@@ -1,14 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,34 +15,25 @@ class Program
             return;
         }
 
-        // Open the PDF document inside a using block for deterministic disposal
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing)
+            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Count form fields on the current page
-                int fieldCount = page.FieldsInTabOrder?.Count ?? 0;
+                // Count form fields on the current page.
+                // Form fields are represented by WidgetAnnotation objects.
+                int fieldCount = 0;
+                foreach (Annotation ann in page.Annotations)
+                {
+                    if (ann is WidgetAnnotation)
+                        fieldCount++;
+                }
 
-                // Log the count for monitoring purposes
-                Console.WriteLine($"Page {i}: {fieldCount} form field(s) found.");
-
-                // Example: extract field values (optional)
-                // foreach (var field in page.FieldsInTabOrder)
-                // {
-                //     Console.WriteLine($"  Field Name: {field.FullName}, Value: {field.Value}");
-                // }
+                Console.WriteLine($"Page {i}: {fieldCount} form field(s) extracted.");
             }
-
-            // (Optional) Perform additional processing here, e.g., flatten fields
-            // doc.Pages.Flatten();
-
-            // Save the (potentially modified) document
-            doc.Save(outputPath);
         }
-
-        Console.WriteLine($"Processing completed. Output saved to '{outputPath}'.");
     }
 }

@@ -1,67 +1,78 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
+using System.Text;
 using Aspose.Pdf;
-using Aspose.Pdf.Vector;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF files to process
-        string[] pdfFiles = { "doc1.pdf", "doc2.pdf", "doc3.pdf" };
-        // Output multi‑page SVG file
+        const string inputPdf  = "input.pdf";
         const string outputSvg = "combined.svg";
 
-        // Collect SVG fragments from all pages of all PDFs
-        List<string> svgFragments = new List<string>();
-
-        foreach (string pdfPath in pdfFiles)
+        if (!File.Exists(inputPdf))
         {
-            if (!File.Exists(pdfPath))
-            {
-                Console.Error.WriteLine($"File not found: {pdfPath}");
-                continue;
-            }
+            Console.Error.WriteLine($"File not found: {inputPdf}");
+            return;
+        }
 
-            // Load PDF document (lifecycle rule: use using for disposal)
-            using (Document doc = new Document(pdfPath))
+        // Load the PDF document (lifecycle: load)
+        using (Document pdfDoc = new Document(inputPdf))
+        {
+            StringBuilder sb = new StringBuilder();
+
+            // Begin a single SVG document
+            sb.AppendLine(@"<?xml version=""1.0"" encoding=""UTF-8""?>");
+            sb.AppendLine(@"<svg xmlns=""http://www.w3.org/2000/svg"" version=""1.1"">");
+
+            // Iterate through all pages (1‑based indexing)
+            for (int i = 1; i <= pdfDoc.Pages.Count; i++)
             {
-                // Iterate through pages (1‑based indexing)
-                for (int i = 1; i <= doc.Pages.Count; i++)
+                Page page = pdfDoc.Pages[i];
+
+                // Skip pages without vector graphics
+                if (!page.HasVectorGraphics())
+                    continue;
+
+                // Extract vector graphics of the current page to a temporary SVG file
+                string tempPath = Path.GetTempFileName();
+                bool extracted = page.TrySaveVectorGraphics(tempPath);
+
+                if (extracted && File.Exists(tempPath))
                 {
-                    Page page = doc.Pages[i];
+                    string pageSvg = File.ReadAllText(tempPath);
 
-                    // Extract vector graphics from the page
-                    SvgExtractor extractor = new SvgExtractor();
-                    List<string> pageSvgs = extractor.Extract(page); // returns SVG strings
-
-                    // If the page contains vector graphics, combine them
-                    if (pageSvgs != null && pageSvgs.Count > 0)
+                    // Remove the outer <svg> wrapper, keep only inner content
+                    int svgStart = pageSvg.IndexOf("<svg", StringComparison.Ordinal);
+                    if (svgStart >= 0)
                     {
-                        // Concatenate all SVG strings for this page
-                        string combinedPageSvg = string.Join("\n", pageSvgs);
-                        svgFragments.Add(combinedPageSvg);
+                        int contentStart = pageSvg.IndexOf('>', svgStart) + 1;
+                        int contentEnd   = pageSvg.LastIndexOf("</svg>", StringComparison.Ordinal);
+                        if (contentEnd > contentStart)
+                        {
+                            string innerContent = pageSvg.Substring(contentStart, contentEnd - contentStart);
+                            sb.AppendLine($@"  <g id=""page{i}"">");
+                            sb.AppendLine(innerContent);
+                            sb.AppendLine("  </g>");
+                        }
                     }
+                    else
+                    {
+                        // Fallback: wrap whatever was returned
+                        sb.AppendLine($@"  <g id=""page{i}"">{pageSvg}</g>");
+                    }
+
+                    // Delete the temporary file
+                    File.Delete(tempPath);
                 }
             }
+
+            // Close the combined SVG document
+            sb.AppendLine("</svg>");
+
+            // Write the combined SVG to the target file (custom save, not a Document.Save)
+            File.WriteAllText(outputSvg, sb.ToString());
+            Console.WriteLine($"Combined SVG saved to '{outputSvg}'.");
         }
-
-        // Write a single SVG file that contains all extracted fragments
-        using (StreamWriter writer = new StreamWriter(outputSvg))
-        {
-            writer.WriteLine(@"<?xml version=""1.0"" encoding=""UTF-8""?>");
-            writer.WriteLine(@"<svg xmlns=""http://www.w3.org/2000/svg"" version=""1.1"">");
-
-            // Insert each page's SVG content
-            foreach (string fragment in svgFragments)
-            {
-                writer.WriteLine(fragment);
-            }
-
-            writer.WriteLine(@"</svg>");
-        }
-
-        Console.WriteLine($"Combined SVG saved to '{outputSvg}'.");
     }
 }

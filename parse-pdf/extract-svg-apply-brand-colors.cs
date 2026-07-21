@@ -6,10 +6,22 @@ using Aspose.Pdf.Vector;
 
 class Program
 {
+    // Simple color transformation: replace any fill or stroke color with the brand color.
+    // This example replaces black (#000000) with brand red (#FF0000).
+    static string TransformColors(string svgContent)
+    {
+        // Replace hex color codes (case‑insensitive) for black with brand red.
+        // You can extend this method to handle more complex transformations.
+        return Regex.Replace(svgContent,
+                             @"#000000",
+                             "#FF0000",
+                             RegexOptions.IgnoreCase);
+    }
+
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputFolder = "ExtractedSvg";
+        const string inputPdfPath  = "input.pdf";
+        const string outputFolder  = "ExtractedSvg";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -17,43 +29,36 @@ class Program
             return;
         }
 
-        // Ensure the output directory exists
+        // Ensure the output directory exists.
         Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for deterministic disposal.
         using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Iterate through all pages (1‑based indexing)
+            // Iterate over all pages (1‑based indexing).
             for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
             {
                 Page page = pdfDoc.Pages[pageIndex];
 
-                // Extract SVG strings from the current page
+                // Use SvgExtractor to obtain SVG strings for vector graphics on the page.
                 SvgExtractor extractor = new SvgExtractor();
-                var svgContents = extractor.Extract(page); // List<string>
+                var svgStrings = extractor.Extract(page); // Returns List<string>
 
-                // Process each extracted SVG
-                for (int i = 0; i < svgContents.Count; i++)
+                // Save each extracted SVG after applying the color transformation.
+                for (int i = 0; i < svgStrings.Count; i++)
                 {
-                    string svg = svgContents[i];
+                    string originalSvg = svgStrings[i];
+                    string transformedSvg = TransformColors(originalSvg);
 
-                    // Example brand palette transformation:
-                    // Replace any black fill or stroke (#000000) with brand red (#FF5733)
-                    // Adjust as needed for other colors.
-                    svg = Regex.Replace(svg, @"(#000000)", "#FF5733", RegexOptions.IgnoreCase);
-
-                    // Optionally, replace other colors here...
-
-                    // Determine output file name
                     string fileName = $"page_{pageIndex}_graphic_{i + 1}.svg";
                     string outputPath = Path.Combine(outputFolder, fileName);
 
-                    // Save the transformed SVG to disk
-                    File.WriteAllText(outputPath, svg);
+                    File.WriteAllText(outputPath, transformedSvg);
+                    Console.WriteLine($"Saved transformed SVG: {outputPath}");
                 }
             }
         }
 
-        Console.WriteLine($"SVG extraction and color transformation completed. Files saved to '{outputFolder}'.");
+        Console.WriteLine("Vector graphic extraction and color transformation completed.");
     }
 }

@@ -7,42 +7,47 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputImage = "page1.png";
-        const int dpi = 300; // Desired resolution in dots per inch
+        // Input PDF file path
+        const string inputPdfPath = "input.pdf";
+        // Output raster image file path (PNG format)
+        const string outputImagePath = "page1.png";
+        // Desired resolution in DPI (dots per inch)
+        const int resolutionDpi = 300;
 
-        if (!File.Exists(inputPdf))
+        // Verify that the input file exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document with deterministic disposal
-        using (Document pdfDoc = new Document(inputPdf))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
-            // Verify that the document contains at least one page
-            if (pdfDoc.Pages.Count < 1)
+            // Ensure the document contains at least one page (Aspose.Pdf uses 1‑based indexing)
+            if (pdfDocument.Pages.Count < 1)
             {
-                Console.Error.WriteLine("The PDF contains no pages.");
+                Console.Error.WriteLine("The PDF does not contain any pages.");
                 return;
             }
 
-            // Select the page to rasterize (Aspose.Pdf uses 1‑based indexing)
-            Page page = pdfDoc.Pages[1];
+            // Retrieve the first page (or change the index to target another page)
+            Page page = pdfDocument.Pages[1];
 
-            // Create a Resolution object specifying the desired DPI
-            Resolution resolution = new Resolution(dpi);
+            // Create a Resolution object with the required DPI
+            Resolution resolution = new Resolution(resolutionDpi);
 
-            // PngDevice does NOT implement IDisposable, so instantiate it without a using block
+            // Initialize a PNG device with the specified resolution.
+            // The device will rasterize the page (including all vector graphics) to PNG.
             PngDevice pngDevice = new PngDevice(resolution);
 
-            // Dispose only the stream; the device does not need explicit disposal
-            using (FileStream outStream = new FileStream(outputImage, FileMode.Create, FileAccess.Write))
+            // Rasterize the page and write the PNG data to the output file
+            using (FileStream outputStream = new FileStream(outputImagePath, FileMode.Create))
             {
-                pngDevice.Process(page, outStream);
+                pngDevice.Process(page, outputStream);
             }
 
-            Console.WriteLine($"Page rasterized to '{outputImage}' at {dpi} DPI.");
+            Console.WriteLine($"Page rasterized successfully to '{outputImagePath}' at {resolutionDpi} DPI.");
         }
     }
 }

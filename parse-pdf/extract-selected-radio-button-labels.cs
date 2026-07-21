@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
@@ -15,30 +16,40 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all form fields in the document
+            // Dictionary to hold field full name -> selected option label (nullable)
+            var radioSelections = new Dictionary<string, string?>();
+
+            // Iterate over all form fields
             foreach (Field field in doc.Form)
             {
                 // Process only radio button fields
-                if (field is RadioButtonField radioButton)
+                if (field is RadioButtonField radio)
                 {
-                    // Selected index is 1‑based; 0 means no option is selected
-                    int selectedIndex = radioButton.Selected;
-
-                    if (selectedIndex > 0 && selectedIndex <= radioButton.Options.Count)
+                    // Selected index is 1‑based; 0 means no selection
+                    int selectedIndex = radio.Selected;
+                    if (selectedIndex > 0 && selectedIndex <= radio.Options.Count)
                     {
-                        // Retrieve the label (option name) corresponding to the selected index
-                        // Options collection holds Option objects; use the Name property for the label
-                        string selectedLabel = radioButton.Options[selectedIndex - 1].Name;
-                        Console.WriteLine($"Radio button '{radioButton.FullName}' selected option: '{selectedLabel}'");
+                        // Retrieve the display label of the selected option.
+                        // In Aspose.Pdf the label is stored in the Option.Value property.
+                        string selectedLabel = radio.Options[selectedIndex - 1].Value;
+                        radioSelections[radio.FullName] = selectedLabel;
                     }
                     else
                     {
-                        Console.WriteLine($"Radio button '{radioButton.FullName}' has no selection.");
+                        // No option selected
+                        radioSelections[radio.FullName] = null;
                     }
                 }
+            }
+
+            // Output the mapping
+            foreach (var kvp in radioSelections)
+            {
+                string valueDisplay = kvp.Value ?? "(none)";
+                Console.WriteLine($"Radio field '{kvp.Key}' selected option: {valueDisplay}");
             }
         }
     }
