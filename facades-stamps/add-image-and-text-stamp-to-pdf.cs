@@ -1,60 +1,64 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string logoPath = "logo.png";
-        const string stampText = "Confidential";
+        const string inputPdf   = "input.pdf";
+        const string outputPdf  = "stamped_output.pdf";
+        const string logoImage  = "logo.png";
 
-        if (!File.Exists(inputPdf) || !File.Exists(logoPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine("Required files not found.");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
+        }
+        if (!File.Exists(logoImage))
+        {
+            Console.Error.WriteLine($"Logo image not found: {logoImage}");
             return;
         }
 
-        // Load the source PDF
-        using (Document doc = new Document(inputPdf))
+        // Initialize the facade and bind the source PDF
+        using (PdfFileStamp fileStamp = new PdfFileStamp())
         {
-            // Create a stamp instance (Facades API)
-            Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
+            fileStamp.BindPdf(inputPdf);
 
-            // Position and size of the stamp on the page
-            stamp.SetOrigin(100, 500);          // X and Y coordinates (from bottom‑left)
-            stamp.SetImageSize(100, 100);       // Width and height of the image part
+            // ---------- Image stamp (company logo) ----------
+            Stamp imageStamp = new Stamp();
+            // Position the logo (example coordinates)
+            imageStamp.SetOrigin(50f, 750f);          // X, Y from bottom-left
+            // Desired size of the logo
+            imageStamp.SetImageSize(100f, 50f);       // Width, Height
+            // Bind the image file
+            imageStamp.BindImage(logoImage);
+            // Add the image stamp to the document
+            fileStamp.AddStamp(imageStamp);
 
-            // Bind the logo image
-            stamp.BindImage(logoPath);
+            // ---------- Text stamp (Confidential) ----------
+            // FormattedText constructor requires System.Drawing.Color
+            // Bold text is achieved by using a bold font (e.g., Helvetica-Bold)
+            FormattedText ft = new FormattedText(
+                "Confidential",                     // text
+                System.Drawing.Color.Red,           // text color
+                "Helvetica-Bold",                   // font name (bold)
+                EncodingType.Winansi,               // encoding
+                false,                              // isEmbedded
+                36);                                // font size
 
-            // Create formatted text (uses System.Drawing.Color as required by the API)
-            FormattedText formattedText = new FormattedText(
-                stampText,                         // text to display
-                System.Drawing.Color.Red,          // text color
-                "Helvetica",                       // font name
-                EncodingType.Winansi,              // encoding
-                false,                             // embedded flag
-                24);                               // font size
+            Stamp textStamp = new Stamp();
+            // Position the text (example coordinates)
+            textStamp.SetOrigin(200f, 750f);
+            // Bind the formatted text as a stamp
+            textStamp.BindLogo(ft);
+            // Add the text stamp to the document
+            fileStamp.AddStamp(textStamp);
 
-            // Bind the text to the same stamp
-            stamp.BindLogo(formattedText);
-
-            // Optional visual settings
-            stamp.IsBackground = false;
-            stamp.Opacity = 0.7f;
-
-            // Apply the stamp to the document using PdfFileStamp
-            using (Aspose.Pdf.Facades.PdfFileStamp fileStamp = new Aspose.Pdf.Facades.PdfFileStamp())
-            {
-                fileStamp.BindPdf(doc);
-                fileStamp.AddStamp(stamp);
-                fileStamp.Save(outputPdf);
-                fileStamp.Close();
-            }
+            // Save the stamped PDF
+            fileStamp.Save(outputPdf);
+            fileStamp.Close();
         }
 
         Console.WriteLine($"Stamped PDF saved to '{outputPdf}'.");

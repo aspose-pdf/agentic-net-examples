@@ -16,27 +16,33 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the document
         Document doc = new Document(inputPath);
-        int lastPageNumber = doc.Pages.Count; // 1‑based index of the last page
+        // Get the last page (1‑based index)
+        Page lastPage = doc.Pages[doc.Pages.Count];
 
-        // Create a text stamp containing the current date (MM-dd-yyyy)
+        // Prepare the footer text with the current date (MM-dd-yyyy)
         string dateText = DateTime.Now.ToString("MM-dd-yyyy");
+
+        // Create a TextStamp for the footer
         TextStamp stamp = new TextStamp(dateText);
+        // Set font, size and color via TextState
         stamp.TextState.Font = FontRepository.FindFont("Helvetica");
         stamp.TextState.FontSize = 12;
         stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-
-        // Position the stamp at the bottom‑center of the page
+        // Position the stamp at the bottom centre of the page
         stamp.HorizontalAlignment = HorizontalAlignment.Center;
         stamp.VerticalAlignment = VerticalAlignment.Bottom;
-        stamp.YIndent = 10; // distance from the bottom edge in points
+        // Distance from the bottom edge (you can adjust as needed)
+        stamp.YIndent = 10f;
 
-        // Apply the stamp only to the last page
-        doc.Pages[lastPageNumber].AddStamp(stamp);
+        // Add the stamp only to the last page
+        lastPage.AddStamp(stamp);
 
         // Save the modified PDF
         doc.Save(outputPath);
-        Console.WriteLine($"Footer with date added to page {lastPageNumber} and saved as '{outputPath}'.");
+        // Document.Close() does not exist in Aspose.Pdf; the object is disposed by GC or a using block.
+
+        Console.WriteLine($"Footer with date added to page {lastPage.Number}, saved as '{outputPath}'.");
     }
 }
