@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -7,55 +6,59 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "custom_borders_table.pdf";
-
         // Create a new PDF document
         using (Document doc = new Document())
         {
             // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Create a table and set its position on the page
+            // Create a table and set column widths
             Table table = new Table
             {
-                ColumnWidths = "100 100 100", // three columns of equal width
-                DefaultCellPadding = new MarginInfo(5, 5, 5, 5),
-                DefaultCellTextState = new TextState { FontSize = 12 }
+                ColumnWidths = "100 100 100"
             };
             page.Paragraphs.Add(table);
 
-            // Populate the table with 6 rows (including a header row)
-            for (int i = 0; i < 6; i++)
+            int rowCount = 6;
+            int colCount = 3;
+
+            // Populate the table
+            for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
             {
+                // Add a new row
                 Row row = table.Rows.Add();
 
-                // Add three cells to each row
-                for (int j = 0; j < 3; j++)
+                // Define a border style based on the row index using the BorderInfo constructor
+                BorderInfo rowBorder;
+                if (rowIndex % 2 == 0) // even rows
                 {
-                    Cell cell = new Cell();
-                    cell.Paragraphs.Add(new TextFragment($"R{i + 1}C{j + 1}"));
-                    row.Cells.Add(cell);
+                    rowBorder = new BorderInfo(BorderSide.All, 1f, Aspose.Pdf.Color.Blue);
+                }
+                else // odd rows
+                {
+                    rowBorder = new BorderInfo(BorderSide.All, 2f, Aspose.Pdf.Color.Red);
                 }
 
-                // Apply custom border style based on row index (1‑based)
-                // Even rows: thick red border
-                // Odd rows: thin blue border
-                if ((i + 1) % 2 == 0) // even row
+                // Apply the border to the entire row
+                row.Border = rowBorder;
+
+                // Add cells to the row
+                for (int colIndex = 0; colIndex < colCount; colIndex++)
                 {
-                    // Set a thick red border for the entire row
-                    row.Border = new BorderInfo(BorderSide.All, 2f, Aspose.Pdf.Color.Red);
-                }
-                else // odd row
-                {
-                    // Set a thin blue border for the entire row
-                    row.Border = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Blue);
+                    Cell cell = new Cell
+                    {
+                        // Apply the same border to each cell (optional)
+                        Border = rowBorder
+                    };
+
+                    // Add some sample text to the cell
+                    cell.Paragraphs.Add(new TextFragment($"R{rowIndex + 1}C{colIndex + 1}"));
+                    row.Cells.Add(cell);
                 }
             }
 
             // Save the PDF document
-            doc.Save(outputPath);
+            doc.Save("TableWithCustomBorders.pdf");
         }
-
-        Console.WriteLine($"PDF with custom table borders saved to '{outputPath}'.");
     }
 }
