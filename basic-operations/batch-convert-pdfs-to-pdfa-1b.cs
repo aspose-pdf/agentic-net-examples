@@ -6,44 +6,39 @@ class Program
 {
     static void Main()
     {
-        // Input folder containing PDFs
-        const string inputFolder = "InputPdfs";
-        // Output folder for PDF/A‑1b files
-        const string outputFolder = "OutputPdfA";
+        const string inputDirectory = "InputPdfs";
+        const string outputDirectory = "OutputPdfA";
 
-        if (!Directory.Exists(inputFolder))
+        if (!Directory.Exists(inputDirectory))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Input directory not found: {inputDirectory}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
+        Directory.CreateDirectory(outputDirectory);
 
-        // Process each PDF file in the input folder
-        foreach (string sourcePath in Directory.GetFiles(inputFolder, "*.pdf"))
+        string[] pdfFiles = Directory.GetFiles(inputDirectory, "*.pdf", SearchOption.TopDirectoryOnly);
+
+        foreach (string inputPath in pdfFiles)
         {
-            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(sourcePath);
-            string targetPath = Path.Combine(outputFolder, $"{fileNameWithoutExt}_pdfa.pdf");
-            string logPath    = Path.Combine(outputFolder, $"{fileNameWithoutExt}_log.txt");
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(inputPath);
+            string outputPath = Path.Combine(outputDirectory, fileNameWithoutExt + ".pdf");
+            string logPath = Path.Combine(outputDirectory, fileNameWithoutExt + "_conversion.log");
 
             try
             {
-                // Load the source PDF (using block ensures proper disposal)
-                using (Document doc = new Document(sourcePath))
+                using (Document doc = new Document(inputPath))
                 {
-                    // Convert to PDF/A‑1b; errors are written to the log file
+                    // Convert to PDF/A‑1b, log conversion issues, delete unconvertible objects
                     doc.Convert(logPath, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
-
-                    // Save the converted document (still a PDF file)
-                    doc.Save(targetPath);
+                    doc.Save(outputPath);
                 }
 
-                Console.WriteLine($"Converted: {sourcePath} → {targetPath}");
+                Console.WriteLine($"Converted: {fileNameWithoutExt}.pdf");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error converting '{sourcePath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
             }
         }
     }
