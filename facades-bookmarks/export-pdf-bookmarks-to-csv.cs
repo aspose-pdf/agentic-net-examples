@@ -1,64 +1,69 @@
 using System;
 using System.IO;
 using Aspose.Pdf.Facades;   // PdfBookmarkEditor, Bookmark, Bookmarks
-using Aspose.Pdf;          // Bookmark (shared namespace)
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string inputPdf  = "input.pdf";
         const string outputCsv = "bookmarks.csv";
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Bind the PDF to the bookmark editor and extract the bookmark hierarchy.
+        // Open the PDF and extract its bookmarks
         using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
         {
-            editor.BindPdf(inputPdf);
-            Bookmarks rootBookmarks = editor.ExtractBookmarks();
+            editor.BindPdf(inputPdf);                     // initialize facade with the PDF
+            Bookmarks bookmarks = editor.ExtractBookmarks(); // get all bookmarks (recursive)
 
-            // Write CSV header and each bookmark (including nested ones) with its level.
-            using (StreamWriter writer = new StreamWriter(outputCsv, false, System.Text.Encoding.UTF8))
+            // Write bookmarks to CSV
+            using (StreamWriter writer = new StreamWriter(outputCsv, false))
             {
-                writer.WriteLine("Title,Destination,Level");
-                foreach (Bookmark bm in rootBookmarks)
-                {
-                    WriteBookmark(writer, bm, 1);
-                }
+                // CSV header
+                writer.WriteLine("Title,DestinationPage,Level");
+
+                // Recursive traversal to capture hierarchy level
+                WriteBookmarks(bookmarks, 0, writer);
             }
         }
 
         Console.WriteLine($"Bookmarks exported to '{outputCsv}'.");
     }
 
-    // Recursively writes a bookmark and its children to the CSV.
-    static void WriteBookmark(StreamWriter writer, Bookmark bm, int level)
+    // Recursively writes each bookmark with its hierarchy level
+    private static void WriteBookmarks(Bookmarks bookmarks, int level, StreamWriter writer)
     {
-        // Destination: use the page number if it is set (>0); otherwise leave empty.
-        string destination = bm.PageNumber > 0 ? bm.PageNumber.ToString() : string.Empty;
-
-        // Escape commas and quotes in the title for CSV compliance.
-        string title = bm.Title ?? string.Empty;
-        title = title.Replace("\"", "\"\"");
-        if (title.Contains(","))
+        foreach (Bookmark bm in bookmarks)
         {
-            title = $"\"{title}\"";
-        }
+            // Escape title for CSV (handle commas and quotes)
+            string escapedTitle = EscapeForCsv(bm.Title);
 
-        writer.WriteLine($"{title},{destination},{level}");
+            // Destination: use PageNumber if set; otherwise leave empty
+            string destination = bm.PageNumber > 0 ? bm.PageNumber.ToString() : string.Empty;
 
-        // Process child bookmarks, if any, increasing the level.
-        if (bm.ChildItem != null && bm.ChildItem.Count > 0)
-        {
-            foreach (Bookmark child in bm.ChildItem)
+            writer.WriteLine($"{escapedTitle},{destination},{level}");
+
+            // Process child bookmarks, if any
+            if (bm.ChildItem != null && bm.ChildItem.Count > 0)
             {
-                WriteBookmark(writer, child, level + 1);
+                WriteBookmarks(bm.ChildItem, level + 1, writer);
             }
         }
+    }
+
+    // Simple CSV escaping: double quotes are doubled, field is quoted if it contains a comma or quote
+    private static string EscapeForCsv(string field)
+    {
+        if (field == null) return string.Empty;
+
+        bool mustQuote = field.Contains(",") || field.Contains("\"") || field.Contains("\n") || field.Contains("\r");
+        string escaped = field.Replace("\"", "\"\"");
+
+        return mustQuote ? $"\"{escaped}\"" : escaped;
     }
 }

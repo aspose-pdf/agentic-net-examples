@@ -1,16 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using System.Text.Json;
-using Aspose.Pdf.Facades;          // PdfBookmarkEditor
-using Aspose.Pdf.Facades;          // Bookmark, Bookmarks
-
-class BookmarkNode
-{
-    public string Title { get; set; }
-    public int Level { get; set; }
-    public List<BookmarkNode> Children { get; set; } = new List<BookmarkNode>();
-}
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -25,47 +17,53 @@ class Program
             return;
         }
 
-        // Bind the PDF and extract its bookmarks
+        // Bind the PDF and extract bookmarks
         using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
         {
             editor.BindPdf(inputPdf);
-            // Extract all bookmarks (recursive)
-            var bookmarks = editor.ExtractBookmarks();
+            Bookmarks bookmarks = editor.ExtractBookmarks(); // recursive extraction
 
-            // Convert to a hierarchical DTO suitable for JSON serialization
-            var rootNodes = new List<BookmarkNode>();
-            foreach (var bm in bookmarks)
+            // Convert to a serializable hierarchy
+            List<BookmarkNode> hierarchy = new List<BookmarkNode>();
+            foreach (Bookmark bm in bookmarks)
             {
-                rootNodes.Add(ConvertBookmark(bm));
+                hierarchy.Add(ConvertBookmark(bm));
             }
 
-            // Serialize to pretty‑printed JSON
+            // Serialize hierarchy to JSON
             JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-            string json = JsonSerializer.Serialize(rootNodes, jsonOptions);
-
-            // Write JSON to file
+            string json = JsonSerializer.Serialize(hierarchy, jsonOptions);
             File.WriteAllText(outputJson, json);
-            Console.WriteLine($"Bookmarks exported to '{outputJson}'.");
         }
+
+        Console.WriteLine($"Bookmarks exported to '{outputJson}'.");
     }
 
-    // Recursively convert Aspose.Pdf.Facades.Bookmark to BookmarkNode
+    // Recursively transforms Aspose.Pdf.Facades.Bookmark into a plain DTO
     static BookmarkNode ConvertBookmark(Bookmark bm)
     {
         BookmarkNode node = new BookmarkNode {
             Title = bm.Title,
-            Level = bm.Level
+            PageNumber = bm.PageNumber,
+            Children = new List<BookmarkNode>()
         };
 
-        // ChildItems may be null; guard against it
         if (bm.ChildItems != null)
         {
-            foreach (var child in bm.ChildItems)
+            foreach (Bookmark child in bm.ChildItems)
             {
                 node.Children.Add(ConvertBookmark(child));
             }
         }
 
         return node;
+    }
+
+    // DTO used for JSON serialization
+    class BookmarkNode
+    {
+        public string Title { get; set; }
+        public int PageNumber { get; set; }
+        public List<BookmarkNode> Children { get; set; }
     }
 }

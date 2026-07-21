@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
@@ -7,50 +8,56 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const int pagesToInsert = 2; // number of pages to add at the beginning
+        const string inputPdf  = "original.pdf";      // source PDF with existing bookmarks
+        const string outputPdf = "updated.pdf";       // result PDF after insertion
+        const int pagesToInsert = 2;                  // number of new pages to add at the beginning
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Load the document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Insert empty pages at the very start (1‑based indexing)
+            // Insert blank pages at the very start (position 1 is the first page)
             for (int i = 0; i < pagesToInsert; i++)
             {
-                doc.Pages.Insert(1);
+                doc.Pages.Insert(1); // inserts an empty page
             }
 
-            // Initialize the bookmark editor and bind it to the in‑memory document
-            PdfBookmarkEditor editor = new PdfBookmarkEditor();
-            editor.BindPdf(doc);
+            // -----------------------------------------------------------------
+            // Adjust existing bookmarks so they point to the correct pages
+            // -----------------------------------------------------------------
+            // Bind the document to a PdfBookmarkEditor facade
+            PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor();
+            bookmarkEditor.BindPdf(doc);
 
-            // Extract current bookmarks
-            Bookmarks existingBookmarks = editor.ExtractBookmarks();
+            // Extract current bookmarks (returns a collection of Bookmark objects)
+            // Store title and original page number for later recreation
+            List<(string Title, int PageNumber)> originalBookmarks = new List<(string, int)>();
+            foreach (Bookmark bm in bookmarkEditor.ExtractBookmarks())
+            {
+                // Guard against null titles
+                string title = bm.Title ?? $"Bookmark_{bm.PageNumber}";
+                originalBookmarks.Add((title, bm.PageNumber));
+            }
 
             // Remove all existing bookmarks
-            editor.DeleteBookmarks();
+            bookmarkEditor.DeleteBookmarks();
 
-            // Re‑create each bookmark with its page number shifted forward
-            foreach (Bookmark bm in existingBookmarks)
+            // Re‑create each bookmark with its page number shifted by the inserted pages
+            foreach (var (title, page) in originalBookmarks)
             {
-                int newPageNumber = bm.PageNumber + pagesToInsert;
-                // Guard against out‑of‑range page numbers
-                if (newPageNumber <= doc.Pages.Count && newPageNumber > 0)
-                {
-                    editor.CreateBookmarkOfPage(bm.Title, newPageNumber);
-                }
+                int newPageNumber = page + pagesToInsert;
+                bookmarkEditor.CreateBookmarkOfPage(title, newPageNumber);
             }
 
-            // Save the updated PDF (including the adjusted bookmarks)
-            editor.Save(outputPath);
+            // Save the modified document (PDF format, no SaveOptions needed)
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Adjusted PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Document saved with adjusted bookmarks to '{outputPdf}'.");
     }
 }

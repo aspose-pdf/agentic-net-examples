@@ -8,7 +8,7 @@ parent: ../agents.md
 
 # AGENTS - facades-bookmarks
 
-> **Facades bookmarks** in PDF using C# / .NET -- **35** verified, compile-tested examples for **Aspose.PDF for .NET** 26.6.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Facades bookmarks** in PDF using C# / .NET -- **35** verified, compile-tested examples for **Aspose.PDF for .NET** 26.7.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 ## Persona
 
@@ -24,14 +24,15 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 ## Required Namespaces
 
 - `using Aspose.Pdf.Facades;` (35/35 files) ← category-specific
-- `using Aspose.Pdf;` (16/35 files)
-- `using Aspose.Pdf.Text;` (4/35 files)
+- `using Aspose.Pdf;` (21/35 files) ← category-specific
 - `using Aspose.Pdf.Annotations;` (1/35 files)
+- `using Aspose.Pdf.Text;` (1/35 files)
 - `using System;` (35/35 files)
-- `using System.IO;` (32/35 files)
+- `using System.IO;` (30/35 files)
 - `using System.Collections.Generic;` (10/35 files)
-- `using System.Drawing;` (4/35 files)
+- `using System.Drawing;` (3/35 files)
 - `using System.Text.Json;` (3/35 files)
+- `using System.Data;` (1/35 files)
 - `using System.Globalization;` (1/35 files)
 - `using System.Text.RegularExpressions;` (1/35 files)
 
@@ -50,36 +51,36 @@ tool.Save("output.pdf");
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [add-colored-bookmarks-to-pdf](./add-colored-bookmarks-to-pdf.cs) | Add Colored Bookmarks to PDF Sections | `PdfBookmarkEditor`, `Bookmark`, `BindPdf` | Shows how to create PDF bookmarks with custom colors (red for warnings, green for informational s... |
-| [add-javascript-bookmark-to-pdf](./add-javascript-bookmark-to-pdf.cs) | Add JavaScript Bookmark to PDF | `PdfContentEditor`, `BindPdf`, `CreateBookmarksAction` | Shows how to create a PDF bookmark that executes JavaScript code when clicked using Aspose.Pdf Fa... |
-| [add-subbookmarks-to-pdf-chapter](./add-subbookmarks-to-pdf-chapter.cs) | Add Sub‑Bookmarks to PDF Chapter | `PdfBookmarkEditor`, `BindPdf`, `Bookmark` | Demonstrates creating a parent bookmark for a chapter, attaching child bookmarks for sections, an... |
-| [add-top-level-blue-bookmark-to-first-page](./add-top-level-blue-bookmark-to-first-page.cs) | Add Top-Level Blue Bookmark to First Page | `PdfBookmarkEditor`, `BindPdf`, `CreateBookmarks` | Demonstrates how to create a top-level bookmark that links to the first page of a PDF and sets it... |
-| [adjust-pdf-bookmarks-after-inserting-pages](./adjust-pdf-bookmarks-after-inserting-pages.cs) | Adjust PDF Bookmarks After Inserting Pages | `Document`, `PdfBookmarkEditor`, `BindPdf` | Demonstrates how to insert pages at the beginning of a PDF and shift existing bookmark destinatio... |
-| [batch-add-reviewed-bookmark-to-pdfs](./batch-add-reviewed-bookmark-to-pdfs.cs) | Batch Add 'Reviewed' Bookmark to PDFs | `PdfBookmarkEditor`, `BindPdf`, `CreateBookmarkOfPage` | Shows how to loop through PDF files in a folder and add a "Reviewed" bookmark on the last page of... |
-| [batch-add-toc-bookmark-to-pdfs](./batch-add-toc-bookmark-to-pdfs.cs) | Batch Add Table of Contents Bookmark to PDFs | `PdfBookmarkEditor`, `BindPdf`, `CreateBookmarkOfPage` | Shows how to iterate over all PDF files in a folder and add a top‑level "Table of Contents" bookm... |
-| [batch-delete-bookmarks-from-encrypted-pdfs](./batch-delete-bookmarks-from-encrypted-pdfs.cs) | Batch Delete Bookmarks from Encrypted PDFs | `Document`, `PdfBookmarkEditor`, `DeleteBookmarks` | Demonstrates how to open password‑protected PDFs, remove all bookmarks using PdfBookmarkEditor, a... |
-| [bookmark-toc-consistency-check](./bookmark-toc-consistency-check.cs) | Validate Bookmark Page Numbers Against Table of Contents | `Document`, `PdfBookmarkEditor`, `Bookmarks` | Extracts PDF bookmarks, generates a simple table of contents by reading the first line of each pa... |
-| [collapse-specific-pdf-bookmarks](./collapse-specific-pdf-bookmarks.cs) | Collapse Specific PDF Bookmarks to Improve Outline Visibilit... | `BindPdf`, `ExtractBookmarks`, `Title` | Demonstrates how to programmatically set selected PDF bookmarks to a collapsed state using Aspose... |
-| [create-bookmark-to-named-destination](./create-bookmark-to-named-destination.cs) | Create Bookmark to Named Destination in PDF | `Document`, `Add`, `PdfContentEditor` | Demonstrates how to add a named destination to a PDF and then create a bookmark that links to tha... |
-| [create-hierarchical-bookmarks-pdfbookmarkeditor](./create-hierarchical-bookmarks-pdfbookmarkeditor.cs) | Create Hierarchical Bookmarks with PdfBookmarkEditor | `PdfBookmarkEditor`, `BindPdf`, `CreateBookmarks` | Demonstrates how to bind a PDF to PdfBookmarkEditor, build a hierarchy of Chapter and Section boo... |
-| [create-image-bookmarks-in-pdf](./create-image-bookmarks-in-pdf.cs) | Create Bookmarks for Images in a PDF | `Document`, `Page`, `XImage` | Shows how to locate images on each page of a PDF and add bookmarks that navigate directly to thos... |
-| [create-pdf-bookmarks-external-urls](./create-pdf-bookmarks-external-urls.cs) | Create PDF Bookmarks with External URLs | `PdfContentEditor`, `BindPdf`, `CreateBookmarksAction` | Shows how to add bookmarks that open external web pages in a PDF using Aspose.Pdf.Facades. |
-| [delete-all-bookmarks-from-pdf](./delete-all-bookmarks-from-pdf.cs) | Delete All Bookmarks from PDF | `PdfBookmarkEditor`, `BindPdf`, `DeleteBookmarks` | Demonstrates how to remove every bookmark from a PDF document using Aspose.Pdf's PdfBookmarkEdito... |
-| [delete-bookmark-and-verify](./delete-bookmark-and-verify.cs) | Delete a Bookmark from PDF and Verify Removal | `PdfBookmarkEditor`, `BindPdf`, `ExtractBookmarks` | Demonstrates how to remove a specific bookmark from a PDF using Aspose.Pdf.Facades, save the upda... |
-| [delete-bookmarks-matching-regex](./delete-bookmarks-matching-regex.cs) | Delete Bookmarks Matching a Regex Pattern | `PdfBookmarkEditor`, `BindPdf`, `ExtractBookmarks` | Demonstrates how to load a PDF, extract its bookmarks, and automatically remove those whose title... |
-| [export-pdf-bookmarks-to-csv](./export-pdf-bookmarks-to-csv.cs) | Export PDF Bookmarks to CSV | `PdfBookmarkEditor`, `BindPdf`, `ExtractBookmarks` | Shows how to extract the bookmark hierarchy from a PDF using Aspose.Pdf.Facades.PdfBookmarkEditor... |
-| [export-pdf-bookmarks-to-excel](./export-pdf-bookmarks-to-excel.cs) | Export PDF Bookmarks to Excel Workbook | `Document`, `PdfBookmarkEditor`, `ExtractBookmarks` | Demonstrates how to extract all bookmarks from a PDF, place their title, level, and destination p... |
-| [export-pdf-bookmarks-to-json](./export-pdf-bookmarks-to-json.cs) | Export PDF Bookmarks to Hierarchical JSON | `PdfBookmarkEditor`, `ExtractBookmarks`, `Bookmark` | Demonstrates how to extract bookmarks from a PDF using Aspose.Pdf.Facades, convert them into a ne... |
-| [export-pdf-bookmarks-to-json__v2](./export-pdf-bookmarks-to-json__v2.cs) | Export PDF Bookmarks to JSON | `Document`, `PdfBookmarkEditor`, `BindPdf` | Demonstrates how to read the bookmark hierarchy from a PDF using Aspose.Pdf.Facades, convert it t... |
-| [export-pdf-bookmarks-to-text](./export-pdf-bookmarks-to-text.cs) | Export PDF Bookmarks to Text Outline | `PdfBookmarkEditor`, `BindPdf`, `ExtractBookmarks` | Shows how to extract bookmarks from a PDF using Aspose.Pdf.Facades.PdfBookmarkEditor and write th... |
-| [export-pdf-bookmarks-to-xml](./export-pdf-bookmarks-to-xml.cs) | Export PDF Bookmarks to XML | `PdfBookmarkEditor`, `BindPdf`, `ExportBookmarksToXML` | Demonstrates how to bind a PDF document with PdfBookmarkEditor and export its bookmark hierarchy ... |
-| [import-bookmarks-from-database](./import-bookmarks-from-database.cs) | Import Bookmarks from Database into PDF | `PdfBookmarkEditor`, `BindPdf`, `CreateBookmarkOfPage` | Shows how to retrieve bookmark records (simulated) and add them to an existing PDF using Aspose.P... |
-| [import-bookmarks-from-json](./import-bookmarks-from-json.cs) | Import Bookmarks from JSON into PDF | `PdfBookmarkEditor`, `Bookmark`, `Bookmarks` | Shows how to read hierarchical bookmark data from a JSON file, convert it to Aspose.Pdf.Facades.B... |
-| [import-csv-bookmarks-into-pdf](./import-csv-bookmarks-into-pdf.cs) | Import CSV Bookmarks into PDF | `Bookmark`, `PdfBookmarkEditor`, `BindPdf` | The example reads a CSV file containing bookmark title, level, and page number, builds a hierarch... |
-| [import-merge-bookmarks-from-external-pdf](./import-merge-bookmarks-from-external-pdf.cs) | Import and Merge Bookmarks from External PDF | `PdfBookmarkEditor`, `BindPdf`, `ExtractBookmarks` | Shows how to extract bookmarks from a source PDF and add them to another PDF while preserving the... |
-| [import-ofd-bookmarks-to-pdf](./import-ofd-bookmarks-to-pdf.cs) | Import Bookmarks from OFD into PDF | `Document`, `OfdLoadOptions`, `PdfBookmarkEditor` | Demonstrates how to load an OFD file, extract its bookmarks using PdfBookmarkEditor, and add thos... |
-| [modify-pdf-bookmark-title](./modify-pdf-bookmark-title.cs) | Modify PDF Bookmark Title Using MemoryStream | `PdfBookmarkEditor`, `BindPdf`, `ModifyBookmarks` | Shows how to bind a PDF from a byte array with a MemoryStream, change an existing bookmark title,... |
-| [remove-duplicate-bookmarks-from-pdf](./remove-duplicate-bookmarks-from-pdf.cs) | Remove Duplicate Bookmarks from PDF | `PdfBookmarkEditor`, `BindPdf`, `ExtractBookmarks` | Shows how to extract all bookmarks from a PDF, filter out duplicates based on title and page numb... |
+| [add-colored-bookmarks-to-pdf](./add-colored-bookmarks-to-pdf.cs) | Add Colored Bookmarks to PDF Sections | `PdfContentEditor`, `BindPdf`, `CreateBookmarksAction` | Shows how to create PDF bookmarks with different colors (red for warnings, green for informationa... |
+| [add-external-url-bookmarks-to-pdf](./add-external-url-bookmarks-to-pdf.cs) | Add External URL Bookmarks to PDF | `Document`, `PdfBookmarkEditor`, `Bookmark` | Shows how to create PDF bookmarks that open external web URLs using Aspose.Pdf's bookmark editor. |
+| [add-subbookmarks-to-pdf-chapter](./add-subbookmarks-to-pdf-chapter.cs) | Add Sub-Bookmarks to a PDF Chapter | `PdfBookmarkEditor`, `BindPdf`, `CreateBookmarks` | Shows how to create a parent bookmark with child bookmarks (sub‑sections) in a PDF using Aspose.P... |
+| [add-top-level-blue-bookmark](./add-top-level-blue-bookmark.cs) | Add Top-Level Blue Bookmark to PDF | `PdfBookmarkEditor`, `BindPdf`, `CreateBookmarks` | Demonstrates how to create a top-level bookmark that points to the first page of a PDF and set it... |
+| [adjust-pdf-bookmarks-after-inserting-pages](./adjust-pdf-bookmarks-after-inserting-pages.cs) | Adjust PDF Bookmarks After Inserting Pages | `Document`, `Insert`, `BindPdf` | Shows how to insert pages at the start of a PDF and shift existing bookmark destinations so they ... |
+| [batch-add-reviewed-bookmark-to-pdfs](./batch-add-reviewed-bookmark-to-pdfs.cs) | Batch Add "Reviewed" Bookmark to PDFs | `PdfBookmarkEditor`, `BindPdf`, `CreateBookmarkOfPage` | Shows how to loop through PDF files in a directory and append a "Reviewed" bookmark on the last p... |
+| [batch-add-toc-bookmark-to-pdfs](./batch-add-toc-bookmark-to-pdfs.cs) | Batch Add Table of Contents Bookmark to PDFs | `PdfBookmarkEditor`, `BindPdf`, `CreateBookmarkOfPage` | Shows how to loop through a directory of PDF files and add a standard "Table of Contents" bookmar... |
+| [batch-delete-bookmarks-from-encrypted-pdfs](./batch-delete-bookmarks-from-encrypted-pdfs.cs) | Batch Delete Bookmarks from Encrypted PDFs | `Document`, `PdfBookmarkEditor`, `DeleteBookmarks` | Shows how to open password‑protected PDF files, remove all bookmarks using PdfBookmarkEditor, and... |
+| [collapse-specific-pdf-bookmarks](./collapse-specific-pdf-bookmarks.cs) | Collapse Specific PDF Bookmarks Using Aspose.Pdf | `PdfBookmarkEditor`, `BindPdf`, `ExtractBookmarks` | Shows how to bind a PDF, extract its bookmarks, recursively set the Open property to false for bo... |
+| [create-bookmark-to-named-destination](./create-bookmark-to-named-destination.cs) | Create Bookmark to Named Destination in PDF | `Document`, `Page`, `FitExplicitDestination` | Shows how to define a named destination in a PDF and add a bookmark that references it using Aspo... |
+| [create-hierarchical-pdf-bookmarks](./create-hierarchical-pdf-bookmarks.cs) | Create Hierarchical PDF Bookmarks with PdfBookmarkEditor | `PdfBookmarkEditor`, `BindPdf`, `CreateBookmarks` | Shows how to bind a PDF to PdfBookmarkEditor, create top‑level chapter bookmarks with child secti... |
+| [create-image-bookmarks-in-pdf](./create-image-bookmarks-in-pdf.cs) | Create Image Bookmarks in PDF | `PdfBookmarkEditor`, `Document`, `Page` | Shows how to add a bookmark for each image found in a PDF, linking the bookmark to the page that ... |
+| [create-javascript-bookmark](./create-javascript-bookmark.cs) | Create JavaScript Bookmark in PDF | `Document`, `PdfContentEditor`, `BindPdf` | Shows how to add a bookmark that executes JavaScript code when clicked using Aspose.Pdf's PdfCont... |
+| [delete-all-bookmarks-from-pdf](./delete-all-bookmarks-from-pdf.cs) | Delete All Bookmarks from PDF | `PdfBookmarkEditor`, `BindPdf`, `DeleteBookmarks` | Demonstrates how to remove every bookmark from a PDF document using the PdfBookmarkEditor facade ... |
+| [delete-bookmarks-matching-regex](./delete-bookmarks-matching-regex.cs) | Delete Bookmarks Matching a Regex Pattern | `PdfBookmarkEditor`, `BindPdf`, `ExtractBookmarks` | Shows how to remove PDF bookmarks whose titles match a regular expression using Aspose.Pdf's PdfB... |
+| [delete-pdf-bookmark-verify](./delete-pdf-bookmark-verify.cs) | Delete a PDF Bookmark and Verify Removal | `PdfBookmarkEditor`, `BindPdf`, `DeleteBookmarks` | Demonstrates how to delete a specific bookmark from a PDF using PdfBookmarkEditor and then confir... |
+| [export-pdf-bookmarks-to-csv](./export-pdf-bookmarks-to-csv.cs) | Export PDF Bookmarks to CSV | `PdfBookmarkEditor`, `BindPdf`, `ExtractBookmarks` | Shows how to extract all bookmarks from a PDF using Aspose.Pdf.Facades.PdfBookmarkEditor and writ... |
+| [export-pdf-bookmarks-to-excel](./export-pdf-bookmarks-to-excel.cs) | Export PDF Bookmarks to Excel | `PdfBookmarkEditor`, `BindPdf`, `ExtractBookmarks` | Extracts all bookmarks from a PDF using PdfBookmarkEditor, traverses the bookmark hierarchy, and ... |
+| [export-pdf-bookmarks-to-json](./export-pdf-bookmarks-to-json.cs) | Export PDF Bookmarks to JSON | `PdfBookmarkEditor`, `BindPdf`, `ExtractBookmarks` | The example opens a PDF file, extracts its hierarchical bookmarks using Aspose.Pdf.Facades.PdfBoo... |
+| [export-pdf-bookmarks-to-json__v2](./export-pdf-bookmarks-to-json__v2.cs) | Export PDF Bookmarks to JSON | `BindPdf`, `ExtractBookmarks`, `Close` | Demonstrates extracting the bookmark hierarchy from a PDF with Aspose.Pdf, flattening it while pr... |
+| [export-pdf-bookmarks-to-text-outline](./export-pdf-bookmarks-to-text-outline.cs) | Export PDF Bookmarks to a Text Outline | `PdfBookmarkEditor`, `BindPdf`, `ExtractBookmarks` | Demonstrates how to extract hierarchical bookmarks from a PDF using Aspose.Pdf and write them to ... |
+| [export-pdf-bookmarks-to-xml](./export-pdf-bookmarks-to-xml.cs) | Export PDF Bookmarks to XML | `PdfBookmarkEditor`, `BindPdf`, `ExportBookmarksToXML` | Demonstrates how to bind a PDF document with PdfBookmarkEditor and export its complete bookmark h... |
+| [import-bookmarks-from-csv](./import-bookmarks-from-csv.cs) | Import Bookmarks from CSV into PDF | `Bookmarks`, `Bookmark`, `PdfBookmarkEditor` | Shows how to read a CSV file, build a hierarchical bookmark tree, and add the bookmarks to an exi... |
+| [import-bookmarks-from-database](./import-bookmarks-from-database.cs) | Import Bookmarks from Database into a PDF | `Document`, `Save`, `PdfBookmarkEditor` | Demonstrates how to read bookmark data from a database‑like result set and add each entry as a PD... |
+| [import-bookmarks-from-json](./import-bookmarks-from-json.cs) | Import Bookmarks from JSON into PDF | `Document`, `PdfBookmarkEditor`, `BindPdf` | Shows how to read a JSON file with bookmark titles and page numbers, deserialize it, and add thos... |
+| [import-ofd-bookmarks-into-pdf](./import-ofd-bookmarks-into-pdf.cs) | Import OFD Bookmarks into PDF | `Document`, `OfdLoadOptions`, `OutlineItemCollection` | Demonstrates loading an OFD file, converting its outline items to Aspose.Pdf.Bookmark objects, an... |
+| [merge-bookmarks-into-pdf](./merge-bookmarks-into-pdf.cs) | Merge Bookmarks from One PDF into Another | `PdfBookmarkEditor`, `Document`, `BindPdf` | Demonstrates how to extract the bookmark hierarchy from a source PDF and append it to a target PD... |
+| [modify-pdf-bookmarks-using-memorystream](./modify-pdf-bookmarks-using-memorystream.cs) | Modify PDF Bookmarks Using MemoryStream | `PdfBookmarkEditor`, `BindPdf`, `ModifyBookmarks` | Shows how to bind a PDF from a byte array via MemoryStream, rename a specific bookmark, and retur... |
+| [remove-duplicate-bookmarks](./remove-duplicate-bookmarks.cs) | Remove Duplicate Bookmarks from PDF | `PdfBookmarkEditor`, `BindPdf`, `ExtractBookmarks` | Demonstrates how to extract all bookmarks from a PDF, identify and remove duplicates based on tit... |
+| [rename-pdf-bookmarks-using-translation-dictionary](./rename-pdf-bookmarks-using-translation-dictionary.cs) | Rename PDF Bookmarks Using a Translation Dictionary | `PdfBookmarkEditor`, `BindPdf`, `ModifyBookmarks` | Shows how to rename PDF bookmarks by applying a case‑insensitive translation map with Aspose.Pdf.... |
 | ... | | | *and 5 more files* |
 
 ## Category Statistics
@@ -125,5 +126,5 @@ tool.Save("output.pdf");
 - Review code examples in this folder for facades-bookmarks patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-07-05 | Run: `20260705_005655_3d29fa`
+Updated: 2026-07-17 | Run: `20260717_171638_da3b3e`
 <!-- AUTOGENERATED:END -->
