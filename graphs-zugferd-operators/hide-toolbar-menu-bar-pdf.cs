@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,22 +16,21 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // JavaScript that hides the toolbar and menu bar when the document opens
-            string js = "app.toolbar = false; app.menu = false;";
+            // Optional: set the viewer preference flags directly
+            doc.HideToolBar = true;
+            doc.HideMenubar = true;
 
-            // Add the script to the document's JavaScript collection using the indexer (named script)
-            doc.JavaScript["HideUI"] = js;
+            // Add JavaScript that runs when the document is opened
+            // This script hides the toolbar and the menu bar in the PDF viewer
+            doc.OpenAction = new JavascriptAction("app.hideToolbar(); app.hideMenuBar();");
 
-            // Set the OpenAction to ensure the script runs when the document is opened
-            doc.OpenAction = new JavascriptAction(js);
-
-            // Save the modified PDF
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with hidden UI to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with hidden toolbar and menu bar: {outputPath}");
     }
 }

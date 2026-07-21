@@ -7,50 +7,43 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string newDescription = "Updated attachment description - version 2";
+        const string inputPdf  = "input.pdf";          // Existing PDF with attachment(s)
+        const string outputPdf = "output.pdf";         // PDF after updating description
+        const string newDescription = "Latest version of the attached file";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            bool updated = false;
-
-            // Pages are 1‑based in Aspose.Pdf
-            for (int pageIdx = 1; pageIdx <= doc.Pages.Count; pageIdx++)
+            // Iterate over all pages (1‑based indexing)
+            foreach (Page page in doc.Pages)
             {
-                Page page = doc.Pages[pageIdx];
-
-                // Annotations collection is also 1‑based
-                for (int annIdx = 1; annIdx <= page.Annotations.Count; annIdx++)
+                // Iterate over all annotations on the page (1‑based indexing)
+                for (int idx = 1; idx <= page.Annotations.Count; idx++)
                 {
-                    Annotation ann = page.Annotations[annIdx];
+                    Annotation ann = page.Annotations[idx];
 
-                    // Look for file attachment annotations
+                    // Check if the annotation is a file attachment
                     if (ann is FileAttachmentAnnotation fileAnn)
                     {
                         // Update the description of the attached file
-                        fileAnn.File.Description = newDescription;
-                        updated = true;
+                        if (fileAnn.File != null)
+                        {
+                            fileAnn.File.Description = newDescription;
+                        }
                     }
                 }
             }
 
-            if (!updated)
-            {
-                Console.WriteLine("No FileAttachmentAnnotation found in the document.");
-            }
-
             // Save the modified PDF
-            doc.Save(outputPath);
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Attachment description updated and saved to '{outputPath}'.");
+        Console.WriteLine($"Attachment description updated and saved to '{outputPdf}'.");
     }
 }

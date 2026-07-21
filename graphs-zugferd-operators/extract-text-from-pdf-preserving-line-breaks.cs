@@ -7,9 +7,10 @@ class Program
 {
     static void Main()
     {
+        // Path to the source PDF file
         const string inputPdf = "input.pdf";
-        const string outputTxt = "extracted.txt";
 
+        // Verify that the file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"File not found: {inputPdf}");
@@ -20,22 +21,21 @@ class Program
         using (Document doc = new Document(inputPdf))
         {
             // Create extraction options that preserve line breaks and spacing
-            TextExtractionOptions options = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
-            // Optional: adjust spacing if needed (1 = default, 0 = auto)
-            options.ScaleFactor = 1;
+            TextExtractionOptions options = new TextExtractionOptions(
+                TextExtractionOptions.TextFormattingMode.Pure); // Pure mode keeps formatting
 
-            // Initialize the TextAbsorber with the options
+            // Initialize a TextAbsorber with the above options
             TextAbsorber absorber = new TextAbsorber(options);
 
-            // Extract text from all pages
+            // Apply the absorber to all pages of the document
             doc.Pages.Accept(absorber);
 
-            // Get the extracted text
+            // Retrieve the extracted text
             string extractedText = absorber.Text;
 
-            // Write the text to a file (or handle as needed)
-            File.WriteAllText(outputTxt, extractedText);
-            Console.WriteLine($"Text extracted to '{outputTxt}'.");
+            // Output the text to the console (or write to a file as needed)
+            Console.WriteLine("=== Extracted Text ===");
+            Console.WriteLine(extractedText);
         }
     }
 }

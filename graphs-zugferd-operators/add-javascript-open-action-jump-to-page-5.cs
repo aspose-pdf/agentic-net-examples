@@ -16,16 +16,19 @@ class Program
             return;
         }
 
-        // Load the PDF, set a JavaScript open action to jump to page 5, and save.
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // JavaScript: page numbers are zero‑based, so page 5 => index 4.
-            string js = "this.pageNum = 4;";
-            doc.OpenAction = new JavascriptAction(js);
+            // JavaScript that jumps to page 5 (pageNum is zero‑based, so 4)
+            JavascriptAction openAction = new JavascriptAction("this.pageNum = 4;");
 
+            // Assign the JavaScript action to be executed when the document opens
+            doc.OpenAction = openAction;
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Document saved with open‑action to page 5: {outputPath}");
+        Console.WriteLine($"Saved PDF with open‑action to page 5: {outputPath}");
     }
 }

@@ -1,47 +1,46 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                     // Core PDF API
-using Aspose.Pdf.Text;                // For XML handling if needed
+using Aspose.Pdf;
 
-class UpdateZugferdAttachment
+class UpdateZugferd
 {
     static void Main()
     {
-        // Paths – adjust as necessary
-        const string inputPdfPath   = "invoice_original.pdf";
-        const string newXmlPath     = "invoice_updated.xml";
-        const string outputPdfPath  = "invoice_updated.pdf";
+        // Paths to the source PDF, the new ZUGFeRD XML, and the output PDF
+        const string pdfPath      = "invoice.pdf";
+        const string newXmlPath   = "new_invoice.xml";
+        const string outputPdfPath = "invoice_updated.pdf";
 
-        // Verify files exist
-        if (!File.Exists(inputPdfPath))
+        // Verify that the input files exist
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
         if (!File.Exists(newXmlPath))
         {
-            Console.Error.WriteLine($"New ZUGFeRD XML not found: {newXmlPath}");
+            Console.Error.WriteLine($"XML not found: {newXmlPath}");
             return;
         }
 
         try
         {
-            // Load the existing PDF (ZUGFeRD PDF/A‑3) inside a using block for deterministic disposal
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Load the existing PDF document
+            using (Document doc = new Document(pdfPath))
             {
-                // Replace (or add) the embedded ZUGFeRD XML attachment.
-                // BindXml replaces the XML associated with the document (used for XFA and ZUGFeRD).
-                pdfDoc.BindXml(newXmlPath);
+                // Replace the embedded ZUGFeRD XML attachment with the new XML.
+                // BindXml replaces the existing XML (e.g., XFA or embedded XML) in the PDF.
+                doc.BindXml(newXmlPath);
 
-                // Save the modified PDF. No SaveOptions are required because we keep the same format (PDF/A‑3).
-                pdfDoc.Save(outputPdfPath);
+                // Save the updated PDF. No SaveOptions are required because we are saving as PDF.
+                doc.Save(outputPdfPath);
             }
 
             Console.WriteLine($"ZUGFeRD XML updated and saved to '{outputPdfPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error updating ZUGFeRD attachment: {ex.Message}");
+            Console.Error.WriteLine($"Error updating PDF: {ex.Message}");
         }
     }
 }

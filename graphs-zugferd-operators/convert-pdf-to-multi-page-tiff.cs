@@ -1,21 +1,22 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices;   // TiffDevice, Resolution, TiffSettings
+using Aspose.Pdf.Devices;
 
-class PdfToMultiPageTiff
+class Program
 {
     static void Main()
     {
         // Input PDF file path
         const string inputPdfPath = "input.pdf";
+
         // Output multi‑page TIFF file path
         const string outputTiffPath = "output.tif";
 
-        // Verify that the source PDF exists
+        // Verify input file exists
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Error: File not found – {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
@@ -25,20 +26,19 @@ class PdfToMultiPageTiff
             // Define the resolution (DPI) for the resulting TIFF images
             Resolution resolution = new Resolution(300);
 
-            // Configure TIFF settings (default settings are sufficient for most cases)
+            // Configure TIFF settings (no compression, default color depth, landscape orientation)
             TiffSettings tiffSettings = new TiffSettings
             {
-                Compression = CompressionType.None,   // No compression
-                Depth = ColorDepth.Default,           // Default color depth
-                Shape = ShapeType.Landscape,          // Landscape orientation
-                SkipBlankPages = false                // Include blank pages
+                Compression = CompressionType.None,
+                Depth = ColorDepth.Default,
+                Shape = ShapeType.Landscape,
+                SkipBlankPages = false
             };
 
-            // Create the TiffDevice with the specified resolution and settings
+            // Create the TIFF device with the specified resolution and settings
             TiffDevice tiffDevice = new TiffDevice(resolution, tiffSettings);
 
-            // Convert the entire PDF to a multi‑page TIFF file.
-            // Each PDF page becomes a separate image layer in the TIFF.
+            // Convert the entire PDF to a multi‑page TIFF file
             tiffDevice.Process(pdfDocument, outputTiffPath);
         }
 

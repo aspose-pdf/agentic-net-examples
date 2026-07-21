@@ -7,14 +7,14 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";
-        const string outputPdf  = "signed_output.pdf";
-        const string pfxPath    = "certificate.pfx";
-        const string pfxPassword = "pfxPassword";
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "signed_output.pdf";
+        const string pfxPath       = "certificate.pfx";
+        const string pfxPassword   = "pfxPassword";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
@@ -24,47 +24,45 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal.
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Create a signature field on the first page.
-            // Fully qualify Rectangle to avoid ambiguity with System.Drawing.
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 100, 250, 150);
+            // Create a signature field on the first page
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 100, 300, 200);
             SignatureField signatureField = new SignatureField(doc.Pages[1], rect)
             {
-                // Set a name for the field (used as the form field identifier).
                 PartialName = "Signature1"
             };
-
-            // Add the signature field to the page's annotation collection.
+            // Add the signature field to the page annotations
             doc.Pages[1].Annotations.Add(signatureField);
 
-            // Initialize the PKCS#7 signature object using the PFX file and password.
-            PKCS7 pkcs7Signature = new PKCS7(pfxPath, pfxPassword)
+            // Prepare the PKCS#7 signature using the PFX certificate
+            using (FileStream pfxStream = File.OpenRead(pfxPath))
             {
-                // Optional metadata for the signature.
-                Reason      = "Document approved",
-                Location    = "Head Office",
-                ContactInfo = "contact@example.com",
-                Date        = DateTime.Now,
-                // Show default signature properties (subject, date, reason, location).
-                ShowProperties = true
-            };
+                PKCS7 pkcs7Signature = new PKCS7(pfxStream, pfxPassword)
+                {
+                    Reason      = "Document approved",
+                    Location    = "Office",
+                    ContactInfo = "contact@example.com",
+                    Date        = DateTime.Now,
+                    ShowProperties = true // display default signature appearance
+                };
 
-            // Configure timestamp settings (replace with a valid TSA URL if needed).
-            // TimestampSettings constructor requires three arguments: serverUrl, basicAuthCredentials, digest algorithm.
-            pkcs7Signature.TimestampSettings = new TimestampSettings(
-                "http://timestamp.example.com",
-                string.Empty,
-                DigestHashAlgorithm.Sha256);
+                // Configure timestamp settings (replace with a real TSA URL if needed)
+                pkcs7Signature.TimestampSettings = new TimestampSettings(
+                    "http://timestamp.example.com", // serverUrl
+                    string.Empty,                    // basicAuthCredentials (none)
+                    DigestHashAlgorithm.Sha256      // digest algorithm
+                );
 
-            // Sign the document using the signature field.
-            signatureField.Sign(pkcs7Signature);
+                // Sign the document using the signature field
+                signatureField.Sign(pkcs7Signature);
+            }
 
-            // Save the signed PDF.
-            doc.Save(outputPdf);
+            // Save the signed PDF
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Signed PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Signed PDF saved to '{outputPdfPath}'.");
     }
 }
