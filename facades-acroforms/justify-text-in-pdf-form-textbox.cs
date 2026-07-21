@@ -1,38 +1,38 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades; // FormEditor, FormFieldFacade
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input_form.pdf";   // existing PDF with a filled textbox
-        const string outputPdf = "output_form.pdf";  // result PDF
-        const string fieldName = "TextBox1";         // fully qualified name of the textbox field
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string fieldName = "myTextBox"; // replace with the actual field name
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // FormEditor constructor that accepts input and output file paths
-        using (Aspose.Pdf.Facades.FormEditor formEditor = new Aspose.Pdf.Facades.FormEditor(inputPdf, outputPdf))
+        // Open the PDF, set justification, and save
+        using (FormEditor editor = new FormEditor())
         {
-            // Configure visual attributes via FormFieldFacade
-            formEditor.Facade = new Aspose.Pdf.Facades.FormFieldFacade
-            {
-                // Set text alignment to justified
-                Alignment = Aspose.Pdf.Facades.FormFieldFacade.AlignJustified
-            };
+            // Load the PDF document into the editor
+            editor.BindPdf(inputPath);
 
-            // Apply the alignment to the specified field
-            formEditor.DecorateField(fieldName);
+            // Configure visual attributes: set alignment to justified
+            editor.Facade = new FormFieldFacade();
+            editor.Facade.Alignment = FormFieldFacade.AlignJustified;
 
-            // Persist changes to the output file
-            formEditor.Save();
+            // Apply the alignment to the specified textbox field
+            editor.DecorateField(fieldName);
+
+            // Save the modified PDF
+            editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Justified textbox saved to '{outputPdf}'.");
+        Console.WriteLine($"Justified PDF saved to '{outputPath}'.");
     }
 }

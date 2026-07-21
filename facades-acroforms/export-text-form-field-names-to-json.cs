@@ -1,6 +1,6 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.Json;
 using Aspose.Pdf.Facades;
 
@@ -8,8 +8,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputJson = "text_fields.json";
+        const string inputPdf = "input.pdf";      // source PDF with form fields
+        const string outputJson = "textFields.json"; // JSON file to write the names to
 
         if (!File.Exists(inputPdf))
         {
@@ -17,15 +17,15 @@ class Program
             return;
         }
 
-        // Load the PDF into the Form facade
+        // Load the PDF form using the Facades Form class
         using (Form form = new Form(inputPdf))
         {
-            var textFieldNames = new List<string>();
+            // Collect only the names of fields whose type is Text
+            List<string> textFieldNames = new List<string>();
 
-            // Iterate over all field names and keep only text fields
             foreach (string fieldName in form.FieldNames)
             {
-                // GetFieldType returns a FieldType enum, not a string
+                // GetFieldType returns a FieldType enum (e.g., FieldType.Text)
                 FieldType fieldType = form.GetFieldType(fieldName);
                 if (fieldType == FieldType.Text)
                 {
@@ -33,13 +33,13 @@ class Program
                 }
             }
 
-            // Serialize the list of names to a JSON array
+            // Serialize the list of names as a JSON array
             string json = JsonSerializer.Serialize(textFieldNames, new JsonSerializerOptions { WriteIndented = true });
 
             // Write the JSON to the output file
             File.WriteAllText(outputJson, json);
         }
 
-        Console.WriteLine($"Exported text field names to '{outputJson}'.");
+        Console.WriteLine($"Exported {outputJson}");
     }
 }

@@ -3,11 +3,11 @@ using System.IO;
 using System.Text.Json;
 using Aspose.Pdf.Facades;
 
-class ExportFormFieldsToJson
+class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
+        const string pdfPath = "input_form.pdf";
         const string jsonPath = "form_fields.json";
 
         if (!File.Exists(pdfPath))
@@ -16,48 +16,40 @@ class ExportFormFieldsToJson
             return;
         }
 
-        // Load the PDF and bind it to the Form facade
+        // Bind the PDF to the Form facade
         using (Form form = new Form(pdfPath))
         {
-            // Export all form fields to a JSON file (indented for readability)
+            // Export all form fields to a JSON file
             using (FileStream jsonStream = new FileStream(jsonPath, FileMode.Create, FileAccess.Write))
             {
                 form.ExportJson(jsonStream, indented: true);
             }
-        }
 
-        // Verify the JSON structure by parsing it
-        try
-        {
-            string jsonContent = File.ReadAllText(jsonPath);
-            using (JsonDocument doc = JsonDocument.Parse(jsonContent))
+            // Verify the exported JSON structure
+            try
             {
-                // The exported JSON is expected to be an array of field objects
-                if (doc.RootElement.ValueKind != JsonValueKind.Array)
+                string jsonContent = File.ReadAllText(jsonPath);
+                using (JsonDocument doc = JsonDocument.Parse(jsonContent))
                 {
-                    Console.Error.WriteLine("Unexpected JSON format: root element is not an array.");
-                }
-                else
-                {
-                    Console.WriteLine($"Exported {doc.RootElement.GetArrayLength()} form fields to JSON.");
-                    // Optionally, display the name of each field
-                    foreach (JsonElement field in doc.RootElement.EnumerateArray())
+                    if (doc.RootElement.ValueKind != JsonValueKind.Object)
                     {
-                        if (field.TryGetProperty("FullName", out JsonElement name))
+                        Console.Error.WriteLine("Invalid JSON: root element is not an object.");
+                    }
+                    else
+                    {
+                        foreach (JsonProperty prop in doc.RootElement.EnumerateObject())
                         {
-                            Console.WriteLine($"Field: {name.GetString()}");
+                            Console.WriteLine($"{prop.Name}: {prop.Value}");
                         }
                     }
                 }
             }
+            catch (JsonException ex)
+            {
+                Console.Error.WriteLine($"JSON parsing error: {ex.Message}");
+            }
         }
-        catch (JsonException ex)
-        {
-            Console.Error.WriteLine($"Failed to parse JSON: {ex.Message}");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Form fields exported to '{jsonPath}'.");
     }
 }

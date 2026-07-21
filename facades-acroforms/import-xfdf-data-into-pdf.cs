@@ -1,39 +1,41 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";   // source PDF with form fields
-        const string outputPdfPath = "output.pdf";  // destination PDF after import
-        const string xfdfPath      = "data.xfdf";   // XFDF file containing field values
+        const string inputPdfPath = "input.pdf";
+        const string xfdfPath = "data.xfdf";
+        const string outputPdfPath = "output.pdf";
 
-        // Verify that required files exist
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Error: PDF file not found – {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
+
         if (!File.Exists(xfdfPath))
         {
-            Console.Error.WriteLine($"Error: XFDF file not found – {xfdfPath}");
+            Console.Error.WriteLine($"XFDF file not found: {xfdfPath}");
             return;
         }
 
-        // Create a Form facade specifying source and target PDF files
-        Form form = new Form(inputPdfPath, outputPdfPath);
-
-        // Open the XFDF stream and import the field values into the PDF
-        using (FileStream xfdfStream = new FileStream(xfdfPath, FileMode.Open, FileAccess.Read))
+        // Initialize the Form facade with source and destination PDF files
+        using (Form form = new Form(inputPdfPath, outputPdfPath))
         {
-            form.ImportXfdf(xfdfStream);
+            // Open the XFDF file as a stream and import its field values
+            using (FileStream xfdfStream = new FileStream(xfdfPath, FileMode.Open, FileAccess.Read))
+            {
+                form.ImportXfdf(xfdfStream);
+            }
+
+            // Persist the changes to the output PDF
+            form.Save();
         }
 
-        // Persist the changes to the output PDF
-        form.Save();
-
-        Console.WriteLine($"Successfully imported XFDF data and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Form fields imported from '{xfdfPath}' and saved to '{outputPdfPath}'.");
     }
 }

@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Forms;
@@ -10,64 +9,63 @@ class Program
 {
     static void Main()
     {
-        using (MemoryStream pdfStream = new MemoryStream())
+        const string pdfPath = "PdfForm.pdf";
+        const string fieldName = "Color";
+
+        // ---------------------------------------------------------------------
+        // 1. Create a PDF with a radio‑button group named "Color" and a few options.
+        //    This guarantees the file exists in the sandbox before we open it with
+        //    the Form facade.
+        // ---------------------------------------------------------------------
+        using (Document doc = new Document())
         {
-            // ---------------------------------------------------------------------
-            // 1. Create a sample PDF in memory that contains a radio button group.
-            // ---------------------------------------------------------------------
-            Document doc = new Document();
+            // Add a single page – the radio button will be placed on this page.
             Page page = doc.Pages.Add();
 
             // Define the rectangle where the radio button field will be placed.
             // (left, bottom, right, top) – values are in points.
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 700, 150, 720);
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 200, 650);
 
-            // Create the radio button field.
-            // Use the constructor that accepts only a Page object, then set the field name via PartialName.
-            RadioButtonField radio = new RadioButtonField(page);
-            radio.PartialName = "RadioGroup"; // field name
-            radio.Rect = rect; // assign the rectangle to the field
+            // Create the radio button field. Use the constructor that accepts only a Page.
+            RadioButtonField radio = new RadioButtonField(page)
+            {
+                Rect = rect,
+                PartialName = fieldName // internal name used by the Form facade
+            };
 
-            // Add options (export value, display value).
-            radio.AddOption("opt1", "Option 1");
-            radio.AddOption("opt2", "Option 2");
-            radio.AddOption("opt3", "Option 3");
+            // Add options (display text, export value).
+            radio.AddOption("Red", "Red");
+            radio.AddOption("Green", "Green");
+            radio.AddOption("Blue", "Blue");
 
             // Add the field to the document's form collection.
             doc.Form.Add(radio);
 
-            // Save the PDF to the memory stream.
-            doc.Save(pdfStream);
-            pdfStream.Position = 0; // rewind for reading
+            // Save the seed PDF so the Form facade can read it.
+            doc.Save(pdfPath);
+        }
 
-            // ---------------------------------------------------------------
-            // 2. Use the Form facade to read the radio button options.
-            // ---------------------------------------------------------------
-            Aspose.Pdf.Facades.Form form = new Aspose.Pdf.Facades.Form();
-            form.BindPdf(pdfStream); // bind the in‑memory PDF
+        // ---------------------------------------------------------------------
+        // 2. Open the PDF with the Form facade and retrieve the option values.
+        // ---------------------------------------------------------------------
+        using (Aspose.Pdf.Facades.Form form = new Aspose.Pdf.Facades.Form(pdfPath))
+        {
+            // GetButtonOptionValues returns a Dictionary<string, string>
+            // where the key is the option's display name and the value is the export value.
+            Dictionary<string, string> optionDict = form.GetButtonOptionValues(fieldName);
 
-            // Retrieve the option values for the radio button group.
-            // The method returns a Dictionary<string, string> where:
-            //   Key   = export name (option value)
-            //   Value = display name (or export value, depending on the PDF)
-            Dictionary<string, string> optionDict = form.GetButtonOptionValues("RadioGroup");
-
-            // Transfer the dictionary entries into a Hashtable as required.
+            // Transfer the dictionary entries into a Hashtable as required by the task.
             Hashtable optionTable = new Hashtable();
             foreach (KeyValuePair<string, string> kvp in optionDict)
             {
                 optionTable.Add(kvp.Key, kvp.Value);
             }
 
-            // Example usage: print all options stored in the Hashtable
-            Console.WriteLine("Radio button options retrieved from the PDF:");
+            // Example output.
             foreach (DictionaryEntry entry in optionTable)
             {
-                Console.WriteLine($"Option Name: {entry.Key}, Value: {entry.Value}");
+                Console.WriteLine($"{entry.Key} = {entry.Value}");
             }
-
-            // Clean up the Form facade
-            form.Close();
         }
     }
 }
