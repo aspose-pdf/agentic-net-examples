@@ -6,13 +6,13 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "large_document.pdf";   // source PDF
-        const string outputRoot   = "SplitPages";          // root folder for page folders
+        const string inputPdf   = "large_input.pdf";          // source PDF
+        const string outputRoot = "SplitPages";               // root folder for all pages
 
         // Verify source file exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
@@ -21,26 +21,26 @@ class Program
 
         try
         {
-            // Load the source PDF (wrapped in using for deterministic disposal)
-            using (Document sourceDoc = new Document(inputPdfPath))
+            // Load the source PDF (using block ensures proper disposal)
+            using (Document srcDoc = new Document(inputPdf))
             {
-                // Aspose.Pdf uses 1‑based page indexing
-                for (int pageNumber = 1; pageNumber <= sourceDoc.Pages.Count; pageNumber++)
+                // Iterate using 1‑based page indexing (Aspose.Pdf requirement)
+                for (int pageNumber = 1; pageNumber <= srcDoc.Pages.Count; pageNumber++)
                 {
-                    // Create a fresh document for the single page
+                    // Create a folder for the current page (e.g., SplitPages/Page_1)
+                    string pageFolder = Path.Combine(outputRoot, $"Page_{pageNumber}");
+                    Directory.CreateDirectory(pageFolder);
+
+                    // Create a new PDF document containing only the current page
                     using (Document singlePageDoc = new Document())
                     {
-                        // Add the current page to the new document
-                        singlePageDoc.Pages.Add(sourceDoc.Pages[pageNumber]);
-
-                        // Prepare a folder for this page (e.g., "SplitPages/Page_1")
-                        string pageFolder = Path.Combine(outputRoot, $"Page_{pageNumber}");
-                        Directory.CreateDirectory(pageFolder);
+                        // Add the page from the source document
+                        singlePageDoc.Pages.Add(srcDoc.Pages[pageNumber]);
 
                         // Save the single‑page PDF inside its folder
-                        string outputPdfPath = Path.Combine(pageFolder, $"Page_{pageNumber}.pdf");
-                        singlePageDoc.Save(outputPdfPath);
-                        Console.WriteLine($"Saved page {pageNumber} to '{outputPdfPath}'");
+                        string outputPath = Path.Combine(pageFolder, $"page_{pageNumber}.pdf");
+                        singlePageDoc.Save(outputPath);
+                        Console.WriteLine($"Saved page {pageNumber} to '{outputPath}'");
                     }
                 }
             }
