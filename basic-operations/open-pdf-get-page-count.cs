@@ -6,18 +6,19 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "sample.pdf";
+        const string inputPath = "sample.pdf";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Wrap Document in a using block for deterministic disposal (document-disposal-with-using rule)
-        using (Document doc = new Document(pdfPath))
+        // Open the PDF using the Document constructor.
+        // The using block ensures the document is disposed properly.
+        using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based; retrieve the total number of pages
+            // Pages are 1‑based; Count gives the total number of pages.
             int pageCount = doc.Pages.Count;
             Console.WriteLine($"Document contains {pageCount} page(s).");
         }
