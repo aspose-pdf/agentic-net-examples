@@ -1,49 +1,34 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;   // FormEditor, FieldType
-using Aspose.Pdf.Forms;    // Not needed for this example but kept for completeness
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file (must exist)
-        const string inputPath  = "input.pdf";
-        // Output PDF file with the new text field
-        const string outputPath = "output_with_customername.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
 
-        // Rectangle coordinates for the new text field (lower‑left x/y, upper‑right x/y)
-        // Adjust these values as needed.
-        const float llx = 100f; // lower‑left X
-        const float lly = 500f; // lower‑left Y
-        const float urx = 300f; // upper‑right X
-        const float ury = 520f; // upper‑right Y
+        // Rectangle coordinates for the text field (lower‑left x/y and upper‑right x/y)
+        float llx = 100f;
+        float lly = 500f;
+        float urx = 300f;
+        float ury = 530f;
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Use FormEditor (Facades API) to add the field
+        using (FormEditor formEditor = new FormEditor())
         {
-            // Initialize FormEditor on the loaded document
-            FormEditor formEditor = new FormEditor(doc);
-
-            // Add a text field named "CustomerName" on page 1
-            bool added = formEditor.AddField(FieldType.Text, "CustomerName", 1, llx, lly, urx, ury);
-            if (!added)
-            {
-                Console.Error.WriteLine("Failed to add the text field.");
-                return;
-            }
-
-            // Save the modified PDF to the output path
-            formEditor.Save(outputPath);
+            formEditor.BindPdf(inputPdf);                                   // Load source PDF
+            formEditor.AddField(FieldType.Text, "CustomerName", 1, llx, lly, urx, ury); // Add text field on page 1
+            formEditor.Save(outputPdf);                                      // Save modified PDF
         }
 
-        Console.WriteLine($"Text field \"CustomerName\" added and saved to '{outputPath}'.");
+        Console.WriteLine($"Text field 'CustomerName' added to page 1 and saved as '{outputPdf}'.");
     }
 }

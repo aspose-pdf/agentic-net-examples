@@ -1,89 +1,100 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Facades; // for FieldType enum
 
-// Define a POCO that matches the JSON structure describing each field.
-public class FieldDefinition
+namespace PdfFormImportExample
 {
-    public string Name { get; set; }          // Fully qualified field name
-    public string Type { get; set; }          // e.g. "Text", "CheckBox", "Radio", "ComboBox"
-    public int PageNumber { get; set; }       // 1‑based page index
-    public float Llx { get; set; }            // Lower‑left X
-    public float Lly { get; set; }            // Lower‑left Y
-    public float Urx { get; set; }            // Upper‑right X
-    public float Ury { get; set; }            // Upper‑right Y
-}
-
-class Program
-{
-    static void Main()
+    // Represents a single field definition from the JSON layout.
+    public class FieldDefinition
     {
-        const string jsonPath   = "fieldLayout.json";   // JSON describing fields
-        const string outputPath = "output.pdf";
+        public string FieldName { get; set; }          // Fully qualified field name
+        public string FieldType { get; set; }          // e.g., "Text", "CheckBox", "Radio", etc.
+        public int PageNumber { get; set; }            // 1‑based page index
+        public float Llx { get; set; }                 // Lower‑left X
+        public float Lly { get; set; }                 // Lower‑left Y
+        public float Urx { get; set; }                 // Upper‑right X
+        public float Ury { get; set; }                 // Upper‑right Y
+    }
 
-        if (!File.Exists(jsonPath))
+    class Program
+    {
+        static void Main()
         {
-            Console.Error.WriteLine($"JSON file not found: {jsonPath}");
-            return;
-        }
+            const string jsonPath   = "fieldLayout.json";   // JSON describing fields
+            const string outputPdf  = "output.pdf";
 
-        // Deserialize the JSON into an array of field definitions.
-        FieldDefinition[] fields;
-        using (FileStream jsonStream = File.OpenRead(jsonPath))
-        {
-            fields = JsonSerializer.Deserialize<FieldDefinition[]>(jsonStream);
-        }
+            // Load field definitions from JSON.
+            List<FieldDefinition> fields = LoadFieldDefinitions(jsonPath);
 
-        // Create a new blank PDF document with a single page.
-        using (Document doc = new Document())
-        {
-            // Ensure at least one page exists.
-            doc.Pages.Add();
-
-            // Use FormEditor (Facade) to add fields based on the JSON layout.
-            using (FormEditor formEditor = new FormEditor(doc))
+            // Create a new blank PDF with a single page (add more pages if needed).
+            using (Document doc = new Document())
             {
-                foreach (var f in fields)
-                {
-                    // Map string type to the corresponding FieldType enum.
-                    FieldType fieldType = MapFieldType(f.Type);
+                // Ensure at least one page exists.
+                doc.Pages.Add();
 
-                    // Add the field to the specified page and rectangle.
-                    // The AddField method returns true on success; ignore the return value here.
-                    formEditor.AddField(
+                // Initialize FormEditor and bind it to the newly created document.
+                FormEditor formEditor = new FormEditor();
+                formEditor.BindPdf(doc);
+
+                // Add each field according to the JSON layout.
+                foreach (FieldDefinition f in fields)
+                {
+                    // Convert string representation to the FieldType enum.
+                    if (!Enum.TryParse(f.FieldType, true, out FieldType fieldType))
+                    {
+                        Console.WriteLine($"Unsupported field type: {f.FieldType}");
+                        continue;
+                    }
+
+                    // Add the field. The AddField method returns true on success.
+                    bool added = formEditor.AddField(
                         fieldType,
-                        f.Name,
+                        f.FieldName,
                         f.PageNumber,
                         f.Llx,
                         f.Lly,
                         f.Urx,
                         f.Ury);
+
+                    if (!added)
+                    {
+                        Console.WriteLine($"Failed to add field: {f.FieldName}");
+                    }
                 }
 
-                // Save the modified document via the FormEditor facade.
-                formEditor.Save(outputPath);
+                // Save the resulting PDF.
+                formEditor.Save(outputPdf);
             }
+
+            Console.WriteLine($"PDF with imported fields saved to '{outputPdf}'.");
         }
 
-        Console.WriteLine($"PDF with imported fields saved to '{outputPath}'.");
-    }
-
-    // Helper to convert a textual field type into the Aspose.Pdf.Facades.FieldType enum.
-    private static FieldType MapFieldType(string typeName)
-    {
-        return typeName?.ToLowerInvariant() switch
+        // Reads the JSON file and deserializes it into a list of FieldDefinition objects.
+        private static List<FieldDefinition> LoadFieldDefinitions(string path)
         {
-            "text"       => FieldType.Text,
-            "checkbox"   => FieldType.CheckBox,
-            "radio"      => FieldType.Radio,
-            "combobox"   => FieldType.ComboBox,
-            "listbox"    => FieldType.ListBox,
-            "pushbutton" => FieldType.PushButton,
-            "signature"  => FieldType.Signature,
-            _            => FieldType.Text   // Default fallback
-        };
+            if (!File.Exists(path))
+            {
+                Console.Error.WriteLine($"JSON file not found: {path}");
+                return new List<FieldDefinition>();
+            }
+
+            string jsonContent = File.ReadAllText(path);
+            JsonSerializerOptions options = new JsonSerializerOptions {
+                PropertyNameCaseInsensitive = true
+            };
+
+            try
+            {
+                return JsonSerializer.Deserialize<List<FieldDefinition>>(jsonContent, options) ?? new List<FieldDefinition>();
+            }
+            catch (JsonException ex)
+            {
+                Console.Error.WriteLine($"Error parsing JSON: {ex.Message}");
+                return new List<FieldDefinition>();
+            }
+        }
     }
 }

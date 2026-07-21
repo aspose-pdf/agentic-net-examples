@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,23 +15,17 @@ class Program
             return;
         }
 
-        // Edit the form using the FormEditor facade
-        using (FormEditor formEditor = new FormEditor())
+        // Initialize FormEditor with source and destination PDFs
+        using (FormEditor formEditor = new FormEditor(inputPath, outputPath))
         {
-            // Load the PDF document
-            formEditor.BindPdf(inputPath);
-
-            // Set the maximum character length for the "PhoneNumber" field to 15
+            // Set the maximum character length of the "PhoneNumber" field to 15
             bool success = formEditor.SetFieldLimit("PhoneNumber", 15);
-            if (!success)
-            {
-                Console.Error.WriteLine("Failed to set field limit for 'PhoneNumber'.");
-            }
+            Console.WriteLine($"SetFieldLimit succeeded: {success}");
 
-            // Save the updated PDF
-            formEditor.Save(outputPath);
+            // Persist the changes to the output file
+            formEditor.Save();
         }
 
-        Console.WriteLine($"PhoneNumber field limit set to 15. Saved as '{outputPath}'.");
+        Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
     }
 }

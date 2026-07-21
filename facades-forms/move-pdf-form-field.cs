@@ -1,40 +1,37 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Use FormEditor (a SaveableFacade) to manipulate form fields.
-        using (FormEditor formEditor = new FormEditor())
+        // Load the PDF and bind it to FormEditor
+        using (Document doc = new Document(inputPath))
+        using (FormEditor formEditor = new FormEditor(doc))
         {
-            // Load the source PDF.
-            formEditor.BindPdf(inputPdf);
-
-            // Move the field named "DateField" to the desired rectangle on page 2.
-            // Lower‑left corner (llx, lly) = (100, 200)
-            // Upper‑right corner (urx, ury) = (llx + width, lly + height) = (250, 220)
+            // Move the field "DateField" to the new rectangle on page 2
+            // Lower‑left corner (100, 200), upper‑right corner (250, 220)
             bool moved = formEditor.MoveField("DateField", 100f, 200f, 250f, 220f);
-
             if (!moved)
             {
-                Console.Error.WriteLine("Failed to move the field 'DateField'.");
+                Console.Error.WriteLine("Failed to move field 'DateField'.");
             }
 
-            // Save the modified PDF.
-            formEditor.Save(outputPdf);
+            // Save the updated PDF
+            formEditor.Save(outputPath);
         }
 
-        Console.WriteLine($"Field moved and saved to '{outputPdf}'.");
+        Console.WriteLine($"Field moved and saved to '{outputPath}'.");
     }
 }

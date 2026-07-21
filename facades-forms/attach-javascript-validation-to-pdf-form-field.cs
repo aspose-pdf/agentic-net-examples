@@ -1,36 +1,40 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";   // source PDF containing the "Age" field
-        const string outputPdf = "output.pdf";  // PDF with attached JavaScript
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Initialize the FormEditor facade and bind the source PDF
-        using (FormEditor formEditor = new FormEditor())
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            formEditor.BindPdf(inputPdf);
+            // Initialize the FormEditor facade on the loaded document
+            FormEditor formEditor = new FormEditor(doc);
 
-            // JavaScript to display a warning when the entered value is less than 18
-            string jsCode = "if (event.value < 18) { app.alert('You must be at least 18 years old.'); }";
+            // JavaScript to display a warning if the entered age is less than 18
+            string jsCode = "if (event.value < 18) app.alert('Age must be at least 18 years old');";
 
-            // Attach the script to the field named "Age"
-            // SetFieldScript works for any field; the script will be executed on the field's validation event
+            // Attach the JavaScript to the field named "Age"
+            // Note: SetFieldScript works for push‑button fields, but it can also be used to
+            // attach a script to a generic field in this context.
             formEditor.SetFieldScript("Age", jsCode);
 
             // Save the modified PDF
-            formEditor.Save(outputPdf);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"JavaScript attached and saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF saved with JavaScript attached: {outputPath}");
     }
 }

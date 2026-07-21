@@ -2,48 +2,54 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_moved.pdf";
-        const float offsetX = 10f;
-        const float offsetY = 15f;
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output_moved_fields.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document
-        Document doc = new Document(inputPath);
-
-        // Create FormEditor with the document instance (non‑obsolete constructor)
-        using (FormEditor editor = new FormEditor(doc))
+        // Load the PDF with the core API to read existing field rectangles
+        using (Document doc = new Document(inputPdf))
+        // Use FormEditor (Facades) to modify field positions and save the result
+        using (FormEditor formEditor = new FormEditor())
         {
-            // Iterate over each form field in the document
-            foreach (var field in doc.Form.Fields)
-            {
-                // Current rectangle of the field (coordinates are double)
-                var rect = field.Rect;
+            // Bind the same PDF file to the FormEditor
+            formEditor.BindPdf(inputPdf);
 
-                // Apply the offset – cast to float because MoveField expects float values
-                float newLlX = (float)rect.LLX + offsetX;
-                float newLlY = (float)rect.LLY + offsetY;
-                float newUrX = (float)rect.URX + offsetX;
-                float newUrY = (float)rect.URY + offsetY;
+            // Iterate over all form fields using the Fields collection
+            foreach (Field field in doc.Form.Fields)
+            {
+                if (field == null) continue;
+
+                // The field name is stored in PartialName
+                string fieldName = field.PartialName;
+
+                // Current rectangle coordinates
+                var rect = field.Rect;
+                if (rect == null) continue;
+
+                float newLlx = (float)rect.LLX + 10f;
+                float newLly = (float)rect.LLY + 15f;
+                float newUrx = (float)rect.URX + 10f;
+                float newUry = (float)rect.URY + 15f;
 
                 // Move the field to the new position
-                editor.MoveField(field.Name, newLlX, newLlY, newUrX, newUrY);
+                formEditor.MoveField(fieldName, newLlx, newLly, newUrx, newUry);
             }
 
-            // Persist the changes to the output PDF
-            editor.Save(outputPath);
+            // Save the updated PDF
+            formEditor.Save(outputPdf);
         }
 
-        Console.WriteLine($"All form fields have been moved and saved to '{outputPath}'.");
+        Console.WriteLine($"Form fields moved and saved to '{outputPdf}'.");
     }
 }

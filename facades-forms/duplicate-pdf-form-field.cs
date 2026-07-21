@@ -6,24 +6,24 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";   // source PDF containing the original field
-        const string outputPdf = "output.pdf";  // PDF that will contain the duplicated field
+        const string inputPdf  = "input.pdf";          // PDF containing the original "Signature" field
+        const string outputPdf = "output.pdf";         // PDF that will contain the duplicated field
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         // FormEditor works with two files: source and destination.
-        // It loads the source PDF, performs form operations, and saves to the destination.
+        // It copies the whole document and then allows form manipulation.
         using (FormEditor formEditor = new FormEditor(inputPdf, outputPdf))
         {
             // Copy the existing field "Signature" to a new field named "SignatureCopy"
-            // on the same page as the original. Page number -1 means "same page".
+            // on the same page (pageNum = -1 keeps the original page).
             formEditor.CopyInnerField("Signature", "SignatureCopy", -1);
 
-            // Persist changes to the output PDF.
+            // Persist the changes to the destination file.
             formEditor.Save();
         }
 
