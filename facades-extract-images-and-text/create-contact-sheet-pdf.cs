@@ -18,80 +18,74 @@ class ContactSheetGenerator
             return;
         }
 
+        // -----------------------------------------------------------------
         // Step 1: Extract all images from the source PDF into memory streams
-        List<MemoryStream> imageStreams = new List<MemoryStream>();
-        using (PdfExtractor extractor = new PdfExtractor())
+        // -----------------------------------------------------------------
+        List<MemoryStream> extractedImages = new List<MemoryStream>();
+        PdfExtractor extractor = new PdfExtractor();
+        extractor.BindPdf(inputPdfPath);
+        extractor.ExtractImage();
+
+        while (extractor.HasNextImage())
         {
-            extractor.BindPdf(inputPdfPath);
-            extractor.ExtractImage();
-
-            while (extractor.HasNextImage())
-            {
-                MemoryStream imgStream = new MemoryStream();
-                extractor.GetNextImage(imgStream);
-                imgStream.Position = 0; // reset for later reading
-                imageStreams.Add(imgStream);
-            }
-
-            extractor.Close(); // optional, Dispose will be called by using
+            MemoryStream imgStream = new MemoryStream();
+            extractor.GetNextImage(imgStream);
+            imgStream.Position = 0; // reset for later reading
+            extractedImages.Add(imgStream);
         }
 
-        if (imageStreams.Count == 0)
-        {
-            Console.WriteLine("No images found in the PDF.");
-            return;
-        }
+        // -----------------------------------------------------------------
+        // Step 2: Build a contact sheet PDF with thumbnails arranged in a grid
+        // -----------------------------------------------------------------
+        // Layout parameters
+        const int columns = 3;                 // thumbnails per row
+        const int thumbWidth = 150;            // thumbnail width (points)
+        const int thumbHeight = 150;           // thumbnail height (points)
+        const int margin = 20;                 // margin between thumbnails and page edges
+        const int rowsPerPage = 4;             // rows per page (adjust as needed)
 
-        // Step 2: Create a new PDF document that will hold the contact sheet
+        // Create the output PDF document
         using (Document contactDoc = new Document())
         {
-            // Define layout parameters
-            const int columns = 5;                     // thumbnails per row
-            const double thumbWidth = 100;             // width of each thumbnail (points)
-            const double thumbHeight = 100;            // height of each thumbnail (points)
-            const double margin = 20;                  // space between thumbnails (points)
-
-            // Add the first page
-            Page page = contactDoc.Pages.Add();
-
-            // Helper to add a new page when needed
-            Action addNewPageIfNeeded = () =>
+            int imagesPerPage = columns * rowsPerPage;
+            for (int i = 0; i < extractedImages.Count; i++)
             {
-                // If the next thumbnail would go below the page bottom, start a new page
-                double requiredHeight = ((imageStreams.Count - 1) / columns + 1) * (thumbHeight + margin) + margin;
-                if (requiredHeight > page.PageInfo.Height)
+                // Start a new page when needed
+                if (i % imagesPerPage == 0)
                 {
-                    page = contactDoc.Pages.Add();
+                    contactDoc.Pages.Add();
                 }
-            };
 
-            // Place each thumbnail on the grid
-            for (int i = 0; i < imageStreams.Count; i++)
-            {
-                int col = i % columns;
-                int row = i / columns;
+                // Current page reference
+                Page page = contactDoc.Pages[contactDoc.Pages.Count];
 
-                double x = margin + col * (thumbWidth + margin);
-                // PDF origin is bottom‑left, so compute Y from top
-                double y = page.PageInfo.Height - margin - (row + 1) * (thumbHeight + margin) + margin;
+                // Compute row and column within the current page
+                int indexInPage = i % imagesPerPage;
+                int row = indexInPage / columns;
+                int col = indexInPage % columns;
 
-                // Ensure the current page can accommodate the thumbnail
-                if (y < margin)
-                {
-                    // Not enough space on current page – start a new one
-                    page = contactDoc.Pages.Add();
-                    row = 0;
-                    y = page.PageInfo.Height - margin - thumbHeight;
-                }
+                // Calculate thumbnail position (lower‑left and upper‑right points)
+                double llx = margin + col * (thumbWidth + margin);
+                double lly = page.PageInfo.Height - margin - (row + 1) * (thumbHeight + margin);
+                double urx = llx + thumbWidth;
+                double ury = lly + thumbHeight;
+
+                // Retrieve the image stream for this thumbnail
+                MemoryStream imgStream = extractedImages[i];
+                imgStream.Position = 0; // ensure stream is at the beginning
 
                 // Add the image to the page at the calculated rectangle
-                MemoryStream imgStream = imageStreams[i];
-                imgStream.Position = 0; // reset before each use
-                page.AddImage(imgStream, new Aspose.Pdf.Rectangle(x, y, x + thumbWidth, y + thumbHeight));
+                page.AddImage(imgStream, new Aspose.Pdf.Rectangle(llx, lly, urx, ury));
             }
 
-            // Step 3: Save the contact sheet PDF
+            // Save the contact sheet PDF
             contactDoc.Save(outputPdfPath);
+        }
+
+        // Cleanup extracted image streams
+        foreach (var ms in extractedImages)
+        {
+            ms.Dispose();
         }
 
         Console.WriteLine($"Contact sheet created: {outputPdfPath}");

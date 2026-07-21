@@ -7,34 +7,38 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputTxtPath = "extracted.txt";
+        const string inputPdf = "input.pdf";
+        const string outputTxt = "output.txt";
 
-        if (!File.Exists(inputPdfPath))
+        // Verify the input PDF exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Use PdfExtractor (Facade) to bind and extract text
+        // Use PdfExtractor within a using block for deterministic disposal
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            extractor.BindPdf(inputPdfPath);
+            // Bind the PDF file to the extractor
+            extractor.BindPdf(inputPdf);
 
-            // Extract text using UTF-8 (Unicode) encoding
+            // Extract text using UTF‑8 encoding
             extractor.ExtractText(Encoding.UTF8);
 
-            // Capture extracted text into a memory stream
+            // Retrieve the extracted text into a memory stream
             using (MemoryStream ms = new MemoryStream())
             {
                 extractor.GetText(ms);
+
+                // Convert the stream bytes to a UTF‑8 string
                 string extractedText = Encoding.UTF8.GetString(ms.ToArray());
 
-                // Save the text to a file with UTF-8 encoding
-                File.WriteAllText(outputTxtPath, extractedText, Encoding.UTF8);
+                // Write the text to a file with UTF‑8 encoding
+                File.WriteAllText(outputTxt, extractedText, Encoding.UTF8);
             }
         }
 
-        Console.WriteLine($"Text successfully extracted to '{outputTxtPath}'.");
+        Console.WriteLine($"Extracted text saved to '{outputTxt}'.");
     }
 }

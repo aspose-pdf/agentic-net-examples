@@ -7,31 +7,29 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputTxt = "output.txt";
+        const string inputPdfPath  = "input.pdf";
+        const string outputTxtPath = "output.txt";
 
-        // Verify input file exists
-        if (!File.Exists(inputPdf))
+        // Verify the source PDF exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Initialize the PdfExtractor facade
-        PdfExtractor extractor = new PdfExtractor();
+        // PdfExtractor implements IDisposable, so wrap it in a using block
+        using (PdfExtractor extractor = new PdfExtractor())
+        {
+            // Bind the PDF file to the extractor
+            extractor.BindPdf(inputPdfPath);
 
-        // Bind the PDF document to the extractor
-        extractor.BindPdf(inputPdf);
+            // Extract all text using UTF‑8 encoding
+            extractor.ExtractText(Encoding.UTF8);
 
-        // Extract text using UTF‑8 encoding
-        extractor.ExtractText(Encoding.UTF8);
+            // Write the extracted text to a UTF‑8 encoded .txt file
+            extractor.GetText(outputTxtPath);
+        }
 
-        // Save the extracted text to a UTF‑8 encoded .txt file
-        extractor.GetText(outputTxt);
-
-        // Release resources held by the extractor
-        extractor.Close();
-
-        Console.WriteLine($"Text extracted to '{outputTxt}'.");
+        Console.WriteLine($"Text extraction complete. Output saved to '{outputTxtPath}'.");
     }
 }

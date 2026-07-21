@@ -6,15 +6,13 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPdf = "sample.pdf";
-
-        // Directory where extracted images will be saved
+        const string inputPdf = "input.pdf";
         const string outputDir = "ExtractedImages";
 
+        // Verify the source PDF exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
@@ -26,28 +24,27 @@ class Program
             // PdfExtractor implements IDisposable, so a using block ensures it is disposed automatically
             using (PdfExtractor extractor = new PdfExtractor())
             {
-                // Bind the PDF document to the extractor
+                // Load the PDF file into the extractor
                 extractor.BindPdf(inputPdf);
 
-                // Start the image extraction process
+                // Perform the image extraction operation
                 extractor.ExtractImage();
 
                 int imageIndex = 1;
-                // Retrieve each extracted image while there are more images available
+                // Iterate over all extracted images
                 while (extractor.HasNextImage())
                 {
-                    // Save each image to a separate file (default format is JPEG)
-                    string imagePath = Path.Combine(outputDir, $"image-{imageIndex}.jpg");
+                    // Build a file name for each image
+                    string imagePath = Path.Combine(outputDir, $"image-{imageIndex}.png");
+
+                    // Save the current image to the file system
                     extractor.GetNextImage(imagePath);
-                    Console.WriteLine($"Saved image {imageIndex} to '{imagePath}'");
+
                     imageIndex++;
                 }
-
-                // No explicit call to Close() is required; the using block will call Dispose(),
-                // which internally releases the bound Document.
             }
 
-            Console.WriteLine("Image extraction completed successfully.");
+            Console.WriteLine($"All images have been extracted to '{outputDir}'.");
         }
         catch (Exception ex)
         {

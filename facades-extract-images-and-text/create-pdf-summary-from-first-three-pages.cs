@@ -9,8 +9,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "summary.pdf";
+        const string inputPdfPath = "input.pdf";
+        const string summaryPdfPath = "summary.pdf";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -24,7 +24,7 @@ class Program
         {
             extractor.BindPdf(inputPdfPath);
             extractor.StartPage = 1;   // 1‑based indexing
-            extractor.EndPage   = 3;   // first three pages
+            extractor.EndPage   = 3;
             extractor.ExtractText();
 
             using (MemoryStream textStream = new MemoryStream())
@@ -37,22 +37,17 @@ class Program
         // Create a new PDF document containing the extracted text
         using (Document summaryDoc = new Document())
         {
-            // Add a single page (Pages.Add() creates a new page at the end)
+            // Add a single page
             summaryDoc.Pages.Add();
 
             // Add the extracted text as a TextFragment
             TextFragment fragment = new TextFragment(extractedText);
-            // Modify the existing TextState instance (property is read‑only)
-            fragment.TextState.Font = FontRepository.FindFont("Helvetica");
-            fragment.TextState.FontSize = 12;
-            fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-
             summaryDoc.Pages[1].Paragraphs.Add(fragment);
 
             // Save the summary PDF
-            summaryDoc.Save(outputPdfPath);
+            summaryDoc.Save(summaryPdfPath);
         }
 
-        Console.WriteLine($"Summary PDF created: {outputPdfPath}");
+        Console.WriteLine($"Summary PDF created: {summaryPdfPath}");
     }
 }

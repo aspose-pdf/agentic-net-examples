@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Text;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -15,15 +14,17 @@ class Program
             return;
         }
 
-        // Initialize the PdfExtractor facade and bind the PDF file.
+        // Use PdfExtractor (facade) to extract text.
+        // The facade implements IDisposable, so wrap it in a using block.
         using (PdfExtractor extractor = new PdfExtractor())
         {
+            // Bind the PDF file to the extractor.
             extractor.BindPdf(inputPdf);
 
-            // Extract all text using Unicode encoding.
-            extractor.ExtractText(Encoding.Unicode);
+            // Extract text from the whole document using Unicode encoding.
+            extractor.ExtractText(); // default is Unicode
 
-            // Write the extracted text to a memory stream.
+            // Save the extracted text into a memory stream.
             using (MemoryStream textStream = new MemoryStream())
             {
                 extractor.GetText(textStream);
@@ -35,6 +36,9 @@ class Program
                     ? "The PDF contains text."
                     : "The PDF does not contain any text.");
             }
+
+            // Close the extractor (optional, as using will dispose it).
+            extractor.Close();
         }
     }
 }

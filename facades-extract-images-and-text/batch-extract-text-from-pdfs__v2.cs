@@ -2,49 +2,51 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-class Program
+namespace PdfBatchExtract
 {
-    static void Main(string[] args)
+    class Program
     {
-        // Expect exactly two arguments: input directory and output directory
-        if (args.Length != 2)
+        static void Main(string[] args)
         {
-            Console.WriteLine("Usage: PdfBatchExtract <InputDirectory> <OutputDirectory>");
-            return;
-        }
+            // Default directories
+            string sourceDirectory = Directory.GetCurrentDirectory();
+            string outputDirectory = Path.Combine(sourceDirectory, "ExtractedText");
 
-        string inputDirectory = args[0];
-        string outputDirectory = args[1];
+            // Optional command‑line arguments: [sourceDirectory] [outputDirectory]
+            if (args.Length > 0 && !string.IsNullOrWhiteSpace(args[0]))
+                sourceDirectory = args[0];
 
-        // Validate input directory
-        if (!Directory.Exists(inputDirectory))
-        {
-            Console.WriteLine($"Error: Input directory does not exist -> {inputDirectory}");
-            return;
-        }
+            if (args.Length > 1 && !string.IsNullOrWhiteSpace(args[1]))
+                outputDirectory = args[1];
 
-        // Ensure output directory exists
-        if (!Directory.Exists(outputDirectory))
-        {
-            Directory.CreateDirectory(outputDirectory);
-        }
-
-        // Get all PDF files (non‑recursive) in the input directory
-        string[] pdfFiles = Directory.GetFiles(inputDirectory, "*.pdf", SearchOption.TopDirectoryOnly);
-
-        foreach (string pdfPath in pdfFiles)
-        {
-            string txtFilePath = Path.Combine(outputDirectory, Path.GetFileNameWithoutExtension(pdfPath) + ".txt");
-
-            // Use PdfExtractor inside a using block to guarantee disposal
-            using (PdfExtractor extractor = new PdfExtractor())
+            // Validate source directory
+            if (!Directory.Exists(sourceDirectory))
             {
-                extractor.BindPdf(pdfPath);
-                extractor.ExtractText();
-                extractor.GetText(txtFilePath);
+                Console.Error.WriteLine($"Source directory does not exist: {sourceDirectory}");
+                return;
             }
 
-            Console.WriteLine($"Extracted text from '{Path.GetFileName(pdfPath)}' to '{txtFilePath}'");
+            // Ensure output directory exists
+            Directory.CreateDirectory(outputDirectory);
+
+            // Get all PDF files in the source directory (non‑recursive)
+            string[] pdfFiles = Directory.GetFiles(sourceDirectory, "*.pdf", SearchOption.TopDirectoryOnly);
+
+            foreach (var pdfPath in pdfFiles)
+            {
+                string txtPath = Path.Combine(outputDirectory, Path.GetFileNameWithoutExtension(pdfPath) + ".txt");
+
+                // PdfExtractor implements IDisposable – use a using block for deterministic cleanup
+                using (var extractor = new PdfExtractor())
+                {
+                    extractor.BindPdf(pdfPath);
+                    extractor.ExtractText();
+                    extractor.GetText(txtPath);
+                }
+
+                Console.WriteLine($"Extracted text from '{Path.GetFileName(pdfPath)}' to '{txtPath}'.");
+            }
         }
     }
 }
+// NOTE: Add a reference to Aspose.Pdf.dll (e.g., via NuGet or Add-Type) before building.

@@ -19,6 +19,7 @@ class Program
         int attempt = 0;
         bool success = false;
 
+        // Retry loop – up to three attempts if an IOException occurs
         while (attempt < maxAttempts && !success)
         {
             attempt++;
@@ -30,34 +31,32 @@ class Program
                     // Bind the source PDF file
                     extractor.BindPdf(inputPdf);
 
-                    // Extract all text using Unicode encoding (default)
+                    // Extract all text (Unicode encoding is default)
                     extractor.ExtractText();
 
-                    // Save extracted text to the output file
+                    // Save extracted text to a file
                     extractor.GetText(outputTxt);
                 }
 
-                // If we reach here, extraction succeeded
+                Console.WriteLine($"Text extraction succeeded on attempt {attempt}.");
                 success = true;
-                Console.WriteLine($"Extraction succeeded on attempt {attempt}.");
             }
             catch (IOException ioEx)
             {
                 // Log the I/O error and retry if attempts remain
-                Console.Error.WriteLine($"I/O error on attempt {attempt}: {ioEx.Message}");
+                Console.Error.WriteLine($"IOException on attempt {attempt}: {ioEx.Message}");
                 if (attempt >= maxAttempts)
                 {
                     Console.Error.WriteLine("Maximum retry attempts reached. Extraction failed.");
                 }
                 else
                 {
-                    // Optional: brief pause before retry
-                    System.Threading.Thread.Sleep(500);
+                    Console.WriteLine("Retrying extraction...");
                 }
             }
             catch (Exception ex)
             {
-                // Non‑IO exceptions are not retried
+                // Any other exception is not retried
                 Console.Error.WriteLine($"Unexpected error: {ex.Message}");
                 break;
             }
