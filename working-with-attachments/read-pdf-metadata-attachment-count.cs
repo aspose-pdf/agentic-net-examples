@@ -1,69 +1,48 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core Aspose.Pdf namespace
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "sample.pdf";          // PDF to analyze
-        const string reportPath   = "metadata_report.txt"; // Output report file
+        const string inputPath = "sample.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF document inside a using block (ensures proper disposal)
+        using (Document doc = new Document(inputPath))
         {
-            // ----- Retrieve standard metadata (DocumentInfo) -----
-            DocumentInfo info = pdfDoc.Info;
-
-            string title   = info.Title   ?? "(none)";
-            string author  = info.Author  ?? "(none)";
-            string subject = info.Subject ?? "(none)";
-            string creator = info.Creator ?? "(none)";
-            string producer = info.Producer ?? "(none)";
-            string keywords = info.Keywords ?? "(none)";
-
-            // CreationDate and ModDate are non‑nullable DateTime values.
-            // Treat default(DateTime) as "no value".
-            string creationDate = info.CreationDate != default ? info.CreationDate.ToString("u") : "(none)";
-            string modDate      = info.ModDate      != default ? info.ModDate.ToString("u")      : "(none)";
+            // ----- Read standard metadata -----
+            string title       = doc.Info.Title       ?? "(none)";
+            string author      = doc.Info.Author      ?? "(none)";
+            string subject     = doc.Info.Subject     ?? "(none)";
+            string keywords    = doc.Info.Keywords    ?? "(none)";
+            string creator     = doc.Info.Creator     ?? "(none)";
+            string producer    = doc.Info.Producer    ?? "(none)";
+            string creationDt  = doc.Info.CreationDate != DateTime.MinValue ? doc.Info.CreationDate.ToString() : "(none)";
+            string modDt       = doc.Info.ModDate != DateTime.MinValue ? doc.Info.ModDate.ToString() : "(none)";
 
             // ----- Count embedded file attachments -----
-            // Aspose.Pdf stores attachments in the EmbeddedFiles collection.
-            // If the collection is null (no attachments), treat count as zero.
-            int attachmentCount = pdfDoc.EmbeddedFiles?.Count ?? 0;
+            // In Aspose.Pdf the collection is called EmbeddedFiles, not Attachments.
+            int attachmentCount = doc.EmbeddedFiles?.Count ?? 0;
 
-            // ----- Build the report text -----
-            string report = $"PDF Metadata Report for '{Path.GetFileName(inputPdfPath)}'{Environment.NewLine}" +
-                            $"------------------------------------------------------------{Environment.NewLine}" +
-                            $"Title   : {title}{Environment.NewLine}" +
-                            $"Author  : {author}{Environment.NewLine}" +
-                            $"Subject : {subject}{Environment.NewLine}" +
-                            $"Creator : {creator}{Environment.NewLine}" +
-                            $"Producer: {producer}{Environment.NewLine}" +
-                            $"Keywords: {keywords}{Environment.NewLine}" +
-                            $"Created : {creationDate}{Environment.NewLine}" +
-                            $"Modified: {modDate}{Environment.NewLine}" +
-                            $"Attachments count: {attachmentCount}{Environment.NewLine}";
-
-            // ----- Output to console -----
-            Console.WriteLine(report);
-
-            // ----- Save report to a text file -----
-            try
-            {
-                File.WriteAllText(reportPath, report);
-                Console.WriteLine($"Report saved to '{reportPath}'.");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Failed to write report file: {ex.Message}");
-            }
+            // ----- Output the report -----
+            Console.WriteLine("PDF Metadata Report");
+            Console.WriteLine("-------------------");
+            Console.WriteLine($"Title            : {title}");
+            Console.WriteLine($"Author           : {author}");
+            Console.WriteLine($"Subject          : {subject}");
+            Console.WriteLine($"Keywords         : {keywords}");
+            Console.WriteLine($"Creator          : {creator}");
+            Console.WriteLine($"Producer         : {producer}");
+            Console.WriteLine($"Creation Date    : {creationDt}");
+            Console.WriteLine($"Modification Date: {modDt}");
+            Console.WriteLine($"Attachment Count : {attachmentCount}");
         }
     }
 }

@@ -1,18 +1,16 @@
 using System;
 using System.IO;
 using System.Net.Http;
-using System.Threading.Tasks;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
 class Program
 {
-    static async Task Main()
+    static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output_with_attachment.pdf";
-        const string fileUrl = "https://example.com/sample.txt";
-        const string attachmentFileName = "sample.txt";
+        const string inputPdf  = "input.pdf";          // source PDF
+        const string outputPdf = "output.pdf";         // result PDF
+        const string fileUrl   = "https://example.com/sample.txt"; // remote file URL
 
         if (!File.Exists(inputPdf))
         {
@@ -20,55 +18,47 @@ class Program
             return;
         }
 
-        // Download the remote file into a byte array
+        // ---- download remote file into memory ----
         byte[] fileBytes;
-        using (HttpClient http = new HttpClient())
+        string fileName;
+        using (HttpClient client = new HttpClient())
         {
-            try
-            {
-                fileBytes = await http.GetByteArrayAsync(fileUrl);
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Failed to download file: {ex.Message}");
-                return;
-            }
+            // extract file name from URL
+            fileName = Path.GetFileName(new Uri(fileUrl).AbsolutePath);
+            // synchronous download (Result blocks until complete)
+            fileBytes = client.GetByteArrayAsync(fileUrl).Result;
         }
 
-        // Open the PDF, add a file attachment annotation, and save
-        using (Document doc = new Document(inputPdf))
+        // ---- open PDF, add attachment, and save ----
+        using (Document doc = new Document(inputPdf))               // document‑disposal‑with‑using
         {
-            // Use the first page (Aspose.Pdf uses 1‑based indexing)
+            // pages are 1‑based
             Page page = doc.Pages[1];
 
-            // Define the annotation rectangle (left, bottom, right, top)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 150, 550);
+            // rectangle for the annotation (left, bottom, right, top)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 600);
 
-            // Create a FileSpecification from the in‑memory stream
+            // create a FileSpecification from the in‑memory stream
             using (MemoryStream ms = new MemoryStream(fileBytes))
             {
-                // The constructor expects a file name and a description; the actual content is set via the Contents property.
-                FileSpecification fileSpec = new FileSpecification(attachmentFileName, attachmentFileName);
-                fileSpec.Contents = ms;
+                FileSpecification fileSpec = new FileSpecification(ms, fileName);
 
-                // Create the FileAttachmentAnnotation
-                FileAttachmentAnnotation attachment = new FileAttachmentAnnotation(page, rect, fileSpec)
+                // create the file‑attachment annotation
+                FileAttachmentAnnotation fileAnnot = new FileAttachmentAnnotation(page, rect, fileSpec)
                 {
-                    // Icon property is optional; the enum FileAttachmentAnnotationIcon does not exist in the current Aspose.Pdf version.
-                    // If a visual icon is desired, a string value can be assigned, e.g., "Paperclip".
-                    // Icon = "Paperclip",
-                    Contents = $"Attached file: {attachmentFileName}",
-                    Title = "Remote File"
+                    Icon     = FileIcon.Paperclip, // corrected enum
+                    Contents = $"Attached file: {fileName}",
+                    Title    = "Remote File"
                 };
 
-                // Add the annotation to the page
-                page.Annotations.Add(attachment);
+                // add annotation to the page
+                page.Annotations.Add(fileAnnot);
             }
 
-            // Save the modified PDF
+            // save the modified PDF (PDF format, no extra SaveOptions needed)
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved with attachment: {outputPdf}");
+        Console.WriteLine($"Remote file attached and saved to '{outputPdf}'.");
     }
 }

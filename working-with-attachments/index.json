@@ -1,16 +1,16 @@
 {
   "category": "working-with-attachments",
-  "nuget_version": "26.6.0",
-  "last_updated": "2026-07-05T10:03:54Z",
+  "nuget_version": "26.7.0",
+  "last_updated": "2026-07-18T01:40:54Z",
   "examples": {
     "add-file-attachment-to-pdf": {
-      "title": "Add File Attachment to PDF",
+      "title": "Add File Attachment Annotation to PDF",
       "filename": "add-file-attachment-to-pdf.cs",
-      "description": "Demonstrates how to load an existing PDF, create a FileSpecification for a file, embed it as a FileAttachmentAnnotation on a page, and save the updated document.",
+      "description": "Demonstrates loading an existing PDF, creating a FileSpecification and a FileAttachmentAnnotation, placing it on a page, and saving the document with the attached file.",
       "tags": [
         "attachment",
-        "pdf",
         "annotation",
+        "pdf",
         "aspose-pdf",
         "file-specification"
       ],
@@ -20,44 +20,89 @@
         "Aspose.Pdf.Rectangle",
         "Aspose.Pdf.FileSpecification",
         "Aspose.Pdf.Annotations.FileAttachmentAnnotation",
-        "Aspose.Pdf.Annotations.FileIcon"
+        "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
-    "embed-file-from-byte-array-into-pdf": {
-      "title": "Embed a File from Byte Array into a PDF",
-      "filename": "embed-file-from-byte-array-into-pdf.cs",
-      "description": "Demonstrates how to create a FileSpecification from a byte array using a MemoryStream and attach it to a PDF page as a file attachment annotation, then save the modified document.",
+    "attach-binary-file-to-pdf": {
+      "title": "Attach Binary File to PDF from Byte Array",
+      "filename": "attach-binary-file-to-pdf.cs",
+      "description": "Demonstrates creating a FileSpecification from a byte array, embedding it in a PDF document, and adding a file attachment annotation to a page.",
       "tags": [
-        "pdf",
         "attachment",
         "file-specification",
         "memorystream",
-        "aspose-pdf"
+        "pdf",
+        "aspnet"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
         "Aspose.Pdf.FileSpecification",
-        "Aspose.Pdf.Annotations.FileAttachmentAnnotation",
-        "Aspose.Pdf.Rectangle"
+        "Aspose.Pdf.FileAttachmentAnnotation",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Color"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
     "add-multiple-attachments-to-pdf": {
       "title": "Add Multiple Attachments to a PDF",
       "filename": "add-multiple-attachments-to-pdf.cs",
-      "description": "Shows how to load a PDF with Aspose.Pdf, iterate a collection of file paths, embed each file as an attachment, and save the updated document.",
+      "description": "Demonstrates how to embed several files into a PDF by iterating a collection of file paths and saving the updated document.",
       "tags": [
         "attachments",
         "pdf",
-        "aspose",
-        "embedded-files",
-        "csharp"
+        "aspose-pdf",
+        "csharp",
+        "embedded-files"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.Document.EmbeddedFiles",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages.Add"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T01:40:54Z",
+      "status": "verified"
+    },
+    "add-custom-descriptions-to-pdf-attachments": {
+      "title": "Add Custom Descriptions to PDF Attachments",
+      "filename": "add-custom-descriptions-to-pdf-attachments.cs",
+      "description": "Shows how to embed files into a PDF and assign a custom description (and MIME type) to each attachment before saving the document using Aspose.Pdf.",
+      "tags": [
+        "attachments",
+        "pdf",
+        "description",
+        "aspose-pdf",
+        "filespecification"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.Document.EmbeddedFiles",
+        "Aspose.Pdf.EmbeddedFilesCollection.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-07-18T01:40:54Z",
+      "status": "verified"
+    },
+    "add-attachment-to-pdf-and-save": {
+      "title": "Add Attachment to PDF and Save to Output Folder",
+      "filename": "add-attachment-to-pdf-and-save.cs",
+      "description": "Shows how to load a PDF, embed a file as an attachment, and save the updated document to a specified output directory.",
+      "tags": [
+        "pdf",
+        "attachment",
+        "embed",
+        "output",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -67,141 +112,95 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
-    "add-file-attachments-with-custom-description": {
-      "title": "Add File Attachments with Custom Description and MIME Type",
-      "filename": "add-file-attachments-with-custom-description.cs",
-      "description": "Demonstrates how to attach files to a PDF, set a custom description (tooltip) and let Aspose.Pdf infer the MIME type from the file extension, then save the document.",
-      "tags": [
-        "attachments",
-        "pdf",
-        "file-specification",
-        "annotation",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.FileSpecification",
-        "Aspose.Pdf.Annotations.FileAttachmentAnnotation",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Page.Annotations.Add"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-05T10:03:54Z",
-      "status": "verified"
-    },
-    "add-file-attachment-to-pdf__v2": {
-      "title": "Add File Attachment to PDF and Save to Output Folder",
-      "filename": "add-file-attachment-to-pdf__v2.cs",
-      "description": "Demonstrates loading a PDF, embedding an external file as an attachment using FileSpecification, and saving the updated PDF to a specified output directory.",
-      "tags": [
-        "pdf",
-        "attachment",
-        "aspose-pdf",
-        "file-specification",
-        "save"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.FileSpecification",
-        "Aspose.Pdf.Document.EmbeddedFiles",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.FileSpecification.Contents"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-05T10:03:54Z",
-      "status": "verified"
-    },
-    "list-pdf-attachments-names-sizes": {
-      "title": "List PDF Attachments with Names and Sizes",
-      "filename": "list-pdf-attachments-names-sizes.cs",
-      "description": "Opens a PDF, accesses its EmbeddedFiles collection, iterates through each attachment, and prints the original file name and size in bytes.",
+    "list-pdf-attachment-names-sizes": {
+      "title": "List PDF Attachment Names and Sizes",
+      "filename": "list-pdf-attachment-names-sizes.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, access its embedded file attachments, and iterate through them to output each attachment's name and size.",
       "tags": [
         "attachments",
         "embedded-files",
         "pdf",
         "aspose-pdf",
-        "file-size"
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.EmbeddedFileCollection",
         "Aspose.Pdf.FileSpecification",
-        "Aspose.Pdf.FileSpecification.Params",
-        "Aspose.Pdf.FileSpecification.Contents"
+        "Aspose.Pdf.FileSpecificationParams",
+        "Aspose.Pdf.Stream"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
-    "extract-embedded-attachment-from-pdf": {
-      "title": "Extract Embedded Attachment from PDF",
-      "filename": "extract-embedded-attachment-from-pdf.cs",
-      "description": "Shows how to locate an embedded file in a PDF by its name and save it to a target directory using Aspose.Pdf.",
+    "extract-attachment-by-name-from-pdf": {
+      "title": "Extract Attachment by Name from PDF",
+      "filename": "extract-attachment-by-name-from-pdf.cs",
+      "description": "The example creates a PDF with an embedded file, then loads the PDF, locates the attachment by its name, and saves it to a specified directory.",
       "tags": [
-        "pdf",
         "attachment",
         "extract",
-        "aspose",
-        "csharp"
+        "pdf",
+        "embedded-files",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.FileSpecification",
-        "Aspose.Pdf.EmbeddedFilesCollection",
-        "Aspose.Pdf.EmbeddedFilesCollection.FindByName",
-        "Aspose.Pdf.FileSpecification.Contents"
+        "Aspose.Pdf.EmbeddedFiles",
+        "Aspose.Pdf.EmbeddedFiles.Add",
+        "Aspose.Pdf.EmbeddedFiles.FindByName",
+        "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
     "extract-pdf-attachments-to-subfolders": {
       "title": "Extract PDF Attachments to Separate Subfolders",
       "filename": "extract-pdf-attachments-to-subfolders.cs",
-      "description": "Demonstrates how to load a PDF with Aspose.Pdf, iterate over its embedded files, and save each attachment into its own subfolder on disk.",
+      "description": "Demonstrates how to read embedded files from a PDF using Aspose.Pdf and save each attachment into its own subfolder on disk.",
       "tags": [
-        "pdf",
         "attachments",
+        "pdf",
         "extraction",
-        "filesystem",
-        "aspnet"
+        "folders",
+        "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.FileSpecification",
         "Aspose.Pdf.Document.EmbeddedFiles",
-        "Aspose.Pdf.FileSpecification.Contents",
-        "Aspose.Pdf.FileSpecification.Name"
+        "Aspose.Pdf.EmbeddedFile.Name",
+        "Aspose.Pdf.EmbeddedFile.Content"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
     "remove-pdf-attachment-by-index": {
       "title": "Remove PDF Attachment by Index",
       "filename": "remove-pdf-attachment-by-index.cs",
-      "description": "Shows how to delete an embedded file from a PDF using its zero‑based index with Aspose.Pdf.",
+      "description": "Shows how to delete an embedded file from a PDF using its zero‑based index by retrieving the attachment name and calling the EmbeddedFiles collection's Delete method.",
       "tags": [
         "pdf",
         "attachment",
         "remove",
-        "aspose.pdf",
-        "csharp"
+        "embedded-files",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.EmbeddedFiles",
         "Aspose.Pdf.EmbeddedFileCollection",
-        "Aspose.Pdf.EmbeddedFileCollection.Delete",
-        "Aspose.Pdf.EmbeddedFileCollection.Count",
-        "Aspose.Pdf.EmbeddedFileCollection.Item"
+        "Aspose.Pdf.EmbeddedFileCollection.Delete"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
     "delete-pdf-attachment-by-filename": {
@@ -209,209 +208,234 @@
       "filename": "delete-pdf-attachment-by-filename.cs",
       "description": "Demonstrates how to remove an embedded file from a PDF by specifying its filename using Aspose.Pdf.",
       "tags": [
+        "pdf",
         "attachment",
         "delete",
-        "pdf",
         "aspose",
-        "embedded-files"
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.EmbeddedFiles",
-        "Aspose.Pdf.EmbeddedFilesCollection.Delete",
+        "Aspose.Pdf.EmbeddedFileCollection",
+        "Aspose.Pdf.EmbeddedFileCollection.Delete",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
     "extract-pdf-attachment-metadata": {
       "title": "Extract PDF Attachment Metadata to JSON",
       "filename": "extract-pdf-attachment-metadata.cs",
-      "description": "Shows how to read file attachment annotations from a PDF, obtain each attachment's filename and creation date, and serialize the collected metadata to a JSON file.",
+      "description": "Shows how to read file attachment annotations from a PDF, retrieve their creation date, file name, title and subject, and write the collected metadata to a JSON file.",
       "tags": [
         "pdf",
         "attachments",
         "metadata",
         "json",
-        "aspose-pdf"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Annotations.Annotation",
         "Aspose.Pdf.Annotations.FileAttachmentAnnotation",
+        "Aspose.Pdf.Annotations.Annotation",
         "Aspose.Pdf.FileSpecification"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
-    "update-attachment-description": {
-      "title": "Update Attachment Description in PDF",
-      "filename": "update-attachment-description.cs",
+    "update-attachment-description-pdf": {
+      "title": "Update File Attachment Description in PDF",
+      "filename": "update-attachment-description-pdf.cs",
       "description": "Demonstrates how to locate a file attachment annotation in a PDF, modify its description, and save the updated document using Aspose.Pdf.",
       "tags": [
         "attachment",
-        "description",
         "pdf",
-        "annotations",
-        "Aspose.Pdf"
+        "annotation",
+        "description",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Annotations.Annotation",
         "Aspose.Pdf.Annotations.FileAttachmentAnnotation",
-        "Aspose.Pdf.FileSpecification",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.FileSpecification"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
     "add-attachment-to-password-protected-pdf": {
       "title": "Add Attachment to Password-Protected PDF",
       "filename": "add-attachment-to-password-protected-pdf.cs",
-      "description": "Demonstrates opening an encrypted PDF with a user password, embedding a file as an attachment, and saving the PDF while preserving its encryption.",
+      "description": "Shows how to open an encrypted PDF with a user password, embed a file as an attachment, and save the document while keeping it encrypted.",
       "tags": [
         "pdf",
         "attachment",
         "encryption",
-        "aspose-pdf",
-        "csharp"
+        "aspose.pdf",
+        "c#"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.FileSpecification",
-        "Aspose.Pdf.Document.EmbeddedFiles",
+        "Aspose.Pdf.EmbeddedFilesCollection.Add",
         "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.InvalidPasswordException"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
     "extract-attachments-from-encrypted-pdf": {
       "title": "Extract Attachments from Encrypted PDF",
       "filename": "extract-attachments-from-encrypted-pdf.cs",
-      "description": "Shows how to open an encrypted PDF with a password, decrypt it, and extract all embedded file attachments to a specified folder.",
+      "description": "Shows how to open an encrypted PDF with a password, decrypt it, and extract all embedded file attachments to a specified folder using Aspose.Pdf.",
       "tags": [
         "pdf",
         "attachments",
-        "decryption",
-        "aspose",
-        "csharp"
+        "encryption",
+        "extraction",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.Decrypt",
         "Aspose.Pdf.Document.EmbeddedFiles",
-        "Aspose.Pdf.FileSpecification",
-        "Aspose.Pdf.FileSpecification.Contents"
+        "Aspose.Pdf.EmbeddedFile.Name",
+        "Aspose.Pdf.EmbeddedFile.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
     "validate-attachment-size-before-adding-to-pdf": {
       "title": "Validate Attachment Size Before Adding to PDF",
       "filename": "validate-attachment-size-before-adding-to-pdf.cs",
-      "description": "The example checks that a file to be attached does not exceed a defined size limit, then adds it as a FileAttachment annotation to the first page of a PDF using Aspose.Pdf.",
+      "description": "Loads an existing PDF, checks each file's size against a defined limit, and attaches only the files that meet the size requirement using Aspose.Pdf file attachment annotations.",
       "tags": [
         "attachment",
-        "size-limit",
+        "size-validation",
         "pdf",
-        "annotation",
-        "validation"
+        "aspose",
+        "annotation"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Rectangle",
         "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.Rectangle",
         "Aspose.Pdf.Annotations.FileAttachmentAnnotation",
+        "Aspose.Pdf.Page.Annotations.Add",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
     "batch-add-attachment-to-pdfs": {
       "title": "Batch Add Attachment to PDFs",
       "filename": "batch-add-attachment-to-pdfs.cs",
-      "description": "Shows how to loop through a directory of PDF files and embed the same external file as an attachment into each document using Aspose.Pdf.",
+      "description": "Demonstrates how to iterate through a folder of PDF files and embed the same attachment into each document using Aspose.Pdf.",
       "tags": [
         "attachments",
         "batch",
         "pdf",
         "aspose-pdf",
-        "file-embedding"
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.FileSpecification",
         "Aspose.Pdf.Document.EmbeddedFiles",
-        "Aspose.Pdf.EmbeddedFilesCollection.Add",
+        "Aspose.Pdf.Document.EmbeddedFiles.Add",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
-    "batch-extract-pdf-attachments-zip": {
-      "title": "Batch Extract PDF Attachments and Create a ZIP Archive",
-      "filename": "batch-extract-pdf-attachments-zip.cs",
-      "description": "Shows how to iterate over a folder of PDFs, extract embedded files with Aspose.Pdf, and package all extracted attachments into a single ZIP archive.",
+    "batch-extract-pdf-attachments-to-zip": {
+      "title": "Batch Extract PDF Attachments to ZIP Archive",
+      "filename": "batch-extract-pdf-attachments-to-zip.cs",
+      "description": "Demonstrates how to iterate through multiple PDF files, extract all embedded file attachments, and store them in a consolidated ZIP archive using Aspose.Pdf.",
       "tags": [
         "pdf",
         "attachments",
-        "extraction",
+        "batch",
         "zip",
-        "batch"
+        "extraction"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.EmbeddedFiles",
-        "Aspose.Pdf.EmbeddedFileCollection",
-        "Aspose.Pdf.FileSpecification",
-        "Aspose.Pdf.FileSpecification.Contents"
+        "Aspose.Pdf.EmbeddedFile",
+        "Aspose.Pdf.EmbeddedFile.Save",
+        "Aspose.Pdf.EmbeddedFile.Name"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
-    "create-pdf-portfolio": {
-      "title": "Create PDF Portfolio with Embedded Files",
-      "filename": "create-pdf-portfolio.cs",
-      "description": "Shows how to create a PDF portfolio and embed existing files such as PDFs, DOCX, and images as attachments using Aspose.Pdf.",
+    "create-pdf-portfolio-with-attachments": {
+      "title": "Create PDF Portfolio with Attachments",
+      "filename": "create-pdf-portfolio-with-attachments.cs",
+      "description": "Demonstrates how to build a PDF Portfolio by creating a document, adding a page with text, embedding multiple files as attachments, and saving the result.",
       "tags": [
-        "pdf-portfolio",
+        "pdf",
+        "portfolio",
         "attachments",
-        "file-specification",
-        "aspose-pdf",
-        "document"
+        "aspose.pdf",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Collection",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.Position",
+        "Aspose.Pdf.FontRepository.FindFont",
         "Aspose.Pdf.FileSpecification",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Collection.Add"
+        "Aspose.Pdf.Document.EmbeddedFiles.Add",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
     "add-word-document-to-pdf-portfolio": {
-      "title": "Add Word Document to PDF Portfolio",
+      "title": "Add a Word Document to a PDF Portfolio",
       "filename": "add-word-document-to-pdf-portfolio.cs",
-      "description": "Shows how to embed a Word (.docx) file into a PDF portfolio using Aspose.Pdf's EmbeddedFiles collection.",
+      "description": "Shows how to embed a Word (.docx) file into a PDF document using Aspose.Pdf, turning the PDF into a portfolio with an attached file.",
       "tags": [
         "pdf-portfolio",
-        "embedded-files",
+        "embed",
+        "word",
         "aspose-pdf",
-        "docx",
+        "attachment"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.Document.EmbeddedFiles",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages.Add"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-07-18T01:40:54Z",
+      "status": "verified"
+    },
+    "insert-excel-into-pdf-portfolio": {
+      "title": "Insert Excel Workbook into PDF Portfolio with Description",
+      "filename": "insert-excel-into-pdf-portfolio.cs",
+      "description": "Shows how to embed an existing Excel workbook into a PDF portfolio and assign a custom description to the attachment using Aspose.Pdf.",
+      "tags": [
+        "pdf-portfolio",
+        "excel-attachment",
+        "file-embedding",
+        "aspose-pdf",
         "csharp"
       ],
       "apis_used": [
@@ -421,107 +445,84 @@
         "Aspose.Pdf.EmbeddedFilesCollection.Add",
         "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-05T10:03:54Z",
-      "status": "verified"
-    },
-    "insert-excel-into-pdf-portfolio": {
-      "title": "Insert Excel Workbook into PDF Portfolio with Description",
-      "filename": "insert-excel-into-pdf-portfolio.cs",
-      "description": "Demonstrates how to create a PDF portfolio, embed an Excel workbook as an attachment, and assign a custom description using Aspose.Pdf.",
-      "tags": [
-        "pdf-portfolio",
-        "attachment",
-        "excel",
-        "aspose-pdf",
-        "file-specification"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Collection",
-        "Aspose.Pdf.FileSpecification",
-        "Aspose.Pdf.Document.Pages.Add",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Collection.Add"
-      ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
     "embed-image-into-pdf-portfolio": {
       "title": "Embed Image into PDF Portfolio with Display Name",
       "filename": "embed-image-into-pdf-portfolio.cs",
-      "description": "Demonstrates how to create a PDF portfolio, embed an image file as an attachment, and set a custom display name for the embedded file using Aspose.Pdf.",
+      "description": "Demonstrates how to embed an image file into a PDF portfolio and assign a custom display name using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "portfolio",
+        "embed",
+        "image",
+        "display-name"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.Document.EmbeddedFiles",
+        "Aspose.Pdf.EmbeddedFilesCollection.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-07-18T01:40:54Z",
+      "status": "verified"
+    },
+    "add-nested-pdf-to-portfolio": {
+      "title": "Add Nested PDF to Existing PDF Portfolio",
+      "filename": "add-nested-pdf-to-portfolio.cs",
+      "description": "Shows how to embed a PDF file as a nested item inside an existing PDF Portfolio (collection) using Aspose.Pdf.",
       "tags": [
         "pdf-portfolio",
-        "embed-attachment",
+        "embedded-file",
         "aspose-pdf",
         "csharp",
-        "file-specification"
+        "document-collection"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Collection",
         "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Collection.Add"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T01:40:54Z",
+      "status": "verified"
+    },
+    "create-pdf-portfolio-with-multiple-embedded-files": {
+      "title": "Create PDF Portfolio with Multiple Embedded Files",
+      "filename": "create-pdf-portfolio-with-multiple-embedded-files.cs",
+      "description": "Demonstrates how to add several files of different types to a PDF portfolio in a single loop using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "portfolio",
+        "embedded-files",
+        "aspose.pdf",
+        "c#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.Document.Pages.Add",
         "Aspose.Pdf.Document.EmbeddedFiles.Add",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
-    "add-nested-pdf-to-portfolio": {
-      "title": "Add Nested PDF to an Existing PDF Portfolio",
-      "filename": "add-nested-pdf-to-portfolio.cs",
-      "description": "Demonstrates how to embed another PDF file as a nested item inside an existing PDF Portfolio using Aspose.Pdf. The example loads the portfolio, creates a FileSpecification for the nested PDF, adds it to the EmbeddedFiles collection, and saves the updated document.",
-      "tags": [
-        "pdf-portfolio",
-        "embedded-files",
-        "aspose-pdf",
-        "csharp",
-        "file-specification"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.FileSpecification",
-        "Aspose.Pdf.EmbeddedFilesCollection.Add",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.EmbeddedFilesCollection"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-05T10:03:54Z",
-      "status": "verified"
-    },
-    "add-multiple-files-to-pdf-portfolio": {
-      "title": "Add Multiple Files to PDF Portfolio",
-      "filename": "add-multiple-files-to-pdf-portfolio.cs",
-      "description": "Creates a PDF portfolio and embeds every file from a specified folder into the document using a single loop.",
-      "tags": [
-        "pdf",
-        "portfolio",
-        "attachments",
-        "embed",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.EmbeddedFileCollection",
-        "Aspose.Pdf.FileSpecification",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.EmbeddedFileCollection.Add"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-05T10:03:54Z",
-      "status": "verified"
-    },
-    "compress-pdf-portfolio-optimization": {
+    "compress-pdf-portfolio-with-optimization": {
       "title": "Compress PDF Portfolio Using Optimization Options",
-      "filename": "compress-pdf-portfolio-optimization.cs",
-      "description": "Loads an existing PDF portfolio, enables object compression via OptimizationOptions, and saves the compressed PDF.",
+      "filename": "compress-pdf-portfolio-with-optimization.cs",
+      "description": "Shows how to open an existing PDF Portfolio, enable object compression via OptimizationOptions, and save the compressed PDF.",
       "tags": [
         "pdf",
-        "compression",
         "portfolio",
+        "compression",
         "optimization",
         "aspose-pdf"
       ],
@@ -529,55 +530,54 @@
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Optimization.OptimizationOptions",
         "Aspose.Pdf.Document.OptimizeResources",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Optimization"
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
     "extract-embedded-files-from-pdf-portfolio": {
       "title": "Extract Embedded Files from PDF Portfolio",
       "filename": "extract-embedded-files-from-pdf-portfolio.cs",
-      "description": "Demonstrates how to load a PDF portfolio with Aspose.Pdf, enumerate its embedded files, preserve any folder hierarchy encoded in the file names, and save each attachment to a structured directory.",
+      "description": "Shows how to load a PDF portfolio with Aspose.Pdf, iterate over its embedded files, and write each file to a structured directory hierarchy on disk.",
       "tags": [
-        "pdf",
-        "portfolio",
-        "extraction",
-        "attachments",
-        "aspnet"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.EmbeddedFileCollection",
-        "Aspose.Pdf.EmbeddedFile",
-        "Aspose.Pdf.EmbeddedFile.Save",
-        "Aspose.Pdf.FileSpecification"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-05T10:03:54Z",
-      "status": "verified"
-    },
-    "extract-embedded-portfolio-item": {
-      "title": "Extract Embedded Portfolio Item by Index",
-      "filename": "extract-embedded-portfolio-item.cs",
-      "description": "Demonstrates how to retrieve a single embedded file from a PDF portfolio using its 1‑based index and save it with its original filename and extension.",
-      "tags": [
-        "pdf",
+        "pdf-portfolio",
         "embedded-files",
-        "portfolio",
         "extraction",
-        "aspnet"
+        "aspose-pdf",
+        "file-io"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.EmbeddedFiles",
-        "Aspose.Pdf.FileSpecification",
-        "Aspose.Pdf.FileSpecification.Contents",
-        "Aspose.Pdf.FileSpecification.Name"
+        "Aspose.Pdf.EmbeddedFile.Save",
+        "Aspose.Pdf.EmbeddedFile.Name",
+        "Aspose.Pdf.EmbeddedFile.FileSpecification"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "generated_at": "2026-07-18T01:40:54Z",
+      "status": "verified"
+    },
+    "extract-embedded-file-from-pdf-portfolio": {
+      "title": "Extract Embedded File from PDF Portfolio by Index",
+      "filename": "extract-embedded-file-from-pdf-portfolio.cs",
+      "description": "Demonstrates how to load a PDF, locate an embedded file by its 1‑based index, and save it using the original file name and extension.",
+      "tags": [
+        "pdf",
+        "embedded-files",
+        "extraction",
+        "portfolio",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.Document.EmbeddedFiles",
+        "Aspose.Pdf.FileSpecification.Name",
+        "Aspose.Pdf.FileSpecification.Contents"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
     "remove-embedded-file-from-pdf-portfolio": {
@@ -585,166 +585,169 @@
       "filename": "remove-embedded-file-from-pdf-portfolio.cs",
       "description": "Shows how to delete a specific embedded file from a PDF portfolio using its collection index with Aspose.Pdf.",
       "tags": [
-        "pdf-portfolio",
+        "pdf",
+        "portfolio",
         "embedded-files",
         "delete",
-        "index",
-        "csharp"
+        "aspnet"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.EmbeddedFilesCollection",
-        "Aspose.Pdf.EmbeddedFilesCollection.DeleteByKey",
-        "Aspose.Pdf.EmbeddedFilesCollection.Keys",
-        "Aspose.Pdf.EmbeddedFilesCollection.Count"
+        "Aspose.Pdf.EmbeddedFileCollection",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.EmbeddedFileCollection.Delete",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
-    "delete-pdf-outline-items-by-title": {
-      "title": "Delete PDF Outline Items by Title",
-      "filename": "delete-pdf-outline-items-by-title.cs",
-      "description": "Demonstrates how to remove outline (bookmark) entries from a PDF by matching their title text instead of using an index.",
+    "delete-pdf-outline-items-matching-text": {
+      "title": "Delete PDF Outline Items Matching Text",
+      "filename": "delete-pdf-outline-items-matching-text.cs",
+      "description": "Loads a PDF, searches its outline (bookmark) entries for a specific description text, and removes the matching items before saving the cleaned document.",
       "tags": [
         "pdf",
         "outline",
         "bookmark",
         "delete",
-        "Aspose.Pdf"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.OutlineItemCollection",
         "Aspose.Pdf.OutlineCollection",
         "Aspose.Pdf.OutlineCollection.Delete",
         "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
     "reorder-pdf-outline-items": {
-      "title": "Reorder PDF Outline (Bookmark) Items",
+      "title": "Reorder PDF Outline Items (Swap First Two)",
       "filename": "reorder-pdf-outline-items.cs",
-      "description": "Shows how to capture existing PDF outline (bookmark) entries, delete them, and re‑add them in a new order while preserving actions and destinations.",
+      "description": "Demonstrates how to swap the first two outline (bookmark) items in a PDF by removing and re‑adding them in the desired order using Aspose.Pdf.",
       "tags": [
-        "outline",
-        "bookmark",
-        "reorder",
         "pdf",
-        "aspose-pdf"
+        "outline",
+        "reorder",
+        "bookmarks",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.OutlineCollection",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.OutlineCollection.Clear",
         "Aspose.Pdf.OutlineCollection.Add",
-        "Aspose.Pdf.OutlineCollection.Delete",
-        "Aspose.Pdf.OutlineItem"
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
-    "apply-custom-visual-template-to-pdf-portfolio": {
-      "title": "Apply Custom Visual Template to PDF Portfolio",
-      "filename": "apply-custom-visual-template-to-pdf-portfolio.cs",
-      "description": "Shows how to add a full‑page graphical background and a header text to each page of an existing PDF Portfolio using Aspose.Pdf.Drawing classes.",
+    "apply-visual-template-to-pdf-portfolio": {
+      "title": "Apply Visual Template to PDF Portfolio Pages",
+      "filename": "apply-visual-template-to-pdf-portfolio.cs",
+      "description": "Demonstrates how to load an existing PDF Portfolio, add a semi‑transparent header graphic and title text to each page using Aspose.PDF.Drawing classes, and save the modified document.",
       "tags": [
         "pdf-portfolio",
         "visual-template",
         "graph",
-        "rectangle",
-        "text"
+        "text",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Drawing.Graph",
         "Aspose.Pdf.Drawing.Rectangle",
-        "Aspose.Pdf.Drawing.GraphInfo",
         "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.Position"
+        "Aspose.Pdf.FontRepository.FindFont",
+        "Aspose.Pdf.Color.FromArgb"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
-    "add-thumbnails-to-pdf-pages": {
-      "title": "Add Thumbnails to PDF Pages",
-      "filename": "add-thumbnails-to-pdf-pages.cs",
-      "description": "Demonstrates generating a thumbnail image for each page of a PDF using Aspose.Pdf's ThumbnailDevice and embedding the image onto the page with the Drawing API.",
+    "generate-pdf-page-thumbnails": {
+      "title": "Generate Thumbnails for Each PDF Page",
+      "filename": "generate-pdf-page-thumbnails.cs",
+      "description": "Demonstrates how to create a thumbnail image for every page of a PDF portfolio using Aspose.Pdf's Drawing API and compile them into a new PDF document.",
       "tags": [
-        "thumbnail",
-        "drawing-api",
         "pdf",
+        "thumbnail",
         "image",
+        "drawing-api",
         "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Devices.ThumbnailDevice",
-        "Aspose.Pdf.Drawing.Image",
-        "Aspose.Pdf.Drawing.MarginInfo",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Page.AddImage",
+        "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
-    "merge-pdf-portfolios-preserving-metadata": {
-      "title": "Merge PDF Portfolios Preserving Metadata",
-      "filename": "merge-pdf-portfolios-preserving-metadata.cs",
-      "description": "Demonstrates how to combine two PDF Portfolio files into a single document while keeping all embedded items and their metadata intact using Aspose.Pdf.",
+    "merge-pdf-portfolios-preserve-metadata": {
+      "title": "Merge Two PDF Portfolios While Preserving Metadata",
+      "filename": "merge-pdf-portfolios-preserve-metadata.cs",
+      "description": "Demonstrates how to combine two PDF Portfolio files into a single document using Aspose.Pdf, while retaining both standard document and XMP metadata from the first portfolio.",
       "tags": [
         "pdf",
         "portfolio",
         "merge",
         "metadata",
-        "attachments"
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.Merge",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-05T10:03:54Z",
-      "status": "verified"
-    },
-    "create-pdf-portfolio-with-embedded-files": {
-      "title": "Create PDF Portfolio with Embedded Files",
-      "filename": "create-pdf-portfolio-with-embedded-files.cs",
-      "description": "Demonstrates how to convert an existing PDF into a portfolio by adding multiple embedded files using Aspose.Pdf.",
-      "tags": [
-        "pdf-portfolio",
-        "embedded-files",
-        "aspose-pdf",
-        "collection",
-        "document"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Collection",
-        "Aspose.Pdf.FileSpecification",
-        "Aspose.Pdf.DocumentInfo",
+        "Aspose.Pdf.Document.Info",
+        "Aspose.Pdf.Document.GetXmpMetadata",
+        "Aspose.Pdf.Document.SetXmpMetadata",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "generated_at": "2026-07-18T01:40:54Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-portfolio-with-embedded-files": {
+      "title": "Convert PDF to Portfolio with Embedded Files",
+      "filename": "convert-pdf-to-portfolio-with-embedded-files.cs",
+      "description": "Demonstrates how to load a regular PDF, embed multiple files, and automatically convert it into a PDF Portfolio using Aspose.Pdf.",
+      "tags": [
+        "pdf-portfolio",
+        "embedded-files",
+        "attachments",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.Document.EmbeddedFiles",
+        "Aspose.Pdf.Document.EmbeddedFiles.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
     "flatten-pdf-portfolio": {
       "title": "Flatten PDF Portfolio to Standard PDF",
       "filename": "flatten-pdf-portfolio.cs",
-      "description": "Shows how to open a PDF portfolio, remove interactive form fields and annotations by flattening, and save it as a regular PDF using Aspose.Pdf.",
+      "description": "Shows how to load a PDF Portfolio, flatten it to remove interactive collection features, and save it as a regular PDF using Aspose.Pdf.",
       "tags": [
-        "pdf",
+        "pdf-portfolio",
         "flatten",
-        "portfolio",
-        "aspose",
-        "csharp"
+        "attachments",
+        "aspose-pdf",
+        "document"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -752,19 +755,19 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
     "read-pdf-metadata-attachment-count": {
-      "title": "Read PDF Metadata and Count Embedded Attachments",
+      "title": "Read PDF Metadata and Count Attachments",
       "filename": "read-pdf-metadata-attachment-count.cs",
-      "description": "Demonstrates how to load a PDF with Aspose.Pdf, extract standard document metadata, count embedded file attachments, and generate a text report.",
+      "description": "Shows how to load a PDF with Aspose.Pdf, read its standard metadata fields, count embedded file attachments, and output a concise report.",
       "tags": [
         "metadata",
         "attachments",
         "pdf",
-        "aspose",
-        "documentinfo"
+        "aspose-pdf",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -774,178 +777,86 @@
         "Aspose.Pdf.DocumentInfo.CreationDate"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
     "generate-csv-report-of-pdf-attachments": {
       "title": "Generate CSV Report of PDF Attachments",
       "filename": "generate-csv-report-of-pdf-attachments.cs",
-      "description": "Demonstrates how to extract embedded file information (name, size, description) from a PDF document and write it to a CSV report.",
+      "description": "Loads a PDF, enumerates its embedded file attachments, and creates a CSV file listing each attachment's name, size, and description.",
       "tags": [
         "attachments",
         "csv",
         "report",
-        "embedded-files",
-        "aspdf"
+        "aspose-pdf",
+        "embedded-files"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.EmbeddedFiles",
-        "Aspose.Pdf.EmbeddedFile",
         "Aspose.Pdf.EmbeddedFile.Name",
-        "Aspose.Pdf.EmbeddedFile.Size",
+        "Aspose.Pdf.EmbeddedFile.FileSize",
         "Aspose.Pdf.EmbeddedFile.Description"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
     "add-in-memory-attachment-to-pdf": {
-      "title": "Add In-Memory Attachment to PDF using Aspose.Pdf",
+      "title": "Add In-Memory Attachment to PDF Using Aspose.Pdf",
       "filename": "add-in-memory-attachment-to-pdf.cs",
-      "description": "Demonstrates how to embed a file into a PDF directly from a MemoryStream, avoiding any temporary files on disk.",
+      "description": "Demonstrates how to embed a file into a PDF using a MemoryStream, avoiding any intermediate disk writes, and then save the PDF to another MemoryStream.",
       "tags": [
+        "pdf",
         "attachment",
         "memorystream",
-        "pdf",
-        "aspose",
-        "embedded-files"
+        "aspose.pdf",
+        "in-memory"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.Pages.Add",
         "Aspose.Pdf.FileSpecification",
-        "Aspose.Pdf.FileSpecification.Contents",
         "Aspose.Pdf.Document.EmbeddedFiles.Add",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
     "attach-remote-file-to-pdf": {
       "title": "Attach Remote File to PDF as File Attachment Annotation",
       "filename": "attach-remote-file-to-pdf.cs",
-      "description": "Downloads a file from a remote URL into memory and embeds it in a PDF as a file attachment annotation using Aspose.Pdf.",
+      "description": "Downloads a file from a remote URL into memory and embeds it in a PDF as a file‑attachment annotation using Aspose.Pdf.",
       "tags": [
         "pdf",
         "attachment",
         "download",
         "memory",
-        "aspose-pdf"
+        "annotation"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Annotations.FileSpecification",
-        "Aspose.Pdf.Annotations.FileAttachmentAnnotation"
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.Annotations.FileAttachmentAnnotation",
+        "Aspose.Pdf.Annotations.FileIcon"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
     "add-file-attachment-to-pdf-with-error-handling": {
       "title": "Add File Attachment to PDF with Error Handling",
       "filename": "add-file-attachment-to-pdf-with-error-handling.cs",
-      "description": "Demonstrates verifying the existence of a PDF and an attachment file, then adding the attachment as a FileAttachmentAnnotation to the first page using Aspose.Pdf, with comprehensive error handling.",
+      "description": "Demonstrates how to attach a file to a PDF using Aspose.Pdf while checking for missing source files and handling possible PDF processing errors.",
       "tags": [
-        "attachment",
         "pdf",
+        "attachment",
         "error-handling",
-        "annotation",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.FileSpecification",
-        "Aspose.Pdf.Annotations.FileAttachmentAnnotation",
-        "Aspose.Pdf.Page.Annotations.Add",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Annotations.FileIcon"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-05T10:03:54Z",
-      "status": "verified"
-    },
-    "add-file-attachment-with-mime-validation": {
-      "title": "Add File Attachment with MIME Type Validation to PDF",
-      "filename": "add-file-attachment-with-mime-validation.cs",
-      "description": "The example verifies that a file's extension maps to an allowed MIME type before embedding it as an attachment in a PDF. It then adds the file to the document's embedded files collection and creates a visible file attachment annotation.",
-      "tags": [
-        "attachment",
-        "mime-type",
-        "pdf",
         "aspose-pdf",
-        "validation"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.FileSpecification",
-        "Aspose.Pdf.Annotations.FileAttachmentAnnotation",
-        "Aspose.Pdf.Annotations.FileIcon",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-05T10:03:54Z",
-      "status": "verified"
-    },
-    "measure-attachment-performance": {
-      "title": "Measure Performance of Adding, Extracting, and Removing PDF Attachments",
-      "filename": "measure-attachment-performance.cs",
-      "description": "Demonstrates how to add a file attachment annotation, extract embedded files, and remove attachments from a PDF while logging the time taken for each operation.",
-      "tags": [
-        "attachments",
-        "performance",
-        "pdf",
-        "file-attachment",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.FileSpecification",
-        "Aspose.Pdf.Annotations.FileAttachmentAnnotation",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Annotations.Annotation"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-05T10:03:54Z",
-      "status": "verified"
-    },
-    "embed-attachment-and-metadata": {
-      "title": "Embed Attachment and Custom Metadata into PDF",
-      "filename": "embed-attachment-and-metadata.cs",
-      "description": "Demonstrates how to embed a file as an attachment in a PDF and add custom metadata about the attachment to the document information dictionary, then save the PDF with those options.",
-      "tags": [
-        "attachment",
-        "metadata",
-        "pdf",
-        "save-options",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.FileSpecification",
-        "Aspose.Pdf.Document.EmbeddedFiles.Add",
-        "Aspose.Pdf.Document.Info.Add",
-        "Aspose.Pdf.PdfSaveOptions",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-05T10:03:54Z",
-      "status": "verified"
-    },
-    "add-unicode-filename-attachment-to-pdf": {
-      "title": "Add Unicode Filename Attachment to PDF",
-      "filename": "add-unicode-filename-attachment-to-pdf.cs",
-      "description": "Shows how to attach a file to a PDF with a Unicode filename using Aspose.Pdf, creating a file attachment annotation and saving the document.",
-      "tags": [
-        "attachment",
-        "unicode",
-        "pdf",
-        "annotation",
-        "file-specification"
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -955,141 +866,253 @@
         "Aspose.Pdf.Annotations.FileAttachmentAnnotation"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "generated_at": "2026-07-18T01:40:54Z",
+      "status": "verified"
+    },
+    "validate-attachment-mime-type": {
+      "title": "Validate Attachment MIME Type Before Adding to PDF",
+      "filename": "validate-attachment-mime-type.cs",
+      "description": "Shows how to verify that an attachment's MIME type matches its file extension and then embed the file into a PDF using Aspose.Pdf.",
+      "tags": [
+        "attachment",
+        "mime-type",
+        "validation",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.Annotations.FileAttachmentAnnotation",
+        "Aspose.Pdf.Document.EmbeddedFiles.Add",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T01:40:54Z",
+      "status": "verified"
+    },
+    "add-extract-remove-pdf-attachments": {
+      "title": "Add, Extract, and Remove PDF Attachments with Timing",
+      "filename": "add-extract-remove-pdf-attachments.cs",
+      "description": "Demonstrates how to add a file attachment annotation to a PDF, extract the attached file, and remove the annotation while measuring the execution time of each operation.",
+      "tags": [
+        "attachments",
+        "pdf",
+        "performance",
+        "annotation",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.Annotations.FileAttachmentAnnotation",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T01:40:54Z",
+      "status": "verified"
+    },
+    "embed-attachment-metadata-in-pdf": {
+      "title": "Embed Attachment and Add Metadata to PDF Document Info",
+      "filename": "embed-attachment-metadata-in-pdf.cs",
+      "description": "Demonstrates how to embed a file into a PDF using Aspose.Pdf, store custom attachment metadata in the document information dictionary, and save the updated PDF.",
+      "tags": [
+        "attachment",
+        "metadata",
+        "pdf",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.DocumentInfo",
+        "Aspose.Pdf.Document.EmbeddedFiles",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T01:40:54Z",
+      "status": "verified"
+    },
+    "add-unicode-file-attachment-to-pdf": {
+      "title": "Add Unicode File Attachment to PDF",
+      "filename": "add-unicode-file-attachment-to-pdf.cs",
+      "description": "Demonstrates creating a PDF (if missing), attaching a file with a Unicode display name using a FileAttachmentAnnotation, and saving the updated document.",
+      "tags": [
+        "attachment",
+        "unicode",
+        "pdf",
+        "annotation",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.Annotations.FileAttachmentAnnotation",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Annotations.FileIcon"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
     "extract-pdf-attachments-sha256": {
       "title": "Extract PDF Attachments and Compute SHA‑256 Hashes",
       "filename": "extract-pdf-attachments-sha256.cs",
-      "description": "The example opens a PDF, enumerates its embedded files, extracts each attachment, and calculates a SHA‑256 hash for integrity verification.",
+      "description": "Loads a PDF, enumerates its embedded file attachments, and calculates a SHA‑256 hash for each attachment to verify integrity.",
       "tags": [
-        "pdf",
         "attachments",
-        "sha256",
         "hash",
+        "sha256",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.EmbeddedFiles",
+        "Aspose.Pdf.EmbeddedFile",
+        "Aspose.Pdf.EmbeddedFileCollection",
+        "Aspose.Pdf.EmbeddedFile.Data"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T01:40:54Z",
+      "status": "verified"
+    },
+    "add-image-watermark-to-pdf-pages": {
+      "title": "Add Image Watermark to All PDF Pages",
+      "filename": "add-image-watermark-to-pdf-pages.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, iterate through each page, create a WatermarkArtifact from an image, configure its opacity and background placement, add it to the page artifacts, and save the watermarked document.",
+      "tags": [
+        "watermark",
+        "pdf",
+        "image",
+        "pages",
         "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.EmbeddedFileCollection",
-        "Aspose.Pdf.EmbeddedFile",
-        "Aspose.Pdf.EmbeddedFile.Save",
-        "Aspose.Pdf.EmbeddedFile.Name"
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.WatermarkArtifact",
+        "Aspose.Pdf.Drawing.WatermarkArtifact.SetImage",
+        "Aspose.Pdf.Drawing.WatermarkArtifact.IsBackground",
+        "Aspose.Pdf.Drawing.WatermarkArtifact.Opacity",
+        "Aspose.Pdf.Page.Artifacts.Add",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
-    "add-pdf-attachment-with-retry": {
-      "title": "Add File Attachment to PDF with Retry on Network Share",
-      "filename": "add-pdf-attachment-with-retry.cs",
-      "description": "Demonstrates how to attach a file to the first page of a PDF stored on a network share and implement a retry mechanism for transient I/O errors.",
+    "add-file-attachment-with-retry": {
+      "title": "Add File Attachment to PDF with Retry Logic",
+      "filename": "add-file-attachment-with-retry.cs",
+      "description": "Demonstrates attaching a file to a PDF using Aspose.Pdf and implementing retry handling for I/O errors when the PDF is stored on a network share.",
       "tags": [
-        "pdf",
         "attachment",
+        "pdf",
         "retry",
-        "network-share",
-        "aspose"
+        "network",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.FileSpecification",
-        "Aspose.Pdf.Rectangle",
         "Aspose.Pdf.Page",
+        "Aspose.Pdf.FileSpecification",
         "Aspose.Pdf.Annotations.FileAttachmentAnnotation",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Page.Annotations.Add"
+        "Aspose.Pdf.Annotations.FileIcon",
+        "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
-    "extract-pdf-attachments-in-parallel": {
-      "title": "Extract PDF Attachments in Parallel",
-      "filename": "extract-pdf-attachments-in-parallel.cs",
-      "description": "Shows how to process multiple PDF files concurrently and extract their embedded attachments using Aspose.Pdf, with reflection‑based fallback handling for saving files.",
+    "extract-embedded-attachments-parallel": {
+      "title": "Extract Embedded Attachments from PDFs in Parallel",
+      "filename": "extract-embedded-attachments-parallel.cs",
+      "description": "Demonstrates how to concurrently extract embedded files from multiple PDF documents using Aspose.Pdf and Parallel.ForEach, saving each attachment to a dedicated folder.",
       "tags": [
         "pdf",
         "attachments",
         "parallel",
-        "extraction",
+        "aspose-pdf",
+        "extraction"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.EmbeddedFilesCollection",
+        "Aspose.Pdf.FileSpecification.Name",
+        "Aspose.Pdf.FileSpecification.Contents"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T01:40:54Z",
+      "status": "verified"
+    },
+    "verify-pdf-size-increases-with-attachment": {
+      "title": "Verify PDF Size Increases When Adding File Attachment",
+      "filename": "verify-pdf-size-increases-with-attachment.cs",
+      "description": "Demonstrates a unit test that creates a blank PDF, adds a file attachment annotation, and asserts that the PDF size grows as expected.",
+      "tags": [
+        "pdf",
+        "attachment",
+        "unit-test",
+        "size",
         "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.EmbeddedFile",
-        "Aspose.Pdf.EmbeddedFile.Save",
-        "Aspose.Pdf.FileSpecification",
-        "Aspose.Pdf.Stream"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-05T10:03:54Z",
-      "status": "verified"
-    },
-    "verify-pdf-size-increase-after-adding-file-attachment": {
-      "title": "Verify PDF Size Increase After Adding File Attachment",
-      "filename": "verify-pdf-size-increase-after-adding-file-attachment.cs",
-      "description": "Creates a PDF, adds a FileAttachmentAnnotation, saves the modified document, and asserts that the file size grows compared to the original PDF.",
-      "tags": [
-        "attachment",
-        "pdf",
-        "unit-test",
-        "size",
-        "nunit"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.PageCollection.Add",
         "Aspose.Pdf.FileSpecification",
         "Aspose.Pdf.Annotations.FileAttachmentAnnotation",
         "Aspose.Pdf.Rectangle",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
-    "test-attachment-removal-updates-collection-count": {
-      "title": "Test Attachment Removal Updates Collection Count",
-      "filename": "test-attachment-removal-updates-collection-count.cs",
-      "description": "Shows an integration test that verifies removing attachments from a ThreadMessageResponse correctly updates the Attachments collection count.",
+    "attachment-removal-integration-tests": {
+      "title": "Attachment Removal Integration Tests",
+      "filename": "attachment-removal-integration-tests.cs",
+      "description": "Shows how to write NUnit integration tests that verify removing, clearing, and removing by index updates the Attachments collection count in a response object.",
       "tags": [
         "attachments",
         "nunit",
-        "integration-test",
-        "aspose-pdf",
-        "collection"
+        "unit-test",
+        "collection",
+        "removal"
       ],
-      "apis_used": [
-        "Aspose.Pdf.AI.Attachment",
-        "Aspose.Pdf.AI.ThreadMessageResponse",
-        "Aspose.Pdf.AI.Tool"
-      ],
+      "apis_used": [],
       "difficulty": "beginner",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     },
     "embed-hidden-xml-metadata-attachment": {
       "title": "Embed Hidden XML Metadata as PDF Attachment",
       "filename": "embed-hidden-xml-metadata-attachment.cs",
-      "description": "Shows how to serialize XML metadata to a memory stream, wrap it in a FileSpecification, and embed it as a hidden file attachment annotation in a PDF using Aspose.Pdf.",
+      "description": "Creates or loads a PDF, builds an XML document with metadata, serializes it to a stream, and embeds it as a hidden file attachment annotation in the PDF.",
       "tags": [
         "pdf",
         "attachment",
         "metadata",
         "xml",
-        "hidden-annotation"
+        "hidden"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
         "Aspose.Pdf.FileSpecification",
         "Aspose.Pdf.Annotations.FileAttachmentAnnotation",
         "Aspose.Pdf.Annotations.AnnotationFlags",
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T10:03:54Z",
+      "generated_at": "2026-07-18T01:40:54Z",
       "status": "verified"
     }
   }

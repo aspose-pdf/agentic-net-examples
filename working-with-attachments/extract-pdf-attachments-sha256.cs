@@ -1,90 +1,64 @@
 using System;
 using System.IO;
 using System.Security.Cryptography;
-using System.Reflection;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPdf = "input.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Document must be disposed via using (lifecycle rule)
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // If there are no embedded files, report and exit
+            // Check if the document contains any embedded files (attachments)
             if (doc.EmbeddedFiles == null || doc.EmbeddedFiles.Count == 0)
             {
                 Console.WriteLine("No attachments found in the PDF.");
                 return;
             }
 
-            // Iterate over each attachment using reflection to avoid direct dependency on EmbeddedFile type
-            foreach (var embedded in doc.EmbeddedFiles)
+            Console.WriteLine($"Found {doc.EmbeddedFiles.Count} attachment(s):");
+
+            // Iterate over each embedded file without referencing the concrete EmbeddedFile type
+            foreach (object obj in doc.EmbeddedFiles)
             {
-                // Retrieve the attachment name via reflection
-                string name = GetPropertyValue<string>(embedded, "Name") ?? "Unnamed";
+                // Use dynamic to access members at runtime (Name, Data)
+                dynamic attachment = obj;
 
-                // Load attachment data into a memory stream
-                using (MemoryStream ms = new MemoryStream())
+                // Ensure the data stream is positioned at the beginning
+                if (attachment.Data != null)
                 {
-                    // Try to invoke Save(Stream) method
-                    MethodInfo saveMethod = embedded.GetType().GetMethod("Save", new[] { typeof(Stream) });
-                    if (saveMethod != null)
-                    {
-                        saveMethod.Invoke(embedded, new object[] { ms });
-                    }
-                    else
-                    {
-                        // Fallback to Save(string) overload if available
-                        MethodInfo saveString = embedded.GetType().GetMethod("Save", new[] { typeof(string) });
-                        if (saveString != null)
-                        {
-                            string tempPath = Path.GetTempFileName();
-                            saveString.Invoke(embedded, new object[] { tempPath });
-                            ms.Write(File.ReadAllBytes(tempPath), 0, (int)new FileInfo(tempPath).Length);
-                            File.Delete(tempPath);
-                        }
-                        else
-                        {
-                            Console.WriteLine($"Cannot extract attachment: {name}");
-                            continue;
-                        }
-                    }
+                    attachment.Data.Position = 0;
+                }
 
-                    byte[] data = ms.ToArray();
+                // Compute SHA‑256 hash of the attachment's data
+                using (SHA256 sha256 = SHA256.Create())
+                {
+                    // If Data is null, treat it as empty content
+                    byte[] hashBytes = attachment.Data != null
+                        ? sha256.ComputeHash(attachment.Data)
+                        : sha256.ComputeHash(Array.Empty<byte>());
 
-                    // Compute SHA‑256 hash of the attachment bytes
-                    byte[] hash;
-                    using (SHA256 sha = SHA256.Create())
-                    {
-                        hash = sha.ComputeHash(data);
-                    }
+                    string hashHex = BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
 
-                    // Convert hash to a hex string for display
-                    string hashHex = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+                    Console.WriteLine($"- Name: {attachment.Name}");
+                    Console.WriteLine($"  SHA‑256: {hashHex}");
+                }
 
-                    Console.WriteLine($"Attachment: {name}");
-                    Console.WriteLine($"SHA‑256: {hashHex}");
+                // Reset the stream position in case further processing is needed
+                if (attachment.Data != null)
+                {
+                    attachment.Data.Position = 0;
                 }
             }
         }
-    }
-
-    private static T GetPropertyValue<T>(object obj, string propertyName)
-    {
-        PropertyInfo prop = obj.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
-        if (prop != null && prop.CanRead)
-        {
-            return (T)prop.GetValue(obj);
-        }
-        return default;
     }
 }

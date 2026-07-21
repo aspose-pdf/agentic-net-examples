@@ -1,67 +1,55 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Core Aspose.Pdf namespace provides Document class
 
 class Program
 {
     static void Main()
     {
+        // Input PDF file containing attachments
         const string pdfPath = "input.pdf";
+
+        // Output CSV file that will hold the report
         const string csvPath = "attachments_report.csv";
 
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document (lifecycle rule: use Document constructor)
+            // Load the PDF document (lifecycle rule: use Document constructor inside a using block)
             using (Document doc = new Document(pdfPath))
             {
-                // Create CSV file for the report
-                using (StreamWriter writer = new StreamWriter(csvPath, false))
+                // Open a StreamWriter for the CSV output
+                using (StreamWriter writer = new StreamWriter(csvPath, false, System.Text.Encoding.UTF8))
                 {
-                    // CSV header
-                    writer.WriteLine("Name,Size,Description");
+                    // Write CSV header
+                    writer.WriteLine("Name,Size (bytes),Description");
 
-                    // Access embedded files (attachments)
-                    var attachments = doc.EmbeddedFiles;
-                    if (attachments != null && attachments.Count > 0)
+                    // Helper to escape commas and quotes for CSV fields
+                    string Escape(string s) => s.Contains(",") ? $"\"{s.Replace("\"", "\"\"")}\"" : s;
+
+                    // Iterate over all embedded files (attachments) in the PDF using reflection
+                    foreach (var embedded in doc.EmbeddedFiles)
                     {
-                        // Use implicit typing to avoid compile‑time dependency on a specific class name
-                        foreach (var file in attachments)
-                        {
-                            // Size is in bytes
-                            long size = (long)file.GetType().GetProperty("Size").GetValue(file);
+                        var type = embedded.GetType();
+                        string name = type.GetProperty("Name")?.GetValue(embedded) as string ?? string.Empty;
+                        long size = (long?)type.GetProperty("FileSize")?.GetValue(embedded) ?? 0L;
+                        string description = type.GetProperty("Description")?.GetValue(embedded) as string ?? string.Empty;
 
-                            // Escape fields that may contain commas or quotes
-                            string name = EscapeCsv(file.GetType().GetProperty("Name").GetValue(file) as string);
-                            string description = EscapeCsv(file.GetType().GetProperty("Description").GetValue(file) as string);
-
-                            writer.WriteLine($"{name},{size},{description}");
-                        }
+                        writer.WriteLine($"{Escape(name)},{size},{Escape(description)}");
                     }
                 }
-            }
 
-            Console.WriteLine($"Attachment report saved to '{csvPath}'.");
+                Console.WriteLine($"Attachment report saved to '{csvPath}'.");
+            }
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
         }
-    }
-
-    // Helper to escape CSV fields containing commas, quotes, or line breaks
-    static string EscapeCsv(string field)
-    {
-        if (field == null) return string.Empty;
-        if (field.Contains("\""))
-            field = field.Replace("\"", "\"\"");
-        if (field.Contains(",") || field.Contains("\"") || field.Contains("\n") || field.Contains("\r"))
-            field = $"\"{field}\"";
-        return field;
     }
 }

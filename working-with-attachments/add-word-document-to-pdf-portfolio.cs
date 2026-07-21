@@ -15,17 +15,20 @@ class Program
             return;
         }
 
-        // Create an empty PDF document (the portfolio container)
-        using (Document pdfDoc = new Document())
+        // Create a new PDF document (empty)
+        using (Document pdf = new Document())
         {
-            // Create a file specification for the Word document to embed
-            FileSpecification fileSpec = new FileSpecification(wordPath);
+            // Optional: add a blank page so the PDF has visible content
+            pdf.Pages.Add();
 
-            // Add the Word document to the PDF portfolio (embedded files collection)
-            pdfDoc.EmbeddedFiles.Add(fileSpec);
+            // Embed the Word document into the PDF portfolio
+            // Create a FileSpecification and assign its Contents via a stream
+            var fileSpec = new FileSpecification(wordPath, "Word document");
+            fileSpec.Contents = new MemoryStream(File.ReadAllBytes(wordPath));
+            pdf.EmbeddedFiles.Add(fileSpec);
 
-            // Save the resulting PDF portfolio
-            pdfDoc.Save(outputPdf);
+            // Save the PDF; the embedded file makes it a portfolio
+            pdf.Save(outputPdf);
         }
 
         Console.WriteLine($"PDF portfolio created at '{outputPdf}'.");
