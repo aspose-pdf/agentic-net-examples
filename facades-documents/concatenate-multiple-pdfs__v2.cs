@@ -3,79 +3,65 @@ using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-class Program
+namespace PdfConcatService
 {
-    static void Main(string[] args)
+    class Program
     {
-        // Simple console‑based PDF concatenation utility.
-        // Usage: PdfConcatenationService <input1.pdf> <input2.pdf> ... [output.pdf]
-        if (args.Length == 0)
+        /// <summary>
+        /// Concatenates multiple PDF files into a single PDF.
+        /// Usage: PdfConcatService <output.pdf> <input1.pdf> [<input2.pdf> ...]
+        /// </summary>
+        static void Main(string[] args)
         {
-            Console.WriteLine("Usage: PdfConcatenationService <pdf1> <pdf2> ... [output]");
-            return;
-        }
-
-        // Determine output file name. If the last argument ends with .pdf and there is more than one argument,
-        // treat it as the desired output path; otherwise default to "merged.pdf".
-        string outputPath = "merged.pdf";
-        var inputFiles = new List<string>(args);
-        if (args.Length > 1 && args[args.Length - 1].EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
-        {
-            outputPath = args[args.Length - 1];
-            inputFiles.RemoveAt(args.Length - 1);
-        }
-
-        // Validate each input file.
-        foreach (var file in inputFiles)
-        {
-            if (!File.Exists(file))
+            // Validate arguments – at least one output path and one input PDF are required.
+            if (args.Length < 2)
             {
-                Console.WriteLine($"Error: File not found - {file}");
+                Console.WriteLine("Usage: PdfConcatService <output.pdf> <input1.pdf> [<input2.pdf> ...]");
                 return;
             }
-            if (!file.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+
+            string outputPath = args[0];
+            var inputPaths = new List<string>(args).GetRange(1, args.Length - 1);
+
+            // Prepare a list to hold the opened file streams for each input PDF.
+            var inputStreams = new List<Stream>();
+            try
             {
-                Console.WriteLine($"Error: Not a PDF file - {file}");
-                return;
+                foreach (var path in inputPaths)
+                {
+                    if (!File.Exists(path))
+                    {
+                        Console.WriteLine($"File not found: {path}");
+                        return;
+                    }
+                    // Open each PDF as a read‑only FileStream.
+                    var fs = new FileStream(path, FileMode.Open, FileAccess.Read);
+                    inputStreams.Add(fs);
+                }
+
+                // Concatenate the PDFs using Aspose.Pdf.Facades.PdfFileEditor.
+                using (var outputStream = new MemoryStream())
+                {
+                    var editor = new PdfFileEditor
+                    {
+                        // Instruct the editor to close the input streams after concatenation.
+                        CloseConcatenatedStreams = true
+                    };
+
+                    editor.Concatenate(inputStreams.ToArray(), outputStream);
+
+                    // Write the resulting PDF to the requested output file.
+                    File.WriteAllBytes(outputPath, outputStream.ToArray());
+                    Console.WriteLine($"Concatenated PDF saved to {outputPath}");
+                }
             }
-        }
-
-        var inputStreams = new List<Stream>();
-        try
-        {
-            // Open each PDF as a read‑only stream.
-            foreach (var file in inputFiles)
+            finally
             {
-                inputStreams.Add(File.OpenRead(file));
-            }
-
-            // MemoryStream that will receive the concatenated result.
-            using var outputStream = new MemoryStream();
-
-            var editor = new PdfFileEditor();
-            // Instruct the editor to close the input streams after concatenation.
-            editor.CloseConcatenatedStreams = true;
-            editor.Concatenate(inputStreams.ToArray(), outputStream);
-
-            // Reset position before reading.
-            outputStream.Position = 0;
-
-            // Write the merged PDF to the desired output file.
-            using var fileOut = File.Create(outputPath);
-            outputStream.CopyTo(fileOut);
-
-            Console.WriteLine($"Merged PDF saved to {outputPath}");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error during concatenation: {ex.Message}");
-        }
-        finally
-        {
-            // Ensure all input streams are disposed.
-            foreach (var s in inputStreams)
-            {
-                s.Dispose();
+                // Ensure every opened stream is disposed, even if an exception occurs.
+                foreach (var s in inputStreams)
+                {
+                    s.Dispose();
+                }
             }
         }
     }

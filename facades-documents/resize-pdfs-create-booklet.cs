@@ -1,74 +1,82 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
-    static void Main(string[] args)
+    // Desired page dimensions (points). 1 point = 1/72 inch.
+    // 1024 x 768 points correspond to roughly 14.22" x 10.67".
+    const double TargetWidth = 1024;
+    const double TargetHeight = 768;
+
+    static void Main()
     {
-        // Input folder containing PDFs to process
-        string inputFolder = args.Length > 0 ? args[0] : "InputPdfs";
-        // Output folder for final booklet
-        string outputFolder = args.Length > 1 ? args[1] : "Output";
-
-        if (!Directory.Exists(inputFolder))
+        // Input PDF files (adjust paths as needed)
+        string[] inputFiles = new string[]
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
-            return;
+            "input1.pdf",
+            "input2.pdf",
+            "input3.pdf"
+        };
+
+        // Validate existence
+        foreach (var file in inputFiles)
+        {
+            if (!File.Exists(file))
+            {
+                Console.Error.WriteLine($"Input file not found: {file}");
+                return;
+            }
         }
 
-        Directory.CreateDirectory(outputFolder);
+        // List to hold paths of resized PDFs
+        List<string> resizedFiles = new List<string>();
 
-        // Temporary folder to store resized PDFs
-        string tempFolder = Path.Combine(outputFolder, "ResizedTemp");
-        Directory.CreateDirectory(tempFolder);
-
-        // Collect all PDF files from the input folder
-        string[] sourceFiles = Directory.GetFiles(inputFolder, "*.pdf");
-        if (sourceFiles.Length == 0)
+        // Resize each PDF to the target dimensions
+        foreach (var srcPath in inputFiles)
         {
-            Console.Error.WriteLine("No PDF files found to process.");
-            return;
-        }
+            // Determine all page numbers for the source document
+            int[] allPages;
+            using (Document srcDoc = new Document(srcPath))
+            {
+                int pageCount = srcDoc.Pages.Count;
+                allPages = new int[pageCount];
+                for (int i = 1; i <= pageCount; i++)
+                {
+                    allPages[i - 1] = i; // 1‑based indexing
+                }
+            }
 
-        // Resize each PDF to 1024x768 and store in the temporary folder
-        string[] resizedFiles = new string[sourceFiles.Length];
-        for (int i = 0; i < sourceFiles.Length; i++)
-        {
-            string src = sourceFiles[i];
-            string resizedPath = Path.Combine(tempFolder,
-                Path.GetFileNameWithoutExtension(src) + "_resized.pdf");
-            resizedFiles[i] = resizedPath;
+            // Create a temporary file for the resized output
+            string resizedPath = Path.Combine(Path.GetTempPath(),
+                $"{Path.GetFileNameWithoutExtension(srcPath)}_resized.pdf");
 
-            // PdfFileEditor.ResizeContents(string inputFile, string outputFile,
-            //     int[] pages, double newWidth, double newHeight)
-            // Passing null for pages applies the operation to all pages.
+            // Perform the resize operation
             PdfFileEditor editor = new PdfFileEditor();
-            editor.ResizeContents(src, resizedPath, null, 1024, 768);
+            editor.ResizeContents(srcPath, resizedPath, allPages, TargetWidth, TargetHeight);
+
+            resizedFiles.Add(resizedPath);
         }
 
-        // Concatenate all resized PDFs into a single PDF
-        string concatenatedPath = Path.Combine(outputFolder, "concatenated.pdf");
+        // Concatenate all resized PDFs into a single document
+        string concatenatedPath = Path.Combine(Path.GetTempPath(), "concatenated.pdf");
         PdfFileEditor concatEditor = new PdfFileEditor();
-        concatEditor.Concatenate(resizedFiles, concatenatedPath);
+        concatEditor.Concatenate(resizedFiles.ToArray(), concatenatedPath);
 
         // Create a booklet from the concatenated PDF
-        string bookletPath = Path.Combine(outputFolder, "booklet.pdf");
+        string bookletPath = "final_booklet.pdf";
         PdfFileEditor bookletEditor = new PdfFileEditor();
         bookletEditor.MakeBooklet(concatenatedPath, bookletPath);
 
-        // Optional: clean up temporary resized files
-        try
+        // Cleanup temporary files (optional)
+        foreach (var tempFile in resizedFiles)
         {
-            foreach (var file in resizedFiles)
-                File.Delete(file);
-            Directory.Delete(tempFolder, true);
+            try { File.Delete(tempFile); } catch { }
         }
-        catch
-        {
-            // Ignored – cleanup is best‑effort
-        }
+        try { File.Delete(concatenatedPath); } catch { }
 
-        Console.WriteLine($"Booklet created at: {bookletPath}");
+        Console.WriteLine($"Booklet created: {bookletPath}");
     }
 }

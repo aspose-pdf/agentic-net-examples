@@ -1,114 +1,63 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class Program
+class PdfConcatenator
 {
-    // Creates a temporary PDF file that contains a single blank page.
-    static string CreateBlankPage()
-    {
-        string tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".pdf");
-        using (Document blankDoc = new Document())
-        {
-            // Add a blank page (default size A4).
-            blankDoc.Pages.Add();
-            blankDoc.Save(tempPath);
-        }
-        return tempPath;
-    }
-
-    // Concatenates the given PDF files, inserting a blank page between each consecutive document.
-    static void ConcatenateWithBlankPages(string[] inputFiles, string outputFile)
+    /// <summary>
+    /// Concatenates the specified PDF files and inserts a blank page between each document.
+    /// </summary>
+    /// <param name="inputFiles">Array of full paths to the source PDF files (order matters).</param>
+    /// <param name="outputFile">Full path for the resulting concatenated PDF.</param>
+    public static void ConcatenateWithBlankPages(string[] inputFiles, string outputFile)
     {
         if (inputFiles == null || inputFiles.Length == 0)
-        {
-            Console.Error.WriteLine("No input files specified.");
-            return;
-        }
+            throw new ArgumentException("At least one input file must be provided.", nameof(inputFiles));
 
-        // Ensure all input files exist.
         foreach (string file in inputFiles)
         {
             if (!File.Exists(file))
-            {
-                Console.Error.WriteLine($"Input file not found: {file}");
-                return;
-            }
+                throw new FileNotFoundException($"Input file not found: {file}");
         }
 
-        // Create a temporary blank‑page PDF.
-        string blankPagePath = CreateBlankPage();
-
-        // If there is only one file, just copy it to the output.
-        if (inputFiles.Length == 1)
+        // Create a temporary single‑page blank PDF.
+        string blankPagePath = Path.Combine(Path.GetTempPath(), $"blank_{Guid.NewGuid()}.pdf");
+        using (Document blankDoc = new Document())
         {
-            File.Copy(inputFiles[0], outputFile, true);
-            File.Delete(blankPagePath);
-            return;
+            // Adding a page creates an empty (white) page.
+            blankDoc.Pages.Add();
+            blankDoc.Save(blankPagePath);
         }
 
-        // Start with the first file as the current intermediate result.
-        string currentResult = inputFiles[0];
-        string tempResult = null;
-
-        // Iterate over the remaining files, concatenating two at a time with a blank page in between.
-        for (int i = 1; i < inputFiles.Length; i++)
+        // Build the sequence: doc1, blank, doc2, blank, ..., lastDoc (no trailing blank).
+        var filesToMerge = new List<string>();
+        for (int i = 0; i < inputFiles.Length; i++)
         {
-            // Prepare a new temporary file for the next intermediate result.
-            tempResult = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".pdf");
-
-            // Use PdfFileEditor to concatenate currentResult, the next input file,
-            // and the blank page file. The overload with four parameters inserts
-            // blank pages where page counts differ, which satisfies the requirement.
-            PdfFileEditor editor = new PdfFileEditor();
-            bool success = editor.Concatenate(currentResult, inputFiles[i], blankPagePath, tempResult);
-
-            if (!success)
-            {
-                Console.Error.WriteLine($"Failed to concatenate '{currentResult}' and '{inputFiles[i]}'.");
-                // Clean up temporary files before exiting.
-                File.Delete(blankPagePath);
-                if (File.Exists(tempResult)) File.Delete(tempResult);
-                return;
-            }
-
-            // Delete the previous intermediate file if it was a temporary one.
-            if (currentResult != inputFiles[0] && File.Exists(currentResult))
-                File.Delete(currentResult);
-
-            // The newly created file becomes the current result for the next iteration.
-            currentResult = tempResult;
+            filesToMerge.Add(inputFiles[i]);
+            if (i < inputFiles.Length - 1) // add blank only between documents
+                filesToMerge.Add(blankPagePath);
         }
 
-        // Move the final intermediate file to the desired output location.
-        File.Copy(currentResult, outputFile, true);
+        // Perform concatenation using PdfFileEditor.
+        PdfFileEditor editor = new PdfFileEditor();
+        editor.Concatenate(filesToMerge.ToArray(), outputFile);
 
-        // Clean up temporary files.
-        if (File.Exists(currentResult) && currentResult != outputFile)
-            File.Delete(currentResult);
-        File.Delete(blankPagePath);
+        // Clean up the temporary blank page file.
+        try { File.Delete(blankPagePath); } catch { /* ignore cleanup errors */ }
     }
 
-    static void Main(string[] args)
+    // Example usage
+    static void Main()
     {
-        // Example usage:
-        // args[0] = output PDF path
-        // args[1..n] = input PDF paths to be concatenated
-        if (args.Length < 2)
-        {
-            Console.WriteLine("Usage: ConcatenateWithBlankPages <output.pdf> <input1.pdf> [<input2.pdf> ...]");
-            return;
-        }
-
-        string outputPath = args[0];
-        string[] inputPaths = new string[args.Length - 1];
-        Array.Copy(args, 1, inputPaths, 0, inputPaths.Length);
+        string[] sources = { "doc1.pdf", "doc2.pdf", "doc3.pdf" };
+        string result = "merged_with_blanks.pdf";
 
         try
         {
-            ConcatenateWithBlankPages(inputPaths, outputPath);
-            Console.WriteLine($"Successfully created '{outputPath}' with blank pages between documents.");
+            ConcatenateWithBlankPages(sources, result);
+            Console.WriteLine($"Successfully created: {result}");
         }
         catch (Exception ex)
         {

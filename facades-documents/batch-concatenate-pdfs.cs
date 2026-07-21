@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -8,43 +7,42 @@ class Program
     static void Main()
     {
         // Folder containing the PDF files to concatenate
-        const string inputFolder = "pdfs";
-        // Path for the resulting merged PDF
-        const string outputFile = "merged.pdf";
+        const string inputFolder = @"C:\PdfFolder";
+        // Output file path for the concatenated PDF
+        const string outputFile = @"C:\PdfFolder\Combined.pdf";
 
-        // Verify the input folder exists
+        // Verify that the input folder exists
         if (!Directory.Exists(inputFolder))
         {
             Console.Error.WriteLine($"Folder not found: {inputFolder}");
             return;
         }
 
-        // Gather all PDF files in the folder using a foreach loop
-        List<string> pdfFiles = new List<string>();
-        foreach (string filePath in Directory.GetFiles(inputFolder, "*.pdf"))
-        {
-            pdfFiles.Add(filePath);
-        }
+        // Collect all PDF files in the folder (non‑recursive)
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
 
-        // Ensure there is at least one PDF to process
-        if (pdfFiles.Count == 0)
+        if (pdfFiles.Length == 0)
         {
-            Console.WriteLine("No PDF files found to concatenate.");
+            Console.Error.WriteLine("No PDF files found to concatenate.");
             return;
         }
 
-        // Concatenate the collected PDFs using Aspose.Pdf.Facades.PdfFileEditor
-        PdfFileEditor editor = new PdfFileEditor();
-        bool result = editor.Concatenate(pdfFiles.ToArray(), outputFile);
+        // Optional: sort the files alphabetically to define concatenation order
+        Array.Sort(pdfFiles);
 
-        // Report the outcome
-        if (result)
+        // Use PdfFileEditor from Aspose.Pdf.Facades to concatenate the files
+        PdfFileEditor fileEditor = new PdfFileEditor();
+
+        // Concatenate the array of input files into a single output file
+        bool success = fileEditor.Concatenate(pdfFiles, outputFile);
+
+        if (success)
         {
-            Console.WriteLine($"Successfully concatenated {pdfFiles.Count} files into '{outputFile}'.");
+            Console.WriteLine($"Successfully concatenated {pdfFiles.Length} files into '{outputFile}'.");
         }
         else
         {
-            Console.Error.WriteLine("PDF concatenation failed.");
+            Console.Error.WriteLine("Concatenation failed.");
         }
     }
 }

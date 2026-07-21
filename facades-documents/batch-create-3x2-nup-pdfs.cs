@@ -6,59 +6,46 @@ class Program
 {
     static void Main()
     {
-        // Directory containing source PDFs
-        const string inputDir = "InputPdfs";
-        // Directory where N‑up PDFs will be written
-        const string outputDir = "OutputNup";
-
-        if (!Directory.Exists(inputDir))
+        // List of source PDF files to be processed.
+        string[] inputFiles = new string[]
         {
-            Console.Error.WriteLine($"Input directory not found: {inputDir}");
-            return;
-        }
+            "document1.pdf",
+            "document2.pdf",
+            "document3.pdf"
+        };
 
-        // Ensure the output folder exists
-        Directory.CreateDirectory(outputDir);
+        // Ensure the output directory exists.
+        string outputDirectory = "NupOutput";
+        Directory.CreateDirectory(outputDirectory);
 
-        // Retrieve all PDF files in the input folder (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(inputDir, "*.pdf", SearchOption.TopDirectoryOnly);
+        // PdfFileEditor provides N‑up functionality without needing a Document object.
+        PdfFileEditor pdfEditor = new PdfFileEditor();
 
-        if (pdfFiles.Length == 0)
+        foreach (string inputPath in inputFiles)
         {
-            Console.WriteLine("No PDF files found to process.");
-            return;
-        }
-
-        // PdfFileEditor does NOT implement IDisposable, so a plain instance is sufficient
-        PdfFileEditor pfe = new PdfFileEditor();
-
-        foreach (string inputPath in pdfFiles)
-        {
-            try
+            // Verify that the source file exists before processing.
+            if (!File.Exists(inputPath))
             {
-                // Build output file name: original name + "_nup.pdf"
-                string fileNameWithoutExt = Path.GetFileNameWithoutExtension(inputPath);
-                string outputPath = Path.Combine(outputDir, $"{fileNameWithoutExt}_nup.pdf");
-
-                // Create a 3‑column by 2‑row N‑up version of the PDF
-                // MakeNUp(string inputFile, string outputFile, int x, int y)
-                bool result = pfe.MakeNUp(inputPath, outputPath, 3, 2);
-
-                if (result)
-                {
-                    Console.WriteLine($"N‑up created: {outputPath}");
-                }
-                else
-                {
-                    Console.Error.WriteLine($"Failed to create N‑up for: {inputPath}");
-                }
+                Console.Error.WriteLine($"Source file not found: {inputPath}");
+                continue;
             }
-            catch (Exception ex)
+
+            // Build the output file name (e.g., document1_nup.pdf).
+            string baseName = Path.GetFileNameWithoutExtension(inputPath);
+            string outputPath = Path.Combine(outputDirectory, $"{baseName}_nup.pdf");
+
+            // Create a 3‑column by 2‑row N‑up version of the PDF.
+            // MakeNUp returns true on success.
+            bool result = pdfEditor.MakeNUp(inputPath, outputPath, 3, 2);
+
+            if (result)
             {
-                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
+                Console.WriteLine($"N‑up PDF created: {outputPath}");
+            }
+            else
+            {
+                Console.Error.WriteLine($"Failed to create N‑up PDF for: {inputPath}");
             }
         }
-
-        // No disposal required for PdfFileEditor
     }
 }

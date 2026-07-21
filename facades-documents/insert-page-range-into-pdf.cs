@@ -6,17 +6,20 @@ class Program
 {
     static void Main()
     {
-        // Paths to the PDFs
-        const string destinationPdf = "dest.pdf";   // PDF into which pages will be inserted
-        const string sourcePdf      = "source.pdf"; // PDF providing the pages to insert
-        const string outputPdf      = "merged.pdf"; // Resulting PDF after insertion
+        // Paths to the destination PDF, the source PDF (pages to insert), and the output PDF.
+        const string destinationPdf = "dest.pdf";
+        const string sourcePdf      = "source.pdf";
+        const string outputPdf      = "merged.pdf";
 
-        // Insert configuration
-        int insertAtPage = 2; // Position in destination where pages will be inserted (1‑based)
-        int startPage    = 3; // First page to take from source (inclusive, 1‑based)
-        int endPage      = 5; // Last page to take from source (inclusive, 1‑based)
+        // Insert location in the destination PDF (1‑based index).
+        // For example, 2 means the pages will be inserted after the first page.
+        int insertLocation = 2;
 
-        // Verify that the input files exist
+        // Range of pages to take from the source PDF (inclusive, 1‑based).
+        int startPage = 3;
+        int endPage   = 5;
+
+        // Verify that the input files exist.
         if (!File.Exists(destinationPdf))
         {
             Console.Error.WriteLine($"Destination file not found: {destinationPdf}");
@@ -29,30 +32,27 @@ class Program
             return;
         }
 
-        try
+        // Use PdfFileEditor (Aspose.Pdf.Facades) to perform the insertion.
+        PdfFileEditor editor = new PdfFileEditor();
+
+        // Insert the specified page range from sourcePdf into destinationPdf at insertLocation.
+        // The result is saved to outputPdf.
+        bool success = editor.Insert(
+            destinationPdf,   // inputFile – the PDF to receive the pages
+            insertLocation,  // insertLocation – position in the input file (1‑based)
+            sourcePdf,       // portFile – the PDF providing pages
+            startPage,       // startPage – first page to insert from portFile
+            endPage,         // endPage – last page to insert from portFile
+            outputPdf);      // outputFile – resulting PDF
+
+        if (success)
         {
-            // PdfFileEditor does not implement IDisposable, so a plain instance is sufficient
-            PdfFileEditor editor = new PdfFileEditor();
-
-            // Perform the insertion:
-            // Insert pages startPage..endPage from sourcePdf into destinationPdf at insertAtPage,
-            // writing the result to outputPdf.
-            bool result = editor.Insert(
-                destinationPdf,   // inputFile
-                insertAtPage,     // insertLocation
-                sourcePdf,        // portFile (the PDF providing pages)
-                startPage,        // startPage in portFile
-                endPage,          // endPage in portFile
-                outputPdf);       // outputFile
-
-            if (result)
-                Console.WriteLine($"Pages inserted successfully. Output saved to '{outputPdf}'.");
-            else
-                Console.Error.WriteLine("Insert operation failed.");
+            Console.WriteLine($"Successfully inserted pages {startPage}-{endPage} from '{sourcePdf}' into '{destinationPdf}' at position {insertLocation}.");
+            Console.WriteLine($"Result saved as '{outputPdf}'.");
         }
-        catch (Exception ex)
+        else
         {
-            Console.Error.WriteLine($"Error during insertion: {ex.Message}");
+            Console.Error.WriteLine("Insert operation failed.");
         }
     }
 }
