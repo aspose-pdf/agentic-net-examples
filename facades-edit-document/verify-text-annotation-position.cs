@@ -1,11 +1,11 @@
 using System;
-using System.Drawing;
-using System.IO;
+using System.Drawing; // System.Drawing.Rectangle for PdfContentEditor
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Facades;
+using NUnit.Framework; // <-- added to bring stub attributes into scope
 
-// Minimal NUnit stubs to allow compilation without the real NUnit package.
+// Minimal NUnit stubs – add when the NUnit package is not referenced.
 namespace NUnit.Framework
 {
     [AttributeUsage(AttributeTargets.Class)]
@@ -16,98 +16,101 @@ namespace NUnit.Framework
 
     public static class Assert
     {
-        public static void AreEqual<T>(T expected, T actual, string message = null)
+        // Simple equality check without tolerance.
+        public static void AreEqual<T>(T expected, T actual, string? message = null)
         {
             if (!object.Equals(expected, actual))
                 throw new Exception(message ?? $"Assert.AreEqual failed. Expected:<{expected}>. Actual:<{actual}>.");
         }
 
-        public static void IsNotNull(object obj, string message = null)
+        // Equality check with tolerance for floating‑point values.
+        public static void AreEqual(double expected, double actual, double delta, string? message = null)
         {
-            if (obj == null)
-                throw new Exception(message ?? "Assert.IsNotNull failed. Object is null.");
+            if (Math.Abs(expected - actual) > delta)
+                throw new Exception(message ?? $"Assert.AreEqual failed. Expected:<{expected}>. Actual:<{actual}>. Tolerance:<{delta}>.");
+        }
+
+        // Generic version that forwards to the double overload (used for float values).
+        public static void AreEqual(float expected, float actual, double delta, string? message = null)
+        {
+            AreEqual((double)expected, (double)actual, delta, message);
+        }
+
+        // Type‑checking helper.
+        public static void IsInstanceOf<T>(object obj, string? message = null)
+        {
+            if (!(obj is T))
+                throw new Exception(message ?? $"Assert.IsInstanceOf failed. Expected type:<{typeof(T)}>. Actual type:<{obj?.GetType()}>.");
         }
     }
 }
 
 namespace AsposePdfTests
 {
-    using NUnit.Framework;
-
     [TestFixture]
     public class TextAnnotationPositionTests
     {
         [Test]
-        public void TextAnnotation_IsPlacedAtExpectedCoordinates()
+        public void TextAnnotation_ShouldBeAtExpectedCoordinates()
         {
-            // Expected rectangle coordinates (lower‑left origin)
-            const double expectedLlx = 100;
-            const double expectedLly = 200;
-            const double expectedUrx = 150; // llx + width (50)
-            const double expectedUry = 230; // lly + height (30)
+            // Expected rectangle (lower‑left X,Y and size) in points
+            const float expectedX = 100f;
+            const float expectedY = 200f;
+            const float expectedWidth = 50f;
+            const float expectedHeight = 50f;
 
-            // 1. Create a simple PDF with a single blank page.
-            using (Document sourceDoc = new Document())
+            // Create a new PDF document with a single blank page
+            using (Document doc = new Document())
             {
-                sourceDoc.Pages.Add(); // adds first page (1‑based indexing)
+                doc.Pages.Add(); // one page added (index 1)
 
-                // 2. Save the source PDF into a memory stream.
-                using (MemoryStream sourceStream = new MemoryStream())
-                {
-                    sourceDoc.Save(sourceStream);
-                    sourceStream.Position = 0; // reset for reading
+                // Use PdfContentEditor (Facade) to add a Text (sticky‑note) annotation
+                PdfContentEditor editor = new PdfContentEditor();
+                editor.BindPdf(doc); // bind the in‑memory document
 
-                    // 3. Use PdfContentEditor (Facade) to add a text annotation.
-                    PdfContentEditor editor = new PdfContentEditor();
-                    editor.BindPdf(sourceStream);
+                // System.Drawing.Rectangle is required by CreateText
+                System.Drawing.Rectangle rect = new System.Drawing.Rectangle(
+                    (int)expectedX,
+                    (int)expectedY,
+                    (int)expectedWidth,
+                    (int)expectedHeight);
 
-                    // Rectangle uses System.Drawing.Rectangle (X,Y = lower‑left in Aspose conversion)
-                    System.Drawing.Rectangle annotationRect = new System.Drawing.Rectangle((int)expectedLlx, (int)expectedLly, 50, 30);
-                    editor.CreateText(
-                        annotationRect,
-                        "TestTitle",          // title of the annotation
-                        "TestContent",        // contents displayed in the popup
-                        true,                 // open flag
-                        "Note",               // icon name
-                        1                     // page number (1‑based)
-                    );
+                // Add the annotation on page 1
+                editor.CreateText(
+                    rect,
+                    title: "Note Title",
+                    contents: "Sample annotation",
+                    open: true,
+                    icon: "Note",   // valid icon name
+                    page: 1);
 
-                    // 4. Save the modified PDF into another memory stream.
-                    using (MemoryStream resultStream = new MemoryStream())
-                    {
-                        editor.Save(resultStream);
-                        resultStream.Position = 0; // reset for reading
+                // Retrieve the annotation that was just added
+                // Annotations collection is 1‑based in Aspose.Pdf
+                Annotation ann = doc.Pages[1].Annotations[1];
+                Assert.IsInstanceOf<TextAnnotation>(ann, "Annotation should be a TextAnnotation.");
 
-                        // 5. Load the resulting PDF and retrieve the annotation.
-                        using (Document resultDoc = new Document(resultStream))
-                        {
-                            // Annotations collection is also 1‑based.
-                            Annotation rawAnnotation = resultDoc.Pages[1].Annotations[1];
-                            Assert.IsNotNull(rawAnnotation, "Annotation should exist on the page.");
+                var textAnn = (TextAnnotation)ann;
 
-                            // Cast to TextAnnotation to access rectangle.
-                            var textAnnotation = rawAnnotation as TextAnnotation;
-                            Assert.IsNotNull(textAnnotation, "Annotation should be a TextAnnotation.");
+                // The annotation rectangle is returned as Aspose.Pdf.Rectangle
+                Aspose.Pdf.Rectangle actualRect = textAnn.Rect;
 
-                            // Verify the rectangle coordinates.
-                            Aspose.Pdf.Rectangle actualRect = textAnnotation.Rect;
-                            Assert.AreEqual(expectedLlx, actualRect.LLX, "LLX does not match.");
-                            Assert.AreEqual(expectedLly, actualRect.LLY, "LLY does not match.");
-                            Assert.AreEqual(expectedUrx, actualRect.URX, "URX does not match.");
-                            Assert.AreEqual(expectedUry, actualRect.URY, "URY does not match.");
-                        }
-                    }
-                }
+                // Verify lower‑left coordinates
+                Assert.AreEqual(expectedX, actualRect.LLX, 0.01, "Lower‑left X coordinate mismatch.");
+                Assert.AreEqual(expectedY, actualRect.LLY, 0.01, "Lower‑left Y coordinate mismatch.");
+
+                // Verify upper‑right coordinates (computed from width/height)
+                Assert.AreEqual(expectedX + expectedWidth, actualRect.URX, 0.01, "Upper‑right X coordinate mismatch.");
+                Assert.AreEqual(expectedY + expectedHeight, actualRect.URY, 0.01, "Upper‑right Y coordinate mismatch.");
             }
         }
     }
 
-    // Dummy entry point to satisfy the compiler when building as an executable.
-    public static class Program
+    // Dummy entry point to satisfy the console‑app requirement when the project is built as an executable.
+    internal static class Program
     {
         public static void Main(string[] args)
         {
-            // No operation – tests are executed via the test runner.
+            // No operation – tests are executed via the NUnit runner.
         }
     }
 }

@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -7,34 +6,40 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        // Create a minimal PDF if it does not already exist.
+        if (!System.IO.File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
+            using (Document seed = new Document())
+            {
+                seed.Pages.Add(); // add a blank page
+                seed.Save(inputPath);
+            }
         }
 
-        // Use PdfContentEditor (facade) to modify viewer preferences
+        // Bind the PDF, read current viewer preferences, set HideMenubar flag, and save.
         using (PdfContentEditor editor = new PdfContentEditor())
         {
-            // Bind the source PDF
             editor.BindPdf(inputPath);
 
-            // Retrieve current viewer preference flags
-            int currentPrefs = editor.GetViewerPreference();
+            // Read existing viewer preferences (bitmask of ViewerPreference flags).
+            int currentPreferences = editor.GetViewerPreference();
+            Console.WriteLine($"Current viewer preferences: 0x{currentPreferences:X}");
 
-            // Ensure the HideMenubar flag is set
-            int newPrefs = currentPrefs | ViewerPreference.HideMenubar;
+            // Set the HideMenubar flag. This adds the flag to the existing preferences.
+            editor.ChangeViewerPreference(ViewerPreference.HideMenubar);
 
-            // Apply the updated viewer preferences
-            editor.ChangeViewerPreference(newPrefs);
+            // Verify that the flag is now set.
+            int updatedPreferences = editor.GetViewerPreference();
+            bool hideMenubarSet = (updatedPreferences & ViewerPreference.HideMenubar) != 0;
+            Console.WriteLine($"HideMenubar flag set: {hideMenubarSet}");
 
-            // Save the modified PDF
+            // Save the modified PDF.
             editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Viewer preferences updated. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }
 }

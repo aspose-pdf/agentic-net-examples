@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf.Facades;
-using System.Drawing; // Required by CreateBookmarksAction (expects System.Drawing.Color)
+using System.Drawing; // required for System.Drawing.Color used by PdfContentEditor
 
 class Program
 {
@@ -9,6 +9,8 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
+        const string bookmarkTitle = "Example Site";
+        const string url = "https://example.org";
 
         if (!File.Exists(inputPath))
         {
@@ -16,27 +18,24 @@ class Program
             return;
         }
 
-        // Use PdfContentEditor facade to add a bookmark that opens an external URL
-        using (PdfContentEditor editor = new PdfContentEditor())
-        {
-            // Bind the existing PDF document
-            editor.BindPdf(inputPath);
+        // Initialize the facade and bind the source PDF
+        PdfContentEditor editor = new PdfContentEditor();
+        editor.BindPdf(inputPath);
 
-            // Create a bookmark with a URI action.
-            // Parameters: title, color, boldFlag, italicFlag, file (null for URI), actionType, destination URL
-            editor.CreateBookmarksAction(
-                "Example Org",          // Bookmark title
-                Color.Blue,            // Title color (System.Drawing.Color required by the API)
-                false,                 // Bold flag
-                false,                 // Italic flag
-                null,                  // File parameter not needed for URI action
-                "URI",                 // Action type for external URL
-                "https://example.org"  // Destination URL
-            );
+        // Create a bookmark that opens an external URL (action type "URI")
+        // Parameters: title, color, boldFlag, italicFlag, file (null for URI), actionType, destination (URL)
+        editor.CreateBookmarksAction(
+            bookmarkTitle,
+            Color.Blue,
+            false,
+            false,
+            null,
+            "URI",
+            url);
 
-            // Save the modified PDF with the new bookmark
-            editor.Save(outputPath);
-        }
+        // Save the modified PDF
+        editor.Save(outputPath);
+        editor.Close();
 
         Console.WriteLine($"Bookmark added and saved to '{outputPath}'.");
     }

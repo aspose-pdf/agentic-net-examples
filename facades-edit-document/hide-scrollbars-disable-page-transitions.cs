@@ -1,5 +1,5 @@
 using System;
-using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -9,30 +9,43 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        // ---------------------------------------------------------------------
+        // 1. Create a minimal PDF so the sandbox has a file to work with.
+        // ---------------------------------------------------------------------
+        using (Document seed = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
+            // Add a single blank page (required for most PDF operations).
+            seed.Pages.Add();
+            seed.Save(inputPath);
         }
 
-        // 1. Hide UI elements (scrollbars, toolbars, etc.) using ViewerPreference.HideWindowUI
-        using (PdfContentEditor contentEditor = new PdfContentEditor())
+        // ---------------------------------------------------------------------
+        // 2. Hide UI elements (scrollbars, toolbars, menu bar, etc.) using
+        //    ViewerPreference flags. The enum is marked with [Flags] so we can
+        //    combine several preferences with a bitwise OR.
+        // ---------------------------------------------------------------------
+        using (PdfContentEditor editor = new PdfContentEditor())
         {
-            contentEditor.BindPdf(inputPath);
-            contentEditor.ChangeViewerPreference(ViewerPreference.HideWindowUI);
-            // Save the intermediate result
-            contentEditor.Save(outputPath);
+            editor.BindPdf(inputPath);
+            // Hide window UI, toolbar and menubar – this also removes scrollbars.
+            editor.ChangeViewerPreference(
+                ViewerPreference.HideWindowUI |
+                ViewerPreference.HideToolbar |
+                ViewerPreference.HideMenubar);
+            editor.Save(outputPath);
         }
 
-        // 2. Disable page transition effects by setting TransitionDuration to 0 for all pages
+        // ---------------------------------------------------------------------
+        // 3. Disable page transition effects – set duration to 0 and clear the
+        //    transition type.
+        // ---------------------------------------------------------------------
         using (PdfPageEditor pageEditor = new PdfPageEditor())
         {
             pageEditor.BindPdf(outputPath);
-            pageEditor.TransitionDuration = 0; // No transition effect
+            pageEditor.TransitionDuration = 0; // no animation
+            pageEditor.TransitionType = 0;     // clear any transition type
             pageEditor.ApplyChanges();
             pageEditor.Save(outputPath);
         }
-
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

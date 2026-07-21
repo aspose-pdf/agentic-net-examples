@@ -7,13 +7,17 @@ class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string inputPdfPath      = "input.pdf";
-        const string attachmentPath    = "attachment_file.pdf";
-        const string outputPdfPath     = "output_with_attachment.pdf";
-        const string attachmentDesc    = "Description of the attached file";
+        // Input PDF to which the attachment will be added
+        const string inputPdfPath = "input.pdf";
+        // File to be attached (embedded) into the PDF
+        const string attachmentPath = "attachment_file.pdf";
+        // Description of the attachment (optional)
+        const string attachmentDescription = "Embedded attachment file";
 
-        // Verify files exist
+        // Output PDF containing the embedded file
+        const string outputPdfPath = "output_with_attachment.pdf";
+
+        // Verify that the source files exist
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
@@ -25,18 +29,20 @@ class Program
             return;
         }
 
-        // PdfContentEditor does not implement IDisposable, so no using block needed
+        // PdfContentEditor is a Facades class used to modify existing PDFs.
+        // It does NOT implement IDisposable, so we do not wrap it in a using block.
         PdfContentEditor editor = new PdfContentEditor();
 
-        // Bind the source PDF
+        // Bind the existing PDF document
         editor.BindPdf(inputPdfPath);
 
-        // Add the attachment as an embedded file (no visible annotation)
-        editor.AddDocumentAttachment(attachmentPath, attachmentDesc);
+        // Add the file as an embedded attachment without any visible annotation.
+        // This creates an entry in the PDF's EmbeddedFiles name tree.
+        editor.AddDocumentAttachment(attachmentPath, attachmentDescription);
 
-        // Save the modified PDF
+        // Save the modified PDF. The attachment is now part of the PDF structure.
         editor.Save(outputPdfPath);
 
-        Console.WriteLine($"Attachment added and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Attachment added. Output saved to '{outputPdfPath}'.");
     }
 }

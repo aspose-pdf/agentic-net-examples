@@ -1,18 +1,19 @@
 using System;
 using System.IO;
-using Aspose.Pdf;   // Document, Page, ImageStamp
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string imagePath = "logo.png";
+        const string inputPdfPath  = "input.pdf";   // source PDF
+        const string outputPdfPath = "output.pdf";  // destination PDF
+        const string imagePath     = "stamp.png";   // image to be used as stamp
 
-        if (!File.Exists(inputPdf))
+        // Validate files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
         if (!File.Exists(imagePath))
@@ -22,25 +23,35 @@ class Program
         }
 
         // Load the image into a memory stream
-        using (FileStream imgStream = File.OpenRead(imagePath))
+        using (FileStream fs = File.OpenRead(imagePath))
+        using (MemoryStream imageStream = new MemoryStream())
         {
-            // Create an ImageStamp from the stream
-            ImageStamp stamp = new ImageStamp(imgStream);
+            fs.CopyTo(imageStream);
+            imageStream.Position = 0; // reset stream position for reading
 
-            // Scale the stamp to 50 % (both width and height)
-            stamp.Zoom = 0.5;   // equivalent to setting ZoomX and ZoomY to 0.5
+            // Load the PDF document
+            Document pdfDoc = new Document(inputPdfPath);
 
-            // Open the PDF document (wrapped in using for deterministic disposal)
-            using (Document pdfDoc = new Document(inputPdf))
+            // Create an ImageStamp from the memory stream
+            ImageStamp stamp = new ImageStamp(imageStream);
+
+            // Scale the stamp to 50% of its original size (double precision)
+            stamp.Zoom = 0.5; // uniform scaling factor
+
+            // Position the stamp – XIndent/YIndent are the offsets from the lower‑left corner (points)
+            stamp.XIndent = 100; // X = 100 points
+            stamp.YIndent = 500; // Y = 500 points
+
+            // Add the stamp to every page of the document
+            foreach (Page page in pdfDoc.Pages)
             {
-                // Add the stamp to the first page (Aspose.Pdf uses 1‑based indexing)
-                pdfDoc.Pages[1].AddStamp(stamp);
-
-                // Save the modified PDF
-                pdfDoc.Save(outputPdf);
+                page.AddStamp(stamp);
             }
+
+            // Save the modified PDF
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Image stamp applied and saved to '{outputPdf}'.");
+        Console.WriteLine($"Image stamp applied and saved to '{outputPdfPath}'.");
     }
 }

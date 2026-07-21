@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -8,28 +7,33 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_outlines.pdf";
 
-        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // PdfContentEditor is a Facades class that implements IDisposable
-        using (PdfContentEditor editor = new PdfContentEditor())
+        // PdfContentEditor is a Facades class used to modify viewer preferences.
+        PdfContentEditor editor = new PdfContentEditor();
+        try
         {
-            // Load the PDF document
+            // Load the PDF document.
             editor.BindPdf(inputPath);
 
-            // Set the viewer preference to show the document outline panel by default
+            // Set the PageMode viewer preference to display the document outline panel by default.
             editor.ChangeViewerPreference(ViewerPreference.PageModeUseOutlines);
 
-            // Save the modified PDF
+            // Save the modified PDF.
             editor.Save(outputPath);
         }
+        finally
+        {
+            // Ensure resources are released.
+            editor.Close();
+        }
 
-        Console.WriteLine($"PDF saved with PageMode set to UseOutlines: '{outputPath}'.");
+        Console.WriteLine($"Viewer preference updated and saved to '{outputPath}'.");
     }
 }

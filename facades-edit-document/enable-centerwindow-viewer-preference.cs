@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -16,23 +15,17 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Use PdfContentEditor facade to modify viewer preferences
+        using (PdfContentEditor editor = new PdfContentEditor())
         {
-            // Create a PdfContentEditor facade to modify viewer preferences
-            PdfContentEditor editor = new PdfContentEditor();
+            // Load the source PDF
+            editor.BindPdf(inputPath);
 
-            // Bind the loaded document to the editor
-            editor.BindPdf(doc);
-
-            // Set the CenterWindow flag to true
+            // Set the CenterWindow flag (true) using the ViewerPreference constant
             editor.ChangeViewerPreference(ViewerPreference.CenterWindow);
 
             // Save the modified PDF
             editor.Save(outputPath);
-
-            // Close the editor (optional, releases resources)
-            editor.Close();
         }
 
         Console.WriteLine($"PDF saved with CenterWindow enabled: {outputPath}");

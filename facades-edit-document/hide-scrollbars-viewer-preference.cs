@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,19 +15,17 @@ class Program
             return;
         }
 
-        // Initialize the facade and bind the source PDF
+        // Initialize the facade, bind the source PDF, and set the viewer preference.
         PdfContentEditor editor = new PdfContentEditor();
         editor.BindPdf(inputPath);
 
-        // Hide UI elements (scrollbars, navigation controls) for small‑screen devices
+        // Hide UI elements such as scrollbars, toolbars, and menu bars.
+        // ViewerPreference.HideWindowUI hides all UI elements, providing a cleaner view.
         editor.ChangeViewerPreference(ViewerPreference.HideWindowUI);
 
-        // Save the modified document
+        // Save the modified PDF.
         editor.Save(outputPath);
 
-        // Release resources if the facade supports it
-        editor.Close();
-
-        Console.WriteLine($"PDF saved with hidden UI to '{outputPath}'.");
+        Console.WriteLine($"Viewer preference applied and saved to '{outputPath}'.");
     }
 }

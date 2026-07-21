@@ -1,44 +1,41 @@
 using System;
-using System.IO;                    // For file existence check and creating a sample PDF
-using Aspose.Pdf;                    // Core Aspose.Pdf namespace (Document class)
-using Aspose.Pdf.Facades;           // Facade API for annotation editing
+using System.Drawing;
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";   // source PDF
-        const string outputPath = "output.pdf";  // result PDF
-        const int    pageNumber = 1;             // target page (1‑based indexing)
+        const string inputPath = "input.pdf";   // Source PDF (will be created inline)
+        const string outputPath = "output.pdf"; // Destination PDF
 
-        // Ensure a source PDF exists – create a minimal one if it does not.
-        if (!File.Exists(inputPath))
+        // ---------------------------------------------------------------------
+        // Create a minimal PDF file so that the example can run in a sandbox
+        // where no external files exist. The PDF contains a single blank page.
+        // ---------------------------------------------------------------------
+        using (Document seed = new Document())
         {
-            // Create a one‑page blank PDF.
-            using (Document doc = new Document())
-            {
-                doc.Pages.Add();
-                doc.Save(inputPath);
-            }
+            seed.Pages.Add();
+            seed.Save(inputPath);
         }
 
-        // Define the annotation rectangle in points (1 point = 1/72 inch).
-        // Example: lower‑left corner at (100,500), width 200, height 100 points.
+        // Define the annotation rectangle (coordinates in points).
+        // System.Drawing.Rectangle constructor expects X, Y, Width, Height.
+        // Lower‑left corner at (100, 500), width 200, height 100.
         System.Drawing.Rectangle rect = new System.Drawing.Rectangle(100, 500, 200, 100);
 
-        // Red border colour.
-        System.Drawing.Color red = System.Drawing.Color.Red;
+        int pageNumber = 1;          // Target page (1‑based indexing)
+        int borderWidth = 6;         // Approx. 2 mm (2 mm ≈ 5.7 points, rounded to 6)
 
-        // 2 mm ≈ 5.67 points → round to 6 points for the border width.
-        int borderWidth = 6;
-
-        // Use PdfContentEditor (a Facades class) to add a square (rectangle) annotation.
+        // Use the Facade to bind the PDF, add a red rectangle annotation, and save.
         using (PdfContentEditor editor = new PdfContentEditor())
         {
-            editor.BindPdf(inputPath); // load the PDF
-            // CreateSquareCircle(rect, contents, colour, square:true, page, borderWidth)
-            editor.CreateSquareCircle(rect, "Red Rectangle", red, true, pageNumber, borderWidth);
-            editor.Save(outputPath);   // persist changes
+            editor.BindPdf(inputPath);
+            // CreateSquareCircle creates a square (true) or circle (false) annotation.
+            // Parameters: rectangle, contents, color, square flag, page, border width.
+            editor.CreateSquareCircle(rect, string.Empty, System.Drawing.Color.Red, true, pageNumber, borderWidth);
+            editor.Save(outputPath);
         }
 
         Console.WriteLine($"Red rectangle annotation added to page {pageNumber} and saved as '{outputPath}'.");

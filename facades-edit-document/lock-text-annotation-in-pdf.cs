@@ -3,44 +3,64 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations; // for AnnotationFlags
 
 class Program
 {
     static void Main()
     {
+        const string tempPath = "temp.pdf";
         const string outputPath = "locked_annotation.pdf";
 
-        // Create a new PDF document and add a single page.
+        // -------------------------------------------------
+        // 1. Create a new PDF document with a single page
+        // -------------------------------------------------
         using (Document doc = new Document())
         {
-            Page page = doc.Pages.Add();
+            // Add a blank page (page size A4)
+            doc.Pages.Add();
 
-            // Define the annotation rectangle (left, bottom, width, height).
+            // -------------------------------------------------
+            // 2. Create a text annotation on the first page
+            // -------------------------------------------------
+            // Fully qualified rectangle to avoid ambiguity
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-
-            // Create a text annotation.
-            TextAnnotation annotation = new TextAnnotation(page, rect)
+            TextAnnotation txtAnn = new TextAnnotation(doc.Pages[1], rect)
             {
-                Title    = "Author",
-                Contents = "This annotation is locked.",
-                Color    = Aspose.Pdf.Color.Yellow,
-                Open     = true
+                Title    = "Note",
+                Contents = "This annotation is locked and cannot be edited by end users."
             };
 
-            // Lock the annotation to prevent further modifications by end users.
-            annotation.Flags = AnnotationFlags.Locked;
+            // -------------------------------------------------
+            // 3. Lock the annotation – set the Locked flag
+            // -------------------------------------------------
+            txtAnn.Flags = AnnotationFlags.Locked;
 
-            // Add the annotation to the page.
-            page.Annotations.Add(annotation);
+            // Add the annotation to the page
+            doc.Pages[1].Annotations.Add(txtAnn);
 
-            // Use the PdfAnnotationEditor facade to bind the document and save it.
-            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-            {
-                editor.BindPdf(doc);
-                editor.Save(outputPath);
-            }
+            // -------------------------------------------------
+            // 4. Save the document to a temporary file
+            // -------------------------------------------------
+            doc.Save(tempPath);
         }
 
-        Console.WriteLine($"PDF saved with a locked annotation: {outputPath}");
+        // -------------------------------------------------
+        // 5. Use PdfAnnotationEditor (Facades API) to bind
+        //    the temporary PDF and save the final output.
+        // -------------------------------------------------
+        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        {
+            editor.BindPdf(tempPath);          // Load the PDF created above
+            editor.Save(outputPath);           // Save the final PDF (annotation remains locked)
+        }
+
+        // Clean up the temporary file
+        if (File.Exists(tempPath))
+        {
+            File.Delete(tempPath);
+        }
+
+        Console.WriteLine($"PDF with locked annotation saved to '{outputPath}'.");
     }
 }

@@ -18,13 +18,13 @@ class Program
         // Initialize the bookmark editor facade
         PdfBookmarkEditor editor = new PdfBookmarkEditor();
 
-        // Load the PDF document into the editor
+        // Load the PDF document
         editor.BindPdf(inputPath);
 
-        // Remove all bookmarks from the document
+        // Remove all bookmarks
         editor.DeleteBookmarks();
 
-        // Save the resulting PDF without bookmarks
+        // Save the updated PDF
         editor.Save(outputPath);
 
         // Release resources held by the facade

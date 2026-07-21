@@ -1,106 +1,69 @@
 using System;
-using System.IO;
-using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string inputPdfPath      = "input.pdf";          // Original PDF
-        const string attachmentPath    = "attachment_file.pdf"; // File to attach
-        const string outputPdfPath     = "output_with_attachment.pdf";
+        const string sourcePdf = "source.pdf";
+        const string attachmentFile = "attachment.txt";
+        const string outputPdf = "output_with_attachment.pdf";
 
-        // Verify source files exist
-        if (!File.Exists(inputPdfPath))
+        // -------------------------------------------------
+        // 1. Prepare required files (inline creation)
+        // -------------------------------------------------
+        // Create a minimal source PDF if it does not already exist.
+        if (!File.Exists(sourcePdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
+            using (Document doc = new Document())
+            {
+                doc.Pages.Add();
+                doc.Save(sourcePdf);
+            }
         }
-        if (!File.Exists(attachmentPath))
+
+        // Create a simple text file to be attached if it does not already exist.
+        if (!File.Exists(attachmentFile))
         {
-            Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
-            return;
+            File.WriteAllText(attachmentFile, "This is a sample attachment.");
         }
 
-        // ------------------------------------------------------------
-        // 1. Add the attachment to the PDF using PdfContentEditor
-        // ------------------------------------------------------------
-        Aspose.Pdf.Facades.PdfContentEditor editor = new Aspose.Pdf.Facades.PdfContentEditor();
-        editor.BindPdf(inputPdfPath);
-        // AddDocumentAttachment adds a file attachment without a visible annotation
-        editor.AddDocumentAttachment(attachmentPath, "Sample attachment");
-        editor.Save(outputPdfPath);
-        editor.Close(); // Facade must be closed explicitly
+        // -------------------------------------------------
+        // 2. Add a document attachment using PdfContentEditor
+        // -------------------------------------------------
+        PdfContentEditor editor = new PdfContentEditor();
+        editor.BindPdf(sourcePdf);
+        // AddDocumentAttachment(string fileAttachmentPath, string description)
+        editor.AddDocumentAttachment(attachmentFile, "Sample attachment description");
+        editor.Save(outputPdf); // Save the modified PDF
 
-        // ------------------------------------------------------------
-        // 2. Extract the attachment from the edited PDF using PdfExtractor
-        // ------------------------------------------------------------
-        Aspose.Pdf.Facades.PdfExtractor extractor = new Aspose.Pdf.Facades.PdfExtractor();
-        extractor.BindPdf(outputPdfPath);
-        // Must call ExtractAttachment before querying names or streams
+        // -------------------------------------------------
+        // 3. Verify the attachment by retrieving its file specification name
+        // -------------------------------------------------
+        PdfExtractor extractor = new PdfExtractor();
+        extractor.BindPdf(outputPdf);
+        // Must call ExtractAttachment before querying names
         extractor.ExtractAttachment();
-
         IList<string> attachmentNames = extractor.GetAttachNames();
-        MemoryStream[] attachmentStreams = extractor.GetAttachment();
 
-        // Find the extracted stream that matches our attachment name
-        MemoryStream matchingStream = null;
-        string matchingName = null;
-        for (int i = 0; i < attachmentNames.Count; i++)
+        // Output the retrieved attachment names
+        Console.WriteLine("Attachments found in the PDF:");
+        foreach (string name in attachmentNames)
         {
-            string name = attachmentNames[i];
-            if (string.Equals(name, Path.GetFileName(attachmentPath), StringComparison.OrdinalIgnoreCase))
-            {
-                matchingName = name;
-                matchingStream = attachmentStreams[i];
-                break;
-            }
+            Console.WriteLine($"- {name}");
         }
 
-        if (matchingStream == null)
+        // Simple verification: check that our expected file name is present
+        if (attachmentNames.Contains(Path.GetFileName(attachmentFile)))
         {
-            Console.Error.WriteLine("Attachment not found in the extracted PDF.");
-            extractor.Close();
-            return;
+            Console.WriteLine("Attachment verification succeeded.");
         }
-
-        // ------------------------------------------------------------
-        // 3. Compare the extracted attachment with the original file
-        // ------------------------------------------------------------
-        byte[] originalBytes = File.ReadAllBytes(attachmentPath);
-
-        // Ensure the stream is positioned at the beginning
-        matchingStream.Position = 0;
-        byte[] extractedBytes = new byte[matchingStream.Length];
-        int read = matchingStream.Read(extractedBytes, 0, extractedBytes.Length);
-        if (read != extractedBytes.Length)
+        else
         {
-            Console.Error.WriteLine("Failed to read the full attachment stream.");
-            extractor.Close();
-            return;
+            Console.WriteLine("Attachment verification failed.");
         }
-
-        bool isIdentical = originalBytes.Length == extractedBytes.Length;
-        if (isIdentical)
-        {
-            for (int i = 0; i < originalBytes.Length; i++)
-            {
-                if (originalBytes[i] != extractedBytes[i])
-                {
-                    isIdentical = false;
-                    break;
-                }
-            }
-        }
-
-        Console.WriteLine(isIdentical
-            ? $"Success: Extracted attachment \"{matchingName}\" matches the original file."
-            : $"Failure: Extracted attachment \"{matchingName}\" differs from the original file.");
-
-        // Clean up
-        extractor.Close();
     }
 }

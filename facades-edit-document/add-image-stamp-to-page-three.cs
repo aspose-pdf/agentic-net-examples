@@ -7,14 +7,13 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string logoPath = "logo.png";
+        const string inputPdf  = "input.pdf";   // source PDF
+        const string outputPdf = "output.pdf";  // result PDF
+        const string logoPath  = "logo.png";    // image to use as stamp
 
-        // Verify required files exist
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
         if (!File.Exists(logoPath))
@@ -23,53 +22,57 @@ class Program
             return;
         }
 
-        // Initialise the facade – use BindPdf and Save (old InputFile/OutputFile are obsolete)
-        PdfFileStamp fileStamp = new PdfFileStamp();
-        fileStamp.BindPdf(inputPath);
-
-        // Create a stamp and bind the logo image (use fully‑qualified Stamp to avoid ambiguity)
-        Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-        stamp.BindImage(logoPath);
-
-        // Define the visual size of the image stamp (width, height in points)
-        const float stampWidth = 100f;
-        const float stampHeight = 50f;
-        stamp.SetImageSize(stampWidth, stampHeight);
-
-        // Determine page‑3 dimensions to calculate bottom‑right coordinates
-        using (Document srcDoc = new Document(inputPath))
+        // Load the document to obtain page dimensions (needed for positioning)
+        using (Document doc = new Document(inputPdf))
         {
-            if (srcDoc.Pages.Count < 3)
+            // Ensure the document has at least three pages
+            if (doc.Pages.Count < 3)
             {
-                Console.Error.WriteLine("The document contains fewer than 3 pages.");
-                fileStamp.Close();
+                Console.Error.WriteLine("The PDF must contain at least three pages.");
                 return;
             }
 
-            Page pageThree = srcDoc.Pages[3];
-            double pageWidth = pageThree.PageInfo.Width;
-            // double pageHeight = pageThree.PageInfo.Height; // not needed for bottom‑right placement
+            // -----------------------------------------------------------------
+            // Create a PdfFileStamp facade and configure input / output files
+            // -----------------------------------------------------------------
+            PdfFileStamp fileStamp = new PdfFileStamp();
+            fileStamp.BindPdf(inputPdf);               // use BindPdf instead of obsolete InputFile
 
-            // Margin from the edges (in points)
-            const double margin = 10.0;
+            // -----------------------------------------------------------------
+            // Create the image stamp
+            // -----------------------------------------------------------------
+            // Fully qualify the Stamp type to avoid ambiguity between Aspose.Pdf.Stamp and Aspose.Pdf.Facades.Stamp
+            Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
 
-            // X coordinate: page width minus stamp width minus right margin
-            float x = (float)(pageWidth - stampWidth - margin);
-            // Y coordinate: bottom margin (origin is lower‑left)
-            float y = (float)margin;
+            // Bind the image that will be used as the stamp
+            stamp.BindImage(logoPath);
 
-            // Position the stamp
-            stamp.SetOrigin(x, y);
+            // Define the desired size of the stamp (width, height) in points
+            const float stampWidth  = 100f; // adjust as needed
+            const float stampHeight = 50f;  // adjust as needed
+            stamp.SetImageSize(stampWidth, stampHeight);
+
+            // Position the stamp at the bottom‑right corner of page 3
+            // PDF coordinate origin is bottom‑left, so X = pageWidth - stampWidth - margin
+            // Y = margin from the bottom.
+            const float margin = 10f; // margin from edges
+            float pageWidth = (float)doc.Pages[3].PageInfo.Width; // cast double to float
+            float originX = pageWidth - stampWidth - margin;
+            float originY = margin; // bottom margin
+
+            stamp.SetOrigin(originX, originY);
+
+            // Apply the stamp only to page 3
+            stamp.Pages = new int[] { 3 };
+
+            // -----------------------------------------------------------------
+            // Add the stamp to the PDF and finalize
+            // -----------------------------------------------------------------
+            fileStamp.AddStamp(stamp);
+            fileStamp.Save(outputPdf);                 // use Save instead of obsolete OutputFile
+            fileStamp.Close();                         // optional, releases resources
         }
 
-        // Apply the stamp only to page 3
-        stamp.Pages = new int[] { 3 };
-
-        // Add the stamp to the file and finalize
-        fileStamp.AddStamp(stamp);
-        fileStamp.Save(outputPath);
-        fileStamp.Close();
-
-        Console.WriteLine($"Logo stamp added to page 3 and saved as '{outputPath}'.");
+        Console.WriteLine($"Image stamp added. Output saved to '{outputPdf}'.");
     }
 }
