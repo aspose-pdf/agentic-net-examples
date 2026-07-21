@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -15,20 +16,22 @@ class Program
             return;
         }
 
-        // Use PdfPageEditor facade to edit page properties
+        // Bind the PDF to the PdfPageEditor facade
         using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // Load the source PDF
             editor.BindPdf(inputPath);
 
-            // Apply changes only to page 2 (page numbers are 1‑based)
+            // Apply changes only to page 2 (1‑based indexing)
             editor.ProcessPages = new int[] { 2 };
 
-            // Set transition type to BoxOut (OUTBOX constant)
+            // Set transition type to BoxOut (outward box)
             editor.TransitionType = PdfPageEditor.OUTBOX;
 
-            // Set zoom factor to 1.3 (130%). Use a float literal.
+            // Set zoom factor to 1.3 (130%) – float literal required
             editor.Zoom = 1.3f;
+
+            // Optional: set transition duration (in seconds)
+            editor.TransitionDuration = 2;
 
             // Apply the configured changes
             editor.ApplyChanges();

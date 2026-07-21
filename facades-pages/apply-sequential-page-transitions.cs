@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,50 +16,38 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Initialize PdfPageEditor with the loaded document
-            using (PdfPageEditor editor = new PdfPageEditor(doc))
+            // Initialize the page editor with the loaded document
+            PdfPageEditor editor = new PdfPageEditor(doc);
+
+            // Define a sequence of transition types (one per page)
+            int[] transitionTypes = new int[]
             {
-                // Define a set of transition types to apply sequentially
-                int[] transitions = new int[]
-                {
-                    PdfPageEditor.BLINDH,
-                    PdfPageEditor.BLINDV,
-                    PdfPageEditor.BTWIPE,
-                    PdfPageEditor.DGLITTER,
-                    PdfPageEditor.DISSOLVE,
-                    PdfPageEditor.INBOX,
-                    PdfPageEditor.LRGLITTER,
-                    PdfPageEditor.LRWIPE,
-                    PdfPageEditor.OUTBOX,
-                    PdfPageEditor.RLWIPE,
-                    PdfPageEditor.SPLITHIN,
-                    PdfPageEditor.SPLITHOUT,
-                    PdfPageEditor.SPLITVIN,
-                    PdfPageEditor.SPLITVOUT,
-                    PdfPageEditor.TBGLITTER,
-                    PdfPageEditor.TBWIPE
-                };
+                PdfPageEditor.BLINDH,      // Page 1
+                PdfPageEditor.DISSOLVE,   // Page 2
+                PdfPageEditor.LRWIPE,     // Page 3
+                PdfPageEditor.SPLITHOUT,  // Page 4
+                PdfPageEditor.TBGLITTER   // Page 5
+                // Add more types as needed
+            };
 
-                int pageCount = doc.Pages.Count; // Pages are 1‑based
-                for (int i = 1; i <= pageCount; i++)
-                {
-                    // Choose a transition type cyclically for each page
-                    int transition = transitions[(i - 1) % transitions.Length];
+            // Apply transitions sequentially across pages
+            for (int i = 1; i <= doc.Pages.Count && i <= transitionTypes.Length; i++)
+            {
+                // Edit only the current page
+                editor.ProcessPages = new int[] { i };
 
-                    // Apply the transition only to the current page
-                    editor.ProcessPages = new int[] { i };
-                    editor.TransitionType = transition;
-                    editor.TransitionDuration = 2; // Duration in seconds (example)
+                // Set the transition type and duration for this page
+                editor.TransitionType = transitionTypes[i - 1];
+                editor.TransitionDuration = 2; // duration in seconds
 
-                    // Commit changes for this page
-                    editor.ApplyChanges();
-                }
+                // Apply the changes to the page
+                editor.ApplyChanges();
             }
 
-            // Save the modified PDF (PDF format by default)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

@@ -1,130 +1,153 @@
 using System;
 using System.IO;
 using System.Text.Json;
+using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-namespace PdfPageAutomation
+class Program
 {
-    // Represents the JSON configuration for page adjustments.
-    public class PageSettingsConfig
+    // Represents the page‑specific settings that can be defined in the JSON file.
+    private class PageSettings
     {
-        // Rotation in degrees (0, 90, 180, 270). Nullable to allow omission.
-        public int? Rotation { get; set; }
-
-        // Zoom factor where 1.0 = 100%.
-        public float? Zoom { get; set; }
-
-        // Horizontal alignment: "Left", "Center", "Right".
-        public string HorizontalAlignment { get; set; }
-
-        // Vertical alignment: "Top", "Center", "Bottom".
-        public string VerticalAlignment { get; set; }
-
-        // Specific page numbers to which the settings should be applied (1‑based indexing).
-        public int[] ProcessPages { get; set; }
+        public int? Rotation { get; set; }                     // 0, 90, 180, 270
+        public float? Zoom { get; set; }                       // 1.0 = 100%
+        public string? HorizontalAlignment { get; set; }        // "Left", "Center", "Right"
+        public string? VerticalAlignment { get; set; }          // "Top", "Center", "Bottom"
+        public int? DisplayDuration { get; set; }              // seconds
+        public int? TransitionDuration { get; set; }           // seconds
+        public string? TransitionType { get; set; }             // e.g., "BLINDH", "DISSOLVE"
     }
 
-    class Program
+    static void Main()
     {
-        static void Main()
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "output.pdf";
+        const string configPath    = "pageSettings.json";
+
+        if (!File.Exists(inputPdfPath))
         {
-            const string configPath   = "settings.json";   // JSON file with the desired settings
-            const string inputPdfPath = "input.pdf";       // Source PDF
-            const string outputPdfPath = "output.pdf";     // Result PDF
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
+        }
 
-            // Validate existence of required files.
-            if (!File.Exists(configPath))
-            {
-                Console.Error.WriteLine($"Configuration file not found: {configPath}");
-                return;
-            }
+        if (!File.Exists(configPath))
+        {
+            Console.Error.WriteLine($"Configuration file not found: {configPath}");
+            return;
+        }
 
-            if (!File.Exists(inputPdfPath))
-            {
-                Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-                return;
-            }
+        // Load the JSON configuration into a dictionary keyed by page number (1‑based).
+        Dictionary<int, PageSettings> config;
+        try
+        {
+            string json = File.ReadAllText(configPath);
+            config = JsonSerializer.Deserialize<Dictionary<int, PageSettings>>(json,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to read configuration: {ex.Message}");
+            return;
+        }
 
-            // Deserialize JSON configuration.
-            PageSettingsConfig config;
-            try
+        // Process the PDF.
+        try
+        {
+            using (Document doc = new Document(inputPdfPath))
             {
-                string json = File.ReadAllText(configPath);
-                config = JsonSerializer.Deserialize<PageSettingsConfig>(json, new JsonSerializerOptions
+                // Create a PdfPageEditor bound to the document.
+                PdfPageEditor editor = new PdfPageEditor(doc);
+
+                // Iterate over each page that has a configuration entry.
+                foreach (var kvp in config)
                 {
-                    PropertyNameCaseInsensitive = true
-                });
-                if (config == null)
-                {
-                    Console.Error.WriteLine("Failed to parse configuration.");
-                    return;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error reading configuration: {ex.Message}");
-                return;
-            }
+                    int pageNumber = kvp.Key;
+                    PageSettings settings = kvp.Value;
 
-            // Open the PDF document and apply the settings via PdfPageEditor.
-            try
-            {
-                using (Document doc = new Document(inputPdfPath))
-                using (PdfPageEditor editor = new PdfPageEditor(doc))
-                {
-                    // Apply rotation if specified.
-                    if (config.Rotation.HasValue)
+                    // Ensure the page number is within the document range.
+                    if (pageNumber < 1 || pageNumber > doc.Pages.Count)
                     {
-                        // Valid values are 0, 90, 180, 270.
-                        editor.Rotation = config.Rotation.Value;
+                        Console.Error.WriteLine($"Page {pageNumber} is out of range. Skipping.");
+                        continue;
                     }
 
-                    // Apply zoom if specified.
-                    if (config.Zoom.HasValue)
+                    // Apply settings to a single page by restricting ProcessPages.
+                    editor.ProcessPages = new int[] { pageNumber };
+
+                    if (settings.Rotation.HasValue)
+                        editor.Rotation = settings.Rotation.Value; // 0,90,180,270
+
+                    if (settings.Zoom.HasValue)
+                        editor.Zoom = settings.Zoom.Value; // float, 1.0 = 100%
+
+                    if (!string.IsNullOrWhiteSpace(settings.HorizontalAlignment))
                     {
-                        editor.Zoom = config.Zoom.Value;
+                        // Map string to Aspose.Pdf.HorizontalAlignment enum.
+                        editor.HorizontalAlignment = settings.HorizontalAlignment.Trim().ToLower() switch
+                        {
+                            "left"   => Aspose.Pdf.HorizontalAlignment.Left,
+                            "center" => Aspose.Pdf.HorizontalAlignment.Center,
+                            "right"  => Aspose.Pdf.HorizontalAlignment.Right,
+                            _ => editor.HorizontalAlignment // keep existing if unknown
+                        };
                     }
 
-                    // Apply horizontal alignment if specified.
-                    if (!string.IsNullOrWhiteSpace(config.HorizontalAlignment))
+                    if (!string.IsNullOrWhiteSpace(settings.VerticalAlignment))
                     {
-                        // Parse string to the Aspose.Pdf.HorizontalAlignment enum.
-                        editor.HorizontalAlignment = (Aspose.Pdf.HorizontalAlignment)Enum.Parse(
-                            typeof(Aspose.Pdf.HorizontalAlignment),
-                            config.HorizontalAlignment,
-                            ignoreCase: true);
+                        // Map string to Aspose.Pdf.VerticalAlignment enum.
+                        editor.VerticalAlignmentType = settings.VerticalAlignment.Trim().ToLower() switch
+                        {
+                            "top"    => Aspose.Pdf.VerticalAlignment.Top,
+                            "center" => Aspose.Pdf.VerticalAlignment.Center,
+                            "bottom" => Aspose.Pdf.VerticalAlignment.Bottom,
+                            _ => editor.VerticalAlignmentType // keep existing if unknown
+                        };
                     }
 
-                    // Apply vertical alignment if specified.
-                    if (!string.IsNullOrWhiteSpace(config.VerticalAlignment))
+                    if (settings.DisplayDuration.HasValue)
+                        editor.DisplayDuration = settings.DisplayDuration.Value; // int seconds
+
+                    if (settings.TransitionDuration.HasValue)
+                        editor.TransitionDuration = settings.TransitionDuration.Value; // int seconds
+
+                    if (!string.IsNullOrWhiteSpace(settings.TransitionType))
                     {
-                        // Parse string to the Aspose.Pdf.VerticalAlignment enum.
-                        editor.VerticalAlignmentType = (Aspose.Pdf.VerticalAlignment)Enum.Parse(
-                            typeof(Aspose.Pdf.VerticalAlignment),
-                            config.VerticalAlignment,
-                            ignoreCase: true);
+                        // Map string to the corresponding transition constant.
+                        editor.TransitionType = settings.TransitionType.Trim().ToUpper() switch
+                        {
+                            "BLINDH" => PdfPageEditor.BLINDH,
+                            "BLINDV" => PdfPageEditor.BLINDV,
+                            "BTWIPE" => PdfPageEditor.BTWIPE,
+                            "DGLITTER" => PdfPageEditor.DGLITTER,
+                            "DISSOLVE" => PdfPageEditor.DISSOLVE,
+                            "INBOX" => PdfPageEditor.INBOX,
+                            "LRGLITTER" => PdfPageEditor.LRGLITTER,
+                            "LRWIPE" => PdfPageEditor.LRWIPE,
+                            "OUTBOX" => PdfPageEditor.OUTBOX,
+                            "RLWIPE" => PdfPageEditor.RLWIPE,
+                            "SPLITHIN" => PdfPageEditor.SPLITHIN,
+                            "SPLITHOUT" => PdfPageEditor.SPLITHOUT,
+                            "SPLITVIN" => PdfPageEditor.SPLITVIN,
+                            "SPLITVOUT" => PdfPageEditor.SPLITVOUT,
+                            "TBGLITTER" => PdfPageEditor.TBGLITTER,
+                            "TBWIPE" => PdfPageEditor.TBWIPE,
+                            _ => editor.TransitionType // keep existing if unknown
+                        };
                     }
 
-                    // Restrict processing to specific pages if the array is provided.
-                    if (config.ProcessPages != null && config.ProcessPages.Length > 0)
-                    {
-                        editor.ProcessPages = config.ProcessPages;
-                    }
-
-                    // Commit the changes to the document.
+                    // Apply the accumulated changes to the current page.
                     editor.ApplyChanges();
-
-                    // Save the modified PDF.
-                    doc.Save(outputPdfPath);
                 }
 
-                Console.WriteLine($"PDF processed successfully. Output saved to '{outputPdfPath}'.");
+                // Save the modified document.
+                doc.Save(outputPdfPath);
+                Console.WriteLine($"Processed PDF saved to '{outputPdfPath}'.");
             }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
-            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
         }
     }
 }

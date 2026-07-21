@@ -7,18 +7,20 @@ class Program
     {
         const string inputPath = "sample.pdf";
 
-        // Verify the PDF file exists before processing
         if (!System.IO.File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Bind the PDF with PdfPageEditor and retrieve rotation of page 4
+        // Bind the PDF to the facade and retrieve the rotation of page 4
         using (PdfPageEditor editor = new PdfPageEditor())
         {
             editor.BindPdf(inputPath);
-            int rotation = editor.GetPageRotation(4); // Pages are 1‑based
+
+            // Pages are 1‑based; page 4 corresponds to the fourth page in the document
+            int rotation = editor.GetPageRotation(4);
+
             Console.WriteLine($"Rotation of page 4: {rotation} degrees");
         }
     }

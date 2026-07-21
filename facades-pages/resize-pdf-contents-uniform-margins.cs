@@ -6,49 +6,34 @@ class Program
 {
     static void Main()
     {
-        // Input and output PDF file paths
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Verify that the source file exists
+        // Verify that the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Source file not found: {inputPath}");
             return;
         }
 
-        // Create an instance of PdfFileEditor (facade API)
-        PdfFileEditor fileEditor = new PdfFileEditor();
+        // Create the PdfFileEditor instance (no IDisposable required)
+        PdfFileEditor editor = new PdfFileEditor();
 
-        // Define uniform margins of 10% on all sides.
-        // MarginsPercent creates a ContentsResizeParameters object where
-        // left, right, top and bottom margins are specified as percentages
-        // of the original page size. The contents size will be calculated
-        // automatically (100% - left% - right% for width, similarly for height).
-        var resizeParams = PdfFileEditor.ContentsResizeParameters.MarginsPercent(
-            left: 10,   // 10% left margin
-            right: 10,  // 10% right margin
-            top: 10,    // 10% top margin
-            bottom: 10  // 10% bottom margin
+        // Define uniform margins of 10 % on each side.
+        // ContentsResizeValue.Percents creates a margin expressed as a percentage of the original page size.
+        // Passing null for content width/height lets the API calculate them automatically.
+        PdfFileEditor.ContentsResizeParameters parameters = new PdfFileEditor.ContentsResizeParameters(
+            PdfFileEditor.ContentsResizeValue.Percents(10), // left margin
+            null,                                          // auto‑calculate content width
+            PdfFileEditor.ContentsResizeValue.Percents(10), // right margin
+            PdfFileEditor.ContentsResizeValue.Percents(10), // top margin
+            null,                                          // auto‑calculate content height
+            PdfFileEditor.ContentsResizeValue.Percents(10)  // bottom margin
         );
 
-        // Resize contents of all pages (pages == null) using the defined parameters.
-        // The method returns true on success.
-        bool result = fileEditor.ResizeContents(
-            source: inputPath,
-            destination: outputPath,
-            pages: null,          // null processes every page in the document
-            parameters: resizeParams
-        );
+        // Resize all pages (pages array = null) using the defined parameters.
+        bool success = editor.ResizeContents(inputPath, outputPath, null, parameters);
 
-        // Report the outcome
-        if (result)
-        {
-            Console.WriteLine($"Successfully resized contents with uniform margins. Output saved to '{outputPath}'.");
-        }
-        else
-        {
-            Console.Error.WriteLine("Failed to resize PDF contents.");
-        }
+        Console.WriteLine(success ? "Page contents resized with uniform margins." : "Resize operation failed.");
     }
 }
